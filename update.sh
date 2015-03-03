@@ -22,4 +22,4 @@ cp -r bower_components/admin-lte/build/bootstrap-less src/less/bootstrap
 # copy build/less to src/less/adminlte
 cp -r bower_components/admin-lte/build/less src/less/adminlte
 
-echo "finsh update"
+echo "finish update"
