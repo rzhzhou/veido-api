@@ -11,6 +11,7 @@
     "tests"
   ],
   "devDependencies": {
-    "admin-lte": "~2.0.2"
+    "admin-lte": "~2.0.2",
+    "echarts": "~2.2.0"
   }
 }

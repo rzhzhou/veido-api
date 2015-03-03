@@ -22,4 +22,13 @@ cp -r bower_components/admin-lte/build/bootstrap-less src/less/bootstrap
 # copy build/less to src/less/adminlte
 cp -r bower_components/admin-lte/build/less src/less/adminlte
 
+# remove echarts from dist/vendor
+rm -rf dist/vendor/echarts
+
+# copy dist of echarts to dist/vendor
+cp -r bower_components/echarts/build/dist dist/vendor/echarts
+
+# copy theme of echarts to dist/vendor/echarts
+cp -r bower_components/echarts/doc/example/theme/ dist/vendor/echarts/theme
+
 echo "finish update"
