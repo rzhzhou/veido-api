@@ -12,6 +12,7 @@
   ],
   "devDependencies": {
     "admin-lte": "~2.0.2",
-    "echarts": "~2.2.0"
+    "echarts": "~2.2.0",
+    "fontawesome": "~4.3.0"
   }
 }

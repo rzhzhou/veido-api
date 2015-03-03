@@ -31,4 +31,11 @@ cp -r bower_components/echarts/build/dist dist/vendor/echarts
 # copy theme of echarts to dist/vendor/echarts
 cp -r bower_components/echarts/doc/example/theme/ dist/vendor/echarts/theme
 
+# add fontawesome directory
+mkdir dist/vendor/fontawesome
+
+# copy css and fonts to dist/vendor/fontawesome
+cp -r bower_components/fontawesome/css dist/vendor/fontawesome/css
+cp -r bower_components/fontawesome/fonts dist/vendor/fontawesome/fonts
+
 echo "finish update"
