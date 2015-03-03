@@ -8,3 +8,10 @@ urlpatterns = patterns('',
 
     url(r'^admin/', include(admin.site.urls)),
 )
+
+urlpatterns += patterns('yqj.views',
+    url(r'^$', 'index_view'),
+    url(r'^location/(\d+)/$', 'location_view'),
+    url(r'^category/(\d+)/$', 'category_view'),
+    url(r'^person/(\d+)/$', 'person_view'),
+)
