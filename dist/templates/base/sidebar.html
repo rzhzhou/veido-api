@@ -1,0 +1,75 @@
+<aside class="main-sidebar">
+  <section class="sidebar">
+    <form class="sidebar-form">
+      <div class="input-group">
+        <input type="text" class="form-control" placeholder="搜索...">
+        <span class="input-group-btn">
+          <button type="submit" class="btn btn-flat"><i class="fa fa-search"></i></button>
+        </span>
+      </div>
+    </form>
+
+    <ul class="sidebar-menu">
+      <li class="header">导航</li>
+
+      <li class="treeview">
+        <a href="/">
+          <i class="fa fa-dashboard"></i>
+          <span>整体概览</span>
+        </a>
+      </li>
+
+      <li class="treeview">
+        <a href="#">
+          <i class="fa fa-tasks"></i>
+          <span>业务信息</span>
+          <i class="fa fa-angle-left pull-right"></i>
+        </a>
+        <ul class="treeview-menu">
+          {% for category in categories %}
+            <li>
+              <a href="/category/{{category.id}}/">
+                <i class="fa fa-circle-o"></i>
+                <span>{{category.name}}</span>
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </li>
+
+      <li class="treeview">
+        <a href="#">
+          <i class="fa fa-globe"></i>
+          <span>区域状况</span>
+          <i class="fa fa-angle-left pull-right"></i>
+        </a>
+        <ul class="treeview-menu">
+          {% for location in locations %}
+            <li>
+              <a href="/location/{{location.id}}/">
+                <i class="fa fa-circle-o"></i>
+                <span>{{location.name}}</span>
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </li>
+
+      <li class="header">我的</li>   
+
+      <li class="treeview">
+        <a href="/collections/">
+          <i class="fa fa-star"></i>
+          <span>我的收藏</span>
+        </a>
+      </li>
+
+      <li class="treeview">
+        <a href="/settings/">
+          <i class="fa fa-gear"></i>
+          <span>我的设置</span>
+        </a>
+      </li>
+    </ul>
+  </section>
+</aside>
