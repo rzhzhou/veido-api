@@ -19,4 +19,5 @@ urlpatterns += patterns('yqj.views',
     url(r'^location/(\d+)/$', 'location_view'),
     url(r'^category/(\d+)/$', 'category_view'),
     url(r'^person/(\d+)/$', 'person_view'),
+    url(r'^login/$', 'login_view'),
 )
