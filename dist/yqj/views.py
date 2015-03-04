@@ -1,8 +1,12 @@
+#coding=utf-8
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse
 
 def index_view(request):
-    return render_to_response("dashboard/dashboard.html")
+    user = {'name': 'wuhan', 'company': u'武汉质监局'}
+    categories = [{'name': u'微博', 'id': '98672345'}, {'name': u'文章', 'id': '52345609'}]
+    locations = [{'name': u'武昌', 'id': '98672345'}, {'name': u'汉口', 'id': '52345609'}]
+    return render_to_response("dashboard/dashboard.html", {'user': user, 'categories': categories, 'locations': locations})
 
 def category_view(request, ctg_id):
     return render_to_response('category/category.html')
