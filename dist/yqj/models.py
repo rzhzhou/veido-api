@@ -40,8 +40,7 @@ class Weibo(models.Model):
     title = models.CharField(max_length=255,blank=True, verbose_name=u'标题')
     url = models.URLField(verbose_name=u'网站链接')
     content = models.TextField(blank=True, verbose_name=u'正文')
-    origin_source = models.CharField(max_length=255, blank=True, verbose_name=u'信息
-转载来源')
+    origin_source = models.CharField(max_length=255, blank=True, verbose_name=u'信息转载来源')
     source = models.CharField(max_length=255, blank=True, verbose_name=u'信息来源')
     website_type = models.CharField(max_length=255, blank=True, verbose_name=u'网站类型')
     pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
