@@ -18,8 +18,16 @@
 
     {% include "base/sidebar.html" %}
 
-    {% include "base/content.html" %}
+    <div class="content-wrapper">
+      <section class="content-header">
+        {% block header %}{% endblock %}
+      </section>
 
+      <section class="content">
+        {% block content %}{% endblock %}
+      </section>
+    </div>
+    
     {% include "base/footer.html" %}
   </div>
 
