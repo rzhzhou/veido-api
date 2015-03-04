@@ -38,4 +38,11 @@ mkdir dist/vendor/fontawesome
 cp -r bower_components/fontawesome/css dist/vendor/fontawesome/css
 cp -r bower_components/fontawesome/fonts dist/vendor/fontawesome/fonts
 
+# add ionicons directory
+mkdir dist/vendor/ionicons
+
+# copy css and fonts to dist/vendor/ionicons
+cp -r bower_components/ionicons/css dist/vendor/ionicons/css
+cp -r bower_components/ionicons/fonts dist/vendor/ionicons/fonts
+
 echo "finish update"
