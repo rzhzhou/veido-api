@@ -5,14 +5,59 @@
 {% block header %}
   <h1>整体概览</h1>
   <ol class="breadcrumb">
-    <li class="active">
-      <a href="/">
-        <i class="fa fa-dashboard"></i>
-        <span>整体概览</span>
-      </a>
-    </li>
+    <li><a href="/"><i class="fa fa-dashboard"></i>首页</a></li>
+    <li class="active">整体概览</li>
   </ol>
 {% endblock %}
 
 {% block content %}
+  <div class="row">
+    <div class="col-md-3 col-sm-6 col-xs-12">
+      <div class="info-box">
+        <span class="info-box-icon bg-aqua">
+          <i class="fa fa-newspaper-o"></i>
+        </span>
+        <div class="info-box-content">
+          <span class="info-box-text">新闻</span>
+          <span class="info-box-number">{{news.number}}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3 col-sm-6 col-xs-12">
+      <div class="info-box">
+        <span class="info-box-icon bg-red">
+          <i class="fa fa-exclamation"></i>
+        </span>
+        <div class="info-box-content">
+          <span class="info-box-text">事件</span>
+          <span class="info-box-number">{{event.number}}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3 col-sm-6 col-xs-12">
+      <div class="info-box">
+        <span class="info-box-icon bg-green">
+          <i class="fa fa-weixin"></i>
+        </span>
+        <div class="info-box-content">
+          <span class="info-box-text">微信</span>
+          <span class="info-box-number">{{weixin.number}}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3 col-sm-6 col-xs-12">
+      <div class="info-box">
+        <span class="info-box-icon bg-yellow">
+          <i class="fa fa-weibo"></i>
+        </span>
+        <div class="info-box-content">
+          <span class="info-box-text">微博</span>
+          <span class="info-box-number">{{weibo.number}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}
