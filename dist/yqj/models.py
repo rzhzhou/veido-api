@@ -24,6 +24,7 @@ class Weixin(models.Model):
     source = models.CharField(max_length=255, blank=True, verbose_name=u'信息来源')
     website_type = models.CharField(max_length=255, blank=True, verbose_name=u'网站类型')
     pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
+    publisher = models.ForeignKey(WeixinPublisher, verbose_name=u'微信发布者')
     area = models.ForeignKey(Area, verbose_name=u'名称')
 
     class Meta:
@@ -35,6 +36,19 @@ class Weixin(models.Model):
         return self.title
 
 
+class WeixinPublisher(models.Model):
+    photo = models.URLField(verbose_name=u'用户头像')
+    publisher = models.CharField(max_length=255, verbose_name=u'发布者')
+    brief = models.CharField(max_length=255, verbose_name=u'简介')
+
+    class Meta:
+        db_table = 'weixinpublisher'
+        verbose_name_plural = u'微信发布者'
+
+    def __unicode__(self):
+        return self.publisher
+
+
 class Weibo(models.Model):
     author = models.CharField(max_length=255, verbose_name=u'作者')
     title = models.CharField(max_length=255,blank=True, verbose_name=u'标题')
@@ -44,6 +58,7 @@ class Weibo(models.Model):
     source = models.CharField(max_length=255, blank=True, verbose_name=u'信息来源')
     website_type = models.CharField(max_length=255, blank=True, verbose_name=u'网站类型')
     pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
+    publisher = models.ForeignKey(WeiboPublisher, verbose_name=u'微博发布者')
     area = models.ForeignKey(Area, verbose_name=u'名称')
 
     class Meta:
@@ -55,6 +70,19 @@ class Weibo(models.Model):
         return self.title
 
 
+class WeiboPublisher(models.Model):
+    photo = models.URLField(verbose_name=u'用户头像')
+    publisher = models.CharField(max_length=255, verbose_name=u'发布者')
+    brief = models.CharField(max_length=255, verbose_name=u'简介')
+
+    class Meta:
+        db_table = 'weibopublisher'
+        verbose_name_plural = u'微博发布者'
+
+    def __unicode__(self):
+        return self.publisher
+
+
 class Article(models.Model):
     author = models.CharField(max_length=255, verbose_name=u'作者')
     title = models.CharField(max_length=255,blank=True, verbose_name=u'标题')
@@ -62,7 +90,7 @@ class Article(models.Model):
     content = models.TextField(blank=True, verbose_name=u'正文')
     source = models.CharField(max_length=255, blank=True, verbose_name=u'信息来源')
     pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
-
+    publisher = models.ForeignKey(ArticlePublisher, verbose_name=u'文章发布者')
     area = models.ForeignKey(Area, verbose_name=u'名称')
 
     class Meta:
@@ -72,6 +100,20 @@ class Article(models.Model):
 
     def __unicode__(self):
         return self.title
+
+
+class ArticlePublisher(models.Model):
+    photo = models.URLField(verbose_name=u'用户头像')
+    publisher = models.CharField(max_length=255, verbose_name=u'发布者')
+    brief = models.CharField(max_length=255, verbose_name=u'简介')
+
+    class Meta:
+        db_table = 'articlepublisher'
+        verbose_name_plural = u'文章发布者'
+
+    def __unicode__(self):
+        return self.publisher
+
 
 
 class Topic(models.Model):
