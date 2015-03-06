@@ -14,7 +14,8 @@ var browserSync = require('browser-sync'),
 
 
 gulp.task('default', ['browser-sync'], function() {
-
+  gulp.watch('src/less/*.less', ['less', reload]);
+  gulp.watch('src/js/*.js', ['js', reload]);
 });
 
 gulp.task('browser-sync', function() {
@@ -24,4 +25,18 @@ gulp.task('browser-sync', function() {
     port: 80,
     open: false
   });
+});
+
+gulp.task('less', function() {
+  gulp.src('src/less/app.less')
+    .pipe(less())
+    .pipe(minify())
+    .pipe(gulp.dest(dist + 'css'));
+});
+
+gulp.task('js', function() {
+  gulp.src(['src/js/adminlte/app.js', 'src/js/app.js'])
+    .pipe(concat('app.js'))
+    .pipe(uglify())
+    .pipe(gulp.dest(dist + 'js'));
 });

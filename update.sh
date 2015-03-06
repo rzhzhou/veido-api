@@ -16,6 +16,9 @@ cp -r bower_components/admin-lte/bootstrap/js dist/vendor/bootstrap/js
 # copy echarts
 cp -r bower_components/echarts/build/dist dist/vendor/echarts
 
+# copy slimScroll
+cp -r bower_components/admin-lte/plugins/slimScroll dist/vendor/slimScroll
+
 # copy fontawesome
 mkdir dist/vendor/fontawesome
 cp -r bower_components/fontawesome/css dist/vendor/fontawesome/css
@@ -24,7 +27,7 @@ cp -r bower_components/fontawesome/fonts dist/vendor/fontawesome/fonts
 # copy adminlte source code
 rm -rf src/less/bootstrap
 rm -rf src/less/adminlte
-cp -r bower_components/admin-lte/build/bootstrap-less src/less/bootstrap
+cp -r bower_components/admin-lte/build/bootstrap-less src/less/bootstrap-less
 cp -r bower_components/admin-lte/build/less/ src/less/adminlte
 rm -rf src/js/adminlte
 cp -r bower_components/admin-lte/dist/js src/js/adminlte
