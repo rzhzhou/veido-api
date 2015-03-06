@@ -11,6 +11,7 @@
 {% endblock %}
 
 {% block content %}
+<!-- four entrances -->
   <div class="row">
     <div class="col-md-3 col-sm-6 col-xs-12">
       <div class="info-box">
@@ -62,6 +63,7 @@
   </div>
 
   <div class="row">
+    <!-- 新闻 -->
     <div class="col-md-6">
       <div class="box box-info">
         <div class="box-header with-border">
@@ -86,7 +88,10 @@
           <a href="/news/">查看更多</a>
         </div>
       </div>
+    </div>
 
+    <!-- 事件 -->
+    <div class="col-md-6">
       <div class="box box-danger">
         <div class="box-header with-border">
           <h3 class="box-title">事件</h3>
@@ -97,28 +102,25 @@
           </div>
         </div>
         <div class="box-body">
-          <table class="table event">
-            <thead>
-              <th class="event-title">标题</th>
-              <th class="event-source">来源</th>
-              <th class="event-time">时间</th>
-            </thead>
-            <tbody>
-              {% for event in event_list %}
-                <tr>
-                  <td><a href="{{ event.url }}" title="{{ event.title }}">{{ event.title }}</a></td>
-                  <td>{{ event.source }}</td>
-                  <td>{{ event.time | date:"Y-m-d" }}</td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+          <div class="list-group">
+            {% for event in event_list %}
+              <a href="{{ event.url }}" class="list-group-item">
+                {{ event.title }}
+                <span class="badge">{{ event.time | date:"m-d" }}</span>
+              </a>
+            {% endfor %}
+          </div>
         </div>
         <div class="box-footer text-center">
           <a href="">查看更多</a>
         </div>
       </div>
+    </div>
+  </div>
 
+  <div class="row">
+    <!-- 微信 -->
+    <div class="col-md-6">
       <div class="box box-success">
         <div class="box-header with-border">
           <h3 class="box-title">微信</h3>
@@ -129,29 +131,27 @@
           </div>
         </div>
         <div class="box-body">
-          <table class="table weixin">
-            <thead>
-              <th class="weixin-title">标题</th>
-              <th class="weixin-source">来源</th>
-              <th class="weixin-time">时间</th>
-            </thead>
-            <tbody>
-              {% for weixin in weixin_list %}
-                <tr>
-                  <td><a href="{{ weixin.url }}" title="{{ weixin.title }}">{{ weixin.title }}</a></td>
-                  <td>{{ weixin.name }}</td>
-                  <td>{{ weixin.time | date:"Y-m-d" }}</td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+          <ul class="media-list">
+            {% for weibo in weibo_list %}
+              <li class="media">
+                <div class="media-left">
+                  <img class="media-object" src="{{ weibo.logo}}" alt="{{ weibo.name }}">
+                </div>  
+                <div class="media-body">
+                  <h4 class="media-heading">{{ weibo.name }}</h4>
+                  <p>{{ weibo.content }}</p>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
         </div>
         <div class="box-footer text-center">
           <a href="/weixin/">查看更多</a>
         </div>
-      </div>            
+      </div>      
     </div>
 
+    <!-- 微博 -->
     <div class="col-md-6">
       <div class="box box-warning">
         <div class="box-header with-border">
@@ -185,7 +185,7 @@
   </div>
 
   <div class="row">
-    <div class="col-md-8">
+    <div class="col-md-6">
       <div class="box box-default">
         <div class="box-header with-border">
           <h3 class="box-title">分类数据</h3>
@@ -198,7 +198,7 @@
         </div>
       </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-6">
       <div class="box box-default">
         <div class="box-header with-border">
           <h3 class="box-title">区域数据</h3>
