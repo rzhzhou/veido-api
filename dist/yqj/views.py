@@ -15,7 +15,10 @@ def index_view(request):
     event = {'number': 29}
     
     logo_path = '/static/img/64.gif'
-    weixin_list_number = news_list_number = event_list_number = weibo_list_number = 5
+    #weixin_list_number = news_list_number = event_list_number = weibo_list_number = 5
+    news_list_number = event_list_number = 5
+    weixin_list_number = weibo_list_number = 5
+
     news_list = []
     weixin_list = []
     event_list = []
