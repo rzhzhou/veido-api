@@ -19,7 +19,7 @@
         </span>
         <div class="info-box-content">
           <span class="info-box-text">新闻</span>
-          <span class="info-box-number">{{news.number}}</span>
+          <span class="info-box-number">{{ news.number }}</span>
         </div>
       </div>
     </div>
@@ -31,7 +31,7 @@
         </span>
         <div class="info-box-content">
           <span class="info-box-text">事件</span>
-          <span class="info-box-number">{{event.number}}</span>
+          <span class="info-box-number">{{ event.number }}</span>
         </div>
       </div>
     </div>
@@ -43,7 +43,7 @@
         </span>
         <div class="info-box-content">
           <span class="info-box-text">微信</span>
-          <span class="info-box-number">{{weixin.number}}</span>
+          <span class="info-box-number">{{ weixin.number }}</span>
         </div>
       </div>
     </div>
@@ -55,7 +55,7 @@
         </span>
         <div class="info-box-content">
           <span class="info-box-text">微博</span>
-          <span class="info-box-number">{{weibo.number}}</span>
+          <span class="info-box-number">{{ weibo.number }}</span>
         </div>
       </div>
     </div>
@@ -73,10 +73,25 @@
           </div>
         </div>
         <div class="box-body">
-          <p>content here</p>
+          <table class="table news">
+            <thead>
+              <th class="news-title">标题</th>
+              <th class="news-source">来源</th>
+              <th class="news-time">时间</th>
+            </thead>
+            <tbody>
+              {% for news in news_list %}
+                <tr>
+                  <td><a href="{{ news.url }}" title="{{ news.title }}">{{ news.title }}</a></td>
+                  <td>{{ news.source }}</td>
+                  <td>{{ news.time | date:"Y-m-d" }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
         <div class="box-footer text-center">
-          <a href="">查看更多</a>
+          <a href="/news/">查看更多</a>
         </div>
       </div>
 
@@ -90,8 +105,21 @@
           </div>
         </div>
         <div class="box-body">
-          <table class="table table-hover">
-            
+          <table class="table event">
+            <thead>
+              <th class="event-title">标题</th>
+              <th class="event-source">来源</th>
+              <th class="event-time">时间</th>
+            </thead>
+            <tbody>
+              {% for event in event_list %}
+                <tr>
+                  <td><a href="{{ event.url }}" title="{{ event.title }}">{{ event.title }}</a></td>
+                  <td>{{ event.source }}</td>
+                  <td>{{ event.time | date:"Y-m-d" }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
           </table>
         </div>
         <div class="box-footer text-center">
@@ -109,10 +137,25 @@
           </div>
         </div>
         <div class="box-body">
-          <p>content here</p>
+          <table class="table weixin">
+            <thead>
+              <th class="weixin-title">标题</th>
+              <th class="weixin-source">来源</th>
+              <th class="weixin-time">时间</th>
+            </thead>
+            <tbody>
+              {% for weixin in weixin_list %}
+                <tr>
+                  <td><a href="{{ weixin.url }}" title="{{ weixin.title }}">{{ weixin.title }}</a></td>
+                  <td>{{ weixin.source }}</td>
+                  <td>{{ weixin.time | date:"Y-m-d" }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
         <div class="box-footer text-center">
-          <a href="">查看更多</a>
+          <a href="/weixin/">查看更多</a>
         </div>
       </div>            
     </div>
@@ -128,10 +171,22 @@
           </div>
         </div>
         <div class="box-body">
-          <p>content here</p>
+          <ul class="media-list">
+            {% for weibo in weibo_list %}
+              <li class="media">
+                <div class="media-left">
+                  <img class="media-object" src="{{ weibo.icon}}" alt="{{ weibo.name }}">
+                </div>  
+                <div class="media-body">
+                  <h4 class="media-heading">{{ weibo.name }}</h4>
+                  <p>{{ weibo.content }}</p>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
         </div>
         <div class="box-footer text-center">
-          <a href="">查看更多</a>
+          <a href="/weibo/">查看更多</a>
         </div>
       </div> 
     </div>
