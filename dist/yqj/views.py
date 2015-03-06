@@ -14,11 +14,12 @@ def index_view(request):
     weixin = {'number': 53}
     event = {'number': 29}
     
-    weixin_list_number = news_list_number = event_list_number = 5
+    logo_path = '/static/img/64.gif'
+    weixin_list_number = news_list_number = event_list_number = weibo_list_number = 5
     news_list = []
     weixin_list = []
     event_list = []
-
+    weibo_list = []
     for i in range(news_list_number):
         news_list.append({'url': 'www.baidu.com', 'title': u'新闻', 'source': u'深度网', 'time': datetime.datetime(2014,6,8)})
 
@@ -26,14 +27,10 @@ def index_view(request):
         event_list.append({'url': 'www.baidu.com', 'title': u'新闻', 'source': u'深度网', 'time': datetime.datetime(2014,6,8)})
                  
     for i in range(weixin_list_number):
-        weixin_list.append({'url': 'www.baidu.com', 'title': u'微信', 'name': u'深度网', 'time': datetime.datetime(2014,6,8)})
+        weibo_list.append({'logo': logo_path, 'url': 'www.baidu.com', 'title': u'微信', 'name': u'深度网', 'time': datetime.datetime(2014,6,8), 'content': u'确定起重机的方案依据有：被吊运物体的重量；重心位置及绑扎；作业现场环境'})
 
-    logo_path = '/static/img/64.gif'
-    weibo_list = [
-                    {'logo': logo_path, 'url': 'www.baidu.com', 'title': u'微信一', 'name': u'深度网', 'time': datetime.datetime(2014,6,8), 'content': u'确定起重机的方案依据有：被吊运物体的重量；重心位置及绑扎；作业现场环境'},
-                    {'logo': logo_path, 'url': 'www.baidu.com', 'title': u'微信二', 'name': u'深度网', 'time': datetime.datetime(2014,6,8), 'content': u'确定起重机的方案依据有：被吊运物体的重量；重心位置及绑扎；作业现场环境'},
-                    {'logo': logo_path, 'url': 'www.baidu.com', 'title': u'微信三', 'name': u'深度网', 'time': datetime.datetime(2014,6,8), 'content': u'确定起重机的方案依据有：被吊运物体的重量；重心位置及绑扎；作业现场环境'},
-                ]
+    for i in range(weibo_list_number):
+        weixin_list.append({'logo': logo_path, 'url': 'www.baidu.com', 'title': u'微博', 'name': u'深度网', 'time': datetime.datetime(2014,6,8), 'content': u'确定起重机的方案依据有：被吊运物体的重量；重心位置及绑扎；作业现场环境'})
     return render_to_response("dashboard/dashboard.html", 
         {'user': user, 
         'categories': categories, 
