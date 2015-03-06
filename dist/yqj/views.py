@@ -30,9 +30,9 @@ def index_view(request):
                     {'url': 'www.baidu.com', 'title': u'微信三', 'name': u'深度网', 'time': datetime.datetime(2014,6,8)},
                 ]
     weibo_list = [
-                    {'url': 'www.baidu.com', 'title': u'微信一', 'name': u'深度网', 'time': datetime.datetime(2014,6,8), 'content': u'确定起重机的方案依据有：被吊运物体的重量；重心位置及绑扎；作业现场环境'},
-                    {'url': 'www.baidu.com', 'title': u'微信二', 'name': u'深度网', 'time': datetime.datetime(2014,6,8), 'content': u'确定起重机的方案依据有：被吊运物体的重量；重心位置及绑扎；作业现场环境'},
-                    {'url': 'www.baidu.com', 'title': u'微信三', 'name': u'深度网', 'time': datetime.datetime(2014,6,8), 'content': u'确定起重机的方案依据有：被吊运物体的重量；重心位置及绑扎；作业现场环境'},
+                    {'logo': 'http://placehold.it/64x64', 'url': 'www.baidu.com', 'title': u'微信一', 'name': u'深度网', 'time': datetime.datetime(2014,6,8), 'content': u'确定起重机的方案依据有：被吊运物体的重量；重心位置及绑扎；作业现场环境'},
+                    {'logo': 'http://placehold.it/64x64','url': 'www.baidu.com', 'title': u'微信二', 'name': u'深度网', 'time': datetime.datetime(2014,6,8), 'content': u'确定起重机的方案依据有：被吊运物体的重量；重心位置及绑扎；作业现场环境'},
+                    {'logo': 'http://placehold.it/64x64','url': 'www.baidu.com', 'title': u'微信三', 'name': u'深度网', 'time': datetime.datetime(2014,6,8), 'content': u'确定起重机的方案依据有：被吊运物体的重量；重心位置及绑扎；作业现场环境'},
                 ]
     return render_to_response("dashboard/dashboard.html", 
         {'user': user, 
