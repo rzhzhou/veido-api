@@ -26,7 +26,8 @@ rm -rf src/less/bootstrap
 rm -rf src/less/adminlte
 cp -r bower_components/admin-lte/build/bootstrap-less src/less/bootstrap
 cp -r bower_components/admin-lte/build/less/ src/less/adminlte
-rm src/js/adminlte.js
-cp bower_components/admin-lte/dist/js/app.js src/js/adminlte.js
+rm -rf src/js/adminlte
+cp -r bower_components/admin-lte/dist/js src/js/adminlte
+
 
 echo "finish update"
