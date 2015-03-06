@@ -14,7 +14,7 @@ def index_view(request):
     weixin = {'number': 53}
     event = {'number': 29}
     
-    weixin_list_number = news_list_number = event_list_number = 10
+    weixin_list_number = news_list_number = event_list_number = 5
     news_list = []
     weixin_list = []
     event_list = []
