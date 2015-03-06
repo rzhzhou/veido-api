@@ -11,7 +11,6 @@
 {% endblock %}
 
 {% block content %}
-<!-- four entrances -->
   <div class="row">
     <div class="col-md-3 col-sm-6 col-xs-12">
       <div class="info-box">
@@ -63,7 +62,6 @@
   </div>
 
   <div class="row">
-    <!-- 新闻 -->
     <div class="col-md-6">
       <div class="box box-info">
         <div class="box-header with-border">
@@ -90,7 +88,6 @@
       </div>
     </div>
 
-    <!-- 事件 -->
     <div class="col-md-6">
       <div class="box box-danger">
         <div class="box-header with-border">
@@ -112,14 +109,13 @@
           </div>
         </div>
         <div class="box-footer text-center">
-          <a href="">查看更多</a>
+          <a href="/events/">查看更多</a>
         </div>
       </div>
     </div>
   </div>
 
   <div class="row">
-    <!-- 微信 -->
     <div class="col-md-6">
       <div class="box box-success">
         <div class="box-header with-border">
@@ -132,14 +128,14 @@
         </div>
         <div class="box-body">
           <ul class="media-list">
-            {% for weibo in weibo_list %}
+            {% for weixin in weixin_list %}
               <li class="media">
                 <div class="media-left">
-                  <img class="media-object" src="{{ weibo.logo}}" alt="{{ weibo.name }}">
+                  <img class="media-object" src="{{ weixin.logo}}" alt="{{ weixin.name }}">
                 </div>  
                 <div class="media-body">
-                  <h4 class="media-heading">{{ weibo.name }}</h4>
-                  <p>{{ weibo.content }}</p>
+                  <h4 class="media-heading">{{ weixin.name }}</h4>
+                  <p>{{ weixin.content }}</p>
                 </div>
               </li>
             {% endfor %}
@@ -151,7 +147,6 @@
       </div>      
     </div>
 
-    <!-- 微博 -->
     <div class="col-md-6">
       <div class="box box-warning">
         <div class="box-header with-border">
