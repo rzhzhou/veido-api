@@ -73,22 +73,14 @@
           </div>
         </div>
         <div class="box-body">
-          <table class="table news">
-            <thead>
-              <th class="news-title">标题</th>
-              <th class="news-source">来源</th>
-              <th class="news-time">时间</th>
-            </thead>
-            <tbody>
-              {% for news in news_list %}
-                <tr>
-                  <td><a href="{{ news.url }}" title="{{ news.title }}">{{ news.title }}</a></td>
-                  <td>{{ news.source }}</td>
-                  <td>{{ news.time | date:"Y-m-d" }}</td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+          <div class="list-group">
+            {% for news in news_list %}
+              <a href="{{ news.url }}" class="list-group-item">
+                {{ news.title }}
+                <span class="badge">{{ news.time | date:"m-d" }}</span>
+              </a>
+            {% endfor %}
+          </div>
         </div>
         <div class="box-footer text-center">
           <a href="/news/">查看更多</a>
