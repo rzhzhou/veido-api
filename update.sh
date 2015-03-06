@@ -21,4 +21,12 @@ mkdir dist/vendor/fontawesome
 cp -r bower_components/fontawesome/css dist/vendor/fontawesome/css
 cp -r bower_components/fontawesome/fonts dist/vendor/fontawesome/fonts
 
+# copy adminlte source code
+rm -rf src/less/bootstrap
+rm -rf src/less/adminlte
+cp -r bower_components/admin-lte/build/bootstrap-less src/less/bootstrap
+cp -r bower_components/admin-lte/build/less/ src/less/adminlte
+rm src/js/adminlte.js
+cp bower_components/admin-lte/dist/js/app.js src/js/adminlte.js
+
 echo "finish update"
