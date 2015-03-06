@@ -1,31 +1,47 @@
 #!/bin/bash
 
-### vendor ###
-
-# remove vendor directory
+# clean up and create folder
 rm -rf dist/vendor
+mkdir dist/vendor
 
-# copy plugins of adminlte to dist/vendor
-cp -r bower_components/admin-lte/plugins dist/vendor
+# copy and rename jquery
+cp -r bower_components/admin-lte/plugins/jQuery dist/vendor/jquery
+mv dist/vendor/jquery/jQuery-2.1.3.min.js dist/vendor/jquery/jquery.min.js
 
-# copy bootstrap to dist/vendor
+# copy bootstrap
 cp -r bower_components/admin-lte/bootstrap dist/vendor/bootstrap
 
-# copy dist of adminlte to dist/vendor
-cp -r bower_components/admin-lte/dist dist/vendor/adminlte
-
-# copy dist of echarts to dist/vendor
+# copy echarts
 cp -r bower_components/echarts/build/dist dist/vendor/echarts
 
-# copy theme of echarts to dist/vendor/echarts
-cp -r bower_components/echarts/doc/example/theme/ dist/vendor/echarts/theme
-
-# add fontawesome directory
+# copy fontawesome
 mkdir dist/vendor/fontawesome
-
-# copy css and fonts to dist/vendor/fontawesome
 cp -r bower_components/fontawesome/css dist/vendor/fontawesome/css
 cp -r bower_components/fontawesome/fonts dist/vendor/fontawesome/fonts
+
+
+
+# copy plugins of adminlte to dist/vendor
+#cp -r bower_components/admin-lte/plugins dist/vendor
+
+# copy bootstrap to dist/vendor
+#cp -r bower_components/admin-lte/bootstrap dist/vendor/bootstrap
+
+# copy dist of adminlte to dist/vendor
+#cp -r bower_components/admin-lte/dist dist/vendor/adminlte
+
+# copy dist of echarts to dist/vendor
+#cp -r bower_components/echarts/build/dist dist/vendor/echarts
+
+# copy theme of echarts to dist/vendor/echarts
+#cp -r bower_components/echarts/doc/example/theme/ dist/vendor/echarts/theme
+
+# add fontawesome directory
+#mkdir dist/vendor/fontawesome
+
+# copy css and fonts to dist/vendor/fontawesome
+#cp -r bower_components/fontawesome/css dist/vendor/fontawesome/css
+#cp -r bower_components/fontawesome/fonts dist/vendor/fontawesome/fonts
 
 # add ionicons directory
 #mkdir dist/vendor/ionicons
@@ -37,13 +53,13 @@ cp -r bower_components/fontawesome/fonts dist/vendor/fontawesome/fonts
 ### src ###
 
 # remove adminlte & bootstrap from src/less
-rm -rf src/less/bootstrap
-rm -rf src/less/adminlte
+#rm -rf src/less/bootstrap
+#rm -rf src/less/adminlte
 
 # copy build/bootstrap-less to src/less/bootstrap
-cp -r bower_components/admin-lte/build/bootstrap-less src/less/bootstrap
+#cp -r bower_components/admin-lte/build/bootstrap-less src/less/bootstrap
 
 # copy build/less to src/less/adminlte
-cp -r bower_components/admin-lte/build/less src/less/adminlte
+#cp -r bower_components/admin-lte/build/less src/less/adminlte
 
 echo "finish update"
