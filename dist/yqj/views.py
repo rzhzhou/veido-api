@@ -14,21 +14,20 @@ def index_view(request):
     weixin = {'number': 53}
     event = {'number': 29}
     
-    news_list = [
-                 {'url': 'www.baidu.com', 'title': u'新闻一', 'source': u'深度网', 'time': datetime.datetime(2014,6,8)},
-                 {'url': 'www.baidu.com', 'title': u'新闻二', 'source': u'深度网', 'time': datetime.datetime(2014,6,8)},
-                 {'url': 'www.baidu.com', 'title': u'新闻三', 'source': u'深度网', 'time': datetime.datetime(2014,6,8)},
-                ]
-    event_list = [
-                 {'url': 'www.baidu.com', 'title': u'新闻一', 'source': u'深度网', 'time': datetime.datetime(2014,6,8)},
-                 {'url': 'www.baidu.com', 'title': u'新闻二', 'source': u'深度网', 'time': datetime.datetime(2014,6,8)},
-                 {'url': 'www.baidu.com', 'title': u'新闻三', 'source': u'深度网', 'time': datetime.datetime(2014,6,8)},
-                ]
-    weixin_list = [
-                    {'url': 'www.baidu.com', 'title': u'微信一', 'name': u'深度网', 'time': datetime.datetime(2014,6,8)},
-                    {'url': 'www.baidu.com', 'title': u'微信二', 'name': u'深度网', 'time': datetime.datetime(2014,6,8)},
-                    {'url': 'www.baidu.com', 'title': u'微信三', 'name': u'深度网', 'time': datetime.datetime(2014,6,8)},
-                ]
+    weixin_list_number = news_list_number = event_list_number = 10
+    news_list = []
+    weixin_list = []
+    event_list = []
+
+    for i in range(news_list_number):
+        news_list.append({'url': 'www.baidu.com', 'title': u'新闻', 'source': u'深度网', 'time': datetime.datetime(2014,6,8)})
+
+    for i in range(event_list_number):
+        event_list.append({'url': 'www.baidu.com', 'title': u'新闻', 'source': u'深度网', 'time': datetime.datetime(2014,6,8)})
+                 
+    for i in range(weixin_list_number):
+        weixin_list.append({'url': 'www.baidu.com', 'title': u'微信', 'name': u'深度网', 'time': datetime.datetime(2014,6,8)})
+
     logo_path = '/static/img/64.gif'
     weibo_list = [
                     {'logo': logo_path, 'url': 'www.baidu.com', 'title': u'微信一', 'name': u'深度网', 'time': datetime.datetime(2014,6,8), 'content': u'确定起重机的方案依据有：被吊运物体的重量；重心位置及绑扎；作业现场环境'},
