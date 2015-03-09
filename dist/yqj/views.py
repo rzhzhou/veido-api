@@ -53,7 +53,8 @@ def category_view(request, ctg_id):
     return render_to_response('category/category.html', {'category': category})
 
 def location_view(request, location_id):
-    return render_to_response("location/location.html")
+    location = {'name': u'武昌', 'url': 'http://www.baidu.com'}
+    return render_to_response("location/location.html", {'location': location})
     
 def person_view(request, person_id):
     return HttpResponse('person')
