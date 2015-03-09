@@ -50,7 +50,7 @@ def index_view(request):
 
 def category_view(request, ctg_id):
     category  = {'name': u'质量检测', 'url': 'http://www.baidu.com'}
-    return render_to_response('category/category.html')
+    return render_to_response('category/category.html', {'category': category})
 
 def location_view(request, location_id):
     return render_to_response("location/location.html")
