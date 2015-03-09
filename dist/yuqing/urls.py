@@ -27,6 +27,6 @@ urlpatterns += patterns('yqj.views',
     url(r'^weixin/(\d+)/$', 'weixin_detail_view'),
     url(r'^weibo/$', 'weibo_view'),
 
-    url(r'^collection/$', 'collection_view'),
+    url(r'^collections/$', 'collection_view'),
     url(r'^login/$', 'login_view'),
 )
