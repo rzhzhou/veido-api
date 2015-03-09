@@ -35,7 +35,13 @@ gulp.task('less', function() {
 });
 
 gulp.task('js', function() {
-  gulp.src(['src/js/adminlte/app.js', 'src/js/app.js'])
+  var files = [
+    'bower_components/admin-lte/plugins/slimScroll/jquery.slimscroll.js',
+    'src/js/adminlte/app.js',
+    'src/js/app.js'
+  ];
+
+  gulp.src(files)
     .pipe(concat('app.js'))
     .pipe(uglify())
     .pipe(gulp.dest(dist + 'js'));
