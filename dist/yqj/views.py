@@ -65,3 +65,9 @@ def news_view(request):
 
 def news_detail_view(request, news_id):
     return render_to_response('news/article.html')
+
+def event_view(request):
+    return render_to_response('event/events.html')
+
+def event_detail_view(request, id):
+    return render_to_response('event/event.html')

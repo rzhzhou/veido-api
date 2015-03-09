@@ -21,5 +21,8 @@ urlpatterns += patterns('yqj.views',
     url(r'^person/(\d+)/$', 'person_view'),
     url(r'^news/$', 'news_view'),
     url(r'^news/(\d+)/$', 'news_detail_view'),
+    url(r'^events/$', 'event_view'),
+    url(r'^events/(\d+)$', 'event_detail_view'),
+
     url(r'^login/$', 'login_view'),
 )
