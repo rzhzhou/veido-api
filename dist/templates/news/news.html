@@ -1,0 +1,50 @@
+{% extends "base/layout.html" %}
+
+{% block title %}新闻 - 质监舆情{% endblock %}
+
+{% block header %}
+  <h1>新闻</h1>
+  <ol class="breadcrumb">
+    <li><a href="/"><i class="fa fa-dashboard"></i>首页</a></li>
+    <li class="active"><a href="/news/">新闻</a></li>
+  </ol>
+{% endblock %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-md-12">
+      <div class="box box-info">
+        <div class="box-header with-border">
+          <h3 class="box-title">新闻列表</h3>
+          <div class="box-tools pull-right">
+            <button class="btn btn-box-tool" data-widget="collapse">
+              <i class="fa fa-minus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="box-body">
+          <table class="table table-bordered table-hover table-custom">
+            <thead>
+              <tr>
+                <th class="col-collect">收藏</th>
+                <th class="col-title">标题</th>
+                <th class="col-source">来源</th>
+                <th class="col-location">地点</th>
+                <th class="col-time">时间</th>
+              </tr>
+            </thead>
+            <tfoot>
+              <tr>
+                <th>收藏</th>
+                <th>标题</th>
+                <th>来源</th>
+                <th>地点</th>
+                <th>时间</th>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "base/layout.html" %}
+
+{% block title %}新闻 - 质监舆情{% endblock %}
+
+{% block header %}
+  <h1>新闻</h1>
+  <ol class="breadcrumb">
+    <li><a href="/"><i class="fa fa-dashboard"></i>首页</a></li>
+    <li class="active"><a href="/news/">新闻</a></li>
+  </ol>
+{% endblock %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-md-8">
+      <div class="box box-info">
+        <div class="box-header with-border">
+          <h3 class="box-title">文章内容</h3>
+        </div>
+        <div class="box-body">
+          <h3 class="article-title text-center">{{ article.title }}</h3>
+          <div class="article-meta text-center">
+            <span class="article-author">作者: {{ article.author }}</span>
+            <span class="article-time">时间: {{ article.time }}</span>
+          </div>
+          <div class="article-content">
+            {{ article.content | safe}}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="box box-default">
+        <div class="box-header with-border">
+          <h3 class="box-title">文章来源</h3>
+        </div>
+        <div class="box-body">
+          <p>content here</p>
+        </div>
+      </div>
+
+      <div class="box box-default">
+        <div class="box-header with-border">
+          <h3 class="box-title">相关文章</h3>
+        </div>
+        <div class="box-body">
+          <div class="list-group">
+            <a href="" class="list-group-item">article title</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
