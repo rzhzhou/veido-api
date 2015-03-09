@@ -59,3 +59,9 @@ def person_view(request, person_id):
 
 def login_view(request):
     return render_to_response('user/login.html')
+
+def news_view(request):
+    return render_to_response('news/news.html')
+
+def news_detail_view(request, news_id):
+    return render_to_response('news/article.html')
