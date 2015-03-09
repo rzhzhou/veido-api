@@ -82,3 +82,6 @@ def weixin_detail_view(request, id):
 
 def weibo_view(request):
     return render_to_response('weibo/weibo.html')
+
+def collection_view(request):
+    return render_to_response('user/collection.html')
