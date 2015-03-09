@@ -71,3 +71,9 @@ def event_view(request):
 
 def event_detail_view(request, id):
     return render_to_response('event/event.html')
+
+def weixin_view(request):
+    return render_to_response('weixin/weixin.html')
+
+def weixin_detail_view(request, id):
+    return render_to_response('weixin/article.html')

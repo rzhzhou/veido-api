@@ -23,6 +23,7 @@ urlpatterns += patterns('yqj.views',
     url(r'^news/(\d+)/$', 'news_detail_view'),
     url(r'^events/$', 'event_view'),
     url(r'^events/(\d+)$', 'event_detail_view'),
-
+    url(r'^weixin/$', 'weixin_view'),
+    url(r'^weixin/(\d+)/$', 'weixin_detail_view'),
     url(r'^login/$', 'login_view'),
 )
