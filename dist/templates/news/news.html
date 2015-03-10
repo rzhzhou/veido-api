@@ -12,32 +12,41 @@
 
 {% block content %}
   <div class="row">
-    <div class="col-md-12">
+    <div class="col-md-8">
       <div class="box box-info">
         <div class="box-header with-border">
-          <h3 class="box-title">新闻列表</h3>
+          <h3 class="article-title text-center">{{ article.title }}</h3>
         </div>
         <div class="box-body">
-          <table class="table table-bordered table-hover table-custom">
-            <thead>
-              <tr>
-                <th class="col-collect">收藏</th>
-                <th class="col-title">标题</th>
-                <th class="col-source">来源</th>
-                <th class="col-location">地点</th>
-                <th class="col-time">时间</th>
-              </tr>
-            </thead>
-            <tfoot>
-              <tr>
-                <th>收藏</th>
-                <th>标题</th>
-                <th>来源</th>
-                <th>地点</th>
-                <th>时间</th>
-              </tr>
-            </tfoot>
-          </table>
+          <div class="article-meta text-center">
+            <span class="article-author">作者: {{ article.author }}</span>
+            <span class="article-time">时间: {{ article.time }}</span>
+          </div>
+          <div class="article-content">
+            {{ article.content | safe}}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="box box-default">
+        <div class="box-header with-border">
+          <h3 class="box-title">文章来源</h3>
+        </div>
+        <div class="box-body">
+          <p>content here</p>
+        </div>
+      </div>
+
+      <div class="box box-default">
+        <div class="box-header with-border">
+          <h3 class="box-title">相关文章</h3>
+        </div>
+        <div class="box-body">
+          <div class="list-group">
+            <a href="" class="list-group-item">article title</a>
+          </div>
         </div>
       </div>
     </div>
