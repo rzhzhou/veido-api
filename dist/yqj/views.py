@@ -63,25 +63,32 @@ def login_view(request):
     return render_to_response('user/login.html')
 
 def news_view(request):
-    return render_to_response('news/news.html')
+    news_list_data = []
+    for i in range(10):
+        news_list_data.append({'url': u'www.baidu.com', 
+                          'title': u'质监免费检测珠宝饰品', 
+                          'source': u'深度网', 
+                          'pubtime': datetime.datetime(2014,6,8), 
+                          'area': u'武昌'})
+    return render_to_response('news/news_list.html', {'news_list_data': news_list_data})
 
 def news_detail_view(request, news_id):
-    return render_to_response('news/article.html')
+    return render_to_response('news/news.html')
 
 def event_view(request):
-    return render_to_response('event/events.html')
+    return render_to_response('event/event_list.html')
 
 def event_detail_view(request, id):
     return render_to_response('event/event.html')
 
 def weixin_view(request):
-    return render_to_response('weixin/weixin.html')
+    return render_to_response('weixin/weixin_list.html')
 
 def weixin_detail_view(request, id):
-    return render_to_response('weixin/article.html')
+    return render_to_response('weixin/weixin.html')
 
 def weibo_view(request):
-    return render_to_response('weibo/weibo.html')
+    return render_to_response('weibo/weibo_list.html')
 
 def collection_view(request):
     return render_to_response('user/collection.html')
