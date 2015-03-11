@@ -10,7 +10,7 @@
     </form>
 
     <ul class="sidebar-menu">
-      <li class="header">导航</li>
+      <li class="header">功能</li>
 
       <li class="treeview">
         <a href="/">
@@ -55,7 +55,7 @@
         </ul>
       </li>
 
-      <li class="header">我的</li>   
+      <li class="header">用户</li>   
 
       <li class="treeview">
         <a href="/collections/">
@@ -70,6 +70,15 @@
           <span>我的设置</span>
         </a>
       </li>
+
+      {% if user.isAdmin %}
+      <li class="treeview">
+        <a href="/admin/">
+          <i class="fa fa-user"></i>
+          <span>用户管理</span>
+        </a>
+      </li>
+      {% endif %}
     </ul>
   </section>
 </aside>
