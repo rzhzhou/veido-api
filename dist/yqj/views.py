@@ -92,3 +92,13 @@ def weibo_view(request):
 
 def collection_view(request):
     return render_to_response('user/collection.html')
+
+def setting_view(request):
+    return render_to_response('user/setting.html')
+
+def custom_view(request):
+    return render_to_response('custom/custom.html')
+
+def user_view(request):
+    return render_to_response('user/user.html')
+
