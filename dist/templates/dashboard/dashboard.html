@@ -13,7 +13,7 @@
 {% block content %}
   <div class="row">
     <div class="col-md-3 col-sm-6 col-xs-12">
-      <div class="info-box">
+      <a href="/news/" class="info-box">
         <span class="info-box-icon bg-aqua">
           <i class="fa fa-newspaper-o"></i>
         </span>
@@ -21,11 +21,11 @@
           <span class="info-box-text">新闻</span>
           <span class="info-box-number">{{ news.number }}</span>
         </div>
-      </div>
+      </a>
     </div>
 
     <div class="col-md-3 col-sm-6 col-xs-12">
-      <div class="info-box">
+      <a href="/event/" class="info-box">
         <span class="info-box-icon bg-red">
           <i class="fa fa-exclamation"></i>
         </span>
@@ -33,11 +33,11 @@
           <span class="info-box-text">事件</span>
           <span class="info-box-number">{{ event.number }}</span>
         </div>
-      </div>
+      </a>
     </div>
 
     <div class="col-md-3 col-sm-6 col-xs-12">
-      <div class="info-box">
+      <a href="/weixin/" class="info-box">
         <span class="info-box-icon bg-green">
           <i class="fa fa-weixin"></i>
         </span>
@@ -45,11 +45,11 @@
           <span class="info-box-text">微信</span>
           <span class="info-box-number">{{ weixin.number }}</span>
         </div>
-      </div>
+      </a>
     </div>
 
     <div class="col-md-3 col-sm-6 col-xs-12">
-      <div class="info-box">
+      <a href="/weibo/" class="info-box">
         <span class="info-box-icon bg-yellow">
           <i class="fa fa-weibo"></i>
         </span>
@@ -57,7 +57,7 @@
           <span class="info-box-text">微博</span>
           <span class="info-box-number">{{ weibo.number }}</span>
         </div>
-      </div>
+      </a>
     </div>
   </div>
 
@@ -109,7 +109,7 @@
           </div>
         </div>
         <div class="box-footer text-center">
-          <a href="/events/">查看更多</a>
+          <a href="/event/">查看更多</a>
         </div>
       </div>
     </div>
