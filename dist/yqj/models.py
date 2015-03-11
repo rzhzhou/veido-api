@@ -132,7 +132,7 @@ class Topic(models.Model):
 
 
 class RealtedData(models.Model):
-    uuid = models.CharField(max_length=32, verbose_name=u'uuid')
+    uuid = models.CharField(max_length=36, verbose_name=u'uuid')
     articles = models.ManyToManyField(Article, related_name='relateddata', related_query_name='relateddatas', null=True, blank=True, verbose_name=u'文章')
     weibo = models.ManyToManyField(Weibo, related_name='relateddata', related_query_name='relateddatas', null=True, blank=True, verbose_name=u'微博')
     weixin = models.ManyToManyField(Weixin, related_name='relateddata', related_query_name='relateddatas', null=True, blank=True, verbose_name=u'微信')
