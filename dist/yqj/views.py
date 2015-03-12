@@ -3,7 +3,7 @@ import datetime
 
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse
-from models import Weixin
+from models import Weixin, Weibo
 
 def index_view(request):
     user = {'name': 'wuhan', 'company': u'武汉质监局', 'isAdmin': True}
@@ -29,12 +29,13 @@ def index_view(request):
 
     for i in range(event_list_number):
         event_list.append({'url': 'www.baidu.com', 'title': u'新闻', 'source': u'深度网', 'time': datetime.datetime(2014,6,8)})
-                 
-    for i in range(weixin_list_number):
-        weibo_list.append({'logo': logo_path, 'url': 'www.baidu.com', 'title': u'微信', 'name': u'深度网', 'time': datetime.datetime(2014,6,8), 'content': u'确定起重机的方案依据有：被吊运物体的重量；重心位置及绑扎；作业现场环境'})
+    
+    weibo_data = Weibo.objects.all()[0:weibo_list_number]
+    for data in weibo_data:
+        weibo_list.append({'logo': data.publisher.photo, 'url': data.url, 'title': data.title, 'name': data.author, 'time': data.pubtime, 'content': data.content})
 
-    weixin = Weixin.objects.all()[0:weixin_list_number]
-    for data in weixin:
+    weixin_data = Weixin.objects.all()[0:weixin_list_number]
+    for data in weixin_data:
         weixin_list.append({'logo': data.publisher.photo, 'url': data.url, 'title': data.title, 'name': data.author, 'time': data.pubtime, 'content': data.content})
     return render_to_response("dashboard/dashboard.html", 
         {'user': user, 
