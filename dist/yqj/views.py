@@ -102,3 +102,6 @@ def custom_view(request):
 def user_view(request):
     return render_to_response('user/user.html')
 
+def register_view(request):
+    return render_to_response('user/register.html')
+
