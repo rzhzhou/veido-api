@@ -35,7 +35,7 @@ def index_view(request):
 
     weixin = Weixin.objects.all()[0:weixin_list_number]
     for data in weixin:
-        weixin_list.append({'logo': data.publisher.photo, 'url': data.url, 'title': data.title, 'name': u'深度网', 'time': data.pubtime, 'content': data.content})
+        weixin_list.append({'logo': data.publisher.photo, 'url': data.url, 'title': data.title, 'name': data.author, 'time': data.pubtime, 'content': data.content})
     return render_to_response("dashboard/dashboard.html", 
         {'user': user, 
         'categories': categories, 
