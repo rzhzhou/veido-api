@@ -24,13 +24,13 @@
         </div>
         <div class="box-body no-padding">
           <ul class="media-list">
-            {% for weibo in weibo_list %}
+            {% for weibo in weibo_latest_list %}
               <li class="media">
                 <div class="media-left">
-                  <img class="media-object" src="{{ weibo.logo }}" alt="{{ weibo.name }}">
+                  <img class="media-object" src="{{ weibo.publisher.photo }}" alt="{{ weibo.publisher.publisher }}">
                 </div>  
                 <div class="media-body">
-                  <h4 class="media-heading">{{ weibo.name }}</h4>
+                  <h4 class="media-heading">{{ weibo.author }}</h4>
                   <p>{{ weibo.content }}</p>
                 </div>
               </li>
@@ -52,13 +52,13 @@
         </div>
         <div class="box-body no-padding">
           <ul class="media-list">
-            {% for weibo in weibo_list %}
+            {% for weibo in weibo_hottest_list %}
               <li class="media">
                 <div class="media-left">
-                  <img class="media-object" src="{{ weibo.logo }}" alt="{{ weibo.name }}">
+                  <img class="media-object" src="{{ weibo.publisher.photo }}" alt="{{ weibo.publisher.publisher }}">
                 </div>  
                 <div class="media-body">
-                  <h4 class="media-heading">{{ weibo.name }}</h4>
+                  <h4 class="media-heading">{{ weibo.author }}</h4>
                   <p>{{ weibo.content }}</p>
                 </div>
               </li>

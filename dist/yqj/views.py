@@ -92,9 +92,9 @@ def event_detail_view(request, id):
     return render_to_response('event/event.html')
 
 def weixin_view(request):
-    latest = Weixin.objects.order_by('-pubtime')[0:100]
-    newest = latest
-    return render_to_response('weixin/weixin_list.html', {'weixin_latest_list': latest, 'weixin_newest_list': newest})
+    latest = Weixin.objects.order_by('-pubtime')[0:20]
+    hottest = latest
+    return render_to_response('weixin/weixin_list.html', {'weixin_latest_list': latest, 'weixin_hottest_list': hottest})
 
 def weixin_detail_view(request, id):
     try:
@@ -107,7 +107,9 @@ def weixin_detail_view(request, id):
     return render_to_response('weixin/weixin.html', {'article': weixin})
 
 def weibo_view(request):
-    return render_to_response('weibo/weibo_list.html')
+    hottest = latest = Weibo.objects.order_by('-pubtime')[0:20]
+    #hottest  = latest
+    return render_to_response('weibo/weibo_list.html', {'weibo_latest_list': latest, 'weibo_hottest_list': hottest})
 
 def collection_view(request):
     return render_to_response('user/collection.html')
