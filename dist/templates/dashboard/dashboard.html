@@ -72,10 +72,10 @@
             </button>
           </div>
         </div>
-        <div class="box-body">
-          <div class="list-group">
+        <div class="box-body no-padding">
+          <div class="list-group no-margin">
             {% for news in news_list %}
-              <a href="{{ news.url }}" class="list-group-item">
+              <a href="{{ news.url }}" class="list-group-item no-border">
                 {{ news.title }}
                 <span class="badge">{{ news.time | date:"m-d" }}</span>
               </a>
@@ -98,10 +98,10 @@
             </button>
           </div>
         </div>
-        <div class="box-body">
-          <div class="list-group">
+        <div class="box-body no-padding">
+          <div class="list-group no-margin">
             {% for event in event_list %}
-              <a href="{{ event.url }}" class="list-group-item">
+              <a href="{{ event.url }}" class="list-group-item no-border">
                 {{ event.title }}
                 <span class="badge">{{ event.time | date:"m-d" }}</span>
               </a>
