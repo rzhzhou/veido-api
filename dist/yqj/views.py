@@ -26,10 +26,10 @@ def index_view(request):
     event_list = []
     weibo_list = []
     for i in range(news_list_number):
-        news_list.append({'url': 'www.baidu.com', 'title': u'新闻', 'source': u'深度网', 'time': datetime.datetime(2014,6,8)})
+        news_list.append({'url': 'www.baidu.com', 'title': u'新闻', 'source': u'深度网', 'time': 21})
 
     for i in range(event_list_number):
-        event_list.append({'url': 'www.baidu.com', 'title': u'新闻', 'source': u'深度网', 'time': datetime.datetime(2014,6,8)})
+        event_list.append({'url': 'www.baidu.com', 'title': u'新闻', 'source': u'深度网', 'time': 53})
     
     weibo_data = Weibo.objects.all()[0:weibo_list_number]
     for data in weibo_data:
@@ -77,7 +77,14 @@ def news_view(request):
     return render_to_response('news/news_list.html', {'news_list_data': news_list_data})
 
 def news_detail_view(request, news_id):
-    return render_to_response('news/news.html')
+    try:
+        news_id = int(id)
+        news = News.objects.get(id=news_id)
+    except ValueError:
+        return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
+    except News.DoesNotExist:
+        return HttpResponse(status=status.HTTP_404_NOT_FOUND)
+    return render_to_response('news/news.html', {'article': news})
 
 def event_view(request):
     return render_to_response('event/event_list.html')
@@ -89,7 +96,14 @@ def weixin_view(request):
     return render_to_response('weixin/weixin_list.html')
 
 def weixin_detail_view(request, id):
-    return render_to_response('weixin/weixin.html')
+    try:
+        weixin_id = int(id)
+        weixin = Weixin.objects.get(id=weixin_id)
+    except ValueError:
+        return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
+    except Weixin.DoesNotExist:
+        return HttpResponse(status=status.HTTP_404_NOT_FOUND)
+    return render_to_response('weixin/weixin.html', {'article': weixin})
 
 def weibo_view(request):
     return render_to_response('weibo/weibo_list.html')
