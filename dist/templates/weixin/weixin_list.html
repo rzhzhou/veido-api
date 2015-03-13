@@ -24,13 +24,13 @@
         </div>
         <div class="box-body no-padding">
           <ul class="media-list">
-            {% for weixin in weixin_list %}
+            {% for weixin in weixin_newest_list %}
               <li class="media">
                 <div class="media-left">
-                  <img class="media-object" src="{{ weixin.logo }}" alt="{{ weixin.name }}">
+                  <img class="media-object" src="{{ weixin.publisher.photo }}" alt="{{ weixin.name }}">
                 </div>  
                 <div class="media-body">
-                  <h4 class="media-heading">{{ weixin.name }}</h4>
+                  <h4 class="media-heading">{{ weixin.author }}</h4>
                   <p><a href="/weixin/{{ weixin.id }}/">{{ weixin.title }}</a></p>
                 </div>
               </li>
@@ -52,13 +52,13 @@
         </div>
         <div class="box-body no-padding">
           <ul class="media-list">
-            {% for weixin in weixin_list %}
+            {% for weixin in weixin_latest_list %}
               <li class="media">
                 <div class="media-left">
-                  <img class="media-object" src="{{ weixin.logo }}" alt="{{ weixin.name }}">
+                  <img class="media-object" src="{{ weixin.publisher.photo }}" alt="{{ weixin.name }}">
                 </div>  
                 <div class="media-body">
-                  <h4 class="media-heading">{{ weixin.name }}</h4>
+                  <h4 class="media-heading">{{ weixin.author }}</h4>
                   <p><a href="/weixin/{{ weixin.id }}/">{{ weixin.title }}</a></p>
                 </div>
               </li>

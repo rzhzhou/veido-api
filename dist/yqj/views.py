@@ -92,7 +92,9 @@ def event_detail_view(request, id):
     return render_to_response('event/event.html')
 
 def weixin_view(request):
-    return render_to_response('weixin/weixin_list.html')
+    latest = Weixin.objects.order_by('-pubtime')[0:100]
+    newest = latest
+    return render_to_response('weixin/weixin_list.html', {'weixin_latest_list': latest, 'weixin_newest_list': newest})
 
 def weixin_detail_view(request, id):
     try:
