@@ -32,11 +32,11 @@ def index_view(request):
     
     weibo_data = Weibo.objects.all()[0:weibo_list_number]
     for data in weibo_data:
-        weibo_list.append({'logo': data.publisher.photo, 'url': data.url, 'title': data.title, 'name': data.author, 'time': data.pubtime, 'content': data.content})
+        weibo_list.append({'logo': data.publisher.photo, 'id': data.id, 'title': data.title, 'name': data.author, 'time': data.pubtime, 'content': data.content})
 
     weixin_data = Weixin.objects.all()[0:weixin_list_number]
     for data in weixin_data:
-        weixin_list.append({'logo': data.publisher.photo, 'url': data.url, 'title': data.title, 'name': data.author, 'time': data.pubtime, 'content': data.content})
+        weixin_list.append({'logo': data.publisher.photo, 'id': data.id, 'title': data.title, 'name': data.author, 'time': data.pubtime, 'content': data.content})
     return render_to_response("dashboard/dashboard.html", 
         {'user': user, 
         'categories': categories, 
