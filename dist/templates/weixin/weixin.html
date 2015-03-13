@@ -34,8 +34,18 @@
         <div class="box-header with-border">
           <h3 class="box-title">微信账号</h3>
         </div>
-        <div class="box-body">
-          <p>content here</p>
+        <div class="box-body no-padding">
+          <ul class="media-list">
+            <li class="media">
+              <div class="media-left">
+                <img class="media-object" src="{{ weixin.logo }}" alt="{{ weixin.name }}">
+              </div>  
+              <div class="media-body">
+                <h4 class="media-heading">{{ weixin.name }}</h4>
+                <p>{{ weixin.description }}</p>
+              </div>
+            </li>              
+          </ul>        
         </div>
       </div>
 
@@ -43,9 +53,9 @@
         <div class="box-header with-border">
           <h3 class="box-title">相关文章</h3>
         </div>
-        <div class="box-body">
-          <div class="list-group">
-            <a href="" class="list-group-item">article title</a>
+        <div class="box-body no-padding">
+          <div class="list-group no-margin">
+            <a href="/weixin/{{ weixin.id }}/" class="list-group-item no-border">{{ weixin.title }}</a>
           </div>
         </div>
       </div>

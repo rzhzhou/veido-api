@@ -75,7 +75,7 @@
         <div class="box-body no-padding">
           <div class="list-group no-margin">
             {% for news in news_list %}
-              <a href="/news/{{ news.id }}" class="list-group-item no-border">
+              <a href="/news/{{ news.id }}/" class="list-group-item no-border">
                 {{ news.title }}
                 <span class="badge">{{ news.time | date:"m-d" }}</span>
               </a>
@@ -101,7 +101,7 @@
         <div class="box-body no-padding">
           <div class="list-group no-margin">
             {% for event in event_list %}
-              <a href="/event/{{ event.id }}" class="list-group-item no-border">
+              <a href="/event/{{ event.id }}/" class="list-group-item no-border">
                 {{ event.title }}
                 <span class="badge">{{ event.time | date:"m-d" }}</span>
               </a>
@@ -135,7 +135,7 @@
                 </div>  
                 <div class="media-body">
                   <h4 class="media-heading">{{ weixin.name }}</h4>
-                  <p><a href="/weixin/{{ weixin.id }}">{{ weixin.title }}</a></p>
+                  <p><a href="/weixin/{{ weixin.id }}/">{{ weixin.title }}</a></p>
                 </div>
               </li>
             {% endfor %}
