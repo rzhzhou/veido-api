@@ -9,9 +9,7 @@ cp -r bower_components/admin-lte/plugins/jQuery dist/vendor/jquery
 mv dist/vendor/jquery/jQuery-2.1.3.min.js dist/vendor/jquery/jquery.min.js
 
 # copy bootstrap
-mkdir dist/vendor/bootstrap
-cp -r bower_components/admin-lte/bootstrap/css dist/vendor/bootstrap/css
-cp -r bower_components/admin-lte/bootstrap/js dist/vendor/bootstrap/js
+cp -r bower_components/admin-lte/bootstrap dist/vendor/bootstrap
 
 # copy echarts
 cp -r bower_components/echarts/build/dist dist/vendor/echarts

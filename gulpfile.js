@@ -37,8 +37,8 @@ gulp.task('less', function() {
 gulp.task('js', function() {
   var files = [
     'bower_components/admin-lte/plugins/slimScroll/jquery.slimscroll.js',
-    'bower_components/admin-lte/plugins/datatables/jquery.dataTables.js',
-    'bower_components/admin-lte/plugins/datatables/dataTables.bootstrap.js',
+    'bower_components/DataTables/media/js/jquery.dataTables.js',
+    'bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.js',
     'src/js/adminlte/app.js',
     'src/js/app.js'
   ];
