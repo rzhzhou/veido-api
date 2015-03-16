@@ -74,6 +74,9 @@ class Weibo(models.Model):
     pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
     publisher = models.ForeignKey(WeiboPublisher, verbose_name=u'微博发布者')
     area = models.ForeignKey(Area, verbose_name=u'名称')
+    praise = models.IntegerField(blank=True, verbose_name=u'点赞数')
+    comment = models.IntegerField(blank=True, verbose_name=u'评论量')
+    tansmit = models.IntegerField(blank=True, verbose_name=u'转发量')
 
     class Meta:
         db_table = 'weibo'
@@ -145,3 +148,12 @@ class RealtedData(models.Model):
         return self.uuid
 
 
+class ArticleCategory(models.Model):
+    name = models.CharField(max_length=255, blank=True, verbose_name=u'')
+    remark = models.CharField(max_length=255, blank=True, verbose_name=u'备注')
+
+    articles = models.ManyToManyField(Article, related_name='categorys', related_query_name='category', null=True, blank=True, verbose_name=u'文章')
+
+    class Meta:
+        db_table = 'article_category'
+        verbose_name_plural = u'文章分类'
