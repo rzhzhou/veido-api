@@ -48,3 +48,9 @@ gulp.task('js', function() {
     .pipe(uglify())
     .pipe(gulp.dest(dist + 'js'));
 });
+
+gulp.task('echarts-theme', function() {
+  gulp.src('bower_components/echarts/doc/example/theme/macarons.js')
+    .pipe(uglify())
+    .pipe(gulp.dest('dist/vendor/echarts/theme'));
+});

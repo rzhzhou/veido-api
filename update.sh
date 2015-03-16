@@ -13,6 +13,8 @@ cp -r bower_components/admin-lte/bootstrap dist/vendor/bootstrap
 
 # copy echarts
 cp -r bower_components/echarts/build/dist dist/vendor/echarts
+mkdir dist/vendor/echarts/theme
+gulp echarts-theme
 
 # copy slimScroll
 cp -r bower_components/admin-lte/plugins/slimScroll dist/vendor/slimScroll
