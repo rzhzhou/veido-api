@@ -74,6 +74,9 @@ class Weibo(models.Model):
     pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
     publisher = models.ForeignKey(WeiboPublisher, verbose_name=u'微博发布者')
     area = models.ForeignKey(Area, verbose_name=u'名称')
+    praise = models.IntegerField(blank=True, verbose_name=u'点赞数')
+    comment = models.IntegerField(blank=True, verbose_name=u'评论量')
+    tansmit = models.IntegerField(blank=True, verbose_name=u'转发量')
 
     class Meta:
         db_table = 'weibo'
