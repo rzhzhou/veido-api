@@ -1,38 +1,12 @@
-from django.shortcuts import render
-from django.http import HttpResponseRedirect
+#coding=utf-8
 
-from django.db import models
-from yqj.models import (Article, Area, Weixin, Topic, RealtedData)
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.decorators import api_view
-#from api.serializers import ArticleSerializer,NotificationSerializer,InsightSerializer,EventSerializer,NewsSerializer,InspectionSerializer
-from general.decorators import login_required
-from django.db.models import Q
-from django.views.generic import View
-from django.core.exceptions import ObjectDoesNotExist
+import datetime
 from django.db import IntegrityError
 from django.conf import settings
-from django.http import JsonResponse, HttpResponse
-from django.db.models import get_model
+from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.db.models import Count
-import datetime
+from yqj.models import (Article, Area, Weixin, Topic, RealtedData, ArticleCategory)
 
-# Create your views here.
-
-@api_view(['GET'])
-def article_view(request, id, **kwargs):
-    try:
-        article_id = int(id)
-        article = Article.objects.get(id=article_id)
-    except ValueError:
-        return Response(status=status.HTTP_400_BAD_REQUEST)
-    except Article.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    serializer = ArticleSerializer(article)
-    return Response(serializer.data)
 
 class TableAPIView(APIView):
     COLLECTED_TEXT = u'<i class="fa fa-star" data-toggle="tooltip", data-placement="right" title="取消收藏">'
@@ -74,7 +48,7 @@ class ArticleTableView(TableAPIView):
         try:
             category = ArticleCategory.objects.get(id=id)
         except ArticleCategory.DoesNotExist:
-            return {'data': []}
+            return Response({'data': []})
         
         result = []
         articles = category.articles.all()[self.LIMIT_NUMBER]
