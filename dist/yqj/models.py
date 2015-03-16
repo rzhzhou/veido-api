@@ -145,3 +145,12 @@ class RealtedData(models.Model):
         return self.uuid
 
 
+class ArticleCategory(models.Model):
+    name = models.CharField(max_length=255, blank=True, verbose_name=u'')
+    remark = models.CharField(max_length=255, blank=True, verbose_name=u'备注')
+
+    articles = models.ManyToManyField(Article, related_name='categorys', related_query_name='category', null=True, blank=True, verbose_name=u'文章')
+
+    class Meta:
+        db_table = 'article_category'
+        verbose_name_plural = u'文章分类'
