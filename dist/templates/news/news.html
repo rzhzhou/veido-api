@@ -45,7 +45,9 @@
         </div>
         <div class="box-body">
           <div class="list-group">
-            <a href="" class="list-group-item">article title</a>
+            {% for item in relate %}
+            <a href="/news/{{ item.id }}" class="list-group-item">{{ item.title }}</a>
+            {% endfor %}
           </div>
         </div>
       </div>

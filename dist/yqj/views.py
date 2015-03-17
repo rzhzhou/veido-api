@@ -3,7 +3,7 @@ import datetime
 
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse
-from models import Weixin, Weibo, RelatedData, ArticleCategory, Area
+from models import Article, Weixin, Weibo, RelatedData, ArticleCategory, Area
 
 def index_view(request):
     user = {'name': 'wuhan', 'company': u'武汉质监局', 'isAdmin': True}
@@ -57,8 +57,10 @@ def category_view(request, ctg_id):
     return render_to_response('category/category.html', {'category': category})
 
 def location_view(request, location_id):
-    location = {'name': u'武昌', 'url': 'http://www.baidu.com'}
-    return render_to_response("location/location.html", {'location': location})
+    location = Area.objects.get(id=int(location_id))
+    weixin = Weixin.objects.filter(area=location)
+    weibo = Weibo.objects.filter(area=location)
+    return render_to_response("location/location.html", {'location': location, 'weixin': weixin, 'weibo': weibo})
     
 def person_view(request, person_id):
     return HttpResponse('person')
@@ -78,13 +80,15 @@ def news_view(request):
 
 def news_detail_view(request, news_id):
     try:
-        news_id = int(id)
-        news = News.objects.get(id=news_id)
+        news_id = int(news_id)
+        news = Article.objects.get(id=news_id)
     except ValueError:
-        return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
-    except News.DoesNotExist:
-        return HttpResponse(status=status.HTTP_404_NOT_FOUND)
-    return render_to_response('news/news.html', {'article': news})
+        return HttpResponse(status=400)
+    except Article.DoesNotExist:
+        return HttpResponse(status=404)
+    r = RelatedData.objects.filter(uuid=news.uuid)[0]
+    relateddata = list(r.weixin.all()) + list(r.weibo.all()) + list(r.articles.all())
+    return render_to_response('news/news.html', {'article': news, 'relate': relateddata})
 
 def event_view(request):
     return render_to_response('event/event_list.html')

@@ -8,6 +8,7 @@ from rest_framework.views import APIView
 from yqj.models import (Article, Area, Weixin, Weibo, Topic, RelatedData, ArticleCategory)
 from serializers import ArticleSerializer
 from django.views.generic import View
+from django.db import models
 #from django.db.model import get_model
 
 class TableAPIView(APIView):
@@ -29,7 +30,7 @@ class TableAPIView(APIView):
         if item_id is None:
             raise TypeError('item should has id atrribute or id key')
         
-        return any(lambda x: x.id == item_id, items)
+        return any(filter(lambda x: x.id == item_id, items))
 
     def collected_items(self):
         return []
@@ -58,15 +59,14 @@ class ArticleTableView(TableAPIView):
 
         for item in articles:
             collect_html = self.collected_html(item)
-            pubtime = get_date_from_iso(item['pubtime'])
-            area = u'武汉'
+            #pubtime = get_date_from_iso(item.pubtime)
             url = u'/news/%s' % item.id
-            title = self.title_html(url, item['title'],item['id'], 'article')
+            title = self.title_html(url, item.title,item.id, 'article')
             hot_index = 78
-            one_record = [collect_html, title, item['source'], area, pubtime, hot_index]
+            one_record = [collect_html, title, item.source, item.area.name, item.pubtime.date(), hot_index]
             result.append(one_record)
 
-        return Response({'data': result})
+        return Response({'news': result})
 
 class NewsTableView(TableAPIView):
     def get(self, request):
@@ -76,11 +76,36 @@ class NewsTableView(TableAPIView):
 
         for item in news:
             collected_html = self.collected_html(item)
-            pubtime = get_date_from_iso(item['item'])
+            #pubtime = get_date_from_iso(item['item'])
             area = u'武汉'
-            title = self.title_html(item['url'], item['title'],item['id'], 'article')
+            url = u'/news/%s' % item.id
+            title = self.title_html(url, item.title,item.id, 'article')
             hot_index = 78
-            one_record = [collect_html, title, item['source'], area, pubtime, hot_index]
+            one_record = [collect_html, title, item.source, item.area.name, item.pubtime.date(), hot_index]
+            result.append(one_record)
+        
+        return Response({"news": result})
+
+
+class LocationTableView(TableAPIView):
+    def get(self, request, location_id):
+        try:
+            id = int(location_id)
+            area = Area.objects.get(id=id)
+        except Area.DoesNotExist:
+            return Response({'news': []})
+        result = []
+        news = Article.objects.filter(area=area)[:self.LIMIT_NUMBER]
+        serializer = ArticleSerializer(news, many=True)
+
+        for item in news:
+            collected_html = self.collected_html(item)
+            #pubtime = get_date_from_iso(item.item)
+            area = u'武汉'
+            url = u'/news/%s' % item.id
+            title = self.title_html(url, item.title,item.id, 'article')
+            hot_index = 78
+            one_record = [collected_html, title, item.source, item.area.name, item.pubtime.date(), hot_index]
             result.append(one_record)
         
         return Response({"news": result})
