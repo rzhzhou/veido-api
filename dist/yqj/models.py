@@ -40,6 +40,7 @@ class Weixin(models.Model):
     pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
     publisher = models.ForeignKey(WeixinPublisher, verbose_name=u'微信发布者')
     area = models.ForeignKey(Area, verbose_name=u'名称')
+    uuid = models.CharField(max_length=36)
 
     class Meta:
         db_table = 'weixin'
@@ -77,6 +78,7 @@ class Weibo(models.Model):
     praise = models.IntegerField(blank=True, verbose_name=u'点赞数')
     comment = models.IntegerField(blank=True, verbose_name=u'评论量')
     tansmit = models.IntegerField(blank=True, verbose_name=u'转发量')
+    uuid = models.CharField(max_length=36)
 
     class Meta:
         db_table = 'weibo'
@@ -109,6 +111,7 @@ class Article(models.Model):
     pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
     publisher = models.ForeignKey(ArticlePublisher, verbose_name=u'文章发布者')
     area = models.ForeignKey(Area, verbose_name=u'名称')
+    uuid = models.CharField(max_length=36)
 
     class Meta:
         db_table = 'article'
@@ -134,7 +137,7 @@ class Topic(models.Model):
         return self.title
 
 
-class RealtedData(models.Model):
+class RelatedData(models.Model):
     uuid = models.CharField(max_length=36, verbose_name=u'uuid')
     articles = models.ManyToManyField(Article, related_name='relateddata', related_query_name='relateddatas', null=True, blank=True, verbose_name=u'文章')
     weibo = models.ManyToManyField(Weibo, related_name='relateddata', related_query_name='relateddatas', null=True, blank=True, verbose_name=u'微博')
