@@ -3,108 +3,103 @@ $.fn.Do = function(func) {
   return this;
 }
 
-// require.config({
-//   paths: {
-//     echarts: '/vendor/echarts',
-//     theme: '/vendor/echarts/theme'
-//   }
-// });
+require.config({
+  paths: {
+    echarts: "/vendor/echarts"
+  }
+});
 
-// require([
-//   'echarts',
-//   'theme/macarons',
-//   'echarts/chart/line',
-//   'echarts/chart/pie'
-// ],
-// function(ec, theme) {
-//   var lineChart = ec.init(document.getElementById('line-chart'), theme);
-//   var lineChartOption = {
-//     tooltip : {
-//       trigger: 'axis'
-//     },
-//     legend: {
-//       data:['标准化','稽查打假','质量监管','科技兴检','特种设备']
-//     },
-//     grid: {
-//       x: 40,
-//       y: 30,
-//       x2: 10,
-//       y2: 30
-//     },
-//     xAxis : [
-//       {
-//         type : 'category',
-//         boundaryGap : false,
-//         data : ['周一','周二','周三','周四','周五','周六','周日']
-//       }
-//     ],
-//     yAxis : [
-//       {
-//         type : 'value'
-//       }
-//     ],
-//     series : [
-//       {
-//         name:'标准化',
-//         type:'line',
-//         stack: '总量',
-//         data:[120, 132, 101, 134, 90, 230, 210]
-//       },
-//       {
-//         name:'稽查打假',
-//         type:'line',
-//         stack: '总量',
-//         data:[220, 182, 191, 234, 290, 330, 310]
-//       },
-//       {
-//         name:'质量监管',
-//         type:'line',
-//         stack: '总量',
-//         data:[150, 232, 201, 154, 190, 330, 410]
-//       },
-//       {
-//         name:'科技兴检',
-//         type:'line',
-//         stack: '总量',
-//         data:[320, 332, 301, 334, 390, 330, 320]
-//       },
-//       {
-//         name:'特种设备',
-//         type:'line',
-//         stack: '总量',
-//         data:[820, 932, 901, 934, 1290, 1330, 1320]
-//       }
-//     ]
-//   };                        
-//   lineChart.setOption(lineChartOption);
-
-
-//   var pieChart = ec.init(document.getElementById('pie-chart'), theme);
-//   var pieChartOption = {
-//     tooltip : {
-//       trigger: 'item',
-//       formatter: "{a} <br/>{b} : {c} ({d}%)"
-//     },
-//     legend: {
-//       data:['江岸','洪山','江夏','东西湖']
-//     },
-//     series : [
-//         {
-//           name:'信息比例',
-//           type:'pie',
-//           radius : '55%',
-//           center: ['50%', '60%'],
-//           data:[
-//             {value:335, name:'江岸'},
-//             {value:310, name:'洪山'},
-//             {value:234, name:'江夏'},
-//             {value:135, name:'东西湖'}
-//           ]
-//         }
-//     ]                        
-//   };
-//   pieChart.setOption(pieChartOption);
-// });
+var myChart = {
+  line: function() {
+    require(['echarts', 'echarts/chart/line'], function(ec) {
+      ec.init(document.getElementById('line-chart'), 'macarons').setOption({
+        tooltip : {
+          trigger: 'axis'
+        },
+        legend: {
+          data:['标准化','稽查打假','质量监管','科技兴检','特种设备']
+        },
+        grid: {
+          x: 40,
+          y: 30,
+          x2: 10,
+          y2: 30
+        },
+        xAxis : [
+          {
+            type : 'category',
+            boundaryGap : false,
+            data : ['周一','周二','周三','周四','周五','周六','周日']
+          }
+        ],
+        yAxis : [
+          {
+            type : 'value'
+          }
+        ],
+        series : [
+          {
+            name:'标准化',
+            type:'line',
+            stack: '总量',
+            data:[120, 132, 101, 134, 90, 230, 210]
+          },
+          {
+            name:'稽查打假',
+            type:'line',
+            stack: '总量',
+            data:[220, 182, 191, 234, 290, 330, 310]
+          },
+          {
+            name:'质量监管',
+            type:'line',
+            stack: '总量',
+            data:[150, 232, 201, 154, 190, 330, 410]
+          },
+          {
+            name:'科技兴检',
+            type:'line',
+            stack: '总量',
+            data:[320, 332, 301, 334, 390, 330, 320]
+          },
+          {
+            name:'特种设备',
+            type:'line',
+            stack: '总量',
+            data:[820, 932, 901, 934, 1290, 1330, 1320]
+          }
+        ]        
+      });
+    });
+  },
+  pie: function() {
+    require(['echarts', 'echarts/chart/pie'], function(ec) {
+      ec.init(document.getElementById('pie-chart'), 'macarons').setOption({
+        tooltip : {
+          trigger: 'item',
+          formatter: "{a} <br/>{b} : {c} ({d}%)"
+        },
+        legend: {
+          data:['江岸','洪山','江夏','东西湖']
+        },
+        series : [
+            {
+              name:'信息比例',
+              type:'pie',
+              radius : '55%',
+              center: ['50%', '60%'],
+              data:[
+                {value:335, name:'江岸'},
+                {value:310, name:'洪山'},
+                {value:234, name:'江夏'},
+                {value:135, name:'东西湖'}
+              ]
+            }
+        ]                                
+      });
+    });
+  }
+};
 
 
 var myTable = function() {
@@ -211,6 +206,8 @@ var myTable = function() {
 };
 
 $(function() {
+  $('#line-chart').Do(myChart.line);
+  $('#pie-chart').Do(myChart.pie);
   $('#news').Do(myTable);
   $('#event').Do(myTable);  
 });

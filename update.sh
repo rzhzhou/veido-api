@@ -11,13 +11,12 @@ mv dist/vendor/jquery/jQuery-2.1.3.min.js dist/vendor/jquery/jquery.min.js
 # copy bootstrap
 cp -r bower_components/admin-lte/bootstrap dist/vendor/bootstrap
 
+# mkdir for dataTables
+mkdir dist/vendor/dataTables
+gulp dataTables
+
 # copy echarts
 cp -r bower_components/echarts/build/dist dist/vendor/echarts
-mkdir dist/vendor/echarts/theme
-gulp echarts-theme
-
-# copy slimScroll
-cp -r bower_components/admin-lte/plugins/slimScroll dist/vendor/slimScroll
 
 # copy fontawesome
 mkdir dist/vendor/fontawesome
