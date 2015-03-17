@@ -49,11 +49,12 @@ gulp.task('js', function() {
 
 gulp.task('dataTables', function() {
   var files = [
-    'bower_components/DataTables/media/js/jquery.dataTables.min.js',
-    'bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js'
+    'bower_components/DataTables/media/js/jquery.dataTables.js',
+    'bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.js'
   ];
 
   gulp.src(files)
     .pipe(concat('dataTables.min.js'))
+    .pipe(uglify())
     .pipe(gulp.dest('dist/vendor/dataTables'));
 });
