@@ -83,9 +83,9 @@ def news_detail_view(request, news_id):
         news_id = int(news_id)
         news = Article.objects.get(id=news_id)
     except ValueError:
-        return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
+        return HttpResponse(status=400)
     except Article.DoesNotExist:
-        return HttpResponse(status=status.HTTP_404_NOT_FOUND)
+        return HttpResponse(status=404)
     r = RelatedData.objects.filter(uuid=news.uuid)[0]
     relateddata = list(r.weixin.all()) + list(r.weibo.all()) + list(r.articles.all())
     return render_to_response('news/news.html', {'article': news, 'relate': relateddata})

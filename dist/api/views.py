@@ -60,11 +60,10 @@ class ArticleTableView(TableAPIView):
         for item in articles:
             collect_html = self.collected_html(item)
             #pubtime = get_date_from_iso(item.pubtime)
-            area = u'武汉'
             url = u'/news/%s' % item.id
             title = self.title_html(url, item.title,item.id, 'article')
             hot_index = 78
-            one_record = [collect_html, title, item.source, area, item.pubtime.date(), hot_index]
+            one_record = [collect_html, title, item.source, item.area.name, item.pubtime.date(), hot_index]
             result.append(one_record)
 
         return Response({'news': result})
@@ -82,7 +81,7 @@ class NewsTableView(TableAPIView):
             url = u'/news/%s' % item.id
             title = self.title_html(url, item.title,item.id, 'article')
             hot_index = 78
-            one_record = [collect_html, title, item.source, area, item.pubtime.date(), hot_index]
+            one_record = [collect_html, title, item.source, item.area.name, item.pubtime.date(), hot_index]
             result.append(one_record)
         
         return Response({"news": result})
@@ -96,7 +95,7 @@ class LocationTableView(TableAPIView):
         except Area.DoesNotExist:
             return Response({'news': []})
         result = []
-        news = Article.objects.filter()[:self.LIMIT_NUMBER]
+        news = Article.objects.filter(area=area)[:self.LIMIT_NUMBER]
         serializer = ArticleSerializer(news, many=True)
 
         for item in news:
@@ -106,7 +105,7 @@ class LocationTableView(TableAPIView):
             url = u'/news/%s' % item.id
             title = self.title_html(url, item.title,item.id, 'article')
             hot_index = 78
-            one_record = [collected_html, title, item.source, area, item.pubtime.date(), hot_index]
+            one_record = [collected_html, title, item.source, item.area.name, item.pubtime.date(), hot_index]
             result.append(one_record)
         
         return Response({"news": result})
