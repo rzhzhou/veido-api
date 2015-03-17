@@ -1,3 +1,16 @@
+/*
+ * configuration
+ */
+require.config({
+  paths: {
+    echarts: "/vendor/echarts"
+  }
+});
+
+
+/*
+ * custom plugin
+ */
 $.fn.Do = function(func) {
   this.length && func.apply(this);
   return this;
@@ -10,6 +23,9 @@ $.fn.Trim = function() {
 };
 
 
+/*
+ * functions
+ */
 var user = {
   login: function() {
     var form = this.find('form');
@@ -39,13 +55,6 @@ var user = {
     });
   }
 };
-
-
-require.config({
-  paths: {
-    echarts: "/vendor/echarts"
-  }
-});
 
 var myChart = {
   line: function() {
@@ -138,7 +147,6 @@ var myChart = {
     });
   }
 };
-
 
 var myTable = function() {
   $.fn.dataTable.ext.errMode = 'throw';
@@ -243,6 +251,10 @@ var myTable = function() {
   });  
 };
 
+
+/*
+ * run function when element exists
+ */
 $(function() {
   $('.login-box').Do(user.login);
 
