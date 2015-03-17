@@ -3,6 +3,44 @@ $.fn.Do = function(func) {
   return this;
 }
 
+$.fn.Trim = function() {
+  var _value = this.find('input').val();
+  var value = $.trim(_value);
+  return value; 
+};
+
+
+var user = {
+  login: function() {
+    var form = this.find('form');
+    var msg = $('.login-box-msg');
+
+    form.submit(function(event) {
+      event.preventDefault();
+
+      var data = {
+        username: $('#username').Trim(),
+        password: $('#password').Trim()
+      };
+
+      var response = function(data) {
+        if (data) {
+          location.href = location.search.length ? location.search.substr(1).split("=")[1] : "/";
+        } else {
+          msg.text('用户名或密码错误！');
+        };
+      };
+
+      if (data.username.length && data.password.length) {
+        $.post('/api/login', data, response);
+      } else {
+        msg.text('请输入用户名和密码！');
+      };
+    });
+  }
+};
+
+
 require.config({
   paths: {
     echarts: "/vendor/echarts"
@@ -206,8 +244,11 @@ var myTable = function() {
 };
 
 $(function() {
+  $('.login-box').Do(user.login);
+
   $('#line-chart').Do(myChart.line);
   $('#pie-chart').Do(myChart.pie);
+
   $('#news').Do(myTable);
   $('#event').Do(myTable);  
 });

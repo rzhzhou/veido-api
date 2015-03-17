@@ -1,0 +1,34 @@
+{% extends "base/_layout.html" %}
+
+{% block title %}登录 - 质监舆情{% endblock %}
+
+{% block class %}login-page{% endblock %}
+
+{% block _content %}
+  <div class="login-box">
+    <div class="login-logo">
+      <a href="/">质监舆情</a>
+    </div>
+    <div class="login-box-body">
+      <p class="login-box-msg">登录</p>
+      <form>
+        <div id="username" class="form-group has-feedback">
+          <input type="text" class="form-control" placeholder="用户名"/>
+          <span class="glyphicon glyphicon-user form-control-feedback"></span>
+        </div>
+        <div id="password" class="form-group has-feedback">
+          <input type="password" class="form-control" placeholder="密码"/>
+          <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+        </div>
+        <div class="row">
+          <div class="col-xs-8">    
+            <a href="/register/">没有账号？</a>         
+          </div>
+          <div class="col-xs-4">
+            <button type="submit" class="btn btn-primary btn-block btn-flat">登录</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}
