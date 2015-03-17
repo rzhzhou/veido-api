@@ -5,8 +5,10 @@ from django.db import IntegrityError
 from django.conf import settings
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from yqj.models import (Article, Area, Weixin, Weibo, Topic, RealtedData, ArticleCategory)
+from yqj.models import (Article, Area, Weixin, Weibo, Topic, RelatedData, ArticleCategory)
 from serializers import ArticleSerializer
+from django.views.generic import View
+#from django.db.model import get_model
 
 class TableAPIView(APIView):
     COLLECTED_TEXT = u'<i class="fa fa-star" data-toggle="tooltip", data-placement="right" title="取消收藏">'
@@ -84,6 +86,6 @@ class NewsTableView(TableAPIView):
         return Response({"news": result})
 
 
-class CollectionTableView(TableAPIView):
-    def get(self, request):
-        news = []
+class CollectModifyView(View):
+    pass
+

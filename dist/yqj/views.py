@@ -3,12 +3,13 @@ import datetime
 
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse
-from models import Weixin, Weibo
+from models import Weixin, Weibo, RelatedData, ArticleCategory, Area
 
 def index_view(request):
     user = {'name': 'wuhan', 'company': u'武汉质监局', 'isAdmin': True}
-    categories = [{'name': u'微博', 'id': '98672345'}, {'name': u'文章', 'id': '52345609'}]
+    categories = ArticleCategory.objects.all()
     locations = [{'name': u'武昌', 'id': '98672345'}, {'name': u'汉口', 'id': '52345609'}]
+    locations = Area.objects.filter(level=2)
     
     news = {'number': 67}
     weibo = {'number': 167}
@@ -104,7 +105,9 @@ def weixin_detail_view(request, id):
         return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
     except Weixin.DoesNotExist:
         return HttpResponse(status=status.HTTP_404_NOT_FOUND)
-    return render_to_response('weixin/weixin.html', {'article': weixin})
+    r = RelatedData.objects.filter(uuid=weixin.uuid)[0]
+    relateddata = list(r.weixin.all()) + list(r.weibo.all()) + list(r.articles.all())
+    return render_to_response('weixin/weixin.html', {'article': weixin, 'relate': relateddata})
 
 def weibo_view(request):
     hottest = latest = Weibo.objects.order_by('-pubtime')[0:20]

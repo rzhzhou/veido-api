@@ -55,7 +55,9 @@
         </div>
         <div class="box-body no-padding">
           <div class="list-group no-margin">
-            <a href="/weixin/{{ weixin.id }}/" class="list-group-item no-border">{{ weixin.title }}</a>
+            {% for item in relate %}
+              <a href="/weixin/{{ item.id }}/" class="list-group-item no-border">{{ item.title }}</a>
+            {% endfor %}
           </div>
         </div>
       </div>
