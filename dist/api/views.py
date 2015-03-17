@@ -5,8 +5,8 @@ from django.db import IntegrityError
 from django.conf import settings
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from yqj.models import (Article, Area, Weixin, Topic, RealtedData, ArticleCategory)
-
+from yqj.models import (Article, Area, Weixin, Weibo, Topic, RealtedData, ArticleCategory)
+from serializers import ArticleSerializer
 
 class TableAPIView(APIView):
     COLLECTED_TEXT = u'<i class="fa fa-star" data-toggle="tooltip", data-placement="right" title="取消收藏">'
@@ -48,19 +48,42 @@ class ArticleTableView(TableAPIView):
         try:
             category = ArticleCategory.objects.get(id=id)
         except ArticleCategory.DoesNotExist:
-            return Response({'data': []})
+            return Response({'news': []})
         
         result = []
-        articles = category.articles.all()[self.LIMIT_NUMBER]
+        articles = category.articles.all()[:self.LIMIT_NUMBER]
         serializer = ArticleSerializer(articles, many=True)
 
         for item in articles:
             collect_html = self.collected_html(item)
-            pubtime = get_date_from_iso(article['pubtime'])
+            pubtime = get_date_from_iso(item['pubtime'])
             area = u'武汉'
-            title = self.title_html(article['url'], article['title'], article['id'], 'article')
+            url = u'/news/%s' % item.id
+            title = self.title_html(url, item['title'],item['id'], 'article')
             hot_index = 78
-            one_record = [collect_html, title, source, area, pubtime, hot_index]
+            one_record = [collect_html, title, item['source'], area, pubtime, hot_index]
             result.append(one_record)
 
         return Response({'data': result})
+
+class NewsTableView(TableAPIView):
+    def get(self, request):
+        result = []
+        news = Article.objects.all()[:self.LIMIT_NUMBER]
+        serializer = ArticleSerializer(news, many=True)
+
+        for item in news:
+            collected_html = self.collected_html(item)
+            pubtime = get_date_from_iso(item['item'])
+            area = u'武汉'
+            title = self.title_html(item['url'], item['title'],item['id'], 'article')
+            hot_index = 78
+            one_record = [collect_html, title, item['source'], area, pubtime, hot_index]
+            result.append(one_record)
+        
+        return Response({"news": result})
+
+
+class CollectionTableView(TableAPIView):
+    def get(self, request):
+        news = []
