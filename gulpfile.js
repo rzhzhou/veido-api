@@ -37,8 +37,6 @@ gulp.task('less', function() {
 gulp.task('js', function() {
   var files = [
     'bower_components/admin-lte/plugins/slimScroll/jquery.slimscroll.js',
-    'bower_components/DataTables/media/js/jquery.dataTables.js',
-    'bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.js',
     'src/js/adminlte/app.js',
     'src/js/app.js'
   ];
@@ -49,8 +47,13 @@ gulp.task('js', function() {
     .pipe(gulp.dest(dist + 'js'));
 });
 
-gulp.task('echarts-theme', function() {
-  gulp.src('bower_components/echarts/doc/example/theme/macarons.js')
-    .pipe(uglify())
-    .pipe(gulp.dest('dist/vendor/echarts/theme'));
+gulp.task('dataTables', function() {
+  var files = [
+    'bower_components/DataTables/media/js/jquery.dataTables.min.js',
+    'bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js'
+  ];
+
+  gulp.src(files)
+    .pipe(concat('dataTables.min.js'))
+    .pipe(gulp.dest('dist/vendor/dataTables'));
 });
