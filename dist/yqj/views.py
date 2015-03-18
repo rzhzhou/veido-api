@@ -3,58 +3,56 @@ import datetime
 
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse
-from yqj.models import Article, Weixin, Weibo, RelatedData, ArticleCategory, Area
+from yqj.models import Article, Weixin, Weibo, RelatedData, ArticleCategory, Area, Topic
 
 from yqj import login_required
 
 @login_required
 def index_view(request):
-    user = {'name': 'wuhan', 'company': u'武汉质监局', 'isAdmin': True}
-    categories = ArticleCategory.objects.all()
-    locations = [{'name': u'武昌', 'id': '98672345'}, {'name': u'汉口', 'id': '52345609'}]
-    locations = Area.objects.filter(level=2)
+    #user = {'name': 'wuhan', 'company': u'武汉质监局', 'isAdmin': True}
+    user = request.myuser
+    if user.is_authenticated():
+        categories = ArticleCategory.objects.all()
+        locations = Area.objects.filter(level=user.area.level+1, parent=user.area)
 
-    news = {'number': 67}
-    weibo = {'number': 167}
-    weixin = {'number': 53}
-    event = {'number': 29}
+	news = Article.objects.all().count()
+	weibo = Weibo.objects.all().count()
+	weixin = Weixin.objects.all().count()
+	event = Topic.objects.all().count()
 
-    logo_path = '/static/img/64.gif'
-    #weixin_list_number = news_list_number = event_list_number = weibo_list_number = 5
-    news_list_number = event_list_number = 5
-    weixin_list_number = weibo_list_number = 5
+	news_list_number = event_list_number = 5
+	weixin_list_number = weibo_list_number = 5
 
-    news_list = []
-    weixin_list = []
-    event_list = []
-    weibo_list = []
-    news_list = Article.objects.all()[:news_list_number]
-    for item in news_list:
-        setattr(item, 'hot_index', RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count())
-
-    for i in range(event_list_number):
-        event_list.append({'url': 'www.baidu.com', 'title': u'新闻', 'source': u'深度网', 'time': 53})
-
-    weibo_data = Weibo.objects.all()[0:weibo_list_number]
-    for data in weibo_data:
-        weibo_list.append({'logo': data.publisher.photo, 'id': data.id, 'title': data.title, 'name': data.author, 'time': data.pubtime, 'content': data.content})
-
-    weixin_data = Weixin.objects.all()[0:weixin_list_number]
-    for data in weixin_data:
-        weixin_list.append({'logo': data.publisher.photo, 'id': data.id, 'title': data.title, 'name': data.author, 'time': data.pubtime, 'content': data.content})
-    return render_to_response("dashboard/dashboard.html",
-        {'user': user,
-        'categories': categories,
-        'locations': locations,
-        'news': news,
-        'weibo': weibo,
-        'weixin': weixin,
-        'event': event,
-        'news_list': news_list,
-        'event_list': event_list,
-        'weixin_list': weixin_list,
-        'weibo_list': weibo_list,
-        })
+	news_list = []
+	weixin_list = []
+	event_list = []
+	weibo_list = []
+	news_list = Article.objects.all()[:news_list_number]
+	for item in news_list:
+	    setattr(item, 'hot_index', RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count())
+	for i in range(event_list_number):
+            event_list.append({'url': 'www.baidu.com', 'title': u'新闻', 'source': u'深度网', 'time': 53})
+	weibo_data = Weibo.objects.all()[0:weibo_list_number]
+	for data in weibo_data:
+	    weibo_list.append({'logo': data.publisher.photo, 'id': data.id, 'title': data.title, 'name': data.author, 'time': data.pubtime, 'content': data.content})
+	weixin_data = Weixin.objects.all()[0:weixin_list_number]
+	for data in weixin_data:
+	    weixin_list.append({'logo': data.publisher.photo, 'id': data.id, 'title': data.title, 'name': data.author, 'time': data.pubtime, 'content': data.content})
+        return render_to_response("dashboard/dashboard.html",
+			{'user': user,
+			'categories': categories,
+			'locations': locations,
+			'news': news,
+			'weibo': weibo,
+			'weixin': weixin,
+			'event': event,
+			'news_list': news_list,
+			'event_list': event_list,
+			'weixin_list': weixin_list,
+			'weibo_list': weibo_list,
+			})
+    else:
+        return HttpResponse(status=401)
 
 def category_view(request, ctg_id):
     category  = {'name': u'质量检测', 'url': 'http://www.baidu.com'}

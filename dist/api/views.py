@@ -103,12 +103,12 @@ class ArticleTableView(TableAPIView):
         serializer = ArticleSerializer(articles, many=True)
 
         for item in articles:
-            collect_html = self.collected_html(item)
+            collected_html = self.collected_html(item)
             #pubtime = get_date_from_iso(item.pubtime)
             url = u'/news/%s' % item.id
             title = self.title_html(url, item.title,item.id, 'article')
             hot_index = RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count()
-            one_record = [collected_html, title, item.source, item.area.name, item.pubtime.date(), hot_index]
+            one_record = [collected_html, title, item.publisher.publisher, item.area.name, item.pubtime.date(), hot_index]
             result.append(one_record)
 
         return Response({'news': result})
@@ -124,7 +124,7 @@ class NewsTableView(TableAPIView):
             url = u'/news/%s' % item.id
             title = self.title_html(url, item.title,item.id, 'article')
             hot_index = RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count()
-            one_record = [collected_html, title, item.source, item.area.name, item.pubtime.date(), hot_index]
+            one_record = [collected_html, title, item.publisher.publisher, item.area.name, item.pubtime.date(), hot_index]
             result.append(one_record)
         
         return Response({"news": result})
@@ -147,7 +147,7 @@ class LocationTableView(TableAPIView):
             url = u'/news/%s' % item.id
             title = self.title_html(url, item.title,item.id, 'article')
             hot_index = RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count()
-            one_record = [collected_html, title, item.source, item.area.name, item.pubtime.date(), hot_index]
+            one_record = [collected_html, title, item.publisher.publisher, item.area.name, item.pubtime.date(), hot_index]
             result.append(one_record)
         
         return Response({"news": result})
