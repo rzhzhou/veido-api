@@ -14,11 +14,11 @@ require.config({
 $.fn.Do = function(func) {
   this.length && func.apply(this);
   return this;
-}
+};
 
 $.fn.Trim = function() {
   var _value = this.find('input').val();
-  var value = $.trim(_value);
+  var value  = $.trim(_value);
   return value; 
 };
 
@@ -29,7 +29,7 @@ $.fn.Trim = function() {
 var user = {
   login: function() {
     var form = this.find('form');
-    var msg = this.find('p');
+    var msg  = this.find('p');
 
     form.submit(function(event) {
       event.preventDefault();
@@ -44,18 +44,59 @@ var user = {
           location.href = location.search.length ? location.search.substr(1).split("=")[1] : "/";
         } else {
           msg.text('用户名或密码错误！');
-        };
+        }
       };
 
       if (data.username.length && data.password.length) {
         $.post('/api/login', data, response);
       } else {
         msg.text('请输入用户名和密码！');
-      };
+      }
     });
   },
   register: function() {
+    var form = this.find('form');
+    var msg  = this.find('p');
 
+    form.submit(function(event) {
+      event.preventDefault();
+
+      var data = {
+        username: $('#username').Trim(),
+        email:    $('#email').Trim(),
+        password: $('#password').Trim(),
+        retype:   $('#retype').Trim()
+      };
+
+      var response = function(data) {
+        if (data) {
+          location.href = "/";
+        } else {
+          msg.text('抱歉，注册失败！');
+        }
+      };
+
+      switch (0) {
+        case data.username.length:
+          msg.text('请输入用户名！');
+          break;
+        case data.email.length:
+          msg.text('请输入邮箱！');
+          break;
+        case data.password.length:
+          msg.text('请输入密码!');
+          break;
+        case data.retype.length:
+          msg.text('请确认密码！');
+          break;
+        case Number( data.password === data.retype ):
+          msg.text('两次输入密码不一致！');
+          break;
+        default:
+          $.post('/api/register/', data, response);
+          break;
+      }
+    });
   }
 };
 
@@ -193,7 +234,7 @@ var myTable = function() {
       "orderable": false
     }],
     "deferLoading": 100,
-    "drawCallback": function(settings) {
+    "drawCallback": function() {
       $('[data-toggle="tooltip"]').tooltip();
     }    
   });
@@ -225,8 +266,8 @@ var myTable = function() {
         var add = function(status) {
           if (status) {
             that.removeClass('fa-star-o').addClass('fa-star');
-            dataTable.ajax.reload(null, false);
-          };
+            table.ajax.reload(null, false);
+          }
         };
 
         $.post('/api/collection/add/', data, add);
@@ -241,8 +282,8 @@ var myTable = function() {
         var remove = function(status) {
           if (status) {
             that.removeClass('fa-star').addClass('fa-star-o');
-            dataTable.ajax.reload(null, false);
-          };
+            table.ajax.reload(null, false);
+          }
         };
 
         $.post('/api/collection/remove/', data, remove);
@@ -260,6 +301,7 @@ var myTable = function() {
  */
 $(function() {
   $('.login-box').Do(user.login);
+  $('.register-box').Do(user.register);
 
   $('#line-chart').Do(myChart.line);
   $('#pie-chart').Do(myChart.pie);
