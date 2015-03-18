@@ -1,13 +1,60 @@
-$.fn.Do = function(func) {
-  this.length && func.apply(this);
-  return this;
-}
-
+/*
+ * configuration
+ */
 require.config({
   paths: {
     echarts: "/vendor/echarts"
   }
 });
+
+
+/*
+ * custom plugin
+ */
+$.fn.Do = function(func) {
+  this.length && func.apply(this);
+  return this;
+}
+
+$.fn.Trim = function() {
+  var _value = this.find('input').val();
+  var value = $.trim(_value);
+  return value; 
+};
+
+
+/*
+ * functions
+ */
+var user = {
+  login: function() {
+    var form = this.find('form');
+    var msg = $('.login-box-msg');
+
+    form.submit(function(event) {
+      event.preventDefault();
+
+      var data = {
+        username: $('#username').Trim(),
+        password: $('#password').Trim()
+      };
+
+      var response = function(data) {
+        if (data) {
+          location.href = location.search.length ? location.search.substr(1).split("=")[1] : "/";
+        } else {
+          msg.text('用户名或密码错误！');
+        };
+      };
+
+      if (data.username.length && data.password.length) {
+        $.post('/api/login', data, response);
+      } else {
+        msg.text('请输入用户名和密码！');
+      };
+    });
+  }
+};
 
 var myChart = {
   line: function() {
@@ -100,7 +147,6 @@ var myChart = {
     });
   }
 };
-
 
 var myTable = function() {
   $.fn.dataTable.ext.errMode = 'throw';
@@ -205,9 +251,16 @@ var myTable = function() {
   });  
 };
 
+
+/*
+ * run function when element exists
+ */
 $(function() {
+  $('.login-box').Do(user.login);
+
   $('#line-chart').Do(myChart.line);
   $('#pie-chart').Do(myChart.pie);
+
   $('#news').Do(myTable);
   $('#event').Do(myTable);  
 });

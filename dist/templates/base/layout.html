@@ -1,16 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>{% block title %}{% endblock %}</title>
-  <meta name="renderer" content="webkit">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
-  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-  <link rel="stylesheet" href="/vendor/bootstrap/css/bootstrap.min.css">
-  <link rel="stylesheet" href="/vendor/fontawesome/css/font-awesome.min.css">
-  <link rel="stylesheet" href="/static/css/app.css">
-</head>
-<body class="skin-blue fixed">
+{% extends "base/_layout.html" %}
+
+{% block class %}skin-blue fixed{% endblock %}
+
+{% block _content %}
   <div class="wrapper">
     {% include "base/header.html" %}
 
@@ -28,11 +20,4 @@
     
     {% include "base/footer.html" %}
   </div>
-
-  <script src="/vendor/jquery/jquery.min.js"></script>
-  <script src="/vendor/bootstrap/js/bootstrap.min.js"></script>
-  <script src="/vendor/dataTables/dataTables.min.js"></script>
-  <script src="/vendor/echarts/echarts.js"></script>
-  <script src="/static/js/app.js"></script>
-</body>
-</html>
+{% endblock %}
