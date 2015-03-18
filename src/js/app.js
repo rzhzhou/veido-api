@@ -42,7 +42,7 @@ app.user = {
       };
 
       var response = function(data) {
-        if (data) {
+        if (data.status) {
           location.href = location.search.length ? location.search.substr(1).split("=")[1] : "/";
         } else {
           msg.text('用户名或密码错误！');
@@ -50,7 +50,7 @@ app.user = {
       };
 
       if (data.username.length && data.password.length) {
-        $.post('/api/login/', data, response);
+        $.post('/api/login/', data, response, 'json');
       } else {
         msg.text('请输入用户名和密码！');
       }
@@ -65,13 +65,12 @@ app.user = {
 
       var data = {
         username: $('#username').Trim(),
-        email:    $('#email').Trim(),
         password: $('#password').Trim(),
         retype:   $('#retype').Trim()
       };
 
       var response = function(data) {
-        if (data) {
+        if (data.status) {
           location.href = "/";
         } else {
           msg.text('抱歉，注册失败！');
@@ -81,9 +80,6 @@ app.user = {
       switch (0) {
         case data.username.length:
           msg.text('请输入用户名！');
-          break;
-        case data.email.length:
-          msg.text('请输入邮箱！');
           break;
         case data.password.length:
           msg.text('请输入密码!');
@@ -95,7 +91,7 @@ app.user = {
           msg.text('两次输入密码不一致！');
           break;
         default:
-          $.post('/api/register/', data, response);
+          $.post('/api/register/', {username: data.username, password: data.password}, response, 'json');
           break;
       }
     });
