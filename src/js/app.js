@@ -95,6 +95,32 @@ app.user = {
           break;
       }
     });
+  },
+  icon: function() {
+    console.log('change icon function');
+  },
+  info: function() {
+    var form = this.find('form');
+    var msg  = this.find('p');
+
+    form.submit(function(event) {
+      event.preventDefault();
+
+      var data = {
+        username:    $('#username').Trim(),
+        oldPassword: $('#old-password').Trim(),
+        newPassword: $('#new-password').Trim(),
+        retype:      $('#retype-password').Trim()
+      };
+
+      var response = function(data) {
+        if (data.status) {
+          msg.text('更新成功！').show();
+        } else{
+          msg.text('原密码错误！').show();
+        };
+      };
+    });
   }
 };
 
