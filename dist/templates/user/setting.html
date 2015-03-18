@@ -17,9 +17,9 @@
         <div class="box-header with-border">
           <h3 class="box-title">头像</h3>
         </div>
-        <div id="user-icon" class="box-body">
+        <div class="box-body user-icon">
           <img src="http://placehold.it/160x160" alt="user icon">
-          <form>
+          <form action="/api/setting/upload/" method="post">
             <div class="form-group">
               <p>从电脑中选择你喜欢的图片作为头像</p>
               <input type="file">
@@ -35,7 +35,7 @@
         <div class="box-header with-border">
           <h3 class="box-title">个人信息</h3>
         </div>
-        <div id="user-info" class="box-body">
+        <div class="box-body user-info">
           <p></p>
           <form>
             <div id="username" class="form-group has-feedback">
@@ -44,17 +44,17 @@
             </div>
             <div id="old-password" class="form-group has-feedback">
               <input type="password" class="form-control" placeholder="原密码">
-              <span class="glyphicon glyphicon-lock form-control-feedback"></span>          
-            </div>            
+              <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+            </div>
             <div id="new-password" class="form-group has-feedback">
               <input type="password" class="form-control" placeholder="新密码">
-              <span class="glyphicon glyphicon-lock form-control-feedback"></span>          
+              <span class="glyphicon glyphicon-lock form-control-feedback"></span>
             </div>
             <div id="retype-password" class="form-group has-feedback">
               <input type="password" class="form-control" placeholder="确认密码">
               <span class="glyphicon glyphicon-log-in form-control-feedback"></span>
             </div>
-            <button class="btn btn-default btn-sm">更新信息</button>            
+            <button class="btn btn-default btn-sm">更新信息</button>
           </form>
         </div>
       </div>
