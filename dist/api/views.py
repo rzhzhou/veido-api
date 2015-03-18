@@ -98,7 +98,7 @@ class ArticleTableView(TableAPIView):
             #pubtime = get_date_from_iso(item.pubtime)
             url = u'/news/%s' % item.id
             title = self.title_html(url, item.title,item.id, 'article')
-            hot_index = 78
+            hot_index = RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count()
             one_record = [collect_html, title, item.source, item.area.name, item.pubtime.date(), hot_index]
             result.append(one_record)
 
@@ -112,11 +112,9 @@ class NewsTableView(TableAPIView):
 
         for item in news:
             collected_html = self.collected_html(item)
-            #pubtime = get_date_from_iso(item['item'])
-            area = u'武汉'
             url = u'/news/%s' % item.id
             title = self.title_html(url, item.title,item.id, 'article')
-            hot_index = 78
+            hot_index = RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count()
             one_record = [collect_html, title, item.source, item.area.name, item.pubtime.date(), hot_index]
             result.append(one_record)
         
@@ -137,10 +135,9 @@ class LocationTableView(TableAPIView):
         for item in news:
             collected_html = self.collected_html(item)
             #pubtime = get_date_from_iso(item.item)
-            area = u'武汉'
             url = u'/news/%s' % item.id
             title = self.title_html(url, item.title,item.id, 'article')
-            hot_index = 78
+            hot_index = RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count()
             one_record = [collected_html, title, item.source, item.area.name, item.pubtime.date(), hot_index]
             result.append(one_record)
         

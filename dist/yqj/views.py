@@ -25,8 +25,9 @@ def index_view(request):
     weixin_list = []
     event_list = []
     weibo_list = []
-    for i in range(news_list_number):
-        news_list.append({'url': 'www.baidu.com', 'title': u'新闻', 'source': u'深度网', 'time': 21})
+    news_list = Article.objects.all()[:news_list_number]
+    for item in news_list:
+        setattr(item, 'hot_index', RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count())
 
     for i in range(event_list_number):
         event_list.append({'url': 'www.baidu.com', 'title': u'新闻', 'source': u'深度网', 'time': 53})

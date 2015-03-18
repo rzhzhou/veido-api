@@ -14,11 +14,11 @@ require.config({
 $.fn.Do = function(func) {
   this.length && func.apply(this);
   return this;
-}
+};
 
 $.fn.Trim = function() {
   var _value = this.find('input').val();
-  var value = $.trim(_value);
+  var value  = $.trim(_value);
   return value; 
 };
 
@@ -26,10 +26,12 @@ $.fn.Trim = function() {
 /*
  * functions
  */
-var user = {
+var app = {};
+
+app.user = {
   login: function() {
     var form = this.find('form');
-    var msg = $('.login-box-msg');
+    var msg  = this.find('p');
 
     form.submit(function(event) {
       event.preventDefault();
@@ -40,23 +42,63 @@ var user = {
       };
 
       var response = function(data) {
-        if (data) {
+        if (data.status) {
           location.href = location.search.length ? location.search.substr(1).split("=")[1] : "/";
         } else {
           msg.text('用户名或密码错误！');
-        };
+        }
       };
 
       if (data.username.length && data.password.length) {
-        $.post('/api/login', data, response);
+        $.post('/api/login/', data, response, 'json');
       } else {
         msg.text('请输入用户名和密码！');
+      }
+    });
+  },
+  register: function() {
+    var form = this.find('form');
+    var msg  = this.find('p');
+
+    form.submit(function(event) {
+      event.preventDefault();
+
+      var data = {
+        username: $('#username').Trim(),
+        password: $('#password').Trim(),
+        retype:   $('#retype').Trim()
       };
+
+      var response = function(data) {
+        if (data.status) {
+          location.href = "/";
+        } else {
+          msg.text('抱歉，注册失败！');
+        }
+      };
+
+      switch (0) {
+        case data.username.length:
+          msg.text('请输入用户名！');
+          break;
+        case data.password.length:
+          msg.text('请输入密码!');
+          break;
+        case data.retype.length:
+          msg.text('请确认密码！');
+          break;
+        case Number( data.password === data.retype ):
+          msg.text('两次输入密码不一致！');
+          break;
+        default:
+          $.post('/api/register/', {username: data.username, password: data.password}, response, 'json');
+          break;
+      }
     });
   }
 };
 
-var myChart = {
+app.chart = {
   line: function() {
     require(['echarts', 'echarts/chart/line'], function(ec) {
       ec.init(document.getElementById('line-chart'), 'macarons').setOption({
@@ -148,7 +190,7 @@ var myChart = {
   }
 };
 
-var myTable = function() {
+app.table = function() {
   $.fn.dataTable.ext.errMode = 'throw';
   
   var table = this.DataTable({
@@ -190,7 +232,7 @@ var myTable = function() {
       "orderable": false
     }],
     "deferLoading": 100,
-    "drawCallback": function(settings) {
+    "drawCallback": function() {
       $('[data-toggle="tooltip"]').tooltip();
     }    
   });
@@ -222,8 +264,8 @@ var myTable = function() {
         var add = function(status) {
           if (status) {
             that.removeClass('fa-star-o').addClass('fa-star');
-            dataTable.ajax.reload(null, false);
-          };
+            table.ajax.reload(null, false);
+          }
         };
 
         $.post('/api/collection/add/', data, add);
@@ -238,8 +280,8 @@ var myTable = function() {
         var remove = function(status) {
           if (status) {
             that.removeClass('fa-star').addClass('fa-star-o');
-            dataTable.ajax.reload(null, false);
-          };
+            table.ajax.reload(null, false);
+          }
         };
 
         $.post('/api/collection/remove/', data, remove);
@@ -256,11 +298,12 @@ var myTable = function() {
  * run function when element exists
  */
 $(function() {
-  $('.login-box').Do(user.login);
+  $('.login-box').Do(app.user.login);
+  $('.register-box').Do(app.user.register);
 
-  $('#line-chart').Do(myChart.line);
-  $('#pie-chart').Do(myChart.pie);
+  $('#line-chart').Do(app.chart.line);
+  $('#pie-chart').Do(app.chart.pie);
 
-  $('#news').Do(myTable);
-  $('#event').Do(myTable);  
+  $('#news').Do(app.table);
+  $('#event').Do(app.table);  
 });

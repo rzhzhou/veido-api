@@ -1,0 +1,40 @@
+{% extends "base/_layout.html" %}
+
+{% block title %}注册 - 质监舆情{% endblock %}
+
+{% block class %}register-page{% endblock %}
+
+{% block _content %}
+  <div class="register-box">
+    <div class="register-logo">
+      <a href="/">质监舆情</a>
+    </div>
+    <div class="register-box-body">
+      <p class="register-box-msg">注册</p>
+      <form>
+        <div id="username" class="form-group has-feedback">
+          <input type="text" class="form-control" placeholder="姓名">
+          <span class="glyphicon glyphicon-user form-control-feedback"></span>
+        </div>
+        <div id="password" class="form-group has-feedback">
+          <input type="text" class="form-control" placeholder="密码">
+          <span class="glyphicon glyphicon-lock form-control-feedback"></span>          
+        </div>
+        <div id="retype" class="form-group has-feedback">
+          <input type="text" class="form-control" placeholder="确认密码">
+          <span class="glyphicon glyphicon-log-in form-control-feedback"></span>
+        </div>
+        <div class="row">
+          <div class="col-xs-8">
+            <div>
+              <a href="/login/">已有账号？</a>
+            </div>
+          </div>
+          <div class="col-xs-4">
+            <button type="submit" class="btn btn-primary btn-block btn-flat">注册</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

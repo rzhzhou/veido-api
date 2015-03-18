@@ -77,7 +77,7 @@
             {% for news in news_list %}
               <a href="/news/{{ news.id }}/" class="list-group-item no-border">
                 {{ news.title }}
-                <span class="badge">{{ news.time | date:"m-d" }}</span>
+                <span class="badge">{{ news.hot_index }}</span>
               </a>
             {% endfor %}
           </div>
