@@ -42,7 +42,7 @@ app.user = {
       };
 
       var response = function(data) {
-        if (data) {
+        if (data.status) {
           location.href = location.search.length ? location.search.substr(1).split("=")[1] : "/";
         } else {
           msg.text('用户名或密码错误！');
@@ -50,7 +50,7 @@ app.user = {
       };
 
       if (data.username.length && data.password.length) {
-        $.post('/api/login/', data, response);
+        $.post('/api/login/', data, response, 'json');
       } else {
         msg.text('请输入用户名和密码！');
       }
