@@ -8,5 +8,9 @@ urlpatterns = patterns('',
     url(r'^category/(\d+)/$', ArticleTableView.as_view()),
     url(r'^location/(\d+)/$', LocationTableView.as_view()),
     url(r'^news/$', NewsTableView.as_view()),
-    url(r'^login/$', 'login_view'),
 )
+
+urlpatterns += patterns('api.views',
+    url(r'^login/$', 'login_view'),
+    url(r'^register/$', 'registe_view'),
+    )

@@ -1,7 +1,9 @@
 #coding: utf-8
-from django.db import models
 import hmac
 import hashlib
+from django.db import models
+from django.conf import settings
+from django.utils.crypto import get_random_string
 # Create your models here.
 
 class Area(models.Model):
@@ -162,17 +164,23 @@ class ArticleCategory(models.Model):
         db_table = 'article_category'
         verbose_name_plural = u'文章分类'
 
+def make_random_string(length=10,
+                         allowed_chars='abcdefghjkmnpqrstuvwxyz'
+                                       'ABCDEFGHJKLMNPQRSTUVWXYZ'
+                                       '23456789'):
+   return get_random_string(length, allowed_chars)
+
 def hash_password(raw_password, salt):
     value = salt + raw_password + salt
     hash = hmac.new(settings.SECRET_KEY, digestmod=hashlib.sha1)
     hash.update(value)
-    return hash.hexdiget()
+    return hash.hexdigest()
 
 def save_user(username, raw_password, area):
     kwargs = {}
     kwargs['username'] = username
-    kwargs['salt'] = self.make_random_string()
-    kwargs['password'] = hash_password(raw_password, salt)
+    kwargs['salt'] = make_random_string()
+    kwargs['password'] = hash_password(raw_password, kwargs['salt'])
     kwargs['area'] = area
     user = User(**kwargs)
     user.save()
@@ -180,18 +188,13 @@ def save_user(username, raw_password, area):
 
 class User(models.Model):
     username = models.CharField(max_length=20, unique=True, verbose_name=u'登录名')
-    passwod = models.CharField(max_length=255, verbose_name=u'hash密码')
+    password = models.CharField(max_length=255, verbose_name=u'hash密码')
     salt = models.CharField(max_length=255)
     area = models.ForeignKey(Area)
 
     def is_authenticated(self):
         return True
 
-    def make_random_string(self, length=10,
-                             allowed_chars='abcdefghjkmnpqrstuvwxyz'
-                                           'ABCDEFGHJKLMNPQRSTUVWXYZ'
-                                           '23456789'):
-       return get_random_string(length, allowed_chars)
 
 
 class AnonymousUser(User):

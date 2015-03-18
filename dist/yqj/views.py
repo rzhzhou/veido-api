@@ -3,8 +3,11 @@ import datetime
 
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse
-from models import Article, Weixin, Weibo, RelatedData, ArticleCategory, Area
+from yqj.models import Article, Weixin, Weibo, RelatedData, ArticleCategory, Area
 
+from yqj import login_required
+
+@login_required
 def index_view(request):
     user = {'name': 'wuhan', 'company': u'武汉质监局', 'isAdmin': True}
     categories = ArticleCategory.objects.all()

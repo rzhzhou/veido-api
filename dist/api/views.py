@@ -8,10 +8,10 @@ from django.db import IntegrityError
 from django.conf import settings
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.decorators import api_view
 from yqj.models import (Article, Area, Weixin, Weibo, Topic, RelatedData, ArticleCategory, save_user)
 from serializers import ArticleSerializer
-#from django.db.model import get_model
-
+from yqj import authenticate, login_required
 
 def login_view(request):
     try:
@@ -21,31 +21,40 @@ def login_view(request):
         return HttpResponse(status=400)
     
     user = authenticate(username, password)
-    response = JsonResponse()
     if user.is_authenticated():
+        response = JsonResponse({'status': True})
         response.set_cookie('pass_id', user.id)
         response.set_cookie('name', user.username)
-        return JsonResponse({'status': True})
+        return response
     else:
         return JsonResponse({'status': False})
 
+@api_view(['POST'])
+def registe_view(request):
+    print request.method
 
-def regist_view(request):
     try:
         username = request.POST['username']
         password = request.POST['password']
     except KeyError:
         return HttpResponse(status=400)
+    users = User.objects.filter(username=username)
+    if users:
+        return JsonResponse({'status': False})
     try:
         area = Area.objects.get(name=u'武汉')
         save_user(username, password, area)
-    except excep:
-        raise excep
+    except :
         return JsonResponse({'status': False})
 
     return JsonResponse({'status': True})
 
     
+class LoginRequiredMixin(object):
+    @classmethod
+    def as_view(cls, **initkwargs):
+        view = super(LoginRequiredMixin, cls).as_view(**initkwargs)
+        return login_required(view)
 
 class TableAPIView(APIView):
     COLLECTED_TEXT = u'<i class="fa fa-star" data-toggle="tooltip", data-placement="right" title="取消收藏">'
