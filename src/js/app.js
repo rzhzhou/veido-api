@@ -50,7 +50,7 @@ app.user = {
       };
 
       if (data.username.length && data.password.length) {
-        $.post('/api/login', data, response);
+        $.post('/api/login/', data, response);
       } else {
         msg.text('请输入用户名和密码！');
       }
