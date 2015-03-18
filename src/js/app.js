@@ -26,7 +26,9 @@ $.fn.Trim = function() {
 /*
  * functions
  */
-var user = {
+var app = {};
+
+app.user = {
   login: function() {
     var form = this.find('form');
     var msg  = this.find('p');
@@ -100,7 +102,7 @@ var user = {
   }
 };
 
-var myChart = {
+app.chart = {
   line: function() {
     require(['echarts', 'echarts/chart/line'], function(ec) {
       ec.init(document.getElementById('line-chart'), 'macarons').setOption({
@@ -192,7 +194,7 @@ var myChart = {
   }
 };
 
-var myTable = function() {
+app.table = function() {
   $.fn.dataTable.ext.errMode = 'throw';
   
   var table = this.DataTable({
@@ -300,12 +302,12 @@ var myTable = function() {
  * run function when element exists
  */
 $(function() {
-  $('.login-box').Do(user.login);
-  $('.register-box').Do(user.register);
+  $('.login-box').Do(app.user.login);
+  $('.register-box').Do(app.user.register);
 
-  $('#line-chart').Do(myChart.line);
-  $('#pie-chart').Do(myChart.pie);
+  $('#line-chart').Do(app.chart.line);
+  $('#pie-chart').Do(app.chart.pie);
 
-  $('#news').Do(myTable);
-  $('#event').Do(myTable);  
+  $('#news').Do(app.table);
+  $('#event').Do(app.table);  
 });
