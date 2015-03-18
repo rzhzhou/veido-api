@@ -29,7 +29,7 @@ urlpatterns += patterns('yqj.views',
     url(r'^weibo/$', 'weibo_view'),
     url(r'^custom/$', 'custom_view'),
     url(r'^collection/$', 'collection_view'),
-    url(r'^setting/$', 'setting_view'),
+    url(r'^settings/$', 'settings_view'),
     url(r'^user/$', 'user_view'),
     url(r'^login/$', 'login_view'),
 )

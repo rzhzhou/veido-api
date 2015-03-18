@@ -13,12 +13,12 @@ def index_view(request):
     categories = ArticleCategory.objects.all()
     locations = [{'name': u'武昌', 'id': '98672345'}, {'name': u'汉口', 'id': '52345609'}]
     locations = Area.objects.filter(level=2)
-    
+
     news = {'number': 67}
     weibo = {'number': 167}
     weixin = {'number': 53}
     event = {'number': 29}
-    
+
     logo_path = '/static/img/64.gif'
     #weixin_list_number = news_list_number = event_list_number = weibo_list_number = 5
     news_list_number = event_list_number = 5
@@ -34,7 +34,7 @@ def index_view(request):
 
     for i in range(event_list_number):
         event_list.append({'url': 'www.baidu.com', 'title': u'新闻', 'source': u'深度网', 'time': 53})
-    
+
     weibo_data = Weibo.objects.all()[0:weibo_list_number]
     for data in weibo_data:
         weibo_list.append({'logo': data.publisher.photo, 'id': data.id, 'title': data.title, 'name': data.author, 'time': data.pubtime, 'content': data.content})
@@ -42,13 +42,13 @@ def index_view(request):
     weixin_data = Weixin.objects.all()[0:weixin_list_number]
     for data in weixin_data:
         weixin_list.append({'logo': data.publisher.photo, 'id': data.id, 'title': data.title, 'name': data.author, 'time': data.pubtime, 'content': data.content})
-    return render_to_response("dashboard/dashboard.html", 
-        {'user': user, 
-        'categories': categories, 
-        'locations': locations, 
-        'news': news, 
-        'weibo': weibo, 
-        'weixin': weixin, 
+    return render_to_response("dashboard/dashboard.html",
+        {'user': user,
+        'categories': categories,
+        'locations': locations,
+        'news': news,
+        'weibo': weibo,
+        'weixin': weixin,
         'event': event,
         'news_list': news_list,
         'event_list': event_list,
@@ -65,7 +65,7 @@ def location_view(request, location_id):
     weixin = Weixin.objects.filter(area=location)
     weibo = Weibo.objects.filter(area=location)
     return render_to_response("location/location.html", {'location': location, 'weixin': weixin, 'weibo': weibo})
-    
+
 def person_view(request, person_id):
     return HttpResponse('person')
 
@@ -73,10 +73,10 @@ def person_view(request, person_id):
 def news_view(request):
     news_list_data = []
     for i in range(10):
-        news_list_data.append({'url': u'www.baidu.com', 
-                          'title': u'质监免费检测珠宝饰品', 
-                          'source': u'深度网', 
-                          'pubtime': datetime.datetime(2014,6,8), 
+        news_list_data.append({'url': u'www.baidu.com',
+                          'title': u'质监免费检测珠宝饰品',
+                          'source': u'深度网',
+                          'pubtime': datetime.datetime(2014,6,8),
                           'area': u'武昌'})
     return render_to_response('news/news_list.html', {'news_list_data': news_list_data})
 
@@ -123,8 +123,8 @@ def weibo_view(request):
 def collection_view(request):
     return render_to_response('user/collection.html')
 
-def setting_view(request):
-    return render_to_response('user/setting.html')
+def settings_view(request):
+    return render_to_response('user/settings.html')
 
 def custom_view(request):
     return render_to_response('custom/custom.html')
@@ -152,4 +152,4 @@ def login_view(request):
             return response
 
     return render_to_response('user/login.html')
-            
+

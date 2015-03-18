@@ -144,7 +144,7 @@ app.user = {
             oldPassword: data.oldPassword,
             newPassword: data.newPassword
           };
-          $.post('/api/setting/info/', _data, response, 'json');
+          $.post('/api/settings/change/', _data, response, 'json');
           break;
       }
     });
