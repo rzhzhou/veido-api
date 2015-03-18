@@ -1,15 +1,51 @@
 #coding=utf-8
 
 import datetime
+from django.views.generic import View
+from django.http import HttpResponse, JsonResponse
+from django.db import models
 from django.db import IntegrityError
 from django.conf import settings
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from yqj.models import (Article, Area, Weixin, Weibo, Topic, RelatedData, ArticleCategory)
+from yqj.models import (Article, Area, Weixin, Weibo, Topic, RelatedData, ArticleCategory, save_user)
 from serializers import ArticleSerializer
-from django.views.generic import View
-from django.db import models
 #from django.db.model import get_model
+
+
+def login_view(request):
+    try:
+        username = request.POST['username']
+        password = request.POST['password']
+    except KeyError:
+        return HttpResponse(status=400)
+    
+    user = authenticate(username, password)
+    response = JsonResponse()
+    if user.is_authenticated():
+        response.set_cookie('pass_id', user.id)
+        response.set_cookie('name', user.username)
+        return JsonResponse({'status': True})
+    else:
+        return JsonResponse({'status': False})
+
+
+def regist_view(request):
+    try:
+        username = request.POST['username']
+        password = request.POST['password']
+    except KeyError:
+        return HttpResponse(status=400)
+    try:
+        area = Area.objects.get(name=u'武汉')
+        save_user(username, password, area)
+    except excep:
+        raise excep
+        return JsonResponse({'status': False})
+
+    return JsonResponse({'status': True})
+
+    
 
 class TableAPIView(APIView):
     COLLECTED_TEXT = u'<i class="fa fa-star" data-toggle="tooltip", data-placement="right" title="取消收藏">'
@@ -63,7 +99,7 @@ class ArticleTableView(TableAPIView):
             url = u'/news/%s' % item.id
             title = self.title_html(url, item.title,item.id, 'article')
             hot_index = RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count()
-            one_record = [collect_html, title, item.source, item.area.name, item.pubtime.date(), hot_index]
+            one_record = [collected_html, title, item.source, item.area.name, item.pubtime.date(), hot_index]
             result.append(one_record)
 
         return Response({'news': result})
@@ -79,7 +115,7 @@ class NewsTableView(TableAPIView):
             url = u'/news/%s' % item.id
             title = self.title_html(url, item.title,item.id, 'article')
             hot_index = RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count()
-            one_record = [collect_html, title, item.source, item.area.name, item.pubtime.date(), hot_index]
+            one_record = [collected_html, title, item.source, item.area.name, item.pubtime.date(), hot_index]
             result.append(one_record)
         
         return Response({"news": result})

@@ -66,8 +66,6 @@ def location_view(request, location_id):
 def person_view(request, person_id):
     return HttpResponse('person')
 
-def login_view(request):
-    return render_to_response('user/login.html')
 
 def news_view(request):
     news_list_data = []
@@ -134,3 +132,21 @@ def user_view(request):
 def register_view(request):
     return render_to_response('user/register.html')
 
+
+def login_view(request):
+    if request.method == 'POST':
+        try:
+            username = request.POST['username']
+            password = reqeust.POST['password']
+        except KeyError:
+            return HttpResponse(status=400)
+
+        user = authenticate(username, password)
+        if user.is_authenticated():
+            response = HttpResponseRedirect('/')
+            response.set_cookie('pass_id', user.id)
+            response.set_cookie('name', user.name)
+            return response
+
+    return render_to_response('user/login.html')
+            
