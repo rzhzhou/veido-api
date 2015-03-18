@@ -63,7 +63,7 @@ class ArticleTableView(TableAPIView):
             url = u'/news/%s' % item.id
             title = self.title_html(url, item.title,item.id, 'article')
             hot_index = RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count()
-            one_record = [collect_html, title, item.source, item.area.name, item.pubtime.date(), hot_index]
+            one_record = [collected_html, title, item.source, item.area.name, item.pubtime.date(), hot_index]
             result.append(one_record)
 
         return Response({'news': result})
@@ -79,7 +79,7 @@ class NewsTableView(TableAPIView):
             url = u'/news/%s' % item.id
             title = self.title_html(url, item.title,item.id, 'article')
             hot_index = RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count()
-            one_record = [collect_html, title, item.source, item.area.name, item.pubtime.date(), hot_index]
+            one_record = [collected_html, title, item.source, item.area.name, item.pubtime.date(), hot_index]
             result.append(one_record)
         
         return Response({"news": result})
