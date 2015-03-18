@@ -19,7 +19,7 @@ $.fn.Do = function(func) {
 $.fn.Trim = function() {
   var _value = this.find('input').val();
   var value  = $.trim(_value);
-  return value; 
+  return value;
 };
 
 
@@ -66,7 +66,7 @@ app.user = {
       var data = {
         username: $('#username').Trim(),
         password: $('#password').Trim(),
-        retype:   $('#retype').Trim()
+        retype:   $('#retype-password').Trim()
       };
 
       var response = function(data) {
@@ -91,7 +91,60 @@ app.user = {
           msg.text('两次输入密码不一致！');
           break;
         default:
-          $.post('/api/register/', {username: data.username, password: data.password}, response, 'json');
+          var _data = {
+            username: data.username,
+            password: data.password
+          };
+          $.post('/api/register/', _data, response, 'json');
+          break;
+      }
+    });
+  },
+  change: function() {
+    var form = this.find('form');
+    var msg  = this.find('p');
+
+    form.submit(function(event) {
+      event.preventDefault();
+
+      var data = {
+        username:    $('#username').Trim(),
+        oldPassword: $('#old-password').Trim(),
+        newPassword: $('#new-password').Trim(),
+        retype:      $('#retype-password').Trim()
+      };
+
+      var response = function(data) {
+        if (data.status) {
+          msg.text('更新成功！').show();
+        } else{
+          msg.text('原密码错误！').show();
+        };
+      };
+
+      switch (0) {
+        case data.username.length:
+          msg.text('请输入姓名').show();
+          break;
+        case data.oldPassword.length:
+          msg.text('请输入原密码').show();
+          break;
+        case data.newPassword.length:
+          msg.text('请输入新密码').show();
+          break;
+        case data.retype.length:
+          msg.text('请输入原密码').show();
+          break;
+        case Number( data.newPassword === data.retype ):
+          msg.text('两次输入密码不一致！').show();
+          break;
+        default:
+          var _data = {
+            username:    data.username,
+            oldPassword: data.oldPassword,
+            newPassword: data.newPassword
+          };
+          $.post('/api/setting/info/', _data, response, 'json');
           break;
       }
     });
@@ -157,7 +210,7 @@ app.chart = {
             stack: '总量',
             data:[820, 932, 901, 934, 1290, 1330, 1320]
           }
-        ]        
+        ]
       });
     });
   },
@@ -184,7 +237,7 @@ app.chart = {
                 {value:135, name:'东西湖'}
               ]
             }
-        ]                                
+        ]
       });
     });
   }
@@ -192,7 +245,7 @@ app.chart = {
 
 app.table = function() {
   $.fn.dataTable.ext.errMode = 'throw';
-  
+
   var table = this.DataTable({
     "ajax": {
       "url": '/api' + location.pathname,
@@ -234,9 +287,9 @@ app.table = function() {
     "deferLoading": 100,
     "drawCallback": function() {
       $('[data-toggle="tooltip"]').tooltip();
-    }    
+    }
   });
-  
+
   table.on('click', 'tr', function() {
     if ( $(this).hasClass('selected') ) {
       $(this).removeClass('selected');
@@ -290,7 +343,7 @@ app.table = function() {
 
     $('.fa-star-o').each(addCollection);
     $('.fa-star').each(removeCollection);
-  });  
+  });
 };
 
 
@@ -300,10 +353,11 @@ app.table = function() {
 $(function() {
   $('.login-box').Do(app.user.login);
   $('.register-box').Do(app.user.register);
+  $('.user-info').Do(app.user.change);
 
   $('#line-chart').Do(app.chart.line);
   $('#pie-chart').Do(app.chart.pie);
 
   $('#news').Do(app.table);
-  $('#event').Do(app.table);  
+  $('#event').Do(app.table);
 });
