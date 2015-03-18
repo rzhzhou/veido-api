@@ -29,7 +29,7 @@ $.fn.Trim = function() {
 var user = {
   login: function() {
     var form = this.find('form');
-    var msg = $('.login-box-msg');
+    var msg = this.find('p');
 
     form.submit(function(event) {
       event.preventDefault();
@@ -53,6 +53,9 @@ var user = {
         msg.text('请输入用户名和密码！');
       };
     });
+  },
+  register: function() {
+
   }
 };
 
