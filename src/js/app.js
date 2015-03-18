@@ -66,7 +66,7 @@ app.user = {
       var data = {
         username: $('#username').Trim(),
         password: $('#password').Trim(),
-        retype:   $('#retype').Trim()
+        retype:   $('#retype-password').Trim()
       };
 
       var response = function(data) {
