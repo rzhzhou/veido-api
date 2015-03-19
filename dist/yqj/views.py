@@ -2,7 +2,7 @@
 import datetime
 
 from django.shortcuts import render, render_to_response
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from yqj.models import Article, Weixin, Weibo, RelatedData, ArticleCategory, Area, Topic
 
 from yqj import login_required
@@ -151,3 +151,8 @@ def login_view(request):
 
     return render_to_response('user/login.html')
 
+def logout_view(request):
+    response = HttpResponseRedirect('/')
+    response.delete_cookie('pass_id')
+    response.delete_cookie('name')
+    return response
