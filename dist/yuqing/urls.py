@@ -3,6 +3,7 @@ import os
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.views.static import serve
+from yqj.views import *
 
 from django.conf import settings
 urlpatterns = patterns('',
@@ -17,16 +18,16 @@ urlpatterns = patterns('',
 
 urlpatterns += patterns('yqj.views',
     url(r'^$', 'index_view'),
-    url(r'^location/(\d+)/$', 'location_view'),
-    url(r'^category/(\d+)/$', 'category_view'),
+    url(r'^location/(\d+)/$', LocationView.as_view()),
+    url(r'^category/(\d+)/$', CategoryView.as_view()),
     url(r'^register/$', 'register_view'),
-    url(r'^news/$', 'news_view'),
-    url(r'^news/(\d+)/$', 'news_detail_view'),
-    url(r'^event/$', 'event_view'),
-    url(r'^event/(\d+)$', 'event_detail_view'),
-    url(r'^weixin/$', 'weixin_view'),
-    url(r'^weixin/(\d+)/$', 'weixin_detail_view'),
-    url(r'^weibo/$', 'weibo_view'),
+    url(r'^news/$', NewsView.as_view()),
+    url(r'^news/(\d+)/$', NewsDetailView.as_view()),
+    url(r'^event/$', EventView.as_view()),
+    url(r'^event/(\d+)$', EventDetailView.as_view()),
+    url(r'^weixin/$', WeixinView.as_view()),
+    url(r'^weixin/(\d+)/$', WeixinDetailView.as_view()),
+    url(r'^weibo/$', WeiboView.as_view()),
     url(r'^custom/$', 'custom_view'),
     url(r'^collection/$', 'collection_view'),
     url(r'^settings/$', 'settings_view'),

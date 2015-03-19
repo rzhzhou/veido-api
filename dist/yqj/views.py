@@ -4,7 +4,7 @@ import datetime
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
 from yqj.models import Article, Weixin, Weibo, RelatedData, ArticleCategory, Area, Topic
-
+from django.views.generic import View
 from yqj import login_required
 
 def SetLogo(obj):
@@ -62,69 +62,118 @@ def index_view(request):
     else:
         return HttpResponse(status=401)
 
-def category_view(request, ctg_id):
-    category  = {'name': u'质量检测', 'url': 'http://www.baidu.com'}
-    return render_to_response('category/category.html', {'category': category})
 
-def location_view(request, location_id):
-    location = Area.objects.get(id=int(location_id))
-    weixin = [SetLogo(data) for data in Weixin.objects.filter(area=location)]
-    weibo = [SetLogo(data) for data in Weibo.objects.filter(area=location)]
-    return render_to_response("location/location.html", {'location': location, 'weixin_list': weixin, 'weibo_list': weibo})
+class LoginRequiredMixin(object):
+    ALLOWED_METHOD = ['GET']
+
+    @classmethod
+    def as_view(cls, **initkwargs):
+        view = super(LoginRequiredMixin, cls).as_view(**initkwargs)
+        return login_required(view)
+
+
+class BaseView(LoginRequiredMixin, View):
+    INCLUDE_SIDEBAR = True
+    INCLUDE_USER = True
+
+    def render_to_response(self, template_path, context={}):
+        if self.INCLUDE_SIDEBAR:
+            categories = self.get_article_categories()
+            #for ctg in categories:
+            #    ctg.id = encrypt(ctg.id)
+            context['categories'] = categories
+
+        if self.INCLUDE_USER:
+            user = self.request.myuser
+            context['user'] = user
+	    context['locations'] = self.get_locations(user.area)
+        return render_to_response(template_path, context)
+    
+    def get_article_categories(self):
+        return ArticleCategory.objects.all()
+    
+    def get_locations(self, area):
+        #area = Area.objects.get(id=int(location_id))
+        if area.id == 4:
+            return []
+        return Area.objects.filter(parent=area, level=area.level+1)
+
+
+class CategoryView(BaseView):
+    def get(self, request, category_id):
+        try:
+            category = ArticleCategory.objects.get(id=category_id)
+	except ArticleCategory.DoesNotExist:
+            category = ''
+        return self.render_to_response('category/category.html', {'category': category})
+
+
+class LocationView(BaseView):
+    def get(self, request, location_id):
+        try:
+	    location = Area.objects.get(id=int(location_id))
+        except Area.DoesNotExist:
+            location = ''
+	weixin = [SetLogo(data) for data in Weixin.objects.filter(area=location)]
+	weibo = [SetLogo(data) for data in Weibo.objects.filter(area=location)]
+        return self.render_to_response("location/location.html", {'location': location, 'weixin_list': weixin, 'weibo_list': weibo})
+
 
 def person_view(request, person_id):
     return HttpResponse('person')
 
 
-def news_view(request):
-    news_list_data = []
-    for i in range(10):
-        news_list_data.append({'url': u'www.baidu.com',
-                          'title': u'质监免费检测珠宝饰品',
-                          'source': u'深度网',
-                          'pubtime': datetime.datetime(2014,6,8),
-                          'area': u'武昌'})
-    return render_to_response('news/news_list.html', {'news_list_data': news_list_data})
+class NewsView(BaseView):
+    def get(self, request):
+        return self.render_to_response('news/news_list.html', {})
 
-def news_detail_view(request, news_id):
-    try:
-        news_id = int(news_id)
-        news = Article.objects.get(id=news_id)
-    except ValueError:
-        return HttpResponse(status=400)
-    except Article.DoesNotExist:
-        return HttpResponse(status=404)
-    r = RelatedData.objects.filter(uuid=news.uuid)[0]
-    relateddata = list(r.weixin.all()) + list(r.weibo.all()) + list(r.articles.all())
-    return render_to_response('news/news.html', {'article': SetLogo(news), 'relate': relateddata})
 
-def event_view(request):
-    return render_to_response('event/event_list.html')
+class NewsDetailView(BaseView):
+    def get(self, request, news_id):
+        try:
+            news_id = int(news_id)
+	    news = Article.objects.get(id=news_id)
+        except Article.DoesNotExist:
+            return self.render_to_response('news/news.html', {'article': '', 'relate': []})
+        r = RelatedData.objects.filter(uuid=news.uuid)[0]
+        relateddata = list(r.weixin.all()) + list(r.weibo.all()) + list(r.articles.all())
+        return self.render_to_response('news/news.html', {'article': SetLogo(news), 'relate': relateddata})
 
-def event_detail_view(request, id):
-    return render_to_response('event/event.html')
 
-def weixin_view(request):
-    latest = [SetLogo(data) for data in Weixin.objects.order_by('-pubtime')[0:20]]
-    hottest = latest
-    return render_to_response('weixin/weixin_list.html', {'weixin_latest_list': latest, 'weixin_hottest_list': hottest})
+class EventView(BaseView):
+    def get(self,request):
+        return self.render_to_response('event/event_list.html')
 
-def weixin_detail_view(request, id):
-    try:
-        weixin_id = int(id)
-        weixin = Weixin.objects.get(id=weixin_id)
-    except ValueError:
-        return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
-    except Weixin.DoesNotExist:
-        return HttpResponse(status=status.HTTP_404_NOT_FOUND)
-    r = RelatedData.objects.filter(uuid=weixin.uuid)[0]
-    relateddata = list(r.weixin.all()) + list(r.weibo.all()) + list(r.articles.all())
-    return render_to_response('weixin/weixin.html', {'article': SetLogo(weixin), 'relate': relateddata})
 
-def weibo_view(request):
-    hottest = latest = [SetLogo(data) for data in Weibo.objects.order_by('-pubtime')[0:20]]
-    #hottest  = latest
-    return render_to_response('weibo/weibo_list.html', {'weibo_latest_list': latest, 'weibo_hottest_list': hottest})
+class EventDetailView(BaseView):
+    def get(self, request, id):
+        return self.render_to_response('event/event.html')
+
+
+class WeixinView(BaseView):
+    def get(self, request):
+        latest = [SetLogo(data) for data in Weixin.objects.order_by('-pubtime')[0:20]]
+        hottest = latest
+        return self.render_to_response('weixin/weixin_list.html', {'weixin_latest_list': latest, 'weixin_hottest_list': hottest})
+
+
+class WeixinDetailView(BaseView):
+    def get(self, request, id):
+        try:
+            weixin_id = int(id)
+            weixin = Weixin.objects.get(id=weixin_id)
+        except Weixin.DoesNotExist:
+	    return render_to_response('weixin/weixin.html', {'article': '', 'relate': []})
+	r = RelatedData.objects.filter(uuid=weixin.uuid)[0]
+	relateddata = list(r.weixin.all()) + list(r.weibo.all()) + list(r.articles.all())
+	return self.render_to_response('weixin/weixin.html', {'article': SetLogo(weixin), 'relate': relateddata})
+
+
+class WeiboView(BaseView):
+    def get(self, request):
+        hottest = latest = [SetLogo(data) for data in Weibo.objects.order_by('-pubtime')[0:20]]
+        #hottest  = latest
+        return self.render_to_response('weibo/weibo_list.html', {'weibo_latest_list': latest, 'weibo_hottest_list': hottest})
 
 def collection_view(request):
     return render_to_response('user/collection.html')
