@@ -175,11 +175,15 @@ class WeiboView(BaseView):
         #hottest  = latest
         return self.render_to_response('weibo/weibo_list.html', {'weibo_latest_list': latest, 'weibo_hottest_list': hottest})
 
-def collection_view(request):
-    return render_to_response('user/collection.html')
 
-def settings_view(request):
-    return render_to_response('user/settings.html')
+class CollectionView(BaseView):
+    def get(self, request):
+        return self.render_to_response('user/collection.html')
+
+
+class SettingsView(BaseView):
+    def get(self, request):
+        return self.render_to_response('user/settings.html')
 
 def custom_view(request):
     return render_to_response('custom/custom.html')
