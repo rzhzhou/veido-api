@@ -25,7 +25,7 @@ def index_view(request):
 	weixin = Weixin.objects.all().count()
 	event = Topic.objects.all().count()
 
-	news_list_number = event_list_number = 5
+	news_list_number = event_list_number = 10 
 	weixin_list_number = weibo_list_number = 5
 
 	news_list = []
