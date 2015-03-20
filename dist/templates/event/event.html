@@ -15,13 +15,13 @@
     <div class="col-md-8">
       <div class="box box-danger">
         <div class="box-header with-border">
-          <h3 class="box-title">事件标题</h3>
+          <h3 class="box-title">{{ event.title }}</h3>
           <div class="box-tools pull-right">
             <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
           </div>          
         </div>
         <div class="box-body">
-          <p>事件描述</p>
+          {{ event.description | safe}}
         </div>
       </div>
     </div>
@@ -35,8 +35,10 @@
           </div>          
         </div>
         <div class="box-body">
-          <ul class="list-group">
-            <li class="list-group-item">关键词<span class="badge">14</span></li>
+          <ul class="list-group no-margin">
+          {% for keywords in keywords_list %}
+            <li class="list-group-item">{{ keywords.name }}<span class="badge">{{ keywords.number }}</span></li>
+          {% endfor %}
           </ul>
         </div>
       </div>
@@ -53,7 +55,7 @@
           </div>
         </div>
         <div class="box-body">
-          <p>line chart here</p>
+          <div id="line-chart" style="height: 320px;"></div>
         </div>
       </div>      
     </div>
@@ -67,7 +69,7 @@
           </div>
         </div>
         <div class="box-body">
-          <p>pie chart here</p>
+          <div id="pie-chart" style="height: 320px;"></div>
         </div>
       </div>            
     </div>
