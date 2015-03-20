@@ -31,7 +31,7 @@ urlpatterns += patterns('yqj.views',
     url(r'^custom/$', 'custom_view'),
     url(r'^collection/$', CollectionView.as_view()),
     url(r'^settings/$', SettingsView.as_view()),
-    url(r'^user/$', 'user_view'),
+    url(r'^user/$', UserView.as_view()),
     url(r'^login/$', 'login_view'),
     url(r'^logout/$', 'logout_view'),
 )

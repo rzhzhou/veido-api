@@ -188,8 +188,10 @@ class SettingsView(BaseView):
 def custom_view(request):
     return render_to_response('custom/custom.html')
 
-def user_view(request):
-    return render_to_response('user/user.html')
+
+class UserView(BaseView):
+    def get(self, request):
+        return slef.render_to_response('user/user.html')
 
 def register_view(request):
     return render_to_response('user/register.html')

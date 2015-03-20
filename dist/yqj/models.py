@@ -196,6 +196,45 @@ class User(models.Model):
         return True
 
 
+class Collection(models.Model):
+    user = models.OneToOneField(User, primary_key=True, verbose_name=u'用户')
+    articles = models.ManyToManyField(Article, null=True, blank=True, related_name='collections', related_query_name='collection', through='ArticleCollection', verbose_name=u'文章')
+    events = models.ManyToManyField(Topic, null=True,blank=True, related_name='collections', related_query_name='collection', through='TopicCollection', verbose_name=u'质量事件')
+    
+    class Meta:
+        db_table = 'collection'
+        verbose_name_plural = u'用户收藏'
+
+    def __unicode__(self):
+        return self.user.username + ' collection'
+
+
+class ArticleCollection(models.Model):
+    article = models.ForeignKey(Article, verbose_name=u'文章')
+    collection = models.ForeignKey(Collection, verbose_name=u'收藏')
+
+    category = models.CharField(max_length=255, blank=True, verbose_name=u'分类')
+    create_time = models.DateTimeField(auto_now=True, verbose_name=u'创建时间')
+
+    class Meta:
+        db_table = 'article_collection'
+        verbose_name_plural = u'文章收藏'
+        unique_together = (("article", "collection"),)
+    def __unicode__(self):
+        return self.category
+
+
+class TopicCollection(models.Model):
+    topic = models.ForeignKey(Topic, verbose_name=u'质量事件')
+    collection = models.ForeignKey(Collection, verbose_name=u'收藏')
+
+    create_time = models.DateTimeField(auto_now=True, verbose_name=u'创建时间')
+
+    class Meta:
+        db_table = 'topic_collection'
+        verbose_name_plural = u'质量事件收藏'
+        unique_together = (("topic", "collection"),)
+
 
 class AnonymousUser(User):
     def is_authenticated(self):
