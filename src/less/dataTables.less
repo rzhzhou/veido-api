@@ -1,0 +1,46 @@
+.table-custom {
+  // fixed layout
+  table-layout: fixed;
+  width: 100%;
+  white-space: nowrap;
+
+  td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .col-collection {
+    width: 1em;
+  }
+  .col-source {
+    width: 6em;
+  }
+  .col-location {
+    width: 4em;
+  }
+  .col-time {
+    width: 4em;
+  }
+  .col-index {
+    width: 2em;
+  }
+
+
+  // collection
+  .star {
+    text-align: center;
+  }
+
+  .fa.fa-star,
+  .fa.fa-star-o {
+    color: @yellow;
+    cursor: pointer;
+  }
+
+
+  // hot index
+  .index {
+    text-align: center;
+  }
+}

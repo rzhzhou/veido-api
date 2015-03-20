@@ -295,6 +295,9 @@ app.table = function() {
       "targets": 0,
       "searchable": false,
       "orderable": false
+    },{
+      "className": "index",
+      "targets": -1
     }],
     "deferLoading": 100,
     "drawCallback": function() {
