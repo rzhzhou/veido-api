@@ -9,7 +9,7 @@ from django.conf import settings
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
-from yqj.models import (Article, Area, Weixin, Weibo, Topic, RelatedData, ArticleCategory, save_user)
+from yqj.models import (Article, Area, Weixin, Weibo, Topic, RelatedData, ArticleCategory, save_user, Collection)
 from serializers import ArticleSerializer
 from yqj import authenticate, login_required
 
@@ -153,6 +153,26 @@ class LocationTableView(TableAPIView):
         return Response({"news": result})
 
 
-class CollectModifyView(View):
-    pass
+class CollectModifyView(APIView):
+    def article_html(self, item):
+        view = ArticleTableView(self.request)
+        hot_index = RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count()
+        line = []
+        line += [view.collected_html(item), item.title, item.publisher.publisher, item.area.name, item.pubtime.date(), item]
+        return line
+
+    def topic_html(self, item):
+        return []
+
+    def get(self, request):
+        try:
+            self.collection = request.myuser.collection
+        except Collection.DoesNotExist:
+            self.collection = Collection(user=self.request.myuser)
+            self.collection.save()
+
+        news = [self.article_html(item) for item in self.collection.articles.all()]
+        topic = [self.topic_html(item) for item in self.collection.articles.all()]
+
+        return Response({'news': news, 'event': topic}) 
 
