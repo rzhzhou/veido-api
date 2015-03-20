@@ -151,6 +151,18 @@ app.user = {
   }
 };
 
+app.search = function() {
+  this.submit(function(event) {
+    event.preventDefault();
+
+    var keywords = $(this).Trim();
+
+    if (keywords.length) {
+      location.href = '/search/' + keywords + '/';
+    }
+  });
+};
+
 app.chart = {
   line: function() {
     require(['echarts', 'echarts/chart/line'], function(ec) {
@@ -354,6 +366,8 @@ $(function() {
   $('.login-box').Do(app.user.login);
   $('.register-box').Do(app.user.register);
   $('.user-info').Do(app.user.change);
+
+  $('.sidebar-form').Do(app.search);
 
   $('#line-chart').Do(app.chart.line);
   $('#pie-chart').Do(app.chart.pie);
