@@ -34,4 +34,5 @@ urlpatterns += patterns('yqj.views',
     url(r'^user/$', UserView.as_view()),
     url(r'^login/$', 'login_view'),
     url(r'^logout/$', 'logout_view'),
+    url(r'^search/(\S+)/$', 'search_view'),
 )

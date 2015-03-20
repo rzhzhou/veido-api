@@ -219,3 +219,6 @@ def logout_view(request):
     response.delete_cookie('pass_id')
     response.delete_cookie('name')
     return response
+
+def search_view(request, keyword):
+    return render_to_response('search/result.html')
