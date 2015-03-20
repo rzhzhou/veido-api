@@ -42,7 +42,7 @@ class Weixin(models.Model):
     website_type = models.CharField(max_length=255, blank=True, verbose_name=u'网站类型')
     pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
     publisher = models.ForeignKey(WeixinPublisher, verbose_name=u'微信发布者')
-    area = models.ForeignKey(Area, verbose_name=u'名称')
+    area = models.ForeignKey(Area, verbose_name=u'地域')
     uuid = models.CharField(max_length=36)
 
     class Meta:
@@ -77,7 +77,7 @@ class Weibo(models.Model):
     website_type = models.CharField(max_length=255, blank=True, verbose_name=u'网站类型')
     pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
     publisher = models.ForeignKey(WeiboPublisher, verbose_name=u'微博发布者')
-    area = models.ForeignKey(Area, verbose_name=u'名称')
+    area = models.ForeignKey(Area, verbose_name=u'地域')
     praise = models.IntegerField(blank=True, verbose_name=u'点赞数')
     comment = models.IntegerField(blank=True, verbose_name=u'评论量')
     tansmit = models.IntegerField(blank=True, verbose_name=u'转发量')
@@ -113,7 +113,7 @@ class Article(models.Model):
     source = models.CharField(max_length=255, blank=True, verbose_name=u'信息来源')
     pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
     publisher = models.ForeignKey(ArticlePublisher, verbose_name=u'文章发布者')
-    area = models.ForeignKey(Area, verbose_name=u'名称')
+    area = models.ForeignKey(Area, verbose_name=u'地域')
     uuid = models.CharField(max_length=36)
 
     class Meta:
@@ -126,8 +126,10 @@ class Article(models.Model):
 
 
 class Topic(models.Model):
-    title = models.CharField(max_length=255,blank=True, verbose_name=u'标题')
-    abstract = models.TextField(blank=True, verbose_name=u'正文')
+    title = models.CharField(max_length=255, blank=True, verbose_name=u'标题')
+    abstract = models.TextField(blank=True, verbose_name=u'简介')
+    source = models.CharField(max_length=255, blank=True, verbose_name=u'首发媒体')
+    area = models.ForeignKey(Area, verbose_name=u'地域')
     articles = models.ManyToManyField(Article, related_name='topic', related_query_name='topics', null=True, blank=True, verbose_name=u'文章')
     weibo = models.ManyToManyField(Weibo, related_name='topic', related_query_name='topics', null=True, blank=True, verbose_name=u'微博')
     weixin = models.ManyToManyField(Weixin, related_name='topic', related_query_name='topics', null=True, blank=True, verbose_name=u'微信')
@@ -155,7 +157,7 @@ class RelatedData(models.Model):
 
 
 class ArticleCategory(models.Model):
-    name = models.CharField(max_length=255, blank=True, verbose_name=u'')
+    name = models.CharField(max_length=255, blank=True, verbose_name=u'名称')
     remark = models.CharField(max_length=255, blank=True, verbose_name=u'备注')
 
     articles = models.ManyToManyField(Article, related_name='categorys', related_query_name='category', null=True, blank=True, verbose_name=u'文章')
