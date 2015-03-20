@@ -9,7 +9,7 @@ from django.conf import settings
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
-from yqj.models import (Article, Area, Weixin, Weibo, Topic, RelatedData, ArticleCategory, save_user, Collection)
+from yqj.models import (Article, Area, Weixin, Weibo, Topic, RelatedData, ArticleCategory, save_user, Collection, Topic)
 from serializers import ArticleSerializer
 from yqj import authenticate, login_required
 
@@ -151,6 +151,21 @@ class LocationTableView(TableAPIView):
             result.append(one_record)
         
         return Response({"news": result})
+
+
+class EventTableView(TableAPIView):
+    def get(self, request):
+        result = []
+        event = Topic.objects.all()[:self.LIMIT_NUMBER]
+        for item in event:
+            collected_html = self.collected_html(item)
+            url = u'/event/%s' % item.id
+            title = self.title_html(url, item.title, item.id, 'article')
+            hot_index = RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count() + RelatedData.objects.filter(uuid=item.uuid)[0].weixin.all().count() + RelatedData.objects.filter(uuid=item.uuid)[0].weibo.all().count()
+            pubtime = RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().order_by('-pubtime')[0].pubtime
+            one_record = [collected_html, title, item.source, item.area.name, pubtime.date(), hot_index]
+            result.append(one_record)
+        return Response({"event": result})
 
 
 class CollectModifyView(APIView):
