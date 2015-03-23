@@ -10,8 +10,8 @@ urlpatterns = patterns('',
     url(r'^news/$', NewsTableView.as_view()),
     url(r'^collection/$', CollectView.as_view()),
     url(r'^event/$', EventTableView.as_view()),
-    url(r'^collection/remove/$', CollecModifyView.as_view()),
-    url(r'^collection/add/$', CollecModifyView.as_view()),
+    url(r'^collection/(?P<action>\w+)/$', CollecModifyView.as_view()),
+    #url(r'^collection/add/$', CollecModifyView.as_view()),
 )
 
 urlpatterns += patterns('api.views',

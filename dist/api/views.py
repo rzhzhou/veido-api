@@ -172,9 +172,11 @@ class EventTableView(TableAPIView):
 
 class CollectView(APIView):
     def article_html(self, item):
+	url = u'/news/%s' % item.id
         view = ArticleTableView(self.request)
+        title = view.title_html(url, item.title, item.id, 'event')
         hot_index = RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count()
-        line = [view.collected_html(item), item.title, item.publisher.publisher, item.area.name, item.pubtime.date(), hot_index]
+        line = [view.collected_html(item), title, item.publisher.publisher, item.area.name, item.pubtime.date(), hot_index]
         return line
 
     def topic_html(self, item):
