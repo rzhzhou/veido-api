@@ -1,0 +1,30 @@
+{% extends "base/layout.html" %}
+
+{% block title %}指定监测 - 质监舆情{% endblock %}
+
+{% block header %}
+  <h1>指定监测</h1>
+  <ol class="breadcrumb">
+    <li><a href="/"><i class="fa fa-dashboard"></i>首页</a></li>
+    <li class="active"><a href="/custom/">指定监测</a></li>
+  </ol>
+{% endblock %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-md-12">
+      <div class="box box-primary">
+        <div class="box-header with-border">
+          <h3 class="box-title">监测列表</h3>
+        </div>
+        <div class="box-body">
+          <ul class="nav nav-pills">
+            {% for custom in custom_list %}
+            <li><a href="/search/{{ custom.name }}/">{{ custom.name }}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
