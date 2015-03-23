@@ -185,9 +185,13 @@ class SettingsView(BaseView):
     def get(self, request):
         return self.render_to_response('user/settings.html')
 
-def custom_view(request):
-    return render_to_response('custom/custom.html')
-
+class CustomView(BaseView):
+    def get(self, request):
+        customname = [u'电梯',u'锅炉', u'315晚会', u'两会']
+        custom_list = []
+        for name in customname:
+            custom_list.append({'name': name})
+        return self.render_to_response('custom/custom.html', {'custom_list': custom_list})
 
 class UserView(BaseView):
     def get(self, request):
