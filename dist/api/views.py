@@ -61,6 +61,8 @@ class TableAPIView(APIView):
     NO_COLLECTED_TEXT = u'<i class="fa fa-star-o" data-toggle="tooltip", data-placement="right" title="添加收藏">'
 
     LIMIT_NUMBER = 300
+    def __init__(self, request=None):
+        self.request = request
 
     def collected_html(self, item):
         items = self.collected_items()
@@ -78,9 +80,9 @@ class TableAPIView(APIView):
         return any(filter(lambda x: x.id == item_id, items))
 
     def collected_items(self):
-        return []
-        #user = self.request.myuser
-        #return user.collections.article_collections.articles
+        #return []
+        user = self.request.myuser
+        return user.collection.articles.all()
 
     def title_html(self, *args):
         title_format = u'<a href="{0}" title="{1}" target="_blank" data-id="{2}" data-type="{3}">{1}</a>'
@@ -160,7 +162,7 @@ class EventTableView(TableAPIView):
         for item in event:
             collected_html = self.collected_html(item)
             url = u'/event/%s' % item.id
-            title = self.title_html(url, item.title, item.id, 'article')
+            title = self.title_html(url, item.title, item.id, 'event')
             hot_index = RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count() + RelatedData.objects.filter(uuid=item.uuid)[0].weixin.all().count() + RelatedData.objects.filter(uuid=item.uuid)[0].weibo.all().count()
             pubtime = RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().order_by('-pubtime')[0].pubtime
             one_record = [collected_html, title, item.source, item.area.name, pubtime.date(), hot_index]
@@ -168,12 +170,11 @@ class EventTableView(TableAPIView):
         return Response({"event": result})
 
 
-class CollectModifyView(APIView):
+class CollectView(APIView):
     def article_html(self, item):
         view = ArticleTableView(self.request)
         hot_index = RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count()
-        line = []
-        line += [view.collected_html(item), item.title, item.publisher.publisher, item.area.name, item.pubtime.date(), item]
+        line = [view.collected_html(item), item.title, item.publisher.publisher, item.area.name, item.pubtime.date(), hot_index]
         return line
 
     def topic_html(self, item):
@@ -185,9 +186,78 @@ class CollectModifyView(APIView):
         except Collection.DoesNotExist:
             self.collection = Collection(user=self.request.myuser)
             self.collection.save()
-
         news = [self.article_html(item) for item in self.collection.articles.all()]
-        topic = [self.topic_html(item) for item in self.collection.articles.all()]
+        topic = [self.topic_html(item) for item in self.collection.events.all()]
 
         return Response({'news': news, 'event': topic}) 
 
+
+class CollecModifyView(View):
+    def save(self, item):
+        data = {self.related_field: item, 'collection': self.collection}
+        if isinstance(item, Article):
+            category = item.categorys.all()[0]
+            data['category'] =  category.name
+        try:
+            collection_item = self.get_related_model().objects.create(**data)
+            collection_item.save()
+        except IntegrityError:
+             pass
+        
+    
+    def delete(self, item):
+        try:
+            collectitem = self.get_collection_model().objects.get(**{self.related_field: item, 'collection': self.collection})
+            collectitem.delete()
+        except self.get_collection_model.DoesNotExist:
+            pass
+    
+    @property
+    def related_field(self):
+        return self.data_type.lower()   
+   
+    def get_related_model(self):
+        return models.get_model('yqj', self.data_type.capitalize() + 'Collection')
+ 
+    def _create_collection(self):
+        #add a collection to the user
+        try:
+            _collection = self.request.myuser.collection
+        except ObjectDoesNotExist:
+            _collection = Collection(user=user)
+            _collection.save()
+        return _collection
+
+    @property
+    def collection(self):
+        return self._create_collection()
+
+    def get_model(self):
+        return models.get_model('yqj', self.data_type.capitalize())
+
+    def get_collection_model(self):
+        return models.get_model('yqj', self.data_type.capitalize() + 'Collection')
+   
+    def post(self, request, action, *args, **kwargs):
+        try:
+            self.data_type = request.POST['type']
+            pk = request.POST['id']
+        except KeyError:
+            return HttpResponse(status=404)
+
+        related_fields = ['article', 'event']
+        if self.data_type not in related_fields:
+            return HttpResponse(status=400)
+
+        #find the model and get instance
+        try:
+            model = self.get_model()
+            item = model.objects.get(id=pk)
+        except model.DoesNotExist:
+            return HttpResponse(status=404)
+
+        if action == 'remove':
+            self.delete(item)
+        elif action == 'add':
+            self.save(item)
+        return JsonResponse({'status': True})

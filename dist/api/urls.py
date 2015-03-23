@@ -1,5 +1,5 @@
 from django.conf.urls import patterns, include, url
-from api.views import ArticleTableView, NewsTableView, LocationTableView, CollectModifyView, EventTableView
+from api.views import ArticleTableView, NewsTableView, LocationTableView, CollectView, EventTableView, CollecModifyView
 urlpatterns = patterns('',
     # Examples:
     # url(r'^$', 'yuqing.views.home', name='home'),
@@ -8,8 +8,10 @@ urlpatterns = patterns('',
     url(r'^category/(\d+)/$', ArticleTableView.as_view()),
     url(r'^location/(\d+)/$', LocationTableView.as_view()),
     url(r'^news/$', NewsTableView.as_view()),
-    url(r'^collection/$', CollectModifyView.as_view()),
+    url(r'^collection/$', CollectView.as_view()),
     url(r'^event/$', EventTableView.as_view()),
+    url(r'^collection/remove/$', CollecModifyView.as_view()),
+    url(r'^collection/add/$', CollecModifyView.as_view()),
 )
 
 urlpatterns += patterns('api.views',
