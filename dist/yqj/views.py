@@ -1,10 +1,12 @@
 #coding=utf-8
 import datetime
+import os
 
+from django.conf import settings
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
-from yqj.models import Article, Weixin, Weibo, RelatedData, ArticleCategory, Area, Topic
 from django.views.generic import View
+from yqj.models import Article, Weixin, Weibo, RelatedData, ArticleCategory, Area, Topic
 from yqj import login_required
 
 def SetLogo(obj):
@@ -183,7 +185,14 @@ class CollectionView(BaseView):
 
 class SettingsView(BaseView):
     def get(self, request):
-        return self.render_to_response('user/settings.html')
+        image_url = None
+        for filename in os.listdir(settings.MEDIA_ROOT):
+            if os.path.splitext(filename)[0] == str(request.myuser.id):
+                image_url = os.path.join('/media', filename)
+        if image_url is None:
+            image_url = '/static/img/avatar.jpg'
+
+        return self.render_to_response('user/settings.html', {'image_url': image_url})
 
 class CustomView(BaseView):
     def get(self, request):

@@ -3,7 +3,8 @@
 import os
 import datetime
 from django.views.generic import View
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
+from django.shortcuts import render_to_response
 from django.db import models
 from django.db import IntegrityError
 from django.conf import settings
@@ -267,6 +268,8 @@ class CollecModifyView(View):
 
 @login_required
 def upload_image(request):
+    print request.path
+    return HttpResponseRedirect(request.path)
     user = request.myuser
     try:
         f = request.FILES['image']
@@ -281,8 +284,8 @@ def upload_image(request):
         for chunk in f.chunks():
             new_file.write(chunk)
     except OSError:
-        return JsonResponse({'status': False})
+        return HttpResponseRedirect(request.path)
     finally:
         new_file.close()
         
-    return JsonResponse({'status': True})
+    return HttpResponseRedirect(request.path)
