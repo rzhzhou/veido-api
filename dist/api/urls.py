@@ -20,4 +20,8 @@ urlpatterns += patterns('api.views',
     url(r'^register/$', 'registe_view'),
     url(r'^settings/upload/$', 'upload_image'),
     url(r'^settings/change/$', 'change_passwd'),
+
+
+    url(r'^user/reset/$', 'reset_passwd'),
+    url(r'^user/remove/$', 'delete_user_view'),
     )
