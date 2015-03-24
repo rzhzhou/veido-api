@@ -18,7 +18,7 @@
           <h3 class="box-title">头像</h3>
         </div>
         <div class="box-body user-icon clearfix">
-          <img src="{{ image_url }}" alt="avatar">
+          <img src="{{ user_image }}" alt="avatar">
           <form action="/api/settings/upload/" method="post" enctype="multipart/form-data">
             <div class="form-group">
               <p>从电脑中选择你喜欢的图片作为头像</p>
@@ -39,7 +39,7 @@
           <p></p>
           <form>
             <div id="username" class="form-group has-feedback">
-              <input type="text" class="form-control" value="{{ user.name }}">
+              <input type="text" class="form-control" value="{{ user.username }}">
               <span class="glyphicon glyphicon-user form-control-feedback"></span>
             </div>
             <div id="old-password" class="form-group has-feedback">
