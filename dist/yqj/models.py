@@ -96,6 +96,7 @@ class ArticlePublisher(models.Model):
     photo = models.URLField(verbose_name=u'用户头像')
     publisher = models.CharField(max_length=255, verbose_name=u'发布者')
     brief = models.CharField(max_length=255, verbose_name=u'简介')
+    serachmode = models.IntegerField(default=0, verbose_name=u'搜索方式') 
 
     class Meta:
         db_table = 'articlepublisher'
