@@ -222,6 +222,20 @@ class UserView(BaseView):
     def get(self, request):
         return self.render_to_response('user/user.html')
 
+
+class UserAdminView(BaseView):
+    
+    def get(self, request):
+        user = request.myuser
+        if not user.isAdmin:
+            return HttpResponse(status=401)
+
+        user_list = user.group.user_set.all()
+        for user in user_list:
+            user.name = user.username
+            user.type = u'管理用户' if user.isAdmin else u'普通用户'
+        return self.render_to_response('user/user.html', {'user_list': user_list})
+
 def register_view(request):
     return render_to_response('user/register.html')
 
@@ -251,3 +265,4 @@ def logout_view(request):
 
 def search_view(request, keyword):
     return render_to_response('search/result.html')
+

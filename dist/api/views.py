@@ -345,3 +345,36 @@ def change_passwd(request):
         return JsonResponse({'status': True})
     else:
         return JsonResponse({'status': False})
+
+@login_required
+def reset_passwd(request):
+    user = request.myuser
+    raise RuntimeError("here")
+    try:
+        user_id = request.POST['id']
+    except KeyError:
+        return HttpResponse(status=400)
+
+    users = user.group.users
+    if user_id in  map(lambda x: x.id):
+        user.password = hash_password('123456', user.salt) 
+        user.save()
+        return JsonResponse({'status': True})
+    else:
+        return JsonResponse({'status': False})
+
+@login_required
+def delete_user_view(request):
+    user = request.myuser
+    try:
+        user_id = request.POST['id']
+    except KeyError:
+        return HttpResponse(status=400)
+
+    users = user.group.users
+    if user_id in  map(lambda x: x.id):
+        delete_user = User.objects.get(id=user_id)
+        delete_user.delete()
+        return JsonResponse({'status': True})
+    else:
+        return JsonResponse({'status': False})
