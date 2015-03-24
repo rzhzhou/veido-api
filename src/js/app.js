@@ -157,15 +157,15 @@ app.user = {
     var reset  = button.eq(0);
     var remove = button.eq(1);
 
-    var data   = {id: []};
+    var id   = [];
 
     var action = function(obj, api) {
       obj.click(function() {
-        data.id.length = 0;
+        id.length = 0;
         
         $this.find('input:checked').each(function(index, element) {
-          var id = $(element).parent().next().data('id');
-          data.id.push(id);
+          var _id = $(element).parent().next().data('id');
+          id.push(_id);
         });
 
         var response = function(data) {
@@ -174,7 +174,7 @@ app.user = {
           }
         };
 
-        $.post(api, data, response, 'json');
+        $.post(api, {'id[]': id}, response, 'json');
       });
     };
 
