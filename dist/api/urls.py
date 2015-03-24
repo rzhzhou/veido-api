@@ -17,4 +17,5 @@ urlpatterns = patterns('',
 urlpatterns += patterns('api.views',
     url(r'^login/$', 'login_view'),
     url(r'^register/$', 'registe_view'),
+    url(r'^settings/upload/$', 'upload_image'),
     )
