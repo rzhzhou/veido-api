@@ -164,11 +164,33 @@ class EventTableView(TableAPIView):
             collected_html = self.collected_html(item)
             url = u'/event/%s' % item.id
             title = self.title_html(url, item.title, item.id, 'event')
-            hot_index = RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count() + RelatedData.objects.filter(uuid=item.uuid)[0].weixin.all().count() + RelatedData.objects.filter(uuid=item.uuid)[0].weibo.all().count()
-            pubtime = RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().order_by('-pubtime')[0].pubtime
+            hot_index = item.articles.all().count() + item.weixin.all().count() + item.weibo.all().count()
+            time = item.articles.all().order_by('-pubtime')
+            if time:
+                pubtime = time[0].pubtime
+            else:
+                pubtime = datetime.datetime.now()
             one_record = [collected_html, title, item.source, item.area.name, pubtime.date(), hot_index]
             result.append(one_record)
         return Response({"event": result})
+
+
+class EventDetailTableView(TableAPIView):
+    def get(self, request, id):
+        try:
+            event = Topic.objects.get(id=int(id))
+        except Topic.DoesNotExist:
+            return Response({'news': ''})
+        news = event.articles.all()
+        result = []
+        for item in news:
+            collected_html = self.collected_html(item)
+            url = u'news/%s' % item.id
+            title = self.title_html(url, item.title, item.id, 'article')
+            hot_index = RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count()
+            one_record = [collected_html, title, item.publisher.publisher, item.area.name, item.pubtime.date(), hot_index]
+            result.append(one_record)
+        return Response({'news': result})
 
 
 class CollectView(APIView):

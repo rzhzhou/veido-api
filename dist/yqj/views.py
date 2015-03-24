@@ -147,7 +147,14 @@ class EventView(BaseView):
 
 class EventDetailView(BaseView):
     def get(self, request, id):
-        return self.render_to_response('event/event.html')
+        try:
+            event_id = int(id)
+	    event = Topic.objects.get(id=event_id)
+        except Topic.DoesNotExist:
+            return self.render_to_response('event/event.html', {'event': '', 'weixin_list': [], 'weibo_list': []})
+        weixin_list = event.weixin.all()
+        weibo_list = event.weibo.all()
+        return self.render_to_response('event/event.html', {'event': event, 'weixin_list': weixin_list, 'weibo_list': weibo_list})
 
 
 class WeixinView(BaseView):
