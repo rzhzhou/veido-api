@@ -258,7 +258,6 @@ class Inspection(models.Model):
     pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
     product = models.CharField(max_length=255, verbose_name=u'名称')
     source = models.CharField(max_length=255, verbose_name=u'信息来源')
-    status = models.IntegerField(verbose_name=u'名称', null=True, blank=True)
     province = models.CharField(max_length=255, verbose_name=u'省')
     city = models.CharField(max_length=255, null=True, blank=True, verbose_name=u'市')
     district = models.CharField(max_length=255, null=True, blank=True, verbose_name=u'地区')

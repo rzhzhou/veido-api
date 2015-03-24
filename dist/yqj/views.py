@@ -6,7 +6,7 @@ from django.conf import settings
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import View
-from yqj.models import Article, Weixin, Weibo, RelatedData, ArticleCategory, Area, Topic
+from yqj.models import Article, Weixin, Weibo, RelatedData, ArticleCategory, Area, Topic, Inspection
 from yqj import login_required
 
 def SetLogo(obj):
@@ -42,10 +42,11 @@ def index_view(request):
 	weibo_data = Weibo.objects.all()[0:weibo_list_number]
 	for data in weibo_data:
             data = SetLogo(data)
-	    weibo_list.append({'logo': data.publisher.photo, 'id': data.id, 'title': data.title, 'name': data.author, 'time': data.pubtime, 'content': data.content})
+	    weibo_list.append({'logo': data.publisher.photo, 'id': data.id, 'title': data.title, 'name': data.publisher.publisher, 'time': data.pubtime, 'content': data.content})
 	weixin_data = Weixin.objects.all()[0:weixin_list_number]
         for data in weixin_data:
             data = SetLogo(data)
+        inspection_list = Inspection.objects.order_by('-pubtime')[:10]
         return render_to_response("dashboard/dashboard.html",
 			{'user': user,
 			'categories': categories,
@@ -58,7 +59,8 @@ def index_view(request):
 			'event_list': event_list,
 			'weixin_list': weixin_data,
 			'weibo_list': weibo_list,
-            'user_image': get_user_image(user),
+                        'user_image': get_user_image(user),
+                        'inspection_list': inspection_list,
 			})
     else:
         return HttpResponse(status=401)
