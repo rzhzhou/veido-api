@@ -1,5 +1,6 @@
 #coding=utf-8
 
+import os
 import datetime
 from django.views.generic import View
 from django.http import HttpResponse, JsonResponse
@@ -263,3 +264,25 @@ class CollecModifyView(View):
         elif action == 'add':
             self.save(item)
         return JsonResponse({'status': True})
+
+@login_required
+def upload_image(request):
+    user = request.myuser
+    try:
+        f = request.FILES['image']
+    except KeyError:
+        return HttpResponse(status=400)
+
+    media_path = settings.MEDIA_ROOT
+    filename = str(user.id) + os.path.splitext(f.name)[1]
+
+    try:
+        new_file = open(os.path.join(media_path, filename), 'w')
+        for chunk in f.chunks():
+            new_file.write(chunk)
+    except OSError:
+        return JsonResponse({'status': False})
+    finally:
+        new_file.close()
+        
+    return JsonResponse({'status': True})
