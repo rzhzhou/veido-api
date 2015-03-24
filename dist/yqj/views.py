@@ -218,7 +218,7 @@ class CustomView(BaseView):
 
 class UserView(BaseView):
     def get(self, request):
-        return slef.render_to_response('user/user.html')
+        return self.render_to_response('user/user.html')
 
 def register_view(request):
     return render_to_response('user/register.html')
