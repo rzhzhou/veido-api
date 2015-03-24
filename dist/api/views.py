@@ -267,8 +267,6 @@ class CollecModifyView(View):
 
 @login_required
 def upload_image(request):
-    print request.path
-    return HttpResponseRedirect(request.path)
     user = request.myuser
     try:
         f = request.FILES['image']
@@ -283,8 +281,8 @@ def upload_image(request):
         for chunk in f.chunks():
             new_file.write(chunk)
     except OSError:
-        return HttpResponseRedirect(request.path)
+        return HttpResponseRedirect('/settings/')
     finally:
         new_file.close()
         
-    return HttpResponseRedirect(request.path)
+    return HttpResponseRedirect('/settings/')
