@@ -185,7 +185,7 @@ class EventDetailTableView(TableAPIView):
         result = []
         for item in news:
             collected_html = self.collected_html(item)
-            url = u'news/%s' % item.id
+            url = u'/news/%s' % item.id
             title = self.title_html(url, item.title, item.id, 'article')
             hot_index = RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count()
             one_record = [collected_html, title, item.publisher.publisher, item.area.name, item.pubtime.date(), hot_index]
@@ -195,7 +195,7 @@ class EventDetailTableView(TableAPIView):
 
 class CollectView(APIView):
     def article_html(self, item):
-	url = u'/news/%s' % item.id
+        url = u'/news/%s' % item.id
         view = ArticleTableView(self.request)
         title = view.title_html(url, item.title, item.id, 'article')
         hot_index = RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count()
@@ -203,7 +203,17 @@ class CollectView(APIView):
         return line
 
     def topic_html(self, item):
-        return []
+        url = u'/event/%s' % item.id
+        view = EventTableView(self.request)
+        title = view.title_html(url, item.title, item.id, 'topic')
+        hot_index = item.articles.all().count() + item.weixin.all().count() + item.weibo.all().count()
+        time = item.articles.all().order_by('-pubtime')
+        if time:
+            pubtime = time[0].pubtime
+        else:
+            pubtime = datetime.datetime.now()
+            one_record = [collected_html, title, item.source, item.area.name, pubtime.date(), hot_index]
+        return one_record 
 
     def get(self, request):
         try:
@@ -270,7 +280,7 @@ class CollecModifyView(View):
         except KeyError:
             return HttpResponse(status=404)
 
-        related_fields = ['article', 'event']
+        related_fields = ['article', 'topic']
         if self.data_type not in related_fields:
             return HttpResponse(status=400)
 

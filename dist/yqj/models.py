@@ -194,6 +194,7 @@ class User(models.Model):
     password = models.CharField(max_length=255, verbose_name=u'hash密码')
     salt = models.CharField(max_length=255)
     area = models.ForeignKey(Area)
+    isAdmin = models.IntegerField(default=0)
 
     def is_authenticated(self):
         return True
