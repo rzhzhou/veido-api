@@ -120,7 +120,7 @@ app.user = {
           location.href = '/login/';
         } else{
           msg.text('原密码错误！').show();
-        };
+        }
       };
 
       switch (0) {
@@ -151,39 +151,35 @@ app.user = {
     });
   },
   management: function() {
-    var button = this.find('button');
+    var $this  = this;
+
+    var button = $this.find('button');
     var reset  = button.eq(0);
     var remove = button.eq(1);
 
-    var list   = this.find('tbody');
+    var data   = {id: []};
 
-    var response = function(data) {
-      if (data.status) {
-        location.href = '/user/';
-      };
+    var action = function(obj, api) {
+      obj.click(function() {
+        data.id.length = 0;
+        
+        $this.find('input:checked').each(function(index, element) {
+          var id = $(element).parent().next().data('id');
+          data.id.push(id);
+        });
+
+        var response = function(data) {
+          if (data.status) {
+            location.href = '/user/';
+          }
+        };
+
+        $.post(api, data, response, 'json');
+      });
     };
 
-    reset.click(function() {
-      var data = {id: []};
-
-      list.find('input:checked').each(function(index, element) {
-        var id = $(element).parent().next().data('id');
-        data.id.push(id);
-      });
-
-      $.post('/api/user/reset', data, response, 'json');
-    });
-
-    remove.click(function() {
-      var data = {id: []};
-
-      list.find('input:checked').each(function(index, element) {
-        var id = $(element).parent().next().data('id');
-        data.id.push(id);
-      });
-
-      $.post('/api/user/remove', data, response, 'json');
-    });
+    action(reset, '/api/user/reset/');
+    action(remove, '/api/user/remove/');
   }
 };
 
