@@ -1,10 +1,12 @@
 #coding=utf-8
 import datetime
+import os
 
+from django.conf import settings
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
-from yqj.models import Article, Weixin, Weibo, RelatedData, ArticleCategory, Area, Topic
 from django.views.generic import View
+from yqj.models import Article, Weixin, Weibo, RelatedData, ArticleCategory, Area, Topic
 from yqj import login_required
 
 def SetLogo(obj):
@@ -58,10 +60,19 @@ def index_view(request):
 			'event_list': event_list,
 			'weixin_list': weixin_list,
 			'weibo_list': weibo_list,
+            'user_image': get_user_image(user),
 			})
     else:
         return HttpResponse(status=401)
 
+def get_user_image(user):
+    image_url = None
+    for filename in os.listdir(settings.MEDIA_ROOT):
+        if os.path.splitext(filename)[0] == str(user.id):
+            image_url = os.path.join('/media', filename)
+    if image_url is None:
+        image_url = '/static/img/avatar.jpg'
+    return image_url
 
 class LoginRequiredMixin(object):
     ALLOWED_METHOD = ['GET']
@@ -86,7 +97,9 @@ class BaseView(LoginRequiredMixin, View):
         if self.INCLUDE_USER:
             user = self.request.myuser
             context['user'] = user
-	    context['locations'] = self.get_locations(user.area)
+        
+        context['user_image'] = get_user_image(user)
+        context['locations'] = self.get_locations(user.area)
         return render_to_response(template_path, context)
     
     def get_article_categories(self):
@@ -99,6 +112,8 @@ class BaseView(LoginRequiredMixin, View):
         return Area.objects.filter(parent=area, level=area.level+1)
 
 
+        
+        
 class CategoryView(BaseView):
     def get(self, request, category_id):
         try:
@@ -190,6 +205,7 @@ class CollectionView(BaseView):
 
 class SettingsView(BaseView):
     def get(self, request):
+
         return self.render_to_response('user/settings.html')
 
 class CustomView(BaseView):

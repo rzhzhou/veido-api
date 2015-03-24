@@ -3,7 +3,8 @@
 import os
 import datetime
 from django.views.generic import View
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
+from django.shortcuts import render_to_response
 from django.db import models
 from django.db import IntegrityError
 from django.conf import settings
@@ -89,7 +90,6 @@ class TableAPIView(APIView):
         title_format = u'<a href="{0}" title="{1}" target="_blank" data-id="{2}" data-type="{3}">{1}</a>'
         return title_format.format(*args)
 
-    
 def get_date_from_iso(datetime_str):
     #return datetime.datetime.strptime("2008-09-03T20:56:35.450686Z", "%Y-%m-%dT%H:%M:%S.%fZ")
     return datetime.datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S.%fZ")
@@ -303,8 +303,8 @@ def upload_image(request):
         for chunk in f.chunks():
             new_file.write(chunk)
     except OSError:
-        return JsonResponse({'status': False})
+        return HttpResponseRedirect('/settings/')
     finally:
         new_file.close()
         
-    return JsonResponse({'status': True})
+    return HttpResponseRedirect('/settings/')
