@@ -189,12 +189,17 @@ def save_user(username, raw_password, area):
     user.save()
     return user
 
+class Group(models.Model):
+    company = models.CharField(max_length=255)
+
+
 class User(models.Model):
     username = models.CharField(max_length=20, unique=True, verbose_name=u'登录名')
     password = models.CharField(max_length=255, verbose_name=u'hash密码')
     salt = models.CharField(max_length=255)
     area = models.ForeignKey(Area)
     isAdmin = models.IntegerField(default=0)
+    group = models.ForeignKey(Group)
 
     def is_authenticated(self):
         return True
@@ -243,3 +248,25 @@ class TopicCollection(models.Model):
 class AnonymousUser(User):
     def is_authenticated(self):
         return False
+
+
+class Inspection(models.Model):
+    url = models.CharField(max_length=255, verbose_name=u'网站链接')
+    name = models.CharField(max_length=255, verbose_name=u'名称')
+    manufacturer = models.CharField(max_length=255, null=True, blank=True,verbose_name=u'转载次数')
+    qualitied = models.FloatField(verbose_name=u'关注度',null=True, blank=True)
+    pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
+    product = models.CharField(max_length=255, verbose_name=u'名称')
+    source = models.CharField(max_length=255, verbose_name=u'信息来源')
+    status = models.IntegerField(verbose_name=u'名称', null=True, blank=True)
+    province = models.CharField(max_length=255, verbose_name=u'省')
+    city = models.CharField(max_length=255, null=True, blank=True, verbose_name=u'市')
+    district = models.CharField(max_length=255, null=True, blank=True, verbose_name=u'地区')
+
+    class Meta:
+        db_table = 'inspection'
+        verbose_name_plural = u'抽检'
+        ordering = ['-pubtime']
+
+    def __unicode__(self):
+        return self.name
