@@ -11,7 +11,8 @@ from django.conf import settings
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
-from yqj.models import (Article, Area, Weixin, Weibo, Topic, RelatedData, ArticleCategory, save_user, Collection, Topic)
+from yqj.models import (Article, Area, Weixin, Weibo, Topic, RelatedData, ArticleCategory,
+                            save_user, Collection, Topic, hash_password)
 from serializers import ArticleSerializer
 from yqj import authenticate, login_required
 
@@ -318,3 +319,24 @@ def upload_image(request):
         new_file.close()
         
     return HttpResponseRedirect('/settings/')
+
+@login_required
+def change_passwd(request):
+    user = request.myuser
+    try:
+        old_passwd = request.POST['oldPassword']
+        new_passwd = request.POST['newPassword']
+        username = request.POST['username']
+    except KeyError:
+        return HttpResponse(status=400)
+    if username != user.username:
+        return JsonResponse({'status': False})
+
+    coded = hash_password(old_passwd, user.salt)
+    #authencate success
+    if user.password == coded:
+        user.password = hash_password(new_passwd, user.salt)
+        user.save()
+        return JsonResponse({'status': True})
+    else:
+        return JsonResponse({'status': False})
