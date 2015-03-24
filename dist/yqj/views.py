@@ -44,6 +44,8 @@ def index_view(request):
             data = SetLogo(data)
 	    weibo_list.append({'logo': data.publisher.photo, 'id': data.id, 'title': data.title, 'name': data.author, 'time': data.pubtime, 'content': data.content})
 	weixin_data = Weixin.objects.all()[0:weixin_list_number]
+        for data in weixin_data:
+            data = SetLogo(data)
         return render_to_response("dashboard/dashboard.html",
 			{'user': user,
 			'categories': categories,
