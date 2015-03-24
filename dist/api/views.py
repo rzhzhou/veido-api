@@ -158,13 +158,17 @@ class LocationTableView(TableAPIView):
 
 
 class EventTableView(TableAPIView):
+    def collected_items(self):
+        user = self.request.myuser
+        return user.collection.events.all()
+
     def get(self, request):
         result = []
         event = Topic.objects.all()[:self.LIMIT_NUMBER]
         for item in event:
             collected_html = self.collected_html(item)
             url = u'/event/%s' % item.id
-            title = self.title_html(url, item.title, item.id, 'event')
+            title = self.title_html(url, item.title, item.id, 'topic')
             hot_index = item.articles.all().count() + item.weixin.all().count() + item.weibo.all().count()
             time = item.articles.all().order_by('-pubtime')
             if time:
@@ -213,7 +217,7 @@ class CollectView(APIView):
             pubtime = time[0].pubtime
         else:
             pubtime = datetime.datetime.now()
-            one_record = [collected_html, title, item.source, item.area.name, pubtime.date(), hot_index]
+        one_record = [view.collected_html(item), title, item.source, item.area.name, pubtime.date(), hot_index]
         return one_record 
 
     def get(self, request):
@@ -276,6 +280,7 @@ class CollecModifyView(View):
    
     def post(self, request, action, *args, **kwargs):
         try:
+            print request.POST['type'], request.POST['id']
             self.data_type = request.POST['type']
             pk = request.POST['id']
         except KeyError:

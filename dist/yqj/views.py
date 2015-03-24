@@ -30,24 +30,20 @@ def index_view(request):
 	news_list_number = event_list_number = 10 
 	weixin_list_number = weibo_list_number = 5
 
-	news_list = []
-	weixin_list = []
-	event_list = []
+	event_list = Topic.objects.all()[:event_list_number]
 	weibo_list = []
 	news_list = Article.objects.all()[:news_list_number]
 	for item in news_list:
             item = SetLogo(item)
 	    setattr(item, 'hot_index', RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count())
-	for i in range(event_list_number):
-            event_list.append({'url': 'www.baidu.com', 'title': u'新闻', 'source': u'深度网', 'time': 53})
+	for item in event_list:
+            setattr(item, 'hot_index', item.articles.all().count()+item.weixin.all().count()+item.weibo.all().count())
+            #event_list.append({'url': 'www.baidu.com', 'title': u'新闻', 'source': u'深度网', 'time': 53})
 	weibo_data = Weibo.objects.all()[0:weibo_list_number]
 	for data in weibo_data:
             data = SetLogo(data)
 	    weibo_list.append({'logo': data.publisher.photo, 'id': data.id, 'title': data.title, 'name': data.author, 'time': data.pubtime, 'content': data.content})
 	weixin_data = Weixin.objects.all()[0:weixin_list_number]
-	for data in weixin_data:
-            data = SetLogo(data)
-	    weixin_list.append({'logo': data.publisher.photo, 'id': data.id, 'title': data.title, 'name': data.author, 'time': data.pubtime, 'content': data.content})
         return render_to_response("dashboard/dashboard.html",
 			{'user': user,
 			'categories': categories,
@@ -58,7 +54,7 @@ def index_view(request):
 			'event': event,
 			'news_list': news_list,
 			'event_list': event_list,
-			'weixin_list': weixin_list,
+			'weixin_list': weixin_data,
 			'weibo_list': weibo_list,
             'user_image': get_user_image(user),
 			})

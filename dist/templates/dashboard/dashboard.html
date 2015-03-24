@@ -131,10 +131,10 @@
             {% for weixin in weixin_list %}
               <li class="media">
                 <div class="media-left">
-                  <img class="media-object" src="{{ weixin.logo }}" alt="{{ weixin.name }}">
+                  <img class="media-object" src="{{ weixin.publisher.photo }}" alt="{{ weixin.name }}">
                 </div>  
                 <div class="media-body">
-                  <h4 class="media-heading">{{ weixin.name }}</h4>
+                  <h4 class="media-heading">{{ weixin.publisher.publisher }}</h4>
                   <p><a href="/weixin/{{ weixin.id }}/">{{ weixin.title }}</a></p>
                 </div>
               </li>
