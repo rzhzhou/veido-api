@@ -117,6 +117,7 @@ app.user = {
       var response = function(data) {
         if (data.status) {
           msg.text('更新成功！').show();
+          location.href = '/login/';
         } else{
           msg.text('原密码错误！').show();
         };
