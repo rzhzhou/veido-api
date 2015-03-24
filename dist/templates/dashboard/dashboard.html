@@ -228,12 +228,12 @@
 
             {% for inspection in inspection_list  %}
             <tr>
-              <td>{{ inspection.category }}</td>
+              <td>{{ inspection.product }}</td>
               <td>
                 <a href="{{ inspection.url }}" title="{{ inspection.name }}" target="_blank">{{ inspection.name }}</a>
               </td>
-              <td>{{ inspection.quality }}</td>
-              <td>{{ inspection.time | date:"Y-m-d" }}</td>
+              <td>{{ inspection.qualitied }}</td>
+              <td>{{ inspection.pubtime | date:"Y-m-d" }}</td>
             </tr>
             {% endfor %}
           </table>
