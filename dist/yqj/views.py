@@ -47,6 +47,8 @@ def index_view(request):
         for data in weixin_data:
             data = SetLogo(data)
         inspection_list = Inspection.objects.order_by('-pubtime')[:10]
+        for item in inspection_list:
+            item.qualitied = str(int(item.qualitied*100)) + '%'
         return render_to_response("dashboard/dashboard.html",
 			{'user': user,
 			'categories': categories,
