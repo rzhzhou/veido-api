@@ -149,6 +149,41 @@ app.user = {
           break;
       }
     });
+  },
+  management: function() {
+    var button = this.find('button');
+    var reset  = button.eq(0);
+    var remove = button.eq(1);
+
+    var list   = this.find('tbody');
+
+    var response = function(data) {
+      if (data.status) {
+        location.href = '/user/';
+      };
+    };
+
+    reset.click(function() {
+      var data = {id: []};
+
+      list.find('input:checked').each(function(index, element) {
+        var id = $(element).parent().next().data('id');
+        data.id.push(id);
+      });
+
+      $.post('/api/user/reset', data, response, 'json');
+    });
+
+    remove.click(function() {
+      var data = {id: []};
+
+      list.find('input:checked').each(function(index, element) {
+        var id = $(element).parent().next().data('id');
+        data.id.push(id);
+      });
+
+      $.post('/api/user/remove', data, response, 'json');
+    });
   }
 };
 
@@ -378,4 +413,6 @@ $(function() {
 
   $('#news').Do(app.table);
   $('#event').Do(app.table);
+
+  $('.user-management').Do(app.user.management);
 });
