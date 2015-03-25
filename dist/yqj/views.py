@@ -232,6 +232,8 @@ class UserAdminView(BaseView):
 
         user_list = user.group.user_set.all()
         for user in user_list:
+            if user.id == request.myuser.id:
+                continue
             user.name = user.username
             user.type = u'管理用户' if user.isAdmin else u'普通用户'
         return self.render_to_response('user/user.html', {'user_list': user_list})
