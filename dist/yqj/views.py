@@ -231,6 +231,7 @@ class UserAdminView(BaseView):
             return HttpResponse(status=401)
 
         user_list = user.group.user_set.all()
+        user_list = filter(lambda x: x.id != request.myuser.id, user_list)
         for user in user_list:
             if user.id == request.myuser.id:
                 continue
