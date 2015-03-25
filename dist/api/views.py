@@ -378,7 +378,7 @@ def delete_user_view(request):
     group_user_ids = list(map(lambda x: x.id, group_users))
 
     for user_id in reseted_id_list:
-        if user_id in group_user_ids:
+        if user_id in group_user_ids and user_id != admin_user.id:
             delete_user = User.objects.get(id=user_id)
             delete_user.delete()
     return JsonResponse({'status': True})
