@@ -174,7 +174,9 @@ app.user = {
           }
         };
 
-        $.post(api, {'id[]': id}, response, 'json');
+        if (id.length) {
+          $.post(api, id.toString(), response, 'json');
+        }
       });
     };
 
