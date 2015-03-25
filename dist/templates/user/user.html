@@ -3,25 +3,21 @@
 {% block title %}用户管理 - 质监舆情{% endblock %}
 
 {% block header %}
-  <h1>用户管理</h1>
+  <h1>账户管理</h1>
   <ol class="breadcrumb">
     <li><a href="/"><i class="fa fa-dashboard"></i>首页</a></li>
-    <li class="active"><a href="/user/">用户管理</a></li>
+    <li class="active"><a href="/user/">账户管理</a></li>
   </ol>
 {% endblock %}
 
 {% block content %}
   <div class="row">
-    <div class="col-md-12">
+    <div class="col-md-8">
       <div class="box box-primary">
         <div class="box-header with-border">
-          <h3 class="box-title">用户列表</h3>
+          <h3 class="box-title">管理</h3>
         </div>
         <div class="box-body user-management">
-          <div class="btn-group">
-            <button class="btn btn-default btn-sm"><i class="fa fa-history"></i> 重置密码</button>
-            <button class="btn btn-default btn-sm"><i class="fa fa-trash-o"></i> 删除账户</button>
-          </div>
           <table class="table table-bordered">
             <thead>
               <tr>
@@ -40,6 +36,37 @@
               {% endfor %}                            
             </tbody>
           </table>
+
+          <div class="btn-group">
+            <button class="btn btn-default btn-sm"><i class="fa fa-history"></i> 重置密码</button>
+            <button class="btn btn-default btn-sm"><i class="fa fa-trash-o"></i> 删除账户</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="box box-primary">
+        <div class="box-header with-border">
+          <h3 class="box-title">添加</h3>
+        </div>
+        <div class="box-body user-add">
+          <form>
+            <div id="username" class="form-group has-feedback">
+              <input type="text" class="form-control" placeholder="姓名">
+              <span class="glyphicon glyphicon-user form-control-feedback"></span>
+            </div>
+            <div id="password" class="form-group has-feedback">
+              <input type="password" class="form-control" placeholder="密码">
+              <span class="glyphicon glyphicon-lock form-control-feedback"></span>          
+            </div>
+            <div id="retype-password" class="form-group has-feedback">
+              <input type="password" class="form-control" placeholder="确认密码">
+              <span class="glyphicon glyphicon-log-in form-control-feedback"></span>
+            </div>
+            <p class="text-warning"></p>
+            <button type="submit" class="btn btn-default btn-sm">添加用户</button>
+          </form>          
         </div>
       </div>
     </div>

@@ -56,50 +56,6 @@ app.user = {
       }
     });
   },
-  register: function() {
-    var form = this.find('form');
-    var msg  = this.find('p');
-
-    form.submit(function(event) {
-      event.preventDefault();
-
-      var data = {
-        username: $('#username').Trim(),
-        password: $('#password').Trim(),
-        retype:   $('#retype-password').Trim()
-      };
-
-      var response = function(data) {
-        if (data.status) {
-          location.href = "/";
-        } else {
-          msg.text('抱歉，注册失败！');
-        }
-      };
-
-      switch (0) {
-        case data.username.length:
-          msg.text('请输入用户名！');
-          break;
-        case data.password.length:
-          msg.text('请输入密码!');
-          break;
-        case data.retype.length:
-          msg.text('请确认密码！');
-          break;
-        case Number( data.password === data.retype ):
-          msg.text('两次输入密码不一致！');
-          break;
-        default:
-          var _data = {
-            username: data.username,
-            password: data.password
-          };
-          $.post('/api/register/', _data, response, 'json');
-          break;
-      }
-    });
-  },
   change: function() {
     var form = this.find('form');
     var msg  = this.find('p');
@@ -182,6 +138,50 @@ app.user = {
 
     action(reset, '/api/user/reset/');
     action(remove, '/api/user/remove/');
+  },
+  add: function() {
+    var form = this.find('form');
+    var msg  = this.find('p');
+
+    form.submit(function(event) {
+      event.preventDefault();
+
+      var data = {
+        username: $('#username').Trim(),
+        password: $('#password').Trim(),
+        retype:   $('#retype-password').Trim()
+      };
+
+      var response = function(data) {
+        if (data.status) {
+          location.href = "/";
+        } else {
+          msg.text('抱歉，注册失败！').show();
+        }
+      };
+
+      switch (0) {
+        case data.username.length:
+          msg.text('请输入用户名！').show();
+          break;
+        case data.password.length:
+          msg.text('请输入密码!').show();
+          break;
+        case data.retype.length:
+          msg.text('请确认密码！').show();
+          break;
+        case Number( data.password === data.retype ):
+          msg.text('两次输入密码不一致！').show();
+          break;
+        default:
+          var _data = {
+            username: data.username,
+            password: data.password
+          };
+          $.post('/api/user/add/', _data, response, 'json');
+          break;
+      }
+    });
   }
 };
 
@@ -401,7 +401,6 @@ app.table = function() {
  */
 $(function() {
   $('.login-box').Do(app.user.login);
-  $('.register-box').Do(app.user.register);
   $('.user-info').Do(app.user.change);
 
   $('.sidebar-form').Do(app.search);
@@ -413,4 +412,5 @@ $(function() {
   $('#event').Do(app.table);
 
   $('.user-management').Do(app.user.management);
+  $('.user-add').Do(app.user.add);
 });
