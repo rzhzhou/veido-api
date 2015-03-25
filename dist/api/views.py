@@ -355,8 +355,9 @@ def reset_passwd(request):
     except KeyError:
         return HttpResponse(status=400)
 
-    users = user.group.users
-    if user_id in  map(lambda x: x.id):
+    users = user.group.user_set.all()
+    user_ids = list[map(lambda x: x.id, users)]
+    if user_id in user_ids:
         user.password = hash_password('123456', user.salt) 
         user.save()
         return JsonResponse({'status': True})
