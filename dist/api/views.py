@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from yqj.models import (Article, Area, Weixin, Weibo, Topic, RelatedData, ArticleCategory,
-                            save_user, Collection, Topic, hash_password)
+                            save_user, Collection, Topic, hash_password, User)
 from serializers import ArticleSerializer
 from yqj import authenticate, login_required
 
@@ -348,34 +348,37 @@ def change_passwd(request):
 
 @login_required
 def reset_passwd(request):
-    user = request.myuser
-    raise RuntimeError("here")
     try:
-        user_id = request.POST['id']
-    except KeyError:
+        reseted_user_ids = request.POST['id'].split(',')
+        reseted_id_list = map(lambda x: int(x), reseted_user_ids)
+    except (KeyError, ValueError):
         return HttpResponse(status=400)
 
-    users = user.group.user_set.all()
-    user_ids = list[map(lambda x: x.id, users)]
-    if user_id in user_ids:
-        user.password = hash_password('123456', user.salt) 
-        user.save()
-        return JsonResponse({'status': True})
-    else:
-        return JsonResponse({'status': False})
+    admin_user = request.myuser
+    group_users = admin_user.group.user_set.all()
+    group_user_ids = list(map(lambda x: x.id, group_users))
+
+    for user_id in reseted_id_list:
+        if user_id in group_user_ids:
+            user = User.objects.get(id=user_id)
+            user.password = hash_password('123456', user.salt) 
+            user.save()
+    return JsonResponse({'status': True})
 
 @login_required
 def delete_user_view(request):
-    user = request.myuser
     try:
-        user_id = request.POST['id']
-    except KeyError:
+        reseted_user_ids = request.POST['id'].split(',')
+        reseted_id_list = map(lambda x: int(x), reseted_user_ids)
+    except (KeyError, ValueError):
         return HttpResponse(status=400)
 
-    users = user.group.users
-    if user_id in  map(lambda x: x.id):
-        delete_user = User.objects.get(id=user_id)
-        delete_user.delete()
-        return JsonResponse({'status': True})
-    else:
-        return JsonResponse({'status': False})
+    admin_user = request.myuser
+    group_users = admin_user.group.user_set.all()
+    group_user_ids = list(map(lambda x: x.id, group_users))
+
+    for user_id in reseted_id_list:
+        if user_id in group_user_ids:
+            delete_user = User.objects.get(id=user_id)
+            delete_user.delete()
+    return JsonResponse({'status': True})
