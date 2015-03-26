@@ -24,4 +24,5 @@ urlpatterns += patterns('api.views',
 
     url(r'^user/reset/$', 'reset_passwd'),
     url(r'^user/remove/$', 'delete_user_view'),
+    url(r'^user/add/$', 'add_user_view'),
     )

@@ -382,3 +382,18 @@ def delete_user_view(request):
             delete_user = User.objects.get(id=user_id)
             delete_user.delete()
     return JsonResponse({'status': True})
+
+@login_required
+def add_user_view(request):
+    try:
+        username = request.POST['username']
+        password = request.POST['password']
+    except KeyError:
+        return HttpResponse(status=400)
+
+    myuser = request.myuser
+    if not myuser.isAdmin:
+        return HttpResponse(status=401)
+
+    save_user(username, password, myuser.area, myuser.group)
+    return JsonResponse({'status': True})

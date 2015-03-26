@@ -180,12 +180,13 @@ def hash_password(raw_password, salt):
     hash.update(value)
     return hash.hexdigest()
 
-def save_user(username, raw_password, area):
+def save_user(username, raw_password, area, group):
     kwargs = {}
     kwargs['username'] = username
     kwargs['salt'] = make_random_string()
     kwargs['password'] = hash_password(raw_password, kwargs['salt'])
     kwargs['area'] = area
+    kwargs['group'] = group
     user = User(**kwargs)
     user.save()
     return user
