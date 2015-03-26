@@ -81,16 +81,16 @@ app.user = {
 
       switch (0) {
         case data.username.length:
-          msg.text('请输入姓名').show();
+          msg.text('请输入姓名！').show();
           break;
         case data.oldPassword.length:
-          msg.text('请输入原密码').show();
+          msg.text('请输入原密码！').show();
           break;
         case data.newPassword.length:
-          msg.text('请输入新密码').show();
+          msg.text('请输入新密码！').show();
           break;
         case data.retype.length:
-          msg.text('请输入原密码').show();
+          msg.text('请确认密码！').show();
           break;
         case Number( data.newPassword === data.retype ):
           msg.text('两次输入密码不一致！').show();
