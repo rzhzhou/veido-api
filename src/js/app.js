@@ -202,51 +202,53 @@ app.search = function() {
 app.chart = {
   line: function() {
     require(['echarts', 'echarts/chart/line'], function(ec) {
-      ec.init(document.getElementById('line-chart'), 'macarons').setOption({
-        tooltip : {
-          trigger: 'axis'
-        },
-        legend: {
-          data:['正面','中性','负面']
-        },
-        grid: {
-          x: 40,
-          y: 30,
-          x2: 20,
-          y2: 30
-        },
-        xAxis : [
-          {
-            type : 'category',
-            boundaryGap : false,
-            data : ['03-20','03-21','03-22','03-23','03-24','03-25','03-26']
-          }
-        ],
-        yAxis : [
-          {
-            type : 'value'
-          }
-        ],
-        series : [
-          {
-            name:'正面',
-            type:'line',
-            stack: '总量',
-            data:[120, 132, 101, 134, 90, 230, 210]
+      $.getJSON('/api/line' + app.url, function(data) {
+        ec.init(document.getElementById('line-chart'), 'macarons').setOption({
+          tooltip: {
+            trigger: 'axis'
           },
-          {
-            name:'中性',
-            type:'line',
-            stack: '总量',
-            data:[220, 182, 191, 234, 290, 330, 310]
+          legend: {
+            data: ['正面','中性','负面']
           },
-          {
-            name:'负面',
-            type:'line',
-            stack: '总量',
-            data:[150, 232, 201, 154, 190, 330, 410]
-          }
-        ]
+          grid: {
+            x: 40,
+            y: 30,
+            x2: 20,
+            y2: 30
+          },
+          xAxis: [
+            {
+              type: 'category',
+              boundaryGap: false,
+              data: data.date
+            }
+          ],
+          yAxis: [
+            {
+              type : 'value'
+            }
+          ],
+          series: [
+            {
+              name: '正面',
+              type: 'line',
+              stack: '总量',
+              data: data.positive
+            },
+            {
+              name: '中性',
+              type: 'line',
+              stack: '总量',
+              data: data.neutral
+            },
+            {
+              name: '负面',
+              type: 'line',
+              stack: '总量',
+              data: data.negative
+            }
+          ]
+        });
       });
     });
   },
