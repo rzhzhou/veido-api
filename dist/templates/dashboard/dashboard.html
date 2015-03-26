@@ -219,23 +219,27 @@
         </div>
         <div class="box-body no-padding">
           <table class="table table-hover">
-            <tr>
-              <th class="inspection-category">产品种类</th>
-              <th class="inspection-name">事件</th>
-              <th class="inspection-quality">合格率</th>
-              <th class="inspection-time">抽检日期</th>              
-            </tr>
-
-            {% for inspection in inspection_list  %}
-            <tr>
-              <td>{{ inspection.product }}</td>
-              <td>
-                <a href="{{ inspection.url }}" title="{{ inspection.name }}" target="_blank">{{ inspection.name }}</a>
-              </td>
-              <td>{{ inspection.qualitied }}</td>
-              <td>{{ inspection.pubtime | date:"Y-m-d" }}</td>
-            </tr>
-            {% endfor %}
+            <thead>
+              <tr>
+                <th class="inspection-category">产品种类</th>
+                <th class="inspection-name">事件</th>
+                <th class="inspection-quality">合格率</th>
+                <th class="inspection-time">抽检日期</th>              
+              </tr>
+            </thead>
+            
+            <tbody>
+              {% for inspection in inspection_list  %}
+              <tr>
+                <td>{{ inspection.product }}</td>
+                <td>
+                  <a href="{{ inspection.url }}" title="{{ inspection.name }}" target="_blank">{{ inspection.name }}</a>
+                </td>
+                <td>{{ inspection.qualitied }}</td>
+                <td>{{ inspection.pubtime | date:"Y-m-d" }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
           </table>
         </div>
       </div>
