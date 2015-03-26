@@ -154,7 +154,7 @@ app.user = {
 
       var response = function(data) {
         if (data.status) {
-          location.href = "/";
+          location.href = "/user/";
         } else {
           msg.text('抱歉，注册失败！').show();
         }
@@ -400,17 +400,25 @@ app.table = function() {
  * run function when element exists
  */
 $(function() {
-  $('.login-box').Do(app.user.login);
-  $('.user-info').Do(app.user.change);
-
-  $('.sidebar-form').Do(app.search);
-
-  $('#line-chart').Do(app.chart.line);
-  $('#pie-chart').Do(app.chart.pie);
-
-  $('#news').Do(app.table);
-  $('#event').Do(app.table);
-
-  $('.user-management').Do(app.user.management);
-  $('.user-add').Do(app.user.add);
+  switch (location.pathname) {
+    case "/login/":
+      $('.login-box').Do(app.user.login);
+      break;
+    case "/settings/":
+      $('.sidebar-form').Do(app.search);
+      $('.user-info').Do(app.user.change);
+      break;
+    case "/user/":
+      $('.sidebar-form').Do(app.search);
+      $('.user-management').Do(app.user.management);
+      $('.user-add').Do(app.user.add);  
+      break;
+    default:
+      $('.sidebar-form').Do(app.search);
+      $('#line-chart').Do(app.chart.line);
+      $('#pie-chart').Do(app.chart.pie);
+      $('#news').Do(app.table);
+      $('#event').Do(app.table);          
+      break;
+  }
 });
