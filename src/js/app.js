@@ -28,6 +28,8 @@ $.fn.Trim = function() {
  */
 var app = {};
 
+app.url = location.pathname;
+
 app.user = {
   login: function() {
     var form = this.find('form');
@@ -388,7 +390,7 @@ app.table = function() {
  * run function when element exists
  */
 $(function() {
-  switch (location.pathname) {
+  switch (app.url) {
     case "/login/":
       $('.login-box').Do(app.user.login);
       break;
