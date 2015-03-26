@@ -76,8 +76,8 @@
           <div class="list-group no-margin">
             {% for news in news_list %}
               <a href="/news/{{ news.id }}/" class="list-group-item no-border">
-                {{ news.title }}
                 <span class="badge" data-toggle="tooltip" data-placement="left" title="热度 {{ news.hot_index }}">{{ news.hot_index }}</span>
+                {{ news.title }}
               </a>
             {% endfor %}
           </div>
@@ -102,8 +102,8 @@
           <div class="list-group no-margin">
             {% for event in event_list %}
               <a href="/event/{{ event.id }}" class="list-group-item no-border">
-                {{ event.title }}
                 <span class="badge" data-toggle="tooltip" data-placement="left" title="热度 {{ event.hot_index }}">{{ event.hot_index }}</span>
+                {{ event.title }}
               </a>
             {% endfor %}
           </div>
