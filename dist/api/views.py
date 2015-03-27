@@ -442,8 +442,8 @@ def chart_pie_index_view(request):
     name = [item.name for item in locations]
     values = []
     for item in locations:
-        #values.append({'name': item.name, 'value': item.article_set.all().count()})
-        values.append({'name': item.name, 'value': 80})
+        values.append({'name': item.name, 'value': item.article_set.all().count()})
+        #values.append({'name': item.name, 'value': 80})
     return JsonResponse({'name': name, "value": values})
 
 @login_required
