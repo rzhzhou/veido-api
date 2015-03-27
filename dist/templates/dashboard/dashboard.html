@@ -101,7 +101,7 @@
         <div class="box-body no-padding">
           <div class="list-group no-margin">
             {% for event in event_list %}
-              <a href="/event/{{ event.id }}" class="list-group-item no-border">
+              <a href="/event/{{ event.id }}/" class="list-group-item no-border">
                 <span class="badge" data-toggle="tooltip" data-placement="left" title="热度 {{ event.hot_index }}">{{ event.hot_index }}</span>
                 {{ event.title }}
               </a>
