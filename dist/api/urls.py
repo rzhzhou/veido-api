@@ -1,5 +1,6 @@
 from django.conf.urls import patterns, include, url
 from api.views import ArticleTableView, NewsTableView, LocationTableView, CollectView, EventTableView, CollecModifyView, EventDetailTableView
+
 urlpatterns = patterns('',
     # Examples:
     # url(r'^$', 'yuqing.views.home', name='home'),
@@ -25,4 +26,6 @@ urlpatterns += patterns('api.views',
     url(r'^user/reset/$', 'reset_passwd'),
     url(r'^user/remove/$', 'delete_user_view'),
     url(r'^user/add/$', 'add_user_view'),
+
+    url(r'^line/$', 'chart_line_index_view'),
     )
