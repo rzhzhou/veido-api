@@ -458,8 +458,6 @@ def chart_line_event_view(request, topic_id):
     negative, positive, neutral = defaultdict(lambda: 0), defaultdict(lambda: 0), defaultdict(lambda: 0)
     for article in articles:
         date = article.pubtime.date()
-        if date < start_d and date >= end_d:
-            continue
         factor = article.feeling_factor
         if date >= start_d and date < end_d:
             if factor > 0.6:
@@ -473,7 +471,7 @@ def chart_line_event_view(request, topic_id):
         result = []
         date = start_d
         while date < end_d:
-            result.append(dic['date'])
+            result.append(dic[date])
             date += datetime.timedelta(days=1)
         return result
 
