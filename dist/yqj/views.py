@@ -42,7 +42,7 @@ def index_view(request):
 	weibo_data = Weibo.objects.all()[0:weibo_list_number]
 	for data in weibo_data:
             data = SetLogo(data)
-	    weibo_list.append({'logo': data.publisher.photo, 'id': data.id, 'title': data.title, 'name': data.publisher.publisher, 'time': data.pubtime, 'content': data.content})
+	    #weibo_list.append({'logo': data.publisher.photo, 'id': data.id, 'title': data.title, 'name': data.publisher.publisher, 'time': data.pubtime, 'content': data.content})
 	weixin_data = Weixin.objects.all()[0:weixin_list_number]
         for data in weixin_data:
             data = SetLogo(data)
@@ -60,7 +60,7 @@ def index_view(request):
 			'news_list': news_list,
 			'event_list': event_list,
 			'weixin_list': weixin_data,
-			'weibo_list': weibo_list,
+			'weibo_list': weibo_data,
                         'user_image': get_user_image(user),
                         'inspection_list': inspection_list,
 			})
