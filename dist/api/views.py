@@ -2,6 +2,7 @@
 
 import os
 import datetime
+from collections import defaultdict
 from django.views.generic import View
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
@@ -423,8 +424,8 @@ def get_count_feeling(start_d, end_d, feeling_type):
 @login_required
 def chart_line_index_view(request):
     today = datetime.datetime.today().date()
-    end_d = today + datetime.timedelta(days=1)
     start_d = today - datetime.timedelta(days=6)
+    end_d = today + datetime.timedelta(days=1)
     
     data = {}
     data['date'] = [today - datetime.timedelta(days=x) for x in reversed(range(7))]
@@ -434,3 +435,41 @@ def chart_line_index_view(request):
     
     return JsonResponse(data)
 
+
+@login_required
+def chart_line_event_view(request, topic_id):
+    today = datetime.datetime.today().date()
+    start_d = today - datetime.timedelta(days=6)
+    end_d = today + datetime.timedelta(days=1)
+    
+    data = {}
+    data['date'] = [today - datetime.timedelta(days=x) for x in reversed(range(7))]
+    
+    articles = Topic.objects.get(id=topic_id).articles.all()
+    negative, positive, neutral = defaultdict(lambda: 0), defaultdict(lambda: 0), defaultdict(lambda: 0)
+    for article in articles:
+        date = article.pubtime.date()
+        if date < start_d and date >= end_d:
+            continue
+        factor = article.feeling_factor
+        if date >= start_d and date < end_d:
+            if factor > 0.6:
+                positive[date] += 1
+            elif factor < 0.4 and factor > 0:
+                negative[date] += 1
+            else:
+                neutral[date] += 1
+    
+    def add_extral_zero(dic):
+        result = []
+        date = start_d
+        while date < end_d:
+            result.append(dic['date'])
+            date += datetime.timedelta(days=1)
+        return result
+
+    data['negative'] = add_extral_zero(negative)
+    data['positive'] = add_extral_zero(positive)
+    data['neutral'] = add_extral_zero(neutral)
+
+    return JsonResponse(data)
