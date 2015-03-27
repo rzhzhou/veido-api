@@ -1,3 +1,4 @@
+#coding=utf-8
 """
 Django settings for yuqing project.
 
@@ -100,3 +101,9 @@ TEMPLATE_DIRS = (
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 MEDIA_URL = '/media/'
+
+
+
+
+
+COMPANY_NAME = u'武汉市质监局'
