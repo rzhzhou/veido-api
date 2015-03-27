@@ -19,8 +19,13 @@
         </div>
         <div class="box-body">
           <div class="article-meta text-center">
+<<<<<<< HEAD
             <span class="article-author">{{ article.author }}</span>
             <span class="article-time">{{ article.time }}</span>
+=======
+            <span class="article-author">作者: {{ article.author }}</span>
+            <span class="article-time">时间: {{ article.pubtime | date:"Y-m-d" }}</span>
+>>>>>>> 9774e6bdc6a000dc0ac4e144bbcd722a31b726f1
           </div>
           <div class="article-content">
             {{ article.content | safe}}
@@ -38,11 +43,11 @@
           <ul class="media-list">
             <li class="media">
               <div class="media-left">
-                <img src="{{ publisher.logo }}" alt="{{ publisher.name }}" class="media-object">
+                <img src="{{ article.publisher.photo }}" alt="{{ article.publisher.publisher }}" class="media-object">
               </div>
               <div class="media-body">
-                <h4 class="media-heading">{{ publisher.name }}</h4>
-                <p>{{ publisher.description }}</p>
+                <h4 class="media-heading">{{ article.publisher.publisher }}</h4>
+                <p>{{ article.publisher.brief }}</p>
               </div>
             </li>
           </ul>
