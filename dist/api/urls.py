@@ -28,4 +28,5 @@ urlpatterns += patterns('api.views',
     url(r'^user/add/$', 'add_user_view'),
 
     url(r'^line/$', 'chart_line_index_view'),
+    url(r'^pie/$', 'chart_pie_index_view'),
     )

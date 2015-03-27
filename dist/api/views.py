@@ -434,3 +434,12 @@ def chart_line_index_view(request):
     
     return JsonResponse(data)
 
+@login_required
+def chart_pie_index_view(request):
+    area = request.myuser.area
+    locations = Area.objects.filter(parent=area)
+    name = [item.name for item in locations]
+    values = []
+    for item in locations:
+        values.append({'name': item.name, 'value': item.article_set.all().count()})
+    return JsonResponse({'name': name, "value": values})
