@@ -254,28 +254,17 @@ app.chart = {
   },
   pie: function() {
     require(['echarts', 'echarts/chart/pie'], function(ec) {
-      ec.init(document.getElementById('pie-chart'), 'macarons').setOption({
-        tooltip : {
-          trigger: 'item',
-          formatter: "{a} <br/>{b} : {c} ({d}%)"
-        },
-        legend: {
-          data:['江岸','洪山','江夏','东西湖']
-        },
-        series : [
-            {
-              name:'信息比例',
-              type:'pie',
-              radius : '55%',
-              center: ['50%', '60%'],
-              data:[
-                {value:335, name:'江岸'},
-                {value:310, name:'洪山'},
-                {value:234, name:'江夏'},
-                {value:135, name:'东西湖'}
-              ]
-            }
-        ]
+      $.getJSON('/api/pie' + app.url, function(data) {
+        ec.init(document.getElementById('pie-chart'), 'macarons').setOption({
+          tooltip: {
+            trigger: 'item',
+            formatter: "{a} <br/>{b} : {c} ({d}%)"
+          },
+          legend: {
+            data: data.name
+          },
+          series: data.value
+        });
       });
     });
   }
@@ -369,50 +358,6 @@ app.table = function() {
 
     collection( $('.fa-star-o'), '/api/collection/add/');
     collection( $('.fa-star'), '/api/collection/remove/');
-
-    // $.fn.articleData = function() {
-    //   var article = this.parent().next().find('a');
-    //   var data = {
-    //     id: article.data('id'),
-    //     type: article.data('type')
-    //   };
-    //   return data;
-    // };
-
-    // var addCollection = function(index, element) {
-    //   $(element).on('click', function(event) {
-    //     event.preventDefault();
-    //     var that = $(this);
-    //     var data = $(this).articleData();
-    //     var add = function(status) {
-    //       if (status) {
-    //         that.removeClass('fa-star-o').addClass('fa-star');
-    //         table.ajax.reload(null, false);
-    //       }
-    //     };
-
-    //     $.post('/api/collection/add/', data, add);
-    //   });
-    // };
-
-    // var removeCollection = function(index, element) {
-    //   $(element).on('click', function(event) {
-    //     event.preventDefault();
-    //     var that = $(this);
-    //     var data = $(this).articleData();
-    //     var remove = function(status) {
-    //       if (status) {
-    //         that.removeClass('fa-star').addClass('fa-star-o');
-    //         table.ajax.reload(null, false);
-    //       }
-    //     };
-
-    //     $.post('/api/collection/remove/', data, remove);
-    //   });
-    // };
-
-    // $('.fa-star-o').each(addCollection);
-    // $('.fa-star').each(removeCollection);
   });
 };
 
