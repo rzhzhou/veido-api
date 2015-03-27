@@ -263,7 +263,15 @@ app.chart = {
           legend: {
             data: data.name
           },
-          series: data.value
+          series: [
+            {
+              name: '信息比例',
+              type: 'pie',
+              radius: '55%',
+              center: ['50%', '60%'],
+              data: data.value
+            }
+          ]
         });
       });
     });
