@@ -341,49 +341,78 @@ app.table = function() {
   });
 
   table.on('draw.dt', function() {
-    $.fn.articleData = function() {
-      var article = this.parent().next().find('a');
-      var data = {
-        id: article.data('id'),
-        type: article.data('type')
-      };
-      return data;
-    };
+    var collection = function(obj, api) {
+      obj.each(function(index, element) {
+        $(element).click(function(event) {
+          event.preventDefault();
 
-    var addCollection = function(index, element) {
-      $(element).on('click', function(event) {
-        event.preventDefault();
-        var that = $(this);
-        var data = $(this).articleData();
-        var add = function(status) {
-          if (status) {
-            that.removeClass('fa-star-o').addClass('fa-star');
-            table.ajax.reload(null, false);
-          }
-        };
+          var $this = $(this);
 
-        $.post('/api/collection/add/', data, add);
+          var article = $this.parent().next().find('a');
+          var data = {
+            id: article.data('id'),
+            type: article.data('type')
+          };
+
+          var action = function(status) {
+            if (status) {
+              $this.toggleClass('fa-star-o');
+              $this.toggleClass('fa-star');
+              table.ajax.reload(null, false);
+            }
+          };
+
+          $.post(api, data, action);
+        });
       });
     };
 
-    var removeCollection = function(index, element) {
-      $(element).on('click', function(event) {
-        event.preventDefault();
-        var that = $(this);
-        var data = $(this).articleData();
-        var remove = function(status) {
-          if (status) {
-            that.removeClass('fa-star').addClass('fa-star-o');
-            table.ajax.reload(null, false);
-          }
-        };
+    collection( $('.fa-star-o'), '/api/collection/add/');
+    collection( $('.fa-star'), '/api/collection/remove/');
 
-        $.post('/api/collection/remove/', data, remove);
-      });
-    };
+    // $.fn.articleData = function() {
+    //   var article = this.parent().next().find('a');
+    //   var data = {
+    //     id: article.data('id'),
+    //     type: article.data('type')
+    //   };
+    //   return data;
+    // };
 
-    $('.fa-star-o').each(addCollection);
-    $('.fa-star').each(removeCollection);
+    // var addCollection = function(index, element) {
+    //   $(element).on('click', function(event) {
+    //     event.preventDefault();
+    //     var that = $(this);
+    //     var data = $(this).articleData();
+    //     var add = function(status) {
+    //       if (status) {
+    //         that.removeClass('fa-star-o').addClass('fa-star');
+    //         table.ajax.reload(null, false);
+    //       }
+    //     };
+
+    //     $.post('/api/collection/add/', data, add);
+    //   });
+    // };
+
+    // var removeCollection = function(index, element) {
+    //   $(element).on('click', function(event) {
+    //     event.preventDefault();
+    //     var that = $(this);
+    //     var data = $(this).articleData();
+    //     var remove = function(status) {
+    //       if (status) {
+    //         that.removeClass('fa-star').addClass('fa-star-o');
+    //         table.ajax.reload(null, false);
+    //       }
+    //     };
+
+    //     $.post('/api/collection/remove/', data, remove);
+    //   });
+    // };
+
+    // $('.fa-star-o').each(addCollection);
+    // $('.fa-star').each(removeCollection);
   });
 };
 
