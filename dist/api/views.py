@@ -5,8 +5,7 @@ import datetime
 from django.views.generic import View
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
-from django.db import models
-from django.db import IntegrityError
+from django.db import models, connection, IntegrityError
 from django.conf import settings
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -397,3 +396,41 @@ def add_user_view(request):
 
     save_user(username, password, myuser.area, myuser.group)
     return JsonResponse({'status': True})
+
+def get_count_feeling(start_d, end_d, feeling_type):
+    feeling_limit = ''
+    if feeling_type == 'positive':
+        feeling_limit = 'feeling_factor >= 0.6'
+    elif feeling_type == 'negative':
+        feeling_limit = 'feeling_factor <= 0.4'
+    else:
+        feeling_limit = 'feeling_factor > 0.4  and feeling_factor < 0.6'
+
+    with connection.cursor() as c:
+        sql_str = "SELECT Date(pubtime), COUNT(*) FROM article where Date(pubtime) >= '{0}' and Date(pubtime) < '{1}' and {2} group by Date(pubtime)".format(start_d, end_d, feeling_limit)
+        c.execute(sql_str)
+        rows = c.fetchall()
+        
+        d =  dict(rows)
+        result = []
+        day = start_d
+        while day < end_d:
+            num = d[day] if day in d else 0
+            result.append(num)
+            day = day + datetime.timedelta(days=1)
+        return result
+    
+@login_required
+def chart_line_index_view(request):
+    today = datetime.datetime.today().date()
+    end_d = today + datetime.timedelta(days=1)
+    start_d = today - datetime.timedelta(days=6)
+    
+    data = {}
+    data['date'] = [today - datetime.timedelta(days=x) for x in reversed(range(7))]
+    data['positive'] = get_count_feeling(start_d, end_d, 'positive')
+    data['neutral'] = get_count_feeling(start_d, end_d, 'netrual')
+    data['negative'] = get_count_feeling(start_d, end_d, 'negative')
+    
+    return JsonResponse(data)
+
