@@ -428,7 +428,7 @@ def chart_line_index_view(request):
     end_d = today + datetime.timedelta(days=1)
     
     data = {}
-    data['date'] = [today - datetime.timedelta(days=x) for x in reversed(range(7))]
+    data['date'] = [(today - datetime.timedelta(days=x)).strftime("%m-%d") for x in reversed(range(7))]
     data['positive'] = get_count_feeling(start_d, end_d, 'positive')
     data['neutral'] = get_count_feeling(start_d, end_d, 'netrual')
     data['negative'] = get_count_feeling(start_d, end_d, 'negative')
@@ -442,7 +442,8 @@ def chart_pie_index_view(request):
     name = [item.name for item in locations]
     values = []
     for item in locations:
-        values.append({'name': item.name, 'value': item.article_set.all().count()})
+        #values.append({'name': item.name, 'value': item.article_set.all().count()})
+        values.append({'name': item.name, 'value': 80})
     return JsonResponse({'name': name, "value": values})
 
 @login_required
@@ -452,7 +453,6 @@ def chart_line_event_view(request, topic_id):
     end_d = today + datetime.timedelta(days=1)
     
     data = {}
-    data['date'] = [today - datetime.timedelta(days=x) for x in reversed(range(7))]
     
     articles = Topic.objects.get(id=topic_id).articles.all()
     negative, positive, neutral = defaultdict(lambda: 0), defaultdict(lambda: 0), defaultdict(lambda: 0)
@@ -480,5 +480,6 @@ def chart_line_event_view(request, topic_id):
     data['negative'] = add_extral_zero(negative)
     data['positive'] = add_extral_zero(positive)
     data['neutral'] = add_extral_zero(neutral)
+    data['date'] = [(today - datetime.timedelta(days=x)).strftime("%m-%d") for x in reversed(range(7))]
 
     return JsonResponse(data)
