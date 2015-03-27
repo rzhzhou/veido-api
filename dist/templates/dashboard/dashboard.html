@@ -76,8 +76,8 @@
           <div class="list-group no-margin">
             {% for news in news_list %}
               <a href="/news/{{ news.id }}/" class="list-group-item no-border">
-                {{ news.title }}
                 <span class="badge" data-toggle="tooltip" data-placement="left" title="热度 {{ news.hot_index }}">{{ news.hot_index }}</span>
+                {{ news.title }}
               </a>
             {% endfor %}
           </div>
@@ -102,8 +102,8 @@
           <div class="list-group no-margin">
             {% for event in event_list %}
               <a href="/event/{{ event.id }}" class="list-group-item no-border">
-                {{ event.title }}
                 <span class="badge" data-toggle="tooltip" data-placement="left" title="热度 {{ event.hot_index }}">{{ event.hot_index }}</span>
+                {{ event.title }}
               </a>
             {% endfor %}
           </div>
@@ -219,23 +219,27 @@
         </div>
         <div class="box-body no-padding">
           <table class="table table-hover">
-            <tr>
-              <th class="inspection-category">产品种类</th>
-              <th class="inspection-name">事件</th>
-              <th class="inspection-quality">合格率</th>
-              <th class="inspection-time">抽检日期</th>              
-            </tr>
-
-            {% for inspection in inspection_list  %}
-            <tr>
-              <td>{{ inspection.product }}</td>
-              <td>
-                <a href="{{ inspection.url }}" title="{{ inspection.name }}" target="_blank">{{ inspection.name }}</a>
-              </td>
-              <td>{{ inspection.qualitied }}</td>
-              <td>{{ inspection.pubtime | date:"Y-m-d" }}</td>
-            </tr>
-            {% endfor %}
+            <thead>
+              <tr>
+                <th class="inspection-category">产品种类</th>
+                <th class="inspection-name">事件</th>
+                <th class="inspection-quality">合格率</th>
+                <th class="inspection-time">抽检日期</th>              
+              </tr>
+            </thead>
+            
+            <tbody>
+              {% for inspection in inspection_list  %}
+              <tr>
+                <td>{{ inspection.product }}</td>
+                <td>
+                  <a href="{{ inspection.url }}" title="{{ inspection.name }}" target="_blank">{{ inspection.name }}</a>
+                </td>
+                <td>{{ inspection.qualitied }}</td>
+                <td>{{ inspection.pubtime | date:"Y-m-d" }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
           </table>
         </div>
       </div>
