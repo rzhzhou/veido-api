@@ -435,7 +435,6 @@ def chart_line_index_view(request):
     
     return JsonResponse(data)
 
-<<<<<<< HEAD
 @login_required
 def chart_pie_index_view(request):
     area = request.myuser.area
@@ -483,4 +482,3 @@ def chart_line_event_view(request, topic_id):
     data['neutral'] = add_extral_zero(neutral)
 
     return JsonResponse(data)
->>>>>>> 92a7d10ef73e3fbc444e00da0b19f53abf46926a
