@@ -3,6 +3,7 @@
 import os
 import datetime
 from collections import defaultdict
+from dateutil.relativedelta import relativedelta
 from django.views.generic import View
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
@@ -448,36 +449,64 @@ def chart_pie_index_view(request):
 
 @login_required
 def chart_line_event_view(request, topic_id):
-    today = datetime.datetime.today().date()
-    start_d = today - datetime.timedelta(days=6)
-    end_d = today + datetime.timedelta(days=1)
-    
-    data = {}
-    
     articles = Topic.objects.get(id=topic_id).articles.all()
-    negative, positive, neutral = defaultdict(lambda: 0), defaultdict(lambda: 0), defaultdict(lambda: 0)
-    for article in articles:
-        date = article.pubtime.date()
-        factor = article.feeling_factor
-        if date >= start_d and date < end_d:
+
+    min_date = min(x.pubtime.date() for x in articles)
+    max_date = max(x.pubtime.date() for x in articles)
+    date_range = max_date - min_date
+
+    #data range by month
+    if  date_range.days > 6 * 7:
+        #get first day of the current month
+        current_date = datetime.datetime.now().date().replace(day=1)
+        #only get recent 6 months data
+        begin_date =  current_date - relativedelta(months=6)
+
+        negative, positive, neutral = defaultdict(int), defaultdict(int), defaultdict(int)
+        for art in articles:
+            date = art.pubtime.date().replace(day=1)
+            if date < begin_date:
+                continue
+            factor = art.feeling_factor
             if factor > 0.6:
                 positive[date] += 1
             elif factor < 0.4 and factor > 0:
                 negative[date] += 1
             else:
                 neutral[date] += 1
-    
-    def add_extral_zero(dic):
-        result = []
-        date = start_d
-        while date < end_d:
-            result.append(dic[date])
-            date += datetime.timedelta(days=1)
-        return result
+        range_date = [ current_date - relativedelta(months=i) for i in range(6, -1, -1) ]
+        
+        data = {}
+        data['negative'] = [ negative[date] for date in range_date]
+        data['positive'] = [ positive[date] for date in range_date]
+        data['neutral'] = [ neutral[date] for date in range_date]
+        data['date'] = [ date.strftime("%Y-%m") for date in range_date]
+        return JsonResponse(data)
+    #data range by weeks
+    else:
+        #find the first day of current week
+        today = datetime.datetime.now().date()
+        first_day = today - datetime.timedelta(days=today.weekday())
+        begin_date =  first_day - relativedelta(weeks=6)
 
-    data['negative'] = add_extral_zero(negative)
-    data['positive'] = add_extral_zero(positive)
-    data['neutral'] = add_extral_zero(neutral)
-    data['date'] = [(today - datetime.timedelta(days=x)).strftime("%m-%d") for x in reversed(range(7))]
+        get_week = lambda x : (first_day - week).days / 7 + 1
+        negative, positive, neutral = defaultdict(int), defaultdict(int), defaultdict(int)
+        for art in articles:
+            week = get_week(art.pubtime.date())
+            if week > 6:
+                continue
+            factor = art.feeling_factor
+            if factor > 0.6:
+                positive[date] += 1
+            elif factor < 0.4 and factor > 0:
+                negative[date] += 1
+            else:
+                neutral[date] += 1
+        range_week = range(6, -1, -1)
 
-    return JsonResponse(data)
+        data = {}
+        data['positive'] = [ positive[week] for week in range_week ]
+        data['negative'] = [ negative[week] for week in range_week ]
+        data['neutral'] = [ neutral[week] for week in range_week ]
+        data['date'] = [ (first_day - datetime.timedelta(days=i*7)).strftime("%m-%d") for i in range_week ]
+        return JsonResponse(data)
