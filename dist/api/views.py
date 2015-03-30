@@ -321,7 +321,8 @@ class SearchView(CollectView):
         return Article.objects.raw(u"SELECT * FROM article WHERE MATCH (content, title) AGAINST ('%s') LIMIT %s" % (key, self.LIMIT))
 
     def search_event(self, key):
-        return Topic.objects.raw(u"SELECT * FROM topic WHERE MATCH (abstract, title) AGAINST ('%s') LIMIT %s" % (key, self.LIMIT))
+        #return Topic.objects.raw(u"SELECT * FROM topic WHERE MATCH (abstract, title) AGAINST ('%s') LIMIT %s" % (key, self.LIMIT))
+        return Topic.objects.raw(u"SELECT * FROM topic WHERE title like '%%{0}%%' LIMIT {1}".format(key, self.LIMIT))
 
 
 @login_required
@@ -510,7 +511,7 @@ def chart_line_event_view(request, topic_id):
         first_day = today - datetime.timedelta(days=today.weekday())
         begin_date =  first_day - relativedelta(weeks=6)
 
-        get_week = lambda x : (first_day - week).days / 7 + 1
+        get_week = lambda x : (first_day - x).days / 7 + 1
         negative, positive, neutral = defaultdict(int), defaultdict(int), defaultdict(int)
         for art in articles:
             week = get_week(art.pubtime.date())
@@ -518,11 +519,11 @@ def chart_line_event_view(request, topic_id):
                 continue
             factor = art.feeling_factor
             if factor > 0.6:
-                positive[date] += 1
+                positive[week] += 1
             elif factor < 0.4 and factor > 0:
-                negative[date] += 1
+                negative[week] += 1
             else:
-                neutral[date] += 1
+                neutral[week] += 1
         range_week = range(6, -1, -1)
 
         data = {}
