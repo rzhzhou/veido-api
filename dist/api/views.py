@@ -16,6 +16,7 @@ from yqj.models import (Article, Area, Weixin, Weibo, Topic, RelatedData, Articl
                             save_user, Collection, Topic, hash_password, User)
 from serializers import ArticleSerializer
 from yqj import authenticate, login_required
+from django.db.models import Count
 
 def login_view(request):
     try:
@@ -474,6 +475,7 @@ def chart_line_event_view(request, topic_id):
                 negative[date] += 1
             else:
                 neutral[date] += 1
+
         range_date = [ current_date - relativedelta(months=i) for i in range(6, -1, -1) ]
         
         data = {}
@@ -510,3 +512,22 @@ def chart_line_event_view(request, topic_id):
         data['neutral'] = [ neutral[week] for week in range_week ]
         data['date'] = [ (first_day - datetime.timedelta(days=i*7)).strftime("%m-%d") for i in range_week ]
         return JsonResponse(data)
+
+
+@api_view(['GET'])
+@login_required
+def chart_pie_event_view(request, topic_id):
+    try:
+        topic = Topic.objects.get(id=int(topic_id))
+    except (KeyError, ValueError, Topic.DoesNotExist):
+        return HttpResponse(status=400)
+
+    data = topic.articles.values('publisher__publisher').annotate(value=Count('publisher__publisher'))
+    name = []
+    value= []
+    for item in data:
+        item['name'] = item.pop('publisher__publisher')
+        name.append(item['name'])
+        value.append(item)
+    return JsonResponse({u'name': name, u'value': value})
+
