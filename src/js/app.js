@@ -213,7 +213,7 @@ app.chart = {
           grid: {
             x: 40,
             y: 30,
-            x2: 20,
+            x2: 25,
             y2: 30
           },
           xAxis: [
