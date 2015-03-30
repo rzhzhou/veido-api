@@ -20,7 +20,7 @@
         <div class="box-body">
           <div class="article-meta text-center">
             <span class="article-author">{{ article.author }}</span>
-            <span class="article-time">{{ article.time }}</span>
+            <span class="article-time">{{ article.pubtime | date:"Y-m-d" }}</span>
           </div>
           <div class="article-content">
             {{ article.content | safe}}
