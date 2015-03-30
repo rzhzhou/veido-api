@@ -230,10 +230,10 @@ app.chart = {
           ],
           series: [
             {
-              name: '正面',
+              name: '负面',
               type: 'line',
               stack: '总量',
-              data: data.positive
+              data: data.negative
             },
             {
               name: '中性',
@@ -242,10 +242,10 @@ app.chart = {
               data: data.neutral
             },
             {
-              name: '负面',
+              name: '正面',
               type: 'line',
               stack: '总量',
-              data: data.negative
+              data: data.positive
             }
           ]
         });
