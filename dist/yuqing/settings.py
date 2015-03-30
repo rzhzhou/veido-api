@@ -106,4 +106,4 @@ MEDIA_URL = '/media/'
 
 
 
-COMPANY_NAME = u'武汉市质监局'
+COMPANY_NAME = u'湖北省武汉市质监局'

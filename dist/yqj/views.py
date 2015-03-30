@@ -21,6 +21,7 @@ def index_view(request):
     if user.is_authenticated():
         categories = ArticleCategory.objects.all()
         locations = Area.objects.filter(level=user.area.level+1, parent=user.area)
+        user.company = user.group.company
 
 	news = Article.objects.all().count()
 	weibo = Weibo.objects.all().count()
@@ -98,6 +99,7 @@ class BaseView(LoginRequiredMixin, View):
 
         if self.INCLUDE_USER:
             user = self.request.myuser
+            user.company = user.group.company
             context['user'] = user
         
         context['user_image'] = get_user_image(user)
