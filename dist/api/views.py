@@ -305,6 +305,25 @@ class CollecModifyView(View):
             self.save(item)
         return JsonResponse({'status': True})
 
+class SearchView(CollectView):
+    LIMIT = 200
+
+    def get(self, request, keyword, *args, **kwargs):
+        news = []
+        for data in self.search_article(keyword):
+            news.append(self.article_html(data))
+        event = []
+        for data in self.search_event(keyword):
+            event.append(self.topic_html(data))
+        return JsonResponse({"news": news, "event": event})
+
+    def search_article(self, key):
+        return Article.objects.raw(u"SELECT * FROM article WHERE MATCH (content, title) AGAINST ('%s') LIMIT %s" % (key, self.LIMIT))
+
+    def search_event(self, key):
+        return Topic.objects.raw(u"SELECT * FROM topic WHERE MATCH (abstract, title) AGAINST ('%s') LIMIT %s" % (key, self.LIMIT))
+
+
 @login_required
 def upload_image(request):
     user = request.myuser
