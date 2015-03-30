@@ -17,7 +17,8 @@ def login_required(view_func):
     
     def wrapper(request, *args, **kwargs):
         if not request.myuser.is_authenticated():
-            next_url = '/login/' if request.path == '/' else '/login/?next=%s' % request.path
+            #next_url = '/login/' if request.path == '/' else '/login/?next=%s' % request.path
+            next_url = '/login/'
             return HttpResponseRedirect(next_url)
         return view_func(request, *args, **kwargs)
     return wrapper
