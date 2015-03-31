@@ -268,6 +268,7 @@ def logout_view(request):
     response.delete_cookie('name')
     return response
 
-def search_view(request, keyword):
-    return render_to_response('search/result.html')
 
+class SearchView(BaseView):
+    def get(self, request, keyword):
+        return self.render_to_response('search/result.html')
