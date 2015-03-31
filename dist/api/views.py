@@ -309,6 +309,11 @@ class SearchView(CollectView):
     LIMIT = 200
 
     def get(self, request, keyword, *args, **kwargs):
+        try:
+            self.collection = request.myuser.collection
+        except Collection.DoesNotExist:
+            self.collection = Collection(user=self.request.myuser)
+            self.collection.save()
         news = []
         for data in self.search_article(keyword):
             news.append(self.article_html(data))
