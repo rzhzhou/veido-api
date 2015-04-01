@@ -475,7 +475,13 @@ def chart_pie_index_view(request):
 
 @login_required
 def chart_line_event_view(request, topic_id):
-    articles = Topic.objects.get(id=topic_id).articles.all()
+    try:
+        articles = Topic.objects.get(id=topic_id).articles.all()
+    except Topic.DoesNotExist:
+        return HttpResponse(status=404)
+    if not articles:
+        return HttpResponse(status=404)
+
 
     min_date = min(x.pubtime.date() for x in articles)
     max_date = max(x.pubtime.date() for x in articles)
