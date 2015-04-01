@@ -9,7 +9,7 @@ def authenticate(username, raw_password):
             return user
         else:
             return AnonymousUser()
-    except User.DoesNotExsis:
+    except User.DoesNotExist:
         return AnonymousUser()
 
 
