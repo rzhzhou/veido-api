@@ -116,7 +116,7 @@ class Article(models.Model):
     publisher = models.ForeignKey(ArticlePublisher, verbose_name=u'文章发布者')
     area = models.ForeignKey(Area, verbose_name=u'地域')
     uuid = models.CharField(max_length=36)
-    feeling_factor = models.FloatField(default=1, verbose_name=u'正负面')
+    feeling_factor = models.FloatField(default=-1, verbose_name=u'正负面')
     
     class Meta:
         db_table = 'article'
