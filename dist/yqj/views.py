@@ -36,7 +36,10 @@ def index_view(request):
 	news_list = Article.objects.all()[:news_list_number]
 	for item in news_list:
             item = SetLogo(item)
-	    setattr(item, 'hot_index', RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count())
+            try:
+	        setattr(item, 'hot_index', RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count())
+            except IndexError:
+                setattr(item, 'hot_index', 0)
 	for item in event_list:
             setattr(item, 'hot_index', item.articles.all().count()+item.weixin.all().count()+item.weibo.all().count())
             #event_list.append({'url': 'www.baidu.com', 'title': u'新闻', 'source': u'深度网', 'time': 53})
