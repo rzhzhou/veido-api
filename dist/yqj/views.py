@@ -8,6 +8,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import View
 from yqj.models import Article, Weixin, Weibo, RelatedData, ArticleCategory, Area, Topic, Inspection
 from yqj import login_required
+from yqj.redisconnect import RedisQueryApi
 
 def SetLogo(obj):
     if obj.publisher.photo == 'kong':
@@ -42,11 +43,16 @@ def index_view(request):
                 setattr(item, 'hot_index', 0)
 	for item in event_list:
             setattr(item, 'hot_index', item.articles.all().count()+item.weixin.all().count()+item.weibo.all().count())
-            #event_list.append({'url': 'www.baidu.com', 'title': u'新闻', 'source': u'深度网', 'time': 53})
-	weibo_data = Weibo.objects.all()[0:weibo_list_number]
-	for data in weibo_data:
-            data = SetLogo(data)
-	    #weibo_list.append({'logo': data.publisher.photo, 'id': data.id, 'title': data.title, 'name': data.publisher.publisher, 'time': data.pubtime, 'content': data.content})
+        
+	#weibo_data = Weibo.objects.all()[0:weibo_list_number]
+	#for data in weibo_data:
+        #    data = SetLogo(data)
+
+        weibo_data = [eval(item) for item in RedisQueryApi().lrange('sort_weibohot', 0, -1)[:5]]
+        for data in weibo_data:
+            if data['photo'] == 'kong':
+                data['photo'] = u'http://tp2.sinaimg.cn/3557640017/180/40054587155/1'
+
 	weixin_data = Weixin.objects.all()[0:weixin_list_number]
         for data in weixin_data:
             data = SetLogo(data)
@@ -200,8 +206,11 @@ class WeixinDetailView(BaseView):
 
 class WeiboView(BaseView):
     def get(self, request):
-        hottest = latest = [SetLogo(data) for data in Weibo.objects.order_by('-pubtime')[0:20]]
-        #hottest  = latest
+        latest = [SetLogo(data) for data in Weibo.objects.order_by('-pubtime')[0:20]]
+        hottest  = [eval(item) for item in RedisQueryApi().lrange('sort_weibohot', 0, -1)[:20]]
+        for data in hottest:
+            if data['photo'] == 'kong':
+                data['photo'] = u'http://tp2.sinaimg.cn/3557640017/180/40054587155/1'
         return self.render_to_response('weibo/weibo_list.html', {'weibo_latest_list': latest, 'weibo_hottest_list': hottest})
 
 

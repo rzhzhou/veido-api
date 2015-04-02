@@ -162,10 +162,10 @@
             {% for weibo in weibo_list %}
               <li class="media">
                 <div class="media-left">
-                  <img class="media-object" src="{{ weibo.publisher.photo }}" alt="{{ weibo.publisher.publisher }}">
+                  <img class="media-object" src="{{ weibo.photo }}" alt="{{ weibo.publisher }}">
                 </div>  
                 <div class="media-body">
-                  <h4 class="media-heading">{{ weibo.publisher.publisher }}</h4>
+                  <h4 class="media-heading">{{ weibo.publisher }}</h4>
                   <p>{{ weibo.content }}</p>
                 </div>
               </li>
