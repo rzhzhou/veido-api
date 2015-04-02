@@ -86,8 +86,16 @@ class TableAPIView(APIView):
 
     def collected_items(self):
         #return []
+        #try:
         user = self.request.myuser
+        try:
+            self.collection = user.collection
+        except Collection.DoesNotExist:
+            self.collection = Collection(user=self.request.myuser)
+            self.collection.save()
         return user.collection.articles.all()
+        #except:
+        #    return []
 
     def title_html(self, *args):
         title_format = u'<a href="{0}" title="{1}" target="_blank" data-id="{2}" data-type="{3}">{1}</a>'
@@ -474,6 +482,7 @@ def chart_pie_index_view(request):
     for item in locations:
         values.append({'name': item.name, 'value': item.article_set.all().count()})
         #values.append({'name': item.name, 'value': 80})
+    values = [item for item in values if item['value']]
     return JsonResponse({'name': name, "value": values})
 
 @login_required
