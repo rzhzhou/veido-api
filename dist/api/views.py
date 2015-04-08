@@ -17,6 +17,7 @@ from yqj.models import (Article, Area, Weixin, Weibo, Topic, RelatedData, Articl
 from serializers import ArticleSerializer
 from yqj import authenticate, login_required
 from django.db.models import Count
+from api_function import GetFirstDaySeason, get_season
 
 def login_view(request):
     try:
@@ -501,9 +502,37 @@ def chart_line_event_view(request, topic_id):
     min_date = min(x.pubtime.date() for x in articles)
     max_date = max(x.pubtime.date() for x in articles)
     date_range = max_date - min_date
+    #data range by season
+    if date_range.days > 6 * 30:
+        #get first day of the current season
+        current_date = GetFirstDaySeason(datetime.datetime.now())
+        #only get recent 4 season data
+        begin_date =  current_date - relativedelta(year=1)
+        negative, positive, neutral = defaultdict(int), defaultdict(int), defaultdict(int)
+        for art in articles:
+            date = GetFirstDaySeason(art.pubtime)
+            if date < begin_date:
+                continue
+            factor = art.feeling_factor
+            if factor > 0.6:
+                positive[date] += 1
+            elif factor < 0.4 and factor > 0:
+                negative[date] += 1
+            else:
+                neutral[date] += 1
+        
+        range_date = [ current_date - relativedelta(months=i) for i in range(12, 0, -3) ]
+
+        data = {}
+        data['negative'] = [ negative[date] for date in range_date]
+        data['positive'] = [ positive[date] for date in range_date]
+        data['neutral'] = [ neutral[date] for date in range_date]
+        data['date'] = [ str(date.year) + get_season(date) for date in range_date]
+        return JsonResponse(data)
+
 
     #data range by month
-    if  date_range.days > 6 * 7:
+    elif  date_range.days > 6 * 7:
         #get first day of the current month
         current_date = datetime.datetime.now().date().replace(day=1)
         #only get recent 6 months data
@@ -511,6 +540,7 @@ def chart_line_event_view(request, topic_id):
 
         negative, positive, neutral = defaultdict(int), defaultdict(int), defaultdict(int)
         for art in articles:
+            print art.feeling_factor
             date = art.pubtime.date().replace(day=1)
             if date < begin_date:
                 continue
@@ -544,6 +574,7 @@ def chart_line_event_view(request, topic_id):
             if week > 6:
                 continue
             factor = art.feeling_factor
+            print factor
             if factor > 0.6:
                 positive[week] += 1
             elif factor < 0.4 and factor > 0:

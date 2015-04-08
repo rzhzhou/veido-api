@@ -3,7 +3,10 @@ from models import WeixinPublisher, WeiboPublisher, ArticlePublisher, ArticleCat
 
 
 class ArticleAdmin(admin.ModelAdmin):
-    list_display = ('title', 'source', 'area', 'feeling_factor')
+    list_display = ('title', 'source', 'area', 'feeling_factor', 'pubtime')
+    list_filter = ('pubtime',)
+    search_fields = ('title', 'source', 'content')
+    raw_id_fields = ('publisher',)
 
 # Register your models here.
 
