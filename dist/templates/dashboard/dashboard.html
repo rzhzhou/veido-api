@@ -224,6 +224,7 @@
                 <th class="inspection-category">产品种类</th>
                 <th class="inspection-name">事件</th>
                 <th class="inspection-quality">合格率</th>
+                <th class="inspection-source">来源</th>
                 <th class="inspection-time">抽检日期</th>              
               </tr>
             </thead>
@@ -236,6 +237,7 @@
                   <a href="{{ inspection.url }}" title="{{ inspection.name }}" target="_blank">{{ inspection.name }}</a>
                 </td>
                 <td>{{ inspection.qualitied }}</td>
+                <td>{{ inspection.source }}</td>
                 <td>{{ inspection.pubtime | date:"Y-m-d" }}</td>
               </tr>
               {% endfor %}
