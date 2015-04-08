@@ -606,10 +606,10 @@ def chart_pie_event_view(request, topic_id):
     #    item['name'] = item.pop('publisher__publisher')
     #    name.append(item['name'])
     #    value.append(item)
-    name = [u'新闻媒体', u'微信', u'微博']
-    value = [{u'name': u'新闻媒体', u'value': topic.articles.count()},
-             {u'name': u'微信', u'value': topic.weixin.count()},
-             {u'name': u'微博', u'value': topic.weibo.count()}]
+    name = [u'新闻媒体', u'政府网站', u'自媒体']
+    value = [{u'name': u'新闻媒体', u'value': topic.articles.filter(publisher__searchmode=0).count()},
+             {u'name': u'政府网站', u'value': topic.articles.filter(publisher__searchmode=1).count()},
+             {u'name': u'自媒体', u'value': topic.weibo.count()+topic.weixin.count()}]
     value = [item for item in value if item['value']]
     return JsonResponse({u'name': name, u'value': value})
 

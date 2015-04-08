@@ -34,7 +34,7 @@ def index_view(request):
 
 
 	end_date = datetime.datetime.now()
-        start_date = end_date + datetime.timedelta(days=-30)
+        start_date = end_date + datetime.timedelta(days=-7)
 	news_list = Article.objects.filter(pubtime__range=(start_date, end_date))
 	for item in news_list:
             item = SetLogo(item)
