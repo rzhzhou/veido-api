@@ -163,9 +163,17 @@ class NewsDetailView(BaseView):
 	    news = Article.objects.get(id=news_id)
         except Article.DoesNotExist:
             return self.render_to_response('news/news.html', {'article': '', 'relate': []})
-        r = RelatedData.objects.filter(uuid=news.uuid)[0]
-        relateddata = list(r.weixin.all()) + list(r.weibo.all()) + list(r.articles.all())
-        return self.render_to_response('news/news.html', {'article': SetLogo(news), 'relate': relateddata})
+
+        try:
+            r = RelatedData.objects.filter(uuid=news.uuid)[0]
+            relateddata = list(r.weixin.all()) + list(r.weibo.all()) + list(r.articles.all())
+        except IndexError:
+            relateddata = []
+        try:
+            event = Topic.objects.filter(articles__id=news_id)[0]
+        except IndexError:
+            event = ''
+        return self.render_to_response('news/news.html', {'article': SetLogo(news), 'relate': relateddata, 'event': event})
 
 
 class EventView(BaseView):
