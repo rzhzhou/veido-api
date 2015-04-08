@@ -565,12 +565,17 @@ def chart_pie_event_view(request, topic_id):
     except (KeyError, ValueError, Topic.DoesNotExist):
         return HttpResponse(status=400)
 
-    data = topic.articles.values('publisher__publisher').annotate(value=Count('publisher__publisher'))
-    name = []
-    value= []
-    for item in data:
-        item['name'] = item.pop('publisher__publisher')
-        name.append(item['name'])
-        value.append(item)
+    #data = topic.articles.values('publisher__publisher').annotate(value=Count('publisher__publisher'))
+    #name = []
+    #value= []
+    #for item in data:
+    #    item['name'] = item.pop('publisher__publisher')
+    #    name.append(item['name'])
+    #    value.append(item)
+    name = [u'新闻媒体', u'微信', u'微博']
+    value = [{u'name': u'新闻媒体', u'value': topic.articles.count()},
+             {u'name': u'微信', u'value': topic.weixin.count()},
+             {u'name': u'微博', u'value': topic.weibo.count()}]
+    value = [item for item in value if item['value']]
     return JsonResponse({u'name': name, u'value': value})
 

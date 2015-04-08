@@ -128,11 +128,11 @@
             {% for weixin in weixin_list %}
               <li class="media">
                 <div class="media-left">
-                  <img class="media-object" src="{{ weixin.logo}}" alt="{{ weixin.name }}">
+                  <img class="media-object" src="{{ weixin.publisher.photo}}" alt="{{ weixin.publisher.publisher }}">
                 </div>  
                 <div class="media-body">
-                  <h4 class="media-heading">{{ weixin.name }}</h4>
-                  <p>{{ weixin.content }}</p>
+                  <h4 class="media-heading">{{ weixin.publisher.publisher }}</h4>
+                  <p>{{ weixin.title }}</p>
                 </div>
               </li>
             {% endfor %}
@@ -156,10 +156,10 @@
             {% for weibo in weibo_list %}
               <li class="media">
                 <div class="media-left">
-                  <img class="media-object" src="{{ weibo.logo}}" alt="{{ weibo.name }}">
+                  <img class="media-object" src="{{ weibo.publisher.photot}}" alt="{{ weibo.publisher.publisher }}">
                 </div>  
                 <div class="media-body">
-                  <h4 class="media-heading">{{ weibo.name }}</h4>
+                  <h4 class="media-heading">{{ weibo.publisher.publisher }}</h4>
                   <p>{{ weibo.content }}</p>
                 </div>
               </li>
