@@ -140,7 +140,10 @@ class NewsTableView(TableAPIView):
             collected_html = self.collected_html(item)
             url = u'/news/%s' % item.id
             title = self.title_html(url, item.title,item.id, 'article')
-            hot_index = RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count()
+            try:
+                hot_index = RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count()
+            except IndexError:
+                hot_index = 0
             one_record = [collected_html, title, item.publisher.publisher, item.area.name, item.pubtime.date(), hot_index]
             result.append(one_record)
         
