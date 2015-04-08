@@ -199,6 +199,15 @@ app.search = function() {
   });
 };
 
+app.menu = function() {
+  var $this = this;
+  var menu  = $this.find('a').filter(function() { return this.href === location.href });
+
+  menu.parent().addClass('active');
+  menu.closest('.treeview-menu').addClass('menu-open');
+  menu.closest('.treeview').addClass('active');
+};
+
 app.chart = {
   line: function() {
     require(['echarts', 'echarts/chart/line'], function(ec) {
@@ -377,15 +386,18 @@ $(function() {
       break;
     case "/settings/":
       $('.sidebar-form').Do(app.search);
+      $('.sidebar-menu').Do(app.menu);
       $('.user-info').Do(app.user.change);
       break;
     case "/user/":
       $('.sidebar-form').Do(app.search);
+      $('.sidebar-menu').Do(app.menu);
       $('.user-management').Do(app.user.management);
       $('.user-add').Do(app.user.add);  
       break;
     default:
       $('.sidebar-form').Do(app.search);
+      $('.sidebar-menu').Do(app.menu);
       $('#line-chart').Do(app.chart.line);
       $('#pie-chart').Do(app.chart.pie);
       $('#news').Do(app.table);
