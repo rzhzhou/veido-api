@@ -32,18 +32,23 @@ def index_view(request):
 	news_list_number = event_list_number = 10 
 	weixin_list_number = weibo_list_number = 5
 
-	event_list = Topic.objects.all()[:event_list_number]
-	weibo_list = []
-	news_list = Article.objects.all()[:news_list_number]
+
+	end_date = datetime.datetime.now()
+        start_date = end_date + datetime.timedelta(days=-30)
+	news_list = Article.objects.filter(pubtime__range=(start_date, end_date))
 	for item in news_list:
             item = SetLogo(item)
             try:
 	        setattr(item, 'hot_index', RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count())
             except IndexError:
                 setattr(item, 'hot_index', 0)
+        news_list = sorted(news_list, key = lambda x: x.hot_index, reverse=True)[:news_list_number]
+
+        event_list = Topic.objects.all()
 	for item in event_list:
             setattr(item, 'hot_index', item.articles.all().count()+item.weixin.all().count()+item.weibo.all().count())
-        
+        event_list = sorted(event_list, key = lambda x: x.hot_index, reverse=True)[:event_list_number]
+
 	#weibo_data = Weibo.objects.all()[0:weibo_list_number]
 	#for data in weibo_data:
         #    data = SetLogo(data)
@@ -56,9 +61,11 @@ def index_view(request):
 	weixin_data = Weixin.objects.all()[0:weixin_list_number]
         for data in weixin_data:
             data = SetLogo(data)
+
         inspection_list = Inspection.objects.order_by('-pubtime')[:10]
         for item in inspection_list:
             item.qualitied = str(int(item.qualitied*100)) + '%'
+
         return render_to_response("dashboard/dashboard.html",
 			{'user': user,
 			'categories': categories,
