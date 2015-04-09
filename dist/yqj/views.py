@@ -149,8 +149,8 @@ class LocationView(BaseView):
 	    location = Area.objects.get(id=int(location_id))
         except Area.DoesNotExist:
             location = ''
-	weixin = [SetLogo(data) for data in Weixin.objects.filter(area=location)]
-	weibo = [SetLogo(data) for data in Weibo.objects.filter(area=location)]
+	weixin = [SetLogo(data) for data in Weixin.objects.filter(area=location)][:10]
+	weibo = [SetLogo(data) for data in Weibo.objects.filter(area=location)][:10]
         return self.render_to_response("location/location.html", {'location': location, 'weixin_list': weixin, 'weibo_list': weibo})
 
 
@@ -195,8 +195,8 @@ class EventDetailView(BaseView):
 	    event = Topic.objects.get(id=event_id)
         except Topic.DoesNotExist:
             return self.render_to_response('event/event.html', {'event': '', 'weixin_list': [], 'weibo_list': []})
-        weixin_list = event.weixin.all()
-        weibo_list = event.weibo.all()
+        weixin_list = event.weixin.all()[:10]
+        weibo_list = event.weibo.all()[:10]
         return self.render_to_response('event/event.html', {'event': event, 'weixin_list': weixin_list, 'weibo_list': weibo_list})
 
 
@@ -299,3 +299,8 @@ def logout_view(request):
 class SearchView(BaseView):
     def get(self, request, keyword):
         return self.render_to_response('search/result.html')
+
+
+class InspectionhView(BaseView):
+    def get(self, request):
+        return self.render_to_response('inspection/inspection.html')
