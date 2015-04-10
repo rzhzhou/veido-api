@@ -24,41 +24,41 @@ def index_view(request):
         locations = Area.objects.filter(level=user.area.level+1, parent=user.area)
         user.company = user.group.company
 
-	news = Article.objects.all().count()
-	weibo = Weibo.objects.all().count()
-	weixin = Weixin.objects.all().count()
-	event = Topic.objects.all().count()
-
-	news_list_number = event_list_number = 10 
-	weixin_list_number = weibo_list_number = 5
-
-
-	end_date = datetime.datetime.now()
+        news = Article.objects.all().count()
+        weibo = Weibo.objects.all().count()
+        weixin = Weixin.objects.all().count()
+        event = Topic.objects.all().count()
+    
+        news_list_number = event_list_number = 10 
+        weixin_list_number = weibo_list_number = 5
+    
+    
+        end_date = datetime.datetime.now()
         start_date = end_date + datetime.timedelta(days=-7)
-	news_list = Article.objects.filter(pubtime__range=(start_date, end_date))
-	for item in news_list:
+        news_list = Article.objects.filter(pubtime__range=(start_date, end_date))[:300]
+        for item in news_list:
             item = SetLogo(item)
             try:
-	        setattr(item, 'hot_index', RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count())
+                setattr(item, 'hot_index', RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count())
             except IndexError:
                 setattr(item, 'hot_index', 0)
         news_list = sorted(news_list, key = lambda x: x.hot_index, reverse=True)[:news_list_number]
-
+    
         event_list = Topic.objects.all()
-	for item in event_list:
+        for item in event_list:
             setattr(item, 'hot_index', item.articles.all().count()+item.weixin.all().count()+item.weibo.all().count())
         event_list = sorted(event_list, key = lambda x: x.hot_index, reverse=True)[:event_list_number]
-
-	#weibo_data = Weibo.objects.all()[0:weibo_list_number]
-	#for data in weibo_data:
-        #    data = SetLogo(data)
-
+    
+        #weibo_data = Weibo.objects.all()[0:weibo_list_number]
+        #for data in weibo_data:
+            #    data = SetLogo(data)
+    
         weibo_data = [eval(item) for item in RedisQueryApi().lrange('sort_weibohot', 0, -1)[:5]]
         for data in weibo_data:
             if data['photo'] == 'kong':
                 data['photo'] = u'http://tp2.sinaimg.cn/3557640017/180/40054587155/1'
-
-	weixin_data = Weixin.objects.all()[0:weixin_list_number]
+    
+        weixin_data = Weixin.objects.all()[0:weixin_list_number]
         for data in weixin_data:
             data = SetLogo(data)
 
@@ -67,20 +67,20 @@ def index_view(request):
             item.qualitied = str(int(item.qualitied*100)) + '%'
 
         return render_to_response("dashboard/dashboard.html",
-			{'user': user,
-			'categories': categories,
-			'locations': locations,
-			'news': news,
-			'weibo': weibo,
-			'weixin': weixin,
-			'event': event,
-			'news_list': news_list,
-			'event_list': event_list,
-			'weixin_list': weixin_data,
-			'weibo_list': weibo_data,
+            {'user': user,
+            'categories': categories,
+            'locations': locations,
+            'news': news,
+            'weibo': weibo,
+            'weixin': weixin,
+            'event': event,
+            'news_list': news_list,
+            'event_list': event_list,
+            'weixin_list': weixin_data,
+            'weibo_list': weibo_data,
                         'user_image': get_user_image(user),
                         'inspection_list': inspection_list,
-			})
+            })
     else:
         return HttpResponse(status=401)
 
@@ -138,7 +138,7 @@ class CategoryView(BaseView):
     def get(self, request, category_id):
         try:
             category = ArticleCategory.objects.get(id=category_id)
-	except ArticleCategory.DoesNotExist:
+        except ArticleCategory.DoesNotExist:
             category = ''
         return self.render_to_response('category/category.html', {'category': category})
 
@@ -146,11 +146,11 @@ class CategoryView(BaseView):
 class LocationView(BaseView):
     def get(self, request, location_id):
         try:
-	    location = Area.objects.get(id=int(location_id))
+            location = Area.objects.get(id=int(location_id))
         except Area.DoesNotExist:
             location = ''
-	weixin = [SetLogo(data) for data in Weixin.objects.filter(area=location)][:10]
-	weibo = [SetLogo(data) for data in Weibo.objects.filter(area=location)][:10]
+        weixin = [SetLogo(data) for data in Weixin.objects.filter(area=location)][:10]
+        weibo = [SetLogo(data) for data in Weibo.objects.filter(area=location)][:10]
         return self.render_to_response("location/location.html", {'location': location, 'weixin_list': weixin, 'weibo_list': weibo})
 
 
@@ -167,7 +167,7 @@ class NewsDetailView(BaseView):
     def get(self, request, news_id):
         try:
             news_id = int(news_id)
-	    news = Article.objects.get(id=news_id)
+            news = Article.objects.get(id=news_id)
         except Article.DoesNotExist:
             return self.render_to_response('news/news.html', {'article': '', 'relate': []})
 
@@ -192,7 +192,7 @@ class EventDetailView(BaseView):
     def get(self, request, id):
         try:
             event_id = int(id)
-	    event = Topic.objects.get(id=event_id)
+            event = Topic.objects.get(id=event_id)
         except Topic.DoesNotExist:
             return self.render_to_response('event/event.html', {'event': '', 'weixin_list': [], 'weibo_list': []})
         weixin_list = event.weixin.all()[:10]
@@ -213,10 +213,10 @@ class WeixinDetailView(BaseView):
             weixin_id = int(id)
             weixin = Weixin.objects.get(id=weixin_id)
         except Weixin.DoesNotExist:
-	    return render_to_response('weixin/weixin.html', {'article': '', 'relate': []})
-	r = RelatedData.objects.filter(uuid=weixin.uuid)[0]
-	relateddata = list(r.weixin.all()) + list(r.weibo.all()) + list(r.articles.all())
-	return self.render_to_response('weixin/weixin.html', {'article': SetLogo(weixin), 'relate': relateddata})
+            return render_to_response('weixin/weixin.html', {'article': '', 'relate': []})
+        r = RelatedData.objects.filter(uuid=weixin.uuid)[0]
+        relateddata = list(r.weixin.all()) + list(r.weibo.all()) + list(r.articles.all())
+        return self.render_to_response('weixin/weixin.html', {'article': SetLogo(weixin), 'relate': relateddata})
 
 
 class WeiboView(BaseView):
