@@ -255,9 +255,10 @@ class AnonymousUser(User):
 
 class Inspection(models.Model):
     url = models.CharField(max_length=255, verbose_name=u'网站链接')
-    name = models.CharField(max_length=255, verbose_name=u'名称')
+    name = models.CharField(max_length=255, verbose_name=u'标题')
+    content = models.TextField(blank=True, verbose_name=u'正文')
     manufacturer = models.CharField(max_length=255, null=True, blank=True,verbose_name=u'转载次数')
-    qualitied = models.FloatField(verbose_name=u'关注度',null=True, blank=True)
+    qualitied = models.FloatField(verbose_name=u'关注度', null=True, blank=True)
     pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
     product = models.CharField(max_length=255, verbose_name=u'名称')
     source = models.CharField(max_length=255, verbose_name=u'信息来源')
