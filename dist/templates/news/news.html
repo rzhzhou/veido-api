@@ -25,6 +25,9 @@
           <div class="article-content">
             {{ article.content | safe}}
           </div>
+          <div class="article-copyright">
+            <small>【免责声明】本文刊载内容来源于互联网，质监舆情平台进行总结发布，仅供业内读者参考交流。</small>
+          </div>
         </div>
       </div>
     </div>
@@ -71,7 +74,7 @@
             <a href="/event/{{ event.id }}" class="list-group-item no-border">{{ event.title }}</a>
           </div>
         </div>
-      </div>      
+      </div>
     </div>
   </div>
 {% endblock %}
