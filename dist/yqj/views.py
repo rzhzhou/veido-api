@@ -11,7 +11,7 @@ from yqj import login_required
 from yqj.redisconnect import RedisQueryApi
 
 def SetLogo(obj):
-    if obj.publisher.photo == 'kong':
+    if not obj.publisher.photo:
         obj.publisher.photo = u'http://tp2.sinaimg.cn/3557640017/180/40054587155/1'
     return obj
 
@@ -48,10 +48,6 @@ def index_view(request):
         for item in event_list:
             setattr(item, 'hot_index', item.articles.all().count()+item.weixin.all().count()+item.weibo.all().count())
         event_list = sorted(event_list, key = lambda x: x.hot_index, reverse=True)[:event_list_number]
-
-        #weibo_data = Weibo.objects.all()[0:weibo_list_number]
-        #for data in weibo_data:
-            #    data = SetLogo(data)
 
         weibo_data = [eval(item) for item in RedisQueryApi().lrange('sort_weibohot', 0, -1)[:5]]
         for data in weibo_data:
@@ -195,8 +191,8 @@ class EventDetailView(BaseView):
             event = Topic.objects.get(id=event_id)
         except Topic.DoesNotExist:
             return self.render_to_response('event/event.html', {'event': '', 'weixin_list': [], 'weibo_list': []})
-        weixin_list = event.weixin.all()[:10]
-        weibo_list = event.weibo.all()[:10]
+        weixin_list = [SetLogo(item) for item in event.weixin.all()][:10]
+        weibo_list = [SetLogo(item) for item in event.weibo.all()][:10]
         return self.render_to_response('event/event.html', {'event': event, 'weixin_list': weixin_list, 'weibo_list': weibo_list})
 
 
