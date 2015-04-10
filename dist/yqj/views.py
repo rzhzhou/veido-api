@@ -28,14 +28,14 @@ def index_view(request):
         weibo = Weibo.objects.all().count()
         weixin = Weixin.objects.all().count()
         event = Topic.objects.all().count()
-    
-        news_list_number = event_list_number = 10 
+
+        news_list_number = event_list_number = 10
         weixin_list_number = weibo_list_number = 5
-    
-    
+
+
         end_date = datetime.datetime.now()
         start_date = end_date + datetime.timedelta(days=-7)
-        news_list = Article.objects.filter(pubtime__range=(start_date, end_date))[:300]
+        news_list = Article.objects.filter(pubtime__range=(start_date, end_date))[:10]
         for item in news_list:
             item = SetLogo(item)
             try:
@@ -43,21 +43,21 @@ def index_view(request):
             except IndexError:
                 setattr(item, 'hot_index', 0)
         news_list = sorted(news_list, key = lambda x: x.hot_index, reverse=True)[:news_list_number]
-    
+
         event_list = Topic.objects.all()
         for item in event_list:
             setattr(item, 'hot_index', item.articles.all().count()+item.weixin.all().count()+item.weibo.all().count())
         event_list = sorted(event_list, key = lambda x: x.hot_index, reverse=True)[:event_list_number]
-    
+
         #weibo_data = Weibo.objects.all()[0:weibo_list_number]
         #for data in weibo_data:
             #    data = SetLogo(data)
-    
+
         weibo_data = [eval(item) for item in RedisQueryApi().lrange('sort_weibohot', 0, -1)[:5]]
         for data in weibo_data:
             if data['photo'] == 'kong':
                 data['photo'] = u'http://tp2.sinaimg.cn/3557640017/180/40054587155/1'
-    
+
         weixin_data = Weixin.objects.all()[0:weixin_list_number]
         for data in weixin_data:
             data = SetLogo(data)
@@ -117,14 +117,14 @@ class BaseView(LoginRequiredMixin, View):
             user = self.request.myuser
             user.company = user.group.company
             context['user'] = user
-        
+
         context['user_image'] = get_user_image(user)
         context['locations'] = self.get_locations(user.area)
         return render_to_response(template_path, context)
-    
+
     def get_article_categories(self):
         return ArticleCategory.objects.all()
-    
+
     def get_locations(self, area):
         #area = Area.objects.get(id=int(location_id))
         if area.id == 4:
@@ -132,8 +132,8 @@ class BaseView(LoginRequiredMixin, View):
         return Area.objects.filter(parent=area, level=area.level+1)
 
 
-        
-        
+
+
 class CategoryView(BaseView):
     def get(self, request, category_id):
         try:
@@ -253,7 +253,7 @@ class UserView(BaseView):
 
 
 class UserAdminView(BaseView):
-    
+
     def get(self, request):
         user = request.myuser
         if not user.isAdmin:
