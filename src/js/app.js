@@ -120,7 +120,7 @@ app.user = {
     var action = function(obj, api) {
       obj.click(function() {
         id.length = 0;
-        
+
         $this.find('input:checked').each(function(index, element) {
           var _id = $(element).parent().next().data('id');
           id.push(_id);
@@ -200,8 +200,7 @@ app.search = function() {
 };
 
 app.menu = function() {
-  var $this = this;
-  var menu  = $this.find('a').filter(function() { return this.href === location.href });
+  var menu  = $(this).find('a').filter(function() { return this.href === location.href });
 
   menu.parent().addClass('active');
   menu.closest('.treeview-menu').addClass('menu-open');
@@ -210,6 +209,7 @@ app.menu = function() {
 
 app.chart = {
   line: function() {
+    console.log(this);
     require(['echarts', 'echarts/chart/line'], function(ec) {
       $.getJSON('/api/line' + app.url, function(data) {
         ec.init(document.getElementById('line-chart'), 'macarons').setOption({
@@ -240,12 +240,12 @@ app.chart = {
           series: [
             {
               name: '正面',
-              type: 'line',            
+              type: 'line',
               data: data.positive
-            },         
+            },
             {
               name: '中性',
-              type: 'line',            
+              type: 'line',
               data: data.neutral
             },
             {
@@ -393,7 +393,7 @@ $(function() {
       $('.sidebar-form').Do(app.search);
       $('.sidebar-menu').Do(app.menu);
       $('.user-management').Do(app.user.management);
-      $('.user-add').Do(app.user.add);  
+      $('.user-add').Do(app.user.add);
       break;
     default:
       $('.sidebar-form').Do(app.search);
@@ -401,7 +401,7 @@ $(function() {
       $('#line-chart').Do(app.chart.line);
       $('#pie-chart').Do(app.chart.pie);
       $('#news').Do(app.table);
-      $('#event').Do(app.table);          
+      $('#event').Do(app.table);
       break;
   }
 });
