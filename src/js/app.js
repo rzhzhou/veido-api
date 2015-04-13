@@ -209,7 +209,6 @@ app.menu = function() {
 
 app.chart = {
   line: function() {
-    console.log(this);
     require(['echarts', 'echarts/chart/line'], function(ec) {
       $.getJSON('/api/line' + app.url, function(data) {
         ec.init(document.getElementById('line-chart'), 'macarons').setOption({
