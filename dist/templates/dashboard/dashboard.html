@@ -132,7 +132,7 @@
               <li class="media">
                 <div class="media-left">
                   <img class="media-object" src="{{ weixin.publisher.photo }}" alt="{{ weixin.publisher }}">
-                </div>  
+                </div>
                 <div class="media-body">
                   <h4 class="media-heading">{{ weixin.publisher.publisher }}</h4>
                   <p><a href="/weixin/{{ weixin.id }}/">{{ weixin.title }}</a></p>
@@ -144,7 +144,7 @@
         <div class="box-footer text-center">
           <a href="/weixin/">查看更多</a>
         </div>
-      </div>      
+      </div>
     </div>
 
     <div class="col-md-6">
@@ -163,7 +163,7 @@
               <li class="media">
                 <div class="media-left">
                   <img class="media-object" src="{{ weibo.photo }}" alt="{{ weibo.publisher }}">
-                </div>  
+                </div>
                 <div class="media-body">
                   <h4 class="media-heading">{{ weibo.publisher }}</h4>
                   <p>{{ weibo.content }}</p>
@@ -175,7 +175,7 @@
         <div class="box-footer text-center">
           <a href="/weibo/">查看更多</a>
         </div>
-      </div> 
+      </div>
     </div>
   </div>
 
@@ -225,10 +225,10 @@
                 <th class="inspection-name">事件</th>
                 <th class="inspection-quality">合格率</th>
                 <th class="inspection-source">来源</th>
-                <th class="inspection-time">抽检日期</th>              
+                <th class="inspection-time">抽检日期</th>
               </tr>
             </thead>
-            
+
             <tbody>
               {% for inspection in inspection_list  %}
               <tr>
@@ -245,8 +245,8 @@
           </table>
         </div>
         <div class="box-footer text-center">
-          <a href="#">查看更多</a>
-        </div>        
+          <a href="/inspection/">查看更多</a>
+        </div>
       </div>
     </div>
   </div>
