@@ -208,6 +208,21 @@ class User(models.Model):
         return True
 
 
+class Custom(models.Model):
+    keyword = models.CharField(max_length=255, verbose_name=u'关键词')
+    group = models.ManyToManyField(Group, related_name='custom', related_query_name='customs', null=True, blank=True, verbose_name=u'所属组')
+    articles = models.ManyToManyField(Article, related_name='custom', related_query_name='customs', null=True, blank=True, verbose_name=u'文章')
+    weibo = models.ManyToManyField(Weibo, related_name='custom', related_query_name='customs', null=True, blank=True, verbose_name=u'微博')
+    weixin = models.ManyToManyField(Weixin, related_name='custom', related_query_name='customs', null=True, blank=True, verbose_name=u'微信')
+
+    class Meta:
+        db_table = 'custom'
+        verbose_name_plural = u'指定监测'
+
+    def __unicode__(self):
+        return self.keyword
+
+
 class Collection(models.Model):
     user = models.OneToOneField(User, primary_key=True, verbose_name=u'用户')
     articles = models.ManyToManyField(Article, null=True, blank=True, related_name='collections', related_query_name='collection', through='ArticleCollection', verbose_name=u'文章')
@@ -256,7 +271,6 @@ class AnonymousUser(User):
 class Inspection(models.Model):
     url = models.CharField(max_length=255, verbose_name=u'网站链接')
     name = models.CharField(max_length=255, verbose_name=u'标题')
-    content = models.TextField(blank=True, verbose_name=u'正文')
     manufacturer = models.CharField(max_length=255, null=True, blank=True,verbose_name=u'转载次数')
     qualitied = models.FloatField(verbose_name=u'关注度', null=True, blank=True)
     pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
