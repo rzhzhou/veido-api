@@ -247,7 +247,7 @@ class CustomListView(BaseView):
             item['news_list'] = keyword.articles.all()[:custom_list_num]
             keyword_list.append(item)
 
-        customname = [u'电梯',u'锅炉', u'315晚会', u'两会']
+        customname = [u'电梯',u'锅炉', u'315晚会', u'两会', u'两会', u'两会', u'两会', u'两会']
         custom_list = []
         for name in customname:
             custom_list.append({'name': name, 'news_list': self.get_news(name), 'id': customname.index(name)})
@@ -265,7 +265,7 @@ class CustomView(BaseView):
             return self.render_to_response('custom/custom.html')
         weixin_list = custom.weixin.all()
         weibo_list = custom.weibo.all()
-        customname = [u'电梯',u'锅炉', u'315晚会', u'两会']
+        customname = [u'电梯',u'锅炉', u'315晚会', u'两会', u'两会', u'两会', u'两会', u'两会']
         custom = {}
         try:
             custom['name'] = customname[int(id)]
@@ -328,6 +328,6 @@ class SearchView(BaseView):
         return self.render_to_response('search/result.html')
 
 
-class InspectionhView(BaseView):
+class InspectionView(BaseView):
     def get(self, request):
         return self.render_to_response('inspection/inspection.html')
