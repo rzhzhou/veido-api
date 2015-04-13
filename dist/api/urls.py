@@ -1,5 +1,5 @@
 from django.conf.urls import patterns, include, url
-from api.views import ArticleTableView, NewsTableView, LocationTableView, CollectView, EventTableView, CollecModifyView, EventDetailTableView, SearchView
+from api.views import ArticleTableView, NewsTableView, LocationTableView, CollectView, EventTableView, CollecModifyView, EventDetailTableView, SearchView, CustomTableView
 
 urlpatterns = patterns('',
     # Examples:
@@ -15,6 +15,7 @@ urlpatterns = patterns('',
     url(r'^search/(\S+)/$', SearchView.as_view()),
     url(r'^collection/(?P<action>\w+)/$', CollecModifyView.as_view()),
     #url(r'^collection/add/$', CollecModifyView.as_view()),
+    url(r'^custom/(\d+)/$', CustomTableView.as_view()),
 )
 
 urlpatterns += patterns('api.views',

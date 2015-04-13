@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from yqj.models import (Article, Area, Weixin, Weibo, Topic, RelatedData, ArticleCategory,
-                            save_user, Collection, Topic, hash_password, User)
+                            save_user, Collection, Topic, hash_password, User, Custom)
 from serializers import ArticleSerializer
 from yqj import authenticate, login_required
 from django.db.models import Count
@@ -343,6 +343,30 @@ class SearchView(CollectView):
     def search_event(self, key):
         #return Topic.objects.raw(u"SELECT * FROM topic WHERE MATCH (abstract, title) AGAINST ('%s') LIMIT %s" % (key, self.LIMIT))
         return Topic.objects.raw(u"SELECT * FROM topic WHERE title like '%%{0}%%' LIMIT {1}".format(key, self.LIMIT))
+
+
+class CustomTableView(TableAPIView):
+    def get(self, request, custom_id):
+        try:
+            custom = Custom.objects.get(id=int(custom_id))
+        except Custom.DoesNotExist:
+            return Response({'news': ''})
+        result = []
+        news = custom.articles.all()[:self.LIMIT_NUMBER]
+        serializer = ArticleSerializer(news, many=True)
+
+        for item in news:
+            collected_html = self.collected_html(item)
+            url = u'/news/%s' % item.id
+            title = self.title_html(url, item.title,item.id, 'article')
+            try:
+                hot_index = RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count()
+            except IndexError:
+                hot_index = 0
+            one_record = [collected_html, title, item.publisher.publisher, item.area.name, item.pubtime.date(), hot_index]
+            result.append(one_record)
+
+        return Response({"news": result})
 
 
 @login_required

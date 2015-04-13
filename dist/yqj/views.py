@@ -263,8 +263,15 @@ class CustomView(BaseView):
             custom = Custom.objects.get(id=int(id))
         except Custom.DoesNotExist:
             return self.render_to_response('custom/custom.html')
+        weixin_list = custom.weixin.all()
+        weibo_list = custom.weibo.all()
         customname = [u'电梯',u'锅炉', u'315晚会', u'两会']
-        return self.render_to_response('custom/custom.html')
+        custom = {}
+        try:
+            custom['name'] = customname[int(id)]
+        except KeyError:
+            return self.render_to_response('custom/custom.html')
+        return self.render_to_response('custom/custom.html', {'name': custom.keyword, 'weixin_list': weixin_list, 'weibo_list': weibo_list})
 
 
 class UserView(BaseView):
