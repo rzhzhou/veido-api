@@ -6,42 +6,38 @@
   <h1>指定监测</h1>
   <ol class="breadcrumb">
     <li><a href="/"><i class="fa fa-dashboard"></i>首页</a></li>
-    <li class="active"><a href="/custom/">指定监测</a></li>
+    <li class="active">指定监测</li>
   </ol>
 {% endblock %}
 
 {% block content %}
   <div class="row">
-    <div class="col-md-12">
+    {% for custom in custom_list %}
+    <div class="col-md-6">
       <div class="box box-info">
         <div class="box-header with-border">
           <h3 class="box-title">{{ custom.name }}</h3>
+          <div class="box-tools pull-right">
+            <button class="btn btn-box-tool" data-widget="collapse">
+              <i class="fa fa-minus"></i>
+            </button>
+          </div>
         </div>
-        <div class="box-body">
-          <table id="news" class="table table-bordered table-hover table-custom">
-            <thead>
-              <tr>
-                <th class="col-collection">收藏</th>
-                <th class="col-title">标题</th>
-                <th class="col-source">来源</th>
-                <th class="col-location">地点</th>
-                <th class="col-time">时间</th>
-                <th class="col-index">热度</th>
-              </tr>
-            </thead>
-            <tfoot>
-              <tr>
-                <th>收藏</th>
-                <th>标题</th>
-                <th>来源</th>
-                <th>地点</th>
-                <th>时间</th>
-                <th>热度</th>
-              </tr>
-            </tfoot>
-          </table>
+        <div class="box-body no-padding">
+          <div class="list-group no-margin">
+            {% for news in custom.news_list %}
+              <a href="/news/{{ news.id }}/" class="list-group-item no-border">
+                <span class="badge" data-toggle="tooltip" data-placement="left" title="热度 {{ news.hot_index }}">{{ news.hot_index }}</span>
+                {{ news.title }}
+              </a>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="box-footer text-center">
+          <a href="/custom/{{ custom.id }}/">查看更多</a>
         </div>
       </div>
     </div>
+    {% endfor %}
   </div>
 {% endblock %}

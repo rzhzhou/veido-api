@@ -6,38 +6,100 @@
   <h1>指定监测</h1>
   <ol class="breadcrumb">
     <li><a href="/"><i class="fa fa-dashboard"></i>首页</a></li>
-    <li class="active">指定监测</li>
+    <li class="active"><a href="/custom/">指定监测</a></li>
   </ol>
 {% endblock %}
 
 {% block content %}
   <div class="row">
-    {% for custom in custom_list %}
-    <div class="col-md-6">
+    <div class="col-md-12">
       <div class="box box-info">
         <div class="box-header with-border">
           <h3 class="box-title">{{ custom.name }}</h3>
+        </div>
+        <div class="box-body">
+          <table id="news" class="table table-bordered table-hover table-custom">
+            <thead>
+              <tr>
+                <th class="col-collection">收藏</th>
+                <th class="col-title">标题</th>
+                <th class="col-source">来源</th>
+                <th class="col-location">地点</th>
+                <th class="col-time">时间</th>
+                <th class="col-index">热度</th>
+              </tr>
+            </thead>
+            <tfoot>
+              <tr>
+                <th>收藏</th>
+                <th>标题</th>
+                <th>来源</th>
+                <th>地点</th>
+                <th>时间</th>
+                <th>热度</th>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6">
+      <div class="box box-success">
+        <div class="box-header with-border">
+          <h3 class="box-title">微信</h3>
           <div class="box-tools pull-right">
             <button class="btn btn-box-tool" data-widget="collapse">
               <i class="fa fa-minus"></i>
             </button>
           </div>
         </div>
-        <div class="box-body no-padding">
-          <div class="list-group no-margin">
-            {% for news in custom.news_list %}
-              <a href="/news/{{ news.id }}/" class="list-group-item no-border">
-                <span class="badge" data-toggle="tooltip" data-placement="left" title="热度 {{ news.hot_index }}">{{ news.hot_index }}</span>
-                {{ news.title }}
-              </a>
+        <div class="box-body">
+          <ul class="media-list">
+            {% for weixin in weixin_list %}
+              <li class="media">
+                <div class="media-left">
+                  <img class="media-object" src="{{ weixin.publisher.photo}}" alt="{{ weixin.publisher.publisher }}">
+                </div>
+                <div class="media-body">
+                  <h4 class="media-heading">{{ weixin.publisher.publisher }}</h4>
+                  <p>{{ weixin.title }}</p>
+                </div>
+              </li>
             {% endfor %}
-          </div>
-        </div>
-        <div class="box-footer text-center">
-          <a href="/custom/{{ custom.id }}/">查看更多</a>
+          </ul>
         </div>
       </div>
     </div>
-    {% endfor %}
+
+    <div class="col-md-6">
+      <div class="box box-warning">
+        <div class="box-header with-border">
+          <h3 class="box-title">微博</h3>
+          <div class="box-tools pull-right">
+            <button class="btn btn-box-tool" data-widget="collapse">
+              <i class="fa fa-minus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="box-body">
+          <ul class="media-list">
+            {% for weibo in weibo_list %}
+              <li class="media">
+                <div class="media-left">
+                  <img class="media-object" src="{{ weibo.publisher.photot}}" alt="{{ weibo.publisher.publisher }}">
+                </div>
+                <div class="media-body">
+                  <h4 class="media-heading">{{ weibo.publisher.publisher }}</h4>
+                  <p>{{ weibo.content }}</p>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
   </div>
 {% endblock %}
