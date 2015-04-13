@@ -12,19 +12,32 @@
 
 {% block content %}
   <div class="row">
-    <div class="col-md-12">
-      <div class="box box-primary">
+    {% for custom in custom_list %}
+    <div class="col-md-6">
+      <div class="box box-info">
         <div class="box-header with-border">
-          <h3 class="box-title">监测列表</h3>
+          <h3 class="box-title">{{ custom.name }}</h3>
+          <div class="box-tools pull-right">
+            <button class="btn btn-box-tool" data-widget="collapse">
+              <i class="fa fa-minus"></i>
+            </button>
+          </div>
         </div>
-        <div class="box-body">
-          <ul class="nav nav-pills">
-            {% for custom in custom_list %}
-            <li><a href="/search/{{ custom.name }}/">{{ custom.name }}</a></li>
+        <div class="box-body no-padding">
+          <div class="list-group no-margin">
+            {% for news in custom.news_list %}
+              <a href="/news/{{ news.id }}/" class="list-group-item no-border">
+                <span class="badge" data-toggle="tooltip" data-placement="left" title="热度 {{ news.hot_index }}">{{ news.hot_index }}</span>
+                {{ news.title }}
+              </a>
             {% endfor %}
-          </ul>
+          </div>
+        </div>
+        <div class="box-footer text-center">
+          <a href="/custom/{{ custom.id }}/">查看更多</a>
         </div>
       </div>
     </div>
+    {% endfor %}
   </div>
 {% endblock %}
