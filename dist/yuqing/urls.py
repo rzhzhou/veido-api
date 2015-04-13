@@ -8,9 +8,8 @@ from yqj.views import *
 
 from django.conf import settings
 
-import autocomplete_light  
-#from yqj import autocomplete_light_registry
-autocomplete_light.autodiscover()  
+#import autocomplete_light  
+#autocomplete_light.autodiscover()  
 
 urlpatterns = patterns('',
     # Examples:
