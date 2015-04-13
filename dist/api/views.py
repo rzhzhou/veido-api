@@ -377,7 +377,8 @@ class InspectionTableView(TableAPIView):
         for item in news:
             collected_html = u'<i class="fa fa-star-o" data-toggle="tooltip", data-placement="right" title="添加收藏">'
             title = self.title_html(item.url, item.name, item.id, 'inspection')
-            one_record = [collected_html, item.product, title, item.qualitied, item.source, item.pubtime.strftime('%Y-%m-%d')]
+            quality = str(item.qualitied * 100)[:4] + "%"
+            one_record = [collected_html, item.product, title, quality, item.source, item.pubtime.strftime('%Y-%m-%d')]
             result.append(one_record)
 
         return Response({"inspection": result})
