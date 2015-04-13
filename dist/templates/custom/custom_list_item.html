@@ -1,0 +1,24 @@
+<div class="row">
+  {% for custom in custom_list %}
+  <div class="col-md-6">
+    <div class="box box-info">
+      <div class="box-header with-border">
+        <h3 class="box-title">{{ custom.name }}</h3>
+      </div>
+      <div class="box-body no-padding">
+        <div class="list-group no-margin">
+          {% for news in custom.news_list %}
+            <a href="/news/{{ news.id }}/" class="list-group-item no-border">
+              <span class="badge" data-toggle="tooltip" data-placement="left" title="热度 {{ news.hot_index }}">{{ news.hot_index }}</span>
+              {{ news.title }}
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="box-footer text-center">
+        <a href="/custom/{{ custom.id }}/">查看更多</a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
