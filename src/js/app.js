@@ -401,6 +401,7 @@ $(function() {
       $('#pie-chart').Do(app.chart.pie);
       $('#news').Do(app.table);
       $('#event').Do(app.table);
+      $('#inspection').Do(app.table);
       break;
   }
 });

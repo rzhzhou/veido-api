@@ -25,7 +25,7 @@ def login_view(request):
         password = request.POST['password']
     except KeyError:
         return HttpResponse(status=400)
-    
+
     user = authenticate(username, password)
     if user.is_authenticated():
         response = JsonResponse({'status': True})
@@ -55,7 +55,7 @@ def registe_view(request):
 
     return JsonResponse({'status': True})
 
-    
+
 class LoginRequiredMixin(object):
     @classmethod
     def as_view(cls, **initkwargs):
@@ -82,7 +82,7 @@ class TableAPIView(APIView):
 
         if item_id is None:
             raise TypeError('item should has id atrribute or id key')
-        
+
         return any(filter(lambda x: x.id == item_id, items))
 
     def collected_items(self):
@@ -105,14 +105,14 @@ class TableAPIView(APIView):
 def get_date_from_iso(datetime_str):
     #return datetime.datetime.strptime("2008-09-03T20:56:35.450686Z", "%Y-%m-%dT%H:%M:%S.%fZ")
     return datetime.datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S.%fZ")
-        
+
 class ArticleTableView(TableAPIView):
     def get(self, request, id):
         try:
             category = ArticleCategory.objects.get(id=id)
         except ArticleCategory.DoesNotExist:
             return Response({'news': []})
-        
+
         result = []
         articles = category.articles.all()[:self.LIMIT_NUMBER]
         serializer = ArticleSerializer(articles, many=True)
@@ -147,7 +147,7 @@ class NewsTableView(TableAPIView):
                 hot_index = 0
             one_record = [collected_html, title, item.publisher.publisher, item.area.name, item.pubtime.date(), hot_index]
             result.append(one_record)
-        
+
         return Response({"news": result})
 
 
@@ -170,7 +170,7 @@ class LocationTableView(TableAPIView):
             hot_index = RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count()
             one_record = [collected_html, title, item.publisher.publisher, item.area.name, item.pubtime.date(), hot_index]
             result.append(one_record)
-        
+
         return Response({"news": result})
 
 
@@ -235,7 +235,7 @@ class CollectView(APIView):
         else:
             pubtime = datetime.datetime.now()
         one_record = [view.collected_html(item), title, item.source, item.area.name, pubtime.date(), hot_index]
-        return one_record 
+        return one_record
 
     def get(self, request):
         try:
@@ -246,7 +246,7 @@ class CollectView(APIView):
         news = [self.article_html(item) for item in self.collection.articles.all()]
         topic = [self.topic_html(item) for item in self.collection.events.all()]
 
-        return Response({'news': news, 'event': topic}) 
+        return Response({'news': news, 'event': topic})
 
 
 class CollecModifyView(View):
@@ -260,22 +260,22 @@ class CollecModifyView(View):
             collection_item.save()
         except IntegrityError:
              pass
-        
-    
+
+
     def delete(self, item):
         try:
             collectitem = self.get_collection_model().objects.get(**{self.related_field: item, 'collection': self.collection})
             collectitem.delete()
         except self.get_collection_model.DoesNotExist:
             pass
-    
+
     @property
     def related_field(self):
-        return self.data_type.lower()   
-   
+        return self.data_type.lower()
+
     def get_related_model(self):
         return models.get_model('yqj', self.data_type.capitalize() + 'Collection')
- 
+
     def _create_collection(self):
         #add a collection to the user
         try:
@@ -294,7 +294,7 @@ class CollecModifyView(View):
 
     def get_collection_model(self):
         return models.get_model('yqj', self.data_type.capitalize() + 'Collection')
-   
+
     def post(self, request, action, *args, **kwargs):
         try:
             print request.POST['type'], request.POST['id']
@@ -373,14 +373,14 @@ class InspectionTableView(TableAPIView):
     def get(self, request):
         result = []
         news = Inspection.objects.order_by('-pubtime').all()
-        
+
         for item in news:
-            collected_html = u'<i class="fa fa-star-o" data-toggle="tooltip", data-placement="right" title="添加收藏">' 
+            collected_html = u'<i class="fa fa-star-o" data-toggle="tooltip", data-placement="right" title="添加收藏">'
             title = self.title_html(item.url, item.name, item.id, 'inspection')
-            one_record = [collected_html, title, item.qualitied, item.source, item.pubtime.strftime('%Y-%m-%d')]
+            one_record = [collected_html, item.product, title, item.qualitied, item.source, item.pubtime.strftime('%Y-%m-%d')]
             result.append(one_record)
 
-        return Response({"news": result})
+        return Response({"inspection": result})
 
 
 @login_required
@@ -402,7 +402,7 @@ def upload_image(request):
         return HttpResponseRedirect('/settings/')
     finally:
         new_file.close()
-        
+
     return HttpResponseRedirect('/settings/')
 
 @login_required
@@ -441,7 +441,7 @@ def reset_passwd(request):
     for user_id in reseted_id_list:
         if user_id in group_user_ids:
             user = User.objects.get(id=user_id)
-            user.password = hash_password('123456', user.salt) 
+            user.password = hash_password('123456', user.salt)
             user.save()
     return JsonResponse({'status': True})
 
@@ -491,7 +491,7 @@ def get_count_feeling(start_d, end_d, feeling_type):
         sql_str = "SELECT Date(pubtime), COUNT(*) FROM article where Date(pubtime) >= '{0}' and Date(pubtime) < '{1}' and {2} group by Date(pubtime)".format(start_d, end_d, feeling_limit)
         c.execute(sql_str)
         rows = c.fetchall()
-        
+
         d =  dict(rows)
         result = []
         day = start_d
@@ -500,19 +500,19 @@ def get_count_feeling(start_d, end_d, feeling_type):
             result.append(num)
             day = day + datetime.timedelta(days=1)
         return result
-    
+
 @login_required
 def chart_line_index_view(request):
     today = datetime.datetime.today().date()
     start_d = today - datetime.timedelta(days=6)
     end_d = today + datetime.timedelta(days=1)
-    
+
     data = {}
     data['date'] = [(today - datetime.timedelta(days=x)).strftime("%m-%d") for x in reversed(range(7))]
     data['positive'] = get_count_feeling(start_d, end_d, 'positive')
     data['neutral'] = get_count_feeling(start_d, end_d, 'netrual')
     data['negative'] = get_count_feeling(start_d, end_d, 'negative')
-    
+
     return JsonResponse(data)
 
 @login_required
@@ -558,7 +558,7 @@ def chart_line_event_view(request, topic_id):
                 negative[date] += 1
             else:
                 neutral[date] += 1
-        
+
         range_date = [ current_date - relativedelta(months=i) for i in range(12, 0, -3) ]
 
         data = {}
@@ -591,7 +591,7 @@ def chart_line_event_view(request, topic_id):
                 neutral[date] += 1
 
         range_date = [ current_date - relativedelta(months=i) for i in range(6, -1, -1) ]
-        
+
         data = {}
         data['negative'] = [ negative[date] for date in range_date]
         data['positive'] = [ positive[date] for date in range_date]
