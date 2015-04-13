@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from yqj.models import (Article, Area, Weixin, Weibo, Topic, RelatedData, ArticleCategory,
-                            save_user, Collection, Topic, hash_password, User, Custom)
+                            save_user, Collection, Topic, hash_password, User, Custom, Inspection)
 from serializers import ArticleSerializer
 from yqj import authenticate, login_required
 from django.db.models import Count
@@ -364,6 +364,20 @@ class CustomTableView(TableAPIView):
             except IndexError:
                 hot_index = 0
             one_record = [collected_html, title, item.publisher.publisher, item.area.name, item.pubtime.date(), hot_index]
+            result.append(one_record)
+
+        return Response({"news": result})
+
+
+class InspectionTableView(TableAPIView):
+    def get(self, request):
+        result = []
+        news = Inspection.objects.order_by('-pubtime').all()
+        
+        for item in news:
+            collected_html = u'<i class="fa fa-star-o" data-toggle="tooltip", data-placement="right" title="添加收藏">' 
+            title = self.title_html(item.url, item.name, item.id, 'inspection')
+            one_record = [collected_html, title, item.qualitied, item.source, item.pubtime.strftime('%Y-%m-%d')]
             result.append(one_record)
 
         return Response({"news": result})

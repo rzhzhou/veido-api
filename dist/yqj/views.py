@@ -330,4 +330,4 @@ class SearchView(BaseView):
 
 class InspectionView(BaseView):
     def get(self, request):
-        return self.render_to_response('inspection/inspection.html')
+        return self.render_to_response('inspection/inspection_list.html', {})
