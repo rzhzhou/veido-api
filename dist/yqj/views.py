@@ -18,7 +18,6 @@ def SetLogo(obj):
 
 @login_required
 def index_view(request):
-    #user = {'name': 'wuhan', 'company': u'武汉质监局', 'isAdmin': True}
     user = request.myuser
     if user.is_authenticated():
         categories = ArticleCategory.objects.all()

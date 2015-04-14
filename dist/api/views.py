@@ -71,7 +71,7 @@ class TableAPIView(APIView):
         self.request = request
 
     def collected_html(self, item):
-        items = self.collected_items()
+        items = self.collected
         return self.COLLECTED_TEXT if self.isIn(item, items) else self.NO_COLLECTED_TEXT
 
     def isIn(self, item, items):
@@ -84,6 +84,12 @@ class TableAPIView(APIView):
             raise TypeError('item should has id atrribute or id key')
 
         return any(filter(lambda x: x.id == item_id, items))
+
+    @property
+    def collected(self):
+        if getattr(self, '_collected', None) is None:
+            self._collected = self.collected_items()
+        return self._collected
 
     def collected_items(self):
         #return []
@@ -579,7 +585,6 @@ def chart_line_event_view(request, topic_id):
 
         negative, positive, neutral = defaultdict(int), defaultdict(int), defaultdict(int)
         for art in articles:
-            print art.feeling_factor
             date = art.pubtime.date().replace(day=1)
             if date < begin_date:
                 continue
