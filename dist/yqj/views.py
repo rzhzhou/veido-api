@@ -9,6 +9,7 @@ from django.views.generic import View
 from yqj.models import Article, Weixin, Weibo, RelatedData, ArticleCategory, Area, Topic, Inspection, Custom
 from yqj import login_required
 from yqj.redisconnect import RedisQueryApi
+from django.db.models import Q
 
 def SetLogo(obj):
     if not obj.publisher.photo:
@@ -119,7 +120,7 @@ class BaseView(LoginRequiredMixin, View):
         return render_to_response(template_path, context)
 
     def get_article_categories(self):
-        return ArticleCategory.objects.all()
+        return ArticleCategory.objects.filter(~Q(name = '其他'))
 
     def get_locations(self, area):
         #area = Area.objects.get(id=int(location_id))
