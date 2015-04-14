@@ -36,7 +36,7 @@ def index_view(request):
 
         end_date = datetime.datetime.now()
         start_date = end_date + datetime.timedelta(days=-7)
-        news_list = Article.objects.filter(pubtime__range=(start_date, end_date))[:10]
+        news_list = Article.objects.filter(pubtime__range=(start_date, end_date))
         for item in news_list:
             item = SetLogo(item)
             try:
@@ -253,7 +253,7 @@ class CustomListView(BaseView):
         for name in customname:
             custom_list.append({'name': name, 'news_list': self.get_news(name), 'id': customname.index(name)})
         return self.render_to_response('custom/custom_list.html', {'custom_list': custom_list})
- 
+
     def get_news(self, keyword):
         return Article.objects.raw(u"SELECT * FROM article WHERE MATCH (content, title) AGAINST ('%s') LIMIT %s" % (keyword, self.custom_list_num))
 
