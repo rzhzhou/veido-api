@@ -61,7 +61,7 @@
         <div class="box-body no-padding">
           <div class="list-group no-margin">
             {% for item in relate %}
-            <a href="/news/{{ item.id }}" class="list-group-item no-border">{{ item.title }}</a>
+            <a href="/news/{{ item.id }}" class="list-group-item no-border" target="_blank">{{ item.title }}</a>
             {% endfor %}
           </div>
         </div>
@@ -73,7 +73,7 @@
         </div>
         <div class="box-body no-padding">
           <div class="list-group no-margin">
-            <a href="/event/{{ event.id }}" class="list-group-item no-border">{{ event.title }}</a>
+            <a href="/event/{{ event.id }}" class="list-group-item no-border" target="_blank">{{ event.title }}</a>
           </div>
         </div>
       </div>
