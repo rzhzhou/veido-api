@@ -194,6 +194,9 @@ def save_user(username, raw_password, area, group):
 
 class Group(models.Model):
     company = models.CharField(max_length=255)
+   
+    def __unicode__(self):
+        return self.company
 
 
 class User(models.Model):
