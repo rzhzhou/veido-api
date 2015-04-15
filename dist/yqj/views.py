@@ -244,7 +244,7 @@ class CustomListView(BaseView):
         for keyword in custom_list:
             item = {}
             item['name'] = keyword.keyword
-            item['news_list'] = keyword.articles.all()[:custom_list_num]
+            item['news_list'] = keyword.articles.all()[:self.custom_list_num]
             keyword_list.append(item)
 
         customname = [u'电梯',u'锅炉', u'315晚会', u'两会', u'两会', u'两会', u'两会', u'两会']
