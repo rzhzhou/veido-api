@@ -6,7 +6,8 @@
   <h1>微信</h1>
   <ol class="breadcrumb">
     <li><a href="/"><i class="fa fa-dashboard"></i>首页</a></li>
-    <li class="active"><a href="/weixin/">微信</a></li>
+    <li><a href="/weixin/">微信</a></li>
+    <li class="active">{{ article.title }}</li>
   </ol>
 {% endblock %}
 
@@ -61,7 +62,7 @@
         <div class="box-body no-padding">
           <div class="list-group no-margin">
             {% for item in relate %}
-              <a href="/weixin/{{ item.id }}/" class="list-group-item no-border">{{ item.title }}</a>
+              <a href="/weixin/{{ item.id }}/" class="list-group-item no-border" target="_blank">{{ item.title }}</a>
             {% endfor %}
           </div>
         </div>

@@ -6,7 +6,8 @@
   <h1>事件</h1>
   <ol class="breadcrumb">
     <li><a href="/"><i class="fa fa-dashboard"></i>首页</a></li>
-    <li class="active"><a href="/event/">事件</a></li>
+    <li><a href="/event/">事件</a></li>
+    <li class="active">{{ event.title }}</li>
   </ol>
 {% endblock %}
 
@@ -16,9 +17,6 @@
       <div class="box box-danger">
         <div class="box-header with-border">
           <h3 class="box-title">{{ event.title }}</h3>
-          <div class="box-tools pull-right">
-            <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-          </div>
         </div>
         <div class="box-body">
           {{ event.abstract }}
@@ -30,9 +28,6 @@
       <div class="box box-default">
         <div class="box-header with-border">
           <h3 class="box-title">关键词</h3>
-          <div class="box-tools pull-right">
-            <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-          </div>
         </div>
         <div class="box-body">
           <ul class="list-group no-margin">
@@ -50,9 +45,6 @@
       <div class="box box-default">
         <div class="box-header with-border">
           <h3 class="box-title">发展趋势</h3>
-          <div class="box-tools pull-right">
-            <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-          </div>
         </div>
         <div class="box-body">
           <div id="line-chart" style="height: 320px;"></div>
@@ -64,9 +56,6 @@
       <div class="box box-default">
         <div class="box-header with-border">
           <h3 class="box-title">媒体分布</h3>
-          <div class="box-tools pull-right">
-            <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-          </div>
         </div>
         <div class="box-body">
           <div id="pie-chart" style="height: 320px;"></div>
@@ -80,9 +69,6 @@
       <div class="box box-info">
         <div class="box-header with-border">
           <h3 class="box-title">相关新闻</h3>
-          <div class="box-tools pull-right">
-            <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-          </div>
         </div>
         <div class="box-body">
           <table id="news" class="table table-bordered table-hover table-custom">
@@ -117,11 +103,6 @@
       <div class="box box-success">
         <div class="box-header with-border">
           <h3 class="box-title">微信</h3>
-          <div class="box-tools pull-right">
-            <button class="btn btn-box-tool" data-widget="collapse">
-              <i class="fa fa-minus"></i>
-            </button>
-          </div>
         </div>
         <div class="box-body">
           <ul class="media-list">
@@ -132,7 +113,7 @@
                 </div>
                 <div class="media-body">
                   <h4 class="media-heading">{{ weixin.publisher.publisher }}</h4>
-                  <p><a href="/weixin/{{ weixin.id }}/">{{ weixin.title }}</a></p>
+                  <p><a href="/weixin/{{ weixin.id }}/" target="_blank">{{ weixin.title }}</a></p>
                 </div>
               </li>
             {% endfor %}
@@ -145,11 +126,6 @@
       <div class="box box-warning">
         <div class="box-header with-border">
           <h3 class="box-title">微博</h3>
-          <div class="box-tools pull-right">
-            <button class="btn btn-box-tool" data-widget="collapse">
-              <i class="fa fa-minus"></i>
-            </button>
-          </div>
         </div>
         <div class="box-body">
           <ul class="media-list">

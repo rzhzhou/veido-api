@@ -66,16 +66,11 @@
       <div class="box box-info">
         <div class="box-header with-border">
           <h3 class="box-title">新闻</h3>
-          <div class="box-tools pull-right">
-            <button class="btn btn-box-tool" data-widget="collapse">
-              <i class="fa fa-minus"></i>
-            </button>
-          </div>
         </div>
         <div class="box-body no-padding">
           <div class="list-group no-margin">
             {% for news in news_list %}
-              <a href="/news/{{ news.id }}/" class="list-group-item no-border">
+              <a href="/news/{{ news.id }}/" class="list-group-item no-border" target="_blank">
                 <span class="badge" data-toggle="tooltip" data-placement="left" title="热度 {{ news.hot_index }}">{{ news.hot_index }}</span>
                 {{ news.title }}
               </a>
@@ -92,16 +87,11 @@
       <div class="box box-danger">
         <div class="box-header with-border">
           <h3 class="box-title">事件</h3>
-          <div class="box-tools pull-right">
-            <button class="btn btn-box-tool" data-widget="collapse">
-              <i class="fa fa-minus"></i>
-            </button>
-          </div>
         </div>
         <div class="box-body no-padding">
           <div class="list-group no-margin">
             {% for event in event_list %}
-              <a href="/event/{{ event.id }}/" class="list-group-item no-border">
+              <a href="/event/{{ event.id }}/" class="list-group-item no-border" target="_blank">
                 <span class="badge" data-toggle="tooltip" data-placement="left" title="热度 {{ event.hot_index }}">{{ event.hot_index }}</span>
                 {{ event.title }}
               </a>
@@ -120,11 +110,6 @@
       <div class="box box-success">
         <div class="box-header with-border">
           <h3 class="box-title">微信</h3>
-          <div class="box-tools pull-right">
-            <button class="btn btn-box-tool" data-widget="collapse">
-              <i class="fa fa-minus"></i>
-            </button>
-          </div>
         </div>
         <div class="box-body no-padding">
           <ul class="media-list">
@@ -135,7 +120,7 @@
                 </div>
                 <div class="media-body">
                   <h4 class="media-heading">{{ weixin.publisher.publisher }}</h4>
-                  <p><a href="/weixin/{{ weixin.id }}/">{{ weixin.title }}</a></p>
+                  <p><a href="/weixin/{{ weixin.id }}/" target="_blank">{{ weixin.title }}</a></p>
                 </div>
               </li>
             {% endfor %}
@@ -151,11 +136,6 @@
       <div class="box box-warning">
         <div class="box-header with-border">
           <h3 class="box-title">微博</h3>
-          <div class="box-tools pull-right">
-            <button class="btn btn-box-tool" data-widget="collapse">
-              <i class="fa fa-minus"></i>
-            </button>
-          </div>
         </div>
         <div class="box-body no-padding">
           <ul class="media-list">
@@ -184,9 +164,6 @@
       <div class="box box-default">
         <div class="box-header with-border">
           <h3 class="box-title">数据概览</h3>
-          <div class="box-tools pull-right">
-            <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-          </div>
         </div>
         <div class="box-body">
           <div id="line-chart" style="height: 320px;"></div>
@@ -197,9 +174,6 @@
       <div class="box box-default">
         <div class="box-header with-border">
           <h3 class="box-title">区域状况</h3>
-          <div class="box-tools pull-right">
-            <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-          </div>
         </div>
         <div class="box-body">
           <div id="pie-chart" style="height: 320px;"></div>
@@ -213,9 +187,6 @@
       <div class="box box-default">
         <div class="box-header with-border">
           <h3 class="box-title">抽检信息</h3>
-          <div class="box-tools pull-right">
-            <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-          </div>
         </div>
         <div class="box-body no-padding">
           <table class="table table-hover">
