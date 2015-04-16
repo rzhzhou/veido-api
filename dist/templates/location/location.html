@@ -17,9 +17,6 @@
       <div class="box box-info">
         <div class="box-header with-border">
           <h3 class="box-title">新闻</h3>
-          <div class="box-tools pull-right">
-            <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-          </div>          
         </div>
         <div class="box-body">
           <table id="news" class="table table-bordered table-hover table-custom">
@@ -54,11 +51,6 @@
       <div class="box box-success">
         <div class="box-header with-border">
           <h3 class="box-title">微信</h3>
-          <div class="box-tools pull-right">
-            <button class="btn btn-box-tool" data-widget="collapse">
-              <i class="fa fa-minus"></i>
-            </button>
-          </div>
         </div>
         <div class="box-body">
           <ul class="media-list">
@@ -66,7 +58,7 @@
               <li class="media">
                 <div class="media-left">
                   <img class="media-object" src="{{ weixin.publisher.photo}}" alt="{{ weixin.name }}">
-                </div>  
+                </div>
                 <div class="media-body">
                   <h4 class="media-heading">{{ weixin.name }}</h4>
                   <p>{{ weixin.title }}</p>
@@ -78,18 +70,13 @@
         <div class="box-footer text-center">
           <a href="/weixin/">查看更多</a>
         </div>
-      </div>      
+      </div>
     </div>
 
     <div class="col-md-6">
       <div class="box box-warning">
         <div class="box-header with-border">
           <h3 class="box-title">微博</h3>
-          <div class="box-tools pull-right">
-            <button class="btn btn-box-tool" data-widget="collapse">
-              <i class="fa fa-minus"></i>
-            </button>
-          </div>
         </div>
         <div class="box-body">
           <ul class="media-list">
@@ -97,7 +84,7 @@
               <li class="media">
                 <div class="media-left">
                   <img class="media-object" src="{{ weibo.publisher.photo}}" alt="{{ weibo.name }}">
-                </div>  
+                </div>
                 <div class="media-body">
                   <h4 class="media-heading">{{ weibo.name }}</h4>
                   <p>{{ weibo.content }}</p>
@@ -109,7 +96,7 @@
         <div class="box-footer text-center">
           <a href="/weibo/">查看更多</a>
         </div>
-      </div> 
+      </div>
     </div>
   </div>
 {% endblock %}
