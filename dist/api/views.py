@@ -356,6 +356,7 @@ class SearchView(CollectView):
 
 class CustomTableView(TableAPIView):
     def get(self, request, custom_id):
+<<<<<<< HEAD
         customname = [u'电梯',u'锅炉', u'两会']
         try:
             #custom = Custom.objects.get(id=int(custom_id))
@@ -365,6 +366,14 @@ class CustomTableView(TableAPIView):
         result = []
         #news = custom.articles.all()[:self.LIMIT_NUMBER]
         news = self.get_news(custom)
+=======
+        try:
+            custom = Custom.objects.get(id=int(custom_id))
+        except Custom.DoesNotExist:
+            return Response({'news': ''})
+        result = []
+        news = custom.articles.all()[:self.LIMIT_NUMBER]
+>>>>>>> d4c94190348c746dd5f6f5db67b882d69fe86110
         serializer = ArticleSerializer(news, many=True)
 
         for item in news:
@@ -380,9 +389,12 @@ class CustomTableView(TableAPIView):
 
         return Response({"news": result})
 
+<<<<<<< HEAD
     def get_news(self, keyword):
         return Article.objects.raw(u"SELECT * FROM article WHERE MATCH (content, title) AGAINST ('%s')" % (keyword))
 
+=======
+>>>>>>> d4c94190348c746dd5f6f5db67b882d69fe86110
 
 class InspectionTableView(TableAPIView):
     def get(self, request):
