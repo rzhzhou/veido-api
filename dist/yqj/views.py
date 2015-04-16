@@ -35,7 +35,7 @@ def index_view(request):
 
         end_date = datetime.datetime.now()
         start_date = end_date + datetime.timedelta(days=-7)
-        news_list = Article.objects.filter(pubtime__range=(start_date, end_date))
+        news_list = Article.objects.filter(pubtime__range=(start_date, end_date))[:300]
         for item in news_list:
             item = SetLogo(item)
             try:
@@ -239,7 +239,6 @@ class CustomListView(BaseView):
     custom_list_num = 5
     def get(self, request):
         user = self.request.myuser
-<<<<<<< HEAD
         #custom_list = user.group.custom.all()
         #keyword_list = []
         #for keyword in custom_list:
@@ -251,17 +250,6 @@ class CustomListView(BaseView):
             #keyword_list.append(keyword)
 
         customname = [u'电梯',u'锅炉', u'两会']
-=======
-        custom_list = user.group.custom.all()
-        keyword_list = []
-        for keyword in custom_list:
-            item = {}
-            item['name'] = keyword.keyword
-            item['news_list'] = keyword.articles.all()[:self.custom_list_num]
-            keyword_list.append(item)
-
-        customname = [u'电梯',u'锅炉', u'315晚会', u'两会', u'两会', u'两会', u'两会', u'两会']
->>>>>>> d4c94190348c746dd5f6f5db67b882d69fe86110
         custom_list = []
         for name in customname:
             custom_list.append({'name': name, 'news_list': self.get_news(name), 'id': customname.index(name)})
@@ -273,7 +261,6 @@ class CustomListView(BaseView):
 
 class CustomView(BaseView):
     def get(self, request, id):
-<<<<<<< HEAD
         #try:
         #    custom = Custom.objects.get(id=int(id))
         #except Custom.DoesNotExist:
@@ -281,25 +268,12 @@ class CustomView(BaseView):
         #weixin_list = custom.weixin.all()
         #weibo_list = custom.weibo.all()
         customname = [u'电梯',u'锅炉', u'两会']
-=======
-        try:
-            custom = Custom.objects.get(id=int(id))
-        except Custom.DoesNotExist:
-            return self.render_to_response('custom/custom.html')
-        weixin_list = custom.weixin.all()
-        weibo_list = custom.weibo.all()
-        customname = [u'电梯',u'锅炉', u'315晚会', u'两会', u'两会', u'两会', u'两会', u'两会']
->>>>>>> d4c94190348c746dd5f6f5db67b882d69fe86110
         custom = {}
         try:
             custom['name'] = customname[int(id)]
         except KeyError:
             return self.render_to_response('custom/custom.html')
-<<<<<<< HEAD
         return self.render_to_response('custom/custom.html', {'name': custom['name'], 'weixin_list': [], 'weibo_list': []})
-=======
-        return self.render_to_response('custom/custom.html', {'name': custom.keyword, 'weixin_list': weixin_list, 'weibo_list': weibo_list})
->>>>>>> d4c94190348c746dd5f6f5db67b882d69fe86110
 
 
 class UserView(BaseView):
