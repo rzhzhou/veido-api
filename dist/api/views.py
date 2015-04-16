@@ -221,6 +221,9 @@ class EventDetailTableView(TableAPIView):
         return Response({'news': result})
 
 
+    def get_collected_html(self, item):
+        pass
+
 class CollectView(APIView):
     def article_html(self, item):
         url = u'/news/%s' % item.id
@@ -353,12 +356,15 @@ class SearchView(CollectView):
 
 class CustomTableView(TableAPIView):
     def get(self, request, custom_id):
+        customname = [u'电梯',u'锅炉', u'两会']
         try:
-            custom = Custom.objects.get(id=int(custom_id))
+            #custom = Custom.objects.get(id=int(custom_id))
+            custom = customname[int(custom_id)]
         except Custom.DoesNotExist:
             return Response({'news': ''})
         result = []
-        news = custom.articles.all()[:self.LIMIT_NUMBER]
+        #news = custom.articles.all()[:self.LIMIT_NUMBER]
+        news = self.get_news(custom)
         serializer = ArticleSerializer(news, many=True)
 
         for item in news:
@@ -373,6 +379,9 @@ class CustomTableView(TableAPIView):
             result.append(one_record)
 
         return Response({"news": result})
+
+    def get_news(self, keyword):
+        return Article.objects.raw(u"SELECT * FROM article WHERE MATCH (content, title) AGAINST ('%s')" % (keyword))
 
 
 class InspectionTableView(TableAPIView):
