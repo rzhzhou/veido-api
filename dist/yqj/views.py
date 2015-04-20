@@ -193,6 +193,10 @@ class EventDetailView(BaseView):
             return self.render_to_response('event/event.html', {'event': '', 'weixin_list': [], 'weibo_list': []})
         weixin_list = [SetLogo(item) for item in event.weixin.all()][:10]
         weibo_list = [SetLogo(item) for item in event.weibo.all()][:10]
+        for item in weibo_list:
+            SetLogo(item)
+            if len(item.content) < 144:
+                setattr(item, 'short', True)
         return self.render_to_response('event/event.html', {'event': event, 'weixin_list': weixin_list, 'weibo_list': weibo_list})
 
 
@@ -218,6 +222,9 @@ class WeixinDetailView(BaseView):
 class WeiboView(BaseView):
     def get(self, request):
         latest = [SetLogo(data) for data in Weibo.objects.order_by('-pubtime')[0:20]]
+        for item in latest:
+            if len(item.content) < 144:
+                setattr(item, 'short', True)
         hottest  = [eval(item) for item in RedisQueryApi().lrange('sort_weibohot', 0, -1)[:20]]
         for data in hottest:
             if data['photo'] == 'kong':

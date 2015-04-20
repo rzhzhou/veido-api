@@ -140,11 +140,12 @@ class ArticleTableView(TableAPIView):
 class NewsTableView(TableAPIView):
     def get(self, request):
         result = []
-        news = Article.objects.all()[:self.LIMIT_NUMBER]
+        news = Article.objects.all()[:1738]
         serializer = ArticleSerializer(news, many=True)
 
         for item in news:
-            collected_html = self.collected_html(item)
+            collected_html = u'<i class="fa fa-star-o" data-toggle="tooltip", data-placement="right" title="添加收藏">'
+            #collected_html = self.collected_html(item)
             url = u'/news/%s' % item.id
             title = self.title_html(url, item.title,item.id, 'article')
             try:
@@ -627,7 +628,6 @@ def chart_line_event_view(request, topic_id):
             if week > 6:
                 continue
             factor = art.feeling_factor
-            print factor
             if factor > 0.6:
                 positive[week] += 1
             elif factor < 0.4 and factor > 0:
