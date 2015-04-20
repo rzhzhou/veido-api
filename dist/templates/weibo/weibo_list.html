@@ -17,27 +17,7 @@
         <div class="box-header with-border">
           <h3 class="box-title">最新</h3>
         </div>
-        <div class="box-body no-padding">
-          <ul class="media-list">
-            {% for weibo in weibo_latest_list %}
-              <li class="media">
-                <div class="media-left">
-                  <img class="media-object" src="{{ weibo.publisher.photo }}" alt="{{ weibo.publisher.publisher }}">
-                </div>
-                <div class="media-body">
-                  <h4 class="media-heading">{{ weibo.author }}</h4>
-                  <p>
-                    {% if weibo.short %}
-                      {{ weibo.content }}
-                    {% else %}
-                      <a href="{{ weibo.url }}" target="_blank">{{ weibo.title }}</a>
-                    {% endif %}
-                  </p>
-                </div>
-              </li>
-            {% endfor %}
-          </ul>
-        </div>
+        {% include "weibo/weibo_list_new.html" %}
       </div>
     </div>
 
@@ -46,21 +26,7 @@
         <div class="box-header with-border">
           <h3 class="box-title">热门</h3>
         </div>
-        <div class="box-body no-padding">
-          <ul class="media-list">
-            {% for weibo in weibo_hottest_list %}
-              <li class="media">
-                <div class="media-left">
-                  <img class="media-object" src="{{ weibo.photo }}" alt="{{ weibo.publisher }}">
-                </div>
-                <div class="media-body">
-                  <h4 class="media-heading">{{ weibo.author }}</h4>
-                  <p>{{ weibo.content }}</p>
-                </div>
-              </li>
-            {% endfor %}
-          </ul>
-        </div>
+        {% include "weibo/weibo_list_hot.html" %}
       </div>
     </div>
   </div>
