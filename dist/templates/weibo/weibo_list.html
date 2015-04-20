@@ -30,7 +30,7 @@
                     {% if weibo.short %}
                       {{ weibo.content }}
                     {% else %}
-                      <a href="weibo.url" target="_blank">{{ weibo.title }}</a>
+                      <a href="{{ weibo.url }}" target="_blank">{{ weibo.title }}</a>
                     {% endif %}
                   </p>
                 </div>
