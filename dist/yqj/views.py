@@ -73,7 +73,7 @@ def index_view(request):
             'news_list': news_list,
             'event_list': event_list,
             'weixin_list': weixin_data,
-            'weibo_list': weibo_data,
+            'weibo_hottest_list': weibo_data,
                         'user_image': get_user_image(user),
                         'inspection_list': inspection_list,
             })
@@ -340,3 +340,4 @@ class SearchView(BaseView):
 class InspectionView(BaseView):
     def get(self, request):
         return self.render_to_response('inspection/inspection_list.html', {})
+
