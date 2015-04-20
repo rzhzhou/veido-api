@@ -51,8 +51,11 @@ def index_view(request):
 
         weibo_data = [eval(item) for item in RedisQueryApi().lrange('sort_weibohot', 0, -1)[:5]]
         for data in weibo_data:
+            data['pubtime'] = datetime.datetime.fromtimestamp(data['pubtime'])
             if data['photo'] == 'kong':
                 data['photo'] = u'http://tp2.sinaimg.cn/3557640017/180/40054587155/1'
+            if len(data['content']) < 144:
+                data['short'] = True
 
         weixin_data = Weixin.objects.all()[0:weixin_list_number]
         for data in weixin_data:
@@ -72,7 +75,7 @@ def index_view(request):
             'event': event,
             'news_list': news_list,
             'event_list': event_list,
-            'weixin_list': weixin_data,
+            'weixin_hottest_list': weixin_data,
             'weibo_hottest_list': weibo_data,
                         'user_image': get_user_image(user),
                         'inspection_list': inspection_list,
@@ -227,8 +230,11 @@ class WeiboView(BaseView):
                 setattr(item, 'short', True)
         hottest  = [eval(item) for item in RedisQueryApi().lrange('sort_weibohot', 0, -1)[:20]]
         for data in hottest:
+            data['pubtime'] = datetime.datetime.fromtimestamp(data['pubtime'])
             if data['photo'] == 'kong':
                 data['photo'] = u'http://tp2.sinaimg.cn/3557640017/180/40054587155/1'
+            if len(data['content']) < 144:
+                data['short'] = True
         return self.render_to_response('weibo/weibo_list.html', {'weibo_latest_list': latest, 'weibo_hottest_list': hottest})
 
 
