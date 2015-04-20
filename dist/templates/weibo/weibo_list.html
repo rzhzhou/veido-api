@@ -26,7 +26,13 @@
                 </div>
                 <div class="media-body">
                   <h4 class="media-heading">{{ weibo.author }}</h4>
-                  <p>{{ weibo.content }}</p>
+                  <p>
+                    {% if weibo.short %}
+                      {{ weibo.content }}
+                    {% else %}
+                      <a href="weibo.url" target="_blank">{{ weibo.title }}</a>
+                    {% endif %}
+                  </p>
                 </div>
               </li>
             {% endfor %}
