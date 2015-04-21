@@ -143,7 +143,7 @@ class TableAPIView(APIView):
             html += """</div>
                        <div class="media-body"> """
             html +=  u'<h4 class="media-heading">%s</h4>' % (item.publisher.publisher)
-            if len(item.content) < 150:
+            if len(item.content) < 200:
                  html +=  u'<p>%s</p>' % (item.content)
             else: 
                  html +=  u'<p><a href="%s" target="_blank">%s</a></p>' % (item.url, item.title)
@@ -507,7 +507,7 @@ class WeiboTableView(TableAPIView):
             html += """</div>
                        <div class="media-body"> """
             html +=  u'<h4 class="media-heading">%s</h4>' % (item['publisher'])
-            if len(item['content']) < 150:
+            if len(item['content']) < 200:
                  html +=  u'<p>%s</p>' % (item['content'])
             else: 
                  html +=  u'<p><a href="%s" target="_blank">%s</a></p>' % (item['url'], item['title'])
