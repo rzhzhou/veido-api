@@ -10,6 +10,9 @@ from yqj.models import Article, Weixin, Weibo, RelatedData, ArticleCategory, Are
 from yqj import login_required
 from yqj.redisconnect import RedisQueryApi
 from django.db.models import Q
+from django.core.paginator import Paginator
+from django.core.paginator import EmptyPage
+from django.core.paginator import PageNotAnInteger
 
 def SetLogo(obj):
     if not obj.publisher.photo:
@@ -130,8 +133,45 @@ class BaseView(LoginRequiredMixin, View):
             return []
         return Area.objects.filter(parent=area, level=area.level+1)
 
+    def set_css_to_weixin(self, items):
+        html = ""
+        count = u'0'
+        for item in items:
+            html += """<li class="media">"""
+            html += """<div class="media-left">"""
+            html +=  u'<img class="media-object" src="%s" alt="%s">' % (item.publisher.photo, item.publisher.publisher)
+            html += """</div>
+                       <div class="media-body"> """
+            html +=  u'<h4 class="media-heading">%s</h4>' % (item.publisher.publisher)
+            html +=  u'<p><a href="/weixin/%s/" target="_blank">%s</a></p>' % (item.id, item.title)
+            html += """<div class="media-meta">
+                       <div class="info pull-right">"""
+            html +=  u'<span>阅读 %s</span>' % count
+            html +=  u'<span><i class="fa fa-thumbs-o-up"></i>%s</span>' % count
+            html += """</div>"""
+            html +=  u'<div class="time pull-left">%s</div>' % str(item.pubtime)
+            html += """</div></div></li>"""
+        return html
 
+    def set_css_to_weibo(self, items):
+        pass
 
+    def paging(self, model, limit, page):
+        #limit  每页显示的记录数 page 页码
+        items = model.objects.all()
+        # 实例化一个分页对象
+        paginator = Paginator(items, limit)
+	try:
+            # 获取某页对应的记录
+            items = paginator.page(page)
+        except PageNotAnInteger: 
+            # 如果页码不是个整数 取第一页的记录
+            items = paginator.page(1)
+        except EmptyPage:  
+            # 如果页码太大，没有相应的记录 取最后一页的记录
+            items = paginator.page(paginator.num_pages)
+
+        return {'items': items, 'total_number': paginator.num_pages}
 
 class CategoryView(BaseView):
     def get(self, request, category_id):
@@ -205,9 +245,14 @@ class EventDetailView(BaseView):
 
 class WeixinView(BaseView):
     def get(self, request):
-        latest = [SetLogo(data) for data in Weixin.objects.order_by('-pubtime')[0:20]]
-        hottest = latest
-        return self.render_to_response('weixin/weixin_list.html', {'weixin_latest_list': latest, 'weixin_hottest_list': hottest})
+        hottest = [SetLogo(data) for data in Weixin.objects.order_by('-pubtime')[0:20]]
+        latest = self.paging(Weixin, 20, 1)
+        items = [SetLogo(data) for data in latest['items']]
+        html = self.set_css_to_weixin(items)
+        return self.render_to_response('weixin/weixin_list.html', {'weixin_latest_list': latest, 
+                                                                   'weixin_hottest_list': hottest, 
+                                                                   'html': html,
+                                                                   'total_page_number': latest['total_number']})
 
 
 class WeixinDetailView(BaseView):
