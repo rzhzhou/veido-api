@@ -1,6 +1,7 @@
 from django.conf.urls import patterns, include, url
 from api.views import ArticleTableView, NewsTableView, LocationTableView, CollectView, EventTableView,\
-                      CollecModifyView, EventDetailTableView, SearchView, CustomTableView, InspectionTableView
+                      CollecModifyView, EventDetailTableView, SearchView, CustomTableView, InspectionTableView,\
+                      WeixinTableView
 
 urlpatterns = patterns('',
     # Examples:
@@ -18,6 +19,7 @@ urlpatterns = patterns('',
     #url(r'^collection/add/$', CollecModifyView.as_view()),
     url(r'^custom/(\d+)/$', CustomTableView.as_view()),
     url(r'^inspection/$', InspectionTableView.as_view()),
+    url(r'^weixin/(?P<weixin_type>\w+)/(?P<page>\d+)/$', WeixinTableView.as_view()),
 )
 
 urlpatterns += patterns('api.views',

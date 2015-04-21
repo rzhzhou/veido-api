@@ -14,10 +14,14 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from yqj.models import (Article, Area, Weixin, Weibo, Topic, RelatedData, ArticleCategory,
                             save_user, Collection, Topic, hash_password, User, Custom, Inspection)
+from yqj.views import SetLogo
 from serializers import ArticleSerializer
 from yqj import authenticate, login_required
 from django.db.models import Count
 from api_function import GetFirstDaySeason, get_season
+from django.core.paginator import Paginator
+from django.core.paginator import EmptyPage
+from django.core.paginator import PageNotAnInteger
 
 def login_view(request):
     try:
@@ -107,6 +111,47 @@ class TableAPIView(APIView):
     def title_html(self, *args):
         title_format = u'<a href="{0}" title="{1}" target="_blank" data-id="{2}" data-type="{3}">{1}</a>'
         return title_format.format(*args)
+
+    def set_css_to_weixin(self, items):
+        html = ""
+        count = u'0'
+        for item in items:
+            html += """<li class="media">"""
+            html += """<div class="media-left">"""
+            html +=  u'<img class="media-object" src="%s" alt="%s">' % (item.publisher.photo, item.publisher.publisher)
+            html += """</div>
+                       <div class="media-body"> """
+            html +=  u'<h4 class="media-heading">%s</h4>' % (item.publisher.publisher)
+            html +=  u'<p><a href="/weixin/%s/" target="_blank">%s</a></p>' % (item.id, item.title)
+            html += """<div class="media-meta">
+                       <div class="info pull-right">"""
+            html +=  u'<span>阅读 %s</span>' % count
+            html +=  u'<span><i class="fa fa-thumbs-o-up"></i> %s</span>' % count
+            html += """</div>"""
+            html +=  u'<div class="time pull-left">%s</div>' % item.pubtime.strftime('%Y-%m-%d %h:%m')
+            html += """</div></div></li>"""
+        return html
+
+    def set_css_to_weibo(self, items):
+        pass
+
+    def paging(self, model, limit, page):
+        #limit  每页显示的记录数 page 页码
+        items = model.objects.all()
+        # 实例化一个分页对象
+        paginator = Paginator(items, limit)
+	try:
+            # 获取某页对应的记录
+            items = paginator.page(page)
+        except PageNotAnInteger: 
+            # 如果页码不是个整数 取第一页的记录
+            items = paginator.page(1)
+        except EmptyPage:  
+            # 如果页码太大，没有相应的记录 取最后一页的记录
+            items = paginator.page(paginator.num_pages)
+
+        return {'items': items, 'total_number': paginator.num_pages}
+
 
 def get_date_from_iso(datetime_str):
     #return datetime.datetime.strptime("2008-09-03T20:56:35.450686Z", "%Y-%m-%dT%H:%M:%S.%fZ")
@@ -398,6 +443,18 @@ class InspectionTableView(TableAPIView):
             result.append(one_record)
 
         return Response({"inspection": result})
+
+
+class WeixinTableView(TableAPIView):
+    weixin_table_limit = 20
+    def get(self, request, weixin_type, page):
+        if weixin_type == 'new':
+            datas = self.paging(Weixin, self.weixin_table_limit, page)
+        elif weixin_type == 'hot':
+            datas = self.paging(Weixin, self.weixin_table_limit, page)
+        items = [SetLogo(data) for data in datas['items']]
+        html = self.set_css_to_weixin(items)
+        return Response({'html': html, 'total': datas['total_number']})
 
 
 @login_required

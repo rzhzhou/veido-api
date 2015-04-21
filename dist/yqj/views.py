@@ -147,9 +147,9 @@ class BaseView(LoginRequiredMixin, View):
             html += """<div class="media-meta">
                        <div class="info pull-right">"""
             html +=  u'<span>阅读 %s</span>' % count
-            html +=  u'<span><i class="fa fa-thumbs-o-up"></i>%s</span>' % count
+            html +=  u'<span><i class="fa fa-thumbs-o-up"></i> %s</span>' % count
             html += """</div>"""
-            html +=  u'<div class="time pull-left">%s</div>' % str(item.pubtime)
+            html +=  u'<div class="time pull-left">%s</div>' % item.pubtime.strftime('%Y-%m-%d %h:%m')
             html += """</div></div></li>"""
         return html
 
