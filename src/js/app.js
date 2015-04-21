@@ -384,6 +384,15 @@ app.media = function() {
     var total = $page.data('total');
     var type  = $page.data('type');
 
+    var loadContent = function(event, num) {
+      var api = '/api' + _this.url + type + '/' + num + '/';
+      $.getJSON(api, function(data) {
+        $content.html(data);
+      });
+    };
+
+    loadContent(event, 1);
+
     $page.bootpag({
       total: total,
       maxVisible: 5,
@@ -392,12 +401,7 @@ app.media = function() {
       first: '←',
       last: '→',
       wrapClass: 'pagination pagination-sm no-margin pull-right'
-    }).on('page', function(event, num) {
-      var api = '/api' + _this.url + type + '/' + num + '/';
-      $.getJSON(api, function(data) {
-        $content.html(data);
-      });
-    });
+    }).on('page', loadContent);
   });
 };
 
