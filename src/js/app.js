@@ -374,6 +374,33 @@ app.table = function() {
   });
 };
 
+app.media = function() {
+  var _this = this;
+
+  $('.media-list').each(function(index, element) {
+    var $content = $(element);
+    var $page    = $content.parent().next();
+
+    var total = $page.data('total');
+    var type  = $page.data('type');
+
+    $page.bootpag({
+      total: total,
+      maxVisible: 5,
+      leaps: true,
+      firstLastUse: true,
+      first: '←',
+      last: '→',
+      wrapClass: 'pagination pagination-sm no-margin pull-right'
+    }).on('page', function(event, num) {
+      var api = '/api' + _this.url + type + '/' + num + '/';
+      $.getJSON(api, function(data) {
+        $content.html(data);
+      });
+    });
+  });
+};
+
 
 /*
  * run function when element exists
@@ -382,6 +409,11 @@ $(function() {
   switch (app.url) {
     case "/login/":
       $('.login-box').Do(app.user.login);
+      break;
+    case "/weixin/" || "/weibo/":
+      $('.sidebar-form').Do(app.search);
+      $('.sidebar-menu').Do(app.menu);
+      app.media();
       break;
     case "/settings/":
       $('.sidebar-form').Do(app.search);

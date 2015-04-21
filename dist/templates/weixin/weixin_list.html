@@ -18,7 +18,7 @@
           <h3 class="box-title">最新</h3>
         </div>
         {% include "weixin/weixin_list_new.html" %}
-        <div class="box-footer" data-total="{{ total_page_number }}"></div>
+        <div class="box-footer clearfix" data-total="{{ total_page_number }}" data-type="new"></div>
       </div>
     </div>
 
@@ -28,6 +28,7 @@
           <h3 class="box-title">热门</h3>
         </div>
         {% include "weixin/weixin_list_hot.html" %}
+        <div class="box-footer clearfix" data-total="{{ total_page_number }}" data-type="hot"></div>
       </div>
     </div>
   </div>
