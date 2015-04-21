@@ -202,8 +202,7 @@ app.search = function() {
 };
 
 app.menu = function() {
-  var menu  = $(this).find('a').filter(function() { return this.href === location.href });
-
+  var menu  = $('aside').find('a').filter(function() { return this.href === location.href });
   menu.parent().addClass('active');
   menu.closest('.treeview-menu').addClass('menu-open');
   menu.closest('.treeview').addClass('active');
@@ -413,7 +412,7 @@ $(function() {
     $('.login-box').Do(app.user.login);
   } else {
     $('.sidebar-form').Do(app.search);
-    $('.sidebar-menu').Do(app.menu);
+    app.menu();
     switch (app.type) {
       case 'dashboard':
         $('#line-chart').Do(app.chart.line);
