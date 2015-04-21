@@ -376,32 +376,29 @@ app.table = function() {
 
 app.media = function() {
   var _this = this;
-
   $('.media-list').each(function(index, element) {
     var $content = $(element);
     var $page    = $content.parent().next();
-
-    var total = $page.data('total');
     var type  = $page.data('type');
-
-    var loadContent = function(event, num) {
-      var api = '/api' + _this.url + type + '/' + num + '/';
-      $.getJSON(api, function(data) {
-        $content.html(data);
+    $.getJSON('/api' + _this.url + type + '/1/', function(data) {
+      $content.html(data.html);
+      $page.bootpag({
+        total: data.total,
+        maxVisible: 5,
+        leaps: true,
+        href: '#top',
+        firstLastUse: true,
+        first: '←',
+        last: '→',
+        wrapClass: 'pagination pagination-sm no-margin pull-right'
+      }).on('page', function(event, num) {
+        var $that = $(this);
+        $.getJSON('/api' + _this.url + type + '/' + num + '/', function(data) {
+          $content.html(data.html);
+          $that.bootpag({total: data.total});
+        });
       });
-    };
-
-    loadContent(event, 1);
-
-    $page.bootpag({
-      total: total,
-      maxVisible: 5,
-      leaps: true,
-      firstLastUse: true,
-      first: '←',
-      last: '→',
-      wrapClass: 'pagination pagination-sm no-margin pull-right'
-    }).on('page', loadContent);
+    });
   });
 };
 
