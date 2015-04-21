@@ -22,6 +22,7 @@ from api_function import GetFirstDaySeason, get_season
 from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
+from yqj.redisconnect import RedisQueryApi
 
 def login_view(request):
     try:
@@ -142,7 +143,7 @@ class TableAPIView(APIView):
             html += """</div>
                        <div class="media-body"> """
             html +=  u'<h4 class="media-heading">%s</h4>' % (item.publisher.publisher)
-            if len(item.content) < 150:
+            if len(item.content) < 200:
                  html +=  u'<p>%s</p>' % (item.content)
             else: 
                  html +=  u'<p><a href="%s" target="_blank">%s</a></p>' % (item.url, item.title)
@@ -172,7 +173,23 @@ class TableAPIView(APIView):
             items = paginator.page(paginator.num_pages)
 
         return {'items': items, 'total_number': paginator.num_pages}
+    
+    def pagingfromredis(self, model, limit, page):
+        items = [eval(item) for item in RedisQueryApi().lrange('sort_weibohot', 0, -1)]
+        # 实例化一个分页对象
+        paginator = Paginator(items, limit)
+	try:
+            # 获取某页对应的记录
+            items = paginator.page(page)
+        except PageNotAnInteger: 
+            # 如果页码不是个整数 取第一页的记录
+            items = paginator.page(1)
+        except EmptyPage:  
+            # 如果页码太大，没有相应的记录 取最后一页的记录
+            items = paginator.page(paginator.num_pages)
 
+        return {'items': items, 'total_number': paginator.num_pages}
+        
 
 def get_date_from_iso(datetime_str):
     #return datetime.datetime.strptime("2008-09-03T20:56:35.450686Z", "%Y-%m-%dT%H:%M:%S.%fZ")
@@ -480,11 +497,41 @@ class WeixinTableView(TableAPIView):
 
 class WeiboTableView(TableAPIView):
     weibo_table_limit = 20
+    def set_css_to_hotweibo(self, items):
+        html = ""
+        count = u'0'
+        for item in items:
+            html += """<li class="media">"""
+            html += """<div class="media-left">"""
+            html +=  u'<img class="media-object" src="%s" alt="%s">' % (item['photo'], item['publisher'])
+            html += """</div>
+                       <div class="media-body"> """
+            html +=  u'<h4 class="media-heading">%s</h4>' % (item['publisher'])
+            if len(item['content']) < 200:
+                 html +=  u'<p>%s</p>' % (item['content'])
+            else: 
+                 html +=  u'<p><a href="%s" target="_blank">%s</a></p>' % (item['url'], item['title'])
+            html += """<div class="media-meta">
+                       <div class="info pull-right">"""
+            html +=  u'<span>转载 %s</span>' % item['reposts_count']
+            html +=  u'<span>评论 %s</span>' % item['comments_count']
+            html +=  u'<span><i class="fa fa-thumbs-o-up"></i> %s</span>' % item['attitudes_count']
+            html += """</div>"""
+            html +=  u'<div class="time pull-left">%s</div>' % datetime.datetime.fromtimestamp(item['pubtime']).strftime('%Y-%m-%d %H:%M')
+            html += """</div></div></li>"""
+        
+        return html
+
     def get(self, request, weibo_type, page):
         if weibo_type == 'new':
             datas = self.paging(Weibo, self.weibo_table_limit, page)
         elif weibo_type == 'hot':
-            datas = self.paging(Weibo, self.weibo_table_limit, page)
+            hot_datas = self.pagingfromredis(Weibo, self.weibo_table_limit, page)
+            for data in hot_datas['items']:
+                if not data['photo']:
+                    data['photo'] = u'http://tp2.sinaimg.cn/3557640017/180/40054587155/1' 
+            html = self.set_css_to_hotweibo(hot_datas['items'])
+            return Response({'html': html, 'total': hot_datas['total_number']})
         items = [SetLogo(data) for data in datas['items']]
         html = self.set_css_to_weibo(items)
         return Response({'html': html, 'total': datas['total_number']})

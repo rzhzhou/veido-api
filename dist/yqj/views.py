@@ -55,9 +55,9 @@ def index_view(request):
         weibo_data = [eval(item) for item in RedisQueryApi().lrange('sort_weibohot', 0, -1)[:5]]
         for data in weibo_data:
             data['pubtime'] = datetime.datetime.fromtimestamp(data['pubtime'])
-            if data['photo'] == 'kong':
+            if not data['photo']:
                 data['photo'] = u'http://tp2.sinaimg.cn/3557640017/180/40054587155/1'
-            if len(data['content']) < 144:
+            if len(data['content']) < 200:
                 data['short'] = True
 
         weixin_data = Weixin.objects.all()[0:weixin_list_number]
