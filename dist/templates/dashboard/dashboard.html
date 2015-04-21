@@ -145,7 +145,35 @@
         <div class="box-header with-border">
           <h3 class="box-title">微博</h3>
         </div>
-        {% include "weibo/weibo_list_hot.html" %}
+        <div class="box-body no-padding">
+          <ul class="media-list">
+            {% for weibo in weibo_hottest_list %}
+              <li class="media">
+                <div class="media-left">
+                  <img class="media-object" src="{{ weibo.photo }}" alt="{{ weibo.publisher }}">
+                </div>
+                <div class="media-body">
+                  <h4 class="media-heading">{{ weibo.author }}</h4>
+                  <p>
+                    {% if weibo.short %}
+                      {{ weibo.content }}
+                    {% else %}
+                      <a href="{{ weibo.url }}" target="_blank">{{ weibo.title }}</a>
+                    {% endif %}
+                  </p>
+                  <div class="media-meta">
+                    <div class="info pull-right">
+                      <span>转载 {{ weibo.transmit }}</span>
+                      <span>评论 {{ weibo.comment }}</span>
+                      <span><i class="fa fa-thumbs-o-up"></i> {{ weibo.praise }}</span>
+                    </div>
+                    <div class="time pull-left">{{ weibo.pubtime | date:"Y-m-d h:m:s" }}</div>
+                  </div>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
         <div class="box-footer text-center">
           <a href="/weibo/">查看更多</a>
         </div>
