@@ -17,7 +17,10 @@
         <div class="box-header with-border">
           <h3 class="box-title">最新</h3>
         </div>
-        {% include "weibo/weibo_list_new.html" %}
+        <div class="box-body no-padding">
+          <ul class="media-list"></ul>
+        </div>
+        <div class="box-footer clearfix" data-total="{{ total_page_number }}" data-type="new"></div>
       </div>
     </div>
 
@@ -26,7 +29,10 @@
         <div class="box-header with-border">
           <h3 class="box-title">热门</h3>
         </div>
-        {% include "weibo/weibo_list_hot.html" %}
+        <div class="box-body no-padding">
+          <ul class="media-list"></ul>
+        </div>
+        <div class="box-footer clearfix" data-total="{{ total_page_number }}" data-type="hot"></div>
       </div>
     </div>
   </div>

@@ -411,7 +411,12 @@ $(function() {
     case "/login/":
       $('.login-box').Do(app.user.login);
       break;
-    case "/weixin/" || "/weibo/":
+    case "/weixin/":
+      $('.sidebar-form').Do(app.search);
+      $('.sidebar-menu').Do(app.menu);
+      app.media();
+      break;
+    case "/weibo/":
       $('.sidebar-form').Do(app.search);
       $('.sidebar-menu').Do(app.menu);
       app.media();
