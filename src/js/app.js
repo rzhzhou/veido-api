@@ -30,6 +30,8 @@ var app = {};
 
 app.url = location.pathname;
 
+app.type = location.pathname.split('/')[1] || 'dashboard';
+
 app.user = {
   login: function() {
     var form = this.find('form');
@@ -407,39 +409,52 @@ app.media = function() {
  * run function when element exists
  */
 $(function() {
-  switch (app.url) {
-    case "/login/":
-      $('.login-box').Do(app.user.login);
-      break;
-    case "/weixin/":
-      $('.sidebar-form').Do(app.search);
-      $('.sidebar-menu').Do(app.menu);
-      app.media();
-      break;
-    case "/weibo/":
-      $('.sidebar-form').Do(app.search);
-      $('.sidebar-menu').Do(app.menu);
-      app.media();
-      break;
-    case "/settings/":
-      $('.sidebar-form').Do(app.search);
-      $('.sidebar-menu').Do(app.menu);
-      $('.user-info').Do(app.user.change);
-      break;
-    case "/user/":
-      $('.sidebar-form').Do(app.search);
-      $('.sidebar-menu').Do(app.menu);
-      $('.user-management').Do(app.user.management);
-      $('.user-add').Do(app.user.add);
-      break;
-    default:
-      $('.sidebar-form').Do(app.search);
-      $('.sidebar-menu').Do(app.menu);
-      $('#line-chart').Do(app.chart.line);
-      $('#pie-chart').Do(app.chart.pie);
-      $('#news').Do(app.table);
-      $('#event').Do(app.table);
-      $('#inspection').Do(app.table);
-      break;
+  if (app.type === 'login') {
+    $('.login-box').Do(app.user.login);
+  } else {
+    $('.sidebar-form').Do(app.search);
+    $('.sidebar-menu').Do(app.menu);
+    switch (app.type) {
+      case 'dashboard':
+        $('#line-chart').Do(app.chart.line);
+        $('#pie-chart').Do(app.chart.pie);
+        break;
+      case 'news':
+        $('#news').Do(app.table);
+        break;
+      case 'event':
+        $('#event').Do(app.table);
+        $('#line-chart').Do(app.chart.line);
+        $('#pie-chart').Do(app.chart.pie);
+        $('#news').Do(app.table);
+        break;
+      case 'weixin':
+        // run function on 'weixin' and 'weibo'
+      case 'weibo':
+        app.media();
+        break;
+      case 'category':
+        // run function on 'category' and 'location'
+      case 'location':
+        $('#news').Do(app.table);
+        break;
+      case 'inspection':
+        $('#inspection').Do(app.table);
+        break;
+      case 'collection':
+        $('#news').Do(app.table);
+        $('#event').Do(app.table);
+        break;
+      case 'settings':
+        $('.user-info').Do(app.user.change);
+        break;
+      case 'user':
+        $('.user-management').Do(app.user.management);
+        $('.user-add').Do(app.user.add);
+        break;
+      default:
+        console.log('unknown type');
+        break;
+    }
   }
 });
