@@ -128,7 +128,7 @@ class TableAPIView(APIView):
             html +=  u'<span>阅读 %s</span>' % count
             html +=  u'<span><i class="fa fa-thumbs-o-up"></i> %s</span>' % count
             html += """</div>"""
-            html +=  u'<div class="time pull-left">%s</div>' % item.pubtime.strftime('%Y-%m-%d %h:%m')
+            html +=  u'<div class="time pull-left">%s</div>' % item.pubtime.replace(tzinfo=None).strftime('%Y-%m-%d %H:%M')
             html += """</div></div></li>"""
         return html
 
