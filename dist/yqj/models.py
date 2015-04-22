@@ -44,6 +44,8 @@ class Weixin(models.Model):
     publisher = models.ForeignKey(WeixinPublisher, verbose_name=u'微信发布者')
     area = models.ForeignKey(Area, verbose_name=u'地域')
     uuid = models.CharField(max_length=36)
+    readnum = models.IntegerField(blank=True, verbose_name=u'阅读数')
+    likenum = models.IntegerField(blank=True, verbose_name=u'点赞数')
 
     class Meta:
         db_table = 'weixin'
