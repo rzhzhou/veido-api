@@ -376,20 +376,19 @@ app.table = function() {
 };
 
 app.media = function() {
-  var _this = this;
-  $('.sns').each(function(index, element) {
+  this.each(function(index, element) {
     var $content = $(element);
     var $page    = $content.parent().next();
 
     var type = function() {
-      if (_this.type === 'weixin' || _this.type === 'weibo') {
+      if (app.type === 'weixin' || app.type === 'weibo') {
         return $page.data('type');
       } else {
         return $page.data('type').replace('-', '/');
       }
     };
 
-    $.getJSON('/api' + _this.url + type() + '/1/', function(data) {
+    $.getJSON('/api' + app.url + type() + '/1/', function(data) {
       $content.html(data.html);
       $page.bootpag({
         total: data.total,
@@ -402,7 +401,7 @@ app.media = function() {
         wrapClass: 'pagination pagination-sm no-margin pull-right'
       }).on('page', function(event, num) {
         var $that = $(this);
-        $.getJSON('/api' + _this.url + type() + '/' + num + '/', function(data) {
+        $.getJSON('/api' + app.url + type() + '/' + num + '/', function(data) {
           $content.html(data.html);
           $that.bootpag({total: data.total});
         });
@@ -434,18 +433,18 @@ $(function() {
         $('#line-chart').Do(app.chart.line);
         $('#pie-chart').Do(app.chart.pie);
         $('#news').Do(app.table);
-        app.media();
+        $('.sns').Do(app.media);
         break;
       case 'weixin':
         // run function on 'weixin' and 'weibo'
       case 'weibo':
-        app.media();
+        $('.sns').Do(app.media);
         break;
       case 'category':
         // run function on 'category' and 'location'
       case 'location':
         $('#news').Do(app.table);
-        app.media();
+        $('.sns').Do(app.media);
         break;
       case 'inspection':
         $('#inspection').Do(app.table);
