@@ -223,7 +223,7 @@ class ArticleTableView(TableAPIView):
 class NewsTableView(TableAPIView):
     def get(self, request):
         result = []
-        news = Article.objects.all()[:1738]
+        news = Article.objects.all()[:self.LIMIT_NUMBER]
         serializer = ArticleSerializer(news, many=True)
 
         for item in news:
