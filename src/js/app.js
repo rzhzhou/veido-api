@@ -377,34 +377,34 @@ app.table = function() {
 
 app.sns = function() {
   this.each(function(index, element) {
-    var $content = $(element);
-    var $page    = $content.parent().next();
+    var $content    = $(element);
+    var $pagination = $content.parent().next();
 
     var type = function() {
       if (app.type === 'weixin' || app.type === 'weibo') {
-        return $page.data('type');
+        return $pagination.data('type');
       } else {
-        return $page.data('type').replace('-', '/');
+        return $pagination.data('type').replace('-', '/');
       }
     };
 
     $.getJSON('/api' + app.url + type() + '/1/', function(data) {
       $content.html(data.html);
-      $page.bootpag({
-        total: data.total,
-        maxVisible: 5,
-        leaps: true,
+
+      $pagination.twbsPagination({
+        totalPages: data.total,
         href: '#top',
-        firstLastUse: true,
-        first: '←',
-        last: '→',
-        wrapClass: 'pagination pagination-sm no-margin pull-right'
-      }).on('page', function(event, num) {
-        var $that = $(this);
-        $.getJSON('/api' + app.url + type() + '/' + num + '/', function(data) {
-          $content.html(data.html);
-          $that.bootpag({total: data.total});
-        });
+        first: '第一页',
+        prev: '上一页',
+        next: '下一页',
+        last: '最后一页',
+        paginationClass: 'pagination pagination-sm no-margin pull-right',
+        onPageClick: function(event, page) {
+          $.getJSON('/api' + app.url + type() + '/' + page + '/', function(data) {
+            $content.html(data.html);
+            $pagination.twbsPagination({totalPages: data.total});
+          });
+        }
       });
     });
   });

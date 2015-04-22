@@ -38,7 +38,7 @@ gulp.task('js', function() {
   var files = [
     'bower_components/admin-lte/plugins/slimScroll/jquery.slimscroll.js',
     'src/js/adminlte/app.js',
-    'bower_components/jquery-bootpag/lib/jquery.bootpag.js',
+    'bower_components/twbs-pagination/jquery.twbsPagination.js',
     'src/js/app.js'
   ];
 
