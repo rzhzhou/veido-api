@@ -202,7 +202,7 @@ app.search = function() {
 };
 
 app.menu = function() {
-  var menu  = $('aside').find('a').filter(function() { return this.href === location.href });
+  var menu  = this.find('a').filter(function() { return this.href === location.href });
   menu.parent().addClass('active');
   menu.closest('.treeview-menu').addClass('menu-open');
   menu.closest('.treeview').addClass('active');
@@ -375,7 +375,7 @@ app.table = function() {
   });
 };
 
-app.media = function() {
+app.sns = function() {
   this.each(function(index, element) {
     var $content = $(element);
     var $page    = $content.parent().next();
@@ -418,8 +418,8 @@ $(function() {
   if (app.type === 'login') {
     $('.login-box').Do(app.user.login);
   } else {
-    $('.sidebar-form').Do(app.search);
-    app.menu();
+    $('aside').find('form').Do(app.search);
+    $('aside').Do(app.menu);
     switch (app.type) {
       case 'dashboard':
         $('#line-chart').Do(app.chart.line);
@@ -433,18 +433,18 @@ $(function() {
         $('#line-chart').Do(app.chart.line);
         $('#pie-chart').Do(app.chart.pie);
         $('#news').Do(app.table);
-        $('.sns').Do(app.media);
+        $('.sns').Do(app.sns);
         break;
       case 'weixin':
         // run function on 'weixin' and 'weibo'
       case 'weibo':
-        $('.sns').Do(app.media);
+        $('.sns').Do(app.sns);
         break;
       case 'category':
         // run function on 'category' and 'location'
       case 'location':
         $('#news').Do(app.table);
-        $('.sns').Do(app.media);
+        $('.sns').Do(app.sns);
         break;
       case 'inspection':
         $('#inspection').Do(app.table);
@@ -459,6 +459,10 @@ $(function() {
       case 'user':
         $('.user-management').Do(app.user.management);
         $('.user-add').Do(app.user.add);
+        break;
+      case 'search':
+        $('#news').Do(app.table);
+        $('#event').Do(app.table);
         break;
       default:
         console.log('unknown type');
