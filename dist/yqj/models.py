@@ -79,8 +79,11 @@ class Weibo(models.Model):
     publisher = models.ForeignKey(WeiboPublisher, verbose_name=u'微博发布者')
     area = models.ForeignKey(Area, verbose_name=u'地域')
     praise = models.IntegerField(blank=True, verbose_name=u'点赞数')
+    #attitudes_count = models.IntegerField(blank=True, verbose_name=u'点赞数')
     comment = models.IntegerField(blank=True, verbose_name=u'评论量')
+    #comments_count = models.IntegerField(blank=True, verbose_name=u'评论量')
     tansmit = models.IntegerField(blank=True, verbose_name=u'转发量')
+    #reposts_count = models.IntegerField(blank=True, verbose_name=u'转发量')
     uuid = models.CharField(max_length=36)
 
     class Meta:
