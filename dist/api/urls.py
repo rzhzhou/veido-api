@@ -1,7 +1,8 @@
 from django.conf.urls import patterns, include, url
 from api.views import ArticleTableView, NewsTableView, LocationTableView, CollectView, EventTableView,\
                       CollecModifyView, EventDetailTableView, SearchView, CustomTableView, InspectionTableView,\
-                      WeixinTableView, WeiboTableView
+                      WeixinTableView, WeiboTableView, LocationWeixinView, LocationWeiboView, EventDetailWeixinView,\
+                      EventDetailWeiboView
 
 urlpatterns = patterns('',
     # Examples:
@@ -9,11 +10,15 @@ urlpatterns = patterns('',
     # url(r'^blog/', include('blog.urls')),
 
     url(r'^category/(\d+)/$', ArticleTableView.as_view()),
+    url(r'^location/(?P<location_id>\d+)/weixin/new/(?P<page>\d+)/$', LocationWeixinView.as_view()),
+    url(r'^location/(?P<location_id>\d+)/weibo/new/(?P<page>\d+)/$', LocationWeiboView.as_view()),
     url(r'^location/(\d+)/$', LocationTableView.as_view()),
     url(r'^news/$', NewsTableView.as_view()),
     url(r'^collection/$', CollectView.as_view()),
     url(r'^event/$', EventTableView.as_view()),
     url(r'^event/(\d+)/$', EventDetailTableView.as_view()),
+    url(r'^event/(?P<id>\d+)/weixin/new/(?P<page>\d+)/$', EventDetailWeixinView.as_view()),
+    url(r'^event/(?P<id>\d+)/weibo/new/(?P<page>\d+)/$', EventDetailWeiboView.as_view()),
     url(r'^search/(\S+)/$', SearchView.as_view()),
     url(r'^collection/(?P<action>\w+)/$', CollecModifyView.as_view()),
     #url(r'^collection/add/$', CollecModifyView.as_view()),

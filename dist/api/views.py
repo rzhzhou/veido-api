@@ -157,9 +157,9 @@ class TableAPIView(APIView):
             html += """</div></div></li>"""
         return html
 
-    def paging(self, model, limit, page):
+    def paging(self, items, limit, page):
         #limit  每页显示的记录数 page 页码
-        items = model.objects.all()
+        #items = model.objects.all()
         # 实例化一个分页对象
         paginator = Paginator(items, limit)
 	try:
@@ -264,6 +264,36 @@ class LocationTableView(TableAPIView):
         return Response({"news": result})
 
 
+class LocationWeixinView(TableAPIView):
+    LOCATION_WEIXIN_LIMIT = 10
+    def get(self, request, location_id, page):
+        try:
+            id = int(location_id)
+            area = Area.objects.get(id=id)
+        except Area.DoesNotExist:
+            return Response({'news': []})
+        items = Weixin.objects.filter(area=area)
+        datas = self.paging(items, self.LOCATION_WEIXIN_LIMIT, page)
+        items = [SetLogo(data) for data in datas['items']]
+        html = self.set_css_to_weixin(items)
+        return Response({'html': html, 'total': datas['total_number']})
+
+
+class LocationWeiboView(TableAPIView):
+    LOCATION_WEIBO_LIMIT = 10
+    def get(self, request, location_id, page):
+        try:
+            id = int(location_id)
+            area = Area.objects.get(id=id)
+        except Area.DoesNotExist:
+            return Response({'news': []})
+        items = Weibo.objects.filter(area=area)
+        datas = self.paging(items, self.LOCATION_WEIBO_LIMIT, page)
+        items = [SetLogo(data) for data in datas['items']]
+        html = self.set_css_to_weibo(items)
+        return Response({'html': html, 'total': datas['total_number']})
+
+
 class EventTableView(TableAPIView):
     def collected_items(self):
         user = self.request.myuser
@@ -307,6 +337,35 @@ class EventDetailTableView(TableAPIView):
 
     def get_collected_html(self, item):
         pass
+
+
+class EventDetailWeixinView(TableAPIView):
+    EVENT_WEIXIN_LIMIT = 10
+    def get(self, request, id, page):
+        try:
+            event = Topic.objects.get(id=int(id))
+        except Topic.DoesNotExist:
+            return Response({'news': ''})
+        items = event.weixin.all() 
+        datas = self.paging(items, self.EVENT_WEIXIN_LIMIT, page)
+        items = [SetLogo(data) for data in datas['items']]
+        html = self.set_css_to_weixin(items)
+        return Response({'html': html, 'total': datas['total_number']})
+
+
+class EventDetailWeiboView(TableAPIView):
+    EVENT_WEIBO_LIMIT = 10
+    def get(self, request, id, page):
+        try:
+            event = Topic.objects.get(id=int(id))
+        except Topic.DoesNotExist:
+            return Response({'news': ''})
+        items = event.weibo.all() 
+        datas = self.paging(items, self.EVENT_BO_LIMIT, page)
+        items = [SetLogo(data) for data in datas['items']]
+        html = self.set_css_to_weibo(items)
+        return Response({'html': html, 'total': datas['total_number']})
+
 
 class CollectView(APIView):
     def article_html(self, item):
@@ -484,19 +543,19 @@ class InspectionTableView(TableAPIView):
 
 
 class WeixinTableView(TableAPIView):
-    weixin_table_limit = 20
+    Weixin_table_limit = 20
     def get(self, request, weixin_type, page):
         if weixin_type == 'new':
-            datas = self.paging(Weixin, self.weixin_table_limit, page)
+            datas = self.paging(Weixin.objects.all(), self.Weixin_table_limit, page)
         elif weixin_type == 'hot':
-            datas = self.paging(Weixin, self.weixin_table_limit, page)
+            datas = self.paging(Weixin.objects.all(), self.Weixin_table_limit, page)
         items = [SetLogo(data) for data in datas['items']]
         html = self.set_css_to_weixin(items)
         return Response({'html': html, 'total': datas['total_number']})
 
 
 class WeiboTableView(TableAPIView):
-    weibo_table_limit = 20
+    Weibo_table_limit = 20
     def set_css_to_hotweibo(self, items):
         html = ""
         count = u'0'
@@ -524,9 +583,9 @@ class WeiboTableView(TableAPIView):
 
     def get(self, request, weibo_type, page):
         if weibo_type == 'new':
-            datas = self.paging(Weibo, self.weibo_table_limit, page)
+            datas = self.paging(Weibo.objects.all(), self.Weibo_table_limit, page)
         elif weibo_type == 'hot':
-            hot_datas = self.pagingfromredis(Weibo, self.weibo_table_limit, page)
+            hot_datas = self.pagingfromredis(Weibo, self.Weibo_table_limit, page)
             for data in hot_datas['items']:
                 if not data['photo']:
                     data['photo'] = u'http://tp2.sinaimg.cn/3557640017/180/40054587155/1' 
