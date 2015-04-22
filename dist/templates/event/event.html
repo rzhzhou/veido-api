@@ -105,20 +105,9 @@
           <h3 class="box-title">微信</h3>
         </div>
         <div class="box-body">
-          <ul class="media-list">
-            {% for weixin in weixin_list %}
-              <li class="media">
-                <div class="media-left">
-                  <img class="media-object" src="{{ weixin.publisher.photo}}" alt="{{ weixin.publisher.publisher }}">
-                </div>
-                <div class="media-body">
-                  <h4 class="media-heading">{{ weixin.publisher.publisher }}</h4>
-                  <p><a href="/weixin/{{ weixin.id }}/" target="_blank">{{ weixin.title }}</a></p>
-                </div>
-              </li>
-            {% endfor %}
-          </ul>
+          <ul class="media-list sns"></ul>
         </div>
+        <div class="box-footer clearfix" data-total="{{ total_page_number }}" data-type="weixin-new"></div>
       </div>
     </div>
 
@@ -128,26 +117,9 @@
           <h3 class="box-title">微博</h3>
         </div>
         <div class="box-body">
-          <ul class="media-list">
-            {% for weibo in weibo_list %}
-              <li class="media">
-                <div class="media-left">
-                  <img class="media-object" src="{{ weibo.publisher.photo}}" alt="{{ weibo.publisher.publisher }}">
-                </div>
-                <div class="media-body">
-                  <h4 class="media-heading">{{ weibo.publisher.publisher }}</h4>
-                  <p>
-                    {% if weibo.short %}
-                      {{ weibo.content }}
-                    {% else %}
-                      <a href="{{weibo.url}}" target="_blank">{{ weibo.title }}</a>
-                    {% endif %}
-                  </p>
-                </div>
-              </li>
-            {% endfor %}
-          </ul>
+          <ul class="media-list sns"></ul>
         </div>
+        <div class="box-footer clearfix" data-total="{{ total_page_number }}" data-type="weibo-new"></div>
       </div>
     </div>
   </div>

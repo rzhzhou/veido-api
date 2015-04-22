@@ -53,20 +53,9 @@
           <h3 class="box-title">微信</h3>
         </div>
         <div class="box-body">
-          <ul class="media-list">
-            {% for weixin in weixin_list %}
-              <li class="media">
-                <div class="media-left">
-                  <img class="media-object" src="{{ weixin.publisher.photo}}" alt="{{ weixin.name }}">
-                </div>
-                <div class="media-body">
-                  <h4 class="media-heading">{{ weixin.name }}</h4>
-                  <p>{{ weixin.title }}</p>
-                </div>
-              </li>
-            {% endfor %}
-          </ul>
+          <ul class="media-list sns"></ul>
         </div>
+        <div class="box-footer clearfix" data-total="{{ total_page_number }}" data-type="weixin-new"></div>
       </div>
     </div>
 
@@ -76,20 +65,9 @@
           <h3 class="box-title">微博</h3>
         </div>
         <div class="box-body">
-          <ul class="media-list">
-            {% for weibo in weibo_list %}
-              <li class="media">
-                <div class="media-left">
-                  <img class="media-object" src="{{ weibo.publisher.photo}}" alt="{{ weibo.name }}">
-                </div>
-                <div class="media-body">
-                  <h4 class="media-heading">{{ weibo.name }}</h4>
-                  <p>{{ weibo.content }}</p>
-                </div>
-              </li>
-            {% endfor %}
-          </ul>
+          <ul class="media-list sns"></ul>
         </div>
+        <div class="box-footer clearfix" data-total="{{ total_page_number }}" data-type="weibo-new"></div>
       </div>
     </div>
   </div>
