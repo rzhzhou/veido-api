@@ -428,7 +428,7 @@ class EventDetailWeiboView(TableAPIView):
         except Topic.DoesNotExist:
             return Response({'html': '', 'total': 0})
         items = event.weibo.all() 
-        datas = self.paging(items, self.EVENT_BO_LIMIT, page)
+        datas = self.paging(items, self.EVENT_WEIBO_LIMIT, page)
         items = [SetLogo(data) for data in datas['items']]
         html = self.set_css_to_weibo(items)
         return Response({'html': html, 'total': datas['total_number']})
@@ -650,7 +650,8 @@ class CustomWeiboView(TableAPIView):
 
 
 class InspectionTableView(TableAPIView):
-    def get(self, request):
+    def get(self, request, page):
+        """
         result = []
         news = Inspection.objects.order_by('-pubtime').all()
 
@@ -662,6 +663,25 @@ class InspectionTableView(TableAPIView):
             result.append(one_record)
 
         return Response({"inspection": result})
+        """
+        items = Inspection.objects.order_by('-pubtime').all()
+        datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
+        result = self.inspection_to_json(datas['items'])
+        return Response({"total": datas['total_number'], "data": result})
+    
+    def inspection_to_json(self, items):
+        result = []
+        for data in items:
+            item = {}
+            item['title'] = data.name
+            item['source'] = data.source
+            item['category'] = data.product
+            item['quality'] = str(data.qualitied * 100)[:4] + "%"
+            item['time'] = data.pubtime.replace(tzinfo=None).strftime('%Y-%m-%d')
+            item['source'] = data.source
+            result.append(item)
+        return result
+            
 
 
 class WeixinTableView(TableAPIView):
