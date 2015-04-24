@@ -265,7 +265,7 @@ class NewsTableView(TableAPIView):
     """
     def get(self, request):
         result = []
-        news = Article.objects.all()[:self.LIMIT_NUMBER]
+        news = Article.objects.filter(website_type='topic')[:self.LIMIT_NUMBER]
         serializer = ArticleSerializer(news, many=True)
 
         for item in news:

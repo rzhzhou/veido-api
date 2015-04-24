@@ -449,6 +449,10 @@ $(function() {
       case 'inspection':
         $('#inspection').Do(app.table);
         break;
+      case 'custom':
+        $('#news').Do(app.table);
+        $('.sns').Do(app.sns);
+        break;
       case 'collection':
         $('#news').Do(app.table);
         $('#event').Do(app.table);

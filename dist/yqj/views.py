@@ -27,7 +27,7 @@ def index_view(request):
         locations = Area.objects.filter(level=user.area.level+1, parent=user.area)
         user.company = user.group.company
 
-        news = Article.objects.all().count()
+        news = Article.objects.filter(website_type='topic').count()
         weibo = Weibo.objects.all().count()
         weixin = Weixin.objects.all().count()
         event = Topic.objects.all().count()
@@ -38,7 +38,7 @@ def index_view(request):
 
         end_date = datetime.datetime.now()
         start_date = end_date + datetime.timedelta(days=-7)
-        news_list = Article.objects.filter(pubtime__range=(start_date, end_date))[:300]
+        news_list = Article.objects.filter(website_type='topic' , pubtime__range=(start_date, end_date))[:300]
         for item in news_list:
             item = SetLogo(item)
             try:
@@ -80,8 +80,8 @@ def index_view(request):
             'event_list': event_list,
             'weixin_hottest_list': weixin_data,
             'weibo_hottest_list': weibo_data,
-                        'user_image': get_user_image(user),
-                        'inspection_list': inspection_list,
+            'user_image': get_user_image(user),
+            'inspection_list': inspection_list,
             })
     else:
         return HttpResponse(status=401)
