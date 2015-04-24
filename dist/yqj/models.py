@@ -122,7 +122,7 @@ class Article(models.Model):
     area = models.ForeignKey(Area, verbose_name=u'地域')
     uuid = models.CharField(max_length=36)
     feeling_factor = models.FloatField(default=-1, verbose_name=u'正负面')
-    type = models.CharField(max_length=20, blank=True, verbose_name=u'类型')
+    website_type = models.CharField(max_length=20, blank=True, verbose_name=u'类型')
     
     class Meta:
         db_table = 'article'
