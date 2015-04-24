@@ -456,16 +456,33 @@ class CollectView(APIView):
         one_record = [view.collected_html(item), title, item.source, item.area.name, pubtime.date(), hot_index]
         return one_record
 
-    def get(self, request):
+    def get(self, requesti, table_type, page):
         try:
             self.collection = request.myuser.collection
         except Collection.DoesNotExist:
             self.collection = Collection(user=self.request.myuser)
             self.collection.save()
+        """
         news = [self.article_html(item) for item in self.collection.articles.all()]
         topic = [self.topic_html(item) for item in self.collection.events.all()]
 
         return Response({'news': news, 'event': topic})
+        """
+        if table_type == 'news':
+            view = ArticleTableView(self.request)
+            items = self.collection.articles.all()
+            datas = view.paging(items, view.NEWS_PAGE_LIMIT, page)
+            result = view.news_to_json(datas['items'])
+        elif table_type == 'event':
+            view = EventTableView(self.request)
+            items = self.collection.events.all()
+            datas = view.paging(items, view.EVENT_PAGE_LIMIT, page)
+            result = view.event_to_json(datas['items'])
+        else:
+            result = []
+            datas = {'taotal_number': 0}
+        return Response({'total': datas['total_number'], 'data': result})
+        
 
 
 class CollecModifyView(View):
@@ -565,7 +582,7 @@ class SearchView(CollectView):
 
 
 class CustomTableView(TableAPIView):
-    def get(self, request, custom_id):
+    def get_bak(self, request, custom_id):
         customname = [u'电梯',u'锅炉', u'两会']
         try:
             #custom = Custom.objects.get(id=int(custom_id))
@@ -592,6 +609,16 @@ class CustomTableView(TableAPIView):
 
     def get_news(self, keyword):
         return Article.objects.raw(u"SELECT * FROM article WHERE MATCH (content, title) AGAINST ('%s')" % (keyword))
+
+    def get(self, request, custom_id, page):
+        try: 
+            custom = Custom.objects.get(id=int(custom_id))
+        except Custom.DoesNotExist:
+            return Response({'total': 0, 'data': []})
+        items = custom.articles.all()
+        datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
+        result = self.news_to_json(datas['items'])
+        return Response({'total': datas['total_number'], 'data': result})
 
 
 class CustomWeixinView(TableAPIView):
