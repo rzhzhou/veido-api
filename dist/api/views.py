@@ -72,6 +72,8 @@ class TableAPIView(APIView):
     NO_COLLECTED_TEXT = u'<i class="fa fa-star-o" data-toggle="tooltip", data-placement="right" title="添加收藏">'
 
     LIMIT_NUMBER = 300
+    NEWS_PAGE_LIMIT = 25
+    EVENT_PAGE_LIMIT = 25
     def __init__(self, request=None):
         self.request = request
 
@@ -189,6 +191,38 @@ class TableAPIView(APIView):
             items = paginator.page(paginator.num_pages)
 
         return {'items': items, 'total_number': paginator.num_pages}
+
+    def news_to_json(self, items):
+        result = []
+        for data in items:
+            item = {}
+            item['title'] = data.title
+            item['id'] = data.id
+            item['source'] = data.source
+            item['location'] = data.area.name
+            item['time'] = data.pubtime.replace(tzinfo=None).strftime('%Y-%m-%d')
+            try:
+                item['hot'] = RelatedData.objects.filter(uuid=data.uuid)[0].articles.all().count()
+            except IndexError:
+                item['hot'] = 0
+            result.append(item)
+        return result
+
+    def event_to_json(self, items):
+        result = []
+        for data in items:
+            item = {}
+            item['title'] = data.title
+            item['id'] = data.id
+            item['source'] = data.source
+            item['location'] = data.area.name
+            try:
+                item['time'] = data.articles.order_by('pubtime')[0].pubtime.replace(tzinfo=None).strftime('%Y-%m-%d')
+            except IndexError:
+                item['time'] = datetime.datetime.now().strftime('%Y-%m-%d')
+            item['hot'] = data.articles.count() + data.weixin.count() + data.weibo.count()
+            result.append(item)
+        return result
         
 
 def get_date_from_iso(datetime_str):
@@ -196,12 +230,13 @@ def get_date_from_iso(datetime_str):
     return datetime.datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S.%fZ")
 
 class ArticleTableView(TableAPIView):
-    def get(self, request, id):
+    def get(self, request, id, page):
         try:
             category = ArticleCategory.objects.get(id=id)
         except ArticleCategory.DoesNotExist:
+            return Response({'total': 0, 'data': []})
+        """
             return Response({'news': []})
-
         result = []
         articles = category.articles.all()[:self.LIMIT_NUMBER]
         serializer = ArticleSerializer(articles, many=True)
@@ -219,8 +254,15 @@ class ArticleTableView(TableAPIView):
             result.append(one_record)
 
         return Response({'news': result})
+        """
+        items = category.articles.all()
+        datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
+        result = self.news_to_json(datas['items'])
+        return Response({'total': datas['total_number'], 'data': result})
+
 
 class NewsTableView(TableAPIView):
+    """
     def get(self, request):
         result = []
         news = Article.objects.all()[:self.LIMIT_NUMBER]
@@ -239,14 +281,22 @@ class NewsTableView(TableAPIView):
             result.append(one_record)
 
         return Response({"news": result})
+    """
+    def get(self, request, page):
+        items = Article.objects.all()
+        datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
+        result = self.news_to_json(datas['items'])
+        return Response({'total': datas['total_number'], 'data': result})
 
 
 class LocationTableView(TableAPIView):
-    def get(self, request, location_id):
+    def get(self, request, location_id, page):
         try:
             id = int(location_id)
             area = Area.objects.get(id=id)
         except Area.DoesNotExist:
+            return Response({'total': 0, 'data': []})
+        """
             return Response({'news': []})
         result = []
         news = Article.objects.filter(area=area)[:self.LIMIT_NUMBER]
@@ -262,6 +312,11 @@ class LocationTableView(TableAPIView):
             result.append(one_record)
 
         return Response({"news": result})
+        """
+        items = Article.objects.filter(area=area)
+        datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
+        result = self.news_to_json(datas['items'])
+        return Response({'total': datas['total_number'], 'data': result})
 
 
 class LocationWeixinView(TableAPIView):
@@ -299,7 +354,8 @@ class EventTableView(TableAPIView):
         user = self.request.myuser
         return user.collection.events.all()
 
-    def get(self, request):
+    def get(self, request, page):
+        """
         result = []
         event = Topic.objects.all()[:self.LIMIT_NUMBER]
         for item in event:
@@ -315,14 +371,20 @@ class EventTableView(TableAPIView):
             one_record = [collected_html, title, item.source, item.area.name, pubtime.date(), hot_index]
             result.append(one_record)
         return Response({"event": result})
+        """
+        items = Topic.objects.all()
+        datas = self.paging(items, self.EVENT_PAGE_LIMIT, page)
+        result = self.event_to_json(datas['items'])
+        return Response({'total': datas['total_number'], 'data': result})
 
 
 class EventDetailTableView(TableAPIView):
-    def get(self, request, id):
+    def get(self, request, id, page):
         try:
             event = Topic.objects.get(id=int(id))
         except Topic.DoesNotExist:
             return Response({'news': ''})
+        """
         news = event.articles.all()
         result = []
         for item in news:
@@ -333,6 +395,11 @@ class EventDetailTableView(TableAPIView):
             one_record = [collected_html, title, item.publisher.publisher, item.area.name, item.pubtime.date(), hot_index]
             result.append(one_record)
         return Response({'news': result})
+        """
+        items = event.articles.all() 
+        datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
+        result = self.news_to_json(datas['items'])
+        return Response({'total': datas['total_number'], 'data': result})
 
 
     def get_collected_html(self, item):

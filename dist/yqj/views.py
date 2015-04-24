@@ -184,6 +184,7 @@ class CategoryView(BaseView):
 
 class LocationView(BaseView):
     def get(self, request, location_id):
+        """
         try:
             location = Area.objects.get(id=int(location_id))
         except Area.DoesNotExist:
@@ -191,6 +192,8 @@ class LocationView(BaseView):
         weixin = [SetLogo(data) for data in Weixin.objects.filter(area=location)][:10]
         weibo = [SetLogo(data) for data in Weibo.objects.filter(area=location)][:10]
         return self.render_to_response("location/location.html", {'location': location, 'weixin_list': weixin, 'weibo_list': weibo})
+        """
+        return self.render_to_response("location/location.html")
 
 
 def person_view(request, person_id):
@@ -212,7 +215,7 @@ class NewsDetailView(BaseView):
 
         try:
             r = RelatedData.objects.filter(uuid=news.uuid)[0]
-            relateddata = list(r.weixin.all()) + list(r.weibo.all()) + list(r.articles.all())
+            relateddata = list(r.articles.all())
         except IndexError:
             relateddata = []
         try:
@@ -234,13 +237,14 @@ class EventDetailView(BaseView):
             event = Topic.objects.get(id=event_id)
         except Topic.DoesNotExist:
             return self.render_to_response('event/event.html', {'event': '', 'weixin_list': [], 'weibo_list': []})
-        weixin_list = [SetLogo(item) for item in event.weixin.all()][:10]
-        weibo_list = [SetLogo(item) for item in event.weibo.all()][:10]
-        for item in weibo_list:
-            SetLogo(item)
-            if len(item.content) < 144:
-                setattr(item, 'short', True)
-        return self.render_to_response('event/event.html', {'event': event, 'weixin_list': weixin_list, 'weibo_list': weibo_list})
+        #weixin_list = [SetLogo(item) for item in event.weixin.all()][:10]
+        #weibo_list = [SetLogo(item) for item in event.weibo.all()][:10]
+        #for item in weibo_list:
+        #    SetLogo(item)
+        #    if len(item.content) < 144:
+        #        setattr(item, 'short', True)
+        #return self.render_to_response('event/event.html', {'event': event, 'weixin_list': weixin_list, 'weibo_list': weibo_list})
+        return self.render_to_response('event/event.html', {'event': event})
 
 
 class WeixinView(BaseView):
