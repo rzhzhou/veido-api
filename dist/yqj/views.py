@@ -266,8 +266,11 @@ class WeixinDetailView(BaseView):
             weixin = Weixin.objects.get(id=weixin_id)
         except Weixin.DoesNotExist:
             return render_to_response('weixin/weixin.html', {'article': '', 'relate': []})
-        r = RelatedData.objects.filter(uuid=weixin.uuid)[0]
-        relateddata = list(r.weixin.all()) + list(r.weibo.all()) + list(r.articles.all())
+        try:
+            r = RelatedData.objects.filter(uuid=weixin.uuid)[0]
+            relateddata = list(r.weixin.all()) + list(r.weibo.all()) + list(r.articles.all())
+        except IndexError:
+            relateddata = []
         return self.render_to_response('weixin/weixin.html', {'article': SetLogo(weixin), 'relate': relateddata})
 
 
