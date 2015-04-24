@@ -326,7 +326,7 @@ class LocationWeixinView(TableAPIView):
             id = int(location_id)
             area = Area.objects.get(id=id)
         except Area.DoesNotExist:
-            return Response({'news': []})
+            return Response({'html': '', 'total': 0})
         items = Weixin.objects.filter(area=area)
         datas = self.paging(items, self.LOCATION_WEIXIN_LIMIT, page)
         items = [SetLogo(data) for data in datas['items']]
@@ -341,7 +341,7 @@ class LocationWeiboView(TableAPIView):
             id = int(location_id)
             area = Area.objects.get(id=id)
         except Area.DoesNotExist:
-            return Response({'news': []})
+            return Response({'html': '', 'total': 0})
         items = Weibo.objects.filter(area=area)
         datas = self.paging(items, self.LOCATION_WEIBO_LIMIT, page)
         items = [SetLogo(data) for data in datas['items']]
@@ -412,7 +412,7 @@ class EventDetailWeixinView(TableAPIView):
         try:
             event = Topic.objects.get(id=int(id))
         except Topic.DoesNotExist:
-            return Response({'news': ''})
+            return Response({'html': '', 'total': 0})
         items = event.weixin.all() 
         datas = self.paging(items, self.EVENT_WEIXIN_LIMIT, page)
         items = [SetLogo(data) for data in datas['items']]
@@ -426,7 +426,7 @@ class EventDetailWeiboView(TableAPIView):
         try:
             event = Topic.objects.get(id=int(id))
         except Topic.DoesNotExist:
-            return Response({'news': ''})
+            return Response({'html': '', 'total': 0})
         items = event.weibo.all() 
         datas = self.paging(items, self.EVENT_BO_LIMIT, page)
         items = [SetLogo(data) for data in datas['items']]
@@ -592,6 +592,34 @@ class CustomTableView(TableAPIView):
 
     def get_news(self, keyword):
         return Article.objects.raw(u"SELECT * FROM article WHERE MATCH (content, title) AGAINST ('%s')" % (keyword))
+
+
+class CustomWeixinView(TableAPIView):
+    CUSTOM_WEIXIN_LIMIT = 10
+    def get(self, request, custom_id, page):
+        try:
+            custom = Custom.objects.get(id=int(custom_id))
+        except Custom.DoesNotExist:
+            return Response({'html': '', 'total': 0})
+        items = custom.weixin.all() 
+        datas = self.paging(items, self.CUSTOM_WEIXIN_LIMIT, page)
+        items = [SetLogo(data) for data in datas['items']]
+        html = self.set_css_to_weixin(items)
+        return Response({'html': html, 'total': datas['total_number']})
+
+
+class CustomWeiboView(TableAPIView):
+    CUSTOM_WEIBO_LIMIT = 10
+    def get(self, request, id, page):
+        try:
+            custom = Custom.objects.get(id=int(custom_id))
+        except Custom.DoesNotExist:
+            return Response({'html': '', 'total': 0})
+        items = custom.weibo.all()
+        datas = self.paging(items, self.CUSTOM_BO_LIMIT, page)
+        items = [SetLogo(data) for data in datas['items']]
+        html = self.set_css_to_weibo(items)
+        return Response({'html': html, 'total': datas['total_number']})
 
 
 class InspectionTableView(TableAPIView):

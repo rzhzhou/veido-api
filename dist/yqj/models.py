@@ -44,6 +44,8 @@ class Weixin(models.Model):
     publisher = models.ForeignKey(WeixinPublisher, verbose_name=u'微信发布者')
     area = models.ForeignKey(Area, verbose_name=u'地域')
     uuid = models.CharField(max_length=36)
+    readnum = models.IntegerField(blank=True, verbose_name=u'阅读数')
+    likenum = models.IntegerField(blank=True, verbose_name=u'点赞数')
 
     class Meta:
         db_table = 'weixin'
@@ -78,12 +80,12 @@ class Weibo(models.Model):
     pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
     publisher = models.ForeignKey(WeiboPublisher, verbose_name=u'微博发布者')
     area = models.ForeignKey(Area, verbose_name=u'地域')
-    praise = models.IntegerField(blank=True, verbose_name=u'点赞数')
-    #attitudes_count = models.IntegerField(blank=True, verbose_name=u'点赞数')
-    comment = models.IntegerField(blank=True, verbose_name=u'评论量')
-    #comments_count = models.IntegerField(blank=True, verbose_name=u'评论量')
-    tansmit = models.IntegerField(blank=True, verbose_name=u'转发量')
-    #reposts_count = models.IntegerField(blank=True, verbose_name=u'转发量')
+    #praise = models.IntegerField(blank=True, verbose_name=u'点赞数')
+    attitudes_count = models.IntegerField(blank=True, verbose_name=u'点赞数')
+    #comment = models.IntegerField(blank=True, verbose_name=u'评论量')
+    comments_count = models.IntegerField(blank=True, verbose_name=u'评论量')
+    #tansmit = models.IntegerField(blank=True, verbose_name=u'转发量')
+    reposts_count = models.IntegerField(blank=True, verbose_name=u'转发量')
     uuid = models.CharField(max_length=36)
 
     class Meta:
@@ -120,6 +122,7 @@ class Article(models.Model):
     area = models.ForeignKey(Area, verbose_name=u'地域')
     uuid = models.CharField(max_length=36)
     feeling_factor = models.FloatField(default=-1, verbose_name=u'正负面')
+    type = models.CharField(max_length=20, blank=True, verbose_name=u'类型')
     
     class Meta:
         db_table = 'article'
