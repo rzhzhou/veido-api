@@ -650,24 +650,24 @@ class CustomWeiboView(TableAPIView):
 
 
 class InspectionTableView(TableAPIView):
-    def get(self, request, page):
-        """
+    def get(self, request):
         result = []
         news = Inspection.objects.order_by('-pubtime').all()
 
         for item in news:
-            collected_html = u'<i class="fa fa-star-o" data-toggle="tooltip", data-placement="right" title="添加收藏">'
+            #collected_html = u'<i class="fa fa-star-o" data-toggle="tooltip", data-placement="right" title="添加收藏">'
             title = self.title_html(item.url, item.name, item.id, 'inspection')
-            quality = str(item.qualitied * 100)[:4] + "%"
-            one_record = [collected_html, item.product, title, quality, item.source, item.pubtime.strftime('%Y-%m-%d')]
+            quality = str(int(item.qualitied*100)) + '%'
+            #one_record = [collected_html, item.product, title, quality, item.source, item.pubtime.strftime('%Y-%m-%d')]
+            one_record = [item.product, title, quality, item.source, item.pubtime.strftime('%Y-%m-%d')]
             result.append(one_record)
 
         return Response({"inspection": result})
-        """
-        items = Inspection.objects.order_by('-pubtime').all()
-        datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
-        result = self.inspection_to_json(datas['items'])
-        return Response({"total": datas['total_number'], "data": result})
+        
+        #items = Inspection.objects.order_by('-pubtime').all()
+        #datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
+        #result = self.inspection_to_json(datas['items'])
+        #return Response({"total": datas['total_number'], "data": result})
     
     def inspection_to_json(self, items):
         result = []
