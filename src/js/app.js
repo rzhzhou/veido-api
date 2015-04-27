@@ -384,18 +384,6 @@ app.table = function() {
     var items = data.data;
 
     var table = $.map(items, function(item, index) {
-      // var row = $('<tr></tr>');
-
-      // $('<td><a href="/' + type + '/' + item.id + '/" title="' + item.title + '" target="_blank">' + item.title + '</a></td>').appendTo(row);
-
-      // $('<td>' + item.source   + '</td>').appendTo(row);
-
-      // $('<td>' + item.location + '</td>').appendTo(row);
-
-      // $('<td>' + item.time     + '</td>').appendTo(row);
-
-      // $('<td>' + item.hot      + '</td>').appendTo(row);
-
       var title     = '<td><a href="/' + type + '/' + item.id + '/" title="' + item.title + '" target="_blank">' + item.title + '</a></td>';
       var source    = '<td>' + item.source   + '</td>';
       var location  = '<td>' + item.location + '</td>';
@@ -404,7 +392,6 @@ app.table = function() {
 
       var row       = '<tr>' + title + source + location + time + hot + '</tr>';
 
-      // console.log(row);
       return row;
     });
 
@@ -418,7 +405,7 @@ app.table = function() {
     $pagination.twbsPagination({
       totalPages: data.total,
       visiblePages: 7,
-      href: '#top',
+      // href: '#top',
       first: '第一页',
       prev: '上一页',
       next: '下一页',
@@ -428,6 +415,7 @@ app.table = function() {
         $.getJSON('/api' + app.url + type + '/' + page + '/', function(data) {
           renderTable(data);
           $pagination.twbsPagination({totalPages: data.total});
+          $('body').animate({ scrollTop: 0 }, 'fast');
         });
       }
     });
