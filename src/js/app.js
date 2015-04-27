@@ -284,6 +284,17 @@ app.chart = {
   }
 };
 
+app.returnTop = function(el) {
+  var top = el.offset().top;
+  var scrollTop = 0;
+
+  if (top > 160) {
+    scrollTop = top - 120;
+  }
+
+  $('body').animate({scrollTop: scrollTop});
+};
+
 app.table = function() {
   var _this       = this;
 
@@ -306,17 +317,6 @@ app.table = function() {
     $content.html(table);
   };
 
-  var scrollTop = function() {
-    var top = _this.offset().top;
-    var scrollTop = 0;
-
-    if (top !== 160) {
-      scrollTop = top - 120;
-    }
-
-    $('body').animate({scrollTop: scrollTop});
-  };
-
   $.getJSON('/api' + app.url + type + '/1/', function(data) {
     renderTable(data);
 
@@ -329,7 +329,8 @@ app.table = function() {
       last: '最后一页',
       paginationClass: 'pagination pagination-sm no-margin pull-right',
       onPageClick: function(event, page) {
-        scrollTop();
+        app.returnTop(_this);
+
         $.getJSON('/api' + app.url + type + '/' + page + '/', function(data) {
           renderTable(data);
           $pagination.twbsPagination({totalPages: data.total});
@@ -431,6 +432,8 @@ app.dataTable = function() {
 };
 
 app.sns = function() {
+  var _this = this;
+
   this.each(function(index, element) {
     var $content    = $(element);
     var $pagination = $content.parent().next();
@@ -448,13 +451,13 @@ app.sns = function() {
 
       $pagination.twbsPagination({
         totalPages: data.total,
-        href: '#top',
         first: '第一页',
         prev: '上一页',
         next: '下一页',
         last: '最后一页',
         paginationClass: 'pagination pagination-sm no-margin pull-right',
         onPageClick: function(event, page) {
+          app.returnTop(_this);
           $.getJSON('/api' + app.url + type() + '/' + page + '/', function(data) {
             $content.html(data.html);
             $pagination.twbsPagination({totalPages: data.total});
