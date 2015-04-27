@@ -285,6 +285,8 @@ app.chart = {
 };
 
 app.table = function() {
+  var _this       = this;
+
   var $content    = this.find('tbody');
   var $pagination = this.parent();
   var type        = this[0].id;
@@ -304,13 +306,23 @@ app.table = function() {
     $content.html(table);
   };
 
+  var scrollTop = function() {
+    var top = _this.offset().top;
+    var scrollTop = 0;
+
+    if (top !== 160) {
+      scrollTop = top - 120;
+    }
+
+    $('body').animate({scrollTop: scrollTop}, 'fast');
+  };
+
   $.getJSON('/api' + app.url + type + '/1/', function(data) {
     renderTable(data);
 
     $pagination.twbsPagination({
       totalPages: data.total,
       visiblePages: 7,
-      // href: '#top',
       first: '第一页',
       prev: '上一页',
       next: '下一页',
@@ -320,7 +332,7 @@ app.table = function() {
         $.getJSON('/api' + app.url + type + '/' + page + '/', function(data) {
           renderTable(data);
           $pagination.twbsPagination({totalPages: data.total});
-          $('body').animate({ scrollTop: 0 }, 'fast');
+          scrollTop();
         });
       }
     });
