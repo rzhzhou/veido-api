@@ -304,21 +304,22 @@ class CustomListView(BaseView):
     custom_list_num = 5
     def get(self, request):
         user = self.request.myuser
-        #custom_list = user.group.custom.all()
-        #keyword_list = []
-        #for keyword in custom_list:
-            #item = {}
-            #item['name'] = keyword.keyword
-            #item['news_list'] = keyword.articles.all()[:self.custom_list_num]
-            #setattr(keyword, 'name', keyword.keyword)
-            #setattr(keyword, 'news_list', keyword.articles.all()[:self.custom_list_num])
-            #keyword_list.append(keyword)
+        custom_list = user.group.custom.all()
+        keyword_list = []
+        for keyword in custom_list:
+            item = {}
+            item['name'] = keyword.keyword
+            item['news_list'] = keyword.articles.all()[:self.custom_list_num]
+            setattr(keyword, 'name', keyword.keyword)
+            setattr(keyword, 'news_list', keyword.articles.all()[:self.custom_list_num])
+            keyword_list.append(keyword)
+        return self.render_to_response('custom/custom_list.html', {'custom_list': keyword_list})
 
-        customname = [u'电梯',u'锅炉', u'两会']
-        custom_list = []
-        for name in customname:
-            custom_list.append({'name': name, 'news_list': self.get_news(name), 'id': customname.index(name)})
-        return self.render_to_response('custom/custom_list.html', {'custom_list': custom_list})
+        #customname = [u'电梯',u'锅炉', u'两会']
+        #custom_list = []
+        #for name in customname:
+        #    custom_list.append({'name': name, 'news_list': self.get_news(name), 'id': customname.index(name)})
+        #return self.render_to_response('custom/custom_list.html', {'custom_list': custom_list})
 
     def get_news(self, keyword):
         return Article.objects.raw(u"SELECT * FROM article WHERE MATCH (content, title) AGAINST ('%s') LIMIT %s" % (keyword, self.custom_list_num))

@@ -456,7 +456,7 @@ class CollectView(APIView):
         one_record = [view.collected_html(item), title, item.source, item.area.name, pubtime.date(), hot_index]
         return one_record
 
-    def get(self, requesti, table_type, page):
+    def get(self, request, table_type, page):
         try:
             self.collection = request.myuser.collection
         except Collection.DoesNotExist:
@@ -637,13 +637,13 @@ class CustomWeixinView(TableAPIView):
 
 class CustomWeiboView(TableAPIView):
     CUSTOM_WEIBO_LIMIT = 10
-    def get(self, request, id, page):
+    def get(self, request, custom_id, page):
         try:
             custom = Custom.objects.get(id=int(custom_id))
         except Custom.DoesNotExist:
             return Response({'html': '', 'total': 0})
         items = custom.weibo.all()
-        datas = self.paging(items, self.CUSTOM_BO_LIMIT, page)
+        datas = self.paging(items, self.CUSTOM_WEIBO_LIMIT, page)
         items = [SetLogo(data) for data in datas['items']]
         html = self.set_css_to_weibo(items)
         return Response({'html': html, 'total': datas['total_number']})
