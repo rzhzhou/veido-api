@@ -468,6 +468,11 @@ app.sns = function() {
   });
 };
 
+app.custom = function() {
+  var custom = $('.custom');
+  // var $msg    =
+};
+
 
 /*
  * run function when element exists
@@ -508,6 +513,7 @@ $(function() {
         $('#inspection').Do(app.dataTable);
         break;
       case 'custom':
+        // app.custom();
         $('#news').Do(app.table);
         $('.sns').Do(app.sns);
         break;

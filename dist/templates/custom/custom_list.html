@@ -14,13 +14,18 @@
   {% if user.isAdmin %}
     <div class="row">
       <div class="col-md-3">
-        <div class="box box-primary pending">
+        <div class="box box-primary custom">
           <div class="box-header with-border">
             <h3 class="box-title">关键词</h3>
           </div>
           <div class="box-body">
-            <p>等待处理中…</p>
-            <ol class="pending-list"></ol>
+            <p>等待处理中：</p>
+            <ol>
+              {% for keyword in keyword_list %}
+                <li>keyword</li>
+              {% endfor %}
+            </ol>
+            <p class="text-warning text-center"></p>
           </div>
           <div class="box-footer">
             <form action="/api/custom/add/">
