@@ -330,9 +330,9 @@ app.table = function() {
       paginationClass: 'pagination pagination-sm no-margin pull-right',
       onPageClick: function(event, page) {
         $.getJSON('/api' + app.url + type + '/' + page + '/', function(data) {
+          scrollTop();
           renderTable(data);
           $pagination.twbsPagination({totalPages: data.total});
-          scrollTop();
         });
       }
     });
