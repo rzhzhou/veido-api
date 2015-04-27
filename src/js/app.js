@@ -374,15 +374,15 @@ app.dataTable = function() {
         "sortDescending":   "倒序排列"
       }
     },
-    "columnDefs": [{
-      "className": "star",
-      "targets": 0,
-      "searchable": false,
-      "orderable": false
-    },{
-      "className": "index",
-      "targets": -1
-    }],
+    // "columnDefs": [{
+    //   "className": "star",
+    //   "targets": 0,
+    //   "searchable": false,
+    //   "orderable": false
+    // },{
+    //   "className": "index",
+    //   "targets": -1
+    // }],
     "deferLoading": 100,
     "drawCallback": function() {
       $('[data-toggle="tooltip"]').tooltip();
