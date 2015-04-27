@@ -327,19 +327,20 @@ class CustomListView(BaseView):
 
 class CustomView(BaseView):
     def get(self, request, id):
-        #try:
-        #    custom = Custom.objects.get(id=int(id))
-        #except Custom.DoesNotExist:
-        #    return self.render_to_response('custom/custom.html')
+        try:
+            custom = Custom.objects.get(id=int(id))
+        except Custom.DoesNotExist:
+            return self.render_to_response('custom/custom.html')
+        return self.render_to_response('custom/custom.html', {'name': custom.keyword})
         #weixin_list = custom.weixin.all()
         #weibo_list = custom.weibo.all()
-        customname = [u'电梯',u'锅炉', u'两会']
-        custom = {}
-        try:
-            custom['name'] = customname[int(id)]
-        except KeyError:
-            return self.render_to_response('custom/custom.html')
-        return self.render_to_response('custom/custom.html', {'name': custom['name'], 'weixin_list': [], 'weibo_list': []})
+        #customname = [u'电梯',u'锅炉', u'两会']
+        #custom = {}
+        #try:
+        #    custom['name'] = customname[int(id)]
+        #except KeyError:
+        #    return self.render_to_response('custom/custom.html')
+        #return self.render_to_response('custom/custom.html', {'name': custom['name'], 'weixin_list': [], 'weibo_list': []})
 
 
 class UserView(BaseView):
