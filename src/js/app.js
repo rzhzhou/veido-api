@@ -314,7 +314,7 @@ app.table = function() {
       scrollTop = top - 120;
     }
 
-    $('body').animate({scrollTop: scrollTop}, 'fast');
+    $('body').animate({scrollTop: scrollTop});
   };
 
   $.getJSON('/api' + app.url + type + '/1/', function(data) {
@@ -329,8 +329,8 @@ app.table = function() {
       last: '最后一页',
       paginationClass: 'pagination pagination-sm no-margin pull-right',
       onPageClick: function(event, page) {
+        scrollTop();
         $.getJSON('/api' + app.url + type + '/' + page + '/', function(data) {
-          scrollTop();
           renderTable(data);
           $pagination.twbsPagination({totalPages: data.total});
         });
