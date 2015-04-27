@@ -285,63 +285,106 @@ app.chart = {
 };
 
 app.table = function() {
-  // $.fn.dataTable.ext.errMode = 'throw';
+  var $content    = this.find('tbody');
+  var $pagination = this.parent();
+  var type        = this[0].id;
 
-  // var table = this.DataTable({
-  //   "ajax": {
-  //     "url": '/api' + location.pathname,
-  //     "dataSrc": this[0].id,
-  //     "cache": true
-  //   },
-  //   "autoWidth": false,
-  //   "pageLength": 25,
-  //   "order": [],
-  //   "language": {
-  //     "processing":         "处理中...",
-  //     "search":             "",
-  //     "searchPlaceholder":  "输入关键字过滤...",
-  //     "lengthMenu":         "显示 _MENU_ 条",
-  //     "info":               "显示第 _START_ 至 _END_ 条，共 _TOTAL_ 条",
-  //     "infoEmpty":          "信息空",
-  //     "infoFiltered":       "(由 _MAX_ 项结果过滤)",
-  //     "infoPostFix":        "",
-  //     "loadingRecords":     "载入中...",
-  //     "zeroRecords":        "无匹配结果",
-  //     "emptyTable":         "无结果",
-  //     "paginate": {
-  //       "first":            "第一页",
-  //       "previous":         "上一页",
-  //       "next":             "下一页",
-  //       "last":             "最后一页"
-  //     },
-  //     "aria": {
-  //       "sortAscending":    "正序排列",
-  //       "sortDescending":   "倒序排列"
-  //     }
-  //   },
-  //   "columnDefs": [{
-  //     "className": "star",
-  //     "targets": 0,
-  //     "searchable": false,
-  //     "orderable": false
-  //   },{
-  //     "className": "index",
-  //     "targets": -1
-  //   }],
-  //   "deferLoading": 100,
-  //   "drawCallback": function() {
-  //     $('[data-toggle="tooltip"]').tooltip();
-  //   }
-  // });
+  var renderTable = function(data) {
+    var items = data.data;
+    var table = $.map(items, function(item, index) {
+      var title     = '<td><a href="/' + type + '/' + item.id + '/" title="' + item.title + '" target="_blank">' + item.title + '</a></td>';
+      var source    = '<td>' + item.source   + '</td>';
+      var location  = '<td>' + item.location + '</td>';
+      var time      = '<td>' + item.time     + '</td>';
+      var hot       = '<td class="text-center">' + item.hot      + '</td>';
 
-  // table.on('click', 'tr', function() {
-  //   if ( $(this).hasClass('selected') ) {
-  //     $(this).removeClass('selected');
-  //   } else {
-  //     table.$('tr.selected').removeClass('selected');
-  //     $(this).addClass('selected');
-  //   }
-  // });
+      var row       = '<tr>' + title + source + location + time + hot + '</tr>';
+      return row;
+    });
+    $content.html(table);
+  };
+
+  $.getJSON('/api' + app.url + type + '/1/', function(data) {
+    renderTable(data);
+
+    $pagination.twbsPagination({
+      totalPages: data.total,
+      visiblePages: 7,
+      // href: '#top',
+      first: '第一页',
+      prev: '上一页',
+      next: '下一页',
+      last: '最后一页',
+      paginationClass: 'pagination pagination-sm no-margin pull-right',
+      onPageClick: function(event, page) {
+        $.getJSON('/api' + app.url + type + '/' + page + '/', function(data) {
+          renderTable(data);
+          $pagination.twbsPagination({totalPages: data.total});
+          $('body').animate({ scrollTop: 0 }, 'fast');
+        });
+      }
+    });
+  });
+};
+
+app.dataTable = function() {
+  $.fn.dataTable.ext.errMode = 'throw';
+
+  var table = this.DataTable({
+    "ajax": {
+      "url": '/api' + location.pathname,
+      "dataSrc": this[0].id,
+      "cache": true
+    },
+    "autoWidth": false,
+    "pageLength": 25,
+    "order": [],
+    "language": {
+      "processing":         "处理中...",
+      "search":             "",
+      "searchPlaceholder":  "输入关键字过滤...",
+      "lengthMenu":         "显示 _MENU_ 条",
+      "info":               "显示第 _START_ 至 _END_ 条，共 _TOTAL_ 条",
+      "infoEmpty":          "信息空",
+      "infoFiltered":       "(由 _MAX_ 项结果过滤)",
+      "infoPostFix":        "",
+      "loadingRecords":     "载入中...",
+      "zeroRecords":        "无匹配结果",
+      "emptyTable":         "无结果",
+      "paginate": {
+        "first":            "第一页",
+        "previous":         "上一页",
+        "next":             "下一页",
+        "last":             "最后一页"
+      },
+      "aria": {
+        "sortAscending":    "正序排列",
+        "sortDescending":   "倒序排列"
+      }
+    },
+    "columnDefs": [{
+      "className": "star",
+      "targets": 0,
+      "searchable": false,
+      "orderable": false
+    },{
+      "className": "index",
+      "targets": -1
+    }],
+    "deferLoading": 100,
+    "drawCallback": function() {
+      $('[data-toggle="tooltip"]').tooltip();
+    }
+  });
+
+  table.on('click', 'tr', function() {
+    if ( $(this).hasClass('selected') ) {
+      $(this).removeClass('selected');
+    } else {
+      table.$('tr.selected').removeClass('selected');
+      $(this).addClass('selected');
+    }
+  });
 
   // table.on('draw.dt', function() {
   //   var collection = function(obj, api) {
@@ -373,53 +416,6 @@ app.table = function() {
   //   collection( $('.fa-star-o'), '/api/collection/add/');
   //   collection( $('.fa-star'), '/api/collection/remove/');
   // });
-
-  // console.log(this);
-
-  var $content    = this.find('tbody');
-  var $pagination = this.parent();
-  var type        = this[0].id;
-
-  var renderTable = function(data) {
-    var items = data.data;
-
-    var table = $.map(items, function(item, index) {
-      var title     = '<td><a href="/' + type + '/' + item.id + '/" title="' + item.title + '" target="_blank">' + item.title + '</a></td>';
-      var source    = '<td>' + item.source   + '</td>';
-      var location  = '<td>' + item.location + '</td>';
-      var time      = '<td>' + item.time     + '</td>';
-      var hot       = '<td class="text-center">' + item.hot      + '</td>';
-
-      var row       = '<tr>' + title + source + location + time + hot + '</tr>';
-
-      return row;
-    });
-
-    $content.html(table);
-  };
-
-
-  $.getJSON('/api' + app.url + type + '/1/', function(data) {
-    renderTable(data);
-
-    $pagination.twbsPagination({
-      totalPages: data.total,
-      visiblePages: 7,
-      // href: '#top',
-      first: '第一页',
-      prev: '上一页',
-      next: '下一页',
-      last: '最后一页',
-      paginationClass: 'pagination pagination-sm no-margin pull-right',
-      onPageClick: function(event, page) {
-        $.getJSON('/api' + app.url + type + '/' + page + '/', function(data) {
-          renderTable(data);
-          $pagination.twbsPagination({totalPages: data.total});
-          $('body').animate({ scrollTop: 0 }, 'fast');
-        });
-      }
-    });
-  });
 };
 
 app.sns = function() {
@@ -494,7 +490,7 @@ $(function() {
         $('.sns').Do(app.sns);
         break;
       case 'inspection':
-        $('#inspection').Do(app.table);
+        $('#inspection').Do(app.dataTable);
         break;
       case 'custom':
         $('#news').Do(app.table);
