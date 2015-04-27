@@ -198,7 +198,7 @@ class TableAPIView(APIView):
             item = {}
             item['title'] = data.title
             item['id'] = data.id
-            item['source'] = data.source
+            item['source'] = data.publisher.publisher
             item['location'] = data.area.name
             item['time'] = data.pubtime.replace(tzinfo=None).strftime('%Y-%m-%d')
             try:

@@ -193,7 +193,11 @@ class LocationView(BaseView):
         weibo = [SetLogo(data) for data in Weibo.objects.filter(area=location)][:10]
         return self.render_to_response("location/location.html", {'location': location, 'weixin_list': weixin, 'weibo_list': weibo})
         """
-        return self.render_to_response("location/location.html")
+        try:
+            location = Area.objects.get(id=int(location_id))
+        except Area.DoesNotExist:
+            location = ''
+        return self.render_to_response("location/location.html", {'location': location})
 
 
 def person_view(request, person_id):
