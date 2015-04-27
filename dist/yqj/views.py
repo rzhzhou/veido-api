@@ -193,7 +193,11 @@ class LocationView(BaseView):
         weibo = [SetLogo(data) for data in Weibo.objects.filter(area=location)][:10]
         return self.render_to_response("location/location.html", {'location': location, 'weixin_list': weixin, 'weibo_list': weibo})
         """
-        return self.render_to_response("location/location.html")
+        try:
+            location = Area.objects.get(id=int(location_id))
+        except Area.DoesNotExist:
+            location = ''
+        return self.render_to_response("location/location.html", {'location': location})
 
 
 def person_view(request, person_id):
@@ -327,19 +331,20 @@ class CustomListView(BaseView):
 
 class CustomView(BaseView):
     def get(self, request, id):
-        #try:
-        #    custom = Custom.objects.get(id=int(id))
-        #except Custom.DoesNotExist:
-        #    return self.render_to_response('custom/custom.html')
+        try:
+            custom = Custom.objects.get(id=int(id))
+        except Custom.DoesNotExist:
+            return self.render_to_response('custom/custom.html')
+        return self.render_to_response('custom/custom.html', {'name': custom.keyword})
         #weixin_list = custom.weixin.all()
         #weibo_list = custom.weibo.all()
-        customname = [u'电梯',u'锅炉', u'两会']
-        custom = {}
-        try:
-            custom['name'] = customname[int(id)]
-        except KeyError:
-            return self.render_to_response('custom/custom.html')
-        return self.render_to_response('custom/custom.html', {'name': custom['name'], 'weixin_list': [], 'weibo_list': []})
+        #customname = [u'电梯',u'锅炉', u'两会']
+        #custom = {}
+        #try:
+        #    custom['name'] = customname[int(id)]
+        #except KeyError:
+        #    return self.render_to_response('custom/custom.html')
+        #return self.render_to_response('custom/custom.html', {'name': custom['name'], 'weixin_list': [], 'weibo_list': []})
 
 
 class UserView(BaseView):
