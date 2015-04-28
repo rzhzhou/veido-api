@@ -469,8 +469,41 @@ app.sns = function() {
 };
 
 app.custom = function() {
-  var custom = $('.custom');
-  // var $msg    =
+  var $custom   = $('.custom'),
+      $list     = $custom.find('li'),
+      $form     = $custom.find('form'),
+      $msg      = $form.prev(),
+      $fieldset = $form.find('fieldset'),
+      api       = $form.attr('action');
+
+  var response = function(data) {
+    if (data.status) {
+      $msg.text('关键词添加成功！').show();
+      location.reload();
+    } else {
+      $msg.text('关键词添加失败！').show();
+    }
+  };
+
+  var addKeyword = function() {
+    $form.submit(function(event) {
+      event.preventDefault();
+
+      var keyword = $form.Trim();
+
+      if (keyword.length) {
+        $.post(api, {keyword: keyword}, response, 'json');
+      } else {
+        $msg.text('请输入关键词！').show();
+      }
+    });
+  };
+
+  if ( $list.length > 6 ) {
+    $fieldset.prop('disabled', true);
+  } else {
+    addKeyword();
+  }
 };
 
 
@@ -513,7 +546,7 @@ $(function() {
         $('#inspection').Do(app.dataTable);
         break;
       case 'custom':
-        // app.custom();
+        app.custom();
         $('#news').Do(app.table);
         $('.sns').Do(app.sns);
         break;
