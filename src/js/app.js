@@ -213,6 +213,7 @@ app.chart = {
     require(['echarts', 'echarts/chart/line'], function(ec) {
       $.getJSON('/api/line' + app.url, function(data) {
         ec.init(document.getElementById('line-chart'), 'macarons').setOption({
+          color: ['#00a65a', '#00c0ef', '#dd4b39'],
           tooltip: {
             trigger: 'axis'
           },
