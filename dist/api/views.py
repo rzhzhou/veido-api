@@ -657,11 +657,14 @@ class CustomWeiboView(TableAPIView):
 
 class CustomModifyView(View):
     def save(self, user):
+        count = Keyword.objects.filter(group=user.group).exclude(custom__isnull=False).count()
+        if count >= 5:
+            return HttpResponse(status=404)
         try:
             custom = Keyword(newkeyword=self.keyword, group=user.group)
             custom.save()
         except IntegrityError:
-            pass
+            return HttpResponse(status=404)
 
     def remove(self, user):
         pass
