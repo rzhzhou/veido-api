@@ -562,8 +562,8 @@ $(function() {
         $('.user-add').Do(app.user.add);
         break;
       case 'search':
-        $('#news').Do(app.table);
-        $('#event').Do(app.table);
+        $('#news').Do(app.dataTable);
+        $('#event').Do(app.dataTable);
         break;
       default:
         console.log('unknown type');
