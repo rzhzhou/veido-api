@@ -213,6 +213,7 @@ app.chart = {
     require(['echarts', 'echarts/chart/line'], function(ec) {
       $.getJSON('/api/line' + app.url, function(data) {
         ec.init(document.getElementById('line-chart'), 'macarons').setOption({
+          color: ['#00a65a', '#00c0ef', '#dd4b39'],
           tooltip: {
             trigger: 'axis'
           },
@@ -284,6 +285,17 @@ app.chart = {
   }
 };
 
+app.returnTop = function(el) {
+  var top = el.offset().top;
+  var scrollTop = 0;
+
+  if (top > 160) {
+    scrollTop = top - 120;
+  }
+
+  $('body').animate({scrollTop: scrollTop});
+};
+
 app.table = function() {
   var _this       = this;
 
@@ -306,17 +318,6 @@ app.table = function() {
     $content.html(table);
   };
 
-  var scrollTop = function() {
-    var top = _this.offset().top;
-    var scrollTop = 0;
-
-    if (top !== 160) {
-      scrollTop = top - 120;
-    }
-
-    $('body').animate({scrollTop: scrollTop}, 'fast');
-  };
-
   $.getJSON('/api' + app.url + type + '/1/', function(data) {
     renderTable(data);
 
@@ -329,8 +330,9 @@ app.table = function() {
       last: '最后一页',
       paginationClass: 'pagination pagination-sm no-margin pull-right',
       onPageClick: function(event, page) {
+        app.returnTop(_this);
+
         $.getJSON('/api' + app.url + type + '/' + page + '/', function(data) {
-          scrollTop();
           renderTable(data);
           $pagination.twbsPagination({totalPages: data.total});
         });
@@ -374,15 +376,15 @@ app.dataTable = function() {
         "sortDescending":   "倒序排列"
       }
     },
-    "columnDefs": [{
-      "className": "star",
-      "targets": 0,
-      "searchable": false,
-      "orderable": false
-    },{
-      "className": "index",
-      "targets": -1
-    }],
+    // "columnDefs": [{
+    //   "className": "star",
+    //   "targets": 0,
+    //   "searchable": false,
+    //   "orderable": false
+    // },{
+    //   "className": "index",
+    //   "targets": -1
+    // }],
     "deferLoading": 100,
     "drawCallback": function() {
       $('[data-toggle="tooltip"]').tooltip();
@@ -431,6 +433,8 @@ app.dataTable = function() {
 };
 
 app.sns = function() {
+  var _this = this;
+
   this.each(function(index, element) {
     var $content    = $(element);
     var $pagination = $content.parent().next();
@@ -448,13 +452,13 @@ app.sns = function() {
 
       $pagination.twbsPagination({
         totalPages: data.total,
-        href: '#top',
         first: '第一页',
         prev: '上一页',
         next: '下一页',
         last: '最后一页',
         paginationClass: 'pagination pagination-sm no-margin pull-right',
         onPageClick: function(event, page) {
+          app.returnTop(_this);
           $.getJSON('/api' + app.url + type() + '/' + page + '/', function(data) {
             $content.html(data.html);
             $pagination.twbsPagination({totalPages: data.total});
@@ -463,6 +467,44 @@ app.sns = function() {
       });
     });
   });
+};
+
+app.custom = function() {
+  var $custom   = $('.custom'),
+      $list     = $custom.find('li'),
+      $form     = $custom.find('form'),
+      $msg      = $form.prev(),
+      $fieldset = $form.find('fieldset'),
+      api       = $form.attr('action');
+
+  var response = function(data) {
+    if (data.status) {
+      $msg.text('关键词添加成功！').show();
+      location.reload();
+    } else {
+      $msg.text('关键词添加失败！').show();
+    }
+  };
+
+  var addKeyword = function() {
+    $form.submit(function(event) {
+      event.preventDefault();
+
+      var keyword = $form.Trim();
+
+      if (keyword.length) {
+        $.post(api, {keyword: keyword}, response, 'json');
+      } else {
+        $msg.text('请输入关键词！').show();
+      }
+    });
+  };
+
+  if ( $list.length > 6 ) {
+    $fieldset.prop('disabled', true);
+  } else {
+    addKeyword();
+  }
 };
 
 
@@ -505,6 +547,7 @@ $(function() {
         $('#inspection').Do(app.dataTable);
         break;
       case 'custom':
+        app.custom();
         $('#news').Do(app.table);
         $('.sns').Do(app.sns);
         break;
@@ -520,8 +563,8 @@ $(function() {
         $('.user-add').Do(app.user.add);
         break;
       case 'search':
-        $('#news').Do(app.table);
-        $('#event').Do(app.table);
+        $('#news').Do(app.dataTable);
+        $('#event').Do(app.dataTable);
         break;
       default:
         console.log('unknown type');
