@@ -36,6 +36,7 @@ class Migration(migrations.Migration):
                 ('pubtime', models.DateTimeField(verbose_name='\u53d1\u5e03\u65f6\u95f4')),
                 ('uuid', models.CharField(max_length=36)),
                 ('feeling_factor', models.FloatField(default=-1, verbose_name='\u6b63\u8d1f\u9762')),
+                ('website_type', models.CharField(max_length=20, verbose_name='\u7c7b\u578b', blank=True)),
                 ('area', models.ForeignKey(verbose_name='\u5730\u57df', to='yqj.Area')),
             ],
             options={
@@ -89,6 +90,19 @@ class Migration(migrations.Migration):
             bases=(models.Model,),
         ),
         migrations.CreateModel(
+            name='Custom',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('searchkeyword', models.CharField(max_length=255, verbose_name='\u5173\u952e\u8bcd')),
+                ('articles', models.ManyToManyField(related_query_name=b'customs', related_name='custom', to='yqj.Article', blank=True, null=True, verbose_name='\u6587\u7ae0')),
+            ],
+            options={
+                'db_table': 'custom',
+                'verbose_name_plural': '\u6307\u5b9a\u76d1\u6d4b',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
             name='Group',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
@@ -117,6 +131,21 @@ class Migration(migrations.Migration):
                 'ordering': ['-pubtime'],
                 'db_table': 'inspection',
                 'verbose_name_plural': '\u62bd\u68c0',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Keyword',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('newkeyword', models.CharField(max_length=255, verbose_name='\u5173\u952e\u8bcd')),
+                ('review', models.CharField(default='', max_length=255, verbose_name='\u5ba1\u6838')),
+                ('custom', models.ForeignKey(to='yqj.Custom')),
+                ('group', models.ForeignKey(to='yqj.Group')),
+            ],
+            options={
+                'db_table': 'keyword',
+                'verbose_name_plural': '\u5173\u952e\u8bcd',
             },
             bases=(models.Model,),
         ),
@@ -208,9 +237,9 @@ class Migration(migrations.Migration):
                 ('source', models.CharField(max_length=255, verbose_name='\u4fe1\u606f\u6765\u6e90', blank=True)),
                 ('website_type', models.CharField(max_length=255, verbose_name='\u7f51\u7ad9\u7c7b\u578b', blank=True)),
                 ('pubtime', models.DateTimeField(verbose_name='\u53d1\u5e03\u65f6\u95f4')),
-                ('praise', models.IntegerField(verbose_name='\u70b9\u8d5e\u6570', blank=True)),
-                ('comment', models.IntegerField(verbose_name='\u8bc4\u8bba\u91cf', blank=True)),
-                ('tansmit', models.IntegerField(verbose_name='\u8f6c\u53d1\u91cf', blank=True)),
+                ('attitudes_count', models.IntegerField(verbose_name='\u70b9\u8d5e\u6570', blank=True)),
+                ('comments_count', models.IntegerField(verbose_name='\u8bc4\u8bba\u91cf', blank=True)),
+                ('reposts_count', models.IntegerField(verbose_name='\u8f6c\u53d1\u91cf', blank=True)),
                 ('uuid', models.CharField(max_length=36)),
                 ('area', models.ForeignKey(verbose_name='\u5730\u57df', to='yqj.Area')),
             ],
@@ -248,6 +277,8 @@ class Migration(migrations.Migration):
                 ('website_type', models.CharField(max_length=255, verbose_name='\u7f51\u7ad9\u7c7b\u578b', blank=True)),
                 ('pubtime', models.DateTimeField(verbose_name='\u53d1\u5e03\u65f6\u95f4')),
                 ('uuid', models.CharField(max_length=36)),
+                ('readnum', models.IntegerField(verbose_name='\u9605\u8bfb\u6570', blank=True)),
+                ('likenum', models.IntegerField(verbose_name='\u70b9\u8d5e\u6570', blank=True)),
                 ('area', models.ForeignKey(verbose_name='\u5730\u57df', to='yqj.Area')),
             ],
             options={
@@ -333,6 +364,18 @@ class Migration(migrations.Migration):
             model_name='relateddata',
             name='weixin',
             field=models.ManyToManyField(related_query_name=b'relateddatas', related_name='relateddata', to='yqj.Weixin', blank=True, null=True, verbose_name='\u5fae\u4fe1'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='custom',
+            name='weibo',
+            field=models.ManyToManyField(related_query_name=b'customs', related_name='custom', to='yqj.Weibo', blank=True, null=True, verbose_name='\u5fae\u535a'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='custom',
+            name='weixin',
+            field=models.ManyToManyField(related_query_name=b'customs', related_name='custom', to='yqj.Weixin', blank=True, null=True, verbose_name='\u5fae\u4fe1'),
             preserve_default=True,
         ),
         migrations.AddField(
