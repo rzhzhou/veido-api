@@ -234,7 +234,7 @@ class Keyword(models.Model):
     review = models.CharField(max_length=255, default=u'', verbose_name=u'审核')
     #synced = models.CharField(max_length=255, default=u'', verbose_name=u'同步')
     group = models.ForeignKey(Group)
-    custom = models.ForeignKey(Custom)
+    custom = models.ForeignKey(Custom, null=True, blank=True, default=u'')
 
     class Meta:
         db_table = 'keyword'
