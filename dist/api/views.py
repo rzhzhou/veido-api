@@ -440,7 +440,8 @@ class CollectView(APIView):
         view = ArticleTableView(self.request)
         title = view.title_html(url, item.title, item.id, 'article')
         hot_index = RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count()
-        line = [view.collected_html(item), title, item.publisher.publisher, item.area.name, item.pubtime.date(), hot_index]
+        line = [title, item.publisher.publisher, item.area.name, item.pubtime.date(), hot_index]
+        #line = [view.collected_html(item), title, item.publisher.publisher, item.area.name, item.pubtime.date(), hot_index]
         return line
 
     def topic_html(self, item):
@@ -453,7 +454,8 @@ class CollectView(APIView):
             pubtime = time[0].pubtime
         else:
             pubtime = datetime.datetime.now()
-        one_record = [view.collected_html(item), title, item.source, item.area.name, pubtime.date(), hot_index]
+        one_record = [title, item.source, item.area.name, pubtime.date(), hot_index]
+        #one_record = [view.collected_html(item), title, item.source, item.area.name, pubtime.date(), hot_index]
         return one_record
 
     def get(self, request, table_type, page):
@@ -647,6 +649,35 @@ class CustomWeiboView(TableAPIView):
         items = [SetLogo(data) for data in datas['items']]
         html = self.set_css_to_weibo(items)
         return Response({'html': html, 'total': datas['total_number']})
+
+
+class CustomModifyView(View):
+    def save(self, user):
+        try:
+            custom = Custom.objects.get(keyword=self.keyword)
+        except Custom.DoesNotExist:
+            custom = Custom(keyword=self.keyword)
+            custom.save()
+        group = user.group
+        try:
+            custom.group.add(group)
+        except:
+            return JsonResponse({'status': False})
+
+    def remove(self, user):
+        pass
+
+    def post(self, request, action):
+        try:
+            self.keyword = request.POST['keyword']
+        except KeyError:
+            return HttpResponse(status=404)
+        user = self.request.myuser
+        if action == 'add':
+            self.save(user)
+        if action == 'remove':
+            self.delete(user)
+        return JsonResponse({'status': True})
 
 
 class InspectionTableView(TableAPIView):

@@ -219,6 +219,8 @@ class User(models.Model):
 
 class Custom(models.Model):
     keyword = models.CharField(max_length=255, verbose_name=u'关键词')
+    #review = models.CharField(max_length=255, default=u'', verbose_name=u'审核')
+    #synced = models.CharField(max_length=255, default=u'', verbose_name=u'同步')
     group = models.ManyToManyField(Group, related_name='custom', related_query_name='customs', null=True, blank=True, verbose_name=u'所属组')
     articles = models.ManyToManyField(Article, related_name='custom', related_query_name='customs', null=True, blank=True, verbose_name=u'文章')
     weibo = models.ManyToManyField(Weibo, related_name='custom', related_query_name='customs', null=True, blank=True, verbose_name=u'微博')
