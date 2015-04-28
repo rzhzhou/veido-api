@@ -13,7 +13,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from yqj.models import (Article, Area, Weixin, Weibo, Topic, RelatedData, ArticleCategory,
-                            save_user, Collection, Topic, hash_password, User, Custom, Inspection)
+                        save_user, Collection, Topic, hash_password, User, Custom, 
+                        Inspection, Keyword)
 from yqj.views import SetLogo
 from serializers import ArticleSerializer
 from yqj import authenticate, login_required
@@ -613,11 +614,12 @@ class CustomTableView(TableAPIView):
         return Article.objects.raw(u"SELECT * FROM article WHERE MATCH (content, title) AGAINST ('%s')" % (keyword))
 
     def get(self, request, custom_id, page):
-        try: 
-            custom = Custom.objects.get(id=int(custom_id))
-        except Custom.DoesNotExist:
+        user = request.myuser
+        try:
+            keyword = Keyword.objects.get(id=int(custom_id), group=user.group)
+        except Keyword.DoesNotExist:
             return Response({'total': 0, 'data': []})
-        items = custom.articles.all()
+        items = keyword.custom.articles.all()
         datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
         result = self.news_to_json(datas['items'])
         return Response({'total': datas['total_number'], 'data': result})
@@ -626,11 +628,12 @@ class CustomTableView(TableAPIView):
 class CustomWeixinView(TableAPIView):
     CUSTOM_WEIXIN_LIMIT = 10
     def get(self, request, custom_id, page):
+        user = request.myuser
         try:
-            custom = Custom.objects.get(id=int(custom_id))
-        except Custom.DoesNotExist:
+            keyword = Keyword.objects.get(id=int(custom_id), group=user.group)
+        except Keyword.DoesNotExist:
             return Response({'html': '', 'total': 0})
-        items = custom.weixin.all() 
+        items = keyword.custom.weixin.all() 
         datas = self.paging(items, self.CUSTOM_WEIXIN_LIMIT, page)
         items = [SetLogo(data) for data in datas['items']]
         html = self.set_css_to_weixin(items)
@@ -640,11 +643,12 @@ class CustomWeixinView(TableAPIView):
 class CustomWeiboView(TableAPIView):
     CUSTOM_WEIBO_LIMIT = 10
     def get(self, request, custom_id, page):
+        user = request.myuser
         try:
-            custom = Custom.objects.get(id=int(custom_id))
-        except Custom.DoesNotExist:
+            keyword = Keyword.objects.get(id=int(custom_id), group=user.group)
+        except Keyword.DoesNotExist:
             return Response({'html': '', 'total': 0})
-        items = custom.weibo.all()
+        items = keyword.custom.weibo.all()
         datas = self.paging(items, self.CUSTOM_WEIBO_LIMIT, page)
         items = [SetLogo(data) for data in datas['items']]
         html = self.set_css_to_weibo(items)
@@ -654,15 +658,10 @@ class CustomWeiboView(TableAPIView):
 class CustomModifyView(View):
     def save(self, user):
         try:
-            custom = Custom.objects.get(keyword=self.keyword)
-        except Custom.DoesNotExist:
-            custom = Custom(keyword=self.keyword)
+            custom = Keyword(newkeyword=self.keyword, group=user.group)
             custom.save()
-        group = user.group
-        try:
-            custom.group.add(group)
-        except:
-            return JsonResponse({'status': False})
+        except IntegrityError:
+            pass
 
     def remove(self, user):
         pass

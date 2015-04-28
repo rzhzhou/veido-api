@@ -1,6 +1,7 @@
 from django.contrib import admin
 from models import WeixinPublisher, WeiboPublisher, ArticlePublisher,\
-                   ArticleCategory, Group, User, Article, Topic, Custom
+                   ArticleCategory, Group, User, Article, Topic, Custom,\
+                   Keyword
 
 
 class ArticleAdmin(admin.ModelAdmin):
@@ -30,3 +31,4 @@ admin.site.register(Group)
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(Topic)
 admin.site.register(Custom)
+admin.site.register(Keyword)

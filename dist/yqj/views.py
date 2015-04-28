@@ -6,7 +6,8 @@ from django.conf import settings
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import View
-from yqj.models import Article, Weixin, Weibo, RelatedData, ArticleCategory, Area, Topic, Inspection, Custom
+from yqj.models import Article, Weixin, Weibo, RelatedData, ArticleCategory,\
+                       Area, Topic, Inspection, Custom, Keyword
 from yqj import login_required
 from yqj.redisconnect import RedisQueryApi
 from django.db.models import Q
@@ -308,22 +309,14 @@ class CustomListView(BaseView):
     custom_list_num = 5
     def get(self, request):
         user = self.request.myuser
-        custom_list = user.group.custom.all()
+        newkeyword_list = Keyword.objects.filter(group=user.group).exclude(custom__isnull=False)
+        searchkeyword_list = Keyword.objects.filter(group=user.group).exclude(custom__isnull=True)
         keyword_list = []
-        for keyword in custom_list:
-            item = {}
-            item['name'] = keyword.keyword
-            item['news_list'] = keyword.articles.all()[:self.custom_list_num]
-            setattr(keyword, 'name', keyword.keyword)
-            setattr(keyword, 'news_list', keyword.articles.all()[:self.custom_list_num])
+        for keyword in searchkeyword_list:
+            setattr(keyword, 'name', keyword.newkeyword)
+            setattr(keyword, 'news_list', keyword.custom.articles.all()[:self.custom_list_num])
             keyword_list.append(keyword)
-        return self.render_to_response('custom/custom_list.html', {'custom_list': keyword_list})
-
-        #customname = [u'电梯',u'锅炉', u'两会']
-        #custom_list = []
-        #for name in customname:
-        #    custom_list.append({'name': name, 'news_list': self.get_news(name), 'id': customname.index(name)})
-        #return self.render_to_response('custom/custom_list.html', {'custom_list': custom_list})
+        return self.render_to_response('custom/custom_list.html', {'custom_list': keyword_list, 'keyword_list': newkeyword_list})
 
     def get_news(self, keyword):
         return Article.objects.raw(u"SELECT * FROM article WHERE MATCH (content, title) AGAINST ('%s') LIMIT %s" % (keyword, self.custom_list_num))
@@ -331,20 +324,12 @@ class CustomListView(BaseView):
 
 class CustomView(BaseView):
     def get(self, request, id):
+        user = request.myuser
         try:
-            custom = Custom.objects.get(id=int(id))
-        except Custom.DoesNotExist:
-            return self.render_to_response('custom/custom.html')
-        return self.render_to_response('custom/custom.html', {'name': custom.keyword})
-        #weixin_list = custom.weixin.all()
-        #weibo_list = custom.weibo.all()
-        #customname = [u'电梯',u'锅炉', u'两会']
-        #custom = {}
-        #try:
-        #    custom['name'] = customname[int(id)]
-        #except KeyError:
-        #    return self.render_to_response('custom/custom.html')
-        #return self.render_to_response('custom/custom.html', {'name': custom['name'], 'weixin_list': [], 'weibo_list': []})
+            custom = Keyword.objects.get(id=int(id), group=user.group)
+        except Keyword.DoesNotExist:
+            return self.render_to_response('custom/custom.html', {'name': u''})
+        return self.render_to_response('custom/custom.html', {'name': custom.newkeyword})
 
 
 class UserView(BaseView):
