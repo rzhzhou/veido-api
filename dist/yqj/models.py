@@ -80,11 +80,8 @@ class Weibo(models.Model):
     pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
     publisher = models.ForeignKey(WeiboPublisher, verbose_name=u'微博发布者')
     area = models.ForeignKey(Area, verbose_name=u'地域')
-    #praise = models.IntegerField(blank=True, verbose_name=u'点赞数')
     attitudes_count = models.IntegerField(blank=True, verbose_name=u'点赞数')
-    #comment = models.IntegerField(blank=True, verbose_name=u'评论量')
     comments_count = models.IntegerField(blank=True, verbose_name=u'评论量')
-    #tansmit = models.IntegerField(blank=True, verbose_name=u'转发量')
     reposts_count = models.IntegerField(blank=True, verbose_name=u'转发量')
     uuid = models.CharField(max_length=36)
 
@@ -218,10 +215,8 @@ class User(models.Model):
 
 
 class Custom(models.Model):
-    keyword = models.CharField(max_length=255, verbose_name=u'关键词')
-    #review = models.CharField(max_length=255, default=u'', verbose_name=u'审核')
-    #synced = models.CharField(max_length=255, default=u'', verbose_name=u'同步')
-    group = models.ManyToManyField(Group, related_name='custom', related_query_name='customs', null=True, blank=True, verbose_name=u'所属组')
+    searchkeyword = models.CharField(max_length=255, verbose_name=u'关键词')
+    #group = models.ManyToManyField(Group, related_name='custom', related_query_name='customs', null=True, blank=True, verbose_name=u'所属组')
     articles = models.ManyToManyField(Article, related_name='custom', related_query_name='customs', null=True, blank=True, verbose_name=u'文章')
     weibo = models.ManyToManyField(Weibo, related_name='custom', related_query_name='customs', null=True, blank=True, verbose_name=u'微博')
     weixin = models.ManyToManyField(Weixin, related_name='custom', related_query_name='customs', null=True, blank=True, verbose_name=u'微信')
@@ -231,7 +226,22 @@ class Custom(models.Model):
         verbose_name_plural = u'指定监测'
 
     def __unicode__(self):
-        return self.keyword
+        return self.searchkeyword
+
+
+class Keyword(models.Model):
+    newkeyword = models.CharField(max_length=255, verbose_name=u'关键词')
+    review = models.CharField(max_length=255, default=u'', verbose_name=u'审核')
+    #synced = models.CharField(max_length=255, default=u'', verbose_name=u'同步')
+    group = models.ForeignKey(Group)
+    custom = models.ForeignKey(Custom)
+
+    class Meta:
+        db_table = 'keyword'
+        verbose_name_plural = u'关键词'
+
+    def __unicode__(self):
+        return self.newkeyword
 
 
 class Collection(models.Model):
