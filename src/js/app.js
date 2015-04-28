@@ -480,10 +480,13 @@ app.custom = function() {
   var response = function(data) {
     if (data.status) {
       $msg.text('关键词添加成功！').show();
-      location.reload();
     } else {
       $msg.text('关键词添加失败！').show();
     }
+
+    setTimeout(function() {
+      location.reload();
+    }, 1000);
   };
 
   var addKeyword = function() {
@@ -500,7 +503,9 @@ app.custom = function() {
     });
   };
 
-  if ( $list.length > 6 ) {
+  // console.log($list.length >= 5);
+
+  if ( $list.length >= 5 ) {
     $fieldset.prop('disabled', true);
   } else {
     addKeyword();
