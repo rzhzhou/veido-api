@@ -227,7 +227,15 @@ class NewsDetailView(BaseView):
             event = Topic.objects.filter(articles__id=news_id)[0]
         except IndexError:
             event = ''
-        return self.render_to_response('news/news.html', {'article': SetLogo(news), 'relate': relateddata, 'event': event})
+        user = self.request.myuser
+        try:
+            collection = user.collection
+        except Collection.DoesNotExist:
+            collection = Collection(user=user)
+            collection.save()
+        items = user.collection.articles.all()
+        iscollected = any(filter(lambda x: x.id == news.id, items))
+        return self.render_to_response('news/news.html', {'article': SetLogo(news), 'relate': relateddata, 'event': event, 'isCollected': iscollected})
 
 
 class EventView(BaseView):
@@ -242,6 +250,14 @@ class EventDetailView(BaseView):
             event = Topic.objects.get(id=event_id)
         except Topic.DoesNotExist:
             return self.render_to_response('event/event.html', {'event': '', 'weixin_list': [], 'weibo_list': []})
+        user = self.request.myuser
+        try:
+            collection = user.collection
+        except Collection.DoesNotExist:
+            collection = Collection(user=user)
+            collection.save()
+        items = user.collection.events.all()
+        iscollected = any(filter(lambda x: x.id == event.id, items))
         #weixin_list = [SetLogo(item) for item in event.weixin.all()][:10]
         #weibo_list = [SetLogo(item) for item in event.weibo.all()][:10]
         #for item in weibo_list:
@@ -249,7 +265,7 @@ class EventDetailView(BaseView):
         #    if len(item.content) < 144:
         #        setattr(item, 'short', True)
         #return self.render_to_response('event/event.html', {'event': event, 'weixin_list': weixin_list, 'weibo_list': weibo_list})
-        return self.render_to_response('event/event.html', {'event': event})
+        return self.render_to_response('event/event.html', {'event': event, 'isCollected': iscollected})
 
 
 class WeixinView(BaseView):
