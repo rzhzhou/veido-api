@@ -59,7 +59,7 @@ def registe_view(request):
     except :
         return JsonResponse({'status': False})
 
-    return JsonResponse({'status': True})
+    return JsonResponse ({'status': True})
 
 
 class LoginRequiredMixin(object):
@@ -284,7 +284,7 @@ class NewsTableView(TableAPIView):
         return Response({"news": result})
     """
     def get(self, request, page):
-        items = Article.objects.all()
+        items = Article.objects.filter(website_type='topic')
         datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
         result = self.news_to_json(datas['items'])
         return Response({'total': datas['total_number'], 'data': result})
