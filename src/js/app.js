@@ -513,6 +513,36 @@ app.custom = function() {
 };
 
 
+app.collection = function() {
+  var _this = this;
+
+  $('.collection').click(function(event) {
+    var star = $(this).find('i');
+    var text = $(this).find('span');
+
+    var collect = function(action, api) {
+      var urlArray = _this.url.split('/');
+      var data = {
+        type: urlArray[1],
+        id: urlArray[2]
+      };
+
+      $.post(api, data, function(action) {
+        star.toggleClass('fa-star-o');
+        star.toggleClass('fa-star');
+        text.text(action);
+      });
+    };
+
+    if ( star.hasClass('fa-star') ) {
+      collect('取消收藏', '/api/collection/remove/');
+    } else {
+      collect('添加收藏', '/api/collection/add/');
+    }
+  });
+};
+
+
 /*
  * run function when element exists
  */
@@ -529,6 +559,7 @@ $(function() {
         break;
       case 'news':
         $('#news').Do(app.table);
+        app.collection();
         break;
       case 'event':
         $('#event').Do(app.table);
