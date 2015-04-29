@@ -26,7 +26,7 @@
             <span class="article-author">{{ article.author }}</span>
             <span class="article-time">{{ article.pubtime | date:"Y-m-d" }}</span>
             <span class="collection">
-              {% if isCollected %}
+              {% if not isCollected %}
                 <i class="fa fa-star-o"></i>
                 添加收藏
               {% else %}
