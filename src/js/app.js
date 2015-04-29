@@ -516,28 +516,30 @@ app.custom = function() {
 app.collection = function() {
   var _this = this;
 
-  $('.collection').click(function(event) {
+  $('.collection').click(function() {
     var star = $(this).find('i');
     var text = $(this).find('span');
 
-    var collect = function(action, api) {
+    var collect = function(api, nextAction) {
       var urlArray = _this.url.split('/');
       var data = {
-        type: urlArray[1],
+        type: urlArray[1] == 'news' ? 'article' : 'topic',
         id: urlArray[2]
       };
 
-      $.post(api, data, function(action) {
-        star.toggleClass('fa-star-o');
-        star.toggleClass('fa-star');
-        text.text(action);
+      $.post(api, data, function(response) {
+        if (response.status) {
+          star.toggleClass('fa-star-o');
+          star.toggleClass('fa-star');
+          text.text(nextAction);
+        }
       });
     };
 
     if ( star.hasClass('fa-star') ) {
-      collect('取消收藏', '/api/collection/remove/');
+      collect('/api/collection/remove/', '添加收藏');
     } else {
-      collect('添加收藏', '/api/collection/add/');
+      collect('/api/collection/add/', '取消收藏');
     }
   });
 };
