@@ -659,12 +659,13 @@ class CustomModifyView(View):
     def save(self, user):
         count = Keyword.objects.filter(group=user.group).exclude(custom__isnull=False).count()
         if count >= 5:
-            return HttpResponse(status=404)
+            return {"status": False}
         try:
             custom = Keyword(newkeyword=self.keyword, group=user.group)
             custom.save()
         except IntegrityError:
-            return HttpResponse(status=404)
+            return {"status": False}
+        return {"status": True}
 
     def remove(self, user):
         pass
@@ -675,11 +676,12 @@ class CustomModifyView(View):
         except KeyError:
             return HttpResponse(status=404)
         user = self.request.myuser
+        status = {"status": False}
         if action == 'add':
-            self.save(user)
+            status = self.save(user)
         if action == 'remove':
-            self.delete(user)
-        return JsonResponse({'status': True})
+            status = self.delete(user)
+        return JsonResponse({'status': status['status']})
 
 
 class InspectionTableView(TableAPIView):
