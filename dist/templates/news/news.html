@@ -22,8 +22,18 @@
         </div>
         <div class="box-body">
           <div class="article-meta text-center">
+
             <span class="article-author">{{ article.author }}</span>
             <span class="article-time">{{ article.pubtime | date:"Y-m-d" }}</span>
+            <span class="collection">
+              {% if isCollected %}
+                <i class="fa fa-star-o"></i>
+                添加收藏
+              {% else %}
+                <i class="fa fa-star"></i>
+                取消收藏
+              {% endif %}
+            </span>
           </div>
           <div class="article-content">
             {{ article.content | safe}}
