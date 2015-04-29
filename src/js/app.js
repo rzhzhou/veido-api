@@ -569,6 +569,7 @@ $(function() {
         $('#pie-chart').Do(app.chart.pie);
         $('#news').Do(app.table);
         $('.sns').Do(app.sns);
+        app.collection();
         break;
       case 'weixin':
         // run function on 'weixin' and 'weibo'
