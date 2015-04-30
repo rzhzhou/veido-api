@@ -242,7 +242,7 @@ class NewsDetailView(BaseView):
             collection = user.collection
         except Collection.DoesNotExist:
             collection = Collection(user=user)
-            collection.save()
+            collection.save(using='master')
         items = user.collection.articles.all()
         iscollected = any(filter(lambda x: x.id == news.id, items))
         return self.render_to_response('news/news.html', {'article': SetLogo(news), 'relate': relateddata, 'event': event, 'isCollected': iscollected})
@@ -265,7 +265,7 @@ class EventDetailView(BaseView):
             collection = user.collection
         except Collection.DoesNotExist:
             collection = Collection(user=user)
-            collection.save()
+            collection.save(using='master')
         items = user.collection.events.all()
         iscollected = any(filter(lambda x: x.id == event.id, items))
         #weixin_list = [SetLogo(item) for item in event.weixin.all()][:10]
