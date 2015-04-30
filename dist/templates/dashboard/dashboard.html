@@ -17,13 +17,13 @@
         <span class="info-box-icon">
           <i class="fa fa-newspaper-o"></i>
         </span>
-        <div class="info-box-content">
+        <div class="info-box-content" data-number="{{ news.number }}" data-percent="{{ news.percent }}">
           <span class="info-box-text">新闻</span>
-          <span class="info-box-number">{{ news.number }}</span>
+          <span class="info-box-number"></span>
           <div class="progress">
-            <div class="progress-bar" style="width: {{ news.percent }}%"></div>
+            <div class="progress-bar"></div>
           </div>
-          <span class="progress-description">{{ news.percent }}% 增长</span>
+          <span class="progress-description"></span>
         </div>
       </a>
     </div>
@@ -33,13 +33,13 @@
         <span class="info-box-icon">
           <i class="fa fa-exclamation"></i>
         </span>
-        <div class="info-box-content">
+        <div class="info-box-content" data-number="{{ event.number }}" data-percent="{{ event.percent }}">
           <span class="info-box-text">事件</span>
-          <span class="info-box-number">{{ event.number }}</span>
+          <span class="info-box-number"></span>
           <div class="progress">
-            <div class="progress-bar" style="width: {{ event.percent }}%"></div>
+            <div class="progress-bar"></div>
           </div>
-          <span class="progress-description">{{ event.percent }}% 增长</span>
+          <span class="progress-description"></span>
         </div>
       </a>
     </div>
@@ -49,13 +49,13 @@
         <span class="info-box-icon">
           <i class="fa fa-weixin"></i>
         </span>
-        <div class="info-box-content">
+        <div class="info-box-content" data-number="{{ weixin.number }}" data-percent="{{ weixin.percent }}">
           <span class="info-box-text">微信</span>
-          <span class="info-box-number">{{ weixin.number }}</span>
+          <span class="info-box-number"></span>
           <div class="progress">
-            <div class="progress-bar" style="width: {{ weixin.percent }}%"></div>
+            <div class="progress-bar"></div>
           </div>
-          <span class="progress-description">{{ weixin.percent }}% 增长</span>
+          <span class="progress-description"></span>
         </div>
       </a>
     </div>
@@ -65,13 +65,13 @@
         <span class="info-box-icon">
           <i class="fa fa-weibo"></i>
         </span>
-        <div class="info-box-content">
+        <div class="info-box-content" data-number="{{ weibo.number }}" data-percent="{{ weibo.percent }}">
           <span class="info-box-text">微博</span>
-          <span class="info-box-number">{{ weibo.number }}</span>
+          <span class="info-box-number"></span>
           <div class="progress">
-            <div class="progress-bar" style="width: {{ weibo.percent }}%"></div>
+            <div class="progress-bar"></div>
           </div>
-          <span class="progress-description">{{ weibo.percent }}% 增长</span>
+          <span class="progress-description"></span>
         </div>
       </a>
     </div>
