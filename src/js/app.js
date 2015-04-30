@@ -544,6 +544,46 @@ app.collection = function() {
   });
 };
 
+app.dashboard = function() {
+  $('.info-box-content').each(function(index, element) {
+    var infoBoxNumber = $(element).find('.info-box-number'),
+        progressBar = $(element).find('.progress-bar'),
+        progressDescription = $(element).find('.progress-description');
+
+    var duration = 3000,
+        refreshInterval = 100,
+        loop = Math.floor( duration / refreshInterval ),
+        loopCount = 0;
+
+    var numberValue = 0,
+        numberFinal = $(element).data('number'),
+        numberIncrement = Math.floor( numberFinal / loop );
+
+    var percentValue = 0,
+        percentFinal = $(element).data('percent'),
+        percentIncrement = Math.floor( percentFinal / loop );
+
+    var interval = setInterval(countTo, refreshInterval);
+
+    function countTo() {
+      numberValue += numberIncrement;
+      percentValue += percentIncrement;
+
+      loopCount++;
+
+      if ( loopCount >= loop ) {
+        clearInterval(interval);
+        numberValue = numberFinal;
+        percentValue = percentFinal;
+      }
+
+      infoBoxNumber.text( numberValue.toFixed() );
+      progressBar.width( percentValue + '%' );
+      progressDescription.text( '占总数据 ' + percentValue.toFixed() + '%' );
+    }
+  });
+};
+
 
 /*
  * run function when element exists
@@ -556,6 +596,7 @@ $(function() {
     $('aside').Do(app.menu);
     switch (app.type) {
       case 'dashboard':
+        app.dashboard();
         $('#line-chart').Do(app.chart.line);
         $('#pie-chart').Do(app.chart.pie);
         break;
