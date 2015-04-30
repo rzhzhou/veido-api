@@ -28,10 +28,20 @@ def index_view(request):
         locations = Area.objects.filter(level=user.area.level+1, parent=user.area)
         user.company = user.group.company
 
-        news = Article.objects.filter(website_type='topic').count()
-        weibo = Weibo.objects.all().count()
-        weixin = Weixin.objects.all().count()
+        #news = Article.objects.filter(website_type='topic').count()
+        news_number = Article.objects.count()
+        weibo_number = Weibo.objects.count()
+        weixin_number = Weixin.objects.count()
+        total = news_number + weixin_number + weibo_number
         event = Topic.objects.all().count()
+        event_news_number = Article.objects.filter(website_type=' ').count()
+        event_weixin_number = Weixin.objects.filter(website_type=' ').count()
+        event_weibo_number = Weibo.objects.filter(website_type=' ').count()
+        event_data_number = event_news_number + event_weixin_number + event_weibo_number
+        news_percent = news_number*100/total
+        event_percent = event_data_number*100/total
+        weixin_percent = weixin_number*100/total
+        weibo_percent = weibo_number*100/total
 
         news_list_number = event_list_number = 10
         weixin_list_number = weibo_list_number = 5
@@ -73,10 +83,10 @@ def index_view(request):
             {'user': user,
             'categories': categories,
             'locations': locations,
-            'news': news,
-            'weibo': weibo,
-            'weixin': weixin,
-            'event': event,
+            'news': {'number': news_number, 'percent': news_percent},
+            'weibo': {'number': weibo_number, 'percent': weibo_percent},
+            'weixin': {'number': weixin_number, 'percent': weixin_percent},
+            'event': {'number': event, 'percent': event_percent},
             'news_list': news_list,
             'event_list': event_list,
             'weixin_hottest_list': weixin_data,

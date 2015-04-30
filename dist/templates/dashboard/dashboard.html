@@ -19,11 +19,11 @@
         </span>
         <div class="info-box-content">
           <span class="info-box-text">新闻</span>
-          <span class="info-box-number">{{ news }}</span>
+          <span class="info-box-number">{{ news.number }}</span>
           <div class="progress">
-            <div class="progress-bar" style="width: 70%"></div>
+            <div class="progress-bar" style="width: {{ news.percent }}%"></div>
           </div>
-          <span class="progress-description">70% 增长</span>
+          <span class="progress-description">{{ news.percent }}% 增长</span>
         </div>
       </a>
     </div>
@@ -35,11 +35,11 @@
         </span>
         <div class="info-box-content">
           <span class="info-box-text">事件</span>
-          <span class="info-box-number">{{ event }}</span>
+          <span class="info-box-number">{{ event.number }}</span>
           <div class="progress">
-            <div class="progress-bar" style="width: 60%"></div>
+            <div class="progress-bar" style="width: {{ event.percent }}%"></div>
           </div>
-          <span class="progress-description">60% 增长</span>
+          <span class="progress-description">{{ event.percent }}% 增长</span>
         </div>
       </a>
     </div>
@@ -51,11 +51,11 @@
         </span>
         <div class="info-box-content">
           <span class="info-box-text">微信</span>
-          <span class="info-box-number">{{ weixin }}</span>
+          <span class="info-box-number">{{ weixin.number }}</span>
           <div class="progress">
-            <div class="progress-bar" style="width: 60%"></div>
+            <div class="progress-bar" style="width: {{ weixin.percent }}%"></div>
           </div>
-          <span class="progress-description">60% 增长</span>
+          <span class="progress-description">{{ weixin.percent }}% 增长</span>
         </div>
       </a>
     </div>
@@ -67,11 +67,11 @@
         </span>
         <div class="info-box-content">
           <span class="info-box-text">微博</span>
-          <span class="info-box-number">{{ weibo}}</span>
+          <span class="info-box-number">{{ weibo.number }}</span>
           <div class="progress">
-            <div class="progress-bar" style="width: 60%"></div>
+            <div class="progress-bar" style="width: {{ weibo.percent }}%"></div>
           </div>
-          <span class="progress-description">60% 增长</span>
+          <span class="progress-description">{{ weibo.percent }}% 增长</span>
         </div>
       </a>
     </div>
