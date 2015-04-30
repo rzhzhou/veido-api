@@ -192,7 +192,7 @@ def save_user(username, raw_password, area, group):
     kwargs['area'] = area
     kwargs['group'] = group
     user = User(**kwargs)
-    user.save()
+    user.save(using='master')
     return user
 
 class Group(models.Model):

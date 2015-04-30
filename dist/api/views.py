@@ -107,7 +107,7 @@ class TableAPIView(APIView):
             self.collection = user.collection
         except Collection.DoesNotExist:
             self.collection = Collection(user=self.request.myuser)
-            self.collection.save()
+            self.collection.save(using='master')
         return user.collection.articles.all()
         #except:
         #    return []
@@ -464,7 +464,7 @@ class CollectView(APIView):
             self.collection = request.myuser.collection
         except Collection.DoesNotExist:
             self.collection = Collection(user=self.request.myuser)
-            self.collection.save()
+            self.collection.save(using='master')
         """
         news = [self.article_html(item) for item in self.collection.articles.all()]
         topic = [self.topic_html(item) for item in self.collection.events.all()]
@@ -496,7 +496,7 @@ class CollecModifyView(View):
             data['category'] =  category.name
         try:
             collection_item = self.get_related_model().objects.create(**data)
-            collection_item.save()
+            collection_item.save(using='master')
         except IntegrityError:
              pass
 
@@ -504,7 +504,7 @@ class CollecModifyView(View):
     def delete(self, item):
         try:
             collectitem = self.get_collection_model().objects.get(**{self.related_field: item, 'collection': self.collection})
-            collectitem.delete()
+            collectitem.delete(using='master')
         except self.get_collection_model.DoesNotExist:
             pass
 
@@ -521,7 +521,7 @@ class CollecModifyView(View):
             _collection = self.request.myuser.collection
         except ObjectDoesNotExist:
             _collection = Collection(user=user)
-            _collection.save()
+            _collection.save(using='master')
         return _collection
 
     @property
@@ -567,7 +567,7 @@ class SearchView(CollectView):
             self.collection = request.myuser.collection
         except Collection.DoesNotExist:
             self.collection = Collection(user=self.request.myuser)
-            self.collection.save()
+            self.collection.save(using='master')
         news = []
         for data in self.search_article(keyword):
             news.append(self.article_html(data))
@@ -662,7 +662,7 @@ class CustomModifyView(View):
             return {"status": False}
         try:
             custom = Keyword(newkeyword=self.keyword, group=user.group)
-            custom.save()
+            custom.save(using='master')
         except IntegrityError:
             return {"status": False}
         return {"status": True}
@@ -812,7 +812,7 @@ def change_passwd(request):
     #authencate success
     if user.password == coded:
         user.password = hash_password(new_passwd, user.salt)
-        user.save()
+        user.save(using='master')
         return JsonResponse({'status': True})
     else:
         return JsonResponse({'status': False})
@@ -833,7 +833,7 @@ def reset_passwd(request):
         if user_id in group_user_ids:
             user = User.objects.get(id=user_id)
             user.password = hash_password('123456', user.salt)
-            user.save()
+            user.save(using='master')
     return JsonResponse({'status': True})
 
 @login_required
@@ -851,7 +851,7 @@ def delete_user_view(request):
     for user_id in reseted_id_list:
         if user_id in group_user_ids and user_id != admin_user.id:
             delete_user = User.objects.get(id=user_id)
-            delete_user.delete()
+            delete_user.delete(using='master')
     return JsonResponse({'status': True})
 
 @login_required

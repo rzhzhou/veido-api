@@ -67,7 +67,14 @@ DATABASES = {
         'NAME': 'yqj',
         'USER': 'test',
         'PASSWORD': 'password',
-    }
+    },
+    'master': {
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': '192.168.1.101',
+        'NAME': 'yqj',
+        'USER': 'test',
+        'PASSWORD': 'password',
+    },
 }
 
 # Internationalization
@@ -99,6 +106,9 @@ TEMPLATE_DIRS = (
 )
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+#MEDIA_ROOT = '/var/www/media'
+#STATIC_ROOT = '/var/www/static'
 
 MEDIA_URL = '/media/'
 
