@@ -492,7 +492,10 @@ class CollecModifyView(View):
     def save(self, item):
         data = {self.related_field: item, 'collection': self.collection}
         if isinstance(item, Article):
-            category = item.categorys.all()[0]
+            try:
+                category = item.categorys.all()[0]
+            except IndexError:
+                category = ArticleCategory.objects.get(name='其他')
             data['category'] =  category.name
         try:
             collection_item = self.get_related_model().objects.create(**data)
@@ -658,6 +661,7 @@ class CustomWeiboView(TableAPIView):
 class CustomModifyView(View):
     def save(self, user):
         count = Keyword.objects.filter(group=user.group).exclude(custom__isnull=False).count()
+        print count
         if count >= 5:
             return {"status": False}
         try:
