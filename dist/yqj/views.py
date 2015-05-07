@@ -38,10 +38,10 @@ def index_view(request):
         event_weixin_number = Weixin.objects.filter(website_type='topic').count()
         event_weibo_number = Weibo.objects.filter(website_type='topic').count()
         event_data_number = event_news_number + event_weixin_number + event_weibo_number
-        news_percent = news_number*100/total
-        event_percent = event_data_number*100/total
-        weixin_percent = weixin_number*100/total
-        weibo_percent = weibo_number*100/total
+        news_percent = news_number*100/total if news_number else 0
+        event_percent = event_data_number*100/total if event_data_number else 0
+        weixin_percent = weixin_number*100/total if weixin_number else 0
+        weibo_percent = weibo_number*100/total if weibo_number else 0
 
         news_list_number = event_list_number = 10
         weixin_list_number = weibo_list_number = 5
