@@ -7,7 +7,7 @@ from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import View
 from yqj.models import Article, Weixin, Weibo, RelatedData, ArticleCategory,\
-                       Area, Topic, Inspection, Custom, Keyword
+                       Area, Topic, Inspection, Custom, Keyword, Collection
 from yqj import login_required
 from yqj.redisconnect import RedisQueryApi
 from django.db.models import Q
