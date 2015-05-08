@@ -64,14 +64,14 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'HOST': '192.168.1.101',
-        'NAME': 'yqj',
+        'NAME': 'yqj2',
         'USER': 'test',
         'PASSWORD': 'password',
     },
     'master': {
         'ENGINE': 'django.db.backends.mysql',
         'HOST': '192.168.1.101',
-        'NAME': 'yqj',
+        'NAME': 'yqj2',
         'USER': 'test',
         'PASSWORD': 'password',
     },
