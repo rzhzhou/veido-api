@@ -43,10 +43,17 @@ class TopicAdmin(admin.ModelAdmin):
     list_editable = ('source', 'area',)
     list_filter = ('source',)
     search_fields = ('title', 'source')
-
+    
     def save_model(self,request, obj, form, change):
-        CrawlerTask(obj.title, 'zjld', u"事件").type_task()
+        if not change:
+            CrawlerTask(obj.title, 'zjld', u"事件").type_task()
         obj.save()
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "area":
+            kwargs["queryset"] = Area.objects.filter(level__lt=3)
+        return super(TopicAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+
 
 
 # Register your models here.
