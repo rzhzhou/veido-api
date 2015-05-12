@@ -2,6 +2,7 @@
 import datetime
 import os
 
+from django.utils import timezone
 from django.conf import settings
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
@@ -47,7 +48,7 @@ def index_view(request):
         weixin_list_number = weibo_list_number = 5
 
 
-        end_date = datetime.datetime.now()
+        end_date = timezone.now()
         start_date = end_date + datetime.timedelta(days=-7)
         news_list = Article.objects.filter(website_type='topic' , pubtime__range=(start_date, end_date))[:300]
         for item in news_list:
