@@ -77,6 +77,7 @@ DATABASES = {
     },
 }
 
+MONGO_CONN_STR = "mongodb://192.168.1.118:27017"
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
 

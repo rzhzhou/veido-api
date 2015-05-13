@@ -1,11 +1,12 @@
+from django.conf import settings
 from pymongo import MongoClient
 from datetime import datetime, timedelta
 
 _CONN = None
 class MongoClient(object):
 
-    MONGO_CONN_STR = "mongodb://192.168.1.118:27017"
-    _conn = MongoClient(MONGO_CONN_STR)
+    
+    _conn = MongoClient(settings.MONGO_CONN_STR)
     db = _conn["crawler"]
 
 def mongo_db():
