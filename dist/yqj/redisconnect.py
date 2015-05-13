@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import redis
+from django.conf import settings
 
 
 class RedisClient(object):
@@ -8,11 +9,7 @@ class RedisClient(object):
 
     """docstring for RedisClient"""
     def __init__(self):
-        self.conf = {
-            'host': '192.168.1.118',
-            'port': '6379',
-            'db': 8
-        }
+        self.conf = settings.REDIS_CONF
 
     def connect(self):
         pool = redis.ConnectionPool(host=self.conf['host'],
