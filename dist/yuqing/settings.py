@@ -78,6 +78,13 @@ DATABASES = {
 }
 
 MONGO_CONN_STR = "mongodb://192.168.1.118:27017"
+
+REDIS_CONF = {
+            'host': '192.168.1.118',
+            'port': '6379',
+            'db': 8
+        }
+ 
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
 
