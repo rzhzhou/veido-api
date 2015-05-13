@@ -24,7 +24,7 @@ def SetLogo(obj):
 def index_view(request):
     user = request.myuser
     if user.is_authenticated():
-        categories = ArticleCategory.objects.all()
+        categories = ArticleCategory.objects.filter(~Q(name='其他'))
         locations = Area.objects.filter(level=user.area.level+1, parent=user.area)
         user.company = user.group.company
 
