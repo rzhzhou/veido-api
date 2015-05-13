@@ -80,7 +80,7 @@ DATABASES = {
 MONGO_CONN_STR = "mongodb://192.168.1.118:27017"
 
 REDIS_CONF = {
-            'host': '192.168.1.118',
+            'host': 'localhost',
             'port': '6379',
             'db': 8
         }
