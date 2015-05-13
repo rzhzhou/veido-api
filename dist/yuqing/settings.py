@@ -63,24 +63,24 @@ WSGI_APPLICATION = 'yuqing.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': '192.168.1.101',
-        'NAME': 'yqj2',
-        'USER': 'test',
-        'PASSWORD': 'password',
+        'HOST': 'localhost',
+        'NAME': 'yqj',
+        'USER': 'shendu',
+        'PASSWORD': 'P@55word',
     },
     'master': {
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': '192.168.1.101',
-        'NAME': 'yqj2',
-        'USER': 'test',
-        'PASSWORD': 'password',
+        'HOST': '192.168.1.161',
+        'NAME': 'yqj',
+        'USER': 'shendu',
+        'PASSWORD': 'P@55word',
     },
 }
 
 MONGO_CONN_STR = "mongodb://192.168.1.118:27017"
 
 REDIS_CONF = {
-            'host': '192.168.1.118',
+            'host': 'localhost',
             'port': '6379',
             'db': 8
         }
