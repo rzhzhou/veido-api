@@ -63,7 +63,7 @@ WSGI_APPLICATION = 'yuqing.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': 'localhost'
+        'HOST': 'localhost',
         'NAME': 'yqj',
         'USER': 'shendu',
         'PASSWORD': 'P@55word',
