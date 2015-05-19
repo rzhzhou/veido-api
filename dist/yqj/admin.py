@@ -13,7 +13,7 @@ show_pubtime.short_description = u'发布时间'
 
 class ArticleAdmin(admin.ModelAdmin):
     list_display = ('title', 'source', 'area', 'feeling_factor', 'pubtime')
-    list_editable = ('source', 'feeling_factor', 'pubtime', 'area',)
+    list_editable = ('source', 'feeling_factor', 'pubtime',)
     list_filter = ('pubtime', )
     search_fields = ('title', 'source', 'content')
     #raw_id_fields = ('area', 'publisher', )
