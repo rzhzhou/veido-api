@@ -3,40 +3,40 @@ from pymongo import MongoClient
 from datetime import datetime, timedelta
 
 _CONN = None
-class MongoClient(object):
+class MongoClients(object):
 
-    
-    _conn = MongoClient(settings.MONGO_CONN_STR)
-    db = _conn["crawler"]
+    def __init__(self):
+        self._conn = MongoClient(settings.MONGO_CONN_STR)
+        self.db = self._conn["crawler"]
 
-def mongo_db():
-    return _CONN  if _CONN else MongoClient().db
+    def mongo_db(self):
+        return _CONN  if _CONN else self.db
 
-_db = mongo_db()
+
 class MongodbQuerApi(object):
 
     def __init__(self, table):
         self.table =table
-
+        self._db = MongoClients().mongo_db()
 
     def save(self, dct):
 
         def insert():
-            _db[self.table].insert(dct)
+            self._db[self.table].insert(dct)
 
         insert()
 
     def find_one(self, dct):
 
         def result():
-            return _db[self.table].find_one(dct)
+            return self._db[self.table].find_one(dct)
 
         return result()
 
     def update(self, term, dct):
 
         def result():
-            _db[self.table].update(term,dct)
+            self._db[self.table].update(term,dct)
 
         result()
 
