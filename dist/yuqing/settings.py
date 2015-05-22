@@ -25,7 +25,7 @@ DEBUG = True
 
 TEMPLATE_DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['192.168.1.161', '27.17.61.26', 'cnshendu.com', 'www.cnshendu.com']
 
 
 # Application definition
@@ -70,7 +70,7 @@ DATABASES = {
     },
     'master': {
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': '192.168.1.161',
+        'HOST': '27.17.61.26',
         'NAME': 'yqj',
         'USER': 'shendu',
         'PASSWORD': 'P@55word',
@@ -115,8 +115,8 @@ TEMPLATE_DIRS = (
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-#MEDIA_ROOT = '/var/www/media'
-#STATIC_ROOT = '/var/www/static'
+MEDIA_ROOT = '/var/www/media'
+STATIC_ROOT = '/var/www/static'
 
 MEDIA_URL = '/media/'
 
@@ -124,4 +124,4 @@ MEDIA_URL = '/media/'
 
 
 
-COMPANY_NAME = u'武汉市质监局'
+COMPANY_NAME = u'质监局'
