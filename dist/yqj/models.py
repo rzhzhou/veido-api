@@ -135,7 +135,7 @@ class Topic(models.Model):
     abstract = models.TextField(blank=True, verbose_name=u'简介')
     source = models.CharField(max_length=255, blank=True, verbose_name=u'首发媒体')
     area = models.ForeignKey(Area, verbose_name=u'地域')
-    keywords = models.CharField(max_length=255, default=u'', verbose_name=u'关键词')
+    keywords = models.CharField(max_length=255, default=u'', verbose_name=u'关键词', blank=True)
     articles = models.ManyToManyField(Article, related_name='topic', related_query_name='topics', null=True, blank=True, verbose_name=u'文章')
     weibo = models.ManyToManyField(Weibo, related_name='topic', related_query_name='topics', null=True, blank=True, verbose_name=u'微博')
     weixin = models.ManyToManyField(Weixin, related_name='topic', related_query_name='topics', null=True, blank=True, verbose_name=u'微信')
