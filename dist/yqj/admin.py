@@ -3,13 +3,33 @@ from django.contrib import admin
 from django import forms
 from django.contrib import messages
 from yqj.mongoconnect import CrawlerTask
-from models import WeixinPublisher, WeiboPublisher, ArticlePublisher,\
+from models import WeixinPublisher, WeiboPublisher,Weibo, ArticlePublisher,\
                    ArticleCategory, Group, User, Article, Topic, Custom,\
                    Keyword, Area
 
 def show_pubtime(obj):
     return obj.pubtime.replace(tzinfo=None).strftime('%Y-%m-%d %H:%M')
 show_pubtime.short_description = u'发布时间'
+
+
+class WeiboAdmin(admin.ModelAdmin):
+    list_display = ('title', 'source', 'website_type', 'area','pubtime')
+    list_editable = ('source', 'pubtime',)
+    list_filter = ('pubtime', )
+    search_fields = ('title', 'source', 'content')
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "area":
+            kwargs["queryset"] = Area.objects.filter(level__lt=3)
+        return super(WeiboAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+
+class WeixinAdmin(admin.ModelAdmin):
+    fields=('author','title','url','content','origin_source','source','website_type','pubtime','publisher','area','uuid','readnum','likenum')
+    list_display=('author','title','origin_source','source','pubtime','publisher','area','readnum')
+    list_editable=('title','pubtime','readnum',)
+    list_filter=('source','origin_source','pubtime',)
+    search_fields=('title','source')
+
 
 class ArticleAdmin(admin.ModelAdmin):
     list_display = ('title', 'source', 'area', 'feeling_factor', 'pubtime')
@@ -56,10 +76,13 @@ class TopicAdmin(admin.ModelAdmin):
 
 
 
+
 # Register your models here.
 
 admin.site.register(WeixinPublisher)
 admin.site.register(WeiboPublisher)
+admin.site.register(Weibo,WeiboAdmin)
+admin.site.register(Weixin,WeixinAdmin)
 admin.site.register(ArticlePublisher)
 admin.site.register(ArticleCategory)
 admin.site.register(User)
