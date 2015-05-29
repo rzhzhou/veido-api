@@ -21,8 +21,8 @@ gulp.task('default', ['browser-sync'], function() {
 gulp.task('browser-sync', function() {
   browserSync({
     notify: false,
-    proxy: '0.0.0.0:8000',
-    port: 8080,
+    proxy: '192.168.168.168:8000',
+    port: 8000,
     open: false
   });
 });
