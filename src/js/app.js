@@ -1,9 +1,11 @@
+'use strict';
+
 /*
  * configuration
  */
 require.config({
   paths: {
-    echarts: "/vendor/echarts"
+    echarts: '/vendor/echarts'
   }
 });
 
@@ -47,7 +49,7 @@ app.user = {
 
       var response = function(data) {
         if (data.status) {
-          location.href = location.search.length ? location.search.substr(1).split("=")[1] : "/";
+          location.href = location.search.length ? location.search.substr(1).split('=')[1] : '/';
         } else {
           msg.text('用户名或密码错误！');
         }
@@ -158,7 +160,7 @@ app.user = {
 
       var response = function(data) {
         if (data.status) {
-          location.href = "/user/";
+          location.href = '/user/';
         } else {
           msg.text('抱歉，注册失败！').show();
         }
@@ -202,7 +204,7 @@ app.search = function() {
 };
 
 app.menu = function() {
-  var menu  = this.find('a').filter(function() { return this.href === location.href });
+  var menu  = this.find('a').filter(function() { return this.href === location.href; });
   menu.parent().addClass('active');
   menu.closest('.treeview-menu').addClass('menu-open');
   menu.closest('.treeview').addClass('active');
@@ -265,7 +267,7 @@ app.chart = {
         ec.init(document.getElementById('pie-chart'), 'macarons').setOption({
           tooltip: {
             trigger: 'item',
-            formatter: "{a} <br/>{b} : {c} ({d}%)"
+            formatter: '{a} <br/>{b} : {c} ({d}%)'
           },
           legend: {
             data: data.name
@@ -345,35 +347,35 @@ app.dataTable = function() {
   $.fn.dataTable.ext.errMode = 'throw';
 
   var table = this.DataTable({
-    "ajax": {
-      "url": '/api' + location.pathname,
-      "dataSrc": this[0].id,
-      "cache": true
+    'ajax': {
+      'url': '/api' + location.pathname,
+      'dataSrc': this[0].id,
+      'cache': true
     },
-    "autoWidth": false,
-    "pageLength": 25,
-    "order": [],
-    "language": {
-      "processing":         "处理中...",
-      "search":             "",
-      "searchPlaceholder":  "输入关键字过滤...",
-      "lengthMenu":         "显示 _MENU_ 条",
-      "info":               "显示第 _START_ 至 _END_ 条，共 _TOTAL_ 条",
-      "infoEmpty":          "信息空",
-      "infoFiltered":       "(由 _MAX_ 项结果过滤)",
-      "infoPostFix":        "",
-      "loadingRecords":     "载入中...",
-      "zeroRecords":        "无匹配结果",
-      "emptyTable":         "无结果",
-      "paginate": {
-        "first":            "第一页",
-        "previous":         "上一页",
-        "next":             "下一页",
-        "last":             "最后一页"
+    'autoWidth': false,
+    'pageLength': 25,
+    'order': [],
+    'language': {
+      'processing':         '处理中...',
+      'search':             '',
+      'searchPlaceholder':  '输入关键字过滤...',
+      'lengthMenu':         '显示 _MENU_ 条',
+      'info':               '显示第 _START_ 至 _END_ 条，共 _TOTAL_ 条',
+      'infoEmpty':          '信息空',
+      'infoFiltered':       '(由 _MAX_ 项结果过滤)',
+      'infoPostFix':        '',
+      'loadingRecords':     '载入中...',
+      'zeroRecords':        '无匹配结果',
+      'emptyTable':         '无结果',
+      'paginate': {
+        'first':            '第一页',
+        'previous':         '上一页',
+        'next':             '下一页',
+        'last':             '最后一页'
       },
-      "aria": {
-        "sortAscending":    "正序排列",
-        "sortDescending":   "倒序排列"
+      'aria': {
+        'sortAscending':    '正序排列',
+        'sortDescending':   '倒序排列'
       }
     },
     // "columnDefs": [{
@@ -385,8 +387,8 @@ app.dataTable = function() {
     //   "className": "index",
     //   "targets": -1
     // }],
-    "deferLoading": 100,
-    "drawCallback": function() {
+    'deferLoading': 100,
+    'drawCallback': function() {
       $('[data-toggle="tooltip"]').tooltip();
     }
   });
@@ -523,7 +525,7 @@ app.collection = function() {
     var collect = function(api, nextAction) {
       var urlArray = _this.url.split('/');
       var data = {
-        type: urlArray[1] == 'news' ? 'article' : 'topic',
+        type: urlArray[1] === 'news' ? 'article' : 'topic',
         id: urlArray[2]
       };
 
