@@ -5,7 +5,7 @@ from django.contrib import messages
 from yqj.mongoconnect import CrawlerTask
 from models import WeixinPublisher, WeiboPublisher,Weibo, ArticlePublisher,\
                    ArticleCategory, Group, User, Article, Topic, Custom,\
-                   Keyword, Area
+                   Keyword, Area,Weixin
 
 def show_pubtime(obj):
     return obj.pubtime.replace(tzinfo=None).strftime('%Y-%m-%d %H:%M')
