@@ -22,7 +22,7 @@ gulp.task('browser-sync', function() {
   browserSync({
     notify: false,
     proxy: '0.0.0.0:8000',
-    port: 80,
+    port: 8080,
     open: false
   });
 });
