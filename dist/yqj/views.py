@@ -8,13 +8,14 @@ from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import View
 from yqj.models import Article, Weixin, Weibo, RelatedData, ArticleCategory,\
-                       Area, Topic, Inspection, Custom, Keyword, Collection
+                       Area, Topic, Inspection, Custom, Keyword, Collection,ArticlePublisher
 from yqj import login_required
 from yqj.redisconnect import RedisQueryApi
 from django.db.models import Q
 from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
+from simArticle import sim_article
 
 def SetLogo(obj):
     if not obj.publisher.photo:
@@ -50,19 +51,26 @@ def index_view(request):
 
         end_date = timezone.now()
         start_date = end_date + datetime.timedelta(days=-7)
-        news_list = Article.objects.filter(website_type='topic' , pubtime__range=(start_date, end_date))[:300]
+        news_list = Article.objects.filter(website_type='hot' , pubtime__range=(start_date, end_date)).order_by('-pubtime')[:news_list_number]
         for item in news_list:
-            item = SetLogo(item)
             try:
                 setattr(item, 'hot_index', RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count())
             except IndexError:
                 setattr(item, 'hot_index', 0)
-        news_list = sorted(news_list, key = lambda x: x.hot_index, reverse=True)[:news_list_number]
+        #news_list = sorted(news_list, key = lambda x: x.hot_index, reverse=True)[:news_list_number]
 
         event_list = Topic.objects.all()
+        for iteml in event_list:
+            try:
+                setattr(iteml, 'time', iteml.articles.order_by('pubtime')[0].pubtime.replace(tzinfo=None).strftime('%Y-%m-%d'))
+            except IndexError:
+                setattr(iteml, 'time', datetime.datetime.now().strftime('%Y-%m-%d'))
+        event_list=sorted(event_list, key=lambda x: x.time, reverse=True)[:event_list_number]
+        #item['time'] = data.articles.order_by('pubtime')[0].pubtime.replace(tzinfo=None).strftime('%Y-%m-%d')
         for item in event_list:
-            setattr(item, 'hot_index', item.articles.all().count()+item.weixin.all().count()+item.weibo.all().count())
-        event_list = sorted(event_list, key = lambda x: x.hot_index, reverse=True)[:event_list_number]
+             setattr(item, 'hot_index', item.articles.all().count()+item.weixin.all().count()+item.weibo.all().count())
+        # event_list=sorted(event_list[:event_list_number],key=lambda x: x.hot_index, reverse=True)
+        #event_list = sorted(event_list, key = lambda x: x.hot_index, reverse=True)[:event_list_number]
 
         weibo_data = [eval(item) for item in RedisQueryApi().lrange('sort_weibohot', 0, -1)[:5]]
         for data in weibo_data:
@@ -246,7 +254,8 @@ class NewsDetailView(BaseView):
             collection.save(using='master')
         items = user.collection.articles.all()
         iscollected = any(filter(lambda x: x.id == news.id, items))
-        return self.render_to_response('news/news.html', {'article': SetLogo(news), 'relate': relateddata, 'event': event, 'isCollected': iscollected})
+        return self.render_to_response('news/news.html', {'article': news, 'relate': relateddata, 'event': event, 'isCollected': iscollected})
+ #sim_article(news.title,news.pubtime
 
 
 class EventView(BaseView):
