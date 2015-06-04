@@ -6,6 +6,7 @@ from yqj.mongoconnect import CrawlerTask
 from models import WeixinPublisher, WeiboPublisher,Weibo, ArticlePublisher,\
                    ArticleCategory, Group, User, Article, Topic, Custom,\
                    Keyword, Area,Weixin
+import jieba.analyse
 
 def show_pubtime(obj):
     return obj.pubtime.replace(tzinfo=None).strftime('%Y-%m-%d %H:%M')
@@ -63,8 +64,11 @@ class TopicAdmin(admin.ModelAdmin):
     list_editable = ('source', 'area',)
     list_filter = ('source',)
     search_fields = ('title', 'source')
-    
+    #
     def save_model(self,request, obj, form, change):
+        obj.keywords = jieba.analyse.extract_tags(obj.title, topK=3, withWeight=True, allowPOS=())
+         # return <type 'list'> contain tuple 
+
         if not change:
             CrawlerTask(obj.title, 'zjld', u"事件").type_task()
         obj.save()

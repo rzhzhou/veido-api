@@ -259,6 +259,8 @@ class EventDetailView(BaseView):
         try:
             event_id = int(id)
             event = Topic.objects.get(id=event_id)
+            eval_keywords_list = eval(event.keywords) if event.keywords else []
+            keywords_list = [{"name": name, "number": number} for name, number in eval_keywords_list]
         except Topic.DoesNotExist:
             return self.render_to_response('event/event.html', {'event': '', 'weixin_list': [], 'weibo_list': []})
         user = self.request.myuser
@@ -276,7 +278,7 @@ class EventDetailView(BaseView):
         #    if len(item.content) < 144:
         #        setattr(item, 'short', True)
         #return self.render_to_response('event/event.html', {'event': event, 'weixin_list': weixin_list, 'weibo_list': weibo_list})
-        return self.render_to_response('event/event.html', {'event': event, 'isCollected': iscollected})
+        return self.render_to_response('event/event.html', {'event': event, 'keywords_list': keywords_list, 'isCollected': iscollected})
 
 
 class WeixinView(BaseView):
