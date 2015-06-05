@@ -246,7 +246,7 @@ class NewsDetailView(BaseView):
             collection.save(using='master')
         items = user.collection.articles.all()
         iscollected = any(filter(lambda x: x.id == news.id, items))
-        return self.render_to_response('news/news.html', {'article': news, 'relate': relateddata, 'event': event, 'isCollected': iscollected})
+        return self.render_to_response('news/news.html', {'article': SetLogo(news), 'relate': relateddata, 'event': event, 'isCollected': iscollected})
  #sim_article(news.title,news.pubtime
 
 
