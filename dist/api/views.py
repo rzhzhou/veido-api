@@ -19,7 +19,7 @@ from yqj.views import SetLogo
 from serializers import ArticleSerializer
 from yqj import authenticate, login_required
 from django.db.models import Count
-from api_function import GetFirstDaySeason, get_season
+from api_function import GetFirstDaySeason, get_season, byYear, bySeason, byMonths, byDays
 from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
@@ -220,8 +220,7 @@ class TableAPIView(APIView):
             item['source'] = data.source
             item['location'] = data.area.name
             try:
-                item['time'] = data.articles.order_by('pubtime')[0].pubtime.replace(tzinfo=None).strftime('%Y-%m-%d')
-            
+                item['time'] = data.articles.order_by('pubtime')[0].pubtime.replace(tzinfo=None).strftime('%Y-%m-%d')           
             except IndexError:
                 item['time'] = datetime.datetime.now().strftime('%Y-%m-%d')
             item['hot'] = data.articles.count() + data.weixin.count() + data.weibo.count()
@@ -937,96 +936,24 @@ def chart_line_event_view(request, topic_id):
         return HttpResponse(status=404)
     if not articles:
         return HttpResponse(status=404)
-
-
     min_date = min(x.pubtime.date() for x in articles)
     max_date = max(x.pubtime.date() for x in articles)
     date_range = max_date - min_date
+    #data range by year
+    if date_range.days > 6 * 55:
+        return byYear(min_date, max_date, date_range, articles)
     #data range by season
-    if date_range.days > 6 * 30:
-        #get first day of the current season
-        current_date = GetFirstDaySeason(datetime.datetime.now())
-        #only get recent 4 season data
-        begin_date =  current_date - relativedelta(year=1)
-        negative, positive, neutral = defaultdict(int), defaultdict(int), defaultdict(int)
-        for art in articles:
-            date = GetFirstDaySeason(art.pubtime)
-            if date < begin_date:
-                continue
-            factor = art.feeling_factor
-            if factor > 0.6:
-                positive[date] += 1
-            elif factor < 0.4 and factor > 0:
-                negative[date] += 1
-            else:
-                neutral[date] += 1
-
-        range_date = [ current_date - relativedelta(months=i) for i in range(12, 0, -3) ]
-
-        data = {}
-        data['negative'] = [ negative[date] for date in range_date]
-        data['positive'] = [ positive[date] for date in range_date]
-        data['neutral'] = [ neutral[date] for date in range_date]
-        data['date'] = [ str(date.year) + get_season(date) for date in range_date]
-        return JsonResponse(data)
-
-
+    elif date_range.days > 6 * 30:
+        return bySeason(min_date, max_date, date_range, articles)
     #data range by month
-    elif  date_range.days > 6 * 7:
-        #get first day of the current month
-        current_date = datetime.datetime.now().date().replace(day=1)
-        #only get recent 6 months data
-        begin_date =  current_date - relativedelta(months=6)
-
-        negative, positive, neutral = defaultdict(int), defaultdict(int), defaultdict(int)
-        for art in articles:
-            date = art.pubtime.date().replace(day=1)
-            if date < begin_date:
-                continue
-            factor = art.feeling_factor
-            if factor > 0.6:
-                positive[date] += 1
-            elif factor < 0.4 and factor > 0:
-                negative[date] += 1
-            else:
-                neutral[date] += 1
-
-        range_date = [ current_date - relativedelta(months=i) for i in range(6, -1, -1) ]
-
-        data = {}
-        data['negative'] = [ negative[date] for date in range_date]
-        data['positive'] = [ positive[date] for date in range_date]
-        data['neutral'] = [ neutral[date] for date in range_date]
-        data['date'] = [ date.strftime("%Y-%m") for date in range_date]
-        return JsonResponse(data)
+    elif  date_range.days > 6 * 10:
+        return byMonths(min_date, max_date, date_range, articles)
     #data range by weeks
     else:
-        #find the first day of current week
-        today = datetime.datetime.now().date()
-        first_day = today - datetime.timedelta(days=today.weekday())
-        begin_date =  first_day - relativedelta(weeks=6)
-
-        get_week = lambda x : (first_day - x).days / 7 + 1
-        negative, positive, neutral = defaultdict(int), defaultdict(int), defaultdict(int)
-        for art in articles:
-            week = get_week(art.pubtime.date())
-            if week > 6:
-                continue
-            factor = art.feeling_factor
-            if factor > 0.6:
-                positive[week] += 1
-            elif factor < 0.4 and factor > 0:
-                negative[week] += 1
-            else:
-                neutral[week] += 1
-        range_week = range(6, -1, -1)
-
-        data = {}
-        data['positive'] = [ positive[week] for week in range_week ]
-        data['negative'] = [ negative[week] for week in range_week ]
-        data['neutral'] = [ neutral[week] for week in range_week ]
-        data['date'] = [ (first_day - datetime.timedelta(days=i*7)).strftime("%m-%d") for i in range_week ]
-        return JsonResponse(data)
+        if min_date.year != max_date.year:
+            return byMonths(min_date, max_date, date_range, articles)
+        else: 
+            return byDays(min_date, max_date, date_range, articles)
 
 
 @api_view(['GET'])
