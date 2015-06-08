@@ -24,6 +24,7 @@ from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
 from yqj.redisconnect import RedisQueryApi
+from django.db.models import Q
 
 def login_view(request):
     try:
@@ -289,7 +290,7 @@ class NewsTableView(TableAPIView):
         return Response({"news": result})
     """
     def get(self, request, page):
-        items = Article.objects.filter(website_type='topic')
+        items = Article.objects.filter(Q(website_type='topic') | Q(website_type='hot'))
         datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
         result = self.news_to_json(datas['items'])
         return Response({'total': datas['total_number'], 'data': result})
