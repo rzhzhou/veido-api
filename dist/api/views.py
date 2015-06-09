@@ -881,11 +881,11 @@ def add_user_view(request):
 def get_count_feeling(start_d, end_d, feeling_type):
     feeling_limit = ''
     if feeling_type == 'positive':
-        feeling_limit = 'feeling_factor >= 0.6'
+        feeling_limit = 'feeling_factor >= 0.9'
     elif feeling_type == 'negative':
-        feeling_limit = 'feeling_factor <= 0.4 and feeling_factor >= 0'
+        feeling_limit = 'feeling_factor <= 0.1 and feeling_factor >= 0'
     else:
-        feeling_limit = 'feeling_factor > 0.4  and feeling_factor < 0.6 or feeling_factor = -1'
+        feeling_limit = 'feeling_factor > 0.1  and feeling_factor < 0.9 or feeling_factor = -1'
 
     with connection.cursor() as c:
         sql_str = "SELECT Date(pubtime), COUNT(*) FROM article where Date(pubtime) >= '{0}' and Date(pubtime) < '{1}' and {2} group by Date(pubtime)".format(start_d, end_d, feeling_limit)

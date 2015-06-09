@@ -36,9 +36,9 @@ def byYear(min_date, max_date, date_range, articles):
         date = art.pubtime.date().year
         timel.append(date)
         factor = art.feeling_factor
-        if factor > 0.6:
+        if factor > 0.8:
             positive[date] += 1
-        elif factor < 0.4 and factor > 0:
+        elif factor < 0.2 and factor > 0:
             negative[date] += 1
         else:
             neutral[date] += 1
@@ -65,9 +65,9 @@ def bySeason(min_date, max_date, date_range, articles):
             if date < begin_date:
                 continue
             factor = art.feeling_factor
-            if factor > 0.6:
+            if factor > 0.9:
                 positive[date] += 1
-            elif factor < 0.4 and factor > 0:
+            elif factor < 0.1 and factor > 0:
                 negative[date] += 1
             else:
                 neutral[date] += 1
@@ -92,9 +92,9 @@ def byMonths(min_date, max_date, date_range, articles):
             if date < begin_date:
                 continue
             factor = art.feeling_factor
-            if factor > 0.6:
+            if factor > 0.9:
                 positive[date] += 1
-            elif factor < 0.4 and factor > 0:
+            elif factor < 0.1 and factor > 0:
                 negative[date] += 1
             else:
                 neutral[date] += 1
@@ -119,9 +119,9 @@ def byDays(min_date, max_date, date_range, articles):
             if week > 6:
                 continue
             factor = art.feeling_factor
-            if factor > 0.6:
+            if factor > 0.9:
                 positive[week] += 1
-            elif factor < 0.4 and factor > 0:
+            elif factor < 0.1 and factor > 0:
                 negative[week] += 1
             else:
                 neutral[week] += 1
