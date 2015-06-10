@@ -36,32 +36,35 @@ APP.type = location.pathname.split('/')[1] || 'dashboard';
 
 APP.user = {
   login: function() {
-    var form = this.find('form');
-    var msg  = this.find('p');
+    var form     = document.forms.login,
+        action   = form.action,
+        elements = form.elements,
+        username = elements.username,
+        password = elements.password,
+        submit   = form.getElementsByTagName('button')[0],
+        msg      = form.getElementsByTagName('p')[0];
 
-    form.submit(function(event) {
+    var enableSubmit = function() {
+      submit.disabled = !(username.value && password.value);
+    };
+
+    var processLogin = function(event) {
       event.preventDefault();
 
-      var data = {
-        username: $('#username').Trim(),
-        password: $('#password').Trim()
-      };
-
-      var response = function(data) {
-        if (data.status) {
+      $.post(action, $(form).serialize(), function(response) {
+        if (response.status) {
           location.href = location.search.length ? location.search.substr(1).split('=')[1] : '/';
         } else {
-          msg.text('用户名或密码错误！');
+          $(msg).text('用户名或密码错误！');
+          submit.disabled = true;
+          password.value  = '';
         }
-      };
+      });
+    };
 
-      if (data.username.length && data.password.length) {
-        $.post('/api/login/', data, response, 'json');
-      } else {
-        msg.text('请输入用户名和密码！');
-      }
-    });
+    $(form).keyup(enableSubmit).submit(processLogin);
   },
+
   change: function() {
     var form = this.find('form');
     var msg  = this.find('p');
