@@ -42,5 +42,6 @@ urlpatterns += patterns('yqj.views',
     url(r'^inspection/$', InspectionView.as_view()),
     url(r'^login/$', 'login_view'),
     url(r'^logout/$', 'logout_view'),
-    url(r'^search/(\S+)/$', SearchView.as_view()),
+    url(r'^search/(.+)/$', SearchView.as_view()),
+    # url(r'^search/(\s+)/$', SearchView.as_view()),
 )
