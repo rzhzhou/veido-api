@@ -595,7 +595,7 @@ APP.dashboard = function() {
  */
 $(function() {
   if (APP.type === 'login') {
-    $('.login-box').Do(APP.user.login);
+    APP.user.login();
   } else {
     $('aside').find('form').Do(APP.search);
     $('aside').Do(APP.menu);
