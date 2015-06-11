@@ -41,11 +41,11 @@ APP.user = {
         elements = form.elements,
         username = elements.username,
         password = elements.password,
-        submit   = form.getElementsByTagName('button')[0],
-        msg      = form.getElementsByTagName('p')[0];
+        submit   = elements[2],
+        $msg     = $(form).find('p');
 
     var enableSubmit = function() {
-      submit.disabled = !(username.value && password.value);
+      submit.disabled = !(username.value.length && password.value.length);
     };
 
     var processLogin = function(event) {
@@ -55,7 +55,7 @@ APP.user = {
         if (response.status) {
           location.href = location.search.length ? location.search.substr(1).split('=')[1] : '/';
         } else {
-          $(msg).text('用户名或密码错误！');
+          $msg.text('用户名或密码错误！');
           submit.disabled = true;
           password.value  = '';
         }
