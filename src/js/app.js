@@ -584,6 +584,12 @@ APP.dashboard = function() {
 };
 
 
+APP.product = function() {
+  $('.filter-list')
+    .find('a').filter(function() { return this.href === location.href; })
+    .parent().addClass('active');
+};
+
 /*
  * run function when element exists
  */
@@ -629,6 +635,10 @@ $(function() {
         APP.custom();
         $('#news').Do(APP.table);
         $('.sns').Do(APP.sns);
+        break;
+      case 'product':
+        APP.product();
+        $('#news').Do(APP.table);
         break;
       case 'collection':
         $('#news').Do(APP.table);
