@@ -176,10 +176,10 @@ class BaseView(LoginRequiredMixin, View):
 	try:
             # 获取某页对应的记录
             items = paginator.page(page)
-        except PageNotAnInteger: 
+        except PageNotAnInteger:
             # 如果页码不是个整数 取第一页的记录
             items = paginator.page(1)
-        except EmptyPage:  
+        except EmptyPage:
             # 如果页码太大，没有相应的记录 取最后一页的记录
             items = paginator.page(paginator.num_pages)
 
@@ -288,8 +288,8 @@ class WeixinView(BaseView):
         latest = self.paging(Weixin, 20, 1)
         items = [SetLogo(data) for data in latest['items']]
         html = self.set_css_to_weixin(items)
-        return self.render_to_response('weixin/weixin_list.html', {'weixin_latest_list': latest, 
-                                                                   'weixin_hottest_list': hottest, 
+        return self.render_to_response('weixin/weixin_list.html', {'weixin_latest_list': latest,
+                                                                   'weixin_hottest_list': hottest,
                                                                    'html': html,
                                                                    'total_page_number': latest['total_number']})
 
@@ -360,6 +360,12 @@ class CustomView(BaseView):
         except Keyword.DoesNotExist:
             return self.render_to_response('custom/custom.html', {'name': u''})
         return self.render_to_response('custom/custom.html', {'name': custom.newkeyword})
+
+
+class ProductView(BaseView):
+    def get(self, reqeust):
+        product_list = [{'id': i, 'name': 'product' + str(i)} for i in xrange(1, 11)]
+        return self.render_to_response('product/product.html', {'product_list': product_list})
 
 
 class UserView(BaseView):
