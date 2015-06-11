@@ -115,38 +115,37 @@ APP.user = {
       }
     });
   },
-  management: function() {
-    var $this  = this;
 
-    var button = $this.find('button');
-    var reset  = button.eq(0);
-    var remove = button.eq(1);
-
-    var id   = [];
+  admin: function() {
+    var $admin  = $('.user-admin'),
+        $input  = $admin.find('input'),
+        $button = $admin.find('button'),
+        $reset  = $button.eq(0),
+        $remove = $button.eq(1),
+        id      = [];
 
     var action = function(obj, api) {
       obj.click(function() {
         id.length = 0;
 
-        $this.find('input:checked').each(function(index, element) {
-          var _id = $(element).parent().next().data('id');
-          id.push(_id);
+        $input.filter(':checked').each(function(index, element) {
+          id.push( $(element).parent().next().data('id') );
         });
 
-        var response = function(data) {
+        var processResponse = function(data) {
           if (data.status) {
-            location.href = '/user/';
+            location.reload();
           }
         };
 
         if (id.length) {
-          $.post(api, {id: id.toString()}, response, 'json');
+          $.post(api, {id: id.toString()}, processResponse, 'json');
         }
       });
     };
 
-    action(reset, '/api/user/reset/');
-    action(remove, '/api/user/remove/');
+    action($reset, '/api/user/reset/');
+    action($remove, '/api/user/remove/');
   },
 
   add: function() {
@@ -648,7 +647,7 @@ $(function() {
         $('.user-info').Do(APP.user.change);
         break;
       case 'user':
-        $('.user-management').Do(APP.user.management);
+        APP.user.admin();
         APP.user.add();
         break;
       case 'search':
