@@ -41,11 +41,11 @@ APP.user = {
         elements = form.elements,
         username = elements.username,
         password = elements.password,
-        submit   = form.getElementsByTagName('button')[0],
-        msg      = form.getElementsByTagName('p')[0];
+        submit   = elements[2],
+        $msg     = $(form).find('p');
 
     var enableSubmit = function() {
-      submit.disabled = !(username.value && password.value);
+      submit.disabled = !(username.value.length && password.value.length);
     };
 
     var processLogin = function(event) {
@@ -55,7 +55,7 @@ APP.user = {
         if (response.status) {
           location.href = location.search.length ? location.search.substr(1).split('=')[1] : '/';
         } else {
-          $(msg).text('用户名或密码错误！');
+          $msg.text('用户名或密码错误！');
           submit.disabled = true;
           password.value  = '';
         }
@@ -148,49 +148,43 @@ APP.user = {
     action(reset, '/api/user/reset/');
     action(remove, '/api/user/remove/');
   },
-  add: function() {
-    var form = this.find('form');
-    var msg  = this.find('p');
 
-    form.submit(function(event) {
+  add: function() {
+    var form     = document.forms.add,
+        action   = form.action,
+        elements = form.elements,
+        username = elements.username,
+        password = elements.password,
+        retype   = elements.retype,
+        submit   = elements[3],
+        $msg     = $(form).find('p');
+
+    var enableSubmit = function() {
+      submit.disabled = !(username.value.length && password.value.length && retype.value.length);
+    };
+
+    var processAdd   = function(event) {
       event.preventDefault();
 
-      var data = {
-        username: $('#username').Trim(),
-        password: $('#password').Trim(),
-        retype:   $('#retype-password').Trim()
-      };
-
-      var response = function(data) {
-        if (data.status) {
+      var processResponse = function(response) {
+        if (response.status) {
           location.href = '/user/';
         } else {
-          msg.text('抱歉，注册失败！').show();
+          $msg.text('抱歉，添加失败！').show();
         }
       };
 
-      switch (0) {
-        case data.username.length:
-          msg.text('请输入用户名！').show();
-          break;
-        case data.password.length:
-          msg.text('请输入密码!').show();
-          break;
-        case data.retype.length:
-          msg.text('请确认密码！').show();
-          break;
-        case Number( data.password === data.retype ):
-          msg.text('两次输入密码不一致！').show();
-          break;
-        default:
-          var _data = {
-            username: data.username,
-            password: data.password
-          };
-          $.post('/api/user/add/', _data, response, 'json');
-          break;
+      if (password.value === retype.value) {
+        $.post(action, $([username, password]).serialize(), processResponse);
+      } else {
+        $msg.text('两次输入密码不一致！').show();
+        submit.disabled = true;
+        password.value  = '';
+        retype.value    = '';
       }
-    });
+    };
+
+    $(form).keyup(enableSubmit).submit(processAdd);
   }
 };
 
@@ -645,7 +639,7 @@ $(function() {
         break;
       case 'user':
         $('.user-management').Do(APP.user.management);
-        $('.user-add').Do(APP.user.add);
+        APP.user.add();
         break;
       case 'search':
         $('#news').Do(APP.dataTable);
