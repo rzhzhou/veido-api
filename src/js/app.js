@@ -159,7 +159,7 @@ APP.user = {
 
       var processResponse = function(response) {
         if (response.status) {
-          location.href = '/user/';
+          location.reload();
         } else {
           $msg.text('抱歉，添加失败！').show();
         }
