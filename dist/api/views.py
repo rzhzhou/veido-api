@@ -12,7 +12,7 @@ from django.conf import settings
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
-from yqj.models import (Article, Area, Weixin, Weibo, Topic, RelatedData, ArticleCategory,
+from yqj.models import (Article, Area, Weixin, Weibo, Topic, RelatedData, Category,
                         save_user, Collection, Topic, hash_password, User, Custom,
                         Inspection, Keyword)
 from yqj.views import SetLogo
@@ -237,8 +237,8 @@ def get_date_from_iso(datetime_str):
 class ArticleTableView(TableAPIView):
     def get(self, request, id, page):
         try:
-            category = ArticleCategory.objects.get(id=id)
-        except ArticleCategory.DoesNotExist:
+            category = Category.objects.get(id=id)
+        except Category.DoesNotExist:
             return Response({'total': 0, 'data': []})
         """
             return Response({'news': []})
@@ -500,7 +500,7 @@ class CollecModifyView(View):
             try:
                 category = item.categorys.all()[0]
             except IndexError:
-                category = ArticleCategory.objects.get(name='其他')
+                category = Category.objects.get(name='其他')
             data['category'] =  category.name
         try:
             collection_item = self.get_related_model().objects.create(**data)
@@ -946,7 +946,7 @@ def chart_line_event_view(request, topic_id):
     if date_range.days > 6 * 55:
         return year_range(min_date, max_date, date_range, articles)
     #data range by season   less two axis has data
-    elif date_range.days > 6 * 30:       
+    elif date_range.days > 6 * 30:
         return season_range(min_date, max_date, date_range, articles)
     #data range by month    less two axis has data
     elif  date_range.days >= 3 * 10:
