@@ -66,54 +66,46 @@ APP.user = {
   },
 
   change: function() {
-    var form = this.find('form');
-    var msg  = this.find('p');
+    var form        = document.forms.info,
+        action      = form.action,
+        elements    = form.elements,
+        username    = elements.username,
+        oldPassword = elements.oldPassword,
+        newPassword = elements.newPassword,
+        retype      = elements.retype,
+        submit      = elements[4],
+        $msg        = $(form).find('p');
 
-    form.submit(function(event) {
+
+    var enableSubmit = function() {
+      submit.disabled = !(username.value.length && oldPassword.value.length && newPassword.value.length && retype.value.length);
+    };
+
+    var processChange = function(event) {
       event.preventDefault();
 
-      var data = {
-        username:    $('#username').Trim(),
-        oldPassword: $('#old-password').Trim(),
-        newPassword: $('#new-password').Trim(),
-        retype:      $('#retype-password').Trim()
-      };
-
-      var response = function(data) {
-        if (data.status) {
-          msg.text('更新成功！').show();
+      var processResponse = function(response) {
+        if (response.status) {
+          $msg.text('更新成功！').show();
           location.href = '/login/';
-        } else{
-          msg.text('原密码错误！').show();
+        } else {
+          $msg.text('原密码错误！').show();
+          oldPassword.value = '';
+          newPassword.value = '';
+          retype.value      = '';
         }
       };
 
-      switch (0) {
-        case data.username.length:
-          msg.text('请输入姓名！').show();
-          break;
-        case data.oldPassword.length:
-          msg.text('请输入原密码！').show();
-          break;
-        case data.newPassword.length:
-          msg.text('请输入新密码！').show();
-          break;
-        case data.retype.length:
-          msg.text('请确认密码！').show();
-          break;
-        case Number( data.newPassword === data.retype ):
-          msg.text('两次输入密码不一致！').show();
-          break;
-        default:
-          var _data = {
-            username:    data.username,
-            oldPassword: data.oldPassword,
-            newPassword: data.newPassword
-          };
-          $.post('/api/settings/change/', _data, response, 'json');
-          break;
+      if (newPassword.value === retype.value) {
+        $.post(action, $([username, oldPassword, newPassword]).serialize(), processResponse);
+      } else {
+        $msg.text('两次输入密码不一致！').show();
+        newPassword.value = '';
+        retype.value      = '';
       }
-    });
+    };
+
+    $(form).keyup(enableSubmit).submit(processChange);
   },
 
   admin: function() {
@@ -644,7 +636,7 @@ $(function() {
         $('#event').Do(APP.table);
         break;
       case 'settings':
-        $('.user-info').Do(APP.user.change);
+        APP.user.change();
         break;
       case 'user':
         APP.user.admin();
