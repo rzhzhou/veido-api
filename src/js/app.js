@@ -196,10 +196,11 @@ APP.search = function() {
 };
 
 APP.menu = function() {
-  var menu  = this.find('a').filter(function() { return this.href === location.href; });
-  menu.parent().addClass('active');
-  menu.closest('.treeview-menu').addClass('menu-open');
-  menu.closest('.treeview').addClass('active');
+  $('aside')
+    .find('a').filter(function() { return this.href === location.href; })
+    .parent().addClass('active')
+    .closest('.treeview-menu').addClass('menu-open')
+    .closest('.treeview').addClass('active');
 };
 
 APP.chart = {
@@ -593,7 +594,7 @@ $(function() {
     APP.user.login();
   } else {
     APP.search();
-    $('aside').Do(APP.menu);
+    APP.menu();
     switch (APP.type) {
       case 'dashboard':
         APP.dashboard();
