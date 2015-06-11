@@ -180,12 +180,16 @@ APP.user = {
 };
 
 APP.search = function() {
-  this.submit(function(event) {
+  var form  = document.forms.search,
+      input = form.elements.keywords;
+
+  $(form).submit(function(event) {
     event.preventDefault();
 
-    var keywords = $(this).Trim();
+    var keywords = $.trim(input.value);
 
     if (keywords.length) {
+      form.reset();
       location.href = '/search/' + keywords + '/';
     }
   });
@@ -588,7 +592,7 @@ $(function() {
   if (APP.type === 'login') {
     APP.user.login();
   } else {
-    $('aside').find('form').Do(APP.search);
+    APP.search();
     $('aside').Do(APP.menu);
     switch (APP.type) {
       case 'dashboard':
