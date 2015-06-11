@@ -8,8 +8,8 @@ from yqj.views import *
 
 from django.conf import settings
 
-#import autocomplete_light  
-#autocomplete_light.autodiscover()  
+#import autocomplete_light
+#autocomplete_light.autodiscover()
 
 urlpatterns = patterns('',
     # Examples:
@@ -19,7 +19,7 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api/', include('api.urls')),
     url(r'^vendor/(?P<path>.*)$', serve,  {'document_root': os.path.join(settings.BASE_DIR, 'vendor')}),
-    # url(r'^autocomplete/', include('autocomplete_light.urls')), 
+    # url(r'^autocomplete/', include('autocomplete_light.urls')),
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 urlpatterns += patterns('yqj.views',
@@ -36,6 +36,7 @@ urlpatterns += patterns('yqj.views',
     url(r'^weibo/$', WeiboView.as_view()),
     url(r'^custom/$', CustomListView.as_view()),
     url(r'^custom/(\d+)/$', CustomView.as_view()),
+    url(r'^product/$', ProductView.as_view()),
     url(r'^collection/$', CollectionView.as_view()),
     url(r'^settings/$', SettingsView.as_view()),
     url(r'^user/$', UserAdminView.as_view()),
