@@ -363,10 +363,15 @@ class CustomView(BaseView):
 
 
 class ProductView(BaseView):
-    def get(self, reqeust):
-        product = Product.objects.all()
-        product_list = [{'id': product[i].id, 'name': product[i].product} for i in xrange(0, len(product))]
-        return self.render_to_response('product/product.html', {'product_list': product_list})
+    def get(self, reqeust, id):
+        if id:
+            product = Product.objects.get(id=id)
+            name = product.product
+        else:
+            name = u'全部'
+        products = Product.objects.all()
+        product_list = [{'id': products[i].id, 'name': products[i].product} for i in xrange(0, len(products))]
+        return self.render_to_response('product/product.html', {'product_list': product_list, 'product': {'name': name}})
 
 
 class UserView(BaseView):

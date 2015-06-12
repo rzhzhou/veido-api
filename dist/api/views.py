@@ -636,9 +636,12 @@ class CustomTableView(TableAPIView):
 
 class ProductTableView(TableAPIView):
     def get(self, request, id, page):
-        try:
-            product = Product.objects.filter(id=id)
-        except Product.DoesNotExist:
+        if id:
+            try:
+                product = [Product.objects.get(id=id)]
+            except Product.DoesNotExist:
+                return HttpResponse(status=404)
+        else:
             product = Product.objects.all()
 
         data = [p.articles.all() for p in product]
