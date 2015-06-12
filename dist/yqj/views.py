@@ -7,7 +7,7 @@ from django.conf import settings
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import View
-from yqj.models import Article, Weixin, Weibo, RelatedData, ArticleCategory,\
+from yqj.models import Article, Weixin, Weibo, RelatedData, Category,\
                        Area, Topic, Inspection, Custom, Keyword, Collection,ArticlePublisher
 from yqj import login_required
 from yqj.redisconnect import RedisQueryApi
@@ -25,7 +25,7 @@ def SetLogo(obj):
 def index_view(request):
     user = request.myuser
     if user.is_authenticated():
-        categories = ArticleCategory.objects.filter(~Q(name='其他'))
+        categories = Category.objects.filter(~Q(name='其他'))
         locations = Area.objects.filter(level=user.area.level+1, parent=user.area)
         user.company = user.group.company
 
@@ -137,7 +137,7 @@ class BaseView(LoginRequiredMixin, View):
         return render_to_response(template_path, context)
 
     def get_article_categories(self):
-        return ArticleCategory.objects.filter(~Q(name = '其他'))
+        return Category.objects.filter(~Q(name = '其他'))
 
     def get_locations(self, area):
         #area = Area.objects.get(id=int(location_id))
@@ -188,8 +188,8 @@ class BaseView(LoginRequiredMixin, View):
 class CategoryView(BaseView):
     def get(self, request, category_id):
         try:
-            category = ArticleCategory.objects.get(id=category_id)
-        except ArticleCategory.DoesNotExist:
+            category = Category.objects.get(id=category_id)
+        except Category.DoesNotExist:
             category = ''
         return self.render_to_response('category/category.html', {'category': category})
 
