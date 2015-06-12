@@ -254,6 +254,7 @@ APP.chart = {
       });
     });
   },
+
   pie: function() {
     require(['echarts', 'echarts/chart/pie'], function(ec) {
       $.getJSON('/api/pie' + APP.url, function(data) {
@@ -602,8 +603,8 @@ $(function() {
     switch (APP.type) {
       case 'dashboard':
         APP.dashboard();
-        $('#line-chart').Do(APP.chart.line);
-        $('#pie-chart').Do(APP.chart.pie);
+        APP.chart.line();
+        APP.chart.pie();
         break;
       case 'news':
         APP.table();
@@ -611,8 +612,8 @@ $(function() {
         break;
       case 'event':
         APP.table();
-        $('#line-chart').Do(APP.chart.line);
-        $('#pie-chart').Do(APP.chart.pie);
+        APP.chart.line();
+        APP.chart.pie();
         APP.sns();
         APP.collection();
         break;
