@@ -294,22 +294,25 @@ APP.returnTop = function(el) {
 APP.table = function() {
   var _this       = this;
 
-  var $content    = this.find('tbody');
-  var $pagination = this.parent();
-  var type        = this[0].id;
+  var $content    = this.find('tbody'),
+      $pagination = this.parent(),
+      type        = this[0].id;
 
   var renderTable = function(data) {
     var items = data.data;
-    var table = $.map(items, function(item, index) {
-      var title     = '<td><a href="/' + type + '/' + item.id + '/" title="' + item.title + '" target="_blank">' + item.title + '</a></td>';
-      var source    = '<td>' + item.source   + '</td>';
-      var location  = '<td>' + item.location + '</td>';
-      var time      = '<td>' + item.time     + '</td>';
-      var hot       = '<td class="text-center">' + item.hot      + '</td>';
 
-      var row       = '<tr>' + title + source + location + time + hot + '</tr>';
+    var table = $.map(items, function(item) {
+      var url       = '/' + type + '/' + item.id + '/',
+          title     = '<td><a href="' + url + '" title="' + item.title + '" target="_blank">' + item.title + '</a></td>',
+          source    = '<td>' + item.source   + '</td>',
+          location  = '<td>' + item.location + '</td>',
+          time      = '<td>' + item.time     + '</td>',
+          hot       = '<td class="text-center">' + item.hot + '</td>',
+          row       = '<tr>' + title + source + location + time + hot + '</tr>';
+
       return row;
     });
+
     $content.html(table);
   };
 
