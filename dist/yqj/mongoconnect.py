@@ -108,3 +108,14 @@ class CrawlerTask(object):
         }
         MongodbQuerApi(self.mongo_task).delete(task_index)
 
+    def update_task(self, old_keyword):
+        task_index = {
+            "data.source_type" : self.task_type,
+            "$or" : [{"key" : old_keyword},{"data.key" : old_keyword}],
+        }
+        MongodbQuerApi(self.mongo_task).delete(task_index)
+        self.type_task()
+
+
+
+
