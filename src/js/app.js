@@ -428,9 +428,9 @@ APP.dataTable = function() {
 };
 
 APP.sns = function() {
-  var _this = this;
+  var $sns = $('.sns');
 
-  this.each(function(index, element) {
+  $sns.each(function(index, element) {
     var $content    = $(element);
     var $pagination = $content.parent().next();
 
@@ -453,7 +453,7 @@ APP.sns = function() {
         last: '最后一页',
         paginationClass: 'pagination pagination-sm no-margin pull-right',
         onPageClick: function(event, page) {
-          APP.returnTop(_this);
+          APP.returnTop($sns);
           $.getJSON('/api' + APP.url + type() + '/' + page + '/', function(data) {
             $content.html(data.html);
             $pagination.twbsPagination({totalPages: data.total});
@@ -610,19 +610,19 @@ $(function() {
         $('#line-chart').Do(APP.chart.line);
         $('#pie-chart').Do(APP.chart.pie);
         $('#news').Do(APP.table);
-        $('.sns').Do(APP.sns);
+        APP.sns();
         APP.collection();
         break;
       case 'weixin':
         // run function on 'weixin' and 'weibo'
       case 'weibo':
-        $('.sns').Do(APP.sns);
+        APP.sns();
         break;
       case 'category':
         // run function on 'category' and 'location'
       case 'location':
         $('#news').Do(APP.table);
-        $('.sns').Do(APP.sns);
+        APP.sns();
         break;
       case 'inspection':
         $('#inspection').Do(APP.dataTable);
@@ -630,7 +630,7 @@ $(function() {
       case 'custom':
         APP.custom();
         $('#news').Do(APP.table);
-        $('.sns').Do(APP.sns);
+        APP.sns();
         break;
       case 'product':
         APP.product();
