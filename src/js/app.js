@@ -509,14 +509,13 @@ APP.custom = function() {
 
 
 APP.collection = function() {
-  var _this = this;
-
   $('.collection').click(function() {
-    var star = $(this).find('i');
-    var text = $(this).find('span');
+    var star = $(this).find('i'),
+        text = $(this).find('span');
 
     var collect = function(api, nextAction) {
-      var urlArray = _this.url.split('/');
+      var urlArray = APP.url.split('/');
+
       var data = {
         type: urlArray[1] === 'news' ? 'article' : 'topic',
         id: urlArray[2]
