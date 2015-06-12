@@ -12,7 +12,6 @@ def show_pubtime(obj):
     return obj.pubtime.replace(tzinfo=None).strftime('%Y-%m-%d %H:%M')
 show_pubtime.short_description = u'发布时间'
 
-
 class WeiboAdmin(admin.ModelAdmin):
     list_display = ('title', 'source', 'website_type', 'area','pubtime')
     list_editable = ('source', 'pubtime',)
@@ -49,7 +48,8 @@ class KeywordAdmin(admin.ModelAdmin):
     #list_editable = ('source', 'feeling_factor', 'pubtime',)
     list_filter = ('group', )
     search_fields = ('newkeyword', 'review')
-    def save_model(self,request, obj, form, change):
+    actions = ["del_keywords"]
+    def save_model(self, request, obj, form, change):
         if obj.custom:
             obj.review = ''
         else:
@@ -78,7 +78,11 @@ class TopicAdmin(admin.ModelAdmin):
             kwargs["queryset"] = Area.objects.filter(level__lt=3)
         return super(TopicAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
+class CustomAdmin(admin.ModelAdmin):
 
+    def delete_model(self, request, obj):
+        CrawlerTask(obj.searchkeyword, 'zjld', u"关键词").del_task()
+        obj.delete()
 
 
 # Register your models here.
@@ -93,5 +97,5 @@ admin.site.register(User)
 admin.site.register(Group)
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(Topic, TopicAdmin)
-admin.site.register(Custom)
+admin.site.register(Custom, CustomAdmin)
 admin.site.register(Keyword, KeywordAdmin)
