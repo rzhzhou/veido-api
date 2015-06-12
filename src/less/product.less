@@ -1,0 +1,37 @@
+.filter-name {
+  float: left;
+  color: #9e9e9e;
+  font-weight: bold;
+  padding-top: 4px;
+}
+
+.filter-list {
+  margin-left: 100px;
+  margin-bottom: 0;
+  padding-left: 0;
+
+  & > li {
+    float: left;
+    list-style: none;
+    padding-right: 6px;
+  }
+
+  & > li > a {
+    display: block;
+    padding: 4px 10px;
+    border-radius: 2px;
+    color: #333;
+  }
+
+  & > li > a:focus,
+  & > li > a:hover {
+    background-color: #eee;
+  }
+
+  & > .active > a,
+  & > .active > a:focus,
+  & > .active > a:hover {
+    background-color: #00c0ef;
+    color: #fff;
+  }
+}

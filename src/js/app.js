@@ -28,40 +28,43 @@ $.fn.Trim = function() {
 /*
  * functions
  */
-var app = {};
+var APP = {};
 
-app.url = location.pathname;
+APP.url = location.pathname;
 
-app.type = location.pathname.split('/')[1] || 'dashboard';
+APP.type = location.pathname.split('/')[1] || 'dashboard';
 
-app.user = {
+APP.user = {
   login: function() {
-    var form = this.find('form');
-    var msg  = this.find('p');
+    var form     = document.forms.login,
+        action   = form.action,
+        elements = form.elements,
+        username = elements.username,
+        password = elements.password,
+        submit   = elements[2],
+        $msg     = $(form).find('p');
 
-    form.submit(function(event) {
+    var enableSubmit = function() {
+      submit.disabled = !(username.value.length && password.value.length);
+    };
+
+    var processLogin = function(event) {
       event.preventDefault();
 
-      var data = {
-        username: $('#username').Trim(),
-        password: $('#password').Trim()
-      };
-
-      var response = function(data) {
-        if (data.status) {
+      $.post(action, $(form).serialize(), function(response) {
+        if (response.status) {
           location.href = location.search.length ? location.search.substr(1).split('=')[1] : '/';
         } else {
-          msg.text('用户名或密码错误！');
+          $msg.text('用户名或密码错误！');
+          submit.disabled = true;
+          password.value  = '';
         }
-      };
+      });
+    };
 
-      if (data.username.length && data.password.length) {
-        $.post('/api/login/', data, response, 'json');
-      } else {
-        msg.text('请输入用户名和密码！');
-      }
-    });
+    $(form).keyup(enableSubmit).submit(processLogin);
   },
+
   change: function() {
     var form = this.find('form');
     var msg  = this.find('p');
@@ -145,53 +148,47 @@ app.user = {
     action(reset, '/api/user/reset/');
     action(remove, '/api/user/remove/');
   },
-  add: function() {
-    var form = this.find('form');
-    var msg  = this.find('p');
 
-    form.submit(function(event) {
+  add: function() {
+    var form     = document.forms.add,
+        action   = form.action,
+        elements = form.elements,
+        username = elements.username,
+        password = elements.password,
+        retype   = elements.retype,
+        submit   = elements[3],
+        $msg     = $(form).find('p');
+
+    var enableSubmit = function() {
+      submit.disabled = !(username.value.length && password.value.length && retype.value.length);
+    };
+
+    var processAdd   = function(event) {
       event.preventDefault();
 
-      var data = {
-        username: $('#username').Trim(),
-        password: $('#password').Trim(),
-        retype:   $('#retype-password').Trim()
-      };
-
-      var response = function(data) {
-        if (data.status) {
+      var processResponse = function(response) {
+        if (response.status) {
           location.href = '/user/';
         } else {
-          msg.text('抱歉，注册失败！').show();
+          $msg.text('抱歉，添加失败！').show();
         }
       };
 
-      switch (0) {
-        case data.username.length:
-          msg.text('请输入用户名！').show();
-          break;
-        case data.password.length:
-          msg.text('请输入密码!').show();
-          break;
-        case data.retype.length:
-          msg.text('请确认密码！').show();
-          break;
-        case Number( data.password === data.retype ):
-          msg.text('两次输入密码不一致！').show();
-          break;
-        default:
-          var _data = {
-            username: data.username,
-            password: data.password
-          };
-          $.post('/api/user/add/', _data, response, 'json');
-          break;
+      if (password.value === retype.value) {
+        $.post(action, $([username, password]).serialize(), processResponse);
+      } else {
+        $msg.text('两次输入密码不一致！').show();
+        submit.disabled = true;
+        password.value  = '';
+        retype.value    = '';
       }
-    });
+    };
+
+    $(form).keyup(enableSubmit).submit(processAdd);
   }
 };
 
-app.search = function() {
+APP.search = function() {
   this.submit(function(event) {
     event.preventDefault();
 
@@ -203,17 +200,17 @@ app.search = function() {
   });
 };
 
-app.menu = function() {
+APP.menu = function() {
   var menu  = this.find('a').filter(function() { return this.href === location.href; });
   menu.parent().addClass('active');
   menu.closest('.treeview-menu').addClass('menu-open');
   menu.closest('.treeview').addClass('active');
 };
 
-app.chart = {
+APP.chart = {
   line: function() {
     require(['echarts', 'echarts/chart/line'], function(ec) {
-      $.getJSON('/api/line' + app.url, function(data) {
+      $.getJSON('/api/line' + APP.url, function(data) {
         ec.init(document.getElementById('line-chart'), 'macarons').setOption({
           color: ['#00a65a', '#00c0ef', '#dd4b39'],
           tooltip: {
@@ -263,7 +260,7 @@ app.chart = {
   },
   pie: function() {
     require(['echarts', 'echarts/chart/pie'], function(ec) {
-      $.getJSON('/api/pie' + app.url, function(data) {
+      $.getJSON('/api/pie' + APP.url, function(data) {
         ec.init(document.getElementById('pie-chart'), 'macarons').setOption({
           tooltip: {
             trigger: 'item',
@@ -287,7 +284,7 @@ app.chart = {
   }
 };
 
-app.returnTop = function(el) {
+APP.returnTop = function(el) {
   var top = el.offset().top;
   var scrollTop = 0;
 
@@ -298,7 +295,7 @@ app.returnTop = function(el) {
   $('body').animate({scrollTop: scrollTop});
 };
 
-app.table = function() {
+APP.table = function() {
   var _this       = this;
 
   var $content    = this.find('tbody');
@@ -320,7 +317,7 @@ app.table = function() {
     $content.html(table);
   };
 
-  $.getJSON('/api' + app.url + type + '/1/', function(data) {
+  $.getJSON('/api' + APP.url + type + '/1/', function(data) {
     renderTable(data);
 
     $pagination.twbsPagination({
@@ -332,9 +329,9 @@ app.table = function() {
       last: '最后一页',
       paginationClass: 'pagination pagination-sm no-margin pull-right',
       onPageClick: function(event, page) {
-        app.returnTop(_this);
+        APP.returnTop(_this);
 
-        $.getJSON('/api' + app.url + type + '/' + page + '/', function(data) {
+        $.getJSON('/api' + APP.url + type + '/' + page + '/', function(data) {
           renderTable(data);
           $pagination.twbsPagination({totalPages: data.total});
         });
@@ -343,7 +340,7 @@ app.table = function() {
   });
 };
 
-app.dataTable = function() {
+APP.dataTable = function() {
   $.fn.dataTable.ext.errMode = 'throw';
 
   var table = this.DataTable({
@@ -434,7 +431,7 @@ app.dataTable = function() {
   // });
 };
 
-app.sns = function() {
+APP.sns = function() {
   var _this = this;
 
   this.each(function(index, element) {
@@ -442,14 +439,14 @@ app.sns = function() {
     var $pagination = $content.parent().next();
 
     var type = function() {
-      if (app.type === 'weixin' || app.type === 'weibo') {
+      if (APP.type === 'weixin' || APP.type === 'weibo') {
         return $pagination.data('type');
       } else {
         return $pagination.data('type').replace('-', '/');
       }
     };
 
-    $.getJSON('/api' + app.url + type() + '/1/', function(data) {
+    $.getJSON('/api' + APP.url + type() + '/1/', function(data) {
       $content.html(data.html);
 
       $pagination.twbsPagination({
@@ -460,8 +457,8 @@ app.sns = function() {
         last: '最后一页',
         paginationClass: 'pagination pagination-sm no-margin pull-right',
         onPageClick: function(event, page) {
-          app.returnTop(_this);
-          $.getJSON('/api' + app.url + type() + '/' + page + '/', function(data) {
+          APP.returnTop(_this);
+          $.getJSON('/api' + APP.url + type() + '/' + page + '/', function(data) {
             $content.html(data.html);
             $pagination.twbsPagination({totalPages: data.total});
           });
@@ -471,7 +468,7 @@ app.sns = function() {
   });
 };
 
-app.custom = function() {
+APP.custom = function() {
   var $custom   = $('.custom'),
       $list     = $custom.find('li'),
       $form     = $custom.find('form'),
@@ -515,7 +512,7 @@ app.custom = function() {
 };
 
 
-app.collection = function() {
+APP.collection = function() {
   var _this = this;
 
   $('.collection').click(function() {
@@ -546,7 +543,7 @@ app.collection = function() {
   });
 };
 
-app.dashboard = function() {
+APP.dashboard = function() {
   $('.info-box-content').each(function(index, element) {
     var infoBoxNumber = $(element).find('.info-box-number'),
         progressBar = $(element).find('.progress-bar'),
@@ -587,66 +584,76 @@ app.dashboard = function() {
 };
 
 
+APP.product = function() {
+  $('.filter-list')
+    .find('a').filter(function() { return this.href === location.href; })
+    .parent().addClass('active');
+};
+
 /*
  * run function when element exists
  */
 $(function() {
-  if (app.type === 'login') {
-    $('.login-box').Do(app.user.login);
+  if (APP.type === 'login') {
+    APP.user.login();
   } else {
-    $('aside').find('form').Do(app.search);
-    $('aside').Do(app.menu);
-    switch (app.type) {
+    $('aside').find('form').Do(APP.search);
+    $('aside').Do(APP.menu);
+    switch (APP.type) {
       case 'dashboard':
-        app.dashboard();
-        $('#line-chart').Do(app.chart.line);
-        $('#pie-chart').Do(app.chart.pie);
+        APP.dashboard();
+        $('#line-chart').Do(APP.chart.line);
+        $('#pie-chart').Do(APP.chart.pie);
         break;
       case 'news':
-        $('#news').Do(app.table);
-        app.collection();
+        $('#news').Do(APP.table);
+        APP.collection();
         break;
       case 'event':
-        $('#event').Do(app.table);
-        $('#line-chart').Do(app.chart.line);
-        $('#pie-chart').Do(app.chart.pie);
-        $('#news').Do(app.table);
-        $('.sns').Do(app.sns);
-        app.collection();
+        $('#event').Do(APP.table);
+        $('#line-chart').Do(APP.chart.line);
+        $('#pie-chart').Do(APP.chart.pie);
+        $('#news').Do(APP.table);
+        $('.sns').Do(APP.sns);
+        APP.collection();
         break;
       case 'weixin':
         // run function on 'weixin' and 'weibo'
       case 'weibo':
-        $('.sns').Do(app.sns);
+        $('.sns').Do(APP.sns);
         break;
       case 'category':
         // run function on 'category' and 'location'
       case 'location':
-        $('#news').Do(app.table);
-        $('.sns').Do(app.sns);
+        $('#news').Do(APP.table);
+        $('.sns').Do(APP.sns);
         break;
       case 'inspection':
-        $('#inspection').Do(app.dataTable);
+        $('#inspection').Do(APP.dataTable);
         break;
       case 'custom':
-        app.custom();
-        $('#news').Do(app.table);
-        $('.sns').Do(app.sns);
+        APP.custom();
+        $('#news').Do(APP.table);
+        $('.sns').Do(APP.sns);
+        break;
+      case 'product':
+        APP.product();
+        $('#news').Do(APP.table);
         break;
       case 'collection':
-        $('#news').Do(app.table);
-        $('#event').Do(app.table);
+        $('#news').Do(APP.table);
+        $('#event').Do(APP.table);
         break;
       case 'settings':
-        $('.user-info').Do(app.user.change);
+        $('.user-info').Do(APP.user.change);
         break;
       case 'user':
-        $('.user-management').Do(app.user.management);
-        $('.user-add').Do(app.user.add);
+        $('.user-management').Do(APP.user.management);
+        APP.user.add();
         break;
       case 'search':
-        $('#news').Do(app.dataTable);
-        $('#event').Do(app.dataTable);
+        $('#news').Do(APP.dataTable);
+        $('#event').Do(APP.dataTable);
         break;
       default:
         console.log('unknown type');
