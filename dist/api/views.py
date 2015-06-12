@@ -14,7 +14,7 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from yqj.models import (Article, Area, Weixin, Weibo, Topic, RelatedData, Category,
                         save_user, Collection, Topic, hash_password, User, Custom,
-                        Inspection, Keyword)
+                        Inspection, Keyword,Product)
 from yqj.views import SetLogo
 from serializers import ArticleSerializer
 from yqj import authenticate, login_required
@@ -630,6 +630,23 @@ class CustomTableView(TableAPIView):
             return Response({'total': 0, 'data': []})
         items = keyword.custom.articles.all()
         datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
+        result = self.news_to_json(datas['items'])
+        return Response({'total': datas['total_number'], 'data': result})
+
+
+class ProductTableView(TableAPIView):
+    def get(self, request, id, page):
+        try:
+            product = Product.objects.filter(id=id)
+        except Product.DoesNotExist:
+            product = Product.objects.all()
+
+        data = [p.articles.all() for p in product]
+        item = reduce(lambda x, y: list(set(x).union(set(y))), data)
+        article_ids = [item[i].id for i in range(len(item))]
+        item = Article.objects.filter(id__in=article_ids)
+
+        datas = self.paging(item, self.NEWS_PAGE_LIMIT, page)
         result = self.news_to_json(datas['items'])
         return Response({'total': datas['total_number'], 'data': result})
 

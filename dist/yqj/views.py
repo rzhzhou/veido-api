@@ -8,7 +8,7 @@ from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import View
 from yqj.models import Article, Weixin, Weibo, RelatedData, Category,\
-                       Area, Topic, Inspection, Custom, Keyword, Collection,ArticlePublisher
+                       Area, Topic, Inspection, Custom, Keyword, Collection,ArticlePublisher,Product
 from yqj import login_required
 from yqj.redisconnect import RedisQueryApi
 from django.db.models import Q
@@ -364,7 +364,8 @@ class CustomView(BaseView):
 
 class ProductView(BaseView):
     def get(self, reqeust):
-        product_list = [{'id': i, 'name': 'product' + str(i)} for i in xrange(1, 11)]
+        product = Product.objects.all()
+        product_list = [{'id': product[i].id, 'name': product[i].product} for i in xrange(0, len(product))]
         return self.render_to_response('product/product.html', {'product_list': product_list})
 
 
