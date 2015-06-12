@@ -7,8 +7,8 @@ from django.conf import settings
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import View
-from yqj.models import Article, Weixin, Weibo, RelatedData, ArticleCategory,Group,\
-                       Area, Topic, Inspection, Custom, Keyword, Collection,ArticlePublisher
+from yqj.models import Article, Weixin, Weibo, RelatedData, Category, Group,\
+                       Area, Topic, Inspection, Custom, Keyword, Collection, ArticlePublisher, Product
 from yqj import login_required
 from yqj.redisconnect import RedisQueryApi
 from django.db.models import Count,Q
@@ -25,7 +25,7 @@ def SetLogo(obj):
 def index_view(request):
     user = request.myuser
     if user.is_authenticated():
-        categories = ArticleCategory.objects.filter(~Q(name='其他'))
+        categories = Category.objects.filter(~Q(name='其他'))
         locations = Area.objects.filter(level=user.area.level+1, parent=user.area)
         user.company = user.group.company
 
@@ -165,7 +165,7 @@ class BaseView(LoginRequiredMixin, View):
         return render_to_response(template_path, context)
 
     def get_article_categories(self):
-        return ArticleCategory.objects.filter(~Q(name = '其他'))
+        return Category.objects.filter(~Q(name = '其他'))
 
     def get_locations(self, area):
         #area = Area.objects.get(id=int(location_id))
@@ -204,10 +204,10 @@ class BaseView(LoginRequiredMixin, View):
 	try:
             # 获取某页对应的记录
             items = paginator.page(page)
-        except PageNotAnInteger: 
+        except PageNotAnInteger:
             # 如果页码不是个整数 取第一页的记录
             items = paginator.page(1)
-        except EmptyPage:  
+        except EmptyPage:
             # 如果页码太大，没有相应的记录 取最后一页的记录
             items = paginator.page(paginator.num_pages)
 
@@ -216,8 +216,8 @@ class BaseView(LoginRequiredMixin, View):
 class CategoryView(BaseView):
     def get(self, request, category_id):
         try:
-            category = ArticleCategory.objects.get(id=category_id)
-        except ArticleCategory.DoesNotExist:
+            category = Category.objects.get(id=category_id)
+        except Category.DoesNotExist:
             category = ''
         return self.render_to_response('category/category.html', {'category': category})
 
@@ -316,8 +316,8 @@ class WeixinView(BaseView):
         latest = self.paging(Weixin, 20, 1)
         items = [SetLogo(data) for data in latest['items']]
         html = self.set_css_to_weixin(items)
-        return self.render_to_response('weixin/weixin_list.html', {'weixin_latest_list': latest, 
-                                                                   'weixin_hottest_list': hottest, 
+        return self.render_to_response('weixin/weixin_list.html', {'weixin_latest_list': latest,
+                                                                   'weixin_hottest_list': hottest,
                                                                    'html': html,
                                                                    'total_page_number': latest['total_number']})
 
@@ -388,6 +388,13 @@ class CustomView(BaseView):
         except Keyword.DoesNotExist:
             return self.render_to_response('custom/custom.html', {'name': u''})
         return self.render_to_response('custom/custom.html', {'name': custom.newkeyword})
+
+
+class ProductView(BaseView):
+    def get(self, reqeust):
+        product = Product.objects.all()
+        product_list = [{'id': product[i].id, 'name': product[i].product} for i in xrange(0, len(product))]
+        return self.render_to_response('product/product.html', {'product_list': product_list})
 
 
 class UserView(BaseView):

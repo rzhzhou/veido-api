@@ -28,192 +28,185 @@ $.fn.Trim = function() {
 /*
  * functions
  */
-var app = {};
+var APP = {};
 
-app.url = location.pathname;
+APP.url = location.pathname;
 
-app.type = location.pathname.split('/')[1] || 'dashboard';
+APP.type = location.pathname.split('/')[1] || 'dashboard';
 
-app.user = {
+APP.user = {
   login: function() {
-    var form = this.find('form');
-    var msg  = this.find('p');
+    var form     = document.forms.login,
+        action   = form.action,
+        elements = form.elements,
+        username = elements.username,
+        password = elements.password,
+        submit   = elements[2],
+        $msg     = $(form).find('p');
 
-    form.submit(function(event) {
+    var enableSubmit = function() {
+      submit.disabled = !(username.value.length && password.value.length);
+    };
+
+    var processLogin = function(event) {
       event.preventDefault();
 
-      var data = {
-        username: $('#username').Trim(),
-        password: $('#password').Trim()
-      };
-
-      var response = function(data) {
-        if (data.status) {
+      $.post(action, $(form).serialize(), function(response) {
+        if (response.status) {
           location.href = location.search.length ? location.search.substr(1).split('=')[1] : '/';
         } else {
-          msg.text('用户名或密码错误！');
+          $msg.text('用户名或密码错误！');
+          submit.disabled = true;
+          password.value  = '';
         }
-      };
+      });
+    };
 
-      if (data.username.length && data.password.length) {
-        $.post('/api/login/', data, response, 'json');
-      } else {
-        msg.text('请输入用户名和密码！');
-      }
-    });
+    $(form).keyup(enableSubmit).submit(processLogin);
   },
-  change: function() {
-    var form = this.find('form');
-    var msg  = this.find('p');
 
-    form.submit(function(event) {
+  change: function() {
+    var form        = document.forms.info,
+        action      = form.action,
+        elements    = form.elements,
+        username    = elements.username,
+        oldPassword = elements.oldPassword,
+        newPassword = elements.newPassword,
+        retype      = elements.retype,
+        submit      = elements[4],
+        $msg        = $(form).find('p');
+
+
+    var enableSubmit = function() {
+      submit.disabled = !(username.value.length && oldPassword.value.length && newPassword.value.length && retype.value.length);
+    };
+
+    var processChange = function(event) {
       event.preventDefault();
 
-      var data = {
-        username:    $('#username').Trim(),
-        oldPassword: $('#old-password').Trim(),
-        newPassword: $('#new-password').Trim(),
-        retype:      $('#retype-password').Trim()
-      };
-
-      var response = function(data) {
-        if (data.status) {
-          msg.text('更新成功！').show();
+      var processResponse = function(response) {
+        if (response.status) {
+          $msg.text('更新成功！').show();
           location.href = '/login/';
-        } else{
-          msg.text('原密码错误！').show();
+        } else {
+          $msg.text('原密码错误！').show();
+          oldPassword.value = '';
+          newPassword.value = '';
+          retype.value      = '';
         }
       };
 
-      switch (0) {
-        case data.username.length:
-          msg.text('请输入姓名！').show();
-          break;
-        case data.oldPassword.length:
-          msg.text('请输入原密码！').show();
-          break;
-        case data.newPassword.length:
-          msg.text('请输入新密码！').show();
-          break;
-        case data.retype.length:
-          msg.text('请确认密码！').show();
-          break;
-        case Number( data.newPassword === data.retype ):
-          msg.text('两次输入密码不一致！').show();
-          break;
-        default:
-          var _data = {
-            username:    data.username,
-            oldPassword: data.oldPassword,
-            newPassword: data.newPassword
-          };
-          $.post('/api/settings/change/', _data, response, 'json');
-          break;
+      if (newPassword.value === retype.value) {
+        $.post(action, $([username, oldPassword, newPassword]).serialize(), processResponse);
+      } else {
+        $msg.text('两次输入密码不一致！').show();
+        newPassword.value = '';
+        retype.value      = '';
       }
-    });
+    };
+
+    $(form).keyup(enableSubmit).submit(processChange);
   },
-  management: function() {
-    var $this  = this;
 
-    var button = $this.find('button');
-    var reset  = button.eq(0);
-    var remove = button.eq(1);
-
-    var id   = [];
+  admin: function() {
+    var $admin  = $('.user-admin'),
+        $input  = $admin.find('input'),
+        $button = $admin.find('button'),
+        $reset  = $button.eq(0),
+        $remove = $button.eq(1),
+        id      = [];
 
     var action = function(obj, api) {
       obj.click(function() {
         id.length = 0;
 
-        $this.find('input:checked').each(function(index, element) {
-          var _id = $(element).parent().next().data('id');
-          id.push(_id);
+        $input.filter(':checked').each(function(index, element) {
+          id.push( $(element).parent().next().data('id') );
         });
 
-        var response = function(data) {
+        var processResponse = function(data) {
           if (data.status) {
-            location.href = '/user/';
+            location.reload();
           }
         };
 
         if (id.length) {
-          $.post(api, {id: id.toString()}, response, 'json');
+          $.post(api, {id: id.toString()}, processResponse, 'json');
         }
       });
     };
 
-    action(reset, '/api/user/reset/');
-    action(remove, '/api/user/remove/');
+    action($reset, '/api/user/reset/');
+    action($remove, '/api/user/remove/');
   },
-  add: function() {
-    var form = this.find('form');
-    var msg  = this.find('p');
 
-    form.submit(function(event) {
+  add: function() {
+    var form     = document.forms.add,
+        action   = form.action,
+        elements = form.elements,
+        username = elements.username,
+        password = elements.password,
+        retype   = elements.retype,
+        submit   = elements[3],
+        $msg     = $(form).find('p');
+
+    var enableSubmit = function() {
+      submit.disabled = !(username.value.length && password.value.length && retype.value.length);
+    };
+
+    var processAdd   = function(event) {
       event.preventDefault();
 
-      var data = {
-        username: $('#username').Trim(),
-        password: $('#password').Trim(),
-        retype:   $('#retype-password').Trim()
-      };
-
-      var response = function(data) {
-        if (data.status) {
-          location.href = '/user/';
+      var processResponse = function(response) {
+        if (response.status) {
+          location.reload();
         } else {
-          msg.text('抱歉，注册失败！').show();
+          $msg.text('抱歉，添加失败！').show();
         }
       };
 
-      switch (0) {
-        case data.username.length:
-          msg.text('请输入用户名！').show();
-          break;
-        case data.password.length:
-          msg.text('请输入密码!').show();
-          break;
-        case data.retype.length:
-          msg.text('请确认密码！').show();
-          break;
-        case Number( data.password === data.retype ):
-          msg.text('两次输入密码不一致！').show();
-          break;
-        default:
-          var _data = {
-            username: data.username,
-            password: data.password
-          };
-          $.post('/api/user/add/', _data, response, 'json');
-          break;
+      if (password.value === retype.value) {
+        $.post(action, $([username, password]).serialize(), processResponse);
+      } else {
+        $msg.text('两次输入密码不一致！').show();
+        submit.disabled = true;
+        password.value  = '';
+        retype.value    = '';
       }
-    });
+    };
+
+    $(form).keyup(enableSubmit).submit(processAdd);
   }
 };
 
-app.search = function() {
-  this.submit(function(event) {
+APP.search = function() {
+  var form  = document.forms.search,
+      input = form.elements.keywords;
+
+  $(form).submit(function(event) {
     event.preventDefault();
 
-    var keywords = $(this).Trim();
+    var keywords = $.trim(input.value);
 
     if (keywords.length) {
+      form.reset();
       location.href = '/search/' + keywords + '/';
     }
   });
 };
 
-app.menu = function() {
-  var menu  = this.find('a').filter(function() { return this.href === location.href; });
-  menu.parent().addClass('active');
-  menu.closest('.treeview-menu').addClass('menu-open');
-  menu.closest('.treeview').addClass('active');
+APP.menu = function() {
+  $('aside')
+    .find('a').filter(function() { return this.href === location.href; })
+    .parent().addClass('active')
+    .closest('.treeview-menu').addClass('menu-open')
+    .closest('.treeview').addClass('active');
 };
 
-app.chart = {
+APP.chart = {
   line: function() {
     require(['echarts', 'echarts/chart/line'], function(ec) {
-      $.getJSON('/api/line' + app.url, function(data) {
+      $.getJSON('/api/line' + APP.url, function(data) {
         ec.init(document.getElementById('line-chart'), 'macarons').setOption({
           color: ['#00a65a', '#00c0ef', '#dd4b39'],
           tooltip: {
@@ -261,9 +254,10 @@ app.chart = {
       });
     });
   },
+
   pie: function() {
     require(['echarts', 'echarts/chart/pie'], function(ec) {
-      $.getJSON('/api/pie' + app.url, function(data) {
+      $.getJSON('/api/pie' + APP.url, function(data) {
         ec.init(document.getElementById('pie-chart'), 'macarons').setOption({
           tooltip: {
             trigger: 'item',
@@ -287,7 +281,7 @@ app.chart = {
   }
 };
 
-app.returnTop = function(el) {
+APP.returnTop = function(el) {
   var top = el.offset().top;
   var scrollTop = 0;
 
@@ -298,52 +292,57 @@ app.returnTop = function(el) {
   $('body').animate({scrollTop: scrollTop});
 };
 
-app.table = function() {
-  var _this       = this;
+APP.table = function() {
+  $('.table-custom').each(function() {
+    var $this       = $(this),
+        $pagination = $this.parent(),
+        content     = this.tBodies[0],
+        type        = this.id;
 
-  var $content    = this.find('tbody');
-  var $pagination = this.parent();
-  var type        = this[0].id;
+    var renderTable = function(data) {
+      var items = data.data;
 
-  var renderTable = function(data) {
-    var items = data.data;
-    var table = $.map(items, function(item, index) {
-      var title     = '<td><a href="/' + type + '/' + item.id + '/" title="' + item.title + '" target="_blank">' + item.title + '</a></td>';
-      var source    = '<td>' + item.source   + '</td>';
-      var location  = '<td>' + item.location + '</td>';
-      var time      = '<td>' + item.time     + '</td>';
-      var hot       = '<td class="text-center">' + item.hot      + '</td>';
+      var table = $.map(items, function(item) {
+        var url       = '/' + type + '/' + item.id + '/',
+            title     = '<td><a href="' + url + '" title="' + item.title + '" target="_blank">' + item.title + '</a></td>',
+            source    = '<td>' + item.source   + '</td>',
+            location  = '<td>' + item.location + '</td>',
+            time      = '<td>' + item.time     + '</td>',
+            hot       = '<td class="text-center">' + item.hot + '</td>',
+            row       = '<tr>' + title + source + location + time + hot + '</tr>';
 
-      var row       = '<tr>' + title + source + location + time + hot + '</tr>';
-      return row;
+        return row;
+      });
+
+      $(content).html(table);
+    };
+
+    $.getJSON('/api' + APP.url + type + '/1/', function(data) {
+      renderTable(data);
+
+      $pagination.twbsPagination({
+        totalPages: data.total,
+        visiblePages: 7,
+        first: '第一页',
+        prev: '上一页',
+        next: '下一页',
+        last: '最后一页',
+        paginationClass: 'pagination pagination-sm no-margin pull-right',
+        onPageClick: function(event, page) {
+          APP.returnTop($this);
+
+          $.getJSON('/api' + APP.url + type + '/' + page + '/', function(data) {
+            renderTable(data);
+            $pagination.twbsPagination({totalPages: data.total});
+          });
+        }
+      });
     });
-    $content.html(table);
-  };
 
-  $.getJSON('/api' + app.url + type + '/1/', function(data) {
-    renderTable(data);
-
-    $pagination.twbsPagination({
-      totalPages: data.total,
-      visiblePages: 7,
-      first: '第一页',
-      prev: '上一页',
-      next: '下一页',
-      last: '最后一页',
-      paginationClass: 'pagination pagination-sm no-margin pull-right',
-      onPageClick: function(event, page) {
-        app.returnTop(_this);
-
-        $.getJSON('/api' + app.url + type + '/' + page + '/', function(data) {
-          renderTable(data);
-          $pagination.twbsPagination({totalPages: data.total});
-        });
-      }
-    });
   });
 };
 
-app.dataTable = function() {
+APP.dataTable = function() {
   $.fn.dataTable.ext.errMode = 'throw';
 
   var table = this.DataTable({
@@ -434,22 +433,22 @@ app.dataTable = function() {
   // });
 };
 
-app.sns = function() {
-  var _this = this;
+APP.sns = function() {
+  var $sns = $('.sns');
 
-  this.each(function(index, element) {
+  $sns.each(function(index, element) {
     var $content    = $(element);
     var $pagination = $content.parent().next();
 
     var type = function() {
-      if (app.type === 'weixin' || app.type === 'weibo') {
+      if (APP.type === 'weixin' || APP.type === 'weibo') {
         return $pagination.data('type');
       } else {
         return $pagination.data('type').replace('-', '/');
       }
     };
 
-    $.getJSON('/api' + app.url + type() + '/1/', function(data) {
+    $.getJSON('/api' + APP.url + type() + '/1/', function(data) {
       $content.html(data.html);
 
       $pagination.twbsPagination({
@@ -460,8 +459,8 @@ app.sns = function() {
         last: '最后一页',
         paginationClass: 'pagination pagination-sm no-margin pull-right',
         onPageClick: function(event, page) {
-          app.returnTop(_this);
-          $.getJSON('/api' + app.url + type() + '/' + page + '/', function(data) {
+          APP.returnTop($sns);
+          $.getJSON('/api' + APP.url + type() + '/' + page + '/', function(data) {
             $content.html(data.html);
             $pagination.twbsPagination({totalPages: data.total});
           });
@@ -471,7 +470,7 @@ app.sns = function() {
   });
 };
 
-app.custom = function() {
+APP.custom = function() {
   var $custom   = $('.custom'),
       $list     = $custom.find('li'),
       $form     = $custom.find('form'),
@@ -515,15 +514,14 @@ app.custom = function() {
 };
 
 
-app.collection = function() {
-  var _this = this;
-
+APP.collection = function() {
   $('.collection').click(function() {
-    var star = $(this).find('i');
-    var text = $(this).find('span');
+    var star = $(this).find('i'),
+        text = $(this).find('span');
 
     var collect = function(api, nextAction) {
-      var urlArray = _this.url.split('/');
+      var urlArray = APP.url.split('/');
+
       var data = {
         type: urlArray[1] === 'news' ? 'article' : 'topic',
         id: urlArray[2]
@@ -546,7 +544,7 @@ app.collection = function() {
   });
 };
 
-app.dashboard = function() {
+APP.dashboard = function() {
   $('.info-box-content').each(function(index, element) {
     var infoBoxNumber = $(element).find('.info-box-number'),
         progressBar = $(element).find('.progress-bar'),
@@ -587,66 +585,74 @@ app.dashboard = function() {
 };
 
 
+APP.product = function() {
+  $('.filter-list')
+    .find('a').filter(function() { return this.href === location.href; })
+    .parent().addClass('active');
+};
+
 /*
  * run function when element exists
  */
 $(function() {
-  if (app.type === 'login') {
-    $('.login-box').Do(app.user.login);
+  if (APP.type === 'login') {
+    APP.user.login();
   } else {
-    $('aside').find('form').Do(app.search);
-    $('aside').Do(app.menu);
-    switch (app.type) {
+    APP.search();
+    APP.menu();
+    switch (APP.type) {
       case 'dashboard':
-        app.dashboard();
-        $('#line-chart').Do(app.chart.line);
-        $('#pie-chart').Do(app.chart.pie);
+        APP.dashboard();
+        APP.chart.line();
+        APP.chart.pie();
         break;
       case 'news':
-        $('#news').Do(app.table);
-        app.collection();
+        APP.table();
+        APP.collection();
         break;
       case 'event':
-        $('#event').Do(app.table);
-        $('#line-chart').Do(app.chart.line);
-        $('#pie-chart').Do(app.chart.pie);
-        $('#news').Do(app.table);
-        $('.sns').Do(app.sns);
-        app.collection();
+        APP.table();
+        APP.chart.line();
+        APP.chart.pie();
+        APP.sns();
+        APP.collection();
         break;
       case 'weixin':
         // run function on 'weixin' and 'weibo'
       case 'weibo':
-        $('.sns').Do(app.sns);
+        APP.sns();
         break;
       case 'category':
         // run function on 'category' and 'location'
       case 'location':
-        $('#news').Do(app.table);
-        $('.sns').Do(app.sns);
+        APP.table();
+        APP.sns();
         break;
       case 'inspection':
-        $('#inspection').Do(app.dataTable);
+        $('#inspection').Do(APP.dataTable);
         break;
       case 'custom':
-        app.custom();
-        $('#news').Do(app.table);
-        $('.sns').Do(app.sns);
+        APP.custom();
+        APP.table();
+        APP.sns();
+        break;
+      case 'product':
+        APP.product();
+        APP.table();
         break;
       case 'collection':
-        $('#news').Do(app.table);
-        $('#event').Do(app.table);
+        APP.table();
         break;
       case 'settings':
-        $('.user-info').Do(app.user.change);
+        APP.user.change();
         break;
       case 'user':
-        $('.user-management').Do(app.user.management);
-        $('.user-add').Do(app.user.add);
+        APP.user.admin();
+        APP.user.add();
         break;
       case 'search':
-        $('#news').Do(app.dataTable);
-        $('#event').Do(app.dataTable);
+        $('#news').Do(APP.dataTable);
+        $('#event').Do(APP.dataTable);
         break;
       default:
         console.log('unknown type');

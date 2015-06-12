@@ -40,6 +40,13 @@ class MongodbQuerApi(object):
 
         result()
 
+    def delete(self, dct):
+
+        def remove():
+            self._db[self.table].remove(dct)
+
+        remove()
+
 class CrawlerTask(object):
 
     def __init__(self, key, mongo_task, task_type):
@@ -93,3 +100,22 @@ class CrawlerTask(object):
             "source": 'sogou'
         }
         weixin = self.insert_task(weixindata)
+
+    def del_task(self):
+        task_index = {
+            "data.source_type" : self.task_type,
+            "$or" : [{"key" : self.key}, {"data.key" : self.key}],
+        }
+        MongodbQuerApi(self.mongo_task).delete(task_index)
+
+    def update_task(self, old_keyword):
+        task_index = {
+            "data.source_type" : self.task_type,
+            "$or" : [{"key" : old_keyword},{"data.key" : old_keyword}],
+        }
+        MongodbQuerApi(self.mongo_task).delete(task_index)
+        self.type_task()
+
+
+
+

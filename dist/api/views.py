@@ -12,14 +12,14 @@ from django.conf import settings
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
-from yqj.models import (Article, Area, Weixin, Weibo, Topic, RelatedData, ArticleCategory,
-                        save_user, Collection, Topic, hash_password, User, Custom, 
-                        Inspection, Keyword)
+from yqj.models import (Article, Area, Weixin, Weibo, Topic, RelatedData, Category,
+                        save_user, Collection, Topic, hash_password, User, Custom,
+                        Inspection, Keyword,Product)
 from yqj.views import SetLogo
 from serializers import ArticleSerializer
 from yqj import authenticate, login_required
 from django.db.models import Count
-from api_function import GetFirstDaySeason, get_season, byYear, bySeason, byMonths, byDays
+from api_function import GetFirstDaySeason, get_season, year_range, season_range, months_range, days_range, week_range, unstable
 from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
@@ -149,7 +149,7 @@ class TableAPIView(APIView):
             html +=  u'<h4 class="media-heading">%s</h4>' % (item.publisher.publisher)
             if len(item.content) < 200:
                  html +=  u'<p>%s</p>' % (item.content)
-            else: 
+            else:
                  html +=  u'<p><a href="%s" target="_blank">%s</a></p>' % (item.url, item.title)
             html += """<div class="media-meta">
                        <div class="info pull-right">"""
@@ -170,15 +170,15 @@ class TableAPIView(APIView):
         try:
             # 获取某页对应的记录
             items = paginator.page(page)
-        except PageNotAnInteger: 
+        except PageNotAnInteger:
             # 如果页码不是个整数 取第一页的记录
             items = paginator.page(1)
-        except EmptyPage:  
+        except EmptyPage:
             # 如果页码太大，没有相应的记录 取最后一页的记录
             items = paginator.page(paginator.num_pages)
 
         return {'items': items, 'total_number': paginator.num_pages}
-    
+
     def pagingfromredis(self, model, limit, page):
         items = [eval(item) for item in RedisQueryApi().lrange('sort_weibohot', 0, -1)]
         # 实例化一个分页对象
@@ -186,10 +186,10 @@ class TableAPIView(APIView):
 	try:
             # 获取某页对应的记录
             items = paginator.page(page)
-        except PageNotAnInteger: 
+        except PageNotAnInteger:
             # 如果页码不是个整数 取第一页的记录
             items = paginator.page(1)
-        except EmptyPage:  
+        except EmptyPage:
             # 如果页码太大，没有相应的记录 取最后一页的记录
             items = paginator.page(paginator.num_pages)
 
@@ -220,7 +220,7 @@ class TableAPIView(APIView):
             item['source'] = data.source
             item['location'] = data.area.name
             try:
-                item['time'] = data.articles.order_by('pubtime')[0].pubtime.replace(tzinfo=None).strftime('%Y-%m-%d')           
+                item['time'] = data.articles.order_by('pubtime')[0].pubtime.replace(tzinfo=None).strftime('%Y-%m-%d')
             except IndexError:
                 item['time'] = datetime.datetime.now().strftime('%Y-%m-%d')
             item['hot'] = data.articles.count() + data.weixin.count() + data.weibo.count()
@@ -229,7 +229,7 @@ class TableAPIView(APIView):
         results = sorted(result, key=lambda item: item['time'], reverse=True)
 
         return results
-        
+
 
 def get_date_from_iso(datetime_str):
     #return datetime.datetime.strptime("2008-09-03T20:56:35.450686Z", "%Y-%m-%dT%H:%M:%S.%fZ")
@@ -238,8 +238,8 @@ def get_date_from_iso(datetime_str):
 class ArticleTableView(TableAPIView):
     def get(self, request, id, page):
         try:
-            category = ArticleCategory.objects.get(id=id)
-        except ArticleCategory.DoesNotExist:
+            category = Category.objects.get(id=id)
+        except Category.DoesNotExist:
             return Response({'total': 0, 'data': []})
         """
             return Response({'news': []})
@@ -436,7 +436,7 @@ class EventDetailTableView(TableAPIView):
             result.append(one_record)
         return Response({'news': result})
         """
-        items = event.articles.all() 
+        items = event.articles.all()
         datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
         result = self.news_to_json(datas['items'])
         return Response({'total': datas['total_number'], 'data': result})
@@ -453,7 +453,7 @@ class EventDetailWeixinView(TableAPIView):
             event = Topic.objects.get(id=int(id))
         except Topic.DoesNotExist:
             return Response({'html': '', 'total': 0})
-        items = event.weixin.all() 
+        items = event.weixin.all()
         datas = self.paging(items, self.EVENT_WEIXIN_LIMIT, page)
         items = [SetLogo(data) for data in datas['items']]
         html = self.set_css_to_weixin(items)
@@ -467,7 +467,7 @@ class EventDetailWeiboView(TableAPIView):
             event = Topic.objects.get(id=int(id))
         except Topic.DoesNotExist:
             return Response({'html': '', 'total': 0})
-        items = event.weibo.all() 
+        items = event.weibo.all()
         datas = self.paging(items, self.EVENT_WEIBO_LIMIT, page)
         items = [SetLogo(data) for data in datas['items']]
         html = self.set_css_to_weibo(items)
@@ -524,7 +524,7 @@ class CollectView(APIView):
             result = []
             datas = {'taotal_number': 0}
         return Response({'total': datas['total_number'], 'data': result})
-        
+
 
 
 class CollecModifyView(View):
@@ -534,7 +534,7 @@ class CollecModifyView(View):
             try:
                 category = item.categorys.all()[0]
             except IndexError:
-                category = ArticleCategory.objects.get(name='其他')
+                category = Category.objects.get(name='其他')
             data['category'] =  category.name
         try:
             collection_item = self.get_related_model().objects.create(**data)
@@ -619,6 +619,7 @@ class SearchView(CollectView):
         return JsonResponse({"news": news, "event": event})
 
     def search_article(self, key):
+        # print type(key.encode('utf8').replace(" ","").decode('utf8'))
         return Article.objects.raw(u"SELECT * FROM article WHERE MATCH (content, title) AGAINST ('%s') LIMIT %s" % (key, self.LIMIT))
 
     def search_event(self, key):
@@ -667,6 +668,23 @@ class CustomTableView(TableAPIView):
         return Response({'total': datas['total_number'], 'data': result})
 
 
+class ProductTableView(TableAPIView):
+    def get(self, request, id, page):
+        try:
+            product = Product.objects.filter(id=id)
+        except Product.DoesNotExist:
+            product = Product.objects.all()
+
+        data = [p.articles.all() for p in product]
+        item = reduce(lambda x, y: list(set(x).union(set(y))), data)
+        article_ids = [item[i].id for i in range(len(item))]
+        item = Article.objects.filter(id__in=article_ids)
+
+        datas = self.paging(item, self.NEWS_PAGE_LIMIT, page)
+        result = self.news_to_json(datas['items'])
+        return Response({'total': datas['total_number'], 'data': result})
+
+
 class CustomWeixinView(TableAPIView):
     CUSTOM_WEIXIN_LIMIT = 10
     def get(self, request, custom_id, page):
@@ -675,7 +693,7 @@ class CustomWeixinView(TableAPIView):
             keyword = Keyword.objects.get(id=int(custom_id), group=user.group)
         except Keyword.DoesNotExist:
             return Response({'html': '', 'total': 0})
-        items = keyword.custom.weixin.all() 
+        items = keyword.custom.weixin.all()
         datas = self.paging(items, self.CUSTOM_WEIXIN_LIMIT, page)
         items = [SetLogo(data) for data in datas['items']]
         html = self.set_css_to_weixin(items)
@@ -741,12 +759,12 @@ class InspectionTableView(TableAPIView):
             result.append(one_record)
 
         return Response({"inspection": result})
-        
+
         #items = Inspection.objects.order_by('-pubtime').all()
         #datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
         #result = self.inspection_to_json(datas['items'])
         #return Response({"total": datas['total_number'], "data": result})
-    
+
     def inspection_to_json(self, items):
         result = []
         for data in items:
@@ -759,7 +777,7 @@ class InspectionTableView(TableAPIView):
             item['source'] = data.source
             result.append(item)
         return result
-            
+
 
 
 class WeixinTableView(TableAPIView):
@@ -788,7 +806,7 @@ class WeiboTableView(TableAPIView):
             html +=  u'<h4 class="media-heading">%s</h4>' % (item['publisher'])
             if len(item['content']) < 200:
                  html +=  u'<p>%s</p>' % (item['content'])
-            else: 
+            else:
                  html +=  u'<p><a href="%s" target="_blank">%s</a></p>' % (item['url'], item['title'])
             html += """<div class="media-meta">
                        <div class="info pull-right">"""
@@ -798,7 +816,7 @@ class WeiboTableView(TableAPIView):
             html += """</div>"""
             html +=  u'<div class="time pull-left">%s</div>' % datetime.datetime.fromtimestamp(item['pubtime']).strftime('%Y-%m-%d %H:%M')
             html += """</div></div></li>"""
-        
+
         return html
 
     def get(self, request, weibo_type, page):
@@ -808,13 +826,13 @@ class WeiboTableView(TableAPIView):
             hot_datas = self.pagingfromredis(Weibo, self.Weibo_table_limit, page)
             for data in hot_datas['items']:
                 if not data['photo']:
-                    data['photo'] = u'http://tp2.sinaimg.cn/3557640017/180/40054587155/1' 
+                    data['photo'] = u'http://tp2.sinaimg.cn/3557640017/180/40054587155/1'
             html = self.set_css_to_hotweibo(hot_datas['items'])
             return Response({'html': html, 'total': hot_datas['total_number']})
         items = [SetLogo(data) for data in datas['items']]
         html = self.set_css_to_weibo(items)
         return Response({'html': html, 'total': datas['total_number']})
-        
+
 
 
 @login_required
@@ -909,8 +927,11 @@ def add_user_view(request):
     if not myuser.isAdmin:
         return HttpResponse(status=401)
 
-    save_user(username, password, myuser.area, myuser.group)
-    return JsonResponse({'status': True})
+    if User.objects.filter(username=username):
+        return JsonResponse({'status': False})
+    else:
+        save_user(username, password, myuser.area, myuser.group)
+        return JsonResponse({'status': True})
 
 def get_count_feeling(start_d, end_d, feeling_type):
     feeling_limit = ''
@@ -972,21 +993,23 @@ def chart_line_event_view(request, topic_id):
     min_date = min(x.pubtime.date() for x in articles)
     max_date = max(x.pubtime.date() for x in articles)
     date_range = max_date - min_date
-    #data range by year
+    #data range by year   less one axis has data
     if date_range.days > 6 * 55:
-        return byYear(min_date, max_date, date_range, articles)
-    #data range by season
+        return year_range(min_date, max_date, date_range, articles)
+    #data range by season   less two axis has data
     elif date_range.days > 6 * 30:
-        return bySeason(min_date, max_date, date_range, articles)
-    #data range by month
-    elif  date_range.days > 6 * 10:
-        return byMonths(min_date, max_date, date_range, articles)
-    #data range by weeks
+        return season_range(min_date, max_date, date_range, articles)
+    #data range by month    less two axis has data
+    elif  date_range.days >= 3 * 10:
+        return months_range(min_date, max_date, date_range, articles)
+    #data range by weeks    less one axis has data
+    elif date_range.days > 7:
+        return week_range(min_date, max_date, date_range, articles)
+    #data range by days     less one axis has data
+    elif date_range.days >= 0:
+        return days_range(min_date, max_date, date_range, articles)
     else:
-        if min_date.year != max_date.year:
-            return byMonths(min_date, max_date, date_range, articles)
-        else: 
-            return byDays(min_date, max_date, date_range, articles)
+        return unstable()
 
 
 @api_view(['GET'])

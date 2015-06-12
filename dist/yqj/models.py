@@ -98,7 +98,7 @@ class ArticlePublisher(models.Model):
     photo = models.URLField(verbose_name=u'用户头像')
     publisher = models.CharField(max_length=255, verbose_name=u'发布者')
     brief = models.CharField(max_length=255, verbose_name=u'简介')
-    searchmode = models.IntegerField(default=0, verbose_name=u'搜索方式') 
+    searchmode = models.IntegerField(default=0, verbose_name=u'搜索方式')
 
     class Meta:
         db_table = 'articlepublisher'
@@ -120,7 +120,7 @@ class Article(models.Model):
     uuid = models.CharField(max_length=36)
     feeling_factor = models.FloatField(default=-1, verbose_name=u'正负面')
     website_type = models.CharField(max_length=20, blank=True, verbose_name=u'类型')
-    
+
     class Meta:
         db_table = 'article'
         verbose_name_plural = u'文章'
@@ -162,14 +162,14 @@ class RelatedData(models.Model):
         return self.uuid
 
 
-class ArticleCategory(models.Model):
+class Category(models.Model):
     name = models.CharField(max_length=255, blank=True, verbose_name=u'名称')
     remark = models.CharField(max_length=255, blank=True, verbose_name=u'备注')
 
-    articles = models.ManyToManyField(Article, related_name='categorys', related_query_name='category', null=True, blank=True, verbose_name=u'文章')
+    articles = models.ManyToManyField(Article, related_name='category', related_query_name='categorys', null=True, blank=True, verbose_name=u'文章')
 
     class Meta:
-        db_table = 'article_category'
+        db_table = 'category'
         verbose_name_plural = u'文章分类'
 
 def make_random_string(length=10,
@@ -197,7 +197,7 @@ def save_user(username, raw_password, area, group):
 
 class Group(models.Model):
     company = models.CharField(max_length=255)
-   
+
     def __unicode__(self):
         return self.company
 
@@ -229,6 +229,19 @@ class Custom(models.Model):
         return self.searchkeyword
 
 
+class Product(models.Model):
+    product = models.CharField(max_length=255, verbose_name='产品')
+
+    articles = models.ManyToManyField(Article, related_name='product', related_query_name='products', null=True, blank=True, verbose_name=u'文章')
+
+    class Meta:
+        db_table = 'product'
+        verbose_name_plural = u'产品监测'
+
+    def __unicode__(self):
+        return self.product
+
+
 class Keyword(models.Model):
     newkeyword = models.CharField(max_length=255, verbose_name=u'关键词')
     review = models.CharField(max_length=255, default=u'', verbose_name=u'审核')
@@ -248,7 +261,7 @@ class Collection(models.Model):
     user = models.OneToOneField(User, primary_key=True, verbose_name=u'用户')
     articles = models.ManyToManyField(Article, null=True, blank=True, related_name='collections', related_query_name='collection', through='ArticleCollection', verbose_name=u'文章')
     events = models.ManyToManyField(Topic, null=True,blank=True, related_name='collections', related_query_name='collection', through='TopicCollection', verbose_name=u'质量事件')
-    
+
     class Meta:
         db_table = 'collection'
         verbose_name_plural = u'用户收藏'
