@@ -292,50 +292,52 @@ APP.returnTop = function(el) {
 };
 
 APP.table = function() {
-  var _this       = this;
+  $('.table-custom').each(function() {
+    var $this       = $(this),
+        $pagination = $this.parent(),
+        content     = this.tBodies[0],
+        type        = this.id;
 
-  var $content    = this.find('tbody'),
-      $pagination = this.parent(),
-      type        = this[0].id;
+    var renderTable = function(data) {
+      var items = data.data;
 
-  var renderTable = function(data) {
-    var items = data.data;
+      var table = $.map(items, function(item) {
+        var url       = '/' + type + '/' + item.id + '/',
+            title     = '<td><a href="' + url + '" title="' + item.title + '" target="_blank">' + item.title + '</a></td>',
+            source    = '<td>' + item.source   + '</td>',
+            location  = '<td>' + item.location + '</td>',
+            time      = '<td>' + item.time     + '</td>',
+            hot       = '<td class="text-center">' + item.hot + '</td>',
+            row       = '<tr>' + title + source + location + time + hot + '</tr>';
 
-    var table = $.map(items, function(item) {
-      var url       = '/' + type + '/' + item.id + '/',
-          title     = '<td><a href="' + url + '" title="' + item.title + '" target="_blank">' + item.title + '</a></td>',
-          source    = '<td>' + item.source   + '</td>',
-          location  = '<td>' + item.location + '</td>',
-          time      = '<td>' + item.time     + '</td>',
-          hot       = '<td class="text-center">' + item.hot + '</td>',
-          row       = '<tr>' + title + source + location + time + hot + '</tr>';
+        return row;
+      });
 
-      return row;
+      $(content).html(table);
+    };
+
+    $.getJSON('/api' + APP.url + type + '/1/', function(data) {
+      renderTable(data);
+
+      $pagination.twbsPagination({
+        totalPages: data.total,
+        visiblePages: 7,
+        first: '第一页',
+        prev: '上一页',
+        next: '下一页',
+        last: '最后一页',
+        paginationClass: 'pagination pagination-sm no-margin pull-right',
+        onPageClick: function(event, page) {
+          APP.returnTop($this);
+
+          $.getJSON('/api' + APP.url + type + '/' + page + '/', function(data) {
+            renderTable(data);
+            $pagination.twbsPagination({totalPages: data.total});
+          });
+        }
+      });
     });
 
-    $content.html(table);
-  };
-
-  $.getJSON('/api' + APP.url + type + '/1/', function(data) {
-    renderTable(data);
-
-    $pagination.twbsPagination({
-      totalPages: data.total,
-      visiblePages: 7,
-      first: '第一页',
-      prev: '上一页',
-      next: '下一页',
-      last: '最后一页',
-      paginationClass: 'pagination pagination-sm no-margin pull-right',
-      onPageClick: function(event, page) {
-        APP.returnTop(_this);
-
-        $.getJSON('/api' + APP.url + type + '/' + page + '/', function(data) {
-          renderTable(data);
-          $pagination.twbsPagination({totalPages: data.total});
-        });
-      }
-    });
   });
 };
 
@@ -604,14 +606,13 @@ $(function() {
         $('#pie-chart').Do(APP.chart.pie);
         break;
       case 'news':
-        $('#news').Do(APP.table);
+        APP.table();
         APP.collection();
         break;
       case 'event':
-        $('#event').Do(APP.table);
+        APP.table();
         $('#line-chart').Do(APP.chart.line);
         $('#pie-chart').Do(APP.chart.pie);
-        $('#news').Do(APP.table);
         APP.sns();
         APP.collection();
         break;
@@ -623,7 +624,7 @@ $(function() {
       case 'category':
         // run function on 'category' and 'location'
       case 'location':
-        $('#news').Do(APP.table);
+        APP.table();
         APP.sns();
         break;
       case 'inspection':
@@ -631,16 +632,15 @@ $(function() {
         break;
       case 'custom':
         APP.custom();
-        $('#news').Do(APP.table);
+        APP.table();
         APP.sns();
         break;
       case 'product':
         APP.product();
-        $('#news').Do(APP.table);
+        APP.table();
         break;
       case 'collection':
-        $('#news').Do(APP.table);
-        $('#event').Do(APP.table);
+        APP.table();
         break;
       case 'settings':
         APP.user.change();
