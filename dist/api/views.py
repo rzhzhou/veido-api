@@ -24,6 +24,7 @@ from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
 from yqj.redisconnect import RedisQueryApi
+from django.db import connection
 
 def login_view(request):
     try:
@@ -287,8 +288,41 @@ class NewsTableView(TableAPIView):
 
         return Response({"news": result})
     """
+    def get_custom_artice(self):
+        custom_id_list = []
+        keywords = Keyword.objects.filter(group_id=4)
+        for keyword in keywords:
+            custom_id = keyword.custom_id
+            if custom_id:
+                custom_id_list.append(custom_id)
+        cursor = connection.cursor()
+
+        sql = 'select article_id from custom_articles where %s'\
+            %(
+                reduce(
+                    lambda x, y: x + " or " + y, 
+                    ["custom_id=%s" for x in custom_id_list]
+                    )
+                )
+        cursor.execute(sql,custom_id_list)
+        row = cursor.fetchall()
+        article_id = []
+        for r in row:
+            article_id.append(r[0]) 
+
+        news_list = ArticleCategory.objects.get(name='质监热点').articles.all()
+
+        for n in news_list:
+            article_id.append(n.id)
+
+        articles = Article.objects.filter(id__in=article_id)
+
+        return articles
+
     def get(self, request, page):
-        items = Article.objects.filter(website_type='hot')
+        # news_list = Article.objects.filter(website_type='hot')
+        # news_list = ArticleCategory.objects.get(name='质监热点').articles.all()
+        items = self.get_custom_artice()
         datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
         result = self.news_to_json(datas['items'])
         return Response({'total': datas['total_number'], 'data': result})

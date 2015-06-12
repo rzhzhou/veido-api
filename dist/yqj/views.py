@@ -7,15 +7,15 @@ from django.conf import settings
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import View
-from yqj.models import Article, Weixin, Weibo, RelatedData, ArticleCategory,\
+from yqj.models import Article, Weixin, Weibo, RelatedData, ArticleCategory,Group,\
                        Area, Topic, Inspection, Custom, Keyword, Collection,ArticlePublisher
 from yqj import login_required
 from yqj.redisconnect import RedisQueryApi
-from django.db.models import Q
+from django.db.models import Count,Q
 from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
-
+from django.db import connection
 def SetLogo(obj):
     if not obj.publisher.photo:
         obj.publisher.photo = u'http://tp2.sinaimg.cn/3557640017/180/40054587155/1'
@@ -47,7 +47,35 @@ def index_view(request):
         weixin_list_number = weibo_list_number = 5
 
         start_date = datetime.now() + timedelta(days=-7)
-        news_list = Article.objects.filter(website_type='hot', pubtime__gt=start_date).order_by('-pubtime')[:news_list_number]
+        # news_lists = Article.objects.filter(website_type='hot', pubtime__gt=start_date).order_by('-pubtime')[:news_list_number]
+        # news_lists = ArticleCategory.objects.get(name='质监热点').articles.filter(pubtime__gt=start_date).order_by('-pubtime')[:news_list_number]
+        custom_id_list=[]
+        keywords = Keyword.objects.filter(group_id=4)
+        for keyword in keywords:
+            custom_id = keyword.custom_id
+            if custom_id:
+                custom_id_list.append(custom_id)
+        cursor = connection.cursor()
+
+        sql = 'select article_id from custom_articles where %s'\
+            %(
+                reduce(
+                    lambda x, y: x + " or " + y, 
+                    ["custom_id=%s" for x in custom_id_list]
+                    )
+                )
+        cursor.execute(sql,custom_id_list)
+        row = cursor.fetchall()
+        article_id = []
+        for r in row:
+            article_id.append(r[0]) 
+
+        hot_list = ArticleCategory.objects.get(name='质监热点').articles.all()
+        for n in hot_list:
+            article_id.append(n.id)
+
+        news_list = Article.objects.filter(id__in=article_id)[:10]
+
         for item in news_list:
             try:
                 setattr(item, 'hot_index', RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count())
