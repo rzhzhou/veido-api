@@ -48,7 +48,6 @@ class KeywordAdmin(admin.ModelAdmin):
     #list_editable = ('source', 'feeling_factor', 'pubtime',)
     list_filter = ('group', )
     search_fields = ('newkeyword', 'review')
-    actions = ["del_keywords"]
     def save_model(self, request, obj, form, change):
         if obj.custom:
             obj.review = ''
@@ -80,8 +79,19 @@ class TopicAdmin(admin.ModelAdmin):
 
 class CustomAdmin(admin.ModelAdmin):
 
+    def save_model(self, request, obj, form, change):
+        if change:
+            key_list = Custom.objects.filter(id=obj.id)
+            if len(key_list) == 0:
+                return
+            old_keyword = key_list[0].searchkeyword
+            CrawlerTask(obj.searchkeyword, "zjld", u"关键词").update_task(old_keyword)
+            obj.save()
+        else:
+            pass
+
     def delete_model(self, request, obj):
-        CrawlerTask(obj.searchkeyword, 'zjld', u"关键词").del_task()
+        CrawlerTask(obj.searchkeyword, "zjld", u"关键词").del_task()
         obj.delete()
 
 
