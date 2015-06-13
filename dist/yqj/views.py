@@ -414,11 +414,11 @@ class ProductView(BaseView):
     def get(self, reqeust, id):
         if id:
             product = Product.objects.get(id=id)
-            name = product.product
+            name = product.name
         else:
             name = u'全部'
         products = Product.objects.all()
-        product_list = [{'id': products[i].id, 'name': products[i].product} for i in xrange(0, len(products))]
+        product_list = [{'id': products[i].id, 'name': products[i].name} for i in xrange(0, len(products))]
         return self.render_to_response('product/product.html', {'product_list': product_list, 'product': {'name': name}})
 
 

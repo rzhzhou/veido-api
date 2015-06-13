@@ -96,11 +96,11 @@ class CustomAdmin(admin.ModelAdmin):
 
 
 class ProductAdmin(admin.ModelAdmin):
-    fields = ('product', )
-    list_display = ('product',)
-    list_editable = ('product',)
-    list_filter = ('product',)
-    search_fields = ('product',)
+    fields = ('name', )
+    list_display = ('name',)
+    list_editable = ('name',)
+    list_filter = ('name',)
+    search_fields = ('name',)
 
 
 # Register your models here.
