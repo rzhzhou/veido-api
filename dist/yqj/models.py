@@ -136,9 +136,9 @@ class Topic(models.Model):
     source = models.CharField(max_length=255, blank=True, verbose_name=u'首发媒体')
     area = models.ForeignKey(Area, verbose_name=u'地域')
     keywords = models.CharField(max_length=255, default=u'', verbose_name=u'关键词', blank=True)
-    articles = models.ManyToManyField(Article, related_name='topic', related_query_name='topics', null=True, blank=True, verbose_name=u'文章')
-    weibo = models.ManyToManyField(Weibo, related_name='topic', related_query_name='topics', null=True, blank=True, verbose_name=u'微博')
-    weixin = models.ManyToManyField(Weixin, related_name='topic', related_query_name='topics', null=True, blank=True, verbose_name=u'微信')
+    articles = models.ManyToManyField(Article, related_name='topics', related_query_name='topic', null=True, blank=True, verbose_name=u'文章')
+    weibo = models.ManyToManyField(Weibo, related_name='topics', related_query_name='topic', null=True, blank=True, verbose_name=u'微博')
+    weixin = models.ManyToManyField(Weixin, related_name='topics', related_query_name='topic', null=True, blank=True, verbose_name=u'微信')
 
     class Meta:
         db_table = 'topic'
@@ -150,9 +150,9 @@ class Topic(models.Model):
 
 class RelatedData(models.Model):
     uuid = models.CharField(max_length=36, verbose_name=u'uuid')
-    articles = models.ManyToManyField(Article, related_name='relateddata', related_query_name='relateddatas', null=True, blank=True, verbose_name=u'文章')
-    weibo = models.ManyToManyField(Weibo, related_name='relateddata', related_query_name='relateddatas', null=True, blank=True, verbose_name=u'微博')
-    weixin = models.ManyToManyField(Weixin, related_name='relateddata', related_query_name='relateddatas', null=True, blank=True, verbose_name=u'微信')
+    articles = models.ManyToManyField(Article, related_name='relateddatas', related_query_name='relateddata', null=True, blank=True, verbose_name=u'文章')
+    weibo = models.ManyToManyField(Weibo, related_name='relateddatas', related_query_name='relateddata', null=True, blank=True, verbose_name=u'微博')
+    weixin = models.ManyToManyField(Weixin, related_name='relateddatas', related_query_name='relateddata', null=True, blank=True, verbose_name=u'微信')
 
     class Meta:
         db_table = 'relateddata'
@@ -166,7 +166,7 @@ class Category(models.Model):
     name = models.CharField(max_length=255, blank=True, verbose_name=u'名称')
     remark = models.CharField(max_length=255, blank=True, verbose_name=u'备注')
 
-    articles = models.ManyToManyField(Article, related_name='category', related_query_name='categorys', null=True, blank=True, verbose_name=u'文章')
+    articles = models.ManyToManyField(Article, related_name='categorys', related_query_name='category', null=True, blank=True, verbose_name=u'文章')
 
     class Meta:
         db_table = 'category'
@@ -217,9 +217,9 @@ class User(models.Model):
 class Custom(models.Model):
     searchkeyword = models.CharField(max_length=255, verbose_name=u'关键词')
     #group = models.ManyToManyField(Group, related_name='custom', related_query_name='customs', null=True, blank=True, verbose_name=u'所属组')
-    articles = models.ManyToManyField(Article, related_name='custom', related_query_name='customs', null=True, blank=True, verbose_name=u'文章')
-    weibo = models.ManyToManyField(Weibo, related_name='custom', related_query_name='customs', null=True, blank=True, verbose_name=u'微博')
-    weixin = models.ManyToManyField(Weixin, related_name='custom', related_query_name='customs', null=True, blank=True, verbose_name=u'微信')
+    articles = models.ManyToManyField(Article, related_name='customs', related_query_name='custom', null=True, blank=True, verbose_name=u'文章')
+    weibo = models.ManyToManyField(Weibo, related_name='customs', related_query_name='custom', null=True, blank=True, verbose_name=u'微博')
+    weixin = models.ManyToManyField(Weixin, related_name='customs', related_query_name='custom', null=True, blank=True, verbose_name=u'微信')
 
     class Meta:
         db_table = 'custom'
@@ -230,16 +230,16 @@ class Custom(models.Model):
 
 
 class Product(models.Model):
-    product = models.CharField(max_length=255, verbose_name='产品')
+    name = models.CharField(max_length=255, blank=True, verbose_name='名称')
 
-    articles = models.ManyToManyField(Article, related_name='product', related_query_name='products', null=True, blank=True, verbose_name=u'文章')
+    articles = models.ManyToManyField(Article, related_name='products', related_query_name='product', null=True, blank=True, verbose_name=u'文章')
 
     class Meta:
         db_table = 'product'
         verbose_name_plural = u'产品监测'
 
     def __unicode__(self):
-        return self.product
+        return self.name
 
 
 class Keyword(models.Model):
