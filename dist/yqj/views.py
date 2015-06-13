@@ -48,7 +48,7 @@ def index_view(request):
 
         start_date = datetime.now() + timedelta(days=-7)
         # news_lists = Article.objects.filter(website_type='hot', pubtime__gt=start_date).order_by('-pubtime')[:news_list_number]
-        # news_lists = ArticleCategory.objects.get(name='质监热点').articles.filter(pubtime__gt=start_date).order_by('-pubtime')[:news_list_number]
+        # news_lists = Category.objects.get(name='质监热点').articles.filter(pubtime__gt=start_date).order_by('-pubtime')[:news_list_number]
         custom_id_list=[]
         keywords = Keyword.objects.filter(group_id=1)
         #group_id = 4
@@ -75,6 +75,20 @@ def index_view(request):
         # article_id = []
         # for r in row:
         #     article_id.append(r[0]) 
+        cursor = connection.cursor()
+
+        sql = 'select article_id from custom_articles where %s'\
+            %(
+                reduce(
+                    lambda x, y: x + " or " + y,
+                    ["custom_id=%s" for x in custom_id_list]
+                    )
+                )
+        cursor.execute(sql,custom_id_list)
+        row = cursor.fetchall()
+        article_id = []
+        for r in row:
+            article_id.append(r[0])
 
         hot_list = Category.objects.get(name='质监热点').articles.all()
         for n in hot_list:
