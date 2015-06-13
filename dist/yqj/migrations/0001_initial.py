@@ -47,20 +47,6 @@ class Migration(migrations.Migration):
             bases=(models.Model,),
         ),
         migrations.CreateModel(
-            name='ArticleCategory',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('name', models.CharField(max_length=255, verbose_name='\u540d\u79f0', blank=True)),
-                ('remark', models.CharField(max_length=255, verbose_name='\u5907\u6ce8', blank=True)),
-                ('articles', models.ManyToManyField(related_query_name=b'category', related_name='categorys', to='yqj.Article', blank=True, null=True, verbose_name='\u6587\u7ae0')),
-            ],
-            options={
-                'db_table': 'article_category',
-                'verbose_name_plural': '\u6587\u7ae0\u5206\u7c7b',
-            },
-            bases=(models.Model,),
-        ),
-        migrations.CreateModel(
             name='ArticleCollection',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
@@ -86,6 +72,20 @@ class Migration(migrations.Migration):
             options={
                 'db_table': 'articlepublisher',
                 'verbose_name_plural': '\u6587\u7ae0\u53d1\u5e03\u8005',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Category',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=255, verbose_name='\u540d\u79f0', blank=True)),
+                ('remark', models.CharField(max_length=255, verbose_name='\u5907\u6ce8', blank=True)),
+                ('articles', models.ManyToManyField(related_query_name=b'categorys', related_name='category', to='yqj.Article', blank=True, null=True, verbose_name='\u6587\u7ae0')),
+            ],
+            options={
+                'db_table': 'category',
+                'verbose_name_plural': '\u6587\u7ae0\u5206\u7c7b',
             },
             bases=(models.Model,),
         ),
@@ -146,19 +146,6 @@ class Migration(migrations.Migration):
             options={
                 'db_table': 'keyword',
                 'verbose_name_plural': '\u5173\u952e\u8bcd',
-            },
-            bases=(models.Model,),
-        ),
-        migrations.CreateModel(
-            name='Product',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('product', models.CharField(max_length=255, verbose_name=b'\xe4\xba\xa7\xe5\x93\x81')),
-                ('articles', models.ManyToManyField(related_query_name=b'products', related_name='product', to='yqj.Article', blank=True, null=True, verbose_name='\u6587\u7ae0')),
-            ],
-            options={
-                'db_table': 'product',
-                'verbose_name_plural': '\u4ea7\u54c1\u76d1\u6d4b',
             },
             bases=(models.Model,),
         ),
