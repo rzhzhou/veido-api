@@ -5,7 +5,7 @@ from django.contrib import messages
 from yqj.mongoconnect import CrawlerTask
 from models import WeixinPublisher, WeiboPublisher,Weibo, ArticlePublisher,\
                    Category, Group, User, Article, Topic, Custom,\
-                   Keyword, Area,Weixin
+                   Keyword, Area,Weixin, Product
 import jieba.analyse
 
 def show_pubtime(obj):
@@ -95,6 +95,14 @@ class CustomAdmin(admin.ModelAdmin):
         obj.delete()
 
 
+class ProductAdmin(admin.ModelAdmin):
+    fields = ('product', )
+    list_display = ('product',)
+    list_editable = ('product',)
+    list_filter = ('product',)
+    search_fields = ('product',)
+
+
 # Register your models here.
 
 admin.site.register(WeixinPublisher)
@@ -109,3 +117,4 @@ admin.site.register(Article, ArticleAdmin)
 admin.site.register(Topic, TopicAdmin)
 admin.site.register(Custom, CustomAdmin)
 admin.site.register(Keyword, KeywordAdmin)
+admin.site.register(Product, ProductAdmin)
