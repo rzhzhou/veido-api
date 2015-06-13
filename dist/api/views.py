@@ -300,7 +300,7 @@ class NewsTableView(TableAPIView):
         sql = 'select article_id from custom_articles where %s'\
             %(
                 reduce(
-                    lambda x, y: x + " or " + y, 
+                    lambda x, y: x + " or " + y,
                     ["custom_id=%s" for x in custom_id_list]
                     )
                 )
@@ -308,9 +308,9 @@ class NewsTableView(TableAPIView):
         row = cursor.fetchall()
         article_id = []
         for r in row:
-            article_id.append(r[0]) 
+            article_id.append(r[0])
 
-        news_list = ArticleCategory.objects.get(name='质监热点').articles.all()
+        news_list = Category.objects.get(name='质监热点').articles.all()
 
         for n in news_list:
             article_id.append(n.id)
@@ -578,7 +578,6 @@ class CollecModifyView(View):
 
     def post(self, request, action, *args, **kwargs):
         try:
-            print request.POST['type'], request.POST['id']
             self.data_type = request.POST['type']
             pk = request.POST['id']
         except KeyError:
@@ -619,7 +618,6 @@ class SearchView(CollectView):
         return JsonResponse({"news": news, "event": event})
 
     def search_article(self, key):
-        # print type(key.encode('utf8').replace(" ","").decode('utf8'))
         return Article.objects.raw(u"SELECT * FROM article WHERE MATCH (content, title) AGAINST ('%s') LIMIT %s" % (key, self.LIMIT))
 
     def search_event(self, key):
@@ -721,7 +719,6 @@ class CustomWeiboView(TableAPIView):
 class CustomModifyView(View):
     def save(self, user):
         count = Keyword.objects.filter(group=user.group).exclude(custom__isnull=False).count()
-        print count
         if count >= 5:
             return {"status": False}
         try:
