@@ -474,45 +474,37 @@ APP.sns = function() {
 };
 
 APP.custom = function() {
-  var $custom   = $('.custom'),
-      $list     = $custom.find('li'),
-      $form     = $custom.find('form'),
-      $msg      = $form.prev(),
-      $fieldset = $form.find('fieldset'),
-      api       = $form.attr('action');
+  var form     = document.forms.addKeyword,
+      action   = form.action,
+      elements = form.elements,
+      fieldset = elements[0],
+      keyword  = elements[1],
+      button   = elements[2],
+      $msg     = $(form).prev(),
+      $list    = $(form).parent().prev().find('li'),
 
-  var response = function(data) {
-    if (data.status) {
-      $msg.text('关键词添加成功！').show();
-    } else {
-      $msg.text('关键词添加失败！').show();
-    }
+      enableSubmit = function() {
+        button.disabled = !(keyword.value.length);
+      },
 
-    setTimeout(function() {
-      location.reload();
-    }, 1000);
-  };
+      processAdd = function(event) {
+        event.preventDefault();
 
-  var addKeyword = function() {
-    $form.submit(function(event) {
-      event.preventDefault();
+        $.post(action, $(form).serialize(), function(response) {
+          if (response.status) {
+            $msg.text('关键词添加成功！').show();
+            location.reload();
+          } else {
+            $msg.text('关键词添加失败！').show();
+            keyword.value = '';
+          }
+        });
+      };
 
-      var keyword = $form.Trim();
-
-      if (keyword.length) {
-        $.post(api, {keyword: keyword}, response, 'json');
-      } else {
-        $msg.text('请输入关键词！').show();
-      }
-    });
-  };
-
-  // console.log($list.length >= 5);
-
-  if ( $list.length >= 5 ) {
-    $fieldset.prop('disabled', true);
+  if ($list.length >= 5) {
+    fieldset.disabled = true;
   } else {
-    addKeyword();
+    $(form).keyup(enableSubmit).submit(processAdd);
   }
 };
 
@@ -586,7 +578,6 @@ APP.dashboard = function() {
     }
   });
 };
-
 
 APP.product = function() {
   $('.filter-list')
