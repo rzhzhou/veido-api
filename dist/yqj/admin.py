@@ -145,9 +145,6 @@ class ProductKeywordAdmin(admin.ModelAdmin):
         obj.delete()
 
 
-
-
-
 # Register your models here.
 
 admin.site.register(WeixinPublisher)
@@ -164,3 +161,4 @@ admin.site.register(Custom)
 admin.site.register(CustomKeyword, CustomKeywordAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(ProductKeyword, ProductKeywordAdmin)
+

@@ -14,7 +14,7 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from yqj.models import (Article, Area, Weixin, Weibo, Topic, RelatedData, Category,
                         save_user, Collection, Topic, hash_password, User, Custom,
-                        Inspection, CustomKeyword,Product)
+                        Inspection, CustomKeyword,Product, ProductKeyword)
 from yqj.views import SetLogo
 from serializers import ArticleSerializer
 from yqj import authenticate, login_required
@@ -671,14 +671,20 @@ class ProductTableView(TableAPIView):
     def get(self, request, id, page):
         if id:
             try:
-                product = [Product.objects.get(id=id)]
-            except Product.DoesNotExist:
-                return HttpResponse(status=404)
+                prokey = [ProductKeyword.objects.get(id=id)]
+            except ProductKeyword.DoesNotExist:
+                prokey = ProductKeyword.objects.filter(group=2)
         else:
-            product = Product.objects.all()
+            prokey = ProductKeyword.objects.filter(group=2)
+
+        prokey_len = len(prokey)
+        product = [prokey[i].product for i in xrange(prokey_len)] 
 
         data = [p.articles.all() for p in product]
-        item = reduce(lambda x, y: list(set(x).union(set(y))), data)
+        if data != []:
+            item = reduce(lambda x, y: list(set(x).union(set(y))), data)
+        else:
+            item =[] 
         article_ids = [item[i].id for i in range(len(item))]
         item = Article.objects.filter(id__in=article_ids)
 
