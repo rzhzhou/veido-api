@@ -7,7 +7,7 @@
   <ol class="breadcrumb">
     <li><a href="/"><i class="fa fa-dashboard"></i>首页</a></li>
     <li><a href="/product/">产品监测</a></li>
-    <li class="active"><a href="/product/{{ product.id }}">{{ product.name }}</a></li>
+    <li class="active"><a href="/product/{{ product.id }}/">{{ product.name }}</a></li>
   </ol>
 {% endblock %}
 
@@ -20,7 +20,7 @@
           <ul class="filter-list clearfix">
             {% for product in product_list %}
             <li>
-              <a href="/product/{{ product.id }}">{{ product.name }}</a>
+              <a href="/product/{{ product.id }}/">{{ product.name }}</a>
             </li>
             {% endfor %}
           </ul>
