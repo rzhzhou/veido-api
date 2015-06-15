@@ -8,7 +8,7 @@ from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import View
 from yqj.models import Article, Weixin, Weibo, RelatedData, Category, Group,\
-                       Area, Topic, Inspection, Custom, Keyword, Collection, ArticlePublisher, Product
+                       Area, Topic, Inspection, Custom, CustomKeyword, Collection, ArticlePublisher, Product
 from yqj import login_required
 from yqj.redisconnect import RedisQueryApi
 from django.db.models import Count,Q
@@ -50,7 +50,7 @@ def index_view(request):
         # news_lists = Article.objects.filter(website_type='hot', pubtime__gt=start_date).order_by('-pubtime')[:news_list_number]
         # news_lists = Category.objects.get(name='质监热点').articles.filter(pubtime__gt=start_date).order_by('-pubtime')[:news_list_number]
         custom_id_list=[]
-        keywords = Keyword.objects.filter(group_id=4)
+        keywords = CustomKeyword.objects.filter(group_id=4)
         #group_id = 4
         for keyword in keywords:
             custom_id = keyword.custom_id
@@ -66,7 +66,7 @@ def index_view(request):
         sql = 'select article_id from custom_articles where %s'\
             %(
                 reduce(
-                    lambda x, y: x + " or " + y, 
+                    lambda x, y: x + " or " + y,
                     ["custom_id=%s" for x in custom_id_list]
                     )
                 )
@@ -74,7 +74,7 @@ def index_view(request):
         row = cursor.fetchall()
         article_id = []
         for r in row:
-            article_id.append(r[0])  
+            article_id.append(r[0])
 
         hot_list = Category.objects.get(name='质监热点').articles.all()
         for n in hot_list:
@@ -373,8 +373,8 @@ class CustomListView(BaseView):
     custom_list_num = 5
     def get(self, request):
         user = self.request.myuser
-        newkeyword_list = Keyword.objects.filter(group=user.group).exclude(custom__isnull=False)
-        searchkeyword_list = Keyword.objects.filter(group=user.group).exclude(custom__isnull=True)
+        newkeyword_list = CustomKeyword.objects.filter(group=user.group).exclude(custom__isnull=False)
+        searchkeyword_list = CustomKeyword.objects.filter(group=user.group).exclude(custom__isnull=True)
         keyword_list = []
         for keyword in searchkeyword_list:
             setattr(keyword, 'name', keyword.newkeyword)
@@ -390,8 +390,8 @@ class CustomView(BaseView):
     def get(self, request, id):
         user = request.myuser
         try:
-            custom = Keyword.objects.get(id=int(id), group=user.group)
-        except Keyword.DoesNotExist:
+            custom = CustomKeyword.objects.get(id=int(id), group=user.group)
+        except CustomKeyword.DoesNotExist:
             return self.render_to_response('custom/custom.html', {'name': u''})
         return self.render_to_response('custom/custom.html', {'name': custom.newkeyword})
 

@@ -14,7 +14,7 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from yqj.models import (Article, Area, Weixin, Weibo, Topic, RelatedData, Category,
                         save_user, Collection, Topic, hash_password, User, Custom,
-                        Inspection, Keyword,Product)
+                        Inspection, CustomKeyword,Product)
 from yqj.views import SetLogo
 from serializers import ArticleSerializer
 from yqj import authenticate, login_required
@@ -290,7 +290,7 @@ class NewsTableView(TableAPIView):
     """
     def get_custom_artice(self):
         custom_id_list = []
-        keywords = Keyword.objects.filter(group_id=4)
+        keywords = CustomKeyword.objects.filter(group_id=4)
         for keyword in keywords:
             custom_id = keyword.custom_id
             if custom_id:
@@ -657,8 +657,8 @@ class CustomTableView(TableAPIView):
     def get(self, request, custom_id, page):
         user = request.myuser
         try:
-            keyword = Keyword.objects.get(id=int(custom_id), group=user.group)
-        except Keyword.DoesNotExist:
+            keyword = CustomKeyword.objects.get(id=int(custom_id), group=user.group)
+        except CustomKeyword.DoesNotExist:
             return Response({'total': 0, 'data': []})
         items = keyword.custom.articles.all()
         datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
@@ -691,8 +691,8 @@ class CustomWeixinView(TableAPIView):
     def get(self, request, custom_id, page):
         user = request.myuser
         try:
-            keyword = Keyword.objects.get(id=int(custom_id), group=user.group)
-        except Keyword.DoesNotExist:
+            keyword = CustomKeyword.objects.get(id=int(custom_id), group=user.group)
+        except CustomKeyword.DoesNotExist:
             return Response({'html': '', 'total': 0})
         items = keyword.custom.weixin.all()
         datas = self.paging(items, self.CUSTOM_WEIXIN_LIMIT, page)
@@ -706,8 +706,8 @@ class CustomWeiboView(TableAPIView):
     def get(self, request, custom_id, page):
         user = request.myuser
         try:
-            keyword = Keyword.objects.get(id=int(custom_id), group=user.group)
-        except Keyword.DoesNotExist:
+            keyword = CustomKeyword.objects.get(id=int(custom_id), group=user.group)
+        except CustomKeyword.DoesNotExist:
             return Response({'html': '', 'total': 0})
         items = keyword.custom.weibo.all()
         datas = self.paging(items, self.CUSTOM_WEIBO_LIMIT, page)
@@ -718,11 +718,11 @@ class CustomWeiboView(TableAPIView):
 
 class CustomModifyView(View):
     def save(self, user):
-        count = Keyword.objects.filter(group=user.group).exclude(custom__isnull=False).count()
+        count = CustomKeyword.objects.filter(group=user.group).exclude(custom__isnull=False).count()
         if count >= 5:
             return {"status": False}
         try:
-            custom = Keyword(newkeyword=self.keyword, group=user.group)
+            custom = CustomKeyword(newkeyword=self.keyword, group=user.group)
             custom.save(using='master')
         except IntegrityError:
             return {"status": False}

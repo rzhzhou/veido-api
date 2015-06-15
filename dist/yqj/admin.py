@@ -5,7 +5,7 @@ from django.contrib import messages
 from yqj.mongoconnect import CrawlerTask
 from models import WeixinPublisher, WeiboPublisher,Weibo, ArticlePublisher,\
                    Category, Group, User, Article, Topic, Custom,\
-                   Keyword, Area,Weixin, Product
+                   CustomKeyword, Area,Weixin, Product
 import jieba.analyse
 
 def show_pubtime(obj):
@@ -43,7 +43,7 @@ class ArticleAdmin(admin.ModelAdmin):
         return super(ArticleAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
 
-class KeywordAdmin(admin.ModelAdmin):
+class CustomKeywordAdmin(admin.ModelAdmin):
     list_display = ('newkeyword', 'review', 'group', 'custom')
     #list_editable = ('source', 'feeling_factor', 'pubtime',)
     list_filter = ('group', )
@@ -116,5 +116,5 @@ admin.site.register(Group)
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(Topic, TopicAdmin)
 admin.site.register(Custom, CustomAdmin)
-admin.site.register(Keyword, KeywordAdmin)
+admin.site.register(CustomKeyword, CustomKeywordAdmin)
 admin.site.register(Product, ProductAdmin)

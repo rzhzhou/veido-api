@@ -229,6 +229,21 @@ class Custom(models.Model):
         return self.searchkeyword
 
 
+class CustomKeyword(models.Model):
+    newkeyword = models.CharField(max_length=255, verbose_name=u'关键词')
+    review = models.CharField(max_length=255, default=u'', verbose_name=u'审核')
+    #synced = models.CharField(max_length=255, default=u'', verbose_name=u'同步')
+    group = models.ForeignKey(Group)
+    custom = models.ForeignKey(Custom, null=True, blank=True, default=u'')
+
+    class Meta:
+        db_table = 'custom_keyword'
+        verbose_name_plural = u'指定监测关键词'
+
+    def __unicode__(self):
+        return self.newkeyword
+
+
 class Product(models.Model):
     name = models.CharField(max_length=255, blank=True, verbose_name='名称')
 
@@ -242,16 +257,16 @@ class Product(models.Model):
         return self.name
 
 
-class Keyword(models.Model):
+class ProductKeyword(models.Model):
     newkeyword = models.CharField(max_length=255, verbose_name=u'关键词')
     review = models.CharField(max_length=255, default=u'', verbose_name=u'审核')
     #synced = models.CharField(max_length=255, default=u'', verbose_name=u'同步')
     group = models.ForeignKey(Group)
-    custom = models.ForeignKey(Custom, null=True, blank=True, default=u'')
+    product = models.ForeignKey(Product, null=True, blank=True, default=u'')
 
     class Meta:
-        db_table = 'keyword'
-        verbose_name_plural = u'关键词'
+        db_table = 'product_keyword'
+        verbose_name_plural = u'产品监测关键词'
 
     def __unicode__(self):
         return self.newkeyword
