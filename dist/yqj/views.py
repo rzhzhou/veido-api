@@ -8,7 +8,8 @@ from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import View
 from yqj.models import Article, Weixin, Weibo, RelatedData, Category, Group,\
-                       Area, Topic, Inspection, Custom, CustomKeyword, Collection, ArticlePublisher, Product
+                       Area, Topic, Inspection, Custom, CustomKeyword, Collection, ArticlePublisher, Product,\
+                       ProductKeyword
 from yqj import login_required
 from yqj.redisconnect import RedisQueryApi
 from django.db.models import Count,Q
@@ -399,13 +400,20 @@ class CustomView(BaseView):
 class ProductView(BaseView):
     def get(self, reqeust, id):
         if id:
-            product = Product.objects.get(id=id)
-            name = product.name
+            try:
+                prokeyword = ProductKeyword.objects.get(id=id)
+                name = prokeyword.newkeyword
+            except:
+                name = u'全部'
         else:
             name = u'全部'
-        products = Product.objects.all()
-        product_list = [{'id': products[i].id, 'name': products[i].name} for i in xrange(0, len(products))]
-        return self.render_to_response('product/product.html', {'product_list': product_list, 'product': {'name': name}})
+        try:
+            prokeywords = ProductKeyword.objects.filter(group=2)
+        except:
+            return self.render_to_response('product/product.html', {'product_list': [{'id': '', 'name': ''}],'product': {'name': u'全部'}})
+        prokey_len = len(prokeywords)
+        prokeyword_list = [{'id': '', 'name': u'全部'}] + [{'id': prokeywords[i].id, 'name': prokeywords[i].newkeyword} for i in xrange(0, prokey_len)]
+        return self.render_to_response('product/product.html', {'product_list': prokeyword_list, 'product': {'name': name}})
 
 
 class UserView(BaseView):
