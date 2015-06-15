@@ -11,21 +11,6 @@ require.config({
 
 
 /*
- * custom plugin
- */
-$.fn.Do = function(func) {
-  this.length && func.apply(this);
-  return this;
-};
-
-$.fn.Trim = function() {
-  var _value = this.find('input').val();
-  var value  = $.trim(_value);
-  return value;
-};
-
-
-/*
  * functions
  */
 var APP = {};
