@@ -295,21 +295,22 @@ class NewsTableView(TableAPIView):
             custom_id = keyword.custom_id
             if custom_id:
                 custom_id_list.append(custom_id)
-        cursor = connection.cursor()
-
-        sql = 'select article_id from custom_articles where %s'\
-            %(
-                reduce(
-                    lambda x, y: x + " or " + y,
-                    ["custom_id=%s" for x in custom_id_list]
+        try:
+            cursor = connection.cursor()
+            sql = 'select article_id from custom_articles where %s'\
+                %(
+                    reduce(
+                        lambda x, y: x + " or " + y,
+                        ["custom_id=%s" for x in custom_id_list]
+                        )
                     )
-                )
-        cursor.execute(sql,custom_id_list)
-        row = cursor.fetchall()
-        article_id = []
-        for r in row:
-            article_id.append(r[0])
-
+            cursor.execute(sql,custom_id_list)
+            row = cursor.fetchall()
+            article_id = []
+            for r in row:
+                article_id.append(r[0])
+        except:
+            article_id = []
         news_list = Category.objects.get(name='质监热点').articles.all()
 
         for n in news_list:

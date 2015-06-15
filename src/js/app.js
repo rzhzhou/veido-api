@@ -11,21 +11,6 @@ require.config({
 
 
 /*
- * custom plugin
- */
-$.fn.Do = function(func) {
-  this.length && func.apply(this);
-  return this;
-};
-
-$.fn.Trim = function() {
-  var _value = this.find('input').val();
-  var value  = $.trim(_value);
-  return value;
-};
-
-
-/*
  * functions
  */
 var APP = {};
@@ -42,25 +27,25 @@ APP.user = {
         username = elements.username,
         password = elements.password,
         submit   = elements[2],
-        $msg     = $(form).find('p');
+        $msg     = $(form).find('p'),
 
-    var enableSubmit = function() {
-      submit.disabled = !(username.value.length && password.value.length);
-    };
+        enableSubmit = function() {
+          submit.disabled = !(username.value.length && password.value.length);
+        },
 
-    var processLogin = function(event) {
-      event.preventDefault();
+        processLogin = function(event) {
+          event.preventDefault();
 
-      $.post(action, $(form).serialize(), function(response) {
-        if (response.status) {
-          location.href = location.search.length ? location.search.substr(1).split('=')[1] : '/';
-        } else {
-          $msg.text('用户名或密码错误！');
-          submit.disabled = true;
-          password.value  = '';
-        }
-      });
-    };
+          $.post(action, $(form).serialize(), function(response) {
+            if (response.status) {
+              location.href = location.search.length ? location.search.substr(1).split('=')[1] : '/';
+            } else {
+              $msg.text('用户名或密码错误！');
+              submit.disabled = true;
+              password.value  = '';
+            }
+          });
+        };
 
     $(form).keyup(enableSubmit).submit(processLogin);
   },
@@ -74,36 +59,36 @@ APP.user = {
         newPassword = elements.newPassword,
         retype      = elements.retype,
         submit      = elements[4],
-        $msg        = $(form).find('p');
+        $msg        = $(form).find('p'),
 
 
-    var enableSubmit = function() {
-      submit.disabled = !(username.value.length && oldPassword.value.length && newPassword.value.length && retype.value.length);
-    };
+        enableSubmit = function() {
+          submit.disabled = !(username.value.length && oldPassword.value.length && newPassword.value.length && retype.value.length);
+        },
 
-    var processChange = function(event) {
-      event.preventDefault();
+        processChange = function(event) {
+          event.preventDefault();
 
-      var processResponse = function(response) {
-        if (response.status) {
-          $msg.text('更新成功！').show();
-          location.href = '/login/';
-        } else {
-          $msg.text('原密码错误！').show();
-          oldPassword.value = '';
-          newPassword.value = '';
-          retype.value      = '';
-        }
-      };
+          var processResponse = function(response) {
+            if (response.status) {
+              $msg.text('更新成功！').show();
+              location.href = '/login/';
+            } else {
+              $msg.text('原密码错误！').show();
+              oldPassword.value = '';
+              newPassword.value = '';
+              retype.value      = '';
+            }
+          };
 
-      if (newPassword.value === retype.value) {
-        $.post(action, $([username, oldPassword, newPassword]).serialize(), processResponse);
-      } else {
-        $msg.text('两次输入密码不一致！').show();
-        newPassword.value = '';
-        retype.value      = '';
-      }
-    };
+          if (newPassword.value === retype.value) {
+            $.post(action, $([username, oldPassword, newPassword]).serialize(), processResponse);
+          } else {
+            $msg.text('两次输入密码不一致！').show();
+            newPassword.value = '';
+            retype.value      = '';
+          }
+        };
 
     $(form).keyup(enableSubmit).submit(processChange);
   },
@@ -114,27 +99,25 @@ APP.user = {
         $button = $admin.find('button'),
         $reset  = $button.eq(0),
         $remove = $button.eq(1),
-        id      = [];
+        id      = [],
 
-    var action = function(obj, api) {
-      obj.click(function() {
-        id.length = 0;
+        action = function(obj, api) {
+          obj.click(function() {
+            id.length = 0;
 
-        $input.filter(':checked').each(function(index, element) {
-          id.push( $(element).parent().next().data('id') );
-        });
+            $input.filter(':checked').each(function(index, element) {
+              id.push( $(element).parent().next().data('id') );
+            });
 
-        var processResponse = function(data) {
-          if (data.status) {
-            location.reload();
-          }
+            if (id.length) {
+              $.post(api, {id: id.toString()}, function(response) {
+                if (response.status) {
+                  location.reload();
+                }
+              });
+            }
+          });
         };
-
-        if (id.length) {
-          $.post(api, {id: id.toString()}, processResponse, 'json');
-        }
-      });
-    };
 
     action($reset, '/api/user/reset/');
     action($remove, '/api/user/remove/');
@@ -148,32 +131,32 @@ APP.user = {
         password = elements.password,
         retype   = elements.retype,
         submit   = elements[3],
-        $msg     = $(form).find('p');
+        $msg     = $(form).find('p'),
 
-    var enableSubmit = function() {
-      submit.disabled = !(username.value.length && password.value.length && retype.value.length);
-    };
+        enableSubmit = function() {
+          submit.disabled = !(username.value.length && password.value.length && retype.value.length);
+        },
 
-    var processAdd   = function(event) {
-      event.preventDefault();
+        processAdd   = function(event) {
+          event.preventDefault();
 
-      var processResponse = function(response) {
-        if (response.status) {
-          location.reload();
-        } else {
-          $msg.text('抱歉，添加失败！').show();
-        }
-      };
+          var processResponse = function(response) {
+            if (response.status) {
+              location.reload();
+            } else {
+              $msg.text('抱歉，添加失败！').show();
+            }
+          };
 
-      if (password.value === retype.value) {
-        $.post(action, $([username, password]).serialize(), processResponse);
-      } else {
-        $msg.text('两次输入密码不一致！').show();
-        submit.disabled = true;
-        password.value  = '';
-        retype.value    = '';
-      }
-    };
+          if (password.value === retype.value) {
+            $.post(action, $([username, password]).serialize(), processResponse);
+          } else {
+            $msg.text('两次输入密码不一致！').show();
+            submit.disabled = true;
+            password.value  = '';
+            retype.value    = '';
+          }
+        };
 
     $(form).keyup(enableSubmit).submit(processAdd);
   }
@@ -282,12 +265,8 @@ APP.chart = {
 };
 
 APP.returnTop = function(el) {
-  var top = el.offset().top;
-  var scrollTop = 0;
-
-  if (top > 160) {
-    scrollTop = top - 120;
-  }
+  var top       = el.offset().top,
+      scrollTop = top > 160 ? top - 120 : 0;
 
   $('body').animate({scrollTop: scrollTop});
 };
@@ -297,25 +276,25 @@ APP.table = function() {
     var $this       = $(this),
         $pagination = $this.parent(),
         content     = this.tBodies[0],
-        type        = this.id;
+        type        = this.id,
 
-    var renderTable = function(data) {
-      var items = data.data;
+        renderTable = function(data) {
+          var items = data.data,
 
-      var table = $.map(items, function(item) {
-        var url       = '/' + type + '/' + item.id + '/',
-            title     = '<td><a href="' + url + '" title="' + item.title + '" target="_blank">' + item.title + '</a></td>',
-            source    = '<td>' + item.source   + '</td>',
-            location  = '<td>' + item.location + '</td>',
-            time      = '<td>' + item.time     + '</td>',
-            hot       = '<td class="text-center">' + item.hot + '</td>',
-            row       = '<tr>' + title + source + location + time + hot + '</tr>';
+              table = $.map(items, function(item) {
+                var url       = '/' + type + '/' + item.id + '/',
+                    title     = '<td><a href="' + url + '" title="' + item.title + '" target="_blank">' + item.title + '</a></td>',
+                    source    = '<td>' + item.source   + '</td>',
+                    location  = '<td>' + item.location + '</td>',
+                    time      = '<td>' + item.time     + '</td>',
+                    hot       = '<td class="text-center">' + item.hot + '</td>',
+                    row       = '<tr>' + title + source + location + time + hot + '</tr>';
 
-        return row;
-      });
+                return row;
+              });
 
-      $(content).html(table);
-    };
+          $(content).html(table);
+        };
 
     $.getJSON('/api' + APP.url + type + '/1/', function(data) {
       renderTable(data);
@@ -338,7 +317,6 @@ APP.table = function() {
         }
       });
     });
-
   });
 };
 
@@ -440,16 +418,16 @@ APP.sns = function() {
   var $sns = $('.sns');
 
   $sns.each(function(index, element) {
-    var $content    = $(element);
-    var $pagination = $content.parent().next();
+    var $content    = $(element),
+        $pagination = $content.parent().next(),
 
-    var type = function() {
-      if (APP.type === 'weixin' || APP.type === 'weibo') {
-        return $pagination.data('type');
-      } else {
-        return $pagination.data('type').replace('-', '/');
-      }
-    };
+        type = function() {
+          if (APP.type === 'weixin' || APP.type === 'weibo') {
+            return $pagination.data('type');
+          } else {
+            return $pagination.data('type').replace('-', '/');
+          }
+        };
 
     $.getJSON('/api' + APP.url + type() + '/1/', function(data) {
       $content.html(data.html);
@@ -474,70 +452,60 @@ APP.sns = function() {
 };
 
 APP.custom = function() {
-  var $custom   = $('.custom'),
-      $list     = $custom.find('li'),
-      $form     = $custom.find('form'),
-      $msg      = $form.prev(),
-      $fieldset = $form.find('fieldset'),
-      api       = $form.attr('action');
+  var form     = document.forms.addKeyword,
+      action   = form.action,
+      elements = form.elements,
+      fieldset = elements[0],
+      keyword  = elements[1],
+      button   = elements[2],
+      $msg     = $(form).prev(),
+      $list    = $(form).parent().prev().find('li'),
 
-  var response = function(data) {
-    if (data.status) {
-      $msg.text('关键词添加成功！').show();
-    } else {
-      $msg.text('关键词添加失败！').show();
-    }
+      enableSubmit = function() {
+        button.disabled = !(keyword.value.length);
+      },
 
-    setTimeout(function() {
-      location.reload();
-    }, 1000);
-  };
+      processAdd = function(event) {
+        event.preventDefault();
 
-  var addKeyword = function() {
-    $form.submit(function(event) {
-      event.preventDefault();
+        $.post(action, $(form).serialize(), function(response) {
+          if (response.status) {
+            $msg.text('关键词添加成功！').show();
+            location.reload();
+          } else {
+            $msg.text('关键词添加失败！').show();
+            keyword.value = '';
+          }
+        });
+      };
 
-      var keyword = $form.Trim();
-
-      if (keyword.length) {
-        $.post(api, {keyword: keyword}, response, 'json');
-      } else {
-        $msg.text('请输入关键词！').show();
-      }
-    });
-  };
-
-  // console.log($list.length >= 5);
-
-  if ( $list.length >= 5 ) {
-    $fieldset.prop('disabled', true);
+  if ($list.length >= 5) {
+    fieldset.disabled = true;
   } else {
-    addKeyword();
+    $(form).keyup(enableSubmit).submit(processAdd);
   }
 };
-
 
 APP.collection = function() {
   $('.collection').click(function() {
     var star = $(this).find('i'),
-        text = $(this).find('span');
+        text = $(this).find('span'),
 
-    var collect = function(api, nextAction) {
-      var urlArray = APP.url.split('/');
+        collect = function(api, nextAction) {
+          var urlArray = APP.url.split('/'),
+              data = {
+                type: urlArray[1] === 'news' ? 'article' : 'topic',
+                id: urlArray[2]
+              };
 
-      var data = {
-        type: urlArray[1] === 'news' ? 'article' : 'topic',
-        id: urlArray[2]
-      };
-
-      $.post(api, data, function(response) {
-        if (response.status) {
-          star.toggleClass('fa-star-o');
-          star.toggleClass('fa-star');
-          text.text(nextAction);
-        }
-      });
-    };
+          $.post(api, data, function(response) {
+            if (response.status) {
+              star.toggleClass('fa-star-o');
+              star.toggleClass('fa-star');
+              text.text(nextAction);
+            }
+          });
+        };
 
     if ( star.hasClass('fa-star') ) {
       collect('/api/collection/remove/', '添加收藏');
@@ -551,22 +519,22 @@ APP.dashboard = function() {
   $('.info-box-content').each(function(index, element) {
     var infoBoxNumber = $(element).find('.info-box-number'),
         progressBar = $(element).find('.progress-bar'),
-        progressDescription = $(element).find('.progress-description');
+        progressDescription = $(element).find('.progress-description'),
 
-    var duration = 3000,
+        duration = 3000,
         refreshInterval = 100,
         loop = Math.floor( duration / refreshInterval ),
-        loopCount = 0;
+        loopCount = 0,
 
-    var numberValue = 0,
+        numberValue = 0,
         numberFinal = $(element).data('number'),
-        numberIncrement = Math.floor( numberFinal / loop );
+        numberIncrement = Math.floor( numberFinal / loop ),
 
-    var percentValue = 0,
+        percentValue = 0,
         percentFinal = $(element).data('percent'),
-        percentIncrement = Math.floor( percentFinal / loop );
+        percentIncrement = Math.floor( percentFinal / loop ),
 
-    var interval = setInterval(countTo, refreshInterval);
+        interval = setInterval(countTo, refreshInterval);
 
     function countTo() {
       numberValue += numberIncrement;
@@ -586,7 +554,6 @@ APP.dashboard = function() {
     }
   });
 };
-
 
 APP.product = function() {
   $('.filter-list')

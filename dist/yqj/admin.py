@@ -5,7 +5,7 @@ from django.contrib import messages
 from yqj.mongoconnect import CrawlerTask
 from models import WeixinPublisher, WeiboPublisher,Weibo, ArticlePublisher,\
                    Category, Group, User, Article, Topic, Custom,\
-                   CustomKeyword, Area,Weixin, Product,ProductKeyword
+                   CustomKeyword, Area,Weixin, Product, ProductKeyword
 import jieba.analyse
 
 def show_pubtime(obj):
@@ -49,13 +49,35 @@ class CustomKeywordAdmin(admin.ModelAdmin):
     list_filter = ('group', )
     search_fields = ('newkeyword', 'review')
     def save_model(self, request, obj, form, change):
-        if obj.custom:
-            obj.review = ''
-        else:
-            CrawlerTask(obj.review, 'zjld', u"关键词").type_task()
-        # messages.error(request,
-        #         "The Parking Location field cannot be changedaaaaaaaaaaa.")
-        obj.save()
+        if not change:
+            if obj.custom:
+                obj.review = ''
+            else:
+                CrawlerTask(obj.review, 'zjld', u"关键词").type_task()
+            # messages.error(request,
+            #         "The Parking Location field cannot be changedaaaaaaaaaaa.")
+            obj.save()
+        else:           
+            key_list = CustomKeyword.objects.filter(id=obj.id)
+            if len(key_list) == 0:
+                return
+            old_keyword = key_list[0].review
+            if not old_keyword:
+                old_keyword = key_list[0].custom
+            if old_keyword == obj.review:
+                return
+            CrawlerTask(obj.review, "zjld", u"关键词").update_task(old_keyword)
+            obj.save()
+
+    def delete_model(self, request, obj):
+        key_list = CustomKeyword.objects.filter(id=obj.id)
+        if len(key_list) == 0:
+            return
+        del_index = key_list[0].review
+        if not del_index:
+            del_index = key_list[0].custom
+        CrawlerTask(del_index, "zjld", u"关键词").del_task()       
+        obj.delete()
 
 class TopicAdmin(admin.ModelAdmin):
     fields = ('title', 'abstract', 'source', 'area', 'keywords')
@@ -77,23 +99,6 @@ class TopicAdmin(admin.ModelAdmin):
             kwargs["queryset"] = Area.objects.filter(level__lt=3)
         return super(TopicAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
-class CustomAdmin(admin.ModelAdmin):
-
-    def save_model(self, request, obj, form, change):
-        if change:
-            key_list = Custom.objects.filter(id=obj.id)
-            if len(key_list) == 0:
-                return
-            old_keyword = key_list[0].searchkeyword
-            CrawlerTask(obj.searchkeyword, "zjld", u"关键词").update_task(old_keyword)
-            obj.save()
-        else:
-            pass
-
-    def delete_model(self, request, obj):
-        CrawlerTask(obj.searchkeyword, "zjld", u"关键词").del_task()
-        obj.delete()
-
 
 class ProductAdmin(admin.ModelAdmin):
     fields = ('name', )
@@ -103,12 +108,41 @@ class ProductAdmin(admin.ModelAdmin):
     search_fields = ('name',)
 
 
-class ProKeyAdmin(admin.ModelAdmin):
-    fields = ('newkeyword', 'review', 'group', 'product', )
-    list_display = ('newkeyword', 'review' ,'group', 'product', )
-    list_editable = ('newkeyword', 'review' ,'group', 'product', )
-    list_filter = ('newkeyword', 'review' ,'group', 'product', )
-    search_fields = ('newkeyword', 'review' ,'group', 'product', )
+class ProductKeywordAdmin(admin.ModelAdmin):
+    list_display = ('newkeyword', 'review', 'group', 'product')
+    list_filter = ('group', )
+    search_fields = ('newkeyword', 'review')
+
+    def save_model(self, request, obj, form, change):
+        if not change:
+            if obj.product:
+                obj.review = ''
+            else:
+                CrawlerTask(obj.review, 'zjld', u"关键词").type_task()
+            # messages.error(request,
+            #         "The Parking Location field cannot be changedaaaaaaaaaaa.")
+            obj.save()
+        else:           
+            key_list = ProductKeyword.objects.filter(id=obj.id)
+            if len(key_list) == 0:
+                return
+            old_keyword = key_list[0].review
+            if not old_keyword:
+                old_keyword = key_list[0].product
+            if old_keyword == obj.review:
+                return
+            CrawlerTask(obj.review, "zjld", u"关键词").update_task(old_keyword)
+            obj.save()
+
+    def delete_model(self, request, obj):
+        key_list = ProductKeyword.objects.filter(id=obj.id)
+        if len(key_list) == 0:
+            return
+        del_index = key_list[0].review
+        if not del_index:
+            del_index = key_list[0].product
+        CrawlerTask(del_index, "zjld", u"关键词").del_task()       
+        obj.delete()
 
 
 # Register your models here.
@@ -123,7 +157,8 @@ admin.site.register(User)
 admin.site.register(Group)
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(Topic, TopicAdmin)
-admin.site.register(Custom, CustomAdmin)
+admin.site.register(Custom)
 admin.site.register(CustomKeyword, CustomKeywordAdmin)
 admin.site.register(Product, ProductAdmin)
-admin.site.register(ProductKeyword, ProKeyAdmin)
+admin.site.register(ProductKeyword, ProductKeywordAdmin)
+
