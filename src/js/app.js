@@ -579,7 +579,7 @@ APP.product = function() {
 };
 
 /*
- * run function when element exists
+ * url based router
  */
 $(function() {
   if (APP.type === 'login') {
