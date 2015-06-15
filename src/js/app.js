@@ -345,61 +345,64 @@ APP.table = function() {
 APP.dataTable = function() {
   $.fn.dataTable.ext.errMode = 'throw';
 
-  var table = this.DataTable({
-    'ajax': {
-      'url': '/api' + location.pathname,
-      'dataSrc': this[0].id,
-      'cache': true
-    },
-    'autoWidth': false,
-    'pageLength': 25,
-    'order': [],
-    'language': {
-      'processing':         '处理中...',
-      'search':             '',
-      'searchPlaceholder':  '输入关键字过滤...',
-      'lengthMenu':         '显示 _MENU_ 条',
-      'info':               '显示第 _START_ 至 _END_ 条，共 _TOTAL_ 条',
-      'infoEmpty':          '信息空',
-      'infoFiltered':       '(由 _MAX_ 项结果过滤)',
-      'infoPostFix':        '',
-      'loadingRecords':     '载入中...',
-      'zeroRecords':        '无匹配结果',
-      'emptyTable':         '无结果',
-      'paginate': {
-        'first':            '第一页',
-        'previous':         '上一页',
-        'next':             '下一页',
-        'last':             '最后一页'
+  $('.initDataTable').each(function() {
+    var table = $(this).DataTable({
+      'ajax': {
+        'url': '/api' + location.pathname,
+        'dataSrc': this.id,
+        'cache': true
       },
-      'aria': {
-        'sortAscending':    '正序排列',
-        'sortDescending':   '倒序排列'
+      'autoWidth': false,
+      'pageLength': 25,
+      'order': [],
+      'language': {
+        'processing':         '处理中...',
+        'search':             '',
+        'searchPlaceholder':  '输入关键字过滤...',
+        'lengthMenu':         '显示 _MENU_ 条',
+        'info':               '显示第 _START_ 至 _END_ 条，共 _TOTAL_ 条',
+        'infoEmpty':          '信息空',
+        'infoFiltered':       '(由 _MAX_ 项结果过滤)',
+        'infoPostFix':        '',
+        'loadingRecords':     '载入中...',
+        'zeroRecords':        '无匹配结果',
+        'emptyTable':         '无结果',
+        'paginate': {
+          'first':            '第一页',
+          'previous':         '上一页',
+          'next':             '下一页',
+          'last':             '最后一页'
+        },
+        'aria': {
+          'sortAscending':    '正序排列',
+          'sortDescending':   '倒序排列'
+        }
+      },
+      // "columnDefs": [{
+      //   "className": "star",
+      //   "targets": 0,
+      //   "searchable": false,
+      //   "orderable": false
+      // },{
+      //   "className": "index",
+      //   "targets": -1
+      // }],
+      'deferLoading': 100,
+      'drawCallback': function() {
+        $('[data-toggle="tooltip"]').tooltip();
       }
-    },
-    // "columnDefs": [{
-    //   "className": "star",
-    //   "targets": 0,
-    //   "searchable": false,
-    //   "orderable": false
-    // },{
-    //   "className": "index",
-    //   "targets": -1
-    // }],
-    'deferLoading': 100,
-    'drawCallback': function() {
-      $('[data-toggle="tooltip"]').tooltip();
-    }
+    });
+
+    table.on('click', 'tbody > tr', function() {
+      if ( $(this).hasClass('selected') ) {
+        $(this).removeClass('selected');
+      } else {
+        table.$('tr.selected').removeClass('selected');
+        $(this).addClass('selected');
+      }
+    });
   });
 
-  table.on('click', 'tr', function() {
-    if ( $(this).hasClass('selected') ) {
-      $(this).removeClass('selected');
-    } else {
-      table.$('tr.selected').removeClass('selected');
-      $(this).addClass('selected');
-    }
-  });
 
   // table.on('draw.dt', function() {
   //   var collection = function(obj, api) {
@@ -629,7 +632,7 @@ $(function() {
         APP.sns();
         break;
       case 'inspection':
-        $('#inspection').Do(APP.dataTable);
+        APP.dataTable();
         break;
       case 'custom':
         APP.custom();
@@ -651,8 +654,7 @@ $(function() {
         APP.user.add();
         break;
       case 'search':
-        $('#news').Do(APP.dataTable);
-        $('#event').Do(APP.dataTable);
+        APP.dataTable();
         break;
       default:
         console.log('unknown type');
