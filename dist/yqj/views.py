@@ -61,20 +61,22 @@ def index_view(request):
         # article_set = [i.articles.all() for i in custom_set]
         # article_set_list = reduce(lambda x, y: list(set(x).union(set(y))), article_set)
         # article_id = [article_set_list[i].id for i in range(len(article_set_list))]
-
-        cursor = connection.cursor()
-        sql = 'select article_id from custom_articles where %s'\
-            %(
-                reduce(
-                    lambda x, y: x + " or " + y,
-                    ["custom_id=%s" for x in custom_id_list]
+        try:
+            cursor = connection.cursor()
+            sql = 'select article_id from custom_articles where %s'\
+                %(
+                    reduce(
+                        lambda x, y: x + " or " + y,
+                        ["custom_id=%s" for x in custom_id_list]
+                        )
                     )
-                )
-        cursor.execute(sql,custom_id_list)
-        row = cursor.fetchall()
-        article_id = []
-        for r in row:
-            article_id.append(r[0])
+            cursor.execute(sql,custom_id_list)
+            row = cursor.fetchall()
+            article_id = []
+            for r in row:
+                article_id.append(r[0])
+        except:
+            article_id = []
 
         hot_list = Category.objects.get(name='质监热点').articles.all()
         for n in hot_list:
