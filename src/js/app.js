@@ -17,7 +17,24 @@ var APP = {};
 
 APP.url = location.pathname;
 
-APP.type = location.pathname.split('/')[1] || 'dashboard';
+APP.type = (function() {
+  var path = APP.url.split('/').slice(1, -1),
+      type = '';
+
+  switch (path.length) {
+    case 0:
+      type = 'dashboard';
+      break;
+    case 1:
+      type = path[0];
+      break;
+    case 2:
+      type = path[0] + 'Item';
+      break;
+  }
+
+  return type;
+})();
 
 APP.user = {
   login: function() {
@@ -562,7 +579,7 @@ APP.product = function() {
 };
 
 /*
- * run function when element exists
+ * url based router
  */
 $(function() {
   if (APP.type === 'login') {
@@ -578,23 +595,30 @@ $(function() {
         break;
       case 'news':
         APP.table();
+        break;
+      case 'newsItem':
         APP.collection();
         break;
       case 'event':
         APP.table();
+        break;
+      case 'eventItem':
+        APP.collection();
         APP.chart.line();
         APP.chart.pie();
         APP.sns();
-        APP.collection();
         break;
       case 'weixin':
-        // run function on 'weixin' and 'weibo'
+        // run function both on 'weixin' and 'weibo'
       case 'weibo':
         APP.sns();
         break;
-      case 'category':
-        // run function on 'category' and 'location'
-      case 'location':
+      case 'weixinItem':
+        break;
+      case 'categoryItem':
+        APP.table();
+        break;
+      case 'locationItem':
         APP.table();
         APP.sns();
         break;
@@ -603,10 +627,14 @@ $(function() {
         break;
       case 'custom':
         APP.custom();
+        break;
+      case 'customItem':
         APP.table();
         APP.sns();
         break;
       case 'product':
+        // run function both on 'product' and 'productItem'
+      case 'productItem':
         APP.product();
         APP.table();
         break;
