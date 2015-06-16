@@ -1,8 +1,9 @@
 'use strict';
 
-/*
- * configuration
- */
+//
+// configuration
+//
+
 require.config({
   paths: {
     echarts: '/vendor/echarts'
@@ -10,9 +11,10 @@ require.config({
 });
 
 
-/*
- * functions
- */
+//
+// functions
+//
+
 var APP = {};
 
 APP.url = location.pathname;
@@ -588,9 +590,10 @@ APP.product = function() {
     .parent().addClass('active');
 };
 
-/*
- * url based router
- */
+//
+// url based router
+//
+
 $(function() {
   if (APP.type === 'login') {
     APP.user.login();
