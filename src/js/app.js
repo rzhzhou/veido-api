@@ -196,8 +196,18 @@ APP.search = function() {
 };
 
 APP.menu = function() {
-  $('aside')
-    .find('a').filter(function() { return this.href === location.href; })
+  var vaildURL = function() {
+    var thisHref = this.getAttribute('href');
+
+    if (APP.type === 'categoryItem' || APP.type === 'locationItem') {
+      return thisHref === APP.url;
+    } else {
+      return thisHref.split('/')[1] === APP.url.split('/')[1];
+    }
+  };
+
+  $('.sidebar-menu')
+    .find('a').filter(vaildURL)
     .parent().addClass('active')
     .closest('.treeview-menu').addClass('menu-open')
     .closest('.treeview').addClass('active');
