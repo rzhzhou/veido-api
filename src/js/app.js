@@ -662,7 +662,7 @@ $(function() {
         APP.dataTable();
         break;
       default:
-        console.log('unknown type');
+        console.warn('unknown type');
         break;
     }
   }
