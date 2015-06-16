@@ -414,7 +414,10 @@ class ProductView(BaseView):
         except:
             return self.render_to_response('product/product.html', {'product_list': [{'id': '', 'name': ''}],'product': {'name': u'全部'}})
         prokey_len = len(prokeywords)
-        prokeyword_list = [{'id': '', 'name': u'全部'}] + [{'id': prokeywords[i].id, 'name': prokeywords[i].newkeyword} for i in xrange(0, prokey_len)]
+        print id
+        prokeyword_list = [{'id': 0, 'name': u'全部'}] + [{'id': prokeywords[i].id, 'name': prokeywords[i].newkeyword} for i in xrange(0, prokey_len)]
+        if id == '0/':
+            return HttpResponseRedirect("/product")
         return self.render_to_response('product/product.html', {'product_list': prokeyword_list, 'product': {'name': name}})
 
 
