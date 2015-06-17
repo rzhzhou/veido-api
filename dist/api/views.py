@@ -14,7 +14,7 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from yqj.models import (Article, Area, Weixin, Weibo, Topic, RelatedData, Category,
                         save_user, Collection, Topic, hash_password, User, Custom,
-                        Inspection, CustomKeyword,Product, ProductKeyword)
+                        Inspection, CustomKeyword,Product, ProductKeyword, Group)
 from yqj.views import SetLogo
 from serializers import ArticleSerializer
 from yqj import authenticate, login_required
@@ -603,7 +603,6 @@ class CollecModifyView(View):
 
 class SearchView(CollectView):
     LIMIT = 200
-
     def get(self, request, keyword, *args, **kwargs):
         try:
             self.collection = request.myuser.collection
@@ -673,9 +672,11 @@ class ProductTableView(TableAPIView):
             try:
                 prokey = [ProductKeyword.objects.get(id=id)]
             except ProductKeyword.DoesNotExist:
-                prokey = ProductKeyword.objects.filter(group=2)
+                group = Group.objects.filter(company=u'广东省质监局')
+                prokey = group[0].productkeyword_set.all()
         else:
-            prokey = ProductKeyword.objects.filter(group=2)
+            group = Group.objects.filter(company=u'广东省质监局')
+            prokey = group[0].productkeyword_set.all()
 
         prokey_len = len(prokey)
         product = [prokey[i].product for i in xrange(prokey_len)] 
