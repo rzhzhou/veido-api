@@ -1,8 +1,9 @@
 'use strict';
 
-/*
- * configuration
- */
+//
+// configuration
+//
+
 require.config({
   paths: {
     echarts: '/vendor/echarts'
@@ -10,9 +11,10 @@ require.config({
 });
 
 
-/*
- * functions
- */
+//
+// functions
+//
+
 var APP = {};
 
 APP.url = location.pathname;
@@ -588,9 +590,10 @@ APP.product = function() {
     .parent().addClass('active');
 };
 
-/*
- * url based router
- */
+//
+// url based router
+//
+
 $(function() {
   if (APP.type === 'login') {
     APP.user.login();
@@ -616,6 +619,7 @@ $(function() {
         APP.collection();
         APP.chart.line();
         APP.chart.pie();
+        APP.table();
         APP.sns();
         break;
       case 'weixin':
@@ -658,11 +662,11 @@ $(function() {
         APP.user.admin();
         APP.user.add();
         break;
-      case 'search':
+      case 'searchItem':
         APP.dataTable();
         break;
       default:
-        console.log('unknown type');
+        console.warn('unknown type');
         break;
     }
   }
