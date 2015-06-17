@@ -662,7 +662,7 @@ $(function() {
         APP.user.admin();
         APP.user.add();
         break;
-      case 'search':
+      case 'searchItem':
         APP.dataTable();
         break;
       default:
