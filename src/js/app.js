@@ -619,6 +619,7 @@ $(function() {
         APP.collection();
         APP.chart.line();
         APP.chart.pie();
+        APP.table();
         APP.sns();
         break;
       case 'weixin':
