@@ -550,37 +550,39 @@ APP.dashboard = function() {
         progressBar = $(element).find('.progress-bar'),
         progressDescription = $(element).find('.progress-description'),
 
-        duration = 3000,
+        duration = 2000,
         refreshInterval = 100,
-        loop = Math.floor( duration / refreshInterval ),
+        loop = Math.floor(duration / refreshInterval),
         loopCount = 0,
 
         numberValue = 0,
         numberFinal = $(element).data('number'),
-        numberIncrement = Math.floor( numberFinal / loop ),
+        numberIncrement = Math.floor(numberFinal / loop),
 
         percentValue = 0,
         percentFinal = $(element).data('percent'),
-        percentIncrement = Math.floor( percentFinal / loop ),
+        percentIncrement = Math.floor(percentFinal / loop),
 
-        interval = setInterval(countTo, refreshInterval);
+        intervalID,
 
-    function countTo() {
-      numberValue += numberIncrement;
-      percentValue += percentIncrement;
+        countTo = function() {
+          numberValue += numberIncrement;
+          percentValue += percentIncrement;
 
-      loopCount++;
+          loopCount++;
 
-      if ( loopCount >= loop ) {
-        clearInterval(interval);
-        numberValue = numberFinal;
-        percentValue = percentFinal;
-      }
+          if (loopCount >= loop) {
+            clearInterval(intervalID);
+            numberValue = numberFinal;
+            percentValue = percentFinal;
+          }
 
-      infoBoxNumber.text( numberValue.toFixed() );
-      progressBar.width( percentValue + '%' );
-      progressDescription.text( '占总数据 ' + percentValue.toFixed() + '%' );
-    }
+          infoBoxNumber.text( numberValue.toFixed() );
+          progressBar.width( percentValue + '%' );
+          progressDescription.text( '占总数据 ' + percentValue.toFixed() + '%' );
+        };
+
+    intervalID = setInterval(countTo, refreshInterval);
   });
 };
 
