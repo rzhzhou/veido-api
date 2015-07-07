@@ -49,7 +49,7 @@ APP.user = {
         $msg     = $(form).find('p'),
 
         enableSubmit = function() {
-          submit.disabled = !(username.value.length && password.value.length);
+          submit.disabled = !(username.value && password.value);
         },
 
         processLogin = function(event) {
@@ -57,7 +57,7 @@ APP.user = {
 
           $.post(action, $(form).serialize(), function(response) {
             if (response.status) {
-              location.href = location.search.length ? location.search.substr(1).split('=')[1] : '/';
+              location.href = location.search ? location.search.substr(1).split('=')[1] : '/';
             } else {
               $msg.text('用户名或密码错误！');
               submit.disabled = true;
