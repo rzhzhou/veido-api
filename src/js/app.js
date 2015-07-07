@@ -595,79 +595,100 @@ APP.product = function() {
 //
 
 $(function() {
-  if (APP.type === 'login') {
-    APP.user.login();
-  } else {
-    APP.search();
-    APP.menu();
-    switch (APP.type) {
-      case 'dashboard':
-        APP.dashboard();
-        APP.chart.line();
-        APP.chart.pie();
-        break;
-      case 'news':
-        APP.table();
-        break;
-      case 'newsItem':
-        APP.collection();
-        break;
-      case 'event':
-        APP.table();
-        break;
-      case 'eventItem':
-        APP.collection();
-        APP.chart.line();
-        APP.chart.pie();
-        APP.table();
-        APP.sns();
-        break;
-      case 'weixin':
-        // run function both on 'weixin' and 'weibo'
-      case 'weibo':
-        APP.sns();
-        break;
-      case 'weixinItem':
-        break;
-      case 'categoryItem':
-        APP.table();
-        break;
-      case 'locationItem':
-        APP.table();
-        APP.sns();
-        break;
-      case 'inspection':
-        APP.dataTable();
-        break;
-      case 'custom':
-        APP.custom();
-        break;
-      case 'customItem':
-        APP.table();
-        APP.sns();
-        break;
-      case 'product':
-        // run function both on 'product' and 'productItem'
-      case 'productItem':
-        APP.product();
-        APP.table();
-        break;
-      case 'collection':
-        APP.table();
-        break;
-      case 'settings':
-        APP.user.change();
-        break;
-      case 'user':
-        APP.user.admin();
-        APP.user.add();
-        break;
-      case 'searchItem':
-        APP.dataTable();
-        break;
-      default:
-        console.warn('unknown type');
-        break;
+  var router = {
+    common: function() {
+      APP.search();
+      APP.menu();
+    },
+    login: function() {
+      APP.user.login();
+    },
+    dashboard: function() {
+      this.common();
+      APP.dashboard();
+      APP.chart.line();
+      APP.chart.pie();
+    },
+    news: function() {
+      this.common();
+      APP.table();
+    },
+    newsItem: function() {
+      this.common();
+      APP.collection();
+    },
+    event: function() {
+      this.common();
+      APP.table();
+    },
+    eventItem: function() {
+      this.common();
+      APP.collection();
+      APP.chart.line();
+      APP.chart.pie();
+      APP.table();
+      APP.sns();
+    },
+    weixin: function() {
+      this.common();
+      this.weibo();
+    },
+    weibo: function() {
+      this.common();
+      APP.sns();
+    },
+    weixinItem: function() {
+      this.common();
+    },
+    categoryItem: function() {
+      this.common();
+      APP.table();
+    },
+    locationItem: function() {
+      this.common();
+      APP.table();
+      APP.sns();
+    },
+    inspection: function() {
+      this.common();
+      APP.dataTable();
+    },
+    custom: function() {
+      this.common();
+      APP.custom();
+    },
+    customItem: function() {
+      this.common();
+      APP.table();
+      APP.sns();
+    },
+    product: function() {
+      this.common();
+      APP.product();
+      APP.table();
+    },
+    productItem: function() {
+      this.common();
+      this.product();
+    },
+    collection: function() {
+      this.common();
+      APP.table();
+    },
+    settings: function() {
+      this.common();
+      APP.user.change();
+    },
+    user: function() {
+      this.common();
+      APP.user.admin();
+      APP.user.add();
+    },
+    searchItem: function() {
+      this.common();
+      APP.dataTable();
     }
-  }
+  };
+
+  return router[APP.type]();
 });
