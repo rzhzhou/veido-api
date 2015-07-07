@@ -638,11 +638,10 @@ $(function() {
     },
     weixin: function() {
       this.common();
-      this.weibo();
+      APP.sns();
     },
     weibo: function() {
-      this.common();
-      APP.sns();
+      this.weixin();
     },
     weixinItem: function() {
       this.common();
