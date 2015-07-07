@@ -496,7 +496,7 @@ APP.custom = function() {
       $list    = $(form).parent().prev().find('li'),
 
       enableSubmit = function() {
-        button.disabled = !(keyword.value.length);
+        button.disabled = !(keyword.value);
       },
 
       processAdd = function(event) {
