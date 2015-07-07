@@ -82,7 +82,7 @@ APP.user = {
 
 
         enableSubmit = function() {
-          submit.disabled = !(username.value.length && oldPassword.value.length && newPassword.value.length && retype.value.length);
+          submit.disabled = !(username.value && oldPassword.value && newPassword.value && retype.value);
         },
 
         processChange = function(event) {
