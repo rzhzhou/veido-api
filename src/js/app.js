@@ -198,21 +198,26 @@ APP.search = function() {
 };
 
 APP.menu = function() {
-  var vaildURL = function() {
-    var thisHref = this.getAttribute('href');
+  var menu     = $('.sidebar-menu'),
+      parent   = menu.parent(),
+      vaildURL = function() {
+        var thisHref = this.getAttribute('href');
 
-    if (APP.type === 'categoryItem' || APP.type === 'locationItem') {
-      return thisHref === APP.url;
-    } else {
-      return thisHref.split('/')[1] === APP.url.split('/')[1];
-    }
-  };
+        if (APP.type === 'categoryItem' || APP.type === 'locationItem') {
+          return thisHref === APP.url;
+        } else {
+          return thisHref.split('/')[1] === APP.url.split('/')[1];
+        }
+      };
 
-  $('.sidebar-menu')
+  menu
+    .detach()
     .find('a').filter(vaildURL)
     .parent().addClass('active')
     .closest('.treeview-menu').addClass('menu-open')
     .closest('.treeview').addClass('active');
+
+  menu.appendTo(parent);
 };
 
 APP.chart = {
