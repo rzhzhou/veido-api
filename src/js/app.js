@@ -190,7 +190,7 @@ APP.search = function() {
 
     var keywords = $.trim(input.value);
 
-    if (keywords.length) {
+    if (keywords) {
       form.reset();
       location.href = '/search/' + keywords + '/';
     }
