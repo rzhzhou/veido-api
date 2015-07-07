@@ -153,7 +153,7 @@ APP.user = {
         $msg     = $(form).find('p'),
 
         enableSubmit = function() {
-          submit.disabled = !(username.value.length && password.value.length && retype.value.length);
+          submit.disabled = !(username.value && password.value && retype.value);
         },
 
         processAdd   = function(event) {
