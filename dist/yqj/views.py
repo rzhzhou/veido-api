@@ -26,7 +26,8 @@ def SetLogo(obj):
 def index_view(request):
     user = request.myuser
     if user.is_authenticated():
-        categories = Category.objects.filter(~Q(name='其他'))
+        categories = ArticleCategory.objects.filter(~(Q(name='其他' )|Q(name='政府' )|Q(name='事件' )|Q(name='质监热点' )
+            |Q(name='指定监测' )))
         locations = Area.objects.filter(level=user.area.level+1, parent=user.area)
         user.company = user.group.company
 
@@ -174,7 +175,8 @@ class BaseView(LoginRequiredMixin, View):
         return render_to_response(template_path, context)
 
     def get_article_categories(self):
-        return Category.objects.filter(~Q(name = '其他'))
+        return ArticleCategory.objects.filter(~(Q(name='其他' )|Q(name='政府' )|Q(name='事件' )|Q(name='质监热点' )
+            |Q(name='指定监测' )))
 
     def get_locations(self, area):
         #area = Area.objects.get(id=int(location_id))
