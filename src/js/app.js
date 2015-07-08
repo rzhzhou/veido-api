@@ -49,7 +49,7 @@ APP.user = {
         $msg     = $(form).find('p'),
 
         enableSubmit = function() {
-          submit.disabled = !(username.value.length && password.value.length);
+          submit.disabled = !(username.value && password.value);
         },
 
         processLogin = function(event) {
@@ -57,7 +57,7 @@ APP.user = {
 
           $.post(action, $(form).serialize(), function(response) {
             if (response.status) {
-              location.href = location.search.length ? location.search.substr(1).split('=')[1] : '/';
+              location.href = location.search ? location.search.substr(1).split('=')[1] : '/';
             } else {
               $msg.text('用户名或密码错误！');
               submit.disabled = true;
@@ -82,7 +82,7 @@ APP.user = {
 
 
         enableSubmit = function() {
-          submit.disabled = !(username.value.length && oldPassword.value.length && newPassword.value.length && retype.value.length);
+          submit.disabled = !(username.value && oldPassword.value && newPassword.value && retype.value);
         },
 
         processChange = function(event) {
@@ -153,7 +153,7 @@ APP.user = {
         $msg     = $(form).find('p'),
 
         enableSubmit = function() {
-          submit.disabled = !(username.value.length && password.value.length && retype.value.length);
+          submit.disabled = !(username.value && password.value && retype.value);
         },
 
         processAdd   = function(event) {
@@ -190,7 +190,7 @@ APP.search = function() {
 
     var keywords = $.trim(input.value);
 
-    if (keywords.length) {
+    if (keywords) {
       form.reset();
       location.href = '/search/' + keywords + '/';
     }
@@ -198,21 +198,26 @@ APP.search = function() {
 };
 
 APP.menu = function() {
-  var vaildURL = function() {
-    var thisHref = this.getAttribute('href');
+  var menu     = $('.sidebar-menu'),
+      parent   = menu.parent(),
+      vaildURL = function() {
+        var thisHref = this.getAttribute('href');
 
-    if (APP.type === 'categoryItem' || APP.type === 'locationItem') {
-      return thisHref === APP.url;
-    } else {
-      return thisHref.split('/')[1] === APP.url.split('/')[1];
-    }
-  };
+        if (APP.type === 'categoryItem' || APP.type === 'locationItem') {
+          return thisHref === APP.url;
+        } else {
+          return thisHref.split('/')[1] === APP.url.split('/')[1];
+        }
+      };
 
-  $('.sidebar-menu')
+  menu
+    .detach()
     .find('a').filter(vaildURL)
     .parent().addClass('active')
     .closest('.treeview-menu').addClass('menu-open')
     .closest('.treeview').addClass('active');
+
+  menu.appendTo(parent);
 };
 
 APP.chart = {
@@ -491,7 +496,7 @@ APP.custom = function() {
       $list    = $(form).parent().prev().find('li'),
 
       enableSubmit = function() {
-        button.disabled = !(keyword.value.length);
+        button.disabled = !(keyword.value);
       },
 
       processAdd = function(event) {
@@ -550,37 +555,39 @@ APP.dashboard = function() {
         progressBar = $(element).find('.progress-bar'),
         progressDescription = $(element).find('.progress-description'),
 
-        duration = 3000,
+        duration = 2000,
         refreshInterval = 100,
-        loop = Math.floor( duration / refreshInterval ),
+        loop = Math.floor(duration / refreshInterval),
         loopCount = 0,
 
         numberValue = 0,
         numberFinal = $(element).data('number'),
-        numberIncrement = Math.floor( numberFinal / loop ),
+        numberIncrement = Math.floor(numberFinal / loop),
 
         percentValue = 0,
         percentFinal = $(element).data('percent'),
-        percentIncrement = Math.floor( percentFinal / loop ),
+        percentIncrement = Math.floor(percentFinal / loop),
 
-        interval = setInterval(countTo, refreshInterval);
+        intervalID,
 
-    function countTo() {
-      numberValue += numberIncrement;
-      percentValue += percentIncrement;
+        countTo = function() {
+          numberValue += numberIncrement;
+          percentValue += percentIncrement;
 
-      loopCount++;
+          loopCount++;
 
-      if ( loopCount >= loop ) {
-        clearInterval(interval);
-        numberValue = numberFinal;
-        percentValue = percentFinal;
-      }
+          if (loopCount >= loop) {
+            clearInterval(intervalID);
+            numberValue = numberFinal;
+            percentValue = percentFinal;
+          }
 
-      infoBoxNumber.text( numberValue.toFixed() );
-      progressBar.width( percentValue + '%' );
-      progressDescription.text( '占总数据 ' + percentValue.toFixed() + '%' );
-    }
+          infoBoxNumber.text( numberValue.toFixed() );
+          progressBar.width( percentValue + '%' );
+          progressDescription.text( '占总数据 ' + percentValue.toFixed() + '%' );
+        };
+
+    intervalID = setInterval(countTo, refreshInterval);
   });
 };
 
@@ -595,79 +602,100 @@ APP.product = function() {
 //
 
 $(function() {
-  if (APP.type === 'login') {
-    APP.user.login();
-  } else {
-    APP.search();
-    APP.menu();
-    switch (APP.type) {
-      case 'dashboard':
-        APP.dashboard();
-        APP.chart.line();
-        APP.chart.pie();
-        break;
-      case 'news':
-        APP.table();
-        break;
-      case 'newsItem':
-        APP.collection();
-        break;
-      case 'event':
-        APP.table();
-        break;
-      case 'eventItem':
-        APP.collection();
-        APP.chart.line();
-        APP.chart.pie();
-        APP.table();
-        APP.sns();
-        break;
-      case 'weixin':
-        // run function both on 'weixin' and 'weibo'
-      case 'weibo':
-        APP.sns();
-        break;
-      case 'weixinItem':
-        break;
-      case 'categoryItem':
-        APP.table();
-        break;
-      case 'locationItem':
-        APP.table();
-        APP.sns();
-        break;
-      case 'inspection':
-        APP.dataTable();
-        break;
-      case 'custom':
-        APP.custom();
-        break;
-      case 'customItem':
-        APP.table();
-        APP.sns();
-        break;
-      case 'product':
-        // run function both on 'product' and 'productItem'
-      case 'productItem':
-        APP.product();
-        APP.table();
-        break;
-      case 'collection':
-        APP.table();
-        break;
-      case 'settings':
-        APP.user.change();
-        break;
-      case 'user':
-        APP.user.admin();
-        APP.user.add();
-        break;
-      case 'searchItem':
-        APP.dataTable();
-        break;
-      default:
-        console.warn('unknown type');
-        break;
+  var router = {
+    common: function() {
+      APP.search();
+      APP.menu();
+    },
+    login: function() {
+      APP.user.login();
+    },
+    dashboard: function() {
+      this.common();
+      APP.dashboard();
+      APP.chart.line();
+      APP.chart.pie();
+    },
+    news: function() {
+      this.common();
+      APP.table();
+    },
+    newsItem: function() {
+      this.common();
+      APP.collection();
+    },
+    event: function() {
+      this.common();
+      APP.table();
+    },
+    eventItem: function() {
+      this.common();
+      APP.collection();
+      APP.chart.line();
+      APP.chart.pie();
+      APP.table();
+      APP.sns();
+    },
+    weixin: function() {
+      this.common();
+      this.weibo();
+    },
+    weibo: function() {
+      this.common();
+      APP.sns();
+    },
+    weixinItem: function() {
+      this.common();
+    },
+    categoryItem: function() {
+      this.common();
+      APP.table();
+    },
+    locationItem: function() {
+      this.common();
+      APP.table();
+      APP.sns();
+    },
+    inspection: function() {
+      this.common();
+      APP.dataTable();
+    },
+    custom: function() {
+      this.common();
+      APP.custom();
+    },
+    customItem: function() {
+      this.common();
+      APP.table();
+      APP.sns();
+    },
+    product: function() {
+      this.common();
+      APP.product();
+      APP.table();
+    },
+    productItem: function() {
+      this.common();
+      this.product();
+    },
+    collection: function() {
+      this.common();
+      APP.table();
+    },
+    settings: function() {
+      this.common();
+      APP.user.change();
+    },
+    user: function() {
+      this.common();
+      APP.user.admin();
+      APP.user.add();
+    },
+    searchItem: function() {
+      this.common();
+      APP.dataTable();
     }
-  }
+  };
+
+  return router[APP.type]();
 });
