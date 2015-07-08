@@ -184,13 +184,14 @@ def hash_password(raw_password, salt):
     hash.update(value)
     return hash.hexdigest()
 
-def save_user(username, raw_password, area, group):
+def save_user(username, raw_password, area, group, isAdmin=0):
     kwargs = {}
     kwargs['username'] = username
     kwargs['salt'] = make_random_string()
     kwargs['password'] = hash_password(raw_password, kwargs['salt'])
     kwargs['area'] = area
     kwargs['group'] = group
+    kwargs['isAdmin'] = isAdmin
     user = User(**kwargs)
     user.save(using='master')
     return user
@@ -204,7 +205,7 @@ class Group(models.Model):
 
 class User(models.Model):
     username = models.CharField(max_length=20, unique=True, verbose_name=u'登录名')
-    password = models.CharField(max_length=255, verbose_name=u'hash密码')
+    password = models.CharField(max_length=255, verbose_name=u'密码')
     salt = models.CharField(max_length=255)
     area = models.ForeignKey(Area)
     isAdmin = models.IntegerField(default=0)
