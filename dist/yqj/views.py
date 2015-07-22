@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 
 from django.utils import timezone
 from django.conf import settings
+from django.template.loader import render_to_string
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import View
@@ -114,10 +115,10 @@ def index_view(request):
         for data in weixin_data:
             data = SetLogo(data)
 
-        inspection_list = Inspection.objects.order_by('-pubtime')[:10]
-        for item in inspection_list:
-            item.qualitied = str(int(item.qualitied*100)) + '%'
-
+        # inspection_list = Inspection.objects.filter(source=user.company).order_by('-pubtime')[:10]
+        # for item in inspection_list:
+        #     item.qualitied = str(int(item.qualitied*100)) + '%'
+        # inspection = render_to_string('inspection/dashboard_inspection.html', {'inspection_list': 'inspection_list'})
         return render_to_response("dashboard/dashboard.html",
             {'user': user,
             'categories': categories,
@@ -131,7 +132,7 @@ def index_view(request):
             'weixin_hottest_list': weixin_data,
             'weibo_hottest_list': weibo_data,
             'user_image': get_user_image(user),
-            'inspection_list': inspection_list,
+            # 'inspection_list': inspection,
             })
     else:
         return HttpResponse(status=401)
