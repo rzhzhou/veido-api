@@ -295,6 +295,68 @@ APP.chart = {
         });
       });
     });
+  },
+
+  map: function () {
+    require(['echarts', 'echarts/chart/map'], function (ec) {
+      require('echarts/util/mapData/params').params.wh = {
+        getGeoJson: function (callback) {
+          $.getJSON('/static/wh.json', callback);
+        }
+      };
+
+      ec.init(document.getElementById('map-chart'), 'macarons').setOption({
+        title: {
+          // text : '武汉地图',
+          subtext : ''
+        },
+        tooltip : {
+          trigger: 'item',
+          formatter: function(a){
+              return a[1]+'<br>'+a[2];
+          }
+        },
+        legend: {
+          orient: 'vertical',
+          x:'right',
+          data:['']
+        },
+        dataRange: {
+          min: 0,
+          max: 1000,
+          color:['orange','yellow'],   //颜色
+          text:['高','低'],           // 文本，默认为数值文本
+          calculable : true
+        },
+        series : [
+          {
+            name: '数据名称',
+            type: 'map',
+            mapType: 'wh',
+            selectedMode : 'single',
+            itemStyle:{
+              normal:{label:{show:false}},  //区域名称
+              emphasis:{label:{show:true}}
+            },
+            data:[
+              {name: '江岸区',value: Math.round(Math.random()*1000)},
+              {name: '江汉区',value: Math.round(Math.random()*1000)},
+              {name: '硚口区',value: Math.round(Math.random()*1000)},
+              {name: '汉阳区',value: Math.round(Math.random()*1000)},
+              {name: '武昌区',value: Math.round(Math.random()*1000)},
+              {name: '洪山区',value: Math.round(Math.random()*1000)},
+              {name: '青山区',value: Math.round(Math.random()*1000)},
+              {name: '东西湖区',value: Math.round(Math.random()*1000)},
+              {name: '蔡甸区',value: Math.round(Math.random()*1000)},
+              {name: '江夏区',value: Math.round(Math.random()*1000)},
+              {name: '黄陂区',value: Math.round(Math.random()*1000)},
+              {name: '新洲区',value: Math.round(Math.random()*1000)},
+              {name: '汉南区',value: Math.round(Math.random()*1000)}
+            ]
+          }
+        ]
+      });
+    });
   }
 };
 
@@ -613,6 +675,7 @@ $(function() {
     dashboard: function() {
       this.common();
       APP.dashboard();
+      APP.chart.map();
       APP.chart.line();
       APP.chart.pie();
     },
