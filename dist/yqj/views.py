@@ -1,6 +1,7 @@
 #coding=utf-8
 import os
 from datetime import datetime, timedelta
+import ConfigParser
 
 from django.utils import timezone
 from django.conf import settings
@@ -118,6 +119,16 @@ def index_view(request):
         for item in inspection_list:
             item.qualitied = str(int(item.qualitied*100)) + '%'
 
+        conf = ConfigParser.ConfigParser()
+        conf.read("../sidebar.cfg")
+        username = user.username
+        sidebar_name = {
+            "news": conf.get(username, "news"),
+            "event": conf.get(username, "event"),
+            "location": conf.get(username, "location"),
+            "custom":conf.get(username, "custom")
+        }
+
         return render_to_response("dashboard/dashboard.html",
             {'user': user,
             'categories': categories,
@@ -132,6 +143,7 @@ def index_view(request):
             'weibo_hottest_list': weibo_data,
             'user_image': get_user_image(user),
             'inspection_list': inspection_list,
+            'name': sidebar_name
             })
     else:
         return HttpResponse(status=401)
