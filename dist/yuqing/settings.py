@@ -63,14 +63,14 @@ WSGI_APPLICATION = 'yuqing.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': 'localhost',
-        'NAME': 'yqj',
+        'HOST': '192.168.1.101',
+        'NAME': 'yqj2',
         'USER': 'root',
         'PASSWORD': '123456',
     },
     'master': {
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': '27.17.61.26',
+        'HOST': '192.168.1.161',
         'NAME': 'yqj',
         'USER': 'shendu',
         'PASSWORD': 'P@55word',
@@ -80,11 +80,11 @@ DATABASES = {
 MONGO_CONN_STR = "mongodb://192.168.1.202:27017"
 
 REDIS_CONF = {
-            'host': 'localhost',
+            'host': '192.168.1.161',
             'port': '6379',
             'db': 8
         }
- 
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
 
