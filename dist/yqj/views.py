@@ -22,6 +22,7 @@ def SetLogo(obj):
         obj.publisher.photo = u'http://tp2.sinaimg.cn/3557640017/180/40054587155/1'
     return obj
 
+
 @login_required
 def index_view(request):
     user = request.myuser
@@ -85,6 +86,8 @@ def index_view(request):
             article_id.append(n.id)
 
         news_list = Article.objects.filter(id__in=article_id)[:10]
+
+        news_list = getScore(user.id, news_list)
 
         for item in news_list:
             try:

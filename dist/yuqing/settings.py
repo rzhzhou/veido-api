@@ -63,17 +63,17 @@ WSGI_APPLICATION = 'yuqing.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': 'localhost',
-        'NAME': 'yqj',
+        'HOST': '192.168.1.101',
+        'NAME': 'yqj2',
         'USER': 'root',
         'PASSWORD': '123456',
     },
     'master': {
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': '27.17.61.26',
-        'NAME': 'yqj',
-        'USER': 'shendu',
-        'PASSWORD': 'P@55word',
+        'HOST': '192.168.1.101',
+        'NAME': 'yqj2',
+        'USER': 'root',
+        'PASSWORD': '123456',
     },
 }
 
@@ -115,7 +115,7 @@ TEMPLATE_DIRS = (
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-MEDIA_ROOT = '/var/www/media'
+# MEDIA_ROOT = '/var/www/media'
 STATIC_ROOT = '/var/www/static'
 
 MEDIA_URL = '/media/'

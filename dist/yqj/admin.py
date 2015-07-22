@@ -5,7 +5,9 @@ from django.contrib import messages
 from yqj.mongoconnect import CrawlerTask
 from models import WeixinPublisher, WeiboPublisher,Weibo, ArticlePublisher,\
                    Category, Group, User, Article, Topic, Custom,\
-                   CustomKeyword, Area,Weixin, Product, ProductKeyword, save_user
+                   CustomKeyword, Area,Weixin, Product, ProductKeyword, save_user,\
+                   GroupAuthUser, LocaltionScore
+# from django.contrib.auth.models import User
 import jieba.analyse
 
 def show_pubtime(obj):
@@ -32,15 +34,31 @@ class WeixinAdmin(admin.ModelAdmin):
 
 
 class ArticleAdmin(admin.ModelAdmin):
-    list_display = ('title', 'source', 'area', 'feeling_factor', 'pubtime')
-    list_editable = ('source', 'feeling_factor', 'pubtime',)
-    list_filter = ('pubtime', )
-    search_fields = ('title', 'source', 'content')
+    list_display = ('title', 'source', 'area', 'feeling_factor', 'pubtime', 'localtion_score')
+    list_editable = ('source', 'feeling_factor', 'pubtime', 'localtion_score')
+    list_filter = ('pubtime', 'localtion_score')
+    search_fields = ('title', 'source', 'content', 'localtion_score')
     #raw_id_fields = ('area', 'publisher', )
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "area":
             kwargs["queryset"] = Area.objects.filter(level__lt=3)
         return super(ArticleAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+
+    def save_model(self, request, obj, form, change):
+        groupauth = GroupAuthUser.objects.get(auth=request.user)
+        company = groupauth.group
+        article = obj
+        score = obj.localtion_score
+        localscore = LocaltionScore(score=score, group=company, article=article)
+
+        try:
+            print LocaltionScore.objects.get(article=article, company=company)
+            localscore.save()
+        except:
+            localscore.save()
+        obj.save()  
+        # print obj.area
+        # obj.save()
 
 
 class CustomKeywordAdmin(admin.ModelAdmin):
@@ -154,7 +172,20 @@ class UserAdmin(admin.ModelAdmin):
         save_user(obj.username, obj.password, obj.area, obj.group, obj.isAdmin)
 
 
+class GroupAuthUserAdmin(admin.ModelAdmin):
+    fields = ('auth', 'group')
+    list_display = ('auth', 'group')
+    list_editable = ('auth', 'group')
+    list_filter = ('auth', 'group')
+    search_fields = ('auth', 'group')
 
+
+# class LocaltionScoreAdmin(admin.ModelAdmin):
+#     fields = ('score', 'groupauthuser', 'article')
+#     list_display = ('score', 'groupauthuser', 'article')
+#     list_editable = ('score', 'groupauthuser', 'article')
+#     list_filter = ('score', 'groupauthuser', 'article')
+#     search_fields = ('score', 'groupauthuser', 'article')
 # Register your models here.
 
 admin.site.register(WeixinPublisher)
@@ -171,4 +202,6 @@ admin.site.register(Custom)
 admin.site.register(CustomKeyword, CustomKeywordAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(ProductKeyword, ProductKeywordAdmin)
+admin.site.register(GroupAuthUser, GroupAuthUserAdmin)
+# admin.site.register(LocaltionScore, LocaltionScoreAdmin)
 
