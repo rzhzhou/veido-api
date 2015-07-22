@@ -18,6 +18,23 @@ from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
 from django.db import connection
+
+
+def sidebarUtil(request):
+    user = request.myuser
+    conf = ConfigParser.ConfigParser()
+    conf.read("../sidebar.cfg")
+    username = user.username
+
+    sidebar_name = {
+        "news": conf.get(username, "news"),
+        "event": conf.get(username, "event"),
+        "location": conf.get(username, "location"),
+        "custom":conf.get(username, "custom")
+    }
+    return sidebar_name
+
+
 def SetLogo(obj):
     if not obj.publisher.photo:
         obj.publisher.photo = u'http://tp2.sinaimg.cn/3557640017/180/40054587155/1'
@@ -119,15 +136,7 @@ def index_view(request):
         for item in inspection_list:
             item.qualitied = str(int(item.qualitied*100)) + '%'
 
-        conf = ConfigParser.ConfigParser()
-        conf.read("../sidebar.cfg")
-        username = user.username
-        sidebar_name = {
-            "news": conf.get(username, "news"),
-            "event": conf.get(username, "event"),
-            "location": conf.get(username, "location"),
-            "custom":conf.get(username, "custom")
-        }
+        sidebar_name = sidebarUtil(request)
 
         return render_to_response("dashboard/dashboard.html",
             {'user': user,
@@ -269,16 +278,18 @@ def person_view(request, person_id):
 
 class NewsView(BaseView):
     def get(self, request):
-        return self.render_to_response('news/news_list.html', {})
+        sidebar_name = sidebarUtil(request)
+        return self.render_to_response('news/news_list.html', {'name': sidebar_name})
 
 
 class NewsDetailView(BaseView):
     def get(self, request, news_id):
+        sidebar_name = sidebarUtil(request)
         try:
             news_id = int(news_id)
             news = Article.objects.get(id=news_id)
         except Article.DoesNotExist:
-            return self.render_to_response('news/news.html', {'article': '', 'relate': []})
+            return self.render_to_response('news/news.html', {'article': '', 'relate': [], 'name': sidebar_name})
 
         try:
             r = RelatedData.objects.filter(uuid=news.uuid)[0]
@@ -297,24 +308,26 @@ class NewsDetailView(BaseView):
             collection.save(using='master')
         items = user.collection.articles.all()
         iscollected = any(filter(lambda x: x.id == news.id, items))
-        return self.render_to_response('news/news.html', {'article': SetLogo(news), 'relate': relateddata, 'event': event, 'isCollected': iscollected})
+        return self.render_to_response('news/news.html', {'article': SetLogo(news), 'relate': relateddata, 'event': event, 'isCollected': iscollected, 'name': sidebar_name})
  #sim_article(news.title,news.pubtime
 
 
 class EventView(BaseView):
     def get(self,request):
-        return self.render_to_response('event/event_list.html')
+        sidebar_name = sidebarUtil(request)
+        return self.render_to_response('event/event_list.html', {'name': sidebar_name})
 
 
 class EventDetailView(BaseView):
     def get(self, request, id):
+        sidebar_name = sidebarUtil(request)
         try:
             event_id = int(id)
             event = Topic.objects.get(id=event_id)
             eval_keywords_list = eval(event.keywords) if event.keywords else []
             keywords_list = [{"name": name, "number": number} for name, number in eval_keywords_list]
         except Topic.DoesNotExist:
-            return self.render_to_response('event/event.html', {'event': '', 'weixin_list': [], 'weibo_list': []})
+            return self.render_to_response('event/event.html', {'event': '', 'weixin_list': [], 'weibo_list': [], 'name': sidebar_name})
         user = self.request.myuser
         try:
             collection = user.collection
@@ -330,7 +343,7 @@ class EventDetailView(BaseView):
         #    if len(item.content) < 144:
         #        setattr(item, 'short', True)
         #return self.render_to_response('event/event.html', {'event': event, 'weixin_list': weixin_list, 'weibo_list': weibo_list})
-        return self.render_to_response('event/event.html', {'event': event, 'keywords_list': keywords_list, 'isCollected': iscollected})
+        return self.render_to_response('event/event.html', {'event': event, 'keywords_list': keywords_list, 'isCollected': iscollected, 'name': sidebar_name})
 
 
 class WeixinView(BaseView):
