@@ -153,7 +153,7 @@ def index_view(request):
                 data['source'] = items.source
                 data['score'] = score
                 data['time'] = items.pubtime
-                data['url'] = items.url
+                data['id'] = items.id
                 risk_list.append(data)
         sidebar_name = sidebarUtil(request)
         return render_to_response("dashboard/dashboard.html",
@@ -297,7 +297,8 @@ def person_view(request, person_id):
 
 class RisksView(BaseView):
     def get(self, request):
-        return self.render_to_response('risk/risk_list.html', {})
+        sidebar_name = sidebarUtil(request)
+        return self.render_to_response('risk/risk_list.html', {"name": sidebar_name})
 
 class RisksDetailView(BaseView):
     def get(self, request, risk_id):
@@ -321,7 +322,8 @@ class RisksDetailView(BaseView):
             collection.save(using='master')
         items = user.collection.articles.all()
         iscollected = any(filter(lambda x: x.id == risk_article.id, items))
-        return self.render_to_response('risk/risk.html', {'article': SetLogo(risk_article), 'relate': relateddata,  'isCollected': iscollected})
+        sidebar_name = sidebarUtil(request)
+        return self.render_to_response('risk/risk.html', {'article': SetLogo(risk_article), 'relate': relateddata,  'isCollected': iscollected, 'name': sidebar_name})
 
 
 class NewsView(BaseView):
