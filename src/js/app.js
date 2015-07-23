@@ -298,6 +298,12 @@ APP.chart = {
   },
 
   map: function () {
+    $.getJSON("api/map",function(result){
+      var city = result.regionData;
+      var data = [];
+      for(var c in city){
+        data[c] = city[c].rank;
+      }
     require(['echarts', 'echarts/chart/map'],
     function(echarts) {
     var myChart = echarts.init(document.getElementById('map-chart'));      
@@ -315,28 +321,14 @@ APP.chart = {
             trigger: 'item',
             formatter: function(a){
                 var name = '风险等级';
-                var c = a[2];
-                switch(a[2]){
-                    case 0:
-                    c = 'A';
-                    break;
-                    case 1:
-                    c = 'B';
-                    break;
-                    case 2:
-                    c = 'C';
-                    break;
-                    case 3:
-                    c = 'D';
-                    break;
-                    case 4:
-                    c = 'E';
-                    break;
-                    default:
-                    c = 'erro'
-                    break;
+                 var city2 ;
+                 for(var i in city)
+                 {
+                    if (a[1] == city[i].region_name){
+                       city2 = data[i];
+                    }
                  }
-                 var res =a[1]+'<br>'+'<br>'+'风险等级'+c;
+                 var res =a[1]+'<br>'+'风险等级  '+city2;
                 return res;
             }
         },
@@ -362,26 +354,31 @@ APP.chart = {
                     normal:{label:{show:false}},  //区域名称
                     emphasis:{label:{show:true}}
                 },
+
                 data:[
-                    {name: '江岸区',value: Math.round(Math.random()*4)},
-                    {name: '江汉区',value: Math.round(Math.random()*4)},
-                    {name: '硚口区',value: Math.round(Math.random()*4)},
-                    {name: '汉阳区',value: Math.round(Math.random()*4)},
-                    {name: '武昌区',value: Math.round(Math.random()*4)},
-                    {name: '洪山区',value: Math.round(Math.random()*4)},
-                    {name: '青山区',value: Math.round(Math.random()*4)},
-                    {name: '东西湖区',value: Math.round(Math.random()*4)},
-                    {name: '蔡甸区',value: Math.round(Math.random()*4)},
-                    {name: '江夏区',value: Math.round(Math.random()*4)},
-                    {name: '黄陂区',value: Math.round(Math.random()*4)},
-                    {name: '新洲区',value: Math.round(Math.random()*4)},
-                    {name: '汉南区',value: Math.round(Math.random()*4)}
+                    {name: '江岸区',value: data[4]},
+                    {name: '江汉区',value: data[6]},
+                    {name: '硚口区',value: data[10]},
+                    {name: '汉阳区',value: data[11]},
+                    {name: '武昌区',value: data[14]},
+                    {name: '洪山区',value: data[1]},
+                    {name: '青山区',value: data[3]},
+                    {name: '东西湖区',value: data[9]},
+                    {name: '蔡甸区',value: data[12]},
+                    {name: '江夏区',value: data[2]},
+                    {name: '黄陂区',value: data[7]},
+                    {name: '新洲区',value: data[8]},
+                    {name: '汉南区',value: data[13]}
                 ]
             }
         ]
     };
     myChart.setOption(option);
     });
+
+
+     });
+    
   
   }
 };

@@ -25,6 +25,8 @@ from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
 from yqj.redisconnect import RedisQueryApi
 from django.db import connection
+import requests
+import json
 
 def login_view(request):
     try:
@@ -1041,4 +1043,24 @@ def chart_pie_event_view(request, topic_id):
              {u'name': u'自媒体', u'value': topic.weibo.count()+topic.weixin.count()}]
     value = [item for item in value if item['value']]
     return JsonResponse({u'name': name, u'value': value})
+
+
+def map_view(request):
+    login_url = "http://192.168.0.215/auth"
+    login_data = {
+        "u": "wuhanzhijian", 
+        "p": "aebcb993a42143aa78b76a57666ec77d6bb55bec",
+    }
+    login_res = requests.post(login_url,data=login_data)
+    login_json = json.loads(login_res.text)
+    login_cookie = login_json["token"]
+
+    url = "http://192.168.0.215/api/dashboard?ed=2015-07-23&edId=9335&sd=2015-06-23&sdId=9305"
+    headers = {
+        "Authorization" : "Bearer "+login_cookie,
+    }
+    res = requests.get(url, headers=headers)
+    data = json.loads(res.text)
+    risk_data = data["regionData"]
+    return JsonResponse({"regionData": risk_data })
 
