@@ -1987,6 +1987,29 @@ APP.product = function() {
     .parent().addClass('active');
 };
 
+
+APP.inspection = function () {
+  var $inspection = $('#inspection'),
+      $content    = $inspection.children('.box-body').find('tbody');
+
+  $content.load('/api/dashboard/local-inspection/');
+
+  $inspection.on('click', 'button', function (event) {
+    event.preventDefault();
+
+    if ( $(this).hasClass('active') ) {
+      return false;
+    }
+
+    $(this)
+      .addClass('active')
+      .siblings().removeClass('active');
+
+    $content.load('/api/dashboard/' + this.id + '/');
+  });
+};
+
+
 //
 // url based router
 //
@@ -2004,6 +2027,7 @@ $(function() {
       this.common();
       APP.dashboard();
       APP.chart.map();
+      APP.inspection();
       APP.chart.line();
       APP.chart.pie();
     },
