@@ -597,7 +597,6 @@ APP.product = function() {
     .parent().addClass('active');
 };
 
-
 APP.inspection = function () {
   var $inspection = $('#inspection'),
       $content    = $inspection.children('.box-body').find('tbody');
@@ -619,6 +618,24 @@ APP.inspection = function () {
   });
 };
 
+APP.risk = function () {
+  var $risk           = $('#risk'),
+      $riskScore      = $risk.find('.risk-score'),
+      $localRelevance = $risk.find('.local-relevance'),
+
+      replaceClass    = function (className) {
+        return function (index, element) {
+          var num     = $(element).data('num'),
+              $item   = $(element).find('i');
+
+          $item.slice(0, num).removeClass(className + '-o').addClass(className);
+        };
+      };
+
+  $riskScore.each(replaceClass('fa-star'));
+  $localRelevance.each(replaceClass('fa-square'));
+};
+
 
 //
 // url based router
@@ -637,6 +654,7 @@ $(function() {
       this.common();
       APP.dashboard();
       APP.inspection();
+      APP.risk();
       APP.chart.line();
       APP.chart.pie();
     },

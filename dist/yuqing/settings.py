@@ -115,7 +115,7 @@ TEMPLATE_DIRS = (
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-MEDIA_ROOT = '/var/www/media'
+# MEDIA_ROOT = '/var/www/media'
 STATIC_ROOT = '/var/www/static'
 
 MEDIA_URL = '/media/'

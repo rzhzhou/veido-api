@@ -267,7 +267,30 @@ class ArticleTableView(TableAPIView):
         result = self.news_to_json(datas['items'])
         return Response({'total': datas['total_number'], 'data': result})
 
+class RisksTableView(TableAPIView):
+    def get_score_article(self):
+        user = request.myuser
+        company = user.group.company
+        group = Group.objects.get(company=user.company).id
+        score_list = LocaltionScore.objects.filter(group=group)
+        for item in score_list:
+            data = {}
+            data['relevance'] = item.score
+            article_list = Article.objects.filter(id=item.article.id).order_by('-pubtime')[:6]
+            for items in article_list:
+                # score = GroupAuthUser.objects.filter(article=items.id)[0]
+                data['title'] = items.title
+                data['source'] = items.source
+                # data['score'] = score
+                data['time'] = items.pubtime
+                risk_list.append(data)
 
+            
+    def get(self, request, page):
+        items = self.get_score_article(group_id)
+        datas = self.paging(items, self.SCORE_PAGE_LIMIT, page)
+        # result = self.news_to_json(datas['items'])
+        return Response({'total': datas['total_number'], 'data': datas['items']})
 class NewsTableView(TableAPIView):
     """
     def get(self, request):

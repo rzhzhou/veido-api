@@ -10,7 +10,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import View
 from yqj.models import Article, Weixin, Weibo, RelatedData, Category, Group,\
                        Area, Topic, Inspection, Custom, CustomKeyword, Collection, ArticlePublisher, Product,\
-                       ProductKeyword
+                       ProductKeyword, LocaltionScore, GroupAuthUser
 from yqj import login_required
 from yqj.redisconnect import RedisQueryApi
 from django.db.models import Count,Q
@@ -22,6 +22,7 @@ def SetLogo(obj):
     if not obj.publisher.photo:
         obj.publisher.photo = u'http://tp2.sinaimg.cn/3557640017/180/40054587155/1'
     return obj
+
 
 @login_required
 def index_view(request):
@@ -87,6 +88,8 @@ def index_view(request):
 
         news_list = Article.objects.filter(id__in=article_id)[:10]
 
+        # news_list = getScore(user.id, news_list)
+
         for item in news_list:
             try:
                 setattr(item, 'hot_index', RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count())
@@ -115,10 +118,21 @@ def index_view(request):
         for data in weixin_data:
             data = SetLogo(data)
 
-        # inspection_list = Inspection.objects.filter(source=user.company).order_by('-pubtime')[:10]
-        # for item in inspection_list:
-        #     item.qualitied = str(int(item.qualitied*100)) + '%'
-        # inspection = render_to_string('inspection/dashboard_inspection.html', {'inspection_list': 'inspection_list'})
+        group = Group.objects.get(company=user.company).id
+        score_list = LocaltionScore.objects.filter(group=group)
+        risk_list = []
+        for item in score_list:
+            data = {}
+            data['relevance'] = item.score
+            article_list = Article.objects.filter(id=item.article.id).order_by('-pubtime')[:6]
+            for items in article_list:
+                # score = GroupAuthUser.objects.filter(article=items.id)[0]
+                data['title'] = items.title
+                data['source'] = items.source
+                # data['score'] = score
+                data['time'] = items.pubtime
+                risk_list.append(data)
+       
         return render_to_response("dashboard/dashboard.html",
             {'user': user,
             'categories': categories,
@@ -129,10 +143,10 @@ def index_view(request):
             'event': {'number': event, 'percent': event_percent},
             'news_list': news_list,
             'event_list': event_list,
+            'risk_list': risk_list,
             'weixin_hottest_list': weixin_data,
             'weibo_hottest_list': weibo_data,
             'user_image': get_user_image(user),
-            # 'inspection_list': inspection,
             })
     else:
         return HttpResponse(status=401)
@@ -256,6 +270,37 @@ def person_view(request, person_id):
     return HttpResponse('person')
 
 
+
+class RisksView(BaseView):
+    def get(self, request):
+        return self.render_to_response('risk/risk_list.html', {})
+
+
+class RisksDetailView(BaseView):
+    def get(self, request, risk_id):
+        try:
+            risk_id = int(risk_id)
+            risk_article = Article.objects.get(id=risk_id)
+        except Article.DoesNotExist:
+            return self.render_to_response('risk/risks.html', {'article': '', 'relate': []})
+
+        try:
+            r = RelatedData.objects.filter(uuid=risk_article.uuid)[0]
+            relateddata = list(r.articles.all())
+        except IndexError:
+            relateddata = []
+        
+        user = self.request.myuser
+        try:
+            collection = user.collection
+        except Collection.DoesNotExist:
+            collection = Collection(user=user)
+            collection.save(using='master')
+        items = user.collection.articles.all()
+        iscollected = any(filter(lambda x: x.id == news.id, items))
+        return self.render_to_response('risk/risk_list.html', {'article': SetLogo(news), 'relate': relateddata,  'isCollected': iscollected})
+
+
 class NewsView(BaseView):
     def get(self, request):
         return self.render_to_response('news/news_list.html', {})
@@ -288,7 +333,6 @@ class NewsDetailView(BaseView):
         iscollected = any(filter(lambda x: x.id == news.id, items))
         return self.render_to_response('news/news.html', {'article': SetLogo(news), 'relate': relateddata, 'event': event, 'isCollected': iscollected})
  #sim_article(news.title,news.pubtime
-
 
 class EventView(BaseView):
     def get(self,request):
