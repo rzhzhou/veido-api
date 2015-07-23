@@ -719,6 +719,11 @@ $(function() {
       this.common();
       this.product();
     },
+    risk: function() {
+      this.common();
+      APP.table();
+      APP.risk();
+    },
     collection: function() {
       this.common();
       APP.table();
