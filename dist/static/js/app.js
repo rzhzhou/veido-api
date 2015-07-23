@@ -1630,6 +1630,7 @@ APP.table = function() {
               });
 
           $(content).html(table);
+          APP.risk();
         };
 
     $.getJSON('/api' + APP.url + type + '/1/', function(data) {
@@ -1656,9 +1657,55 @@ APP.table = function() {
   });
 };
 
+APP.table1 = function() {
+  $('.table-custom1').each(function() {
+    var $this       = $(this),
+        $pagination = $this.parent(),
+        content     = this.tBodies[0],
+        type        = this.id,
+
+        renderTable = function(data) {
+          var items = data.data,
+
+              table = $.map(items, function(item) {
+                var url       = '/' + type + '/' + item.id + '/',
+                    title     = '<td><a href="' + url + '" title="' + item.title + '" target="_blank">' + item.title + '</a></td>',
+                    source    = '<td>' + item.source   + '</td>',
+                    time      = '<td>' + item.time + '</td>',                    
+                    score     = '<td class="risk-score" data-num="'+item.score+'"><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i></td>',
+                    relevance =  '<td class="local-relevance" data-num="'+item.relevance+'"><i class="fa fa-square-o"></i><i class="fa fa-square-o"></i><i class="fa fa-square-o"></i></td>',
+                    row       = '<tr>' + title + source + time + score + relevance + '</tr>';
+
+                return row;
+              });
+
+          $(content).html(table);
+        };
+
+    $.getJSON('/api' + APP.url + type + '/1/', function(data) {
+      renderTable(data);
+      $pagination.twbsPagination({
+        totalPages: data.total,
+        visiblePages: 7,
+        first: '第一页',
+        prev: '上一页',
+        next: '下一页',
+        last: '最后一页',
+        paginationClass: 'pagination pagination-sm no-margin pull-right',
+        onPageClick: function(event, page) {
+          APP.returnTop($this);
+          $.getJSON('/api' + APP.url + type + '/' + page + '/', function(data) {
+            renderTable(data);
+            $pagination.twbsPagination({totalPages: data.total});
+          });
+        }
+      });
+    });
+  });
+};
+
 APP.dataTable = function() {
   $.fn.dataTable.ext.errMode = 'throw';
-
   $('.initDataTable').each(function() {
     var table = $(this).DataTable({
       'ajax': {
@@ -1921,6 +1968,7 @@ APP.inspection = function () {
 };
 
 APP.risk = function () {
+  console.log("risk");
   var $risk           = $('#risk'),
       $riskScore      = $risk.find('.risk-score'),
       $localRelevance = $risk.find('.local-relevance'),
@@ -1990,6 +2038,15 @@ $(function() {
     weixinItem: function() {
       this.common();
     },
+    risk: function() {
+      this.common();
+      APP.table1();
+      APP.risk();
+    },
+    riskItem: function() {
+      this.common();
+      APP.collection();
+    },
     categoryItem: function() {
       this.common();
       APP.table();
@@ -2020,11 +2077,6 @@ $(function() {
     productItem: function() {
       this.common();
       this.product();
-    },
-    risk: function() {
-      this.common();
-      APP.table();
-      APP.risk();
     },
     collection: function() {
       this.common();

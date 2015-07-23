@@ -328,6 +328,7 @@ APP.table = function() {
               });
 
           $(content).html(table);
+          APP.risk();
         };
 
     $.getJSON('/api' + APP.url + type + '/1/', function(data) {
@@ -367,19 +368,11 @@ APP.table1 = function() {
               table = $.map(items, function(item) {
                 var url       = '/' + type + '/' + item.id + '/',
                     title     = '<td><a href="' + url + '" title="' + item.title + '" target="_blank">' + item.title + '</a></td>',
-                    time      = '<td>' + item.time     + '</td>',
                     source    = '<td>' + item.source   + '</td>',
-                    score     = '<td class="risk-score" data-num="'+item.score+'">
-                                <i class="fa fa-star-o"></i>
-                                <i class="fa fa-star-o"></i>
-                                <i class="fa fa-star-o"></i>
-                                </td>',
-                    relevance =  '<td class="local-relevance" data-num="'+item.relevance+'">
-                                <i class="fa fa-square-o"></i>
-                                <i class="fa fa-square-o"></i>
-                                <i class="fa fa-square-o"></i>
-                                </td>'
-                    row       = '<tr>' + title + source + location + score + relevance + '</tr>';
+                    time      = '<td>' + item.time + '</td>',                    
+                    score     = '<td class="risk-score" data-num="'+item.score+'"><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i></td>',
+                    relevance =  '<td class="local-relevance" data-num="'+item.relevance+'"><i class="fa fa-square-o"></i><i class="fa fa-square-o"></i><i class="fa fa-square-o"></i></td>',
+                    row       = '<tr>' + title + source + time + score + relevance + '</tr>';
 
                 return row;
               });
@@ -389,7 +382,6 @@ APP.table1 = function() {
 
     $.getJSON('/api' + APP.url + type + '/1/', function(data) {
       renderTable(data);
-
       $pagination.twbsPagination({
         totalPages: data.total,
         visiblePages: 7,
@@ -400,7 +392,6 @@ APP.table1 = function() {
         paginationClass: 'pagination pagination-sm no-margin pull-right',
         onPageClick: function(event, page) {
           APP.returnTop($this);
-
           $.getJSON('/api' + APP.url + type + '/' + page + '/', function(data) {
             renderTable(data);
             $pagination.twbsPagination({totalPages: data.total});
@@ -413,7 +404,6 @@ APP.table1 = function() {
 
 APP.dataTable = function() {
   $.fn.dataTable.ext.errMode = 'throw';
-
   $('.initDataTable').each(function() {
     var table = $(this).DataTable({
       'ajax': {
@@ -676,6 +666,7 @@ APP.inspection = function () {
 };
 
 APP.risk = function () {
+  console.log("risk");
   var $risk           = $('#risk'),
       $riskScore      = $risk.find('.risk-score'),
       $localRelevance = $risk.find('.local-relevance'),
