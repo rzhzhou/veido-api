@@ -597,6 +597,46 @@ APP.product = function() {
     .parent().addClass('active');
 };
 
+APP.inspection = function () {
+  var $inspection = $('#inspection'),
+      $content    = $inspection.children('.box-body').find('tbody');
+
+  $content.load('/api/dashboard/local-inspection/');
+
+  $inspection.on('click', 'button', function (event) {
+    event.preventDefault();
+
+    if ( $(this).hasClass('active') ) {
+      return false;
+    }
+
+    $(this)
+      .addClass('active')
+      .siblings().removeClass('active');
+
+    $content.load('/api/dashboard/' + this.id + '/');
+  });
+};
+
+APP.risk = function () {
+  var $risk           = $('#risk'),
+      $riskScore      = $risk.find('.risk-score'),
+      $localRelevance = $risk.find('.local-relevance'),
+
+      replaceClass    = function (className) {
+        return function (index, element) {
+          var num     = $(element).data('num'),
+              $item   = $(element).find('i');
+
+          $item.slice(0, num).removeClass(className + '-o').addClass(className);
+        };
+      };
+
+  $riskScore.each(replaceClass('fa-star'));
+  $localRelevance.each(replaceClass('fa-square'));
+};
+
+
 //
 // url based router
 //
@@ -613,6 +653,8 @@ $(function() {
     dashboard: function() {
       this.common();
       APP.dashboard();
+      APP.inspection();
+      APP.risk();
       APP.chart.line();
       APP.chart.pie();
     },
