@@ -11,22 +11,69 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import re
+from ConfigParser import SafeConfigParser
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
+def _load_config():
+    global DEBUG, TEMPLATE_DEBUG, ALLOWED_HOSTS
+    global COMPANY_NAME, LANGUAGE_CODE, TIME_ZONE, USE_I18N, USE_L10N, USE_TZ
+    global MYSQL_CONN_STR_DEFAULT, MYSQL_CONN_STR_MASTER, MONGO_CONN_STR, REDIS_CONN_STR
+
+    cp = SafeConfigParser()
+    cp.read(os.path.join(BASE_DIR, "../config.cfg"))
+
+    SECTION = cp.get('deploy', 'environment')
+
+    # SECURITY WARNING: don't run with debug turned on in production!
+    DEBUG = cp.getboolean(SECTION, 'DEBUG')
+
+    TEMPLATE_DEBUG = DEBUG
+
+    ALLOWED_HOSTS = eval(cp.get(SECTION, 'ALLOWED_HOSTS'))
+
+    COMPANY_NAME = cp.get(SECTION, 'COMPANY_NAME')
+
+    # Internationalization
+    # https://docs.djangoproject.com/en/1.7/topics/i18n/
+
+    LANGUAGE_CODE = cp.get(SECTION, 'LANGUAGE_CODE')
+
+    TIME_ZONE = cp.get(SECTION, 'TIME_ZONE')
+
+    USE_I18N = cp.get(SECTION, 'USE_I18N')
+
+    USE_L10N = cp.get(SECTION, 'USE_L10N')
+
+    USE_TZ = cp.get(SECTION, 'USE_TZ')
+
+    # MySQL
+    mysql_conn_str_default = cp.get(SECTION, 'mysql_conn_str_default')
+    mysql_conn_str_master = cp.get(SECTION, 'mysql_conn_str_master')
+    MYSQL_CONN_STR_DEFAULT = re.match(
+        r"mysql://(?P<username>.+):(?P<password>.+)@(?P<host>.+):(?P<port>\d+)/(?P<name>.+)",
+        mysql_conn_str_default).groupdict()
+    MYSQL_CONN_STR_MASTER = re.match(
+        r"mysql://(?P<username>.+):(?P<password>.+)@(?P<host>.+):(?P<port>\d+)/(?P<name>.+)",
+        mysql_conn_str_master).groupdict()
+
+    # MongoDB
+    MONGO_CONN_STR = cp.get(SECTION, 'mongo_conn_str')
+
+    # Redis
+    redis_conn_str = cp.get(SECTION, 'redis_conn_str')
+    REDIS_CONN_STR = re.match(
+        r"redis://(?P<host>.+):(?P<port>\d+)/(?P<db>.+)",
+        redis_conn_str).groupdict()
+
+_load_config()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '6f-lqyij0+64*exps#yyni+%@)6aryv56ooe)2h+$$vvvkdcm8'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-TEMPLATE_DEBUG = True
-
-ALLOWED_HOSTS = ['192.168.1.161', '27.17.61.26', 'cnshendu.com', 'www.cnshendu.com']
-
 
 # Application definition
 
@@ -63,40 +110,19 @@ WSGI_APPLICATION = 'yuqing.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': '192.168.1.161',
-        'NAME': 'yqj',
-        'USER': 'shendu',
-        'PASSWORD': 'P@55word',
+        'HOST': MYSQL_CONN_STR_DEFAULT['host'],
+        'NAME': MYSQL_CONN_STR_DEFAULT['name'],
+        'USER': MYSQL_CONN_STR_DEFAULT['username'],
+        'PASSWORD': MYSQL_CONN_STR_DEFAULT['password'],
     },
     'master': {
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': '192.168.1.161',
-        'NAME': 'yqj',
-        'USER': 'shendu',
-        'PASSWORD': 'P@55word',
+        'HOST': MYSQL_CONN_STR_MASTER['host'],
+        'NAME': MYSQL_CONN_STR_MASTER['name'],
+        'USER': MYSQL_CONN_STR_MASTER['username'],
+        'PASSWORD': MYSQL_CONN_STR_MASTER['password'],
     },
 }
-
-MONGO_CONN_STR = "mongodb://192.168.1.202:27017"
-
-REDIS_CONF = {
-            'host': '192.168.1.161',
-            'port': '6379',
-            'db': 8
-        }
-
-# Internationalization
-# https://docs.djangoproject.com/en/1.7/topics/i18n/
-
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
-USE_I18N = True
-
-USE_L10N = True
-
-USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
@@ -115,13 +141,4 @@ TEMPLATE_DIRS = (
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# MEDIA_ROOT = '/var/www/media'
-STATIC_ROOT = '/var/www/static'
-
 MEDIA_URL = '/media/'
-
-
-
-
-
-COMPANY_NAME = u'质监局'
