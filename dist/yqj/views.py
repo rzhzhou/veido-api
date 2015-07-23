@@ -560,4 +560,3 @@ class InspectionView(BaseView):
     def get(self, request):
         sidebar_name = sidebarUtil(request)
         return self.render_to_response('inspection/inspection_list.html', {'name': sidebar_name})
-
