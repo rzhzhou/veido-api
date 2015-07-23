@@ -1,6 +1,7 @@
 #coding=utf-8
 import os
 from datetime import datetime, timedelta
+import ConfigParser
 
 from django.utils import timezone
 from django.conf import settings
@@ -18,6 +19,24 @@ from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
 from django.db import connection
+
+
+def sidebarUtil(request):
+    BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+    user = request.myuser
+    conf = ConfigParser.ConfigParser()
+    conf.read(os.path.join(BASE_DIR, "../sidebar.cfg"))
+    username = user.username
+
+    sidebar_name = {
+        "news": conf.get(username, "news"),
+        "event": conf.get(username, "event"),
+        "location": conf.get(username, "location"),
+        "custom":conf.get(username, "custom")
+    }
+    return sidebar_name
+
+
 def SetLogo(obj):
     if not obj.publisher.photo:
         obj.publisher.photo = u'http://tp2.sinaimg.cn/3557640017/180/40054587155/1'
@@ -122,11 +141,8 @@ def index_view(request):
 
         risk_list = []
         for item in score_list:
-            print '-----id ',item.id
-            print '---item.article.id',item.article.id
             data = {}
             data['relevance'] = item.score
-            print'---relevance', item.score
             article_list = Article.objects.filter(id=item.article.id).order_by('-pubtime')
             for items in article_list:
                 try:
@@ -136,10 +152,10 @@ def index_view(request):
                 data['title'] = items.title
                 data['source'] = items.source
                 data['score'] = score
-                print '---score',score
                 data['time'] = items.pubtime
+                data['id'] = items.id
                 risk_list.append(data)
-       
+        sidebar_name = sidebarUtil(request)
         return render_to_response("dashboard/dashboard.html",
             {'user': user,
             'categories': categories,
@@ -153,7 +169,8 @@ def index_view(request):
             'risk_list': risk_list,
             'weixin_hottest_list': weixin_data,
             'weibo_hottest_list': weibo_data,
-            'user_image': get_user_image(user),
+            'user_image': get_user_image(user),        
+            'name': sidebar_name,
             })
     else:
         return HttpResponse(status=401)
@@ -234,7 +251,7 @@ class BaseView(LoginRequiredMixin, View):
         items = model.objects.all()
         # 实例化一个分页对象
         paginator = Paginator(items, limit)
-	try:
+        try:
             # 获取某页对应的记录
             items = paginator.page(page)
         except PageNotAnInteger:
@@ -280,7 +297,8 @@ def person_view(request, person_id):
 
 class RisksView(BaseView):
     def get(self, request):
-        return self.render_to_response('risk/risk_list.html', {})
+        sidebar_name = sidebarUtil(request)
+        return self.render_to_response('risk/risk_list.html', {"name": sidebar_name})
 
 class RisksDetailView(BaseView):
     def get(self, request, risk_id):
@@ -295,7 +313,7 @@ class RisksDetailView(BaseView):
             relateddata = list(r.articles.all())
         except IndexError:
             relateddata = []
-        
+
         user = self.request.myuser
         try:
             collection = user.collection
@@ -304,21 +322,24 @@ class RisksDetailView(BaseView):
             collection.save(using='master')
         items = user.collection.articles.all()
         iscollected = any(filter(lambda x: x.id == risk_article.id, items))
-        return self.render_to_response('risk/risk.html', {'article': SetLogo(risk_article), 'relate': relateddata,  'isCollected': iscollected})
+        sidebar_name = sidebarUtil(request)
+        return self.render_to_response('risk/risk.html', {'article': SetLogo(risk_article), 'relate': relateddata,  'isCollected': iscollected, 'name': sidebar_name})
 
 
 class NewsView(BaseView):
     def get(self, request):
-        return self.render_to_response('news/news_list.html', {})
+        sidebar_name = sidebarUtil(request)
+        return self.render_to_response('news/news_list.html', {'name': sidebar_name})
 
 
 class NewsDetailView(BaseView):
     def get(self, request, news_id):
+        sidebar_name = sidebarUtil(request)
         try:
             news_id = int(news_id)
             news = Article.objects.get(id=news_id)
         except Article.DoesNotExist:
-            return self.render_to_response('news/news.html', {'article': '', 'relate': []})
+            return self.render_to_response('news/news.html', {'article': '', 'relate': [], 'name': sidebar_name})
 
         try:
             r = RelatedData.objects.filter(uuid=news.uuid)[0]
@@ -337,23 +358,25 @@ class NewsDetailView(BaseView):
             collection.save(using='master')
         items = user.collection.articles.all()
         iscollected = any(filter(lambda x: x.id == news.id, items))
-        return self.render_to_response('news/news.html', {'article': SetLogo(news), 'relate': relateddata, 'event': event, 'isCollected': iscollected})
+        return self.render_to_response('news/news.html', {'article': SetLogo(news), 'relate': relateddata, 'event': event, 'isCollected': iscollected, 'name': sidebar_name})
  #sim_article(news.title,news.pubtime
 
 class EventView(BaseView):
     def get(self,request):
-        return self.render_to_response('event/event_list.html')
+        sidebar_name = sidebarUtil(request)
+        return self.render_to_response('event/event_list.html', {'name': sidebar_name})
 
 
 class EventDetailView(BaseView):
     def get(self, request, id):
+        sidebar_name = sidebarUtil(request)
         try:
             event_id = int(id)
             event = Topic.objects.get(id=event_id)
             eval_keywords_list = eval(event.keywords) if event.keywords else []
             keywords_list = [{"name": name, "number": number} for name, number in eval_keywords_list]
         except Topic.DoesNotExist:
-            return self.render_to_response('event/event.html', {'event': '', 'weixin_list': [], 'weibo_list': []})
+            return self.render_to_response('event/event.html', {'event': '', 'weixin_list': [], 'weibo_list': [], 'name': sidebar_name})
         user = self.request.myuser
         try:
             collection = user.collection
@@ -369,11 +392,12 @@ class EventDetailView(BaseView):
         #    if len(item.content) < 144:
         #        setattr(item, 'short', True)
         #return self.render_to_response('event/event.html', {'event': event, 'weixin_list': weixin_list, 'weibo_list': weibo_list})
-        return self.render_to_response('event/event.html', {'event': event, 'keywords_list': keywords_list, 'isCollected': iscollected})
+        return self.render_to_response('event/event.html', {'event': event, 'keywords_list': keywords_list, 'isCollected': iscollected, 'name': sidebar_name})
 
 
 class WeixinView(BaseView):
     def get(self, request):
+        sidebar_name = sidebarUtil(request)
         hottest = [SetLogo(data) for data in Weixin.objects.order_by('-pubtime')[0:20]]
         latest = self.paging(Weixin, 20, 1)
         items = [SetLogo(data) for data in latest['items']]
@@ -381,26 +405,29 @@ class WeixinView(BaseView):
         return self.render_to_response('weixin/weixin_list.html', {'weixin_latest_list': latest,
                                                                    'weixin_hottest_list': hottest,
                                                                    'html': html,
-                                                                   'total_page_number': latest['total_number']})
+                                                                   'total_page_number': latest['total_number'],
+                                                                   'name': sidebar_name})
 
 
 class WeixinDetailView(BaseView):
     def get(self, request, id):
+        sidebar_name = sidebarUtil(request)
         try:
             weixin_id = int(id)
             weixin = Weixin.objects.get(id=weixin_id)
         except Weixin.DoesNotExist:
-            return render_to_response('weixin/weixin.html', {'article': '', 'relate': []})
+            return render_to_response('weixin/weixin.html', {'article': '', 'relate': [], 'name': sidebar_name})
         try:
             r = RelatedData.objects.filter(uuid=weixin.uuid)[0]
             relateddata = list(r.weixin.all()) + list(r.weibo.all()) + list(r.articles.all())
         except IndexError:
             relateddata = []
-        return self.render_to_response('weixin/weixin.html', {'article': SetLogo(weixin), 'relate': relateddata})
+        return self.render_to_response('weixin/weixin.html', {'article': SetLogo(weixin), 'relate': relateddata, 'name': sidebar_name})
 
 
 class WeiboView(BaseView):
     def get(self, request):
+        sidebar_name = sidebarUtil(request)
         latest = [SetLogo(data) for data in Weibo.objects.order_by('-pubtime')[0:20]]
         for item in latest:
             if len(item.content) < 144:
@@ -412,18 +439,19 @@ class WeiboView(BaseView):
                 data['photo'] = u'http://tp2.sinaimg.cn/3557640017/180/40054587155/1'
             if len(data['content']) < 144:
                 data['short'] = True
-        return self.render_to_response('weibo/weibo_list.html', {'weibo_latest_list': latest, 'weibo_hottest_list': hottest})
+        return self.render_to_response('weibo/weibo_list.html', {'weibo_latest_list': latest, 'weibo_hottest_list': hottest, 'name': sidebar_name})
 
 
 class CollectionView(BaseView):
     def get(self, request):
-        return self.render_to_response('user/collection.html')
+        sidebar_name = sidebarUtil(request)
+        return self.render_to_response('user/collection.html',{'name': sidebar_name})
 
 
 class SettingsView(BaseView):
     def get(self, request):
-
-        return self.render_to_response('user/settings.html')
+        sidebar_name = sidebarUtil(request)
+        return self.render_to_response('user/settings.html', {'name': sidebar_name})
 
 class CustomListView(BaseView):
     custom_list_num = 5
@@ -483,6 +511,7 @@ class UserView(BaseView):
 class UserAdminView(BaseView):
 
     def get(self, request):
+        sidebar_name = sidebarUtil(request)
         user = request.myuser
         if not user.isAdmin:
             return HttpResponse(status=401)
@@ -494,7 +523,7 @@ class UserAdminView(BaseView):
                 continue
             user.name = user.username
             user.type = u'管理用户' if user.isAdmin else u'普通用户'
-        return self.render_to_response('user/user.html', {'user_list': user_list})
+        return self.render_to_response('user/user.html', {'user_list': user_list, 'name': sidebar_name})
 
 def register_view(request):
     return render_to_response('user/register.html')
@@ -531,5 +560,5 @@ class SearchView(BaseView):
 
 class InspectionView(BaseView):
     def get(self, request):
-        return self.render_to_response('inspection/inspection_list.html', {})
-
+        sidebar_name = sidebarUtil(request)
+        return self.render_to_response('inspection/inspection_list.html', {'name': sidebar_name})

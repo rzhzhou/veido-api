@@ -203,7 +203,7 @@ APP.menu = function() {
       vaildURL = function() {
         var thisHref = this.getAttribute('href');
 
-        if (APP.type === 'categoryItem' || APP.type === 'locationItem') {
+        if (APP.type === 'dashboard' || APP.type === 'categoryItem' || APP.type === 'locationItem') {
           return thisHref === APP.url;
         } else {
           return thisHref.split('/')[1] === APP.url.split('/')[1];
@@ -726,6 +726,11 @@ $(function() {
     productItem: function() {
       this.common();
       this.product();
+    },
+    risk: function() {
+      this.common();
+      APP.table();
+      APP.risk();
     },
     collection: function() {
       this.common();
