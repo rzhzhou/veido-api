@@ -22,9 +22,10 @@ from django.db import connection
 
 
 def sidebarUtil(request):
+    BASE_DIR = os.path.dirname(os.path.dirname(__file__))
     user = request.myuser
     conf = ConfigParser.ConfigParser()
-    conf.read("../sidebar.cfg")
+    conf.read(os.path.join(BASE_DIR, "../sidebar.cfg"))
     username = user.username
 
     sidebar_name = {
