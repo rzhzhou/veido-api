@@ -203,7 +203,7 @@ APP.menu = function() {
       vaildURL = function() {
         var thisHref = this.getAttribute('href');
 
-        if (APP.type === 'categoryItem' || APP.type === 'locationItem') {
+        if (APP.type === 'dashboard' || APP.type === 'categoryItem' || APP.type === 'locationItem') {
           return thisHref === APP.url;
         } else {
           return thisHref.split('/')[1] === APP.url.split('/')[1];

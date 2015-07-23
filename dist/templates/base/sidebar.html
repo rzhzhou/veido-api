@@ -22,14 +22,14 @@
       <li class="treeview">
         <a href="/news/">
           <i class="fa fa-newspaper-o"></i>
-          <span>新闻</span>
+          <span>{{ name.news }}</span>
         </a>
       </li>
 
       <li class="treeview">
         <a href="/event/">
           <i class="fa fa-exclamation-triangle"></i>
-          <span>事件</span>
+          <span>{{ name.event }}</span>
         </a>
       </li>
 
@@ -68,7 +68,7 @@
       <li class="treeview">
         <a href="#">
           <i class="fa fa-globe"></i>
-          <span>区域状况</span>
+          <span>{{ name.location }}</span>
           <i class="fa fa-angle-left pull-right"></i>
         </a>
         <ul class="treeview-menu">
@@ -91,9 +91,9 @@
       </li>
 
       <li class="treeview">
-        <a href="/custom/">
+        <a href="http://27.17.61.26:21580/#/login" target="_blank">
           <i class="fa fa-eye"></i>
-          <span>指定监测</span>
+          <span>{{ name.custom }}</span>
         </a>
       </li>
 

@@ -18,7 +18,7 @@
           <i class="fa fa-newspaper-o"></i>
         </span>
         <div class="info-box-content" data-number="{{ news.number }}" data-percent="{{ news.percent }}">
-          <span class="info-box-text">新闻</span>
+          <span class="info-box-text">{{ name.news }}</span>
           <span class="info-box-number"></span>
           <div class="progress">
             <div class="progress-bar"></div>
@@ -34,7 +34,7 @@
           <i class="fa fa-exclamation"></i>
         </span>
         <div class="info-box-content" data-number="{{ event.number }}" data-percent="{{ event.percent }}">
-          <span class="info-box-text">事件</span>
+          <span class="info-box-text">{{ name.event }}</span>
           <span class="info-box-number"></span>
           <div class="progress">
             <div class="progress-bar"></div>
@@ -81,7 +81,7 @@
     <div class="col-md-6">
       <div class="box box-info">
         <div class="box-header with-border">
-          <h3 class="box-title">新闻</h3>
+          <h3 class="box-title">{{ name.news }}</h3>
         </div>
         <div class="box-body no-padding">
           <div class="list-group no-margin">
@@ -206,7 +206,7 @@
     <div class="col-md-6">
       <div class="box box-danger">
         <div class="box-header with-border">
-          <h3 class="box-title">事件</h3>
+          <h3 class="box-title">{{ name.event }}</h3>
         </div>
         <div class="box-body no-padding">
           <div class="list-group no-margin">
@@ -315,7 +315,7 @@
     <div class="col-md-6">
       <div class="box box-default">
         <div class="box-header with-border">
-          <h3 class="box-title">区域状况</h3>
+          <h3 class="box-title">{{ name.location }}</h3>
         </div>
         <div class="box-body">
           <div id="pie-chart" style="height: 320px;"></div>
