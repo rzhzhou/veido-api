@@ -120,8 +120,8 @@ class Article(models.Model):
     area = models.ForeignKey(Area, verbose_name=u'地域')
     uuid = models.CharField(max_length=36)
     feeling_factor = models.FloatField(default=-1, verbose_name=u'正负面')
-    website_type = models.CharField(max_length=20, blank=True, verbose_name=u'类型')
-    localtion_score = models.FloatField(blank=True, null=True, verbose_name=u'评分')
+    website_type = models.CharField(max_length=20, blank=True, verbose_name=u'评分')
+    # localtion_score = models.FloatField(blank=True, null=True, verbose_name=u'评分')
 
 
     class Meta:
@@ -131,6 +131,30 @@ class Article(models.Model):
 
     def __unicode__(self):
         return self.title
+
+
+class Tarticle(models.Model):
+    author = models.CharField(max_length=255, verbose_name=u'作者')
+    title = models.CharField(max_length=255,blank=True, verbose_name=u'标题')
+    url = models.URLField(verbose_name=u'网站链接')
+    content = models.TextField(blank=True, verbose_name=u'正文')
+    source = models.CharField(max_length=255, blank=True, verbose_name=u'信息来源')
+    pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
+    publisher = models.ForeignKey(ArticlePublisher, verbose_name=u'文章发布者')
+    area = models.ForeignKey(Area, verbose_name=u'地域')
+    uuid = models.CharField(max_length=36)
+    feeling_factor = models.FloatField(default=-1, verbose_name=u'正负面')
+    website_type = models.CharField(max_length=20, blank=True, verbose_name=u'评分')
+    # localtion_score = models.IntegerField(blank=True, null=True, verbose_name=u'评分')
+
+
+    class Meta:
+        db_table = 'article'
+        verbose_name_plural = u'风险评分'
+
+    def __unicode__(self):
+        return self.title
+
 
 
 class Topic(models.Model):
@@ -349,19 +373,32 @@ class GroupAuthUser(models.Model):
 
     class Meta:
         db_table = 'group_authuser'
+        verbose_name_plural = u'用户绑定'
 
     def __unicode__(self):
         return  self.auth
 
 
 class LocaltionScore(models.Model):
-    score = models.FloatField(verbose_name=u'分数', null=True, blank=True)
+    score = models.IntegerField(default=0, verbose_name=u'分数')
     group = models.ForeignKey(Group, verbose_name=u'分组')
     article = models.ForeignKey(Article, verbose_name=u'新闻')
 
     class Meta:
         db_table = 'localtion_score'
         verbose_name_plural = u'本地评分'
+
+    def __unicode__(self):
+        return str(self.score)
+
+
+class RiskScore(models.Model):
+    score = models.IntegerField(default=0, verbose_name=u'分数')
+    article = models.ForeignKey(Tarticle, verbose_name=u'新闻')
+
+    class Meta:
+        db_table = 'risk_score'
+        verbose_name_plural = u'风险评分展示'
 
     def __unicode__(self):
         return str(self.score)

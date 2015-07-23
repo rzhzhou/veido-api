@@ -87,8 +87,6 @@ def index_view(request):
 
         news_list = Article.objects.filter(id__in=article_id)[:10]
 
-        news_list = getScore(user.id, news_list)
-
         for item in news_list:
             try:
                 setattr(item, 'hot_index', RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count())
