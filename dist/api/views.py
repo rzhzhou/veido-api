@@ -77,6 +77,7 @@ class TableAPIView(APIView):
     LIMIT_NUMBER = 300
     NEWS_PAGE_LIMIT = 25
     EVENT_PAGE_LIMIT = 25
+    RISK_PAGE_LIMIT = 25
     def __init__(self, request=None):
         self.request = request
 
@@ -278,17 +279,20 @@ class RisksTableView(TableAPIView):
             data['relevance'] = item.score
             article_list = Article.objects.filter(id=item.article.id).order_by('-pubtime')[:6]
             for items in article_list:
-                # score = GroupAuthUser.objects.filter(article=items.id)[0]
+                try:
+                    score = RiskScore.objects.get(article=items.id).score
+                except RiskScore.DoesNotExist:
+                    score = 0               
                 data['title'] = items.title
                 data['source'] = items.source
-                # data['score'] = score
+                data['score'] = score
                 data['time'] = items.pubtime
                 risk_list.append(data)
 
             
     def get(self, request, page):
         items = self.get_score_article(group_id)
-        datas = self.paging(items, self.SCORE_PAGE_LIMIT, page)
+        datas = self.paging(items, self.RISK_PAGE_LIMIT, page)
         # result = self.news_to_json(datas['items'])
         return Response({'total': datas['total_number'], 'data': datas['items']})
 class NewsTableView(TableAPIView):

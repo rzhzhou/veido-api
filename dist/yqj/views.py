@@ -10,7 +10,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import View
 from yqj.models import Article, Weixin, Weibo, RelatedData, Category, Group,\
                        Area, Topic, Inspection, Custom, CustomKeyword, Collection, ArticlePublisher, Product,\
-                       ProductKeyword, LocaltionScore, GroupAuthUser
+                       ProductKeyword, LocaltionScore, GroupAuthUser, RiskScore
 from yqj import login_required
 from yqj.redisconnect import RedisQueryApi
 from django.db.models import Count,Q
@@ -118,17 +118,25 @@ def index_view(request):
             data = SetLogo(data)
 
         group = Group.objects.get(company=user.company).id
-        score_list = LocaltionScore.objects.filter(group=group)
+        score_list = LocaltionScore.objects.filter(group=group)[:6]
+
         risk_list = []
         for item in score_list:
+            print '-----id ',item.id
+            print '---item.article.id',item.article.id
             data = {}
             data['relevance'] = item.score
-            article_list = Article.objects.filter(id=item.article.id).order_by('-pubtime')[:6]
+            print'---relevance', item.score
+            article_list = Article.objects.filter(id=item.article.id).order_by('-pubtime')
             for items in article_list:
-                # score = GroupAuthUser.objects.filter(article=items.id)[0]
+                try:
+                    score = RiskScore.objects.get(article=items.id).score
+                except RiskScore.DoesNotExist:
+                    score = 0
                 data['title'] = items.title
                 data['source'] = items.source
-                # data['score'] = score
+                data['score'] = score
+                print '---score',score
                 data['time'] = items.pubtime
                 risk_list.append(data)
        
@@ -274,14 +282,13 @@ class RisksView(BaseView):
     def get(self, request):
         return self.render_to_response('risk/risk_list.html', {})
 
-
 class RisksDetailView(BaseView):
     def get(self, request, risk_id):
         try:
             risk_id = int(risk_id)
             risk_article = Article.objects.get(id=risk_id)
         except Article.DoesNotExist:
-            return self.render_to_response('risk/risks.html', {'article': '', 'relate': []})
+            return self.render_to_response('risk/risk.html', {'article': '', 'relate': []})
 
         try:
             r = RelatedData.objects.filter(uuid=risk_article.uuid)[0]
@@ -296,8 +303,8 @@ class RisksDetailView(BaseView):
             collection = Collection(user=user)
             collection.save(using='master')
         items = user.collection.articles.all()
-        iscollected = any(filter(lambda x: x.id == news.id, items))
-        return self.render_to_response('risk/risk_list.html', {'article': SetLogo(news), 'relate': relateddata,  'isCollected': iscollected})
+        iscollected = any(filter(lambda x: x.id == risk_article.id, items))
+        return self.render_to_response('risk/risk.html', {'article': SetLogo(risk_article), 'relate': relateddata,  'isCollected': iscollected})
 
 
 class NewsView(BaseView):
