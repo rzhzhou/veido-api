@@ -15,7 +15,8 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from yqj.models import (Article, Area, Weixin, Weibo, Topic, RelatedData, Category,
                         save_user, Collection, Topic, hash_password, User, Custom,
-                        Inspection, CustomKeyword,Product, ProductKeyword, Group)
+                        Inspection, CustomKeyword,Product, ProductKeyword, Group,
+                        LocaltionScore, RiskScore)
 from yqj.views import SetLogo
 from serializers import ArticleSerializer
 from yqj import authenticate, login_required
@@ -269,11 +270,12 @@ class ArticleTableView(TableAPIView):
         return Response({'total': datas['total_number'], 'data': result})
 
 class RisksTableView(TableAPIView):
-    def get_score_article(self):
+    def get_score_article(self, request):
         user = request.myuser
         company = user.group.company
-        group = Group.objects.get(company=user.company).id
+        group = Group.objects.get(company=company).id
         score_list = LocaltionScore.objects.filter(group=group)
+        risk_list = []
         for item in score_list:
             data = {}
             data['relevance'] = item.score
@@ -289,17 +291,18 @@ class RisksTableView(TableAPIView):
                 data['time'] = items.pubtime
                 data['id'] = items.id
                 risk_list.append(data)
-
+        return risk_list
             
     def get(self, request, page):
-        items = self.get_score_article()
+        items = self.get_score_article(request)
         datas = self.paging(items, self.RISK_PAGE_LIMIT, page)
-        # result = self.news_to_json(datas['items'])
-        risk_list = render_to_string('risk/dashboard_risk.html', {'risk_list':  datas['items']})
-        print risk_list
-        return HttpResponse(risk_list)
+        # risk_list = render_to_string('risk/dashboard_risk.html', {'risk_list':  datas['items']})
+        # print risk_list
+        # return Response(risk_list)
 
-        # return Response({'total': datas['total_number'], 'data': datas['items']})
+        return Response({'total': datas['total_number'], 'data': list(datas['items'])})
+
+
 class NewsTableView(TableAPIView):
     """
     def get(self, request):
