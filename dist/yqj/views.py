@@ -155,8 +155,22 @@ def index_view(request):
                 data['time'] = items.pubtime
                 data['url'] = items.url
                 risk_list.append(data)
-
-            'name': sidebar_name
+        sidebar_name = sidebarUtil(request)
+        return render_to_response("dashboard/dashboard.html",
+            {'user': user,
+            'categories': categories,
+            'locations': locations,
+            'news': {'number': news_number, 'percent': news_percent},
+            'weibo': {'number': weibo_number, 'percent': weibo_percent},
+            'weixin': {'number': weixin_number, 'percent': weixin_percent},
+            'event': {'number': event, 'percent': event_percent},
+            'news_list': news_list,
+            'event_list': event_list,
+            'risk_list': risk_list,
+            'weixin_hottest_list': weixin_data,
+            'weibo_hottest_list': weibo_data,
+            'user_image': get_user_image(user),        
+            'name': sidebar_name,
             })
     else:
         return HttpResponse(status=401)
