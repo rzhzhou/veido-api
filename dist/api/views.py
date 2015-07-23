@@ -287,14 +287,19 @@ class RisksTableView(TableAPIView):
                 data['source'] = items.source
                 data['score'] = score
                 data['time'] = items.pubtime
+                data['id'] = items.id
                 risk_list.append(data)
 
             
     def get(self, request, page):
-        items = self.get_score_article(group_id)
+        items = self.get_score_article()
         datas = self.paging(items, self.RISK_PAGE_LIMIT, page)
         # result = self.news_to_json(datas['items'])
-        return Response({'total': datas['total_number'], 'data': datas['items']})
+        risk_list = render_to_string('risk/dashboard_risk.html', {'risk_list':  datas['items']})
+        print risk_list
+        return HttpResponse(risk_list)
+
+        # return Response({'total': datas['total_number'], 'data': datas['items']})
 class NewsTableView(TableAPIView):
     """
     def get(self, request):
