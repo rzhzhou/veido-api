@@ -9,7 +9,7 @@ class RedisClient(object):
 
     """docstring for RedisClient"""
     def __init__(self):
-        self.conf = settings.REDIS_CONF
+        self.conf = settings.REDIS_CONN_STR
 
     def connect(self):
         pool = redis.ConnectionPool(host=self.conf['host'],
@@ -59,6 +59,6 @@ class RedisQueryApi(object):
 
     def scard(self, name):
         return self.instance.scard(name)
-        
+
     def sort(self, name, start=None, num=None, by=None, get=None, desc=False, alpha=False, store=None):
         return self.instance.sort(name, start, num, by, get, desc, alpha, store)
