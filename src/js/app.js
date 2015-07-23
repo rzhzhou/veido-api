@@ -688,6 +688,14 @@ $(function() {
     weixinItem: function() {
       this.common();
     },
+    risk: function() {
+      this.common();
+      APP.risk();
+    },
+    riskItem: function() {
+      this.common();
+      APP.collection();
+    },
     categoryItem: function() {
       this.common();
       APP.table();
