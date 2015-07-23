@@ -298,65 +298,91 @@ APP.chart = {
   },
 
   map: function () {
-    require(['echarts', 'echarts/chart/map'], function (ec) {
+    require(['echarts', 'echarts/chart/map'],
+    function(echarts) {
+    var myChart = echarts.init(document.getElementById('map-chart'));      
       require('echarts/util/mapData/params').params.wh = {
         getGeoJson: function (callback) {
-          $.getJSON('/static/wh.json', callback);
+          $.getJSON('/static/wh.json',callback);
         }
-      };
-
-      ec.init(document.getElementById('map-chart'), 'macarons').setOption({
+      }
+   var option = {
         title: {
-          // text : '武汉地图',
-          subtext : ''
+           /* text : '武汉地图',*/
+            subtext : ''
         },
         tooltip : {
-          trigger: 'item',
-          formatter: function(a){
-              return a[1]+'<br>'+a[2];
-          }
+            trigger: 'item',
+            formatter: function(a){
+                var name = '风险等级';
+                var c = a[2];
+                switch(a[2]){
+                    case 0:
+                    c = 'A';
+                    break;
+                    case 1:
+                    c = 'B';
+                    break;
+                    case 2:
+                    c = 'C';
+                    break;
+                    case 3:
+                    c = 'D';
+                    break;
+                    case 4:
+                    c = 'E';
+                    break;
+                    default:
+                    c = 'erro'
+                    break;
+                 }
+                 var res =a[1]+'<br>'+'<br>'+'风险等级'+c;
+                return res;
+            }
         },
         legend: {
-          orient: 'vertical',
-          x:'right',
-          data:['']
+            orient: 'vertical',
+            x:'right',
+            data:['']
         },
         dataRange: {
-          min: 0,
-          max: 1000,
-          color:['orange','yellow'],   //颜色
-          text:['高','低'],           // 文本，默认为数值文本
-          calculable : true
+            min: 1,
+            max: 5,
+            color:['#810004','#ad3f10','#fa9529','#fff26e','#cee19e',],   //颜色
+            text:['高','低'],           // 文本，默认为数值文本
+            calculable : true
         },
         series : [
-          {
-            name: '数据名称',
-            type: 'map',
-            mapType: 'wh',
-            selectedMode : 'single',
-            itemStyle:{
-              normal:{label:{show:false}},  //区域名称
-              emphasis:{label:{show:true}}
-            },
-            data:[
-              {name: '江岸区',value: Math.round(Math.random()*1000)},
-              {name: '江汉区',value: Math.round(Math.random()*1000)},
-              {name: '硚口区',value: Math.round(Math.random()*1000)},
-              {name: '汉阳区',value: Math.round(Math.random()*1000)},
-              {name: '武昌区',value: Math.round(Math.random()*1000)},
-              {name: '洪山区',value: Math.round(Math.random()*1000)},
-              {name: '青山区',value: Math.round(Math.random()*1000)},
-              {name: '东西湖区',value: Math.round(Math.random()*1000)},
-              {name: '蔡甸区',value: Math.round(Math.random()*1000)},
-              {name: '江夏区',value: Math.round(Math.random()*1000)},
-              {name: '黄陂区',value: Math.round(Math.random()*1000)},
-              {name: '新洲区',value: Math.round(Math.random()*1000)},
-              {name: '汉南区',value: Math.round(Math.random()*1000)}
-            ]
-          }
+            {
+                name: '数据名称',
+                type: 'map',
+                mapType: 'wh',
+                selectedMode : 'single',
+                itemStyle:{
+                    normal:{label:{show:false}},  //区域名称
+                    emphasis:{label:{show:true}}
+                },
+                data:[
+                    {name: '江岸区',value: Math.round(Math.random()*4)},
+                    {name: '江汉区',value: Math.round(Math.random()*4)},
+                    {name: '硚口区',value: Math.round(Math.random()*4)},
+                    {name: '汉阳区',value: Math.round(Math.random()*4)},
+                    {name: '武昌区',value: Math.round(Math.random()*4)},
+                    {name: '洪山区',value: Math.round(Math.random()*4)},
+                    {name: '青山区',value: Math.round(Math.random()*4)},
+                    {name: '东西湖区',value: Math.round(Math.random()*4)},
+                    {name: '蔡甸区',value: Math.round(Math.random()*4)},
+                    {name: '江夏区',value: Math.round(Math.random()*4)},
+                    {name: '黄陂区',value: Math.round(Math.random()*4)},
+                    {name: '新洲区',value: Math.round(Math.random()*4)},
+                    {name: '汉南区',value: Math.round(Math.random()*4)}
+                ]
+            }
         ]
-      });
+    };
+    myChart.setOption(option);
     });
+  
   }
 };
 
