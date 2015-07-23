@@ -122,11 +122,8 @@ def index_view(request):
 
         risk_list = []
         for item in score_list:
-            print '-----id ',item.id
-            print '---item.article.id',item.article.id
             data = {}
             data['relevance'] = item.score
-            print'---relevance', item.score
             article_list = Article.objects.filter(id=item.article.id).order_by('-pubtime')
             for items in article_list:
                 try:
@@ -136,8 +133,8 @@ def index_view(request):
                 data['title'] = items.title
                 data['source'] = items.source
                 data['score'] = score
-                print '---score',score
                 data['time'] = items.pubtime
+                data['url'] = items.url
                 risk_list.append(data)
        
         return render_to_response("dashboard/dashboard.html",
