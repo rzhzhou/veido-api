@@ -79,9 +79,8 @@ gulp.task('serve-js', ['clean-js'], function() {
 gulp.task('serve', function() {
   browserSync.init({
     notify: false,
-    proxy: '127.0.0.1:8000',
-    port: 80,
-    open: false
+    open: false,
+    proxy: '127.0.0.1:8000'
   });
 
   gulp.watch('src/less/*.less', ['serve-less']);
@@ -97,4 +96,4 @@ gulp.task('serve', function() {
 
 // default task
 
-gulp.task('default', ['build']);
+gulp.task('default', ['serve']);
