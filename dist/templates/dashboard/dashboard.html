@@ -117,7 +117,7 @@
               {% for risk in risk_list %}
               <tr>
                 <td class="risk-item">
-                  <a href="">{{ risk.title }}</a>
+                  <a href="{{ risk.url }}" title="{{ risk.title }}" target="_blank">{{ risk.title }}</a>
                   <p>
                     <span class="date">日期：{{ risk.time | date:"Y-m-d" }}</span>
                     <span class="source">来源：{{ risk.source }}</span>
