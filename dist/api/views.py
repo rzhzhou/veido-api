@@ -7,6 +7,7 @@ from dateutil.relativedelta import relativedelta
 from django.views.generic import View
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
+from django.template.loader import render_to_string
 from django.db import models, connection, IntegrityError
 from django.conf import settings
 from rest_framework.response import Response
@@ -76,6 +77,7 @@ class TableAPIView(APIView):
     LIMIT_NUMBER = 300
     NEWS_PAGE_LIMIT = 25
     EVENT_PAGE_LIMIT = 25
+    RISK_PAGE_LIMIT = 25
     def __init__(self, request=None):
         self.request = request
 
@@ -266,7 +268,33 @@ class ArticleTableView(TableAPIView):
         result = self.news_to_json(datas['items'])
         return Response({'total': datas['total_number'], 'data': result})
 
+class RisksTableView(TableAPIView):
+    def get_score_article(self):
+        user = request.myuser
+        company = user.group.company
+        group = Group.objects.get(company=user.company).id
+        score_list = LocaltionScore.objects.filter(group=group)
+        for item in score_list:
+            data = {}
+            data['relevance'] = item.score
+            article_list = Article.objects.filter(id=item.article.id).order_by('-pubtime')[:6]
+            for items in article_list:
+                try:
+                    score = RiskScore.objects.get(article=items.id).score
+                except RiskScore.DoesNotExist:
+                    score = 0               
+                data['title'] = items.title
+                data['source'] = items.source
+                data['score'] = score
+                data['time'] = items.pubtime
+                risk_list.append(data)
 
+            
+    def get(self, request, page):
+        items = self.get_score_article(group_id)
+        datas = self.paging(items, self.RISK_PAGE_LIMIT, page)
+        # result = self.news_to_json(datas['items'])
+        return Response({'total': datas['total_number'], 'data': datas['items']})
 class NewsTableView(TableAPIView):
     """
     def get(self, request):
@@ -752,6 +780,29 @@ class CustomModifyView(View):
             status = self.delete(user)
         return JsonResponse({'status': status['status']})
 
+class InspectionLocalView(TableAPIView):
+    def get(self, request):
+        user = request.myuser
+        company = user.group.company
+        inspection_list = Inspection.objects.filter(source=company).order_by('-pubtime')[:10]
+        for item in inspection_list:
+            item.qualitied = str(int(item.qualitied*100)) + '%'
+
+        inspection = render_to_string('inspection/dashboard_inspection.html', {'inspection_list': inspection_list})
+        return HttpResponse(inspection)
+
+        
+class InspectionNationalView(TableAPIView):
+    def get(self, request):
+        user = request.myuser
+        user.company = user.group.company
+        inspection_list = Inspection.objects.all().order_by('-pubtime')[:10]
+        for item in inspection_list:
+            item.qualitied = str(int(item.qualitied*100)) + '%'
+
+        inspection = render_to_string('inspection/dashboard_inspection.html', {'inspection_list': inspection_list})
+        return HttpResponse(inspection)
+
 
 class InspectionTableView(TableAPIView):
     def get(self, request):
@@ -785,6 +836,8 @@ class InspectionTableView(TableAPIView):
             item['source'] = data.source
             result.append(item)
         return result
+
+
 
 
 

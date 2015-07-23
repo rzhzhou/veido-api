@@ -4,6 +4,7 @@ import hashlib
 from django.db import models
 from django.conf import settings
 from django.utils.crypto import get_random_string
+from django.contrib.auth.models import User
 # Create your models here.
 
 class Area(models.Model):
@@ -119,7 +120,9 @@ class Article(models.Model):
     area = models.ForeignKey(Area, verbose_name=u'地域')
     uuid = models.CharField(max_length=36)
     feeling_factor = models.FloatField(default=-1, verbose_name=u'正负面')
-    website_type = models.CharField(max_length=20, blank=True, verbose_name=u'类型')
+    website_type = models.CharField(max_length=20, blank=True, verbose_name=u'评分')
+    # localtion_score = models.FloatField(blank=True, null=True, verbose_name=u'评分')
+
 
     class Meta:
         db_table = 'article'
@@ -128,6 +131,30 @@ class Article(models.Model):
 
     def __unicode__(self):
         return self.title
+
+
+class Tarticle(models.Model):
+    author = models.CharField(max_length=255, verbose_name=u'作者')
+    title = models.CharField(max_length=255,blank=True, verbose_name=u'标题')
+    url = models.URLField(verbose_name=u'网站链接')
+    content = models.TextField(blank=True, verbose_name=u'正文')
+    source = models.CharField(max_length=255, blank=True, verbose_name=u'信息来源')
+    pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
+    publisher = models.ForeignKey(ArticlePublisher, verbose_name=u'文章发布者')
+    area = models.ForeignKey(Area, verbose_name=u'地域')
+    uuid = models.CharField(max_length=36)
+    feeling_factor = models.FloatField(default=-1, verbose_name=u'正负面')
+    website_type = models.CharField(max_length=20, blank=True, verbose_name=u'评分')
+    # localtion_score = models.IntegerField(blank=True, null=True, verbose_name=u'评分')
+
+
+    class Meta:
+        db_table = 'article'
+        verbose_name_plural = u'风险评分'
+
+    def __unicode__(self):
+        return self.title
+
 
 
 class Topic(models.Model):
@@ -213,7 +240,8 @@ class User(models.Model):
 
     def is_authenticated(self):
         return True
-
+def __unicode__(self):
+        return self.username
 
 class Custom(models.Model):
     searchkeyword = models.CharField(max_length=255, verbose_name=u'关键词')
@@ -337,3 +365,41 @@ class Inspection(models.Model):
 
     def __unicode__(self):
         return self.name
+
+
+class GroupAuthUser(models.Model):
+    auth = models.CharField(max_length=255, verbose_name=u'用户名')
+    group = models.ForeignKey(Group, verbose_name=u'分组')
+
+    class Meta:
+        db_table = 'group_authuser'
+        verbose_name_plural = u'用户绑定'
+
+    def __unicode__(self):
+        return  self.auth
+
+
+class LocaltionScore(models.Model):
+    score = models.IntegerField(default=0, verbose_name=u'分数')
+    group = models.ForeignKey(Group, verbose_name=u'分组')
+    article = models.ForeignKey(Article, verbose_name=u'新闻')
+
+    class Meta:
+        db_table = 'localtion_score'
+        verbose_name_plural = u'本地评分'
+
+    def __unicode__(self):
+        return str(self.score)
+
+
+class RiskScore(models.Model):
+    score = models.IntegerField(default=0, verbose_name=u'分数')
+    article = models.ForeignKey(Tarticle, verbose_name=u'新闻')
+
+    class Meta:
+        db_table = 'risk_score'
+        verbose_name_plural = u'风险评分展示'
+
+    def __unicode__(self):
+        return str(self.score)
+

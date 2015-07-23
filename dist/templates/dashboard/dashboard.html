@@ -18,7 +18,7 @@
           <i class="fa fa-newspaper-o"></i>
         </span>
         <div class="info-box-content" data-number="{{ news.number }}" data-percent="{{ news.percent }}">
-          <span class="info-box-text">新闻</span>
+          <span class="info-box-text">{{ name.news }}</span>
           <span class="info-box-number"></span>
           <div class="progress">
             <div class="progress-bar"></div>
@@ -34,7 +34,7 @@
           <i class="fa fa-exclamation"></i>
         </span>
         <div class="info-box-content" data-number="{{ event.number }}" data-percent="{{ event.percent }}">
-          <span class="info-box-text">事件</span>
+          <span class="info-box-text">{{ name.event }}</span>
           <span class="info-box-number"></span>
           <div class="progress">
             <div class="progress-bar"></div>
@@ -74,6 +74,74 @@
           <span class="progress-description"></span>
         </div>
       </a>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6">
+      <div class="box box-info">
+        <div class="box-header with-border">
+          <h3 class="box-title">{{ name.news }}</h3>
+        </div>
+        <div class="box-body no-padding">
+          <div class="list-group no-margin">
+            {% for news in news_list %}
+              <a href="/news/{{ news.id }}/" class="list-group-item no-border" target="_blank">
+                <span class="badge" data-toggle="tooltip" data-placement="left" title="热度 {{ news.hot_index }}">{{ news.hot_index }}</span>
+                {{ news.title }}
+              </a>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="box-footer text-center">
+          <a href="/news/">查看更多</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div id="risk" class="box box-danger">
+        <div class="box-header with-border">
+          <h3 class="box-title">风险快讯</h3>
+        </div>
+        <div class="box-body no-padding">
+          <table class="table table-hover table-risk">
+            <thead>
+              <tr>
+                <td class="col-title">标题</td>
+                <td class="col-risk">风险指数</td>
+                <td class="col-relevance">本地相关度</td>
+              </tr>
+            </thead>
+            <tbody>
+              {% for risk in risk_list %}
+              <tr>
+                <td class="risk-item">
+                  <a href="{{ risk.url }}" title="{{ risk.title }}" target="_blank">{{ risk.title }}</a>
+                  <p>
+                    <span class="date">日期：{{ risk.time | date:"Y-m-d" }}</span>
+                    <span class="source">来源：{{ risk.source }}</span>
+                  </p>
+                </td>
+                <td class="risk-score" data-num={{ risk.score }}>
+                  <i class="fa fa-star-o"></i>
+                  <i class="fa fa-star-o"></i>
+                  <i class="fa fa-star-o"></i>
+                </td>
+                <td class="local-relevance" data-num={{ risk.relevance }}>
+                  <i class="fa fa-square-o"></i>
+                  <i class="fa fa-square-o"></i>
+                  <i class="fa fa-square-o"></i>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="box-footer text-center">
+          <a href="/risk/">查看更多</a>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -138,7 +206,7 @@
     <div class="col-md-6">
       <div class="box box-danger">
         <div class="box-header with-border">
-          <h3 class="box-title">事件</h3>
+          <h3 class="box-title">{{ name.event }}</h3>
         </div>
         <div class="box-body no-padding">
           <div class="list-group no-margin">
@@ -247,7 +315,7 @@
     <div class="col-md-6">
       <div class="box box-default">
         <div class="box-header with-border">
-          <h3 class="box-title">区域状况</h3>
+          <h3 class="box-title">{{ name.location }}</h3>
         </div>
         <div class="box-body">
           <div id="pie-chart" style="height: 320px;"></div>
