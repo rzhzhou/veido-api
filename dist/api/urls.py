@@ -2,7 +2,7 @@ from django.conf.urls import patterns, include, url
 from api.views import ArticleTableView, NewsTableView, LocationTableView, CollectView, EventTableView,\
                       CollecModifyView, EventDetailTableView, SearchView, CustomTableView, InspectionNationalView,\
                       InspectionTableView, InspectionLocalView, WeixinTableView, WeiboTableView, LocationWeixinView, LocationWeiboView, EventDetailWeixinView,\
-                      EventDetailWeiboView, CustomWeixinView, CustomWeiboView, CustomModifyView,ProductTableView
+                      EventDetailWeiboView, CustomWeixinView, CustomWeiboView, CustomModifyView,ProductTableView, RisksTableView
                       
 
 urlpatterns = patterns('',
@@ -15,6 +15,7 @@ urlpatterns = patterns('',
     url(r'^location/(?P<location_id>\d+)/weibo/new/(?P<page>\d+)/$', LocationWeiboView.as_view()),
     url(r'^location/(?P<location_id>\d+)/news/(?P<page>\d+)/$', LocationTableView.as_view()),
     url(r'^news/news/(?P<page>\d+)/$', NewsTableView.as_view()),
+    url(r'^risk/news/(?P<page>\d+)/$', RisksTableView.as_view()),
     url(r'^collection/(?P<table_type>\S+)/(?P<page>\d+)/$', CollectView.as_view()),
     url(r'^event/event/(?P<page>\d+)/$', EventTableView.as_view()),
     url(r'^event/(?P<id>\d+)/news/(?P<page>\d+)/$', EventDetailTableView.as_view()),

@@ -15,7 +15,8 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from yqj.models import (Article, Area, Weixin, Weibo, Topic, RelatedData, Category,
                         save_user, Collection, Topic, hash_password, User, Custom,
-                        Inspection, CustomKeyword,Product, ProductKeyword, Group)
+                        Inspection, CustomKeyword,Product, ProductKeyword, Group,
+                        LocaltionScore, RiskScore)
 from yqj.views import SetLogo
 from serializers import ArticleSerializer
 from yqj import authenticate, login_required
@@ -77,6 +78,7 @@ class TableAPIView(APIView):
     LIMIT_NUMBER = 300
     NEWS_PAGE_LIMIT = 25
     EVENT_PAGE_LIMIT = 25
+    RISK_PAGE_LIMIT = 25
     def __init__(self, request=None):
         self.request = request
 
@@ -177,7 +179,6 @@ class TableAPIView(APIView):
         except EmptyPage:
             # 如果页码太大，没有相应的记录 取最后一页的记录
             items = paginator.page(paginator.num_pages)
-
         return {'items': items, 'total_number': paginator.num_pages}
 
     def pagingfromredis(self, model, limit, page):
@@ -266,6 +267,38 @@ class ArticleTableView(TableAPIView):
         datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
         result = self.news_to_json(datas['items'])
         return Response({'total': datas['total_number'], 'data': result})
+
+class RisksTableView(TableAPIView):
+    def get_score_article(self, request):
+        user = request.myuser
+        company = user.group.company
+        group = Group.objects.get(company=company).id
+        score_list = LocaltionScore.objects.filter(group=group)
+        risk_list = []
+        for item in score_list:
+            data = {}
+            data['relevance'] = item.score
+            article_list = Article.objects.filter(id=item.article.id).order_by('-pubtime')
+            for items in article_list:
+                try:
+                    score = RiskScore.objects.get(article=items.id).score
+                except RiskScore.DoesNotExist:
+                    score = 0               
+                data['title'] = items.title
+                data['source'] = items.source
+                data['score'] = score
+                data['pubtime'] = items.pubtime
+                data['id'] = items.id
+                risk_list.append(data)
+        return risk_list
+            
+    def get(self, request, page):
+        items = self.get_score_article(request)
+        datas = self.paging(items, self.RISK_PAGE_LIMIT, page)
+        html_string = render_to_string('risk/risk_list_tmpl.html', {'risk_list':  datas['items']})
+        return Response({"total": datas['total_number'], "html": html_string})
+
+        # return Response({'total': datas['total_number'], 'data': list(datas['items'])})
 
 
 class NewsTableView(TableAPIView):

@@ -416,9 +416,9 @@ APP.table = function() {
   });
 };
 
+
 APP.dataTable = function() {
   $.fn.dataTable.ext.errMode = 'throw';
-
   $('.initDataTable').each(function() {
     var table = $(this).DataTable({
       'ajax': {
@@ -659,7 +659,6 @@ APP.product = function() {
     .parent().addClass('active');
 };
 
-
 APP.inspection = function () {
   var $inspection = $('#inspection'),
       $content    = $inspection.children('.box-body').find('tbody');
@@ -681,6 +680,67 @@ APP.inspection = function () {
   });
 };
 
+(function ($) {
+  $.fn.showRisk = function () {
+    var $riskScore      = this.find('td.risk-score'),
+        $localRelevance = this.find('td.local-relevance'),
+
+        replaceClass    = function (className) {
+          return function (index, element) {
+            var num     = $(element).data('num'),
+                $item   = $(element).find('i');
+
+            $item.slice(0, num).removeClass(className + '-o').addClass(className);
+          };
+        };
+
+    $riskScore.each(replaceClass('fa-star'));
+    $localRelevance.each(replaceClass('fa-square'));
+
+    return this;
+  };
+}(jQuery));
+
+APP.riskList = function () {
+  var $risk = $('#risk'),
+      $paginationContainer = $risk.parent(),
+
+      toAPI = function (pageNumber) {
+        if (typeof pageNumber === 'undefined') {
+          pageNumber = 1;
+        }
+
+        return '/api/risk/news/' + pageNumber + '/';
+      },
+
+      renderTable = function (pageContent) {
+        $('<tbody/>')
+          .html(pageContent)
+          .showRisk()
+          .replaceAll($risk.find('tbody'));
+      };
+
+  $.get(toAPI(), function (data) {
+    renderTable(data.html);
+
+    $paginationContainer.twbsPagination({
+      totalPages: data.total,
+      visiblePages: 7,
+      first: '第一页',
+      prev: '上一页',
+      next: '下一页',
+      last: '最后一页',
+      paginationClass: 'pagination pagination-sm no-margin pull-right',
+      onPageClick: function(event, pageNumber) {
+        APP.returnTop($(this));
+        $.get(toAPI(pageNumber), function(data) {
+          renderTable(data.html);
+          $paginationContainer.twbsPagination({totalPages: data.total});
+        });
+      }
+    });
+  });
+};
 
 //
 // url based router
@@ -700,6 +760,7 @@ $(function() {
       APP.dashboard();
       APP.inspection();
       APP.chart.map();
+      $('.table-risk').showRisk();
       APP.chart.line();
       APP.chart.pie();
     },
@@ -763,6 +824,10 @@ $(function() {
     productItem: function() {
       this.common();
       this.product();
+    },
+    risk: function() {
+      this.common();
+      APP.riskList();
     },
     collection: function() {
       this.common();

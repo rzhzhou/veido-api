@@ -1,0 +1,19 @@
+{% for risk in risk_list  %}
+<tr>
+  <td>
+    <a href="/news/{{ risk.id }}/" target="_blank">{{ risk.title }}</a>
+  </td>
+  <td>{{ risk.source }}</td>
+  <td>{{ risk.pubtime | date:"Y-m-d" }}</td>
+  <td class="risk-score" data-num={{ risk.score }}>
+    <i class="fa fa-star-o"></i>
+    <i class="fa fa-star-o"></i>
+    <i class="fa fa-star-o"></i>
+  </td>
+  <td class="local-relevance" data-num={{ risk.relevance }}>
+    <i class="fa fa-square-o"></i>
+    <i class="fa fa-square-o"></i>
+    <i class="fa fa-square-o"></i>
+  </td>
+</tr>
+{% endfor %}

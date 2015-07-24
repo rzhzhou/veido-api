@@ -5,7 +5,9 @@ from django.contrib import messages
 from yqj.mongoconnect import CrawlerTask
 from models import WeixinPublisher, WeiboPublisher,Weibo, ArticlePublisher,\
                    Category, Group, User, Article, Topic, Custom,\
-                   CustomKeyword, Area,Weixin, Product, ProductKeyword, save_user
+                   CustomKeyword, Area,Weixin, Product, ProductKeyword, save_user,\
+                   GroupAuthUser, LocaltionScore, Tarticle, RiskScore
+# from django.contrib.auth.models import User
 import jieba.analyse
 
 def show_pubtime(obj):
@@ -32,15 +34,62 @@ class WeixinAdmin(admin.ModelAdmin):
 
 
 class ArticleAdmin(admin.ModelAdmin):
-    list_display = ('title', 'source', 'area', 'feeling_factor', 'pubtime')
-    list_editable = ('source', 'feeling_factor', 'pubtime',)
-    list_filter = ('pubtime', )
-    search_fields = ('title', 'source', 'content')
-    #raw_id_fields = ('area', 'publisher', )
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "area":
-            kwargs["queryset"] = Area.objects.filter(level__lt=3)
-        return super(ArticleAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+    # fields = ('title', 'source', 'area', 'feeling_factor', 'pubtime', 'website_type')
+    list_display = ('title', 'source', 'area', 'feeling_factor', 'pubtime', 'website_type')
+    list_editable = ('source', 'feeling_factor', 'pubtime', 'website_type')
+    list_filter = ('pubtime', 'website_type')
+    search_fields = ('title', 'source', 'content', 'website_type')
+    raw_id_fields = ('area', 'publisher')
+    # def formfield_for_foreignkey(self, db_field, request, **kwargs):
+    #     if db_field.name == "area":
+    #         kwargs["queryset"] = Area.objects.filter(level__lt=3)
+    #     return super(ArticleAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+
+    def save_model(self, request, obj, form, change):
+        groupauth = GroupAuthUser.objects.get(auth=request.user)
+        company = groupauth.group
+        article = obj
+        score = int(obj.website_type)
+        localscore = LocaltionScore(score=score, group=company, article=article)
+
+        loca = LocaltionScore.objects.filter(article=article, group=company)
+        if loca:
+            loca.delete()
+            localscore.save()
+        else:
+            localscore.save()
+        # try:
+        #     lo = LocaltionScore.objects.get(article=article, group=company)
+        #     if lo:
+        #         lo.delete()
+        #         localscore.save()
+        # except:
+        #     localscore.save()
+        obj.save()  
+        # print obj.area
+        # obj.save()
+
+
+class TarticleAdmin(admin.ModelAdmin):
+    # fields = ('title', 'source', 'area', 'feeling_factor', 'pubtime', 'localtion_score')
+    list_display = ('title', 'source', 'area', 'feeling_factor', 'pubtime', 'website_type')
+    list_editable = ('source', 'feeling_factor', 'pubtime', 'website_type')
+    list_filter = ('pubtime', 'website_type')
+    search_fields = ('title', 'source', 'content', 'website_type')
+    raw_id_fields = ('area', 'publisher')
+    def save_model(self, request, obj, form, change):
+        score = int(obj.website_type)
+        article = obj
+        risk_score = RiskScore(score=score ,article=article)
+
+        risk = RiskScore.objects.filter(article=article)
+
+        if risk:
+            risk.delete()
+            risk_score.save()
+        else:
+            risk_score.save()
+
 
 
 class CustomKeywordAdmin(admin.ModelAdmin):
@@ -154,7 +203,27 @@ class UserAdmin(admin.ModelAdmin):
         save_user(obj.username, obj.password, obj.area, obj.group, obj.isAdmin)
 
 
+class GroupAuthUserAdmin(admin.ModelAdmin):
+    fields = ('auth', 'group')
+    list_display = ('auth', 'group')
+    list_editable = ('auth', 'group')
+    list_filter = ('auth', 'group')
+    search_fields = ('auth', 'group')
 
+
+class LocaltionScoreAdmin(admin.ModelAdmin):
+    fields = ('score', 'group', 'article')
+    list_display = ('score', 'group', 'article')
+    # list_editable = ('score', 'group')
+    list_filter = ('score', 'group')
+    search_fields = ('score', 'group')
+
+
+class RiskScoreAdmin(admin.ModelAdmin):
+    fields = ('score', 'article')
+    list_display = ('score', 'article')
+    # list_filter = ('score', 'article')
+    search_fields = ('score', 'article')
 # Register your models here.
 
 admin.site.register(WeixinPublisher)
@@ -171,4 +240,8 @@ admin.site.register(Custom)
 admin.site.register(CustomKeyword, CustomKeywordAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(ProductKeyword, ProductKeywordAdmin)
+admin.site.register(GroupAuthUser, GroupAuthUserAdmin)
+admin.site.register(LocaltionScore, LocaltionScoreAdmin)
+admin.site.register(Tarticle, TarticleAdmin)
+admin.site.register(RiskScore, RiskScoreAdmin)
 
