@@ -54,7 +54,7 @@ class ArticleAdmin(admin.ModelAdmin):
 
         loca = LocaltionScore.objects.filter(article=article, group=company)
         if loca:
-            loca.delete
+            loca.delete()
             localscore.save()
         else:
             localscore.save()
