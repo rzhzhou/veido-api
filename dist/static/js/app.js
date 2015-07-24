@@ -1,1 +1,2101 @@
-function _init(){$.AdminLTE.layout={activate:function(){var t=this;t.fix(),t.fixSidebar(),$(window,".wrapper").resize(function(){t.fix(),t.fixSidebar()})},fix:function(){var t=$(".main-header").outerHeight()+$(".main-footer").outerHeight(),e=$(window).height(),i=$(".sidebar").height();$("body").hasClass("fixed")?$(".content-wrapper, .right-side").css("min-height",e-$(".main-footer").outerHeight()):e>=i?$(".content-wrapper, .right-side").css("min-height",e-t):$(".content-wrapper, .right-side").css("min-height",i)},fixSidebar:function(){return $("body").hasClass("fixed")?("undefined"==typeof $.fn.slimScroll&&console&&console.error("Error: the fixed layout requires the slimscroll plugin!"),void($.AdminLTE.options.sidebarSlimScroll&&"undefined"!=typeof $.fn.slimScroll&&($(".sidebar").slimScroll({destroy:!0}).height("auto"),$(".sidebar").slimscroll({height:$(window).height()-$(".main-header").height()+"px",color:"rgba(0,0,0,0.2)",size:"3px"})))):void("undefined"!=typeof $.fn.slimScroll&&$(".sidebar").slimScroll({destroy:!0}).height("auto"))}},$.AdminLTE.pushMenu=function(t){var e=this.options.screenSizes;$(t).click(function(t){t.preventDefault(),$(window).width()>e.sm-1?$("body").toggleClass("sidebar-collapse"):$("body").hasClass("sidebar-open")?($("body").removeClass("sidebar-open"),$("body").removeClass("sidebar-collapse")):$("body").addClass("sidebar-open")}),$(".content-wrapper").click(function(){$(window).width()<=e.sm-1&&$("body").hasClass("sidebar-open")&&$("body").removeClass("sidebar-open")})},$.AdminLTE.tree=function(t){var e=this;$("li a",$(t)).click(function(t){var i=$(this),n=i.next();if(n.is(".treeview-menu")&&n.is(":visible"))n.slideUp("normal",function(){n.removeClass("menu-open")}),n.parent("li").removeClass("active");else if(n.is(".treeview-menu")&&!n.is(":visible")){var a=i.parents("ul").first(),o=a.find("ul:visible").slideUp("normal");o.removeClass("menu-open");var s=i.parent("li");n.slideDown("normal",function(){n.addClass("menu-open"),a.find("li.active").removeClass("active"),s.addClass("active"),e.layout.fix()})}n.is(".treeview-menu")&&t.preventDefault()})},$.AdminLTE.boxWidget={activate:function(){var t=$.AdminLTE.options,e=this;$(t.boxWidgetOptions.boxWidgetSelectors.collapse).click(function(t){t.preventDefault(),e.collapse($(this))}),$(t.boxWidgetOptions.boxWidgetSelectors.remove).click(function(t){t.preventDefault(),e.remove($(this))})},collapse:function(t){var e=t.parents(".box").first(),i=e.find(".box-body, .box-footer");e.hasClass("collapsed-box")?(t.children(".fa-plus").removeClass("fa-plus").addClass("fa-minus"),i.slideDown(300,function(){e.removeClass("collapsed-box")})):(t.children(".fa-minus").removeClass("fa-minus").addClass("fa-plus"),i.slideUp(300,function(){e.addClass("collapsed-box")}))},remove:function(t){var e=t.parents(".box").first();e.slideUp()},options:$.AdminLTE.options.boxWidgetOptions}}if(function(e){e.fn.extend({slimScroll:function(i){var n={width:"auto",height:"250px",size:"7px",color:"#000",position:"right",distance:"1px",start:"top",opacity:.4,alwaysVisible:!1,disableFadeOut:!1,railVisible:!1,railColor:"#333",railOpacity:.2,railDraggable:!0,railClass:"slimScrollRail",barClass:"slimScrollBar",wrapperClass:"slimScrollDiv",allowPageScroll:!1,wheelStep:20,touchScrollStep:200,borderRadius:"7px",railBorderRadius:"7px"},a=e.extend(n,i);return this.each(function(){function n(t){if(d){var t=t||window.event,i=0;t.wheelDelta&&(i=-t.wheelDelta/120),t.detail&&(i=t.detail/3);var n=t.target||t.srcTarget||t.srcElement;e(n).closest("."+a.wrapperClass).is(w.parent())&&o(i,!0),t.preventDefault&&!$&&t.preventDefault(),$||(t.returnValue=!1)}}function o(t,e,i){$=!1;var n=t,o=w.outerHeight()-S.outerHeight();if(e&&(n=parseInt(S.css("top"))+t*parseInt(a.wheelStep)/100*S.outerHeight(),n=Math.min(Math.max(n,0),o),n=t>0?Math.ceil(n):Math.floor(n),S.css({top:n+"px"})),m=parseInt(S.css("top"))/(w.outerHeight()-S.outerHeight()),n=m*(w[0].scrollHeight-w.outerHeight()),i){n=t;var s=n/w[0].scrollHeight*w.outerHeight();s=Math.min(Math.max(s,0),o),S.css({top:s+"px"})}w.scrollTop(n),w.trigger("slimscrolling",~~n),l(),c()}function s(){window.addEventListener?(this.addEventListener("DOMMouseScroll",n,!1),this.addEventListener("mousewheel",n,!1)):document.attachEvent("onmousewheel",n)}function r(){g=Math.max(w.outerHeight()/w[0].scrollHeight*w.outerHeight(),P),S.css({height:g+"px"});var t=g==w.outerHeight()?"none":"block";S.css({display:t})}function l(){if(r(),clearTimeout(h),m==~~m){if($=a.allowPageScroll,v!=m){var t=0==~~m?"top":"bottom";w.trigger("slimscroll",t)}}else $=!1;return v=m,g>=w.outerHeight()?void($=!0):(S.stop(!0,!0).fadeIn("fast"),void(a.railVisible&&A.stop(!0,!0).fadeIn("fast")))}function c(){a.alwaysVisible||(h=setTimeout(function(){a.disableFadeOut&&d||u||p||(S.fadeOut("slow"),A.fadeOut("slow"))},1e3))}var d,u,p,h,f,g,m,v,b="<div></div>",P=30,$=!1,w=e(this);if(w.parent().hasClass(a.wrapperClass)){var C=w.scrollTop();if(S=w.parent().find("."+a.barClass),A=w.parent().find("."+a.railClass),r(),e.isPlainObject(i)){if("height"in i&&"auto"==i.height){w.parent().css("height","auto"),w.css("height","auto");var y=w.parent().parent().height();w.parent().css("height",y),w.css("height",y)}if("scrollTo"in i)C=parseInt(a.scrollTo);else if("scrollBy"in i)C+=parseInt(a.scrollBy);else if("destroy"in i)return S.remove(),A.remove(),void w.unwrap();o(C,!1,!0)}}else if(!(e.isPlainObject(i)&&"destroy"in i)){a.height="auto"==a.height?w.parent().height():a.height;var x=e(b).addClass(a.wrapperClass).css({position:"relative",overflow:"hidden",width:a.width,height:a.height});w.css({overflow:"hidden",width:a.width,height:a.height,"-ms-touch-action":"none"});var A=e(b).addClass(a.railClass).css({width:a.size,height:"100%",position:"absolute",top:0,display:a.alwaysVisible&&a.railVisible?"block":"none","border-radius":a.railBorderRadius,background:a.railColor,opacity:a.railOpacity,zIndex:90}),S=e(b).addClass(a.barClass).css({background:a.color,width:a.size,position:"absolute",top:0,opacity:a.opacity,display:a.alwaysVisible?"block":"none","border-radius":a.borderRadius,BorderRadius:a.borderRadius,MozBorderRadius:a.borderRadius,WebkitBorderRadius:a.borderRadius,zIndex:99}),k="right"==a.position?{right:a.distance}:{left:a.distance};A.css(k),S.css(k),w.wrap(x),w.parent().append(S),w.parent().append(A),a.railDraggable&&S.bind("mousedown",function(i){var n=e(document);return p=!0,t=parseFloat(S.css("top")),pageY=i.pageY,n.bind("mousemove.slimscroll",function(e){currTop=t+e.pageY-pageY,S.css("top",currTop),o(0,S.position().top,!1)}),n.bind("mouseup.slimscroll",function(t){p=!1,c(),n.unbind(".slimscroll")}),!1}).bind("selectstart.slimscroll",function(t){return t.stopPropagation(),t.preventDefault(),!1}),A.hover(function(){l()},function(){c()}),S.hover(function(){u=!0},function(){u=!1}),w.hover(function(){d=!0,l(),c()},function(){d=!1,c()}),window.navigator.msPointerEnabled?(w.bind("MSPointerDown",function(t,e){t.originalEvent.targetTouches.length&&(f=t.originalEvent.targetTouches[0].pageY)}),w.bind("MSPointerMove",function(t){if(t.originalEvent.preventDefault(),t.originalEvent.targetTouches.length){var e=(f-t.originalEvent.targetTouches[0].pageY)/a.touchScrollStep;o(e,!0),f=t.originalEvent.targetTouches[0].pageY}})):(w.bind("touchstart",function(t,e){t.originalEvent.touches.length&&(f=t.originalEvent.touches[0].pageY)}),w.bind("touchmove",function(t){if($||t.originalEvent.preventDefault(),t.originalEvent.touches.length){var e=(f-t.originalEvent.touches[0].pageY)/a.touchScrollStep;o(e,!0),f=t.originalEvent.touches[0].pageY}})),r(),"bottom"===a.start?(S.css({top:w.outerHeight()-S.outerHeight()}),o(0,!0)):"top"!==a.start&&(o(e(a.start).position().top,null,!0),a.alwaysVisible||S.hide()),s()}}),this}}),e.fn.extend({slimscroll:e.fn.slimScroll})}(jQuery),"undefined"==typeof jQuery)throw new Error("AdminLTE requires jQuery");$.AdminLTE={},$.AdminLTE.options={navbarMenuSlimscroll:!0,navbarMenuSlimscrollWidth:"3px",navbarMenuHeight:"200px",sidebarToggleSelector:"[data-toggle='offcanvas']",sidebarPushMenu:!0,sidebarSlimScroll:!0,enableBoxRefresh:!0,enableBSToppltip:!0,BSTooltipSelector:"[data-toggle='tooltip']",enableFastclick:!0,enableBoxWidget:!0,boxWidgetOptions:{boxWidgetIcons:{collapse:"fa fa-minus",open:"fa fa-plus",remove:"fa fa-times"},boxWidgetSelectors:{remove:'[data-widget="remove"]',collapse:'[data-widget="collapse"]'}},directChat:{enable:!0,contactToggleSelector:'[data-widget="chat-pane-toggle"]'},colors:{lightBlue:"#3c8dbc",red:"#f56954",green:"#00a65a",aqua:"#00c0ef",yellow:"#f39c12",blue:"#0073b7",navy:"#001F3F",teal:"#39CCCC",olive:"#3D9970",lime:"#01FF70",orange:"#FF851B",fuchsia:"#F012BE",purple:"#8E24AA",maroon:"#D81B60",black:"#222222",gray:"#d2d6de"},screenSizes:{xs:480,sm:768,md:992,lg:1200}},$(function(){var t=$.AdminLTE.options;_init(),$.AdminLTE.layout.activate(),$.AdminLTE.tree(".sidebar"),t.navbarMenuSlimscroll&&"undefined"!=typeof $.fn.slimscroll&&$(".navbar .menu").slimscroll({height:"200px",alwaysVisible:!1,size:"3px"}).css("width","100%"),t.sidebarPushMenu&&$.AdminLTE.pushMenu(t.sidebarToggleSelector),t.enableBSToppltip&&$(t.BSTooltipSelector).tooltip(),t.enableBoxWidget&&$.AdminLTE.boxWidget.activate(),t.enableFastclick&&"undefined"!=typeof FastClick&&FastClick.attach(document.body),t.directChat.enable&&$(t.directChat.contactToggleSelector).click(function(){var t=$(this).parents(".direct-chat").first();t.toggleClass("direct-chat-contacts-open")}),$('.btn-group[data-toggle="btn-toggle"]').each(function(){var t=$(this);$(this).find(".btn").click(function(e){t.find(".btn.active").removeClass("active"),$(this).addClass("active"),e.preventDefault()})})}),function(t){t.fn.boxRefresh=function(e){function i(t){t.append(o),a.onLoadStart.call(t)}function n(t){t.find(o).remove(),a.onLoadDone.call(t)}var a=t.extend({trigger:".refresh-btn",source:"",onLoadStart:function(t){},onLoadDone:function(t){}},e),o=t('<div class="overlay"><div class="fa fa-refresh fa-spin"></div></div>');return this.each(function(){if(""===a.source)return void(console&&console.log("Please specify a source first - boxRefresh()"));var e=t(this),o=e.find(a.trigger).first();o.click(function(t){t.preventDefault(),i(e),e.find(".box-body").load(a.source,function(){n(e)})})})}}(jQuery),function(t){t.fn.todolist=function(e){var i=t.extend({onCheck:function(t){},onUncheck:function(t){}},e);return this.each(function(){"undefined"!=typeof t.fn.iCheck?(t("input",this).on("ifChecked",function(e){var n=t(this).parents("li").first();n.toggleClass("done"),i.onCheck.call(n)}),t("input",this).on("ifUnchecked",function(e){var n=t(this).parents("li").first();n.toggleClass("done"),i.onUncheck.call(n)})):t("input",this).on("change",function(e){var n=t(this).parents("li").first();n.toggleClass("done"),i.onCheck.call(n)})})}}(jQuery),function(t,e,i,n){"use strict";var a=t.fn.twbsPagination,o=function(i,n){if(this.$element=t(i),this.options=t.extend({},t.fn.twbsPagination.defaults,n),this.options.startPage<1||this.options.startPage>this.options.totalPages)throw new Error("Start page option is incorrect");if(this.options.totalPages=parseInt(this.options.totalPages),isNaN(this.options.totalPages))throw new Error("Total pages option is not correct!");if(this.options.visiblePages=parseInt(this.options.visiblePages),isNaN(this.options.visiblePages))throw new Error("Visible pages option is not correct!");if(this.options.totalPages<this.options.visiblePages&&(this.options.visiblePages=this.options.totalPages),this.options.onPageClick instanceof Function&&this.$element.first().bind("page",this.options.onPageClick),this.options.href){var a,o=this.options.href.replace(/[-\/\\^$*+?.|[\]]/g,"\\$&");o=o.replace(this.options.hrefVariable,"(\\d+)"),null!=(a=new RegExp(o,"i").exec(e.location.href))&&(this.options.startPage=parseInt(a[1],10))}var s="function"==typeof this.$element.prop?this.$element.prop("tagName"):this.$element.attr("tagName");return this.$listContainer="UL"===s?this.$element:t("<ul></ul>"),this.$listContainer.addClass(this.options.paginationClass),"UL"!==s&&this.$element.append(this.$listContainer),this.render(this.getPages(this.options.startPage)),this.setupEvents(),this};o.prototype={constructor:o,destroy:function(){return this.$element.empty(),this.$element.removeData("twbs-pagination"),this.$element.unbind("page"),this},show:function(t){if(1>t||t>this.options.totalPages)throw new Error("Page is incorrect.");return this.render(this.getPages(t)),this.setupEvents(),this.$element.trigger("page",t),this},buildListItems:function(e){var i=t();if(this.options.first&&(i=i.add(this.buildItem("first",1))),this.options.prev){var n=e.currentPage>1?e.currentPage-1:this.options.loop?this.options.totalPages:1;i=i.add(this.buildItem("prev",n))}for(var a=0;a<e.numeric.length;a++)i=i.add(this.buildItem("page",e.numeric[a]));if(this.options.next){var o=e.currentPage<this.options.totalPages?e.currentPage+1:this.options.loop?1:this.options.totalPages;i=i.add(this.buildItem("next",o))}return this.options.last&&(i=i.add(this.buildItem("last",this.options.totalPages))),i},buildItem:function(e,i){var n=t("<li></li>"),a=t("<a></a>"),o=null;switch(e){case"page":o=i,n.addClass(this.options.pageClass);break;case"first":o=this.options.first,n.addClass(this.options.firstClass);break;case"prev":o=this.options.prev,n.addClass(this.options.prevClass);break;case"next":o=this.options.next,n.addClass(this.options.nextClass);break;case"last":o=this.options.last,n.addClass(this.options.lastClass)}return n.data("page",i),n.data("page-type",e),n.append(a.attr("href",this.makeHref(i)).html(o)),n},getPages:function(t){var e=[],i=Math.floor(this.options.visiblePages/2),n=t-i+1-this.options.visiblePages%2,a=t+i;0>=n&&(n=1,a=this.options.visiblePages),a>this.options.totalPages&&(n=this.options.totalPages-this.options.visiblePages+1,a=this.options.totalPages);for(var o=n;a>=o;)e.push(o),o++;return{currentPage:t,numeric:e}},render:function(e){this.$listContainer.children().remove(),this.$listContainer.append(this.buildListItems(e));var i=this.$listContainer.children();i.filter(function(){return t(this).data("page")===e.currentPage&&"page"===t(this).data("page-type")}).addClass(this.options.activeClass),i.filter(function(){return"first"===t(this).data("page-type")}).toggleClass(this.options.disabledClass,1===e.currentPage),i.filter(function(){return"last"===t(this).data("page-type")}).toggleClass(this.options.disabledClass,e.currentPage===this.options.totalPages),i.filter(function(){return"prev"===t(this).data("page-type")}).toggleClass(this.options.disabledClass,!this.options.loop&&1===e.currentPage),i.filter(function(){return"next"===t(this).data("page-type")}).toggleClass(this.options.disabledClass,!this.options.loop&&e.currentPage===this.options.totalPages)},setupEvents:function(){var e=this;this.$listContainer.find("li").each(function(){var i=t(this);return i.off(),i.hasClass(e.options.disabledClass)||i.hasClass(e.options.activeClass)?void i.click(function(t){t.preventDefault()}):void i.click(function(t){!e.options.href&&t.preventDefault(),e.show(parseInt(i.data("page"),10))})})},makeHref:function(t){return this.options.href?this.options.href.replace(this.options.hrefVariable,t):"#"}},t.fn.twbsPagination=function(e){var i,a=Array.prototype.slice.call(arguments,1),s=t(this),r=s.data("twbs-pagination"),l="object"==typeof e&&e;return r||s.data("twbs-pagination",r=new o(this,l)),"string"==typeof e&&(i=r[e].apply(r,a)),i===n?s:i},t.fn.twbsPagination.defaults={totalPages:0,startPage:1,visiblePages:5,href:!1,hrefVariable:"{{number}}",first:"First",prev:"Previous",next:"Next",last:"Last",loop:!1,onPageClick:null,paginationClass:"pagination",nextClass:"next",prevClass:"prev",lastClass:"last",firstClass:"first",pageClass:"page",activeClass:"active",disabledClass:"disabled"},t.fn.twbsPagination.Constructor=o,t.fn.twbsPagination.noConflict=function(){return t.fn.twbsPagination=a,this}}(jQuery,window,document),require.config({paths:{echarts:"/vendor/echarts"}});var APP={};APP.url=location.pathname,APP.type=function(){var t=APP.url.split("/").slice(1,-1),e="";switch(t.length){case 0:e="dashboard";break;case 1:e=t[0];break;case 2:e=t[0]+"Item"}return e}(),APP.user={login:function(){var t=document.forms.login,e=t.action,i=t.elements,n=i.username,a=i.password,o=i[2],s=$(t).find("p"),r=function(){o.disabled=!(n.value&&a.value)},l=function(i){i.preventDefault(),$.post(e,$(t).serialize(),function(t){t.status?location.href=location.search?location.search.substr(1).split("=")[1]:"/":(s.text("用户名或密码错误！"),o.disabled=!0,a.value="")})};$(t).keyup(r).submit(l)},change:function(){var t=document.forms.info,e=t.action,i=t.elements,n=i.username,a=i.oldPassword,o=i.newPassword,s=i.retype,r=i[4],l=$(t).find("p"),c=function(){r.disabled=!(n.value&&a.value&&o.value&&s.value)},d=function(t){t.preventDefault();var i=function(t){t.status?(l.text("更新成功！").show(),location.href="/login/"):(l.text("原密码错误！").show(),a.value="",o.value="",s.value="")};o.value===s.value?$.post(e,$([n,a,o]).serialize(),i):(l.text("两次输入密码不一致！").show(),o.value="",s.value="")};$(t).keyup(c).submit(d)},admin:function(){var t=$(".user-admin"),e=t.find("input"),i=t.find("button"),n=i.eq(0),a=i.eq(1),o=[],s=function(t,i){t.click(function(){o.length=0,e.filter(":checked").each(function(t,e){o.push($(e).parent().next().data("id"))}),o.length&&$.post(i,{id:o.toString()},function(t){t.status&&location.reload()})})};s(n,"/api/user/reset/"),s(a,"/api/user/remove/")},add:function(){var t=document.forms.add,e=t.action,i=t.elements,n=i.username,a=i.password,o=i.retype,s=i[3],r=$(t).find("p"),l=function(){s.disabled=!(n.value&&a.value&&o.value)},c=function(t){t.preventDefault();var i=function(t){t.status?location.reload():r.text("抱歉，添加失败！").show()};a.value===o.value?$.post(e,$([n,a]).serialize(),i):(r.text("两次输入密码不一致！").show(),s.disabled=!0,a.value="",o.value="")};$(t).keyup(l).submit(c)}},APP.search=function(){var t=document.forms.search,e=t.elements.keywords;$(t).submit(function(i){i.preventDefault();var n=$.trim(e.value);n&&(t.reset(),location.href="/search/"+n+"/")})},APP.menu=function(){var t=$(".sidebar-menu"),e=t.parent(),i=function(){var t=this.getAttribute("href");return"categoryItem"===APP.type||"locationItem"===APP.type?t===APP.url:t.split("/")[1]===APP.url.split("/")[1]};t.detach().find("a").filter(i).parent().addClass("active").closest(".treeview-menu").addClass("menu-open").closest(".treeview").addClass("active"),t.appendTo(e)},APP.chart={line:function(){require(["echarts","echarts/chart/line"],function(t){$.getJSON("/api/line"+APP.url,function(e){t.init(document.getElementById("line-chart"),"macarons").setOption({color:["#00a65a","#00c0ef","#dd4b39"],tooltip:{trigger:"axis"},legend:{data:["正面","中性","负面"]},grid:{x:40,y:30,x2:25,y2:30},xAxis:[{type:"category",boundaryGap:!1,data:e.date}],yAxis:[{type:"value"}],series:[{name:"正面",type:"line",data:e.positive},{name:"中性",type:"line",data:e.neutral},{name:"负面",type:"line",data:e.negative}]})})})},pie:function(){require(["echarts","echarts/chart/pie"],function(t){$.getJSON("/api/pie"+APP.url,function(e){t.init(document.getElementById("pie-chart"),"macarons").setOption({tooltip:{trigger:"item",formatter:"{a} <br/>{b} : {c} ({d}%)"},legend:{data:e.name},series:[{name:"信息比例",type:"pie",radius:"55%",center:["50%","60%"],data:e.value}]})})})}},APP.returnTop=function(t){var e=t.offset().top,i=e>160?e-120:0;$("body").animate({scrollTop:i})},APP.table=function(){$(".table-custom").each(function(){var t=$(this),e=t.parent(),i=this.tBodies[0],n=this.id,a=function(t){var e=t.data,a=$.map(e,function(t){var e="/"+n+"/"+t.id+"/",i='<td><a href="'+e+'" title="'+t.title+'" target="_blank">'+t.title+"</a></td>",a="<td>"+t.source+"</td>",o="<td>"+t.location+"</td>",s="<td>"+t.time+"</td>",r='<td class="text-center">'+t.hot+"</td>",l="<tr>"+i+a+o+s+r+"</tr>";return l});$(i).html(a)};$.getJSON("/api"+APP.url+n+"/1/",function(i){a(i),e.twbsPagination({totalPages:i.total,visiblePages:7,first:"第一页",prev:"上一页",next:"下一页",last:"最后一页",paginationClass:"pagination pagination-sm no-margin pull-right",onPageClick:function(i,o){APP.returnTop(t),$.getJSON("/api"+APP.url+n+"/"+o+"/",function(t){a(t),e.twbsPagination({totalPages:t.total})})}})})})},APP.dataTable=function(){$.fn.dataTable.ext.errMode="throw",$(".initDataTable").each(function(){var t=$(this).DataTable({ajax:{url:"/api"+location.pathname,dataSrc:this.id,cache:!0},autoWidth:!1,pageLength:25,order:[],language:{processing:"处理中...",search:"",searchPlaceholder:"输入关键字过滤...",lengthMenu:"显示 _MENU_ 条",info:"显示第 _START_ 至 _END_ 条，共 _TOTAL_ 条",infoEmpty:"信息空",infoFiltered:"(由 _MAX_ 项结果过滤)",infoPostFix:"",loadingRecords:"载入中...",zeroRecords:"无匹配结果",emptyTable:"无结果",paginate:{first:"第一页",previous:"上一页",next:"下一页",last:"最后一页"},aria:{sortAscending:"正序排列",sortDescending:"倒序排列"}},deferLoading:100,drawCallback:function(){$('[data-toggle="tooltip"]').tooltip()}});t.on("click","tbody > tr",function(){$(this).hasClass("selected")?$(this).removeClass("selected"):(t.$("tr.selected").removeClass("selected"),$(this).addClass("selected"))})})},APP.sns=function(){var t=$(".sns");t.each(function(e,i){var n=$(i),a=n.parent().next(),o=function(){return"weixin"===APP.type||"weibo"===APP.type?a.data("type"):a.data("type").replace("-","/")};$.getJSON("/api"+APP.url+o()+"/1/",function(e){n.html(e.html),a.twbsPagination({totalPages:e.total,first:"第一页",prev:"上一页",next:"下一页",last:"最后一页",paginationClass:"pagination pagination-sm no-margin pull-right",onPageClick:function(e,i){APP.returnTop(t),$.getJSON("/api"+APP.url+o()+"/"+i+"/",function(t){n.html(t.html),a.twbsPagination({totalPages:t.total})})}})})})},APP.custom=function(){var t=document.forms.addKeyword,e=t.action,i=t.elements,n=i[0],a=i[1],o=i[2],s=$(t).prev(),r=$(t).parent().prev().find("li"),l=function(){o.disabled=!a.value},c=function(i){i.preventDefault(),$.post(e,$(t).serialize(),function(t){t.status?(s.text("关键词添加成功！").show(),location.reload()):(s.text("关键词添加失败！").show(),a.value="")})};r.length>=5?n.disabled=!0:$(t).keyup(l).submit(c)},APP.collection=function(){$(".collection").click(function(){var t=$(this).find("i"),e=$(this).find("span"),i=function(i,n){var a=APP.url.split("/"),o={type:"news"===a[1]?"article":"topic",id:a[2]};$.post(i,o,function(i){i.status&&(t.toggleClass("fa-star-o"),t.toggleClass("fa-star"),e.text(n))})};t.hasClass("fa-star")?i("/api/collection/remove/","添加收藏"):i("/api/collection/add/","取消收藏")})},APP.dashboard=function(){$(".info-box-content").each(function(t,e){var i,n=$(e).find(".info-box-number"),a=$(e).find(".progress-bar"),o=$(e).find(".progress-description"),s=2e3,r=100,l=Math.floor(s/r),c=0,d=0,u=$(e).data("number"),p=Math.floor(u/l),h=0,f=$(e).data("percent"),g=Math.floor(f/l),m=function(){d+=p,h+=g,c++,c>=l&&(clearInterval(i),d=u,h=f),n.text(d.toFixed()),a.width(h+"%"),o.text("占总数据 "+h.toFixed()+"%")};i=setInterval(m,r)})},APP.product=function(){$(".filter-list").find("a").filter(function(){return this.href===location.href}).parent().addClass("active")},APP.inspection=function(){var t=$("#inspection"),e=t.children(".box-body").find("tbody");e.load("/api/dashboard/local-inspection/"),t.on("click","button",function(t){return t.preventDefault(),$(this).hasClass("active")?!1:($(this).addClass("active").siblings().removeClass("active"),void e.load("/api/dashboard/"+this.id+"/"))})},APP.risk=function(){var t=$("#risk"),e=t.find(".risk-score"),i=t.find(".local-relevance"),n=function(t){return function(e,i){var n=$(i).data("num"),a=$(i).find("i");a.slice(0,n).removeClass(t+"-o").addClass(t)}};e.each(n("fa-star")),i.each(n("fa-square"))},$(function(){var t={common:function(){APP.search(),APP.menu()},login:function(){APP.user.login()},dashboard:function(){this.common(),APP.dashboard(),APP.inspection(),APP.risk(),APP.chart.line(),APP.chart.pie()},news:function(){this.common(),APP.table()},newsItem:function(){this.common(),APP.collection()},event:function(){this.common(),APP.table()},eventItem:function(){this.common(),APP.collection(),APP.chart.line(),APP.chart.pie(),APP.table(),APP.sns()},weixin:function(){this.common(),APP.sns()},weibo:function(){this.weixin()},weixinItem:function(){this.common()},categoryItem:function(){this.common(),APP.table()},locationItem:function(){this.common(),APP.table(),APP.sns()},inspection:function(){this.common(),APP.dataTable()},custom:function(){this.common(),APP.custom()},customItem:function(){this.common(),APP.table(),APP.sns()},product:function(){this.common(),APP.product(),APP.table()},productItem:function(){this.common(),this.product()},collection:function(){this.common(),APP.table()},settings:function(){this.common(),APP.user.change()},user:function(){this.common(),APP.user.admin(),APP.user.add()},searchItem:function(){this.common(),APP.dataTable()}};return t[APP.type]()});
+/*! Copyright (c) 2011 Piotr Rochala (http://rocha.la)
+ * Dual licensed under the MIT (http://www.opensource.org/licenses/mit-license.php)
+ * and GPL (http://www.opensource.org/licenses/gpl-license.php) licenses.
+ *
+ * Version: 1.3.3
+ *
+ */
+(function ($) {
+
+  $.fn.extend({
+    slimScroll: function (options) {
+
+      var defaults = {
+        // width in pixels of the visible scroll area
+        width: 'auto',
+        // height in pixels of the visible scroll area
+        height: '250px',
+        // width in pixels of the scrollbar and rail
+        size: '7px',
+        // scrollbar color, accepts any hex/color value
+        color: '#000',
+        // scrollbar position - left/right
+        position: 'right',
+        // distance in pixels between the side edge and the scrollbar
+        distance: '1px',
+        // default scroll position on load - top / bottom / $('selector')
+        start: 'top',
+        // sets scrollbar opacity
+        opacity: .4,
+        // enables always-on mode for the scrollbar
+        alwaysVisible: false,
+        // check if we should hide the scrollbar when user is hovering over
+        disableFadeOut: false,
+        // sets visibility of the rail
+        railVisible: false,
+        // sets rail color
+        railColor: '#333',
+        // sets rail opacity
+        railOpacity: .2,
+        // whether  we should use jQuery UI Draggable to enable bar dragging
+        railDraggable: true,
+        // defautlt CSS class of the slimscroll rail
+        railClass: 'slimScrollRail',
+        // defautlt CSS class of the slimscroll bar
+        barClass: 'slimScrollBar',
+        // defautlt CSS class of the slimscroll wrapper
+        wrapperClass: 'slimScrollDiv',
+        // check if mousewheel should scroll the window if we reach top/bottom
+        allowPageScroll: false,
+        // scroll amount applied to each mouse wheel step
+        wheelStep: 20,
+        // scroll amount applied when user is using gestures
+        touchScrollStep: 200,
+        // sets border radius
+        borderRadius: '7px',
+        // sets border radius of the rail
+        railBorderRadius: '7px'
+      };
+
+      var o = $.extend(defaults, options);
+
+      // do it for every element that matches selector
+      this.each(function () {
+
+        var isOverPanel, isOverBar, isDragg, queueHide, touchDif,
+                barHeight, percentScroll, lastScroll,
+                divS = '<div></div>',
+                minBarHeight = 30,
+                releaseScroll = false;
+
+        // used in event handlers and for better minification
+        var me = $(this);
+
+        // ensure we are not binding it again
+        if (me.parent().hasClass(o.wrapperClass))
+        {
+          // start from last bar position
+          var offset = me.scrollTop();
+
+          // find bar and rail
+          bar = me.parent().find('.' + o.barClass);
+          rail = me.parent().find('.' + o.railClass);
+
+          getBarHeight();
+
+          // check if we should scroll existing instance
+          if ($.isPlainObject(options))
+          {
+            // Pass height: auto to an existing slimscroll object to force a resize after contents have changed
+            if ('height' in options && options.height == 'auto') {
+              me.parent().css('height', 'auto');
+              me.css('height', 'auto');
+              var height = me.parent().parent().height();
+              me.parent().css('height', height);
+              me.css('height', height);
+            }
+
+            if ('scrollTo' in options)
+            {
+              // jump to a static point
+              offset = parseInt(o.scrollTo);
+            }
+            else if ('scrollBy' in options)
+            {
+              // jump by value pixels
+              offset += parseInt(o.scrollBy);
+            }
+            else if ('destroy' in options)
+            {
+              // remove slimscroll elements
+              bar.remove();
+              rail.remove();
+              me.unwrap();
+              return;
+            }
+
+            // scroll content by the given offset
+            scrollContent(offset, false, true);
+          }
+
+          return;
+        }
+        else if ($.isPlainObject(options))
+        {
+          if ('destroy' in options)
+          {
+            return;
+          }
+        }
+
+        // optionally set height to the parent's height
+        o.height = (o.height == 'auto') ? me.parent().height() : o.height;
+
+        // wrap content
+        var wrapper = $(divS)
+                .addClass(o.wrapperClass)
+                .css({
+                  position: 'relative',
+                  overflow: 'hidden',
+                  width: o.width,
+                  height: o.height
+                });
+
+        // update style for the div
+        me.css({
+          overflow: 'hidden',
+          width: o.width,
+          height: o.height,
+          //Fix for IE10
+          "-ms-touch-action": "none"
+        });
+
+        // create scrollbar rail
+        var rail = $(divS)
+                .addClass(o.railClass)
+                .css({
+                  width: o.size,
+                  height: '100%',
+                  position: 'absolute',
+                  top: 0,
+                  display: (o.alwaysVisible && o.railVisible) ? 'block' : 'none',
+                  'border-radius': o.railBorderRadius,
+                  background: o.railColor,
+                  opacity: o.railOpacity,
+                  zIndex: 90
+                });
+
+        // create scrollbar
+        var bar = $(divS)
+                .addClass(o.barClass)
+                .css({
+                  background: o.color,
+                  width: o.size,
+                  position: 'absolute',
+                  top: 0,
+                  opacity: o.opacity,
+                  display: o.alwaysVisible ? 'block' : 'none',
+                  'border-radius': o.borderRadius,
+                  BorderRadius: o.borderRadius,
+                  MozBorderRadius: o.borderRadius,
+                  WebkitBorderRadius: o.borderRadius,
+                  zIndex: 99
+                });
+
+        // set position
+        var posCss = (o.position == 'right') ? {right: o.distance} : {left: o.distance};
+        rail.css(posCss);
+        bar.css(posCss);
+
+        // wrap it
+        me.wrap(wrapper);
+
+        // append to parent div
+        me.parent().append(bar);
+        me.parent().append(rail);
+
+        // make it draggable and no longer dependent on the jqueryUI
+        if (o.railDraggable) {
+          bar.bind("mousedown", function (e) {
+            var $doc = $(document);
+            isDragg = true;
+            t = parseFloat(bar.css('top'));
+            pageY = e.pageY;
+
+            $doc.bind("mousemove.slimscroll", function (e) {
+              currTop = t + e.pageY - pageY;
+              bar.css('top', currTop);
+              scrollContent(0, bar.position().top, false);// scroll content
+            });
+
+            $doc.bind("mouseup.slimscroll", function (e) {
+              isDragg = false;
+              hideBar();
+              $doc.unbind('.slimscroll');
+            });
+            return false;
+          }).bind("selectstart.slimscroll", function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+            return false;
+          });
+        }
+
+        // on rail over
+        rail.hover(function () {
+          showBar();
+        }, function () {
+          hideBar();
+        });
+
+        // on bar over
+        bar.hover(function () {
+          isOverBar = true;
+        }, function () {
+          isOverBar = false;
+        });
+
+        // show on parent mouseover
+        me.hover(function () {
+          isOverPanel = true;
+          showBar();
+          hideBar();
+        }, function () {
+          isOverPanel = false;
+          hideBar();
+        });
+
+        if (window.navigator.msPointerEnabled) {          
+          // support for mobile
+          me.bind('MSPointerDown', function (e, b) {
+            if (e.originalEvent.targetTouches.length)
+            {
+              // record where touch started
+              touchDif = e.originalEvent.targetTouches[0].pageY;
+            }
+          });
+
+          me.bind('MSPointerMove', function (e) {
+            // prevent scrolling the page if necessary
+            e.originalEvent.preventDefault();
+            if (e.originalEvent.targetTouches.length)
+            {
+              // see how far user swiped
+              var diff = (touchDif - e.originalEvent.targetTouches[0].pageY) / o.touchScrollStep;
+              // scroll content
+              scrollContent(diff, true);
+              touchDif = e.originalEvent.targetTouches[0].pageY;
+              
+            }
+          });
+        } else {
+          // support for mobile
+          me.bind('touchstart', function (e, b) {
+            if (e.originalEvent.touches.length)
+            {
+              // record where touch started
+              touchDif = e.originalEvent.touches[0].pageY;
+            }
+          });
+
+          me.bind('touchmove', function (e) {
+            // prevent scrolling the page if necessary
+            if (!releaseScroll)
+            {
+              e.originalEvent.preventDefault();
+            }
+            if (e.originalEvent.touches.length)
+            {
+              // see how far user swiped
+              var diff = (touchDif - e.originalEvent.touches[0].pageY) / o.touchScrollStep;
+              // scroll content
+              scrollContent(diff, true);
+              touchDif = e.originalEvent.touches[0].pageY;
+            }
+          });
+        }
+
+        // set up initial height
+        getBarHeight();
+
+        // check start position
+        if (o.start === 'bottom')
+        {
+          // scroll content to bottom
+          bar.css({top: me.outerHeight() - bar.outerHeight()});
+          scrollContent(0, true);
+        }
+        else if (o.start !== 'top')
+        {
+          // assume jQuery selector
+          scrollContent($(o.start).position().top, null, true);
+
+          // make sure bar stays hidden
+          if (!o.alwaysVisible) {
+            bar.hide();
+          }
+        }
+
+        // attach scroll events
+        attachWheel();
+
+        function _onWheel(e)
+        {
+          // use mouse wheel only when mouse is over
+          if (!isOverPanel) {
+            return;
+          }
+
+          var e = e || window.event;
+
+          var delta = 0;
+          if (e.wheelDelta) {
+            delta = -e.wheelDelta / 120;
+          }
+          if (e.detail) {
+            delta = e.detail / 3;
+          }
+
+          var target = e.target || e.srcTarget || e.srcElement;
+          if ($(target).closest('.' + o.wrapperClass).is(me.parent())) {
+            // scroll content
+            scrollContent(delta, true);
+          }
+
+          // stop window scroll
+          if (e.preventDefault && !releaseScroll) {
+            e.preventDefault();
+          }
+          if (!releaseScroll) {
+            e.returnValue = false;
+          }
+        }
+
+        function scrollContent(y, isWheel, isJump)
+        {
+          releaseScroll = false;
+          var delta = y;
+          var maxTop = me.outerHeight() - bar.outerHeight();
+
+          if (isWheel)
+          {
+            // move bar with mouse wheel
+            delta = parseInt(bar.css('top')) + y * parseInt(o.wheelStep) / 100 * bar.outerHeight();
+
+            // move bar, make sure it doesn't go out
+            delta = Math.min(Math.max(delta, 0), maxTop);
+
+            // if scrolling down, make sure a fractional change to the
+            // scroll position isn't rounded away when the scrollbar's CSS is set
+            // this flooring of delta would happened automatically when
+            // bar.css is set below, but we floor here for clarity
+            delta = (y > 0) ? Math.ceil(delta) : Math.floor(delta);
+
+            // scroll the scrollbar
+            bar.css({top: delta + 'px'});
+          }
+
+          // calculate actual scroll amount
+          percentScroll = parseInt(bar.css('top')) / (me.outerHeight() - bar.outerHeight());
+          delta = percentScroll * (me[0].scrollHeight - me.outerHeight());
+
+          if (isJump)
+          {
+            delta = y;
+            var offsetTop = delta / me[0].scrollHeight * me.outerHeight();
+            offsetTop = Math.min(Math.max(offsetTop, 0), maxTop);
+            bar.css({top: offsetTop + 'px'});
+          }
+
+          // scroll content
+          me.scrollTop(delta);
+
+          // fire scrolling event
+          me.trigger('slimscrolling', ~~delta);
+
+          // ensure bar is visible
+          showBar();
+
+          // trigger hide when scroll is stopped
+          hideBar();
+        }
+
+        function attachWheel()
+        {
+          if (window.addEventListener)
+          {
+            this.addEventListener('DOMMouseScroll', _onWheel, false);
+            this.addEventListener('mousewheel', _onWheel, false);
+          }
+          else
+          {
+            document.attachEvent("onmousewheel", _onWheel)
+          }
+        }
+
+        function getBarHeight()
+        {
+          // calculate scrollbar height and make sure it is not too small
+          barHeight = Math.max((me.outerHeight() / me[0].scrollHeight) * me.outerHeight(), minBarHeight);
+          bar.css({height: barHeight + 'px'});
+
+          // hide scrollbar if content is not long enough
+          var display = barHeight == me.outerHeight() ? 'none' : 'block';
+          bar.css({display: display});
+        }
+
+        function showBar()
+        {
+          // recalculate bar height
+          getBarHeight();
+          clearTimeout(queueHide);
+
+          // when bar reached top or bottom
+          if (percentScroll == ~~percentScroll)
+          {
+            //release wheel
+            releaseScroll = o.allowPageScroll;
+
+            // publish approporiate event
+            if (lastScroll != percentScroll)
+            {
+              var msg = (~~percentScroll == 0) ? 'top' : 'bottom';
+              me.trigger('slimscroll', msg);
+            }
+          }
+          else
+          {
+            releaseScroll = false;
+          }
+          lastScroll = percentScroll;
+
+          // show only when required
+          if (barHeight >= me.outerHeight()) {
+            //allow window scroll
+            releaseScroll = true;
+            return;
+          }
+          bar.stop(true, true).fadeIn('fast');
+          if (o.railVisible) {
+            rail.stop(true, true).fadeIn('fast');
+          }
+        }
+
+        function hideBar()
+        {
+          // only hide when options allow it
+          if (!o.alwaysVisible)
+          {
+            queueHide = setTimeout(function () {
+              if (!(o.disableFadeOut && isOverPanel) && !isOverBar && !isDragg)
+              {
+                bar.fadeOut('slow');
+                rail.fadeOut('slow');
+              }
+            }, 1000);
+          }
+        }
+
+      });
+
+      // maintain chainability
+      return this;
+    }
+  });
+
+  $.fn.extend({
+    slimscroll: $.fn.slimScroll
+  });
+
+})(jQuery);
+
+/*! AdminLTE app.js
+ * ================
+ * Main JS application file for AdminLTE v2. This file
+ * should be included in all pages. It controls some layout
+ * options and implements exclusive AdminLTE plugins.
+ *
+ * @Author  Almsaeed Studio
+ * @Support <http://www.almsaeedstudio.com>
+ * @Email   <support@almsaeedstudio.com>
+ * @version 2.0.5
+ * @license MIT <http://opensource.org/licenses/MIT>
+ */
+
+'use strict';
+
+//Make sure jQuery has been loaded before app.js
+if (typeof jQuery === "undefined") {
+  throw new Error("AdminLTE requires jQuery");
+}
+
+/* AdminLTE
+ *
+ * @type Object
+ * @description $.AdminLTE is the main object for the template's app.
+ *              It's used for implementing functions and options related
+ *              to the template. Keeping everything wrapped in an object
+ *              prevents conflict with other plugins and is a better
+ *              way to organize our code.
+ */
+$.AdminLTE = {};
+
+/* --------------------
+ * - AdminLTE Options -
+ * --------------------
+ * Modify these options to suit your implementation
+ */
+$.AdminLTE.options = {
+  //Add slimscroll to navbar menus
+  //This requires you to load the slimscroll plugin
+  //in every page before app.js
+  navbarMenuSlimscroll: true,
+  navbarMenuSlimscrollWidth: "3px", //The width of the scroll bar
+  navbarMenuHeight: "200px", //The height of the inner menu
+  //Sidebar push menu toggle button selector
+  sidebarToggleSelector: "[data-toggle='offcanvas']",
+  //Activate sidebar push menu
+  sidebarPushMenu: true,
+  //Activate sidebar slimscroll if the fixed layout is set (requires SlimScroll Plugin)
+  sidebarSlimScroll: true,
+  //BoxRefresh Plugin
+  enableBoxRefresh: true,
+  //Bootstrap.js tooltip
+  enableBSToppltip: true,
+  BSTooltipSelector: "[data-toggle='tooltip']",
+  //Enable Fast Click. Fastclick.js creates a more
+  //native touch experience with touch devices. If you
+  //choose to enable the plugin, make sure you load the script
+  //before AdminLTE's app.js
+  enableFastclick: true,
+  //Box Widget Plugin. Enable this plugin
+  //to allow boxes to be collapsed and/or removed
+  enableBoxWidget: true,
+  //Box Widget plugin options
+  boxWidgetOptions: {
+    boxWidgetIcons: {
+      //The icon that triggers the collapse event
+      collapse: 'fa fa-minus',
+      //The icon that trigger the opening event
+      open: 'fa fa-plus',
+      //The icon that triggers the removing event
+      remove: 'fa fa-times'
+    },
+    boxWidgetSelectors: {
+      //Remove button selector
+      remove: '[data-widget="remove"]',
+      //Collapse button selector
+      collapse: '[data-widget="collapse"]'
+    }
+  },
+  //Direct Chat plugin options
+  directChat: {
+    //Enable direct chat by default
+    enable: true,
+    //The button to open and close the chat contacts pane
+    contactToggleSelector: '[data-widget="chat-pane-toggle"]'
+  },
+  //Define the set of colors to use globally around the website
+  colors: {
+    lightBlue: "#3c8dbc",
+    red: "#f56954",
+    green: "#00a65a",
+    aqua: "#00c0ef",
+    yellow: "#f39c12",
+    blue: "#0073b7",
+    navy: "#001F3F",
+    teal: "#39CCCC",
+    olive: "#3D9970",
+    lime: "#01FF70",
+    orange: "#FF851B",
+    fuchsia: "#F012BE",
+    purple: "#8E24AA",
+    maroon: "#D81B60",
+    black: "#222222",
+    gray: "#d2d6de"
+  },
+  //The standard screen sizes that bootstrap uses.
+  //If you change these in the variables.less file, change
+  //them here too.
+  screenSizes: {
+    xs: 480,
+    sm: 768,
+    md: 992,
+    lg: 1200
+  }
+};
+
+/* ------------------
+ * - Implementation -
+ * ------------------
+ * The next block of code implements AdminLTE's
+ * functions and plugins as specified by the
+ * options above.
+ */
+$(function () {
+  //Easy access to options
+  var o = $.AdminLTE.options;
+
+  //Set up the object
+  _init();
+
+  //Activate the layout maker
+  $.AdminLTE.layout.activate();
+
+  //Enable sidebar tree view controls
+  $.AdminLTE.tree('.sidebar');
+
+  //Add slimscroll to navbar dropdown
+  if (o.navbarMenuSlimscroll && typeof $.fn.slimscroll != 'undefined') {
+    $(".navbar .menu").slimscroll({
+      height: "200px",
+      alwaysVisible: false,
+      size: "3px"
+    }).css("width", "100%");
+  }
+
+  //Activate sidebar push menu
+  if (o.sidebarPushMenu) {
+    $.AdminLTE.pushMenu(o.sidebarToggleSelector);
+  }
+
+  //Activate Bootstrap tooltip
+  if (o.enableBSToppltip) {
+    $(o.BSTooltipSelector).tooltip();
+  }
+
+  //Activate box widget
+  if (o.enableBoxWidget) {
+    $.AdminLTE.boxWidget.activate();
+  }
+
+  //Activate fast click
+  if (o.enableFastclick && typeof FastClick != 'undefined') {
+    FastClick.attach(document.body);
+  }
+
+  //Activate direct chat widget
+  if (o.directChat.enable) {
+    $(o.directChat.contactToggleSelector).click(function () {
+      var box = $(this).parents('.direct-chat').first();
+      box.toggleClass('direct-chat-contacts-open');
+    });
+  }
+
+  /*
+   * INITIALIZE BUTTON TOGGLE
+   * ------------------------
+   */
+  $('.btn-group[data-toggle="btn-toggle"]').each(function () {
+    var group = $(this);
+    $(this).find(".btn").click(function (e) {
+      group.find(".btn.active").removeClass("active");
+      $(this).addClass("active");
+      e.preventDefault();
+    });
+
+  });
+});
+
+/* ----------------------------------
+ * - Initialize the AdminLTE Object -
+ * ----------------------------------
+ * All AdminLTE functions are implemented below.
+ */
+function _init() {
+
+  /* Layout
+   * ======
+   * Fixes the layout height in case min-height fails.
+   *
+   * @type Object
+   * @usage $.AdminLTE.layout.activate()
+   *        $.AdminLTE.layout.fix()
+   *        $.AdminLTE.layout.fixSidebar()
+   */
+  $.AdminLTE.layout = {
+    activate: function () {
+      var _this = this;
+      _this.fix();
+      _this.fixSidebar();
+      $(window, ".wrapper").resize(function () {
+        _this.fix();
+        _this.fixSidebar();
+      });
+    },
+    fix: function () {
+      //Get window height and the wrapper height
+      var neg = $('.main-header').outerHeight() + $('.main-footer').outerHeight();
+      var window_height = $(window).height();
+      var sidebar_height = $(".sidebar").height();
+      //Set the min-height of the content and sidebar based on the
+      //the height of the document.
+      if ($("body").hasClass("fixed")) {
+        $(".content-wrapper, .right-side").css('min-height', window_height - $('.main-footer').outerHeight());
+      } else {
+        if (window_height >= sidebar_height) {
+          $(".content-wrapper, .right-side").css('min-height', window_height - neg);
+        } else {
+          $(".content-wrapper, .right-side").css('min-height', sidebar_height);
+        }
+      }
+    },
+    fixSidebar: function () {
+      //Make sure the body tag has the .fixed class
+      if (!$("body").hasClass("fixed")) {
+        if (typeof $.fn.slimScroll != 'undefined') {
+          $(".sidebar").slimScroll({destroy: true}).height("auto");
+        }
+        return;
+      } else if (typeof $.fn.slimScroll == 'undefined' && console) {
+        console.error("Error: the fixed layout requires the slimscroll plugin!");
+      }
+      //Enable slimscroll for fixed layout
+      if ($.AdminLTE.options.sidebarSlimScroll) {
+        if (typeof $.fn.slimScroll != 'undefined') {
+          //Distroy if it exists
+          $(".sidebar").slimScroll({destroy: true}).height("auto");
+          //Add slimscroll
+          $(".sidebar").slimscroll({
+            height: ($(window).height() - $(".main-header").height()) + "px",
+            color: "rgba(0,0,0,0.2)",
+            size: "3px"
+          });
+        }
+      }
+    }
+  };
+
+  /* PushMenu()
+   * ==========
+   * Adds the push menu functionality to the sidebar.
+   *
+   * @type Function
+   * @usage: $.AdminLTE.pushMenu("[data-toggle='offcanvas']")
+   */
+  $.AdminLTE.pushMenu = function (toggleBtn) {
+    //Get the screen sizes
+    var screenSizes = this.options.screenSizes;
+
+    //Enable sidebar toggle
+    $(toggleBtn).click(function (e) {
+      e.preventDefault();
+
+      //Enable sidebar push menu
+      if ($(window).width() > (screenSizes.sm - 1)) {
+        $("body").toggleClass('sidebar-collapse');
+      }
+      //Handle sidebar push menu for small screens
+      else {
+        if ($("body").hasClass('sidebar-open')) {
+          $("body").removeClass('sidebar-open');
+          $("body").removeClass('sidebar-collapse')
+        } else {
+          $("body").addClass('sidebar-open');
+        }
+      }
+    });
+
+    $(".content-wrapper").click(function () {
+      //Enable hide menu when clicking on the content-wrapper on small screens
+      if ($(window).width() <= (screenSizes.sm - 1) && $("body").hasClass("sidebar-open")) {
+        $("body").removeClass('sidebar-open');
+      }
+    });
+
+  };
+
+  /* Tree()
+   * ======
+   * Converts the sidebar into a multilevel
+   * tree view menu.
+   *
+   * @type Function
+   * @Usage: $.AdminLTE.tree('.sidebar')
+   */
+  $.AdminLTE.tree = function (menu) {
+    var _this = this;
+
+    $("li a", $(menu)).click(function (e) {
+      //Get the clicked link and the next element
+      var $this = $(this);
+      var checkElement = $this.next();
+
+      //Check if the next element is a menu and is visible
+      if ((checkElement.is('.treeview-menu')) && (checkElement.is(':visible'))) {
+        //Close the menu
+        checkElement.slideUp('normal', function () {
+          checkElement.removeClass('menu-open');
+          //Fix the layout in case the sidebar stretches over the height of the window
+          //_this.layout.fix();
+        });
+        checkElement.parent("li").removeClass("active");
+      }
+      //If the menu is not visible
+      else if ((checkElement.is('.treeview-menu')) && (!checkElement.is(':visible'))) {
+        //Get the parent menu
+        var parent = $this.parents('ul').first();
+        //Close all open menus within the parent
+        var ul = parent.find('ul:visible').slideUp('normal');
+        //Remove the menu-open class from the parent
+        ul.removeClass('menu-open');
+        //Get the parent li
+        var parent_li = $this.parent("li");
+
+        //Open the target menu and add the menu-open class
+        checkElement.slideDown('normal', function () {
+          //Add the class active to the parent li
+          checkElement.addClass('menu-open');
+          parent.find('li.active').removeClass('active');
+          parent_li.addClass('active');
+          //Fix the layout in case the sidebar stretches over the height of the window
+          _this.layout.fix();
+        });
+      }
+      //if this isn't a link, prevent the page from being redirected
+      if (checkElement.is('.treeview-menu')) {
+        e.preventDefault();
+      }
+    });
+  };
+
+  /* BoxWidget
+   * =========
+   * BoxWidget is plugin to handle collapsing and
+   * removing boxes from the screen.
+   *
+   * @type Object
+   * @usage $.AdminLTE.boxWidget.activate()
+   *        Set all of your option in the main $.AdminLTE.options object
+   */
+  $.AdminLTE.boxWidget = {
+    activate: function () {
+      var o = $.AdminLTE.options;
+      var _this = this;
+      //Listen for collapse event triggers
+      $(o.boxWidgetOptions.boxWidgetSelectors.collapse).click(function (e) {
+        e.preventDefault();
+        _this.collapse($(this));
+      });
+
+      //Listen for remove event triggers
+      $(o.boxWidgetOptions.boxWidgetSelectors.remove).click(function (e) {
+        e.preventDefault();
+        _this.remove($(this));
+      });
+    },
+    collapse: function (element) {
+      //Find the box parent
+      var box = element.parents(".box").first();
+      //Find the body and the footer
+      var bf = box.find(".box-body, .box-footer");
+      if (!box.hasClass("collapsed-box")) {
+        //Convert minus into plus
+        element.children(".fa-minus").removeClass("fa-minus").addClass("fa-plus");
+        bf.slideUp(300, function () {
+          box.addClass("collapsed-box");
+        });
+      } else {
+        //Convert plus into minus
+        element.children(".fa-plus").removeClass("fa-plus").addClass("fa-minus");
+        bf.slideDown(300, function () {
+          box.removeClass("collapsed-box");
+        });
+      }
+    },
+    remove: function (element) {
+      //Find the box parent
+      var box = element.parents(".box").first();
+      box.slideUp();
+    },
+    options: $.AdminLTE.options.boxWidgetOptions
+  };
+}
+
+/* ------------------
+ * - Custom Plugins -
+ * ------------------
+ * All custom plugins are defined below.
+ */
+
+/*
+ * BOX REFRESH BUTTON
+ * ------------------
+ * This is a custom plugin to use with the compenet BOX. It allows you to add
+ * a refresh button to the box. It converts the box's state to a loading state.
+ *
+ * @type plugin
+ * @usage $("#box-widget").boxRefresh( options );
+ */
+(function ($) {
+
+  $.fn.boxRefresh = function (options) {
+
+    // Render options
+    var settings = $.extend({
+      //Refressh button selector
+      trigger: ".refresh-btn",
+      //File source to be loaded (e.g: ajax/src.php)
+      source: "",
+      //Callbacks
+      onLoadStart: function (box) {
+      }, //Right after the button has been clicked
+      onLoadDone: function (box) {
+      } //When the source has been loaded
+
+    }, options);
+
+    //The overlay
+    var overlay = $('<div class="overlay"><div class="fa fa-refresh fa-spin"></div></div>');
+
+    return this.each(function () {
+      //if a source is specified
+      if (settings.source === "") {
+        if (console) {
+          console.log("Please specify a source first - boxRefresh()");
+        }
+        return;
+      }
+      //the box
+      var box = $(this);
+      //the button
+      var rBtn = box.find(settings.trigger).first();
+
+      //On trigger click
+      rBtn.click(function (e) {
+        e.preventDefault();
+        //Add loading overlay
+        start(box);
+
+        //Perform ajax call
+        box.find(".box-body").load(settings.source, function () {
+          done(box);
+        });
+      });
+    });
+
+    function start(box) {
+      //Add overlay and loading img
+      box.append(overlay);
+
+      settings.onLoadStart.call(box);
+    }
+
+    function done(box) {
+      //Remove overlay and loading img
+      box.find(overlay).remove();
+
+      settings.onLoadDone.call(box);
+    }
+
+  };
+
+})(jQuery);
+
+/*
+ * TODO LIST CUSTOM PLUGIN
+ * -----------------------
+ * This plugin depends on iCheck plugin for checkbox and radio inputs
+ *
+ * @type plugin
+ * @usage $("#todo-widget").todolist( options );
+ */
+(function ($) {
+
+  $.fn.todolist = function (options) {
+    // Render options
+    var settings = $.extend({
+      //When the user checks the input
+      onCheck: function (ele) {
+      },
+      //When the user unchecks the input
+      onUncheck: function (ele) {
+      }
+    }, options);
+
+    return this.each(function () {
+
+      if (typeof $.fn.iCheck != 'undefined') {
+        $('input', this).on('ifChecked', function (event) {
+          var ele = $(this).parents("li").first();
+          ele.toggleClass("done");
+          settings.onCheck.call(ele);
+        });
+
+        $('input', this).on('ifUnchecked', function (event) {
+          var ele = $(this).parents("li").first();
+          ele.toggleClass("done");
+          settings.onUncheck.call(ele);
+        });
+      } else {
+        $('input', this).on('change', function (event) {
+          var ele = $(this).parents("li").first();
+          ele.toggleClass("done");
+          settings.onCheck.call(ele);
+        });
+      }
+    });
+  };
+}(jQuery));
+/*!
+ * jQuery pagination plugin v1.2.5
+ * http://esimakin.github.io/twbs-pagination/
+ *
+ * Copyright 2014, Eugene Simakin
+ * Released under Apache 2.0 license
+ * http://apache.org/licenses/LICENSE-2.0.html
+ */
+;
+(function ($, window, document, undefined) {
+
+    'use strict';
+
+    var old = $.fn.twbsPagination;
+
+    // PROTOTYPE AND CONSTRUCTOR
+
+    var TwbsPagination = function (element, options) {
+        this.$element = $(element);
+        this.options = $.extend({}, $.fn.twbsPagination.defaults, options);
+
+        if (this.options.startPage < 1 || this.options.startPage > this.options.totalPages) {
+            throw new Error('Start page option is incorrect');
+        }
+
+        this.options.totalPages = parseInt(this.options.totalPages);
+        if (isNaN(this.options.totalPages)) {
+            throw new Error('Total pages option is not correct!');
+        }
+
+        this.options.visiblePages = parseInt(this.options.visiblePages);
+        if (isNaN(this.options.visiblePages)) {
+            throw new Error('Visible pages option is not correct!');
+        }
+
+        if (this.options.totalPages < this.options.visiblePages) {
+            this.options.visiblePages = this.options.totalPages;
+        }
+
+        if (this.options.onPageClick instanceof Function) {
+            this.$element.first().bind('page', this.options.onPageClick);
+        }
+
+        if (this.options.href) {
+            var m, regexp = this.options.href.replace(/[-\/\\^$*+?.|[\]]/g, '\\$&');
+            regexp = regexp.replace(this.options.hrefVariable, '(\\d+)');
+            if ((m = new RegExp(regexp, 'i').exec(window.location.href)) != null) {
+                this.options.startPage = parseInt(m[1], 10);
+            }
+        }
+
+        var tagName = (typeof this.$element.prop === 'function') ?
+            this.$element.prop('tagName') : this.$element.attr('tagName');
+
+        if (tagName === 'UL') {
+            this.$listContainer = this.$element;
+        } else {
+            this.$listContainer = $('<ul></ul>');
+        }
+
+        this.$listContainer.addClass(this.options.paginationClass);
+
+        if (tagName !== 'UL') {
+            this.$element.append(this.$listContainer);
+        }
+
+        this.render(this.getPages(this.options.startPage));
+        this.setupEvents();
+
+        return this;
+    };
+
+    TwbsPagination.prototype = {
+
+        constructor: TwbsPagination,
+
+        destroy: function () {
+            this.$element.empty();
+            this.$element.removeData('twbs-pagination');
+            this.$element.unbind('page');
+            return this;
+        },
+
+        show: function (page) {
+            if (page < 1 || page > this.options.totalPages) {
+                throw new Error('Page is incorrect.');
+            }
+
+            this.render(this.getPages(page));
+            this.setupEvents();
+
+            this.$element.trigger('page', page);
+            return this;
+        },
+
+        buildListItems: function (pages) {
+            var $listItems = $();
+
+            if (this.options.first) {
+                $listItems = $listItems.add(this.buildItem('first', 1));
+            }
+
+            if (this.options.prev) {
+                var prev = pages.currentPage > 1 ? pages.currentPage - 1 : this.options.loop ? this.options.totalPages  : 1;
+                $listItems = $listItems.add(this.buildItem('prev', prev));
+            }
+
+            for (var i = 0; i < pages.numeric.length; i++) {
+                $listItems = $listItems.add(this.buildItem('page', pages.numeric[i]));
+            }
+
+            if (this.options.next) {
+                var next = pages.currentPage < this.options.totalPages ? pages.currentPage + 1 : this.options.loop ? 1 : this.options.totalPages;
+                $listItems = $listItems.add(this.buildItem('next', next));
+            }
+
+            if (this.options.last) {
+                $listItems = $listItems.add(this.buildItem('last', this.options.totalPages));
+            }
+
+            return $listItems;
+        },
+
+        buildItem: function (type, page) {
+            var itemContainer = $('<li></li>'),
+                itemContent = $('<a></a>'),
+                itemText = null;
+
+            switch (type) {
+                case 'page':
+                    itemText = page;
+                    itemContainer.addClass(this.options.pageClass);
+                    break;
+                case 'first':
+                    itemText = this.options.first;
+                    itemContainer.addClass(this.options.firstClass);
+                    break;
+                case 'prev':
+                    itemText = this.options.prev;
+                    itemContainer.addClass(this.options.prevClass);
+                    break;
+                case 'next':
+                    itemText = this.options.next;
+                    itemContainer.addClass(this.options.nextClass);
+                    break;
+                case 'last':
+                    itemText = this.options.last;
+                    itemContainer.addClass(this.options.lastClass);
+                    break;
+                default:
+                    break;
+            }
+
+            itemContainer.data('page', page);
+            itemContainer.data('page-type', type);
+            itemContainer.append(itemContent.attr('href', this.makeHref(page)).html(itemText));
+            return itemContainer;
+        },
+
+        getPages: function (currentPage) {
+            var pages = [];
+
+            var half = Math.floor(this.options.visiblePages / 2);
+            var start = currentPage - half + 1 - this.options.visiblePages % 2;
+            var end = currentPage + half;
+
+            // handle boundary case
+            if (start <= 0) {
+                start = 1;
+                end = this.options.visiblePages;
+            }
+            if (end > this.options.totalPages) {
+                start = this.options.totalPages - this.options.visiblePages + 1;
+                end = this.options.totalPages;
+            }
+
+            var itPage = start;
+            while (itPage <= end) {
+                pages.push(itPage);
+                itPage++;
+            }
+
+            return {"currentPage": currentPage, "numeric": pages};
+        },
+
+        render: function (pages) {
+            this.$listContainer.children().remove();
+            this.$listContainer.append(this.buildListItems(pages));
+
+            var children = this.$listContainer.children();
+            children.filter(function () {
+                return $(this).data('page') === pages.currentPage && $(this).data('page-type') === 'page';
+            }).addClass(this.options.activeClass);
+
+            children.filter(function () {
+                return $(this).data('page-type') === 'first';
+            }).toggleClass(this.options.disabledClass, pages.currentPage === 1);
+
+            children.filter(function () {
+                return $(this).data('page-type') === 'last';
+            }).toggleClass(this.options.disabledClass, pages.currentPage === this.options.totalPages);
+
+            children.filter(function () {
+                return $(this).data('page-type') === 'prev';
+            }).toggleClass(this.options.disabledClass, !this.options.loop && pages.currentPage === 1);
+
+            children.filter(function () {
+                return $(this).data('page-type') === 'next';
+            }).toggleClass(this.options.disabledClass, !this.options.loop && pages.currentPage === this.options.totalPages);
+        },
+
+        setupEvents: function () {
+            var base = this;
+            this.$listContainer.find('li').each(function () {
+                var $this = $(this);
+                $this.off();
+                if ($this.hasClass(base.options.disabledClass) || $this.hasClass(base.options.activeClass)) {
+                    $this.click(function (evt) {
+                        evt.preventDefault();
+                    });
+                    return;
+                }
+                $this.click(function (evt) {
+                    // Prevent click event if href is not set.
+                    !base.options.href && evt.preventDefault();
+                    base.show(parseInt($this.data('page'), 10));
+                });
+            });
+        },
+
+        makeHref: function (c) {
+            return this.options.href ? this.options.href.replace(this.options.hrefVariable, c) : "#";
+        }
+
+    };
+
+    // PLUGIN DEFINITION
+
+    $.fn.twbsPagination = function (option) {
+        var args = Array.prototype.slice.call(arguments, 1);
+        var methodReturn;
+
+        var $this = $(this);
+        var data = $this.data('twbs-pagination');
+        var options = typeof option === 'object' && option;
+
+        if (!data) $this.data('twbs-pagination', (data = new TwbsPagination(this, options) ));
+        if (typeof option === 'string') methodReturn = data[ option ].apply(data, args);
+
+        return ( methodReturn === undefined ) ? $this : methodReturn;
+    };
+
+    $.fn.twbsPagination.defaults = {
+        totalPages: 0,
+        startPage: 1,
+        visiblePages: 5,
+        href: false,
+        hrefVariable: '{{number}}',
+        first: 'First',
+        prev: 'Previous',
+        next: 'Next',
+        last: 'Last',
+        loop: false,
+        onPageClick: null,
+        paginationClass: 'pagination',
+        nextClass: 'next',
+        prevClass: 'prev',
+        lastClass: 'last',
+        firstClass: 'first',
+        pageClass: 'page',
+        activeClass: 'active',
+        disabledClass: 'disabled'
+    };
+
+    $.fn.twbsPagination.Constructor = TwbsPagination;
+
+    $.fn.twbsPagination.noConflict = function () {
+        $.fn.twbsPagination = old;
+        return this;
+    };
+
+})(jQuery, window, document);
+
+'use strict';
+
+//
+// configuration
+//
+
+require.config({
+  paths: {
+    echarts: '/vendor/echarts'
+  }
+});
+
+
+//
+// functions
+//
+
+var APP = {};
+
+APP.url = location.pathname;
+
+APP.type = (function() {
+  var path = APP.url.split('/').slice(1, -1),
+      type = '';
+
+  switch (path.length) {
+    case 0:
+      type = 'dashboard';
+      break;
+    case 1:
+      type = path[0];
+      break;
+    case 2:
+      type = path[0] + 'Item';
+      break;
+  }
+
+  return type;
+})();
+
+APP.user = {
+  login: function() {
+    var form     = document.forms.login,
+        action   = form.action,
+        elements = form.elements,
+        username = elements.username,
+        password = elements.password,
+        submit   = elements[2],
+        $msg     = $(form).find('p'),
+
+        enableSubmit = function() {
+          submit.disabled = !(username.value && password.value);
+        },
+
+        processLogin = function(event) {
+          event.preventDefault();
+
+          $.post(action, $(form).serialize(), function(response) {
+            if (response.status) {
+              location.href = location.search ? location.search.substr(1).split('=')[1] : '/';
+            } else {
+              $msg.text('用户名或密码错误！');
+              submit.disabled = true;
+              password.value  = '';
+            }
+          });
+        };
+
+    $(form).keyup(enableSubmit).submit(processLogin);
+  },
+
+  change: function() {
+    var form        = document.forms.info,
+        action      = form.action,
+        elements    = form.elements,
+        username    = elements.username,
+        oldPassword = elements.oldPassword,
+        newPassword = elements.newPassword,
+        retype      = elements.retype,
+        submit      = elements[4],
+        $msg        = $(form).find('p'),
+
+
+        enableSubmit = function() {
+          submit.disabled = !(username.value && oldPassword.value && newPassword.value && retype.value);
+        },
+
+        processChange = function(event) {
+          event.preventDefault();
+
+          var processResponse = function(response) {
+            if (response.status) {
+              $msg.text('更新成功！').show();
+              location.href = '/login/';
+            } else {
+              $msg.text('原密码错误！').show();
+              oldPassword.value = '';
+              newPassword.value = '';
+              retype.value      = '';
+            }
+          };
+
+          if (newPassword.value === retype.value) {
+            $.post(action, $([username, oldPassword, newPassword]).serialize(), processResponse);
+          } else {
+            $msg.text('两次输入密码不一致！').show();
+            newPassword.value = '';
+            retype.value      = '';
+          }
+        };
+
+    $(form).keyup(enableSubmit).submit(processChange);
+  },
+
+  admin: function() {
+    var $admin  = $('.user-admin'),
+        $input  = $admin.find('input'),
+        $button = $admin.find('button'),
+        $reset  = $button.eq(0),
+        $remove = $button.eq(1),
+        id      = [],
+
+        action = function(obj, api) {
+          obj.click(function() {
+            id.length = 0;
+
+            $input.filter(':checked').each(function(index, element) {
+              id.push( $(element).parent().next().data('id') );
+            });
+
+            if (id.length) {
+              $.post(api, {id: id.toString()}, function(response) {
+                if (response.status) {
+                  location.reload();
+                }
+              });
+            }
+          });
+        };
+
+    action($reset, '/api/user/reset/');
+    action($remove, '/api/user/remove/');
+  },
+
+  add: function() {
+    var form     = document.forms.add,
+        action   = form.action,
+        elements = form.elements,
+        username = elements.username,
+        password = elements.password,
+        retype   = elements.retype,
+        submit   = elements[3],
+        $msg     = $(form).find('p'),
+
+        enableSubmit = function() {
+          submit.disabled = !(username.value && password.value && retype.value);
+        },
+
+        processAdd   = function(event) {
+          event.preventDefault();
+
+          var processResponse = function(response) {
+            if (response.status) {
+              location.reload();
+            } else {
+              $msg.text('抱歉，添加失败！').show();
+            }
+          };
+
+          if (password.value === retype.value) {
+            $.post(action, $([username, password]).serialize(), processResponse);
+          } else {
+            $msg.text('两次输入密码不一致！').show();
+            submit.disabled = true;
+            password.value  = '';
+            retype.value    = '';
+          }
+        };
+
+    $(form).keyup(enableSubmit).submit(processAdd);
+  }
+};
+
+APP.search = function() {
+  var form  = document.forms.search,
+      input = form.elements.keywords;
+
+  $(form).submit(function(event) {
+    event.preventDefault();
+
+    var keywords = $.trim(input.value);
+
+    if (keywords) {
+      form.reset();
+      location.href = '/search/' + keywords + '/';
+    }
+  });
+};
+
+APP.menu = function() {
+  var menu     = $('.sidebar-menu'),
+      parent   = menu.parent(),
+      vaildURL = function() {
+        var thisHref = this.getAttribute('href');
+
+        if (APP.type === 'dashboard' || APP.type === 'categoryItem' || APP.type === 'locationItem') {
+          return thisHref === APP.url;
+        } else {
+          return thisHref.split('/')[1] === APP.url.split('/')[1];
+        }
+      };
+
+  menu
+    .detach()
+    .find('a').filter(vaildURL)
+    .parent().addClass('active')
+    .closest('.treeview-menu').addClass('menu-open')
+    .closest('.treeview').addClass('active');
+
+  menu.appendTo(parent);
+};
+
+APP.chart = {
+  line: function() {
+    require(['echarts', 'echarts/chart/line'], function(ec) {
+      $.getJSON('/api/line' + APP.url, function(data) {
+        ec.init(document.getElementById('line-chart'), 'macarons').setOption({
+          color: ['#00a65a', '#00c0ef', '#dd4b39'],
+          tooltip: {
+            trigger: 'axis'
+          },
+          legend: {
+            data: ['正面','中性','负面']
+          },
+          grid: {
+            x: 40,
+            y: 30,
+            x2: 25,
+            y2: 30
+          },
+          xAxis: [
+            {
+              type: 'category',
+              boundaryGap: false,
+              data: data.date
+            }
+          ],
+          yAxis: [
+            {
+              type : 'value'
+            }
+          ],
+          series: [
+            {
+              name: '正面',
+              type: 'line',
+              data: data.positive
+            },
+            {
+              name: '中性',
+              type: 'line',
+              data: data.neutral
+            },
+            {
+              name: '负面',
+              type: 'line',
+              data: data.negative
+            }
+          ]
+        });
+      });
+    });
+  },
+
+  pie: function() {
+    require(['echarts', 'echarts/chart/pie'], function(ec) {
+      $.getJSON('/api/pie' + APP.url, function(data) {
+        ec.init(document.getElementById('pie-chart'), 'macarons').setOption({
+          tooltip: {
+            trigger: 'item',
+            formatter: '{a} <br/>{b} : {c} ({d}%)'
+          },
+          legend: {
+            data: data.name
+          },
+          series: [
+            {
+              name: '信息比例',
+              type: 'pie',
+              radius: '55%',
+              center: ['50%', '60%'],
+              data: data.value
+            }
+          ]
+        });
+      });
+    });
+  }
+};
+
+APP.returnTop = function(el) {
+  var top       = el.offset().top,
+      scrollTop = top > 160 ? top - 120 : 0;
+
+  $('body').animate({scrollTop: scrollTop});
+};
+
+APP.table = function() {
+  $('.table-custom').each(function() {
+    var $this       = $(this),
+        $pagination = $this.parent(),
+        content     = this.tBodies[0],
+        type        = this.id,
+
+        renderTable = function(data) {
+          var items = data.data,
+
+              table = $.map(items, function(item) {
+                var url       = '/' + type + '/' + item.id + '/',
+                    title     = '<td><a href="' + url + '" title="' + item.title + '" target="_blank">' + item.title + '</a></td>',
+                    source    = '<td>' + item.source   + '</td>',
+                    location  = '<td>' + item.location + '</td>',
+                    time      = '<td>' + item.time     + '</td>',
+                    hot       = '<td class="text-center">' + item.hot + '</td>',
+                    row       = '<tr>' + title + source + location + time + hot + '</tr>';
+
+                return row;
+              });
+
+          $(content).html(table);
+          APP.risk();
+        };
+
+    $.getJSON('/api' + APP.url + type + '/1/', function(data) {
+      renderTable(data);
+
+      $pagination.twbsPagination({
+        totalPages: data.total,
+        visiblePages: 7,
+        first: '第一页',
+        prev: '上一页',
+        next: '下一页',
+        last: '最后一页',
+        paginationClass: 'pagination pagination-sm no-margin pull-right',
+        onPageClick: function(event, page) {
+          APP.returnTop($this);
+
+          $.getJSON('/api' + APP.url + type + '/' + page + '/', function(data) {
+            renderTable(data);
+            $pagination.twbsPagination({totalPages: data.total});
+          });
+        }
+      });
+    });
+  });
+};
+
+APP.table1 = function() {
+  $('.table-custom1').each(function() {
+    var $this       = $(this),
+        $pagination = $this.parent(),
+        content     = this.tBodies[0],
+        type        = this.id,
+
+        renderTable = function(data) {
+          var items = data.data,
+
+              table = $.map(items, function(item) {
+                var url       = '/' + type + '/' + item.id + '/',
+                    title     = '<td><a href="' + url + '" title="' + item.title + '" target="_blank">' + item.title + '</a></td>',
+                    source    = '<td>' + item.source   + '</td>',
+                    time      = '<td>' + item.time + '</td>',                    
+                    score     = '<td class="risk-score" data-num="'+item.score+'"><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i></td>',
+                    relevance =  '<td class="local-relevance" data-num="'+item.relevance+'"><i class="fa fa-square-o"></i><i class="fa fa-square-o"></i><i class="fa fa-square-o"></i></td>',
+                    row       = '<tr>' + title + source + time + score + relevance + '</tr>';
+
+                return row;
+              });
+
+          $(content).html(table);
+        };
+
+    $.getJSON('/api' + APP.url + type + '/1/', function(data) {
+      renderTable(data);
+      $pagination.twbsPagination({
+        totalPages: data.total,
+        visiblePages: 7,
+        first: '第一页',
+        prev: '上一页',
+        next: '下一页',
+        last: '最后一页',
+        paginationClass: 'pagination pagination-sm no-margin pull-right',
+        onPageClick: function(event, page) {
+          APP.returnTop($this);
+          $.getJSON('/api' + APP.url + type + '/' + page + '/', function(data) {
+            renderTable(data);
+            $pagination.twbsPagination({totalPages: data.total});
+          });
+        }
+      });
+    });
+  });
+};
+
+APP.dataTable = function() {
+  $.fn.dataTable.ext.errMode = 'throw';
+  $('.initDataTable').each(function() {
+    var table = $(this).DataTable({
+      'ajax': {
+        'url': '/api' + location.pathname,
+        'dataSrc': this.id,
+        'cache': true
+      },
+      'autoWidth': false,
+      'pageLength': 25,
+      'order': [],
+      'language': {
+        'processing':         '处理中...',
+        'search':             '',
+        'searchPlaceholder':  '输入关键字过滤...',
+        'lengthMenu':         '显示 _MENU_ 条',
+        'info':               '显示第 _START_ 至 _END_ 条，共 _TOTAL_ 条',
+        'infoEmpty':          '信息空',
+        'infoFiltered':       '(由 _MAX_ 项结果过滤)',
+        'infoPostFix':        '',
+        'loadingRecords':     '载入中...',
+        'zeroRecords':        '无匹配结果',
+        'emptyTable':         '无结果',
+        'paginate': {
+          'first':            '第一页',
+          'previous':         '上一页',
+          'next':             '下一页',
+          'last':             '最后一页'
+        },
+        'aria': {
+          'sortAscending':    '正序排列',
+          'sortDescending':   '倒序排列'
+        }
+      },
+      // "columnDefs": [{
+      //   "className": "star",
+      //   "targets": 0,
+      //   "searchable": false,
+      //   "orderable": false
+      // },{
+      //   "className": "index",
+      //   "targets": -1
+      // }],
+      'deferLoading': 100,
+      'drawCallback': function() {
+        $('[data-toggle="tooltip"]').tooltip();
+      }
+    });
+
+    table.on('click', 'tbody > tr', function() {
+      if ( $(this).hasClass('selected') ) {
+        $(this).removeClass('selected');
+      } else {
+        table.$('tr.selected').removeClass('selected');
+        $(this).addClass('selected');
+      }
+    });
+  });
+
+
+  // table.on('draw.dt', function() {
+  //   var collection = function(obj, api) {
+  //     obj.each(function(index, element) {
+  //       $(element).click(function(event) {
+  //         event.preventDefault();
+
+  //         var $this = $(this);
+
+  //         var article = $this.parent().next().find('a');
+  //         var data = {
+  //           id: article.data('id'),
+  //           type: article.data('type')
+  //         };
+
+  //         var action = function(status) {
+  //           if (status) {
+  //             $this.toggleClass('fa-star-o');
+  //             $this.toggleClass('fa-star');
+  //             table.ajax.reload(null, false);
+  //           }
+  //         };
+
+  //         $.post(api, data, action);
+  //       });
+  //     });
+  //   };
+
+  //   collection( $('.fa-star-o'), '/api/collection/add/');
+  //   collection( $('.fa-star'), '/api/collection/remove/');
+  // });
+};
+
+APP.sns = function() {
+  var $sns = $('.sns');
+
+  $sns.each(function(index, element) {
+    var $content    = $(element),
+        $pagination = $content.parent().next(),
+
+        type = function() {
+          if (APP.type === 'weixin' || APP.type === 'weibo') {
+            return $pagination.data('type');
+          } else {
+            return $pagination.data('type').replace('-', '/');
+          }
+        };
+
+    $.getJSON('/api' + APP.url + type() + '/1/', function(data) {
+      $content.html(data.html);
+
+      $pagination.twbsPagination({
+        totalPages: data.total,
+        first: '第一页',
+        prev: '上一页',
+        next: '下一页',
+        last: '最后一页',
+        paginationClass: 'pagination pagination-sm no-margin pull-right',
+        onPageClick: function(event, page) {
+          APP.returnTop($sns);
+          $.getJSON('/api' + APP.url + type() + '/' + page + '/', function(data) {
+            $content.html(data.html);
+            $pagination.twbsPagination({totalPages: data.total});
+          });
+        }
+      });
+    });
+  });
+};
+
+APP.custom = function() {
+  var form     = document.forms.addKeyword,
+      action   = form.action,
+      elements = form.elements,
+      fieldset = elements[0],
+      keyword  = elements[1],
+      button   = elements[2],
+      $msg     = $(form).prev(),
+      $list    = $(form).parent().prev().find('li'),
+
+      enableSubmit = function() {
+        button.disabled = !(keyword.value);
+      },
+
+      processAdd = function(event) {
+        event.preventDefault();
+
+        $.post(action, $(form).serialize(), function(response) {
+          if (response.status) {
+            $msg.text('关键词添加成功！').show();
+            location.reload();
+          } else {
+            $msg.text('关键词添加失败！').show();
+            keyword.value = '';
+          }
+        });
+      };
+
+  if ($list.length >= 5) {
+    fieldset.disabled = true;
+  } else {
+    $(form).keyup(enableSubmit).submit(processAdd);
+  }
+};
+
+APP.collection = function() {
+  $('.collection').click(function() {
+    var star = $(this).find('i'),
+        text = $(this).find('span'),
+
+        collect = function(api, nextAction) {
+          var urlArray = APP.url.split('/'),
+              data = {
+                type: urlArray[1] === 'news' ? 'article' : 'topic',
+                id: urlArray[2]
+              };
+
+          $.post(api, data, function(response) {
+            if (response.status) {
+              star.toggleClass('fa-star-o');
+              star.toggleClass('fa-star');
+              text.text(nextAction);
+            }
+          });
+        };
+
+    if ( star.hasClass('fa-star') ) {
+      collect('/api/collection/remove/', '添加收藏');
+    } else {
+      collect('/api/collection/add/', '取消收藏');
+    }
+  });
+};
+
+APP.dashboard = function() {
+  $('.info-box-content').each(function(index, element) {
+    var infoBoxNumber = $(element).find('.info-box-number'),
+        progressBar = $(element).find('.progress-bar'),
+        progressDescription = $(element).find('.progress-description'),
+
+        duration = 2000,
+        refreshInterval = 100,
+        loop = Math.floor(duration / refreshInterval),
+        loopCount = 0,
+
+        numberValue = 0,
+        numberFinal = $(element).data('number'),
+        numberIncrement = Math.floor(numberFinal / loop),
+
+        percentValue = 0,
+        percentFinal = $(element).data('percent'),
+        percentIncrement = Math.floor(percentFinal / loop),
+
+        intervalID,
+
+        countTo = function() {
+          numberValue += numberIncrement;
+          percentValue += percentIncrement;
+
+          loopCount++;
+
+          if (loopCount >= loop) {
+            clearInterval(intervalID);
+            numberValue = numberFinal;
+            percentValue = percentFinal;
+          }
+
+          infoBoxNumber.text( numberValue.toFixed() );
+          progressBar.width( percentValue + '%' );
+          progressDescription.text( '占总数据 ' + percentValue.toFixed() + '%' );
+        };
+
+    intervalID = setInterval(countTo, refreshInterval);
+  });
+};
+
+APP.product = function() {
+  $('.filter-list')
+    .find('a').filter(function() { return this.href === location.href; })
+    .parent().addClass('active');
+};
+
+APP.inspection = function () {
+  var $inspection = $('#inspection'),
+      $content    = $inspection.children('.box-body').find('tbody');
+
+  $content.load('/api/dashboard/local-inspection/');
+
+  $inspection.on('click', 'button', function (event) {
+    event.preventDefault();
+
+    if ( $(this).hasClass('active') ) {
+      return false;
+    }
+
+    $(this)
+      .addClass('active')
+      .siblings().removeClass('active');
+
+    $content.load('/api/dashboard/' + this.id + '/');
+  });
+};
+
+APP.risk = function () {
+  console.log("risk");
+  var $risk           = $('#risk'),
+      $riskScore      = $risk.find('.risk-score'),
+      $localRelevance = $risk.find('.local-relevance'),
+
+      replaceClass    = function (className) {
+        return function (index, element) {
+          var num     = $(element).data('num'),
+              $item   = $(element).find('i');
+
+          $item.slice(0, num).removeClass(className + '-o').addClass(className);
+        };
+      };
+
+  $riskScore.each(replaceClass('fa-star'));
+  $localRelevance.each(replaceClass('fa-square'));
+};
+
+
+//
+// url based router
+//
+
+$(function() {
+  var router = {
+    common: function() {
+      APP.search();
+      APP.menu();
+    },
+    login: function() {
+      APP.user.login();
+    },
+    dashboard: function() {
+      this.common();
+      APP.dashboard();
+      APP.inspection();
+      APP.risk();
+      APP.chart.line();
+      APP.chart.pie();
+    },
+    news: function() {
+      this.common();
+      APP.table();
+    },
+    newsItem: function() {
+      this.common();
+      APP.collection();
+    },
+    event: function() {
+      this.common();
+      APP.table();
+    },
+    eventItem: function() {
+      this.common();
+      APP.collection();
+      APP.chart.line();
+      APP.chart.pie();
+      APP.table();
+      APP.sns();
+    },
+    weixin: function() {
+      this.common();
+      APP.sns();
+    },
+    weibo: function() {
+      this.weixin();
+    },
+    weixinItem: function() {
+      this.common();
+    },
+    risk: function() {
+      this.common();
+      APP.table1();
+      APP.risk();
+    },
+    riskItem: function() {
+      this.common();
+      APP.collection();
+    },
+    categoryItem: function() {
+      this.common();
+      APP.table();
+    },
+    locationItem: function() {
+      this.common();
+      APP.table();
+      APP.sns();
+    },
+    inspection: function() {
+      this.common();
+      APP.dataTable();
+    },
+    custom: function() {
+      this.common();
+      APP.custom();
+    },
+    customItem: function() {
+      this.common();
+      APP.table();
+      APP.sns();
+    },
+    product: function() {
+      this.common();
+      APP.product();
+      APP.table();
+    },
+    productItem: function() {
+      this.common();
+      this.product();
+    },
+    collection: function() {
+      this.common();
+      APP.table();
+    },
+    settings: function() {
+      this.common();
+      APP.user.change();
+    },
+    user: function() {
+      this.common();
+      APP.user.admin();
+      APP.user.add();
+    },
+    searchItem: function() {
+      this.common();
+      APP.dataTable();
+    }
+  };
+
+  return router[APP.type]();
+});
