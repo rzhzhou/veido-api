@@ -138,7 +138,7 @@ def index_view(request):
             data = SetLogo(data)
 
         group = Group.objects.get(company=user.company).id
-        score_list = LocaltionScore.objects.filter(group=group)[:6]
+        score_list = LocaltionScore.objects.filter(group=group)
 
         risk_list = []
         for item in score_list:
@@ -156,6 +156,7 @@ def index_view(request):
                 data['time'] = items.pubtime
                 data['id'] = items.id
                 risk_list.append(data)
+        risk_list=sorted(risk_list, key=lambda x: x['time'], reverse=True)[:6]
         sidebar_name = sidebarUtil(request)
         return render_to_response("dashboard/dashboard.html",
             {'user': user,

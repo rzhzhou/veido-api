@@ -290,6 +290,7 @@ class RisksTableView(TableAPIView):
                 data['pubtime'] = items.pubtime
                 data['id'] = items.id
                 risk_list.append(data)
+        risk_list = sorted(risk_list, key=lambda x: x['pubtime'], reverse=True)
         return risk_list
             
     def get(self, request, page):
