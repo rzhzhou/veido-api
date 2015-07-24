@@ -1628,6 +1628,28 @@ APP.chart = {
                  {
                     if (a[1] == city[i].region_name){
                        city2 = data[i];
+                       switch(city2){
+                        case "A" :
+                          city2 = "A";
+                          break;
+                        case "B" :
+                           city2 = "A";
+                           break;
+                        case "C" :
+                           city2 = "B";
+                           break;
+                        case "D" :
+                           city2 = "C";
+                           break;
+                        case "E" :
+                           city2 = "C";
+                           break;
+                        default :
+                           city2 ="erro";
+                           break;
+
+
+                       }
                     }
                  }
                  var res =a[1]+'<br>'+'风险等级  '+city2;
@@ -1640,11 +1662,16 @@ APP.chart = {
             data:['']
         },
         dataRange: {
-            min: 1,
-            max: 5,
-            color:['#810004','#ad3f10','#fa9529','#fff26e','#cee19e',],   //颜色
-            text:['高','低'],           // 文本，默认为数值文本
-            calculable : true
+           min: 0,
+           max: 3,
+           splitNumber:3,
+           color:['#fa9529','#fff26e','#cee19e',],
+            formatter : function(v, v2){
+            if (v2  == '3') { return  'C'+'-高风险'}
+            else if(v2  =='2'){return  'B'+'-中风险'}
+            else if(v2  == '1'){return  'A'+'-低风险'}
+        },
+           x:"right"
         },
         series : [
             {
