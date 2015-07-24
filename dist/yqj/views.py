@@ -136,14 +136,6 @@ def index_view(request):
         for data in weixin_data:
             data = SetLogo(data)
 
-<<<<<<< HEAD
-        inspection_list = Inspection.objects.order_by('-pubtime')[:10]
-        for item in inspection_list:
-            item.qualitied = str(int(item.qualitied*100)) + '%'
-
-        sidebar_name = sidebarUtil(request)
-
-=======
         group = Group.objects.get(company=user.company).id
         score_list = LocaltionScore.objects.filter(group=group)[:6]
 
@@ -164,7 +156,6 @@ def index_view(request):
                 data['id'] = items.id
                 risk_list.append(data)
         sidebar_name = sidebarUtil(request)
->>>>>>> risk
         return render_to_response("dashboard/dashboard.html",
             {'user': user,
             'categories': categories,
@@ -178,13 +169,8 @@ def index_view(request):
             'risk_list': risk_list,
             'weixin_hottest_list': weixin_data,
             'weibo_hottest_list': weibo_data,
-<<<<<<< HEAD
-            'user_image': get_user_image(user),
-            'name': sidebar_name
-=======
             'user_image': get_user_image(user),        
             'name': sidebar_name,
->>>>>>> risk
             })
     else:
         return HttpResponse(status=401)
