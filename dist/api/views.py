@@ -287,7 +287,7 @@ class RisksTableView(TableAPIView):
                 data['title'] = items.title
                 data['source'] = items.source
                 data['score'] = score
-                data['time'] = items.pubtime
+                data['pubtime'] = items.pubtime
                 data['id'] = items.id
                 risk_list.append(data)
         return risk_list
