@@ -179,7 +179,6 @@ class TableAPIView(APIView):
         except EmptyPage:
             # 如果页码太大，没有相应的记录 取最后一页的记录
             items = paginator.page(paginator.num_pages)
-
         return {'items': items, 'total_number': paginator.num_pages}
 
     def pagingfromredis(self, model, limit, page):
@@ -279,7 +278,7 @@ class RisksTableView(TableAPIView):
         for item in score_list:
             data = {}
             data['relevance'] = item.score
-            article_list = Article.objects.filter(id=item.article.id).order_by('-pubtime')[:6]
+            article_list = Article.objects.filter(id=item.article.id).order_by('-pubtime')
             for items in article_list:
                 try:
                     score = RiskScore.objects.get(article=items.id).score
@@ -296,11 +295,10 @@ class RisksTableView(TableAPIView):
     def get(self, request, page):
         items = self.get_score_article(request)
         datas = self.paging(items, self.RISK_PAGE_LIMIT, page)
-        # risk_list = render_to_string('risk/dashboard_risk.html', {'risk_list':  datas['items']})
-        # print risk_list
-        # return Response(risk_list)
+        html_string = render_to_string('risk/risk_list_tmpl.html', {'risk_list':  datas['items']})
+        return Response({"total": datas['total_number'], "html": html_string})
 
-        return Response({'total': datas['total_number'], 'data': list(datas['items'])})
+        # return Response({'total': datas['total_number'], 'data': list(datas['items'])})
 
 
 class NewsTableView(TableAPIView):

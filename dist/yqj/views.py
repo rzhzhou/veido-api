@@ -294,7 +294,6 @@ def person_view(request, person_id):
     return HttpResponse('person')
 
 
-
 class RisksView(BaseView):
     def get(self, request):
         sidebar_name = sidebarUtil(request)
@@ -306,7 +305,7 @@ class RisksDetailView(BaseView):
             risk_id = int(risk_id)
             risk_article = Article.objects.get(id=risk_id)
         except Article.DoesNotExist:
-            return self.render_to_response('risk/risk.html', {'article': '', 'relate': []})
+            return self.render_to_response('news/news.html', {'article': '', 'relate': []})
 
         try:
             r = RelatedData.objects.filter(uuid=risk_article.uuid)[0]
@@ -323,7 +322,7 @@ class RisksDetailView(BaseView):
         items = user.collection.articles.all()
         iscollected = any(filter(lambda x: x.id == risk_article.id, items))
         sidebar_name = sidebarUtil(request)
-        return self.render_to_response('risk/risk.html', {'article': SetLogo(risk_article), 'relate': relateddata,  'isCollected': iscollected, 'name': sidebar_name})
+        return self.render_to_response('news/news.html', {'article': SetLogo(risk_article), 'relate': relateddata,  'isCollected': iscollected, 'name': sidebar_name})
 
 
 class NewsView(BaseView):
