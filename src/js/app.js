@@ -641,7 +641,7 @@ APP.inspection = function () {
 
 APP.riskList = function () {
   var $risk = $('#risk'),
-      $content = $risk.find('tbody'),
+      $paginationContainer = $risk.parent(),
 
       toAPI = function (pageNumber) {
         if (typeof pageNumber === 'undefined') {
@@ -655,13 +655,13 @@ APP.riskList = function () {
         $('<tbody/>')
           .html(pageContent)
           .showRisk()
-          .replaceAll($content);
+          .replaceAll($risk.find('tbody'));
       };
 
   $.get(toAPI(), function (data) {
     renderTable(data.html);
 
-    $risk.parent().twbsPagination({
+    $paginationContainer.twbsPagination({
       totalPages: data.total,
       visiblePages: 7,
       first: '第一页',
@@ -670,11 +670,10 @@ APP.riskList = function () {
       last: '最后一页',
       paginationClass: 'pagination pagination-sm no-margin pull-right',
       onPageClick: function(event, pageNumber) {
-        APP.returnTop($this);
-
+        APP.returnTop($(this));
         $.get(toAPI(pageNumber), function(data) {
           renderTable(data.html);
-          $pagination.twbsPagination({totalPages: data.total});
+          $paginationContainer.twbsPagination({totalPages: data.total});
         });
       }
     });
