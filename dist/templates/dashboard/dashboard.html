@@ -77,8 +77,6 @@
     </div>
   </div>
 
-
-
   <div class="row">
     <div class="col-md-6">
       <div class="box box-info">
@@ -87,50 +85,6 @@
         </div>
         <div class="box-body no-padding">
           <div id="map-chart" style="height:400px"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-md-6">
-      <div class="box box-danger">
-        <div class="box-header with-border">
-          <h3 class="box-title">事件</h3>
-        </div>
-        <div class="box-body no-padding">
-          <div class="list-group no-margin">
-            {% for event in event_list %}
-              <a href="/event/{{ event.id }}/" class="list-group-item no-border" target="_blank">
-                <span class="badge" data-toggle="tooltip" data-placement="left" title="热度 {{ event.hot_index }}">{{ event.hot_index }}</span>
-                {{ event.title }}
-              </a>
-            {% endfor %}
-          </div>
-        </div>
-        <div class="box-footer text-center">
-          <a href="/event/">查看更多</a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="col-md-6">
-      <div class="box box-info">
-        <div class="box-header with-border">
-          <h3 class="box-title">{{ name.news }}</h3>
-        </div>
-        <div class="box-body no-padding">
-          <div class="list-group no-margin">
-            {% for news in news_list %}
-              <a href="/news/{{ news.id }}/" class="list-group-item no-border" target="_blank">
-                <span class="badge" data-toggle="tooltip" data-placement="left" title="热度 {{ news.hot_index }}">{{ news.hot_index }}</span>
-                {{ news.title }}
-              </a>
-            {% endfor %}
-          </div>
-        </div>
-        <div class="box-footer text-center">
-          <a href="/news/">查看更多</a>
         </div>
       </div>
     </div>
@@ -221,7 +175,7 @@
     <div class="col-md-6">
       <div class="box box-info">
         <div class="box-header with-border">
-          <h3 class="box-title">新闻</h3>
+          <h3 class="box-title">{{ name.news }}</h3>
         </div>
         <div class="box-body no-padding">
           <div class="list-group no-margin">
