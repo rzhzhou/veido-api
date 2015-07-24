@@ -1605,6 +1605,25 @@ APP.chart = {
       var data = [];
       for(var c in city){
         data[c] = city[c].rank;
+        switch(data[c]){
+          case "A" :
+            data[c] = 1 ;
+            break;
+          case "B" :
+            data[c] = 1 ;
+            break;
+          case "C" :
+            data[c] = 2 ;
+            break;
+          case "D" :
+            data[c] = 3;
+            break;
+          case "E" :
+            data[c] = 3;
+            break;
+          default :
+             data[c] = 3;
+        }
       }
     require(['echarts', 'echarts/chart/map'],
     function(echarts) {
@@ -1629,26 +1648,18 @@ APP.chart = {
                     if (a[1] == city[i].region_name){
                        city2 = data[i];
                        switch(city2){
-                        case "A" :
+                        case 1 :
                           city2 = "A";
                           break;
-                        case "B" :
-                           city2 = "A";
-                           break;
-                        case "C" :
+                        case 2 :
                            city2 = "B";
                            break;
-                        case "D" :
-                           city2 = "C";
-                           break;
-                        case "E" :
+                        case 3 :
                            city2 = "C";
                            break;
                         default :
                            city2 ="erro";
                            break;
-
-
                        }
                     }
                  }
@@ -1689,7 +1700,7 @@ APP.chart = {
                     {name: '江汉区',value: data[6]},
                     {name: '硚口区',value: data[10]},
                     {name: '汉阳区',value: data[11]},
-                    {name: '武昌区',value: data[14]},
+                    {name: '武昌区',value: data[0]},
                     {name: '洪山区',value: data[1]},
                     {name: '青山区',value: data[3]},
                     {name: '东西湖区',value: data[9]},
