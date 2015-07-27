@@ -326,65 +326,64 @@ APP.chart = {
   },
 
   map: function () {
-    $.getJSON("api/map",function(result){
-      var city = result.regionData;
-      var data = [];
-      for(var c in city){
+    $.getJSON ('api/map', function ( result ) {
+      var city = result.regionData,
+            data = [ ];
+      for ( var c in city ) {
         data[c] = city[c].rank;
         switch(data[c]){
-          case "A" :
+          case 'A' :
             data[c] = 1 ;
             break;
-          case "B" :
+          case 'B' :
             data[c] = 1 ;
             break;
-          case "C" :
+          case 'C' :
             data[c] = 2 ;
             break;
-          case "D" :
+          case 'D' :
             data[c] = 3;
             break;
-          case "E" :
+          case 'E' :
             data[c] = 3;
             break;
           default :
              data[c] = 3;
-        }
+             break;
+         }
       }
-    require(['echarts', 'echarts/chart/map'],
-    function(echarts) {
-    var myChart = echarts.init(document.getElementById('map-chart'));
+
+    require(['echarts', 'echarts/chart/map'],function ( echarts )  {
+      var myChart = echarts.init(document.getElementById('map-chart'));
       require('echarts/util/mapData/params').params.wh = {
         getGeoJson: function (callback) {
-          $.getJSON('/static/wh.json',callback);
+        $.getJSON('/static/wh.json',callback);
         }
       }
-   var option = {
+      var option = {
         title: {
-           /* text : '武汉地图',*/
             subtext : ''
         },
-        tooltip : {
+       tooltip : {
             trigger: 'item',
-            formatter: function(a){
-                var name = '风险等级';
-                 var city2 ;
-                 for(var i in city)
-                 {
-                    if (a[1] == city[i].region_name){
+            formatter: function ( a ){
+              var name = '风险等级',
+                    city2 ;
+                for ( var i in city) {
+                  if (a[1] == city[i].region_name){
                        city2 = data[i];
                        switch(city2){
-                        case 1 :
-                          city2 = "A";
-                          break;
-                        case 2 :
-                           city2 = "B";
+                         case 1 :
+                           city2 = 'A';
+                           break;
+                         case 2 :
+                           city2 = 'B';
                            break;
                         case 3 :
-                           city2 = "C";
+                           city2 = 'C';
                            break;
                         default :
-                           city2 ="erro";
+                           city2 ='erro';
                            break;
                        }
                     }
@@ -403,15 +402,15 @@ APP.chart = {
            max: 3,
            splitNumber:3,
            color:['#fa9529','#fff26e','#cee19e',],
-            formatter : function(v, v2){
-            if (v2  == '3') { return  'C'+'-高风险'}
-            else if(v2  =='2'){return  'B'+'-中风险'}
-            else if(v2  == '1'){return  'A'+'-低风险'}
-        },
-           x:"right"
+           formatter : function ( v, v2 ) {
+              if (v2  == '3') { return  'C'+'-高风险'}
+              else if(v2  =='2'){return  'B'+'-中风险'}
+              else if(v2  == '1'){return  'A'+'-低风险'}
+            },
+            x:"right"
         },
         series : [
-            {
+             {
                 name: '数据名称',
                 type: 'map',
                 mapType: 'wh',
@@ -419,9 +418,9 @@ APP.chart = {
                 itemStyle:{
                     normal:{label:{show:false}},  //区域名称
                     emphasis:{label:{show:true}}
-                },
+              },
 
-                data:[
+        data:[
                     {name: '江岸区',value: data[4]},
                     {name: '江汉区',value: data[6]},
                     {name: '硚口区',value: data[10]},
@@ -441,10 +440,7 @@ APP.chart = {
     };
     myChart.setOption(option);
     });
-
-
      });
-
 
   }
 };
