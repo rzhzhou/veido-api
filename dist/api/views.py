@@ -274,6 +274,33 @@ class RisksTableView(TableAPIView):
         company = user.group.company
         group = Group.objects.get(company=company).id
         score_list = LocaltionScore.objects.filter(group=group)
+        socre_id = []
+        for item in score_list:
+            socre_id.append(item.article_id)
+
+        article_list = Article.objects.filter(id__in=socre_id)
+        risk_list = []
+        for item in article_list:
+            data = {}
+            try:
+                relevance = LocaltionScore.objects.get(article_id=item.id).score
+            except LocaltionScore.DoesNotExist:
+                relevance = 0
+            try:
+                score = RiskScore.objects.get(article=item.id).score
+            except RiskScore.DoesNotExist:
+                score = 0
+            data['relevance'] = relevance
+            data['title'] = item.title
+            data['source'] = item.source
+            data['score'] = score
+            data['pubtime'] = item.pubtime
+            data['id'] = item.id
+            risk_list.append(data)
+        return risk_list
+        ''' 
+        # This method is sorting in the memory 
+        score_list = LocaltionScore.objects.filter(group=group)
         risk_list = []
         for item in score_list:
             data = {}
@@ -292,7 +319,7 @@ class RisksTableView(TableAPIView):
                 risk_list.append(data)
         risk_list = sorted(risk_list, key=lambda x: x['pubtime'], reverse=True)
         return risk_list
-            
+        '''    
     def get(self, request, page):
         items = self.get_score_article(request)
         datas = self.paging(items, self.RISK_PAGE_LIMIT, page)

@@ -108,6 +108,7 @@ def index_view(request):
         news_list = Article.objects.filter(id__in=article_id)[:10]
 
 
+
         for item in news_list:
             try:
                 setattr(item, 'hot_index', RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count())
@@ -136,26 +137,33 @@ def index_view(request):
         for data in weixin_data:
             data = SetLogo(data)
 
+
         group = Group.objects.get(company=user.company).id
         score_list = LocaltionScore.objects.filter(group=group)
-
-        risk_list = []
+        socre_id = []
         for item in score_list:
+            socre_id.append(item.article_id)
+
+        article_list = Article.objects.filter(id__in=socre_id)[:6]
+        risk_list = []
+        for item in article_list:
             data = {}
-            data['relevance'] = item.score
-            article_list = Article.objects.filter(id=item.article.id).order_by('-pubtime')
-            for items in article_list:
-                try:
-                    score = RiskScore.objects.get(article=items.id).score
-                except RiskScore.DoesNotExist:
-                    score = 0
-                data['title'] = items.title
-                data['source'] = items.source
-                data['score'] = score
-                data['time'] = items.pubtime
-                data['id'] = items.id
-                risk_list.append(data)
-        risk_list=sorted(risk_list, key=lambda x: x['time'], reverse=True)[:6]
+            try:
+                relevance = LocaltionScore.objects.get(article_id=item.id).score
+            except LocaltionScore.DoesNotExist:
+                relevance = 0
+            try:
+                score = RiskScore.objects.get(article=item.id).score
+            except RiskScore.DoesNotExist:
+                score = 0
+            data['relevance'] = relevance
+            data['title'] = item.title
+            data['source'] = item.source
+            data['score'] = score
+            data['time'] = item.pubtime
+            data['id'] = item.id
+            risk_list.append(data)
+            
         sidebar_name = sidebarUtil(request)
         return render_to_response("dashboard/dashboard.html",
             {'user': user,
