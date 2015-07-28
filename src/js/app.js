@@ -296,10 +296,11 @@ APP.chart = {
       });
     });
   },
-  map: function() {
-    $.getJSON('api/map',function (result ) {
+  map : function () {
+    $.getJSON('/api/map/' , function (result ) {
       var city = result.regionData,
-      data = [];
+      data = [],
+      city2;
       for ( var c in city) {
         data[c] = city[c].rank;
         switch (data[c]) {
@@ -323,22 +324,20 @@ APP.chart = {
           break;
         }
       }
-      require(['echarts', 'echarts/chart/map'], function (echarts ) {
-        var myChart = echarts.init(document.getElementById('map-chart'));
+
+      require(['echarts', 'echarts/chart/map'], function (ec ) {
         require('echarts/util/mapData/params').params.wh = {
           getGeoJson: function (callback ) {
-            $.getJSON('/static/wh.json', callback);
+          $.getJSON('/static/wh.json', callback);
           }
         }
-        var option = {
+        ec.init(document.getElementById('map-chart')).setOption({
           title: {
             subtext: ''
           },
           tooltip: {
             trigger: 'item',
             formatter: function(a) {
-              var name = '风险等级',
-              city2;
               for (var i in city) {
                 if (a[1] == city[i].region_name) {
                   city2 = data[i];
@@ -358,8 +357,7 @@ APP.chart = {
                   }
                 }
               }
-              var res = a[1] + '<br>' + '风险等级  ' + city2;
-              return res;
+              return a[1] + '<br>' + '风险等级  ' + city2;
             }
           },
           legend: {
@@ -373,12 +371,12 @@ APP.chart = {
             splitNumber: 3,
             color: ['#fa9529', '#fff26e', '#cee19e', ],
             formatter: function(v, v2) {
-              if (v2 == '3') {
-                return 'C' + '-高风险'
+              if (v2 == '1') {
+                return 'A' + '-低风险';
               } else if (v2 == '2') {
-                return 'B' + '-中风险'
-              } else if (v2 == '1') {
-                return 'A' + '-低风险'
+                return 'B' + '-中风险';
+              } else if (v2 == '3') {
+                return 'C' + '-高风险';
               }
             },
             x: "right"
@@ -401,7 +399,6 @@ APP.chart = {
                 }
               }
             },
-
             data: [{
               name: '江岸区',
               value: data[4]
@@ -455,8 +452,7 @@ APP.chart = {
               value: data[13]
             }]
           }]
-        };
-        myChart.setOption(option);
+        });
       });
     });
   }
