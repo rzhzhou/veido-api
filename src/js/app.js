@@ -296,12 +296,14 @@ APP.chart = {
       });
     });
   },
-  map : function () {
-    $.getJSON('/api/map/' , function (result ) {
+
+  map: function () {
+    $.getJSON('/api/map/' , function (result) {
       var city = result.regionData,
-      data = [],
-      city2;
-      for ( var c in city) {
+          data = [],
+          city2;
+
+      for (var c in city) {
         data[c] = city[c].rank;
         switch (data[c]) {
         case 'A':
@@ -330,7 +332,8 @@ APP.chart = {
           getGeoJson: function (callback ) {
           $.getJSON('/static/wh.json', callback);
           }
-        }
+        };
+
         ec.init(document.getElementById('map-chart')).setOption({
           title: {
             subtext: ''
@@ -457,6 +460,7 @@ APP.chart = {
     });
   }
 };
+
 APP.returnTop = function(el) {
   var top       = el.offset().top,
       scrollTop = top > 160 ? top - 120 : 0;
