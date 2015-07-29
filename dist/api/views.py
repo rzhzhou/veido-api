@@ -222,15 +222,16 @@ class TableAPIView(APIView):
             item['source'] = data.source
             item['location'] = data.area.name
             try:
-                item['time'] = data.articles.order_by('pubtime')[0].pubtime.replace(tzinfo=None).strftime('%Y-%m-%d')
-            except IndexError:
+                item['time'] = data.pubtime.replace(tzinfo=None).strftime('%Y-%m-%d')
+                # item['time'] = data.articles.order_by('pubtime')[0].pubtime.replace(tzinfo=None).strftime('%Y-%m-%d')
+            except:
                 item['time'] = datetime.datetime.now().strftime('%Y-%m-%d')
             item['hot'] = data.articles.count() + data.weixin.count() + data.weibo.count()
             result.append(item)
 
-        results = sorted(result, key=lambda item: item['time'], reverse=True)
+        # results = sorted(result, key=lambda item: item['time'], reverse=True)
 
-        return results
+        return result
 
 
 def get_date_from_iso(datetime_str):
