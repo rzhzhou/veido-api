@@ -12,7 +12,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import View
 from yqj.models import Article, Weixin, Weibo, RelatedData, Category, Group,\
                        Area, Topic, Inspection, Custom, CustomKeyword, Collection, ArticlePublisher, Product,\
-                       ProductKeyword, LocaltionScore, GroupAuthUser, RiskScore
+                       ProductKeyword, LocaltionScore, GroupAuthUser, RiskScore, Risk
 from yqj import login_required
 from yqj.redisconnect import RedisQueryApi
 from django.db.models import Count,Q
@@ -272,28 +272,25 @@ class RisksView(BaseView):
 
 class RisksDetailView(BaseView):
     def get(self, request, risk_id):
+        sidebar_name = sidebarUtil(request)
         try:
             risk_id = int(risk_id)
-            risk_article = Article.objects.get(id=risk_id)
-        except Article.DoesNotExist:
-            return self.render_to_response('news/news.html', {'article': '', 'relate': []})
-
-        try:
-            r = RelatedData.objects.filter(uuid=risk_article.uuid)[0]
-            relateddata = list(r.articles.all())
-        except IndexError:
-            relateddata = []
-
+            risk = Risk.objects.get(id=risk_id)
+            eval_keywords_list = eval(risk.keywords) if risk.keywords else []
+            keywords_list = [{"name": name, "number": number} for name, number in eval_keywords_list]
+        except Risk.DoesNotExist:
+            return self.render_to_response('risk/risk.html', {'risk': '', 'weixin_list': [], 'weibo_list': [], 'name': sidebar_name})
         user = self.request.myuser
         try:
             collection = user.collection
         except Collection.DoesNotExist:
             collection = Collection(user=user)
             collection.save(using='master')
-        items = user.collection.articles.all()
-        iscollected = any(filter(lambda x: x.id == risk_article.id, items))
+        # this my problem  events 
+        items = user.collection.events.all()
+        iscollected = any(filter(lambda x: x.id == risk.id, items))
         sidebar_name = sidebarUtil(request)
-        return self.render_to_response('news/news.html', {'article': SetLogo(risk_article), 'relate': relateddata,  'isCollected': iscollected, 'name': sidebar_name})
+        return self.render_to_response('risk/risk.html', {'risk': risk,  'keywords_list': keywords_list, 'isCollected': iscollected, 'name': sidebar_name})
 
 
 class NewsView(BaseView):

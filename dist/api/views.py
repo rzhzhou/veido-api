@@ -16,7 +16,7 @@ from rest_framework.decorators import api_view
 from yqj.models import (Article, Area, Weixin, Weibo, Topic, RelatedData, Category,
                         save_user, Collection, Topic, hash_password, User, Custom,
                         Inspection, CustomKeyword,Product, ProductKeyword, Group,
-                        LocaltionScore, RiskScore)
+                        LocaltionScore, RiskScore, Risk)
 from yqj.views import SetLogo
 from serializers import ArticleSerializer
 from yqj import authenticate, login_required
@@ -328,6 +328,44 @@ class RisksTableView(TableAPIView):
 
         # return Response({'total': datas['total_number'], 'data': list(datas['items'])})
 
+class RisksDetailTableView(TableAPIView):
+
+    def get(self, request, id, page):
+        try:
+            risk = Risk.objects.get(id=int(id))
+        except Risk.DoesNotExist:
+            return Response({'risk': ''})
+        items = risk.articles.all()
+        datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
+        result = self.news_to_json(datas['items'])
+        return Response({'total': datas['total_number'], 'data': result})
+
+class RisksDetailWeixinView(TableAPIView):
+    EVENT_WEIXIN_LIMIT = 10
+    def get(self, request, id, page):
+        try:
+            risk = Risk.objects.get(id=int(id))
+        except Risk.DoesNotExist:
+            return Response({'html': '', 'total': 0})
+        items = risk.weixin.all()
+        datas = self.paging(items, self.EVENT_WEIXIN_LIMIT, page)
+        items = [SetLogo(data) for data in datas['items']]
+        html = self.set_css_to_weixin(items)
+        return Response({'html': html, 'total': datas['total_number']})
+
+
+class RisksDetailWeiboView(TableAPIView):
+    EVENT_WEIBO_LIMIT = 10
+    def get(self, request, id, page):
+        try:
+            risk = Risk.objects.get(id=int(id))
+        except Risk.DoesNotExist:
+            return Response({'html': '', 'total': 0})
+        items = risk.weibo.all()
+        datas = self.paging(items, self.EVENT_WEIBO_LIMIT, page)
+        items = [SetLogo(data) for data in datas['items']]
+        html = self.set_css_to_weibo(items)
+        return Response({'html': html, 'total': datas['total_number']})
 
 class NewsTableView(TableAPIView):
     """
