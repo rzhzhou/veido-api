@@ -655,7 +655,7 @@ APP.riskList = function () {
           pageNumber = 1;
         }
 
-        return '/api/risk/news/' + pageNumber + '/';
+        return '/api/risk/risk/' + pageNumber + '/';
       },
 
       renderTable = function (pageContent) {
@@ -772,6 +772,14 @@ $(function() {
     risk: function() {
       this.common();
       APP.riskList();
+    },
+    riskItem: function() {
+      this.common();
+      APP.collection();
+      APP.chart.line();
+      APP.chart.pie();
+      APP.table();
+      APP.sns();
     },
     collection: function() {
       this.common();
