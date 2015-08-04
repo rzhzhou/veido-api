@@ -133,30 +133,6 @@ class Article(models.Model):
         return self.title
 
 
-class Tarticle(models.Model):
-    author = models.CharField(max_length=255, verbose_name=u'作者')
-    title = models.CharField(max_length=255,blank=True, verbose_name=u'标题')
-    url = models.URLField(verbose_name=u'网站链接')
-    content = models.TextField(blank=True, verbose_name=u'正文')
-    source = models.CharField(max_length=255, blank=True, verbose_name=u'信息来源')
-    pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
-    publisher = models.ForeignKey(ArticlePublisher, verbose_name=u'文章发布者')
-    area = models.ForeignKey(Area, verbose_name=u'地域')
-    uuid = models.CharField(max_length=36)
-    feeling_factor = models.FloatField(default=-1, verbose_name=u'正负面')
-    website_type = models.CharField(max_length=20, blank=True, verbose_name=u'评分')
-    # localtion_score = models.IntegerField(blank=True, null=True, verbose_name=u'评分')
-
-
-    class Meta:
-        db_table = 'article'
-        verbose_name_plural = u'风险评分'
-
-    def __unicode__(self):
-        return self.title
-
-
-
 class Topic(models.Model):
     title = models.CharField(max_length=255, blank=True, verbose_name=u'标题')
     abstract = models.TextField(blank=True, verbose_name=u'简介')
@@ -170,6 +146,66 @@ class Topic(models.Model):
     class Meta:
         db_table = 'topic'
         verbose_name_plural = u'聚类事件'
+
+    def __unicode__(self):
+        return self.title
+
+
+class Risk(models.Model):
+    title = models.CharField(max_length=255, blank=True, verbose_name=u'标题')
+    abstract = models.TextField(blank=True, verbose_name=u'简介')
+    source = models.CharField(max_length=255, blank=True, verbose_name=u'首发媒体')
+    area = models.ForeignKey(Area, verbose_name=u'地域')
+    keywords = models.CharField(max_length=255, default=u'', verbose_name=u'关键词', blank=True)
+    score = models.IntegerField(default=0, verbose_name=u'评分')
+
+    articles = models.ManyToManyField(Article, related_name='risks', related_query_name='risk', null=True, blank=True, verbose_name=u'文章')
+    weibo = models.ManyToManyField(Weibo, related_name='risks', related_query_name='risk', null=True, blank=True, verbose_name=u'微博')
+    weixin = models.ManyToManyField(Weixin, related_name='risks', related_query_name='risk', null=True, blank=True, verbose_name=u'微信')
+
+    class Meta:
+        db_table = 'risk'
+        verbose_name_plural = u'风险快讯'
+
+    def __unicode__(self):
+        return self.title
+
+
+class LRisk(models.Model):
+    title = models.CharField(max_length=255, blank=True, verbose_name=u'标题')
+    abstract = models.TextField(blank=True, verbose_name=u'简介')
+    source = models.CharField(max_length=255, blank=True, verbose_name=u'首发媒体')
+    area = models.ForeignKey(Area, verbose_name=u'地域')
+    keywords = models.CharField(max_length=255, default=u'', verbose_name=u'关键词', blank=True)
+    score = models.IntegerField(default=0, verbose_name=u'评分')
+
+    articles = models.ManyToManyField(Article, related_name='lrisks', related_query_name='lrisk', null=True, blank=True, verbose_name=u'文章')
+    weibo = models.ManyToManyField(Weibo, related_name='lrisks', related_query_name='lrisk', null=True, blank=True, verbose_name=u'微博')
+    weixin = models.ManyToManyField(Weixin, related_name='lrisks', related_query_name='lrisk', null=True, blank=True, verbose_name=u'微信')
+
+    class Meta:
+        db_table = 'risk'
+        verbose_name_plural = u'本地评分'
+
+    def __unicode__(self):
+        return self.title
+
+
+class TRisk(models.Model):
+    title = models.CharField(max_length=255, blank=True, verbose_name=u'标题')
+    abstract = models.TextField(blank=True, verbose_name=u'简介')
+    source = models.CharField(max_length=255, blank=True, verbose_name=u'首发媒体')
+    area = models.ForeignKey(Area, verbose_name=u'地域')
+    keywords = models.CharField(max_length=255, default=u'', verbose_name=u'关键词', blank=True)
+    score = models.IntegerField(default=0, verbose_name=u'评分')
+
+    articles = models.ManyToManyField(Article, related_name='trisks', related_query_name='trisk', null=True, blank=True, verbose_name=u'文章')
+    weibo = models.ManyToManyField(Weibo, related_name='trisks', related_query_name='trisk', null=True, blank=True, verbose_name=u'微博')
+    weixin = models.ManyToManyField(Weixin, related_name='trisks', related_query_name='trisk', null=True, blank=True, verbose_name=u'微信')
+
+    class Meta:
+        db_table = 'risk'
+        verbose_name_plural = u'风险评分'
 
     def __unicode__(self):
         return self.title
@@ -382,11 +418,11 @@ class GroupAuthUser(models.Model):
 class LocaltionScore(models.Model):
     score = models.IntegerField(default=0, verbose_name=u'分数')
     group = models.ForeignKey(Group, verbose_name=u'分组')
-    article = models.ForeignKey(Article, verbose_name=u'新闻')
+    risk = models.ForeignKey(Risk, verbose_name=u'风险快讯')
 
     class Meta:
         db_table = 'localtion_score'
-        verbose_name_plural = u'本地评分'
+        verbose_name_plural = u'本地评分展示'
 
     def __unicode__(self):
         return str(self.score)
@@ -394,7 +430,7 @@ class LocaltionScore(models.Model):
 
 class RiskScore(models.Model):
     score = models.IntegerField(default=0, verbose_name=u'分数')
-    article = models.ForeignKey(Tarticle, verbose_name=u'新闻')
+    risk = models.ForeignKey(Risk, verbose_name=u'风险快讯')
 
     class Meta:
         db_table = 'risk_score'
@@ -402,4 +438,7 @@ class RiskScore(models.Model):
 
     def __unicode__(self):
         return str(self.score)
+
+
+
 

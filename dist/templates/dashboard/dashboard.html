@@ -81,20 +81,10 @@
     <div class="col-md-6">
       <div class="box box-info">
         <div class="box-header with-border">
-          <h3 class="box-title">{{ name.news }}</h3>
+          <h3 class="box-title">区域风险状况</h3>
         </div>
         <div class="box-body no-padding">
-          <div class="list-group no-margin">
-            {% for news in news_list %}
-              <a href="/news/{{ news.id }}/" class="list-group-item no-border" target="_blank">
-                <span class="badge" data-toggle="tooltip" data-placement="left" title="热度 {{ news.hot_index }}">{{ news.hot_index }}</span>
-                {{ news.title }}
-              </a>
-            {% endfor %}
-          </div>
-        </div>
-        <div class="box-footer text-center">
-          <a href="/news/">查看更多</a>
+          <div id="map-chart" style="height:400px"></div>
         </div>
       </div>
     </div>
@@ -158,17 +148,16 @@
           </div>
         </div>
         <div class="box-body no-padding">
-          <table class="table table-hover">
+          <table class="table table-hover table-custom">
             <thead>
               <tr>
-                <th class="inspection-category">产品种类</th>
-                <th class="inspection-name">事件</th>
-                <th class="inspection-quality">合格率</th>
-                <th class="inspection-source">来源</th>
-                <th class="inspection-time">抽检日期</th>
+                <th class="col-category">产品种类</th>
+                <th class="col-name">事件</th>
+                <th class="col-quality">合格率</th>
+                <th class="col-source">来源</th>
+                <th class="col-time">抽检日期</th>
               </tr>
             </thead>
-
             <tbody>
               {% include "inspection/dashboard_inspection.html" %}
             </tbody>
@@ -185,7 +174,7 @@
     <div class="col-md-6">
       <div class="box box-info">
         <div class="box-header with-border">
-          <h3 class="box-title">新闻</h3>
+          <h3 class="box-title">{{ name.news }}</h3>
         </div>
         <div class="box-body no-padding">
           <div class="list-group no-margin">
