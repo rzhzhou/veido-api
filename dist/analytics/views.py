@@ -23,7 +23,7 @@ class PieTypeTableView(TableAPIView):
         weixin = WeiXin.objects.filter(pubtime__range=(start,end)).count() 
         weibo = Weibo.objects.filter(pubtime__range=(start,end)).count()
 
-    return Response({'article': article, 'weixin': weixin, 'weibo': weibo})
+        return Response({'article': article, 'weixin': weixin, 'weibo': weibo})
 
 class PieFeelingTableView(TableAPIView):
     def get(self, request, start, end):
@@ -35,7 +35,7 @@ class PieFeelingTableView(TableAPIView):
 
         negative = Article.objects.filter(pubtime__range=(start,end), feeling_factor__lt=0.5).count()
     
-    return Response({'positive':positive, 'normal': normal, 'negative': negative})
+        return Response({'positive':positive, 'normal': normal, 'negative': negative})
 
 
 class PieAreaTableView(TableAPIView):
@@ -62,7 +62,7 @@ class PieAreaTableView(TableAPIView):
             provice_count.append({'name': name, 'count': count})
         sort_result = sorted(provice_count, key=lambda x:x['count'], reversed=True)[:6]
     
-    return Response({'provice_count':provice_count, 'sort_result': sort_result})
+        return Response({'provice_count':provice_count, 'sort_result': sort_result})
 
 
 class AnalyticsView(BaseView):
