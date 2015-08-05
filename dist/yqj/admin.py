@@ -1,4 +1,4 @@
-#coding=utf-8
+   #coding=utf-8
 
 from django.contrib import admin
 from django import forms
@@ -226,6 +226,30 @@ class RiskAdmin(admin.ModelAdmin):
     list_editable = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
     list_filter = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
     search_fields = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
+
+    def save_model(self, request, obj, form, change):
+        if not change:
+            CrawlerTask(obj.title, 'zjld', u"风险快讯").type_task()
+            obj.save()
+        else:           
+            key_list = Risk.objects.filter(id=obj.id)
+            if not key_list:
+                return
+            old_keyword = key_list[0].title
+            if not obj.title:
+                return
+            if old_keyword == obj.title:
+                return
+            CrawlerTask(obj.title, "zjld", u"风险快讯").update_task(old_keyword)
+            obj.save()
+
+    def delete_model(self, request, obj):
+        key_list = Risk.objects.filter(id=obj.id)
+        if not key_list:
+            return
+        del_index = key_list[0].title
+        CrawlerTask(del_index, "zjld", u"风险快讯").del_task()       
+        obj.delete()        
 
 
 class LRiskAdmin(admin.ModelAdmin):
