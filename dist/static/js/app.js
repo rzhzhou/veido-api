@@ -1938,13 +1938,122 @@ APP.analytics = function () {
 
       chart = {
         trend: function (start, end) {
-          console.log(start);
-          console.log(end);
+           require(['echarts', 'echarts/chart/line','echarts/theme/macarons',], function (ec ) {
+             $.getJSON(api, {type: 'chart-trend', start: start, end: end}, function (data) {
+                ec.init( document .getElementById('chart-trend'), 'macarons'),setOption({
+                  tooltip : {
+                    backgroundColor:'rgba(50,50,50,0.5)',
+                    trigger:'axis',
+                    axisPointer : {
+                      type : 'line',
+                      lineStyle : {
+                        color : '#008acd',
+                      }
+                    }
+                  },
+                  shadowStyle : {
+                    color : 'rgba(200,200,200,0.2)'
+                  },
+                  legend : {
+                    data : ['全部' , '新闻' ,  '微博' ,   '微信']
+                  },
+                  toolbox: {
+                    show: true,
+                    eature: {
+                      mark: {
+                        show: false
+                      },
+                     dataView: {
+                        show: true,
+                        readOnly: false
+                      },
+                      magicType: {
+                        show: false,
+                        type: ['line']
+                      },
+                      restore: {
+                        show: false
+                       },
+                       saveAsImage: {
+                         show: true
+                        }
+                      }
+                    },
+                    calculable: true,
+                    xAxis: [{
+                      type: 'category',
+                      boundaryGap: false,
+                      data: data.time
+                    }],
+                    yAxis: [{
+                      type: 'value'
+                    }],
+                    series: [{
+                      name: '全部',
+                      type: 'line',
+                      stack: '总量',
+                      data:data.value
+                    },
+                    {
+                      name: '新闻',
+                      type: 'line',
+                      stack: '总量',
+                      data:data.value
+                      },
+                      {
+                      name: '微博',
+                      type: 'line',
+                      stack: '总量',
+                      data:data.value
+                      },
+                      {
+                      name: '微信',
+                      type: 'line',
+                      stack: '总量',
+                      data:data.value
+                      },
+                      ]
+                  });
+                })
+             })
         },
-
         type: function (start, end) {
-          console.log(start);
-          console.log(end);
+          require(['echarts', 'echarts/chart/pie','echarts/theme/macarons',], function (ec ) {
+             $.getJSON(api, {type: 'chart-type', start: start, end: end}, function (data) {
+              ec.init(document.getElementById('chart-type')).setOption({
+                 tooltip : {
+                  trigger: 'item',
+                  formatter: "{a} <br/>{b} : {c} ({d}%)"
+                 },
+                 legend: {
+                   orient : 'vertical',
+                   x : 'left',
+                   data:['新闻','微博','微信']
+                   },
+                 toolbox: {
+                   show : true,
+                   feature : {
+                     dataView : {show: true, readOnly: false},
+                     saveAsImage : {show: true}
+                   }
+                 },
+                 calculable : true,
+                 series : [
+                   {
+                      name:'访问来源',
+                      type:'pie',
+                      radius : '55%',
+                      center: ['50%', '60%'],
+                      data:[
+                        {value:data.news, name:'新闻'},
+                        {value:data.weibo, name:'微博'},
+                        {value:data.weixin, name:'微信'}
+                      ]
+                   }
+                 ]
+              });
+            });
+          });
         },
 
         emotion: function (start, end) {
@@ -1964,7 +2073,6 @@ APP.analytics = function () {
 
       showChart = function () {
         var chartType = $chart.find('.tab-pane.active')[0].id.slice(6);
-
         chart[chartType](start, end);
       },
 
