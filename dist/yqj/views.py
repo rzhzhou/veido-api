@@ -374,6 +374,7 @@ class SettingsView(BaseView):
 
         return self.render_to_response('user/settings.html')
 
+
 class CustomListView(BaseView):
     custom_list_num = 5
     def get(self, request):
@@ -422,6 +423,11 @@ class ProductView(BaseView):
         prokey_len = len(prokeywords)
         prokeyword_list = [{'id': '0', 'name': u'全部'}] + [{'id': prokeywords[i].id, 'name': prokeywords[i].newkeyword} for i in xrange(0, prokey_len)]
         return self.render_to_response('product/product.html', {'product_list': prokeyword_list, 'product': {'name': name}})
+
+
+class AnalyticsView(BaseView):
+    def get(self, request):
+        return self.render_to_response('analytics/analytics.html')
 
 
 class UserView(BaseView):
