@@ -167,6 +167,7 @@ class BaseView(LoginRequiredMixin, View):
             #for ctg in categories:
             #    ctg.id = encrypt(ctg.id)
             context['categories'] = categories
+            context['industries'] = categories
 
         if self.INCLUDE_USER:
             user = self.request.myuser
