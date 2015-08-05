@@ -203,7 +203,7 @@ APP.menu = function() {
       vaildURL = function() {
         var thisHref = this.getAttribute('href');
 
-        if (APP.type === 'categoryItem' || APP.type === 'locationItem') {
+        if (APP.type === 'categoryItem' || APP.type === 'locationItem' || APP.type === 'analyticsItem') {
           return thisHref === APP.url;
         } else {
           return thisHref.split('/')[1] === APP.url.split('/')[1];
@@ -620,6 +620,92 @@ APP.inspection = function () {
 };
 
 
+APP.analytics = function () {
+  var $el = $('.date-range-picker'),
+      $dateRangeLabel = $el.children('span'),
+      $statisticTotal = $('.statistic-total').children('span'),
+      $statisticRisk = $('.statistic-risk').children('span'),
+
+      showDateRange = function (start, end) {
+        $dateRangeLabel.html(start + ' ~ ' + end);
+      },
+
+      showDataList = function (dataList) {
+        $('<tbody/>')
+          .html(dataList)
+          .replaceAll($('tbody'));
+      },
+
+      showAnalytics = function (start, end) {
+        start = start.format('YYYY-MM-DD');
+        end   = end.format('YYYY-MM-DD');
+
+        showDateRange(start, end);
+
+        $('.statistic').trigger('showStatistic', [start, end]);
+      };
+
+
+      $('.statistic').on('showStatistic', function (event, start, end) {
+        $.getJSON('/api/analytics/1/', {type: 'statistic', start: start, end: end}, function (statistic) {
+          $statisticTotal.text(statistic.total);
+          $statisticRisk.text(statistic.risk);
+        });
+      });
+
+  showAnalytics(moment().subtract(6, 'days'), moment());
+
+  $el.daterangepicker({
+    ranges: {
+      '过去7天': [moment().subtract(6, 'days'), moment()],
+      '过去30天': [moment().subtract(29, 'days'), moment()],
+      '这个月': [moment().startOf('month'), moment().endOf('month')],
+      '上个月': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+    },
+    'locale': {
+      'format': 'YYYY-MM-DD',
+      'separator': ' - ',
+      'applyLabel': '确定',
+      'cancelLabel': '取消',
+      'fromLabel': '从',
+      'toLabel': '到',
+      'customRangeLabel': '自定义',
+      'daysOfWeek': [
+        '日',
+        '一',
+        '二',
+        '三',
+        '四',
+        '五',
+        '六'
+      ],
+      'monthNames': [
+        '一月',
+        '二月',
+        '三月',
+        '四月',
+        '五月',
+        '六月',
+        '七月',
+        '八月',
+        '九月',
+        '十月',
+        '十一月',
+        '十二月'
+      ],
+      'firstDay': 1
+    },
+    'startDate': moment().subtract(6, 'days'),
+    'endDate': moment(),
+    'minDate': '2010-01-01',
+    'maxDate': moment(),
+    'opens': 'left',
+    'parentEl': '.content-header',
+    'applyClass': 'btn-success',
+    'cancelClass': 'btn-default'
+  }, showAnalytics);
+};
+
 //
 // url based router
 //
@@ -700,6 +786,10 @@ $(function() {
     productItem: function() {
       this.common();
       this.product();
+    },
+    analyticsItem: function () {
+      this.common();
+      APP.analytics();
     },
     collection: function() {
       this.common();

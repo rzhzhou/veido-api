@@ -1,8 +1,11 @@
+# -*- coding: utf-8 -*-
 from django.shortcuts import render
 from rest_framework.response import Response
 from django.db.models import Count,Q
 from rest_framework.views import APIView
 from yqj.models import Article, Weixin, Weibo, Area
+from base.views import BaseView
+
 
 class TableAPIView(APIView):
     def __init__(self, request=None):
@@ -34,6 +37,7 @@ class PieFeelingTableView(TableAPIView):
     
     return Response({'positive':positive, 'normal': normal, 'negative': negative})
 
+
 class PieAreaTableView(TableAPIView):
     def get(self, request, start, end):
     #SELECT id FROM yqj.`area` WHERE parent_id IN (SELECT id FROM yqj.`area` WHERE parent_id=2) OR parent_id=2 OR id =2
@@ -59,3 +63,9 @@ class PieAreaTableView(TableAPIView):
         sort_result = sorted(provice_count, key=lambda x:x['count'], reversed=True)[:6]
     
     return Response({'provice_count':provice_count, 'sort_result': sort_result})
+
+
+class AnalyticsView(BaseView):
+    def get(self, request):
+        return self.render_to_response('analytics/analytics.html', {'industry': {'name': u'综合'}})
+
