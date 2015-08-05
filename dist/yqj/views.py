@@ -103,26 +103,26 @@ def index_view(request):
 
         group = Group.objects.get(company=user.company).id
         score_list = LocaltionScore.objects.filter(group=group)
-        socre_id = []
+        risk_id = []
         for item in score_list:
-            socre_id.append(item.article_id)
+            risk_id.append(item.risk_id)
 
-        article_list = Article.objects.filter(id__in=socre_id)[:6]
+        risk = Risk.objects.filter(id__in=risk_id)[:6]    
         risk_list = []
-        for item in article_list:
+        for item in risk:
             data = {}
             try:
-                relevance = LocaltionScore.objects.get(article_id=item.id).score
-            except LocaltionScore.DoesNotExist:
+                relevance = LocaltionScore.objects.get(risk=item.id).score
+            except:
                 relevance = 0
             try:
-                score = RiskScore.objects.get(article=item.id).score
+                score = RiskScore.objects.get(risk=item.id).score
             except RiskScore.DoesNotExist:
                 score = 0
-            data['relevance'] = relevance
+            data['relevance'] = 0       #relevance
             data['title'] = item.title
             data['source'] = item.source
-            data['score'] = score
+            data['score'] = 0 #score
             data['time'] = item.pubtime
             data['id'] = item.id
             risk_list.append(data)
