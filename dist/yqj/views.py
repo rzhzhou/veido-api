@@ -3,7 +3,6 @@ import os
 from datetime import datetime, timedelta
 
 from django.conf import settings
-from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
 from django.db import connection
@@ -13,12 +12,12 @@ from django.shortcuts import render, render_to_response
 from django.template.loader import render_to_string
 from django.utils import timezone
 
-from yqj import login_required
+from base import login_required, get_user_image
+from base.views import BaseView
 from yqj.redisconnect import RedisQueryApi
 from yqj.models import (Article, Weixin, Weibo, RelatedData, Category, Group,
     Area, Topic, Inspection, Custom, CustomKeyword, Collection, ArticlePublisher,
     Product, ProductKeyword)
-from base.views import BaseView
 
 
 def SetLogo(obj):
@@ -142,16 +141,6 @@ def index_view(request):
             })
     else:
         return HttpResponse(status=401)
-
-def get_user_image(user):
-    image_url = None
-    for filename in os.listdir(settings.MEDIA_ROOT):
-        if os.path.splitext(filename)[0] == str(user.id):
-            image_url = os.path.join('/media', filename)
-    if image_url is None:
-        image_url = '/static/img/avatar.jpg'
-    return image_url
-
 
 class CategoryView(BaseView):
     def get(self, request, category_id):

@@ -1,31 +1,34 @@
-#coding=utf-8
-
+# -*- coding: utf-8 -*-
 import os
-import datetime
 from collections import defaultdict
+from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
-from django.views.generic import View
-from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
-from django.shortcuts import render_to_response
-from django.template.loader import render_to_string
-from django.db import models, connection, IntegrityError
-from django.conf import settings
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework.decorators import api_view
-from yqj.models import (Article, Area, Weixin, Weibo, Topic, RelatedData, Category,
-                        save_user, Collection, Topic, hash_password, User, Custom,
-                        Inspection, CustomKeyword,Product, ProductKeyword, Group)
-from yqj.views import SetLogo
 from serializers import ArticleSerializer
-from yqj import authenticate, login_required
-from django.db.models import Count
-from api_function import GetFirstDaySeason, get_season, year_range, season_range, months_range, days_range, week_range, unstable
+
+from django.conf import settings
 from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
+from django.db import models, connection, IntegrityError
+from django.db.models import Count
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
+from django.shortcuts import render_to_response
+from django.template.loader import render_to_string
+from django.views.generic import View
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.decorators import api_view
+
+from base import authenticate, login_required
+from yqj.models import (Article, Area, Weixin, Weibo, Topic, RelatedData,
+    Category, save_user, Collection, Topic, hash_password, User, Custom,
+    Inspection, CustomKeyword,Product, ProductKeyword, Group)
 from yqj.redisconnect import RedisQueryApi
-from django.db import connection
+from yqj.views import SetLogo
+from api.api_function import (GetFirstDaySeason, get_season, year_range,
+    season_range, months_range, days_range, week_range, unstable)
+
+
 
 def login_view(request):
     try:
@@ -63,12 +66,6 @@ def registe_view(request):
 
     return JsonResponse ({'status': True})
 
-
-class LoginRequiredMixin(object):
-    @classmethod
-    def as_view(cls, **initkwargs):
-        view = super(LoginRequiredMixin, cls).as_view(**initkwargs)
-        return login_required(view)
 
 class TableAPIView(APIView):
     COLLECTED_TEXT = u'<i class="fa fa-star" data-toggle="tooltip", data-placement="right" title="取消收藏">'
@@ -223,7 +220,7 @@ class TableAPIView(APIView):
             try:
                 item['time'] = data.articles.order_by('pubtime')[0].pubtime.replace(tzinfo=None).strftime('%Y-%m-%d')
             except IndexError:
-                item['time'] = datetime.datetime.now().strftime('%Y-%m-%d')
+                item['time'] = datetime.now().strftime('%Y-%m-%d')
             item['hot'] = data.articles.count() + data.weixin.count() + data.weibo.count()
             result.append(item)
 
@@ -233,8 +230,8 @@ class TableAPIView(APIView):
 
 
 def get_date_from_iso(datetime_str):
-    #return datetime.datetime.strptime("2008-09-03T20:56:35.450686Z", "%Y-%m-%dT%H:%M:%S.%fZ")
-    return datetime.datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S.%fZ")
+    #return datetime.strptime("2008-09-03T20:56:35.450686Z", "%Y-%m-%dT%H:%M:%S.%fZ")
+    return datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S.%fZ")
 
 class ArticleTableView(TableAPIView):
     def get(self, request, id, page):
@@ -408,7 +405,7 @@ class EventTableView(TableAPIView):
             if time:
                 pubtime = time[0].pubtime
             else:
-                pubtime = datetime.datetime.now()
+                pubtime = datetime.now()
             one_record = [collected_html, title, item.source, item.area.name, pubtime.date(), hot_index]
             result.append(one_record)
         return Response({"event": result})
@@ -495,7 +492,7 @@ class CollectView(APIView):
         if time:
             pubtime = time[0].pubtime
         else:
-            pubtime = datetime.datetime.now()
+            pubtime = datetime.now()
         one_record = [title, item.source, item.area.name, pubtime.date(), hot_index]
         #one_record = [view.collected_html(item), title, item.source, item.area.name, pubtime.date(), hot_index]
         return one_record
@@ -680,13 +677,13 @@ class ProductTableView(TableAPIView):
             prokey = group[0].productkeyword_set.all()
 
         prokey_len = len(prokey)
-        product = [prokey[i].product for i in xrange(prokey_len)] 
+        product = [prokey[i].product for i in xrange(prokey_len)]
 
         data = [p.articles.all() for p in product]
         if data != []:
             item = reduce(lambda x, y: list(set(x).union(set(y))), data)
         else:
-            item =[] 
+            item =[]
         article_ids = [item[i].id for i in range(len(item))]
         item = Article.objects.filter(id__in=article_ids)
 
@@ -764,7 +761,7 @@ class InspectionLocalView(TableAPIView):
         inspection = render_to_string('inspection/dashboard_inspection.html', {'inspection_list': inspection_list})
         return HttpResponse(inspection)
 
-        
+
 class InspectionNationalView(TableAPIView):
     def get(self, request):
         user = request.myuser
@@ -848,7 +845,7 @@ class WeiboTableView(TableAPIView):
             html +=  u'<span>评论 %s</span>' % item['comments_count']
             html +=  u'<span><i class="fa fa-thumbs-o-up"></i> %s</span>' % item['attitudes_count']
             html += """</div>"""
-            html +=  u'<div class="time pull-left">%s</div>' % datetime.datetime.fromtimestamp(item['pubtime']).strftime('%Y-%m-%d %H:%M')
+            html +=  u'<div class="time pull-left">%s</div>' % datetime.fromtimestamp(item['pubtime']).strftime('%Y-%m-%d %H:%M')
             html += """</div></div></li>"""
 
         return html
@@ -987,17 +984,17 @@ def get_count_feeling(start_d, end_d, feeling_type):
         while day < end_d:
             num = d[day] if day in d else 0
             result.append(num)
-            day = day + datetime.timedelta(days=1)
+            day = day + timedelta(days=1)
         return result
 
 @login_required
 def chart_line_index_view(request):
-    today = datetime.datetime.today().date()
-    start_d = today - datetime.timedelta(days=6)
-    end_d = today + datetime.timedelta(days=1)
+    today = datetime.today().date()
+    start_d = today - timedelta(days=6)
+    end_d = today + timedelta(days=1)
 
     data = {}
-    data['date'] = [(today - datetime.timedelta(days=x)).strftime("%m-%d") for x in reversed(range(7))]
+    data['date'] = [(today - timedelta(days=x)).strftime("%m-%d") for x in reversed(range(7))]
     data['positive'] = get_count_feeling(start_d, end_d, 'positive')
     data['neutral'] = get_count_feeling(start_d, end_d, 'netrual')
     data['negative'] = get_count_feeling(start_d, end_d, 'negative')
