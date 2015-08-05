@@ -1931,8 +1931,80 @@ APP.analytics = function () {
       $statisticTotal = $('.statistic-total').children('span'),
       $statisticRisk = $('.statistic-risk').children('span'),
 
+      chartTrend = function (start, end) {
+
+      },
+
+      chartType = function (start, end) {
+
+      },
+
+      chartEmotion = function (start, end) {
+
+      },
+
+      chartWeibo = function (start, end) {
+
+      },
+
       showDateRange = function (start, end) {
         $dateRangeLabel.html(start + ' ~ ' + end);
+      },
+
+      showChart = function (event, start, end) {
+
+      },
+
+      showStatistic = function (event, start, end) {
+        $.getJSON(api, {type: 'statistic', start: start, end: end}, function (statistic) {
+          $statisticTotal.text(statistic.total);
+          $statisticRisk.text(statistic.risk);
+        });
+      },
+
+      showDataList = function (event, start, end) {
+        var $dataList = $('#data-list'),
+            $paginationContainer = $dataList.parent(),
+
+            toParam = function (pageNumber) {
+              if (typeof pageNumber === 'undefined') {
+                pageNumber = 1;
+              }
+
+              return {
+                type: 'data-list',
+                start: start,
+                end: end,
+                page: pageNumber,
+              };
+            },
+
+            renderTable = function (pageContent) {
+              $('<tbody/>')
+                .html(pageContent)
+                .replaceAll($dataList.find('tbody'));
+            };
+
+        $.get(api, toParam(), function (data) {
+          renderTable(data.html);
+
+          $paginationContainer.twbsPagination({
+            totalPages: data.total,
+            visiblePages: 7,
+            first: '第一页',
+            prev: '上一页',
+            next: '下一页',
+            last: '最后一页',
+            paginationClass: 'pagination pagination-sm no-margin pull-right',
+            onPageClick: function(event, pageNumber) {
+              APP.returnTop($(this));
+              $.get(api, toParam(pageNumber), function(data) {
+                renderTable(data.html);
+                $paginationContainer.twbsPagination({totalPages: data.total});
+              });
+            }
+          });
+        });
       },
 
       showAnalytics = function (start, end) {
@@ -1941,63 +2013,18 @@ APP.analytics = function () {
 
         showDateRange(start, end);
 
-        $('.statistic').trigger('showStatistic', [start, end]);
+        $('#chart').trigger('showChart', [start, end]);
+
+        $('#statistic').trigger('showStatistic', [start, end]);
 
         $('#data-list').trigger('showDataList', [start, end]);
       };
 
+  $('#chart').on('showChart', showChart);
 
-  $('.statistic').on('showStatistic', function (event, start, end) {
-    $.getJSON(api, {type: 'statistic', start: start, end: end}, function (statistic) {
-      $statisticTotal.text(statistic.total);
-      $statisticRisk.text(statistic.risk);
-    });
-  });
+  $('#statistic').on('showStatistic', showStatistic);
 
-  $('#data-list').on('showDataList', function (event, start, end) {
-    var $dataList = $('#data-list'),
-        $paginationContainer = $dataList.parent(),
-
-        toParam = function (pageNumber) {
-          if (typeof pageNumber === 'undefined') {
-            pageNumber = 1;
-          }
-
-          return {
-            type: 'data-list',
-            start: start,
-            end: end,
-            page: pageNumber,
-          };
-        },
-
-        renderTable = function (pageContent) {
-          $('<tbody/>')
-            .html(pageContent)
-            .replaceAll($dataList.find('tbody'));
-        };
-
-    $.get(api, toParam(), function (data) {
-      renderTable(data.html);
-
-      $paginationContainer.twbsPagination({
-        totalPages: data.total,
-        visiblePages: 7,
-        first: '第一页',
-        prev: '上一页',
-        next: '下一页',
-        last: '最后一页',
-        paginationClass: 'pagination pagination-sm no-margin pull-right',
-        onPageClick: function(event, pageNumber) {
-          APP.returnTop($(this));
-          $.get(api, toParam(pageNumber), function(data) {
-            renderTable(data.html);
-            $paginationContainer.twbsPagination({totalPages: data.total});
-          });
-        }
-      });
-    });
-  });
+  $('#data-list').on('showDataList', showDataList);
 
   $el.daterangepicker({
     ranges: {
@@ -2050,8 +2077,8 @@ APP.analytics = function () {
   }, showAnalytics);
 
   showAnalytics(moment().subtract(6, 'days'), moment());
-
 };
+
 
 //
 // url based router
