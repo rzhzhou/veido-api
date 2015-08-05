@@ -30,6 +30,7 @@ def index_view(request):
         categories = Category.objects.filter(~(Q(name='其他' )|Q(name='政府' )|Q(name='事件' )|Q(name='质监热点' )
             |Q(name='指定监测' )))
         locations = Area.objects.filter(level=user.area.level+1, parent=user.area)
+        industries = categories
         user.company = user.group.company
 
         news_number = Article.objects.count()
@@ -123,6 +124,7 @@ def index_view(request):
             {'user': user,
             'categories': categories,
             'locations': locations,
+            'industries': industries,
             'news': {'number': news_number, 'percent': news_percent},
             'weibo': {'number': weibo_number, 'percent': weibo_percent},
             'weixin': {'number': weixin_number, 'percent': weixin_percent},
