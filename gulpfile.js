@@ -20,18 +20,6 @@ var jsFiles = [
   'src/js/app.js'
 ];
 
-var dataTablesFiles = [
-  'bower_components/DataTables/media/js/jquery.dataTables.js',
-  'bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.js'
-];
-
-gulp.task('dataTables', function() {
-  return gulp.src(dataTablesFiles)
-    .pipe(concat('dataTables.min.js'))
-    .pipe(uglify())
-    .pipe(gulp.dest('dist/vendor/dataTables'));
-});
-
 gulp.task('clean-css', function() {
   del.sync(['dist/static/css/*.css']);
 });
@@ -40,6 +28,34 @@ gulp.task('clean-js', function() {
   del.sync(['dist/static/js/*.js']);
 });
 
+
+// tasks for vendor
+
+gulp.task('dateRangePicker', function () {
+  var files = [
+    'bower_components/moment/moment.js',
+    'bower_components/bootstrap-daterangepicker/daterangepicker.js'
+  ];
+
+  return gulp.src(files)
+    .pipe(concat('dateRangePicker.min.js'))
+    .pipe(uglify())
+    .pipe(gulp.dest('dist/vendor/dateRangePicker'));
+});
+
+gulp.task('dataTables', function () {
+  var files = [
+    'bower_components/DataTables/media/js/jquery.dataTables.js',
+    'bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.js'
+  ];
+
+  return gulp.src(files)
+    .pipe(concat('dataTables.min.js'))
+    .pipe(uglify())
+    .pipe(gulp.dest('dist/vendor/dataTables'));
+});
+
+gulp.task('vendor', ['dateRangePicker', 'dataTables']);
 
 // tasks for build
 
