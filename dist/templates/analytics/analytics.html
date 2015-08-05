@@ -4,6 +4,11 @@
 
 {% block header %}
   <h1>{{ industry.name }}</h1>
+  <button class="date-range-picker btn btn-default">
+    <i class="fa fa-calendar"></i>
+    <span></span>
+    <b class="caret"></b>
+  </button>
 {% endblock %}
 
 {% block content %}
@@ -37,15 +42,19 @@
   <div class="row">
     <div class="col-md-12">
       <div class="box box-solid">
-        <div class="box-body">
-          <div class="statistic">
-            <div class="statistic-total">
-              <span>367800</span>
-              <p>监测数据</p>
+        <div class="box-body statistic">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="statistic-total text-center">
+                <span>367800</span>
+                <p>监测数据</p>
+              </div>
             </div>
-            <div class="statistic-risk">
-              <span>367800</span>
-              <p>风险数据</p>
+            <div class="col-md-6">
+              <div class="statistic-risk text-center">
+                <span>367800</span>
+                <p>风险数据</p>
+              </div>
             </div>
           </div>
         </div>
