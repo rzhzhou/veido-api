@@ -1,5 +1,8 @@
+# -*- coding: utf-8 -*-
 from django.shortcuts import render
 from rest_framework.views import APIView
+
+from yqj.views import BaseView
 
 
 class TableAPIView(APIView):
@@ -26,3 +29,7 @@ class PieAreaTableView(TableAPIView):
     def get(self, request):
         pass
 
+
+class AnalyticsView(BaseView):
+    def get(self, request):
+        return self.render_to_response('analytics/analytics.html', {'industry': {'name': u'综合'}})

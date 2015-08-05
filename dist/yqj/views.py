@@ -429,11 +429,6 @@ class ProductView(BaseView):
         return self.render_to_response('product/product.html', {'product_list': prokeyword_list, 'product': {'name': name}})
 
 
-class AnalyticsView(BaseView):
-    def get(self, request):
-        return self.render_to_response('analytics/analytics.html')
-
-
 class UserView(BaseView):
     def get(self, request):
         return self.render_to_response('user/user.html')
