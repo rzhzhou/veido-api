@@ -5,7 +5,7 @@ from django.db.models import Count,Q
 from rest_framework.views import APIView
 from yqj.models import Article, Weixin, Weibo, Area
 from base.views import BaseView
-import datatime
+from datetime import datetime
 
 
 class TableAPIView(APIView):
@@ -19,7 +19,9 @@ class LineTableView(TableAPIView):
 
 
 class PieTypeTableView(TableAPIView):
-    def get(self, request, start, end):
+    def get(self, request):
+        start = datetime.strftime(request.GET['start'], '%Y-%m-%d')
+        end = datetime.strftime(request.GET['end'], '%Y-%m-%d')
         news = Article.objects.filter(pubtime__range=(start,end)).count()
         weixin = WeiXin.objects.filter(pubtime__range=(start,end)).count() 
         weibo = Weibo.objects.filter(pubtime__range=(start,end)).count()
@@ -27,7 +29,9 @@ class PieTypeTableView(TableAPIView):
         return Response({'news': article, 'weixin': weixin, 'weibo': weibo})
 
 class PieFeelingTableView(TableAPIView):
-    def get(self, request, start, end):
+    def get(self, request):
+        start = datetime.strftime(request.GET['start'], '%Y-%m-%d')
+        end = datetime.strftime(request.GET['end'], '%Y-%m-%d')
         positive = Article.objects.filter(pubtime__range=(start,end), 
             feeling_factor__gte=0.6).count()
 
@@ -40,9 +44,10 @@ class PieFeelingTableView(TableAPIView):
 
 
 class PieAreaTableView(TableAPIView):
-    def get(self, request, start, end):
+    def get(self, request):
     #SELECT id FROM yqj.`area` WHERE parent_id IN (SELECT id FROM yqj.`area` WHERE parent_id=2) OR parent_id=2 OR id =2
-
+        start = datetime.strftime(request.GET['start'], '%Y-%m-%d')
+        end = datetime.strftime(request.GET['end'], '%Y-%m-%d')
         pro_area = Area.objects.filter(level=2)
         pro_id = []
         for item in pro_area:
