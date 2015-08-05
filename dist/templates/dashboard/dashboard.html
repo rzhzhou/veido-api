@@ -78,42 +78,6 @@
   </div>
 
   <div class="row">
-    <div class="col-md-12">
-      <div id="inspection" class="box box-default">
-        <div class="box-header with-border">
-          <h3 class="box-title">抽检信息</h3>
-          <div class="box-tools pull-right">
-            <div class="btn-group">
-              <button type="button" id="local-inspection" class="btn btn-default btn-xs active">本地</button>
-              <button type="button" id="national-inspection" class="btn btn-default btn-xs">全国</button>
-            </div>
-          </div>
-        </div>
-        <div class="box-body no-padding">
-          <table class="table table-hover table-custom">
-            <thead>
-              <tr>
-                <th class="col-category">产品种类</th>
-                <th class="col-name">事件</th>
-                <th class="col-quality">合格率</th>
-                <th class="col-source">来源</th>
-                <th class="col-time">抽检日期</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {% include "inspection/dashboard_inspection.html" %}
-            </tbody>
-          </table>
-        </div>
-        <div class="box-footer text-center">
-          <a href="/inspection/">查看更多</a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="row">
     <div class="col-md-6">
       <div class="box box-info">
         <div class="box-header with-border">
@@ -251,6 +215,42 @@
         </div>
         <div class="box-body">
           <div id="pie-chart" style="height: 320px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div id="inspection" class="box box-default">
+        <div class="box-header with-border">
+          <h3 class="box-title">抽检信息</h3>
+          <div class="box-tools pull-right">
+            <div class="btn-group">
+              <button type="button" id="local-inspection" class="btn btn-default btn-xs active">本地</button>
+              <button type="button" id="national-inspection" class="btn btn-default btn-xs">全国</button>
+            </div>
+          </div>
+        </div>
+        <div class="box-body no-padding">
+          <table class="table table-hover table-custom">
+            <thead>
+              <tr>
+                <th class="col-category">产品种类</th>
+                <th class="col-name">事件</th>
+                <th class="col-quality">合格率</th>
+                <th class="col-source">来源</th>
+                <th class="col-time">抽检日期</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {% include "inspection/dashboard_inspection.html" %}
+            </tbody>
+          </table>
+        </div>
+        <div class="box-footer text-center">
+          <a href="/inspection/">查看更多</a>
         </div>
       </div>
     </div>
