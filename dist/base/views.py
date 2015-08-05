@@ -1,6 +1,22 @@
 # -*- coding: utf-8 -*-
+import os
+from django.conf import settings
+from django.db.models import Q
+from django.shortcuts import render_to_response
 from django.views.generic import View
+
 from yqj import login_required
+from yqj.models import Area, Category
+
+
+def get_user_image(user):
+    image_url = None
+    for filename in os.listdir(settings.MEDIA_ROOT):
+        if os.path.splitext(filename)[0] == str(user.id):
+            image_url = os.path.join('/media', filename)
+    if image_url is None:
+        image_url = '/static/img/avatar.jpg'
+    return image_url
 
 
 class LoginRequiredMixin(object):

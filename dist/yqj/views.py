@@ -7,7 +7,7 @@ from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
 from django.db import connection
-from django.db.models import Count,Q
+from django.db.models import Count, Q
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, render_to_response
 from django.template.loader import render_to_string
