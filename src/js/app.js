@@ -203,7 +203,7 @@ APP.menu = function() {
       vaildURL = function() {
         var thisHref = this.getAttribute('href');
 
-        if (APP.type === 'categoryItem' || APP.type === 'locationItem') {
+        if (APP.type === 'categoryItem' || APP.type === 'locationItem' || APP.type === 'analyticsItem') {
           return thisHref === APP.url;
         } else {
           return thisHref.split('/')[1] === APP.url.split('/')[1];
@@ -620,6 +620,14 @@ APP.inspection = function () {
 };
 
 
+APP.analytics = (function () {
+  var init = function () {
+    console.log('fine');
+  };
+
+  return { init: init };
+}());
+
 //
 // url based router
 //
@@ -700,6 +708,10 @@ $(function() {
     productItem: function() {
       this.common();
       this.product();
+    },
+    analyticsItem: function () {
+      this.common();
+      APP.analytics.init();
     },
     collection: function() {
       this.common();
