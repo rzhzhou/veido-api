@@ -623,46 +623,58 @@ APP.inspection = function () {
 
 
 APP.analytics = function () {
-  var api = '/api' + APP.url,
-      $el = $('.date-range-picker'),
-      $dateRangeLabel = $el.children('span'),
+  var start = '',
+      end = '',
+      api = '/api' + APP.url,
+      $dateRangePicker = $('.date-range-picker'),
+      $dateRangeLabel = $dateRangePicker.children('span'),
+      $chart = $('#chart'),
+      $statistic = $('#statistic'),
+      $dataList = $('#data-list'),
       $statisticTotal = $('.statistic-total').children('span'),
       $statisticRisk = $('.statistic-risk').children('span'),
 
-      chartTrend = function (start, end) {
+      chart = {
+        trend: function (start, end) {
+          console.log(start);
+          console.log(end);
+        },
 
-      },
+        type: function (start, end) {
+          console.log(start);
+          console.log(end);
+        },
 
-      chartType = function (start, end) {
+        emotion: function (start, end) {
+          console.log(start);
+          console.log(end);
+        },
 
-      },
-
-      chartEmotion = function (start, end) {
-
-      },
-
-      chartWeibo = function (start, end) {
-
+        weibo: function (start, end) {
+          console.log(start);
+          console.log(end);
+        }
       },
 
       showDateRange = function (start, end) {
         $dateRangeLabel.html(start + ' ~ ' + end);
       },
 
-      showChart = function (event, start, end) {
+      showChart = function () {
+        var chartType = $chart.find('.tab-pane.active')[0].id.slice(6);
 
+        chart[chartType](start, end);
       },
 
-      showStatistic = function (event, start, end) {
+      showStatistic = function () {
         $.getJSON(api, {type: 'statistic', start: start, end: end}, function (statistic) {
           $statisticTotal.text(statistic.total);
           $statisticRisk.text(statistic.risk);
         });
       },
 
-      showDataList = function (event, start, end) {
-        var $dataList = $('#data-list'),
-            $paginationContainer = $dataList.parent(),
+      showDataList = function () {
+        var $paginationContainer = $dataList.parent(),
 
             toParam = function (pageNumber) {
               if (typeof pageNumber === 'undefined') {
@@ -705,26 +717,29 @@ APP.analytics = function () {
         });
       },
 
-      showAnalytics = function (start, end) {
-        start = start.format('YYYY-MM-DD');
-        end   = end.format('YYYY-MM-DD');
+      showAnalytics = function (startMoment, endMoment) {
+        start = startMoment.format('YYYY-MM-DD');
+        end   = endMoment.format('YYYY-MM-DD');
 
         showDateRange(start, end);
 
-        $('#chart').trigger('showChart', [start, end]);
+        $chart
+          .trigger('showChart')
+          .off('shown.bs.tab')
+          .on('shown.bs.tab', showChart);
 
-        $('#statistic').trigger('showStatistic', [start, end]);
+        $statistic.trigger('showStatistic');
 
-        $('#data-list').trigger('showDataList', [start, end]);
+        $dataList.trigger('showDataList');
       };
 
-  $('#chart').on('showChart', showChart);
+  $chart.on('showChart', showChart);
 
-  $('#statistic').on('showStatistic', showStatistic);
+  $statistic.on('showStatistic', showStatistic);
 
-  $('#data-list').on('showDataList', showDataList);
+  $dataList.on('showDataList', showDataList);
 
-  $el.daterangepicker({
+  $dateRangePicker.daterangepicker({
     ranges: {
       '过去7天': [moment().subtract(6, 'days'), moment()],
       '过去30天': [moment().subtract(29, 'days'), moment()],
