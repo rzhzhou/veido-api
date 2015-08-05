@@ -1925,12 +1925,37 @@ APP.inspection = function () {
 APP.analytics = function () {
   var $el = $('.date-range-picker'),
       $dateRangeLabel = $el.children('span'),
+      $statisticTotal = $('.statistic-total').children('span'),
+      $statisticRisk = $('.statistic-risk').children('span'),
 
       showDateRange = function (start, end) {
-        $dateRangeLabel.html(start.format('YYYY-MM-DD') + ' ~ ' + end.format('YYYY-MM-DD'));
+        $dateRangeLabel.html(start + ' ~ ' + end);
+      },
+
+      showDataList = function (dataList) {
+        $('<tbody/>')
+          .html(dataList)
+          .replaceAll($('tbody'));
+      },
+
+      showAnalytics = function (start, end) {
+        start = start.format('YYYY-MM-DD');
+        end   = end.format('YYYY-MM-DD');
+
+        showDateRange(start, end);
+
+        $('.statistic').trigger('showStatistic', [start, end]);
       };
 
-  showDateRange(moment().subtract(6, 'days'), moment());
+
+      $('.statistic').on('showStatistic', function (event, start, end) {
+        $.getJSON('/api/analytics/1/', {type: 'statistic', start: start, end: end}, function (statistic) {
+          $statisticTotal.text(statistic.total);
+          $statisticRisk.text(statistic.risk);
+        });
+      });
+
+  showAnalytics(moment().subtract(6, 'days'), moment());
 
   $el.daterangepicker({
     ranges: {
@@ -1980,7 +2005,7 @@ APP.analytics = function () {
     'parentEl': '.content-header',
     'applyClass': 'btn-success',
     'cancelClass': 'btn-default'
-  }, showDateRange);
+  }, showAnalytics);
 };
 
 //
