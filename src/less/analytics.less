@@ -5,5 +5,30 @@
   right: 15px;
 }
 
-.statistic {
+.statistic-total,
+.statistic-risk {
+  font-size: 18px;
+
+  > span {
+    font-size: 36px;
+  }
+
+  & > p {
+    margin-bottom: 0;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
 }
+
+.statistic-total > span {
+  color: #00a65a;
+}
+
+.statistic-risk {
+  border-left: 1px dashed #eaeaea;
+
+  & > span {
+    color: #dd4b39;
+  }
+}
+
