@@ -4,7 +4,95 @@
 
 {% block header %}
   <h1>{{ industry.name }}</h1>
+  <button class="date-range-picker btn btn-default">
+    <i class="fa fa-calendar"></i>
+    <span></span>
+    <b class="caret"></b>
+  </button>
 {% endblock %}
 
 {% block content %}
+  <div class="row">
+    <div class="col-md-12">
+      <div class="nav-tabs-custom">
+        <ul class="nav nav-tabs">
+          <li class="active">
+            <a href="#chart-trend" data-toggle="tab">报道总趋势分析</a>
+          </li>
+          <li>
+            <a href="#chart-type" data-toggle="tab">信息类型分析</a>
+          </li>
+          <li>
+            <a href="#chart-emotion" data-toggle="tab">情感分析</a>
+          </li>
+          <li>
+            <a href="#chart-weibo" data-toggle="tab">微博地域分析</a>
+          </li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane active" id="chart-trend"></div>
+          <div class="tab-pane" id="chart-type"></div>
+          <div class="tab-pane" id="chart-emotion"></div>
+          <div class="tab-pane" id="chart-weibo"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="box box-solid">
+        <div class="box-body statistic">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="statistic-total text-center">
+                <span>367800</span>
+                <p>监测数据</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="statistic-risk text-center">
+                <span>367800</span>
+                <p>风险数据</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="box box-info">
+        <div class="box-header with-border">
+          <h3 class="box-title">数据列表</h3>
+        </div>
+        <div class="box-body clearfix">
+          <table id="news" class="table table-bordered table-hover table-custom">
+            <thead>
+              <tr>
+                <th class="col-title">标题</th>
+                <th class="col-source">来源</th>
+                <th class="col-location">地点</th>
+                <th class="col-time">时间</th>
+                <th class="col-index">热度</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+            <tfoot>
+              <tr>
+                <th>标题</th>
+                <th>来源</th>
+                <th>地点</th>
+                <th>时间</th>
+                <th>热度</th>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
 {% endblock %}
