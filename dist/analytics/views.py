@@ -2,7 +2,7 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 
-from yqj.views import BaseView
+from base.views import BaseView
 
 
 class TableAPIView(APIView):
