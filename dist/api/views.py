@@ -260,7 +260,7 @@ class ArticleTableView(TableAPIView):
         return Response({'news': result})
         """
         items = category.articles.all()
-        datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
+        datas = self.paging(items, settings.NEWS_PAGE_LIMIT, page)
         result = self.news_to_json(datas['items'])
         return Response({'total': datas['total_number'], 'data': result})
 
@@ -322,7 +322,7 @@ class NewsTableView(TableAPIView):
         # news_list = Article.objects.filter(website_type='hot')
         # news_list = ArticleCategory.objects.get(name='质监热点').articles.all()
         items = self.get_custom_artice()
-        datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
+        datas = self.paging(items, settings.NEWS_PAGE_LIMIT, page)
         result = self.news_to_json(datas['items'])
         return Response({'total': datas['total_number'], 'data': result})
 
@@ -352,7 +352,7 @@ class LocationTableView(TableAPIView):
         return Response({"news": result})
         """
         items = Article.objects.filter(area=area)
-        datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
+        datas = self.paging(items, settings.NEWS_PAGE_LIMIT, page)
         result = self.news_to_json(datas['items'])
         return Response({'total': datas['total_number'], 'data': result})
 
@@ -436,7 +436,7 @@ class EventDetailTableView(TableAPIView):
         return Response({'news': result})
         """
         items = event.articles.all()
-        datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
+        datas = self.paging(items, settings.NEWS_PAGE_LIMIT, page)
         result = self.news_to_json(datas['items'])
         return Response({'total': datas['total_number'], 'data': result})
 
@@ -512,7 +512,7 @@ class CollectView(APIView):
         if table_type == 'news':
             view = ArticleTableView(self.request)
             items = self.collection.articles.all()
-            datas = view.paging(items, view.NEWS_PAGE_LIMIT, page)
+            datas = view.paging(items, settings.NEWS_PAGE_LIMIT, page)
             result = view.news_to_json(datas['items'])
         elif table_type == 'event':
             view = EventTableView(self.request)
@@ -659,7 +659,7 @@ class CustomTableView(TableAPIView):
         except CustomKeyword.DoesNotExist:
             return Response({'total': 0, 'data': []})
         items = keyword.custom.articles.all()
-        datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
+        datas = self.paging(items, settings.NEWS_PAGE_LIMIT, page)
         result = self.news_to_json(datas['items'])
         return Response({'total': datas['total_number'], 'data': result})
 
@@ -687,7 +687,7 @@ class ProductTableView(TableAPIView):
         article_ids = [item[i].id for i in range(len(item))]
         item = Article.objects.filter(id__in=article_ids)
 
-        datas = self.paging(item, self.NEWS_PAGE_LIMIT, page)
+        datas = self.paging(item, settings.NEWS_PAGE_LIMIT, page)
         result = self.news_to_json(datas['items'])
         return Response({'total': datas['total_number'], 'data': result})
 
@@ -790,7 +790,7 @@ class InspectionTableView(TableAPIView):
         return Response({"inspection": result})
 
         #items = Inspection.objects.order_by('-pubtime').all()
-        #datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
+        #datas = self.paging(items, settings.NEWS_PAGE_LIMIT, page)
         #result = self.inspection_to_json(datas['items'])
         #return Response({"total": datas['total_number'], "data": result})
 

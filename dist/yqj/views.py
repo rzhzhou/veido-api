@@ -242,7 +242,8 @@ class EventDetailView(BaseView):
 class WeixinView(BaseView):
     def get(self, request):
         hottest = [SetLogo(data) for data in Weixin.objects.order_by('-pubtime')[0:20]]
-        latest = self.paging(Weixin, 20, 1)
+        weixin = Weixin.objects.all()
+        latest = self.paging(weixin, 20, 1)
         items = [SetLogo(data) for data in latest['items']]
         html = self.set_css_to_weixin(items)
         return self.render_to_response('weixin/weixin_list.html', {'weixin_latest_list': latest,

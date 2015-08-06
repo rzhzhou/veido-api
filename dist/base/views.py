@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.core.paginator import Paginator
+from django.core.paginator import EmptyPage
+from django.core.paginator import PageNotAnInteger
 from django.db.models import Q
 from django.shortcuts import render_to_response
 from django.views.generic import View
@@ -74,7 +76,6 @@ class BaseView(LoginRequiredMixin, View):
 
     def paging(self, items, limit, page):
         paginator = Paginator(items, limit)
-
         try:
             items = paginator.page(page) # 获取某页对应的记录
         except PageNotAnInteger:

@@ -39,7 +39,7 @@ class DispatchView(APIView, BaseView):
 
     def data_list(self, start, end, page):
         items = Article.objects.filter(pubtime__range=(start, end)).order_by('-pubtime')
-        datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
+        datas = self.paging(items, settings.NEWS_PAGE_LIMIT, page)
         result = self.news_to_json(datas['items'])
         news = render_to_string('analytics/data_list_tmpl.html', {'data_list': result})
         return HttpResponse(news)
