@@ -2120,7 +2120,7 @@ APP.analytics = function () {
         weibo: function (start, end) {
           $('#chart-weibo').attr('style','height:400px;width:60%');
           require(['echarts', 'echarts/chart/map'],function (ec){
-            $.getJSON(api, { type : 'char_weibo', start : start, end : end },function(data){
+            $.getJSON(api, { type : 'chart_weibo', start : start, end : end },function(data){
               ec.init(document.getElementById('chart-weibo')).setOption({
                 title : {
                     text: '微博地域分析',
