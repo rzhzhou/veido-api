@@ -47,16 +47,20 @@ class DispatchView(APIView):
 
     def get(self, request, id):
         parameter = request.GET
-        type = parameter['type'].replace('-', '_')
-        start = parameter['start']
-        end = parameter['end']
-        page = parameter['page'] if parameter.has_key('page') else 0
+        try:
+            type = parameter['type'].replace('-', '_')
+            start = parameter['start']
+            end = parameter['end']
+            page = parameter['page'] if parameter.has_key('page') else 0
 
-        func = getattr(globals()['DispatchView'](), type)
-        if page:
-            return func(start, end, page)
-        else:
-            return func(start, end)
+            func = getattr(globals()['DispatchView'](), type)
+            if page:
+                return func(start, end, page)
+            else:
+                return func(start, end)
+        except Exception, e:
+            return Response({})
+
 
     def statistic(self, start, end):
         total = Article.objects.filter(pubtime__range=(start, end)).count()
