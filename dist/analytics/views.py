@@ -82,10 +82,9 @@ class DispatchView(APIView, BaseView):
             percent =  result['value']*100/sort_result[0]['value'] if result['value'] else 0
             sort_percent.append({'percent': percent})
         index = 0
-        if index<len(sort_result):
-            for items in sort_result:
-                items.update(sort_percent[index].items())
-                index+=1
+        for items in sort_result:
+            items.update(sort_percent[index])
+            index+=1
         return Response({'provice_count':provice_count, 'sort_result': sort_result})
 
     def chart_trend(self, start, end):
