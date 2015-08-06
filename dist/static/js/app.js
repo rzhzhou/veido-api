@@ -1957,6 +1957,12 @@ APP.analytics = function () {
                   legend : {
                     data : ['全部' , '新闻' ,  '微博' ,   '微信']
                   },
+                  grid: {
+                    x: 50,
+                    y: 30,
+                    x2: 25,
+                    y2: 65
+                   },
                   toolbox: {
                     show: true,
                     feature: {
@@ -1991,25 +1997,21 @@ APP.analytics = function () {
                     series: [{
                       name: '全部',
                       type: 'line',
-                      stack: '总量',
                       data:data.total_data
                     },
                     {
                       name: '新闻',
                       type: 'line',
-                      stack: '总量',
                       data:data.news_data
                       },
                       {
                       name: '微博',
                       type: 'line',
-                      stack: '总量',
                       data:data.weibo_data
                       },
                       {
                       name: '微信',
                       type: 'line',
-                      stack: '总量',
                       data:data.weixin_data
                       },
                       ]
@@ -2029,8 +2031,9 @@ APP.analytics = function () {
                  legend: {
                    orient : 'vertical',
                    x : 'left',
+                   y : 'bottom',
                    data:['新闻','微博','微信']
-                   },
+                 },
                  toolbox: {
                    show : true,
                    feature : {
@@ -2130,7 +2133,7 @@ APP.analytics = function () {
           // $('#chart-weibo').attr('style','height:400px;width:60%');
           $.getJSON(api, { type : 'chart_weibo', start : start, end : end },function(data){
             var item = data.sort_result;
-            require(['echarts', 'echarts/chart/map'],function (ec){           
+            require(['echarts', 'echarts/chart/map'],function (ec){
               ec.init(document.getElementById('weibo-map')).setOption({
                 title : {
                     text: '微博地域分析',
@@ -2188,15 +2191,16 @@ APP.analytics = function () {
               });
            });
 
-            $('#weibo-bar').each(function(){   
-                var sort_table  = $.map(item,function(item){
+
+            $('#weibo-bar').each(function(){
+                var sort_table  =$.map(item,function(item){
                   var area                = '<span class="area">'+item.name+'</span>',
                          num               = '<span class="num">'+item.value+'</span>',
                          progressBar = '<div class="progress"><div class="progress-bar" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width: '+item.percent+'%"></div></div>',
                          progress         = area + num + progressBar;
                   return progress;
                 });
-              
+
               $('#progress').html(sort_table);
             })
           });
