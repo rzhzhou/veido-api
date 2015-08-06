@@ -1,14 +1,49 @@
 # -*- coding: utf-8 -*-
-from django.shortcuts import render
-from rest_framework.response import Response
-from django.db.models import Count,Q
-from rest_framework.views import APIView
-from yqj.models import Article, Weixin, Weibo, Area
-from base.views import BaseView
 from datetime import datetime, timedelta
+
+from django.core.paginator import Paginator
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
+from django.db.models import Count, Q
+from django.shortcuts import render
+from django.template.loader import render_to_string
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from base.views import BaseView
+from yqj.models import Article, Area, RelatedData, Weixin, Weibo
 
 
 class DispatchView(APIView):
+
+    NEWS_PAGE_LIMIT = 25
+
+    def paging(self, items, limit, page):
+        paginator = Paginator(items, limit)
+
+        try:
+            items = paginator.page(page) # 获取某页对应的记录
+        except PageNotAnInteger:
+            items = paginator.page(1) # 如果页码不是个整数 取第一页的记录
+        except EmptyPage:
+            items = paginator.page(paginator.num_pages) # 如果页码太大，没有相应的记录 取最后一页的记录
+
+        return {'items': items, 'total_number': paginator.num_pages}
+
+    def news_to_json(self, items):
+        result = []
+        for data in items:
+            item = {}
+            item['title'] = data.title
+            item['id'] = data.id
+            item['source'] = data.publisher.publisher
+            item['location'] = data.area.name
+            item['time'] = data.pubtime.replace(tzinfo=None).strftime('%Y-%m-%d')
+            try:
+                item['hot'] = RelatedData.objects.filter(uuid=data.uuid)[0].articles.all().count()
+            except IndexError:
+                item['hot'] = 0
+            result.append(item)
+        return result
 
     def get(self, request, id):
         parameter = request.GET
@@ -28,6 +63,14 @@ class DispatchView(APIView):
         risk = total
         return Response({'total': total, 'risk': risk})
 
+    def data_list(self, start, end, page):
+        items = Article.objects.filter(pubtime__range=(start, end)).order_by('-pubtime')
+        datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
+        result = self.news_to_json(datas['items'])
+        news = render_to_string('analytics/data_list_tmpl.html', {'data_list': result})
+        return HttpResponse(news)
+
+
     def chart_type(self, start, end):
         try:
             article = Article.objects.filter(pubtime__range=(start,end)).count()
@@ -35,9 +78,9 @@ class DispatchView(APIView):
             weibo = Weibo.objects.filter(pubtime__range=(start,end)).count()
             return Response({'news': article, 'weixin': weixin, 'weibo': weibo})
         except:
-            return Response({}) 
+            return Response({})
 
-    def chart_emotion(self, start, end): 
+    def chart_emotion(self, start, end):
         try:
             positive = Article.objects.filter(pubtime__range=(start,end),
                 feeling_factor__gte=0.6).count()
