@@ -29,49 +29,49 @@ class DispatchView(APIView):
         return Response({'total': total, 'risk': risk})
 
     def chart_type(self, start, end):
-        try:
-            article = Article.objects.filter(pubtime__range=(start,end)).count()
-            weixin = Weixin.objects.filter(pubtime__range=(start,end)).count()
-            weibo = Weibo.objects.filter(pubtime__range=(start,end)).count()
-            return Response({'news': article, 'weixin': weixin, 'weibo': weibo})
-        except:
-            return Response({}) 
-
+        article = Article.objects.filter(pubtime__range=(start,end)).count()
+        weixin = Weixin.objects.filter(pubtime__range=(start,end)).count()
+        weibo = Weibo.objects.filter(pubtime__range=(start,end)).count()
+        return Response({'news': article, 'weixin': weixin, 'weibo': weibo})
+        
     def chart_emotion(self, start, end): 
-        try:
-            positive = Article.objects.filter(pubtime__range=(start,end),
-                feeling_factor__gte=0.6).count()
+        
+        positive = Article.objects.filter(pubtime__range=(start,end),
+            feeling_factor__gte=0.6).count()
 
-            normal = Article.objects.filter(pubtime__range=(start,end),
-                feeling_factor__gte=0.5, feeling_factor__lt=0.6).count()
+        normal = Article.objects.filter(pubtime__range=(start,end),
+            feeling_factor__gte=0.5, feeling_factor__lt=0.6).count()
 
-            negative = Article.objects.filter(pubtime__range=(start,end), feeling_factor__lt=0.5).count()
+        negative = Article.objects.filter(pubtime__range=(start,end), feeling_factor__lt=0.5).count()
 
-            return Response({'positive':positive, 'normal': normal, 'negative': negative})
-        except:
-            return Response({})
-
+        return Response({'positive':positive, 'normal': normal, 'negative': negative})
+    
     def chart_weibo(self, start, end):
-        try:
-            pro_area = Area.objects.filter(level=2)
-            pro_id = []
-            for item in pro_area:
-                pro_id.append(item.id)
-            provice_count = []
-            for i in pro_id:
-                city_area = Area.objects.filter(parent_id=i)
-                city_id = []
-                for c in city_area:
-                    city_id.append(c.id)
-                one_pro = Area.objects.filter(Q(parent_id__in=city_id)|Q(parent_id=i)|Q(id=i))
-                count = Weibo.objects.filter(area__in=one_pro, pubtime__range=(start,end)).count()
-                name =  Area.objects.get(id=i).name
-                provice_count.append({'name': name, 'value': count})
-            sort_result = sorted(provice_count, key=lambda x:x['value'], reverse=True)[:6]
-
-            return Response({'provice_count':provice_count, 'sort_result': sort_result})
-        except:
-            return Response({})
+        pro_area = Area.objects.filter(level=2)
+        pro_id = []
+        for item in pro_area:
+            pro_id.append(item.id)
+        provice_count = []
+        for i in pro_id:
+            city_area = Area.objects.filter(parent_id=i)
+            city_id = []
+            for c in city_area:
+                city_id.append(c.id)
+            one_pro = Area.objects.filter(Q(parent_id__in=city_id)|Q(parent_id=i)|Q(id=i))
+            count = Weibo.objects.filter(area__in=one_pro, pubtime__range=(start,end)).count()
+            name =  Area.objects.get(id=i).name
+            provice_count.append({'name': name, 'value': count})
+        sort_result = sorted(provice_count, key=lambda x:x['value'], reverse=True)[:6]
+        sort_percent = []
+        for result in sort_result:
+            percent =  result['value']*100/sort_result[0]['value'] if result['value'] else 0
+            sort_percent.append({'percent': percent})
+        index = 0
+        if index<len(sort_result):
+            for items in sort_result:
+                items.update(sort_percent[index].items())
+                index+=1
+        return Response({'provice_count':provice_count, 'sort_result': sort_result})
 
     def chart_trend(self, start, end):
         start = datetime.strptime(start, "%Y-%m-%d")
