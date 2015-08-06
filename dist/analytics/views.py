@@ -1,44 +1,59 @@
 # -*- coding: utf-8 -*-
-from django.shortcuts import render
-from rest_framework.response import Response
-from django.db.models import Count,Q
-from rest_framework.views import APIView
-from yqj.models import Article, Weixin, Weibo, Area
-from base.views import BaseView
 from datetime import datetime, timedelta
 
+from django.http import HttpResponse
+from django.db.models import Q
+from django.template.loader import render_to_string
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-class DispatchView(APIView):
+from base.views import BaseView
+from yqj.models import Article, Area, Weixin, Weibo
+
+
+class DispatchView(APIView, BaseView):
 
     def get(self, request, id):
         parameter = request.GET
-        type = parameter['type'].replace('-', '_')
-        start = parameter['start']
-        end = parameter['end']
-        page = parameter['page'] if parameter.has_key('page') else 0
+        try:
+            type = parameter['type'].replace('-', '_')
+            start = parameter['start']
+            end = parameter['end']
+            page = parameter['page'] if parameter.has_key('page') else 0
 
-        func = getattr(globals()['DispatchView'](), type)
-        if page:
-            return func(start, end, page)
-        else:
-            return func(start, end)
+            func = getattr(globals()['DispatchView'](), type)
+            if page:
+                return func(start, end, page)
+            else:
+                return func(start, end)
+        except Exception, e:
+            return Response({})
+
 
     def statistic(self, start, end):
         total = Article.objects.filter(pubtime__range=(start, end)).count()
         risk = total
         return Response({'total': total, 'risk': risk})
 
+    def data_list(self, start, end, page):
+        items = Article.objects.filter(pubtime__range=(start, end)).order_by('-pubtime')
+        datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
+        result = self.news_to_json(datas['items'])
+        news = render_to_string('analytics/data_list_tmpl.html', {'data_list': result})
+        return HttpResponse(news)
+
+
     def chart_type(self, start, end):
         article = Article.objects.filter(pubtime__range=(start,end)).count()
         weixin = Weixin.objects.filter(pubtime__range=(start,end)).count()
         weibo = Weibo.objects.filter(pubtime__range=(start,end)).count()
         return Response({'news': article, 'weixin': weixin, 'weibo': weibo})
-        
-    def chart_emotion(self, start, end): 
+       
+
+    def chart_emotion(self, start, end):
         
         positive = Article.objects.filter(pubtime__range=(start,end),
-            feeling_factor__gte=0.6).count()
-
+                feeling_factor__gte=0.6).count()
         normal = Article.objects.filter(pubtime__range=(start,end),
             feeling_factor__gte=0.5, feeling_factor__lt=0.6).count()
 
@@ -97,4 +112,3 @@ class DispatchView(APIView):
 class AnalyticsView(BaseView):
     def get(self, request):
         return self.render_to_response('analytics/analytics.html', {'industry': {'name': u'综合'}})
-
