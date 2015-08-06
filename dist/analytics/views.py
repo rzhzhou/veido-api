@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from django.http import HttpResponse
 from django.db.models import Q
 from django.template.loader import render_to_string
+from django.utils.dateparse import parse_date
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -27,6 +28,7 @@ class DispatchView(APIView, BaseView):
             else:
                 return func(start, end)
         except Exception, e:
+            print e
             return Response({})
 
 
@@ -88,23 +90,23 @@ class DispatchView(APIView, BaseView):
         return Response({'provice_count':provice_count, 'sort_result': sort_result})
 
     def chart_trend(self, start, end):
-        start = datetime.strptime(start, "%Y-%m-%d")
-        end = datetime.strptime(end, "%Y-%m-%d")
-        date_range = end - start
-        date = [(start + timedelta(days=x)).date() for x in xrange(date_range.days)]
-        news_data = [Article.objects.filter(pubtime__gte=date[x], pubtime__lt=date[x] + timedelta(days=1)).count() for x in xrange(date_range.days)]
-        weixin_data = [Weixin.objects.filter(pubtime__gte=date[x], pubtime__lt=date[x] + timedelta(days=1)).count() for x in xrange(date_range.days)]
-        weibo_data = [Weibo.objects.filter(pubtime__gte=date[x], pubtime__lt=date[x] + timedelta(days=1)).count() for x in xrange(date_range.days)]
-        total_data = [news_data[i] + weixin_data[i] + weibo_data[i] for i in xrange(len(date))]
+        start = parse_date(start)
+        end = parse_date(end)
+        days = (end - start).days
+        date = [(start + timedelta(days=x)) for x in xrange(days)]
+        news_data = [Article.objects.filter(pubtime__range=(str(date[x]), str(date[x] + timedelta(days=1)))).count() for x in xrange(days)]
+        weixin_data = [Weixin.objects.filter(pubtime__range=(str(date[x]), str(date[x] + timedelta(days=1)))).count() for x in xrange(days)]
+        weibo_data = [Weibo.objects.filter(pubtime__range=(str(date[x]), str(date[x] + timedelta(days=1)))).count() for x in xrange(days)]
+        total_data = [news_data[i] + weixin_data[i] + weibo_data[i] for i in xrange(days)]
 
-        date = [i.strftime("%m-%d") for i in date]
+        date = map(lambda x: x.strftime("%m-%d"), date)
 
         return Response({
-        "date": date,
-        "news_data": news_data,
-        "weixin_data": weixin_data,
-        "weibo_data": weibo_data,
-        "total_data": total_data
+            "date": date,
+            "news_data": news_data,
+            "weixin_data": weixin_data,
+            "weibo_data": weibo_data,
+            "total_data": total_data
         })
 
 
