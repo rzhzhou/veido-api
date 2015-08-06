@@ -638,7 +638,7 @@ APP.analytics = function () {
         trend: function (start, end) {
            require(['echarts', 'echarts/chart/line','echarts/theme/macarons',], function (ec ) {
              $.getJSON(api, {type: 'chart-trend', start: start, end: end}, function (data) {
-                ec.init( document .getElementById('chart-trend'), 'macarons'),setOption({
+               ec.init( document .getElementById('chart-trend'), 'macarons'),setOption({
                   tooltip : {
                     backgroundColor:'rgba(50,50,50,0.5)',
                     trigger:'axis',
@@ -711,14 +711,14 @@ APP.analytics = function () {
                       data:data.value
                       },
                       ]
-                  });
-                })
+                   });
+               })
              })
         },
         type: function (start, end) {
           require(['echarts', 'echarts/chart/pie','echarts/theme/macarons',], function (ec ) {
              $.getJSON(api, {type: 'chart-type', start: start, end: end}, function (data) {
-              ec.init(document.getElementById('chart-type')).setOption({
+                ec.init(document.getElementById('chart-type')).setOption({
                  tooltip : {
                   trigger: 'item',
                   formatter: "{a} <br/>{b} : {c} ({d}%)"
@@ -749,8 +749,8 @@ APP.analytics = function () {
                       ]
                    }
                  ]
-              });
-            });
+                });
+             });
           });
         },
 
