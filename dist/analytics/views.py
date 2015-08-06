@@ -5,7 +5,7 @@ from django.db.models import Count,Q
 from rest_framework.views import APIView
 from yqj.models import Article, Weixin, Weibo, Area
 from base.views import BaseView
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 class TableAPIView(APIView):
@@ -20,8 +20,8 @@ class LineTableView(TableAPIView):
 
 class PieTypeTableView(TableAPIView):
     def get(self, request):
-        start = datetime.strftime(request.GET['start'], '%Y-%m-%d')
-        end = datetime.strftime(request.GET['end'], '%Y-%m-%d')
+        start = datetime.strptime(request.GET['start'], '%Y-%m-%d')
+        end = datetime.strptime(request.GET['end'], '%Y-%m-%d')+timedelta(days=1)
         news = Article.objects.filter(pubtime__range=(start,end)).count()
         weixin = WeiXin.objects.filter(pubtime__range=(start,end)).count() 
         weibo = Weibo.objects.filter(pubtime__range=(start,end)).count()
@@ -29,9 +29,9 @@ class PieTypeTableView(TableAPIView):
         return Response({'news': article, 'weixin': weixin, 'weibo': weibo})
 
 class PieFeelingTableView(TableAPIView):
-    def get(self, request):
-        start = datetime.strftime(request.GET['start'], '%Y-%m-%d')
-        end = datetime.strftime(request.GET['end'], '%Y-%m-%d')
+    def get(self, request, id):
+        start = datetime.strptime(request.GET['start'], '%Y-%m-%d')
+        end = datetime.strptime(request.GET['end'], '%Y-%m-%d')+timedelta(days=1)
         positive = Article.objects.filter(pubtime__range=(start,end), 
             feeling_factor__gte=0.6).count()
 
@@ -44,10 +44,10 @@ class PieFeelingTableView(TableAPIView):
 
 
 class PieAreaTableView(TableAPIView):
-    def get(self, request):
+    def get(self, request, id):
     #SELECT id FROM yqj.`area` WHERE parent_id IN (SELECT id FROM yqj.`area` WHERE parent_id=2) OR parent_id=2 OR id =2
-        start = datetime.strftime(request.GET['start'], '%Y-%m-%d')
-        end = datetime.strftime(request.GET['end'], '%Y-%m-%d')
+        start = datetime.strptime(request.GET['start'], '%Y-%m-%d')
+        end = datetime.strptime(request.GET['end'], '%Y-%m-%d')+timedelta(days=1)
         pro_area = Area.objects.filter(level=2)
         pro_id = []
         for item in pro_area:
@@ -66,7 +66,7 @@ class PieAreaTableView(TableAPIView):
             count = Weibo.objects.filter(area__in=one_pro, pubtime__range=(start,end)).count()
             name =  Area.objects.get(id=i).name  
             provice_count.append({'name': name, 'count': count})
-        sort_result = sorted(provice_count, key=lambda x:x['count'], reversed=True)[:6]
+        sort_result = sorted(provice_count, key=lambda x:x['count'], reverse=True)[:6]
     
         return Response({'provice_count':provice_count, 'sort_result': sort_result})
 
