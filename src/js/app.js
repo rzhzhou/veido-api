@@ -638,7 +638,7 @@ APP.analytics = function () {
         trend: function (start, end) {
            require(['echarts', 'echarts/chart/line','echarts/theme/macarons',], function (ec ) {
              $.getJSON(api, {type: 'chart-trend', start: start, end: end}, function (data) {
-               ec.init( document .getElementById('chart-trend'), 'macarons'),setOption({
+               ec.init( document .getElementById('chart-trend'), 'macarons').setOption({
                   tooltip : {
                     backgroundColor:'rgba(50,50,50,0.5)',
                     trigger:'axis',
@@ -690,25 +690,25 @@ APP.analytics = function () {
                       name: '全部',
                       type: 'line',
                       stack: '总量',
-                      data:data.all
+                      data:data.total_data
                     },
                     {
                       name: '新闻',
                       type: 'line',
                       stack: '总量',
-                      data:data.news
+                      data:data.news_data
                       },
                       {
                       name: '微博',
                       type: 'line',
                       stack: '总量',
-                      data:data.weibo
+                      data:data.weibo_data
                       },
                       {
                       name: '微信',
                       type: 'line',
                       stack: '总量',
-                      data:data.weixin
+                      data:data.weixin_data
                       },
                       ]
                  });
