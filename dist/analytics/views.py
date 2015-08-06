@@ -31,21 +31,11 @@ class DispatchView(APIView):
     def chart_type(self, start, end):
         return Response({})
 
-
-class LineTableView():
-    """
-    {
-        "date": ["07-30", "07-31", "08-01", "08-02", "08-03", "08-04", "08-05"],
-        "news_data": [491, 363, 164, 116, 331, 381, 168],
-    }
-    """
-    def get(self, request, id):
-        start = datetime.strptime(request.GET['start'], "%Y-%m-%d")
-        end = datetime.strptime(request.GET['end'], "%Y-%m-%d")
+    def chart_trend(self, start, end):
+        start = datetime.strptime(start, "%Y-%m-%d")
+        end = datetime.strptime(end, "%Y-%m-%d")
         date_range = end - start
-        # print (start + timedelta(days=1)).strftime("%m-%d")
         date = [(start + timedelta(days=x)).date() for x in xrange(date_range.days)]
-        print type(date[0])
         news_data = [Article.objects.filter(pubtime__gte=date[x], pubtime__lt=date[x] + timedelta(days=1)).count() for x in xrange(date_range.days)]
         weixin_data = [Weixin.objects.filter(pubtime__gte=date[x], pubtime__lt=date[x] + timedelta(days=1)).count() for x in xrange(date_range.days)]
         weibo_data = [Weibo.objects.filter(pubtime__gte=date[x], pubtime__lt=date[x] + timedelta(days=1)).count() for x in xrange(date_range.days)]
