@@ -34,15 +34,22 @@ class LineTableView():
         start = datetime.strptime(request.GET['start'], "%Y-%m-%d")
         end = datetime.strptime(request.GET['end'], "%Y-%m-%d")
         date_range = end - start
+        # print (start + timedelta(days=1)).strftime("%m-%d")
         date = [(start + timedelta(days=x)).date() for x in xrange(date_range.days)]
+        print type(date[0])
         news_data = [Article.objects.filter(pubtime__gte=date[x], pubtime__lt=date[x] + timedelta(days=1)).count() for x in xrange(date_range.days)]
         weixin_data = [Weixin.objects.filter(pubtime__gte=date[x], pubtime__lt=date[x] + timedelta(days=1)).count() for x in xrange(date_range.days)]
         weibo_data = [Weibo.objects.filter(pubtime__gte=date[x], pubtime__lt=date[x] + timedelta(days=1)).count() for x in xrange(date_range.days)]
+        total_data = [news_data[i] + weixin_data[i] + weibo_data[i] for i in xrange(len(date))]
+
+        date = [i.strftime("%m-%d") for i in date]
+        
         return Response({
         "date": date,
         "news_data": news_data,
         "weixin_data": weixin_data,
         "weibo_data": weibo_data,
+        "total_data": total_data
         })
 
 
