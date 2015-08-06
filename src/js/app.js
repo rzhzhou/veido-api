@@ -636,23 +636,246 @@ APP.analytics = function () {
 
       chart = {
         trend: function (start, end) {
-          console.log(start);
-          console.log(end);
+           require(['echarts', 'echarts/chart/line','echarts/theme/macarons',], function (ec ) {
+             $.getJSON(api, {type: 'chart-trend', start: start, end: end}, function (data) {
+               ec.init( document .getElementById('chart-trend'), 'macarons').setOption({
+                  tooltip : {
+                    backgroundColor:'rgba(50,50,50,0.5)',
+                    trigger:'axis',
+                    axisPointer : {
+                      type : 'line',
+                      lineStyle : {
+                        color : '#008acd',
+                      }
+                    }
+                  },
+                  shadowStyle : {
+                    color : 'rgba(200,200,200,0.2)'
+                  },
+                  legend : {
+                    data : ['全部' , '新闻' ,  '微博' ,   '微信']
+                  },
+                  toolbox: {
+                    show: true,
+                    eature: {
+                      mark: {
+                        show: false
+                      },
+                     dataView: {
+                        show: true,
+                        readOnly: false
+                      },
+                      magicType: {
+                        show: false,
+                        type: ['line']
+                      },
+                      restore: {
+                        show: false
+                       },
+                       saveAsImage: {
+                         show: true
+                        }
+                      }
+                    },
+                    calculable: true,
+                    xAxis: [{
+                      type: 'category',
+                      boundaryGap: false,
+                      data: data.date
+                    }],
+                    yAxis: [{
+                      type: 'value'
+                    }],
+                    series: [{
+                      name: '全部',
+                      type: 'line',
+                      stack: '总量',
+                      data:data.total_data
+                    },
+                    {
+                      name: '新闻',
+                      type: 'line',
+                      stack: '总量',
+                      data:data.news_data
+                      },
+                      {
+                      name: '微博',
+                      type: 'line',
+                      stack: '总量',
+                      data:data.weibo_data
+                      },
+                      {
+                      name: '微信',
+                      type: 'line',
+                      stack: '总量',
+                      data:data.weixin_data
+                      },
+                      ]
+                 });
+             })
+           })
         },
-
         type: function (start, end) {
-          console.log(start);
-          console.log(end);
+          require(['echarts', 'echarts/chart/pie','echarts/theme/macarons',], function (ec ) {
+             $.getJSON(api, {type: 'chart-type', start: start, end: end}, function (data) {
+                ec.init(document.getElementById('chart-type')).setOption({
+                 tooltip : {
+                  trigger: 'item',
+                  formatter: "{a} <br/>{b} : {c} ({d}%)"
+                 },
+                 legend: {
+                   orient : 'vertical',
+                   x : 'left',
+                   data:['新闻','微博','微信']
+                   },
+                 toolbox: {
+                   show : true,
+                   feature : {
+                     dataView : {show: true, readOnly: false},
+                     saveAsImage : {show: true}
+                   }
+                 },
+                 calculable : true,
+                 series : [
+                   {
+                      name:'访问来源',
+                      type:'pie',
+                      radius : '55%',
+                      center: ['50%', '60%'],
+                      data:[
+                        {value:data.news, name:'新闻'},
+                        {value:data.weibo, name:'微博'},
+                        {value:data.weixin, name:'微信'}
+                      ]
+                   }
+                 ]
+                });
+             });
+          });
         },
 
         emotion: function (start, end) {
-          console.log(start);
-          console.log(end);
+          $('#chart-emotion').attr('style','height:400px;width:100%');
+          require(['echarts', 'echarts/chart/pie'],function (ec){
+            $.getJSON(api, { type : 'chart_emotion', start : start, end : end},function(data) {
+                ec.init(document.getElementById('chart-emotion')).setOption({
+                    title : {
+                    text: '情感分析',
+                    subtext: '',
+                    x:'center'
+                  },
+                  tooltip : {
+                      trigger: 'item',
+                      formatter: "{a} <br/>{b} : {c} ({d}%)"
+                  },
+                  legend: {
+                      orient : 'vertical',
+                      x : 'left',
+                      data:['正面','中性','负面']
+                  },
+                  toolbox: {
+                      show : false,
+                      feature : {
+                          mark : {show: true},
+                          dataView : {show: true, readOnly: false},
+                          magicType : {
+                              show: true,
+                              type: ['pie'],
+                              option: {
+                                  funnel: {
+                                      x: '25%',
+                                      width: '50%',
+                                      funnelAlign: 'left',
+                                      max: 2000
+                                  }
+                              }
+                          },
+                          restore : {show: false},
+                          saveAsImage : {show: true}
+                      }
+                  },
+                  calculable : true,
+                  series : [
+                      {
+                          name:'访问来源',
+                          type:'pie',
+                          radius : '55%',
+                          center: ['50%', '60%'],
+                          data:
+                          [
+                              {value : data.positive, name:'正面'},
+                              {value : data.normal, name:'中性'},
+                              {value : data.negative, name:'负面'},
+                          ]
+                      }
+                  ]
+                });
+            });
+          });
+
         },
 
         weibo: function (start, end) {
-          console.log(start);
-          console.log(end);
+          $('#chart-weibo').attr('style','height:400px;width:60%');
+          require(['echarts', 'echarts/chart/map'],function (ec){
+            $.getJSON(api, { type : 'chart_weibo', start : start, end : end },function(data){
+              ec.init(document.getElementById('chart-weibo')).setOption({
+                title : {
+                    text: '微博地域分析',
+                    subtext:'纯属虚构',
+                    x:'center'
+                },
+                tooltip : {
+                    trigger: 'item'
+                },
+                legend: {
+                    orient: 'vertical',
+                    x:'left',
+                    data:['微博文']
+                },
+                dataRange: {
+                    min: 0,
+                    max: 10000,
+                    x: 'left',
+                    y: 'bottom',
+                    text:['高','低'],           // 文本，默认为数值文本
+                    calculable : true
+                },
+                toolbox: {
+                    show: false,
+                    orient : 'vertical',
+                    x: 'right',
+                    y: 'center',
+                    feature : {
+                        mark : {show: true},
+                        dataView : {show: true, readOnly: false},
+                        restore : {show: true},
+                        saveAsImage : {show: true}
+                    }
+                },
+                roamController: {
+                    show: true,
+                    x: 'right',
+                    mapTypeControl: {
+                        'china': true
+                    }
+                },
+                series : [
+                    {
+                        name: '微博文',
+                        type: 'map',
+                        mapType: 'china',
+                        roam: false,
+                        itemStyle:{
+                            normal:{label:{show:true}},
+                            emphasis:{label:{show:true}}
+                        },
+                        data:data.provice_count
+                    },
+                ]
+              });
+           });
+          });
         }
       },
 
@@ -662,7 +885,6 @@ APP.analytics = function () {
 
       showChart = function () {
         var chartType = $chart.find('.tab-pane.active')[0].id.slice(6);
-
         chart[chartType](start, end);
       },
 
