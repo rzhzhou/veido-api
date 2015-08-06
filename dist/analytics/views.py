@@ -42,7 +42,7 @@ class DispatchView(APIView, BaseView):
         datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
         result = self.news_to_json(datas['items'])
         news = render_to_string('analytics/data_list_tmpl.html', {'data_list': result})
-        return HttpResponse(news)
+        return Response({'total': datas['total_number'], 'html':news})
 
 
     def chart_type(self, start, end):
