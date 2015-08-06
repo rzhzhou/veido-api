@@ -64,13 +64,10 @@ class DispatchView(APIView):
                 for c in city_area:
                     city_id.append(c.id)
                 one_pro = Area.objects.filter(Q(parent_id__in=city_id)|Q(parent_id=i)|Q(id=i))
-                one_pro_id = []
-                for items in one_pro:
-                    one_pro_id.append(items.id)
                 count = Weibo.objects.filter(area__in=one_pro, pubtime__range=(start,end)).count()
                 name =  Area.objects.get(id=i).name
-                provice_count.append({'name': name, 'count': count})
-            sort_result = sorted(provice_count, key=lambda x:x['count'], reverse=True)[:6]
+                provice_count.append({'name': name, 'value': count})
+            sort_result = sorted(provice_count, key=lambda x:x['value'], reverse=True)[:6]
 
             return Response({'provice_count':provice_count, 'sort_result': sort_result})
         except:
