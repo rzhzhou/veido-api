@@ -23,7 +23,7 @@ class DispatchView(APIView):
         else:
             return func(start, end)
 
-    def statistic(self, start, end, page):
+    def statistic(self, start, end):
         total = Article.objects.filter(pubtime__range=(start, end)).count()
         risk = total
         return Response({'total': total, 'risk': risk})
@@ -42,7 +42,7 @@ class DispatchView(APIView):
         total_data = [news_data[i] + weixin_data[i] + weibo_data[i] for i in xrange(len(date))]
 
         date = [i.strftime("%m-%d") for i in date]
-        
+
         return Response({
         "date": date,
         "news_data": news_data,
