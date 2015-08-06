@@ -840,7 +840,7 @@ APP.analytics = function () {
                 },
                 dataRange: {
                     min: 0,
-                    max: 10000,
+                    max: item[0].value,
                     x: 'left',
                     y: 'bottom',
                     text:['高','低'],           // 文本，默认为数值文本

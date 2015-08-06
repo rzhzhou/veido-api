@@ -42,7 +42,7 @@ class DispatchView(APIView, BaseView):
         datas = self.paging(items, settings.NEWS_PAGE_LIMIT, page)
         result = self.news_to_json(datas['items'])
         news = render_to_string('analytics/data_list_tmpl.html', {'data_list': result})
-        return HttpResponse(news)
+        return Response({'total': datas['total_number'], 'html':news})
 
 
     def chart_type(self, start, end):
@@ -84,10 +84,9 @@ class DispatchView(APIView, BaseView):
             percent =  result['value']*100/sort_result[0]['value'] if result['value'] else 0
             sort_percent.append({'percent': percent})
         index = 0
-        if index<len(sort_result):
-            for items in sort_result:
-                items.update(sort_percent[index].items())
-                index+=1
+        for items in sort_result:
+            items.update(sort_percent[index])
+            index+=1
         return Response({'provice_count':provice_count, 'sort_result': sort_result})
 
     def chart_trend(self, start, end):
