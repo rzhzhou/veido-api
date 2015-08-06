@@ -2118,10 +2118,14 @@ APP.analytics = function () {
         },
 
         weibo: function (start, end) {
-          $('#chart-weibo').attr('style','height:400px;width:60%');
-          require(['echarts', 'echarts/chart/map'],function (ec){
-            $.getJSON(api, { type : 'chart_weibo', start : start, end : end },function(data){
-              ec.init(document.getElementById('chart-weibo')).setOption({
+          var weibo_map = $('<div class = "tab-weibo" id = "weibo-map" style = "height:400px;width:60%"></div>');
+          var weibo_bar = $('<div class = "tab-weibo" id = "weibo-bar" style = "height:400px;width:40%"><h4>微博地域分析</h4><div id="progress"></div></div>');
+          $('#chart-weibo').append(weibo_map).append(weibo_bar);
+          // $('#chart-weibo').attr('style','height:400px;width:60%');
+          $.getJSON(api, { type : 'chart_weibo', start : start, end : end },function(data){
+            var item = data.sort_result;
+            require(['echarts', 'echarts/chart/map'],function (ec){           
+              ec.init(document.getElementById('weibo-map')).setOption({
                 title : {
                     text: '微博地域分析',
                     subtext:'纯属虚构',
@@ -2177,6 +2181,18 @@ APP.analytics = function () {
                 ]
               });
            });
+
+            $('#weibo-bar').each(function(){   
+                var sort_table  =$.map(item,function(item){
+                  var area                = '<span class="area">'+item.name+'</span>',
+                         num               = '<span class="num">'+item.value+'</span>',
+                         progressBar = '<div class="progress"><div class="progress-bar" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width: '+item.percent+'%"></div></div>',
+                         progress         = area + num + progressBar;
+                  return progress;
+                });
+              
+              $('#progress').html(sort_table);
+            })
           });
         }
       },
