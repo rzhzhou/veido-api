@@ -14,7 +14,7 @@
 {% block content %}
   <div class="row">
     <div class="col-md-12">
-      <div class="nav-tabs-custom">
+      <div id="chart" class="nav-tabs-custom">
         <ul class="nav nav-tabs">
           <li class="active">
             <a href="#chart-trend" data-toggle="tab">报道总趋势分析</a>
@@ -41,18 +41,18 @@
 
   <div class="row">
     <div class="col-md-12">
-      <div class="box box-solid">
-        <div class="box-body statistic">
+      <div id="statistic" class="box box-solid">
+        <div class="box-body">
           <div class="row">
             <div class="col-md-6">
               <div class="statistic-total text-center">
-                <span>367800</span>
+                <span></span>
                 <p>监测数据</p>
               </div>
             </div>
             <div class="col-md-6">
               <div class="statistic-risk text-center">
-                <span>367800</span>
+                <span></span>
                 <p>风险数据</p>
               </div>
             </div>
@@ -69,7 +69,7 @@
           <h3 class="box-title">数据列表</h3>
         </div>
         <div class="box-body clearfix">
-          <table id="news" class="table table-bordered table-hover table-custom">
+          <table id="data-list" class="table table-bordered table-hover table-custom">
             <thead>
               <tr>
                 <th class="col-title">标题</th>

@@ -1,3 +1,5 @@
+/* global moment */
+
 'use strict';
 
 //
@@ -621,16 +623,123 @@ APP.inspection = function () {
 
 
 APP.analytics = function () {
-  var $el = $('.date-range-picker'),
-      $dateRangeLabel = $el.children('span'),
+  var start = '',
+      end = '',
+      api = '/api' + APP.url,
+      $dateRangePicker = $('.date-range-picker'),
+      $dateRangeLabel = $dateRangePicker.children('span'),
+      $chart = $('#chart'),
+      $statistic = $('#statistic'),
+      $dataList = $('#data-list'),
+      $statisticTotal = $('.statistic-total').children('span'),
+      $statisticRisk = $('.statistic-risk').children('span'),
+
+      chart = {
+        trend: function (start, end) {
+          console.log(start);
+          console.log(end);
+        },
+
+        type: function (start, end) {
+          console.log(start);
+          console.log(end);
+        },
+
+        emotion: function (start, end) {
+          console.log(start);
+          console.log(end);
+        },
+
+        weibo: function (start, end) {
+          console.log(start);
+          console.log(end);
+        }
+      },
 
       showDateRange = function (start, end) {
-        $dateRangeLabel.html(start.format('YYYY-MM-DD') + ' ~ ' + end.format('YYYY-MM-DD'));
+        $dateRangeLabel.html(start + ' ~ ' + end);
+      },
+
+      showChart = function () {
+        var chartType = $chart.find('.tab-pane.active')[0].id.slice(6);
+
+        chart[chartType](start, end);
+      },
+
+      showStatistic = function () {
+        $.getJSON(api, {type: 'statistic', start: start, end: end}, function (statistic) {
+          $statisticTotal.text(statistic.total);
+          $statisticRisk.text(statistic.risk);
+        });
+      },
+
+      showDataList = function () {
+        var $paginationContainer = $dataList.parent(),
+
+            toParam = function (pageNumber) {
+              if (typeof pageNumber === 'undefined') {
+                pageNumber = 1;
+              }
+
+              return {
+                type: 'data-list',
+                start: start,
+                end: end,
+                page: pageNumber,
+              };
+            },
+
+            renderTable = function (pageContent) {
+              $('<tbody/>')
+                .html(pageContent)
+                .replaceAll($dataList.find('tbody'));
+            };
+
+        $.get(api, toParam(), function (data) {
+          renderTable(data.html);
+
+          $paginationContainer.twbsPagination({
+            totalPages: data.total,
+            visiblePages: 7,
+            first: '第一页',
+            prev: '上一页',
+            next: '下一页',
+            last: '最后一页',
+            paginationClass: 'pagination pagination-sm no-margin pull-right',
+            onPageClick: function(event, pageNumber) {
+              APP.returnTop($(this));
+              $.get(api, toParam(pageNumber), function(data) {
+                renderTable(data.html);
+                $paginationContainer.twbsPagination({totalPages: data.total});
+              });
+            }
+          });
+        });
+      },
+
+      showAnalytics = function (startMoment, endMoment) {
+        start = startMoment.format('YYYY-MM-DD');
+        end   = endMoment.format('YYYY-MM-DD');
+
+        showDateRange(start, end);
+
+        $chart
+          .trigger('showChart')
+          .off('shown.bs.tab')
+          .on('shown.bs.tab', showChart);
+
+        $statistic.trigger('showStatistic');
+
+        $dataList.trigger('showDataList');
       };
 
-  showDateRange(moment().subtract(6, 'days'), moment());
+  $chart.on('showChart', showChart);
 
-  $el.daterangepicker({
+  $statistic.on('showStatistic', showStatistic);
+
+  $dataList.on('showDataList', showDataList);
+
+  $dateRangePicker.daterangepicker({
     ranges: {
       '过去7天': [moment().subtract(6, 'days'), moment()],
       '过去30天': [moment().subtract(29, 'days'), moment()],
@@ -678,8 +787,11 @@ APP.analytics = function () {
     'parentEl': '.content-header',
     'applyClass': 'btn-success',
     'cancelClass': 'btn-default'
-  }, showDateRange);
+  }, showAnalytics);
+
+  showAnalytics(moment().subtract(6, 'days'), moment());
 };
+
 
 //
 // url based router
