@@ -1,49 +1,17 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime, timedelta
 
-from django.core.paginator import Paginator
-from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
-from django.db.models import Count, Q
-from django.shortcuts import render
+from django.http import HttpResponse
+from django.db.models import Q
 from django.template.loader import render_to_string
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from base.views import BaseView
-from yqj.models import Article, Area, RelatedData, Weixin, Weibo
+from yqj.models import Article, Area, Weixin, Weibo
 
 
-class DispatchView(APIView):
-
-    NEWS_PAGE_LIMIT = 25
-
-    def paging(self, items, limit, page):
-        paginator = Paginator(items, limit)
-
-        try:
-            items = paginator.page(page) # 获取某页对应的记录
-        except PageNotAnInteger:
-            items = paginator.page(1) # 如果页码不是个整数 取第一页的记录
-        except EmptyPage:
-            items = paginator.page(paginator.num_pages) # 如果页码太大，没有相应的记录 取最后一页的记录
-
-        return {'items': items, 'total_number': paginator.num_pages}
-
-    def news_to_json(self, items):
-        result = []
-        for data in items:
-            item = {}
-            item['title'] = data.title
-            item['id'] = data.id
-            item['source'] = data.publisher.publisher
-            item['location'] = data.area.name
-            item['time'] = data.pubtime.replace(tzinfo=None).strftime('%Y-%m-%d')
-            try:
-                item['hot'] = RelatedData.objects.filter(uuid=data.uuid)[0].articles.all().count()
-            except IndexError:
-                item['hot'] = 0
-            result.append(item)
-        return result
+class DispatchView(APIView, BaseView):
 
     def get(self, request, id):
         parameter = request.GET
@@ -144,4 +112,3 @@ class DispatchView(APIView):
 class AnalyticsView(BaseView):
     def get(self, request):
         return self.render_to_response('analytics/analytics.html', {'industry': {'name': u'综合'}})
-
