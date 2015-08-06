@@ -5,7 +5,7 @@ from django.shortcuts import render_to_response
 from django.views.generic import View
 
 from base import login_required, get_user_image
-from yqj.models import Area, Category
+from yqj.models import Area, Category, RelatedData
 
 
 class LoginRequiredMixin(object):
@@ -18,6 +18,7 @@ class LoginRequiredMixin(object):
 
 
 class BaseView(LoginRequiredMixin, View):
+    NEWS_PAGE_LIMIT = 25
     INCLUDE_SIDEBAR = True
     INCLUDE_USER = True
 
@@ -71,19 +72,30 @@ class BaseView(LoginRequiredMixin, View):
     def set_css_to_weibo(self, items):
         pass
 
-    def paging(self, model, limit, page):
-        #limit  每页显示的记录数 page 页码
-        items = model.objects.all()
-        # 实例化一个分页对象
+    def paging(self, items, limit, page):
         paginator = Paginator(items, limit)
+
         try:
-            # 获取某页对应的记录
-            items = paginator.page(page)
+            items = paginator.page(page) # 获取某页对应的记录
         except PageNotAnInteger:
-            # 如果页码不是个整数 取第一页的记录
-            items = paginator.page(1)
+            items = paginator.page(1) # 如果页码不是个整数 取第一页的记录
         except EmptyPage:
-            # 如果页码太大，没有相应的记录 取最后一页的记录
-            items = paginator.page(paginator.num_pages)
+            items = paginator.page(paginator.num_pages) # 如果页码太大，没有相应的记录 取最后一页的记录
 
         return {'items': items, 'total_number': paginator.num_pages}
+
+    def news_to_json(self, items):
+        result = []
+        for data in items:
+            item = {}
+            item['title'] = data.title
+            item['id'] = data.id
+            item['source'] = data.publisher.publisher
+            item['location'] = data.area.name
+            item['time'] = data.pubtime.replace(tzinfo=None).strftime('%Y-%m-%d')
+            try:
+                item['hot'] = RelatedData.objects.filter(uuid=data.uuid)[0].articles.all().count()
+            except IndexError:
+                item['hot'] = 0
+            result.append(item)
+        return result
