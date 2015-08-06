@@ -657,7 +657,7 @@ APP.analytics = function () {
                   },
                   toolbox: {
                     show: true,
-                    eature: {
+                    feature: {
                       mark: {
                         show: false
                       },
@@ -720,6 +720,7 @@ APP.analytics = function () {
              $.getJSON(api, {type: 'chart-type', start: start, end: end}, function (data) {
                 ec.init(document.getElementById('chart-type')).setOption({
                  tooltip : {
+                  backgroundColor:'rgba(50,50,50,0.5)',
                   trigger: 'item',
                   formatter: "{a} <br/>{b} : {c} ({d}%)"
                  },
