@@ -1983,7 +1983,7 @@ APP.analytics = function () {
                     xAxis: [{
                       type: 'category',
                       boundaryGap: false,
-                      data: data.time
+                      data: data.date
                     }],
                     yAxis: [{
                       type: 'value'
@@ -1992,30 +1992,30 @@ APP.analytics = function () {
                       name: '全部',
                       type: 'line',
                       stack: '总量',
-                      data:data.value
+                      data:data.all
                     },
                     {
                       name: '新闻',
                       type: 'line',
                       stack: '总量',
-                      data:data.value
+                      data:data.news
                       },
                       {
                       name: '微博',
                       type: 'line',
                       stack: '总量',
-                      data:data.value
+                      data:data.weibo
                       },
                       {
                       name: '微信',
                       type: 'line',
                       stack: '总量',
-                      data:data.value
+                      data:data.weixin
                       },
                       ]
-                   });
-               })
+                 });
              })
+           })
         },
         type: function (start, end) {
           require(['echarts', 'echarts/chart/pie','echarts/theme/macarons',], function (ec ) {
