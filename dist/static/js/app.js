@@ -2336,6 +2336,17 @@ APP.analytics = function () {
   }, showAnalytics);
 
   showAnalytics(moment().subtract(6, 'days'), moment());
+
+  if (location.pathname === '/analytics/0/') {
+    start = moment().subtract(6, 'days').format('YYYY-MM-DD');
+    end = moment().format('YYYY-MM-DD');
+
+    for (var type in chart) {
+      if(chart.hasOwnProperty(type)) {
+        chart[type](start, end);
+      }
+    }
+  }
 };
 
 
