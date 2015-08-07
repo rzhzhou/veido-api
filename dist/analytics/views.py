@@ -8,12 +8,12 @@ from django.utils.dateparse import parse_date
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from base.views import BaseView
+from base.views import BaseTemplateView
 from django.conf import settings
 from yqj.models import Article, Area, Weixin, Weibo
 
 
-class DispatchView(APIView, BaseView):
+class DispatchView(APIView, BaseTemplateView):
 
     def get(self, request, id):
         parameter = request.GET
@@ -29,7 +29,6 @@ class DispatchView(APIView, BaseView):
             else:
                 return func(start, end)
         except Exception, e:
-            print e
             return Response({})
 
     def statistic(self, start, end):
@@ -54,7 +53,7 @@ class DispatchView(APIView, BaseView):
         article = Article.objects.filter(pubtime__range=(start,end)).count()
         weixin = Weixin.objects.filter(pubtime__range=(start,end)).count()
         weibo = Weibo.objects.filter(pubtime__range=(start,end)).count()
-        return Response({'news': article, 'weixin': weixin, 'weibo': weibo})   
+        return Response({'news': article, 'weixin': weixin, 'weibo': weibo})
 
     def chart_emotion(self, start, end):
         start = parse_date(start)
@@ -67,7 +66,7 @@ class DispatchView(APIView, BaseView):
         negative = Article.objects.filter(pubtime__range=(start,end), feeling_factor__lt=0.5).count()
 
         return Response({'positive':positive, 'normal': normal, 'negative': negative})
-    
+
     def chart_weibo(self, start, end):
         start = parse_date(start)
         end = parse_date(end)
@@ -102,11 +101,11 @@ class DispatchView(APIView, BaseView):
         days = (end - start).days
         date = [(start + timedelta(days=x)) for x in xrange(days)]
         news_data = map(lambda x: Article.objects.filter(pubtime__range=(
-            str(date[x]), str(date[x] + timedelta(days=1)))).count(), xrange(days))
+            date[x], date[x] + timedelta(days=1))).count(), xrange(days))
         weixin_data = map( lambda x: Weixin.objects.filter(pubtime__range=(
-            str(date[x]), str(date[x] + timedelta(days=1)))).count(), xrange(days))
+            date[x], date[x] + timedelta(days=1))).count(), xrange(days))
         weibo_data = map(lambda x: Weibo.objects.filter(pubtime__range=(
-            str(date[x]), str(date[x] + timedelta(days=1)))).count(), xrange(days))
+            date[x], date[x] + timedelta(days=1))).count(), xrange(days))
         total_data = map(lambda x: news_data[x] + weixin_data[x] + weibo_data[x] , xrange(days))
 
         date = map(lambda x: x.strftime("%m-%d"), date)
@@ -120,6 +119,6 @@ class DispatchView(APIView, BaseView):
         })
 
 
-class AnalyticsView(BaseView):
+class AnalyticsView(BaseTemplateView):
     def get(self, request):
         return self.render_to_response('analytics/analytics.html', {'industry': {'name': u'综合'}})

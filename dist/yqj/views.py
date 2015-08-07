@@ -13,7 +13,7 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 
 from base import login_required, get_user_image
-from base.views import BaseView
+from base.views import BaseTemplateView
 from yqj.redisconnect import RedisQueryApi
 from yqj.models import (Article, Weixin, Weibo, RelatedData, Category, Group,
     Area, Topic, Inspection, Custom, CustomKeyword, Collection, ArticlePublisher,
@@ -142,7 +142,7 @@ def index_view(request):
     else:
         return HttpResponse(status=401)
 
-class CategoryView(BaseView):
+class CategoryView(BaseTemplateView):
     def get(self, request, category_id):
         try:
             category = Category.objects.get(id=category_id)
@@ -151,7 +151,7 @@ class CategoryView(BaseView):
         return self.render_to_response('category/category.html', {'category': category})
 
 
-class LocationView(BaseView):
+class LocationView(BaseTemplateView):
     def get(self, request, location_id):
         """
         try:
@@ -173,12 +173,12 @@ def person_view(request, person_id):
     return HttpResponse('person')
 
 
-class NewsView(BaseView):
+class NewsView(BaseTemplateView):
     def get(self, request):
         return self.render_to_response('news/news_list.html', {})
 
 
-class NewsDetailView(BaseView):
+class NewsDetailView(BaseTemplateView):
     def get(self, request, news_id):
         try:
             news_id = int(news_id)
@@ -207,12 +207,12 @@ class NewsDetailView(BaseView):
  #sim_article(news.title,news.pubtime
 
 
-class EventView(BaseView):
+class EventView(BaseTemplateView):
     def get(self,request):
         return self.render_to_response('event/event_list.html')
 
 
-class EventDetailView(BaseView):
+class EventDetailView(BaseTemplateView):
     def get(self, request, id):
         try:
             event_id = int(id)
@@ -239,7 +239,7 @@ class EventDetailView(BaseView):
         return self.render_to_response('event/event.html', {'event': event, 'keywords_list': keywords_list, 'isCollected': iscollected})
 
 
-class WeixinView(BaseView):
+class WeixinView(BaseTemplateView):
     def get(self, request):
         hottest = [SetLogo(data) for data in Weixin.objects.order_by('-pubtime')[0:20]]
         weixin = Weixin.objects.all()
@@ -252,7 +252,7 @@ class WeixinView(BaseView):
                                                                    'total_page_number': latest['total_number']})
 
 
-class WeixinDetailView(BaseView):
+class WeixinDetailView(BaseTemplateView):
     def get(self, request, id):
         try:
             weixin_id = int(id)
@@ -267,7 +267,7 @@ class WeixinDetailView(BaseView):
         return self.render_to_response('weixin/weixin.html', {'article': SetLogo(weixin), 'relate': relateddata})
 
 
-class WeiboView(BaseView):
+class WeiboView(BaseTemplateView):
     def get(self, request):
         latest = [SetLogo(data) for data in Weibo.objects.order_by('-pubtime')[0:20]]
         for item in latest:
@@ -283,18 +283,18 @@ class WeiboView(BaseView):
         return self.render_to_response('weibo/weibo_list.html', {'weibo_latest_list': latest, 'weibo_hottest_list': hottest})
 
 
-class CollectionView(BaseView):
+class CollectionView(BaseTemplateView):
     def get(self, request):
         return self.render_to_response('user/collection.html')
 
 
-class SettingsView(BaseView):
+class SettingsView(BaseTemplateView):
     def get(self, request):
 
         return self.render_to_response('user/settings.html')
 
 
-class CustomListView(BaseView):
+class CustomListView(BaseTemplateView):
     custom_list_num = 5
     def get(self, request):
         user = self.request.myuser
@@ -311,7 +311,7 @@ class CustomListView(BaseView):
         return Article.objects.raw(u"SELECT * FROM article WHERE MATCH (content, title) AGAINST ('%s') LIMIT %s" % (keyword, self.custom_list_num))
 
 
-class CustomView(BaseView):
+class CustomView(BaseTemplateView):
     def get(self, request, id):
         user = request.myuser
         try:
@@ -321,7 +321,7 @@ class CustomView(BaseView):
         return self.render_to_response('custom/custom.html', {'name': custom.newkeyword})
 
 
-class ProductView(BaseView):
+class ProductView(BaseTemplateView):
     def get(self, reqeust, id):
         if id:
             try:
@@ -344,12 +344,12 @@ class ProductView(BaseView):
         return self.render_to_response('product/product.html', {'product_list': prokeyword_list, 'product': {'name': name}})
 
 
-class UserView(BaseView):
+class UserView(BaseTemplateView):
     def get(self, request):
         return self.render_to_response('user/user.html')
 
 
-class UserAdminView(BaseView):
+class UserAdminView(BaseTemplateView):
 
     def get(self, request):
         user = request.myuser
@@ -393,11 +393,11 @@ def logout_view(request):
     return response
 
 
-class SearchView(BaseView):
+class SearchView(BaseTemplateView):
     def get(self, request, keyword):
         return self.render_to_response('search/result.html')
 
 
-class InspectionView(BaseView):
+class InspectionView(BaseTemplateView):
     def get(self, request):
         return self.render_to_response('inspection/inspection_list.html', {})
