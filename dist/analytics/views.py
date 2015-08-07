@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from base.views import BaseView
+from django.conf import settings
 from yqj.models import Article, Area, Weixin, Weibo
 
 
