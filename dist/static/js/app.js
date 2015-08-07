@@ -2065,11 +2065,6 @@ APP.analytics = function () {
           require(['echarts', 'echarts/chart/pie'],function (ec){
             $.getJSON(api, { type : 'chart_emotion', start : start, end : end},function(data) {
                 ec.init(document.getElementById('chart-emotion')).setOption({
-                    title : {
-                    text: '情感分析',
-                    subtext: '',
-                    x:'center'
-                  },
                   tooltip : {
                       backgroundColor:'rgba(50,50,50,0.5)',
                       trigger: 'item',
@@ -2124,23 +2119,18 @@ APP.analytics = function () {
         },
 
         weibo: function (start, end) {
-          var weibo_map = $('<div class="wMap aa "><div class = "tab-weibo" id = "weibo-map" style = "height:400px;width:100%"></div></div>');
-          var weibo_bar = $('<div class="wMap ab"><div class = "tab-weibo" id = "weibo-bar" style = "height:400px;width:100%"><h4>微博地域分析</h4><div id="progress"></div></div></div>');
+          var weiboMap = $('<div class="wMap aa col-md-8 col-xs-12"><div class = "tab-weibo" id = "weibo-map" style = "height:400px"></div></div>');
+          var  weiboBar  = $('<div class="wMap ab col-md-4 col-xs-0"><div class = "tab-weibo" id = "weibo-bar" style = "height:400px"><div id="progress"></div></div></div>');
           if($('#chart-weibo').children().hasClass('wMap')){
             // $('.tab-weibo').remove();
             $('.wMap').remove();
           }
-          $('#chart-weibo').append(weibo_map).append(weibo_bar);
+          $('#chart-weibo').append(weiboMap).append( weiboBar );
           // $('#chart-weibo').attr('style','height:400px;width:60%');
-          $.getJSON(api, { type : 'chart_weibo', start : start, end : end },function(data){
+          $.getJSON(api, { type : 'chart-weibo', start : start, end : end },function(data){
             var item = data.sort_result;
             require(['echarts', 'echarts/chart/map'],function (ec){
               ec.init(document.getElementById('weibo-map')).setOption({
-                title : {
-                    text: '微博地域分析',
-                    subtext:'',
-                    x:'center'
-                },
                 tooltip : {
                     trigger: 'item'
                 },
@@ -2171,7 +2161,7 @@ APP.analytics = function () {
                 },
                 roamController: {
                     show: true,
-                    x: '80%', 
+                    x: '85%',
                     mapTypeControl: {
                         'china': true
                     }
@@ -2194,7 +2184,7 @@ APP.analytics = function () {
 
 
             $('#weibo-bar').each(function(){
-                var sort_table  =$.map(item,function(item){
+                var sortTable  =$.map(item,function(item){
                   var area                = '<span class="area">'+item.name+'</span>',
                          num               = '<span class="num">'+item.value+'</span>',
                          progressBar = '<div class="progress"><div class="progress-bar" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width: '+item.percent+'%"></div></div>',
@@ -2202,7 +2192,12 @@ APP.analytics = function () {
                   return progress;
                 });
 
-              $('#progress').html(sort_table);
+              $('#progress').html(sortTable);
+              $('.num').css({
+                  float:'right',
+                  marginTop:'-20px',
+
+              });
             })
           });
         }
@@ -2341,6 +2336,17 @@ APP.analytics = function () {
   }, showAnalytics);
 
   showAnalytics(moment().subtract(6, 'days'), moment());
+
+  if (location.pathname === '/analytics/0/') {
+    start = moment().subtract(6, 'days').format('YYYY-MM-DD');
+    end = moment().format('YYYY-MM-DD');
+
+    for (var type in chart) {
+      if(chart.hasOwnProperty(type)) {
+        chart[type](start, end);
+      }
+    }
+  }
 };
 
 
