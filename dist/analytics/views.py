@@ -33,15 +33,15 @@ class DispatchView(APIView, BaseView):
             return Response({})
 
     def statistic(self, start, end):
-        start = str(parse_date(start))
-        end = str(parse_date(end))
+        start = parse_date(start)
+        end = parse_date(end)
         total = Article.objects.filter(pubtime__range=(start, end)).count()
         risk = total
         return Response({'total': total, 'risk': risk})
 
     def data_list(self, start, end, page):
-        start = str(parse_date(start))
-        end = str(parse_date(end))
+        start = parse_date(start)
+        end = parse_date(end)
         items = Article.objects.filter(pubtime__range=(start, end)).order_by('-pubtime')
         datas = self.paging(items, settings.NEWS_PAGE_LIMIT, page)
         result = self.news_to_json(datas['items'])
@@ -49,16 +49,16 @@ class DispatchView(APIView, BaseView):
         return Response({'total': datas['total_number'], 'html':news})
 
     def chart_type(self, start, end):
-        start = str(parse_date(start))
-        end = str(parse_date(end))
+        start = parse_date(start)
+        end = parse_date(end)
         article = Article.objects.filter(pubtime__range=(start,end)).count()
         weixin = Weixin.objects.filter(pubtime__range=(start,end)).count()
         weibo = Weibo.objects.filter(pubtime__range=(start,end)).count()
         return Response({'news': article, 'weixin': weixin, 'weibo': weibo})   
 
     def chart_emotion(self, start, end):
-        start = str(parse_date(start))
-        end = str(parse_date(end))
+        start = parse_date(start)
+        end = parse_date(end)
         positive = Article.objects.filter(pubtime__range=(start,end),
                 feeling_factor__gte=0.6).count()
         normal = Article.objects.filter(pubtime__range=(start,end),
@@ -69,8 +69,8 @@ class DispatchView(APIView, BaseView):
         return Response({'positive':positive, 'normal': normal, 'negative': negative})
     
     def chart_weibo(self, start, end):
-        start = str(parse_date(start))
-        end = str(parse_date(end))
+        start = parse_date(start)
+        end = parse_date(end)
         pro_area = Area.objects.filter(level=2)
         pro_id = []
         for item in pro_area:
@@ -101,9 +101,12 @@ class DispatchView(APIView, BaseView):
         end = parse_date(end)
         days = (end - start).days
         date = [(start + timedelta(days=x)) for x in xrange(days)]
-        news_data = map(lambda x: Article.objects.filter(pubtime__range=(str(date[x]), str(date[x] + timedelta(days=1)))).count(), xrange(days))
-        weixin_data = map( lambda x: Weixin.objects.filter(pubtime__range=(str(date[x]), str(date[x] + timedelta(days=1)))).count(), xrange(days))
-        weibo_data = map(lambda x: Weibo.objects.filter(pubtime__range=(str(date[x]), str(date[x] + timedelta(days=1)))).count(), xrange(days))
+        news_data = map(lambda x: Article.objects.filter(pubtime__range=(
+            str(date[x]), str(date[x] + timedelta(days=1)))).count(), xrange(days))
+        weixin_data = map( lambda x: Weixin.objects.filter(pubtime__range=(
+            str(date[x]), str(date[x] + timedelta(days=1)))).count(), xrange(days))
+        weibo_data = map(lambda x: Weibo.objects.filter(pubtime__range=(
+            str(date[x]), str(date[x] + timedelta(days=1)))).count(), xrange(days))
         total_data = map(lambda x: news_data[x] + weixin_data[x] + weibo_data[x] , xrange(days))
 
         date = map(lambda x: x.strftime("%m-%d"), date)
