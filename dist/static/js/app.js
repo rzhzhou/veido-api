@@ -1957,6 +1957,12 @@ APP.analytics = function () {
                   legend : {
                     data : ['全部' , '新闻' ,  '微博' ,   '微信']
                   },
+                  grid: {
+                    x: 50,
+                    y: 30,
+                    x2: 25,
+                    y2: 65
+                   },
                   toolbox: {
                     show: true,
                     feature: {
@@ -1991,25 +1997,21 @@ APP.analytics = function () {
                     series: [{
                       name: '全部',
                       type: 'line',
-                      stack: '总量',
                       data:data.total_data
                     },
                     {
                       name: '新闻',
                       type: 'line',
-                      stack: '总量',
                       data:data.news_data
                       },
                       {
                       name: '微博',
                       type: 'line',
-                      stack: '总量',
                       data:data.weibo_data
                       },
                       {
                       name: '微信',
                       type: 'line',
-                      stack: '总量',
                       data:data.weixin_data
                       },
                       ]
@@ -2029,8 +2031,9 @@ APP.analytics = function () {
                  legend: {
                    orient : 'vertical',
                    x : 'left',
+                   y : 'bottom',
                    data:['新闻','微博','微信']
-                   },
+                 },
                  toolbox: {
                    show : true,
                    feature : {
@@ -2068,21 +2071,23 @@ APP.analytics = function () {
                     x:'center'
                   },
                   tooltip : {
+                      backgroundColor:'rgba(50,50,50,0.5)',
                       trigger: 'item',
                       formatter: "{a} <br/>{b} : {c} ({d}%)"
                   },
                   legend: {
                       orient : 'vertical',
                       x : 'left',
+                      y : 'bottom',
                       data:['正面','中性','负面']
                   },
                   toolbox: {
-                      show : false,
+                      show : true,
                       feature : {
-                          mark : {show: true},
+                          mark : {show: false},
                           dataView : {show: true, readOnly: false},
                           magicType : {
-                              show: true,
+                              show: false,
                               type: ['pie'],
                               option: {
                                   funnel: {
@@ -2119,17 +2124,20 @@ APP.analytics = function () {
         },
 
         weibo: function (start, end) {
-          var weibo_map = $('<div class = "tab-weibo" id = "weibo-map" style = "height:400px;width:60%"></div>');
-          var weibo_bar = $('<div class = "tab-weibo" id = "weibo-bar" style = "height:400px;width:40%"><h4>微博地域分析</h4><div id="progress"></div></div>');
+          var weibo_map = $('<div class = "tab-weibo" id = "weibo-map" style = "height:400px;width:934px"></div>');
+          var weibo_bar = $('<div class = "tab-weibo" id = "weibo-bar" style = "height:400px;width:500px"><h4>微博地域分析</h4><div id="progress"></div></div>');
+          if($('#chart-weibo').children().hasClass('tab-weibo')){
+            $('.tab-weibo').remove();
+          }
           $('#chart-weibo').append(weibo_map).append(weibo_bar);
           // $('#chart-weibo').attr('style','height:400px;width:60%');
           $.getJSON(api, { type : 'chart_weibo', start : start, end : end },function(data){
             var item = data.sort_result;
-            require(['echarts', 'echarts/chart/map'],function (ec){           
+            require(['echarts', 'echarts/chart/map'],function (ec){
               ec.init(document.getElementById('weibo-map')).setOption({
                 title : {
                     text: '微博地域分析',
-                    subtext:'纯属虚构',
+                    subtext:'',
                     x:'center'
                 },
                 tooltip : {
@@ -2162,7 +2170,7 @@ APP.analytics = function () {
                 },
                 roamController: {
                     show: true,
-                    x: 'right',
+                    x: 750, 
                     mapTypeControl: {
                         'china': true
                     }
@@ -2183,7 +2191,8 @@ APP.analytics = function () {
               });
            });
 
-            $('#weibo-bar').each(function(){   
+
+            $('#weibo-bar').each(function(){
                 var sort_table  =$.map(item,function(item){
                   var area                = '<span class="area">'+item.name+'</span>',
                          num               = '<span class="num">'+item.value+'</span>',
@@ -2191,7 +2200,7 @@ APP.analytics = function () {
                          progress         = area + num + progressBar;
                   return progress;
                 });
-              
+
               $('#progress').html(sort_table);
             })
           });
