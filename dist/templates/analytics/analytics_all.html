@@ -1,0 +1,46 @@
+{% extends "base/layout.html" %}
+
+{% block title %}风险监测预警 - 数据统计{% endblock %}
+
+{% block header %}
+	<h1>风险监测预警</h1>
+{% endblock %}
+
+{% block content %}
+	<div class="row">
+	    <div class="col-md-12">
+	    	<h3 class="box-title">报道总趋势分析</h3>
+	     	<div class="tab-pane " id="chart-trend" style="height:400px"></div> 
+	    </div>
+	 </div>
+
+         <div class="row">
+	    <div class="col-md-6">
+	      <div class="box box-default">
+	        <div class="box-header with-border">
+	          <h3 class="box-title">信息类型分析</h3>
+	        </div>
+	        <div class="box-body">
+	          <div class="tab-pane" id="chart-type" style="height:400px"></div>
+	        </div>
+	      </div>
+	    </div>
+	    <div class="col-md-6">
+	      <div class="box box-default">
+	        <div class="box-header with-border">
+	          <h3 class="box-title">情感分析</h3>
+	        </div>
+	        <div class="box-body">
+	          <div class="tab-pane" id="chart-emotion" style="height:400px"></div>
+	        </div>
+	      </div>
+	    </div>
+	 </div>
+
+	 <div class="row">
+	    <div class="col-md-12">
+	    	<h3 class="box-title">微博地域分析</h3>
+	     	<div class="tab-pane" id="chart-weibo" style="height:400px" ></div> 
+	    </div>
+	 </div>
+{% endblock %}
