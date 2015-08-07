@@ -5057,14 +5057,19 @@ Gradient Background colors
   margin-left:  85%;
 }
 #chart-weibo{
-  width: 1344px;
+  width: 100%;
   margin :0 auto;
 }
 .aa{
   float: left;
-  width: 744px;
+  width:60%;
 }
 .ab{
   float: left;
-  width: 500px;
+  width: 40%;
+}
+@media (min-width:200px) and (max-width: 1564px){
+  #chart-weibo{
+    width: 1400px;
+  }
 }

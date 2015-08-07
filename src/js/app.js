@@ -869,7 +869,7 @@ APP.analytics = function () {
                 },
                 roamController: {
                     show: true,
-                    x: 650, 
+                    x: '80%', 
                     mapTypeControl: {
                         'china': true
                     }
