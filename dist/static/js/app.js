@@ -2124,10 +2124,11 @@ APP.analytics = function () {
         },
 
         weibo: function (start, end) {
-          var weibo_map = $('<div class = "tab-weibo" id = "weibo-map" style = "height:400px;width:934px"></div>');
-          var weibo_bar = $('<div class = "tab-weibo" id = "weibo-bar" style = "height:400px;width:500px"><h4>微博地域分析</h4><div id="progress"></div></div>');
-          if($('#chart-weibo').children().hasClass('tab-weibo')){
-            $('.tab-weibo').remove();
+          var weibo_map = $('<div class="wMap aa "><div class = "tab-weibo" id = "weibo-map" style = "height:400px;width:100%"></div></div>');
+          var weibo_bar = $('<div class="wMap ab"><div class = "tab-weibo" id = "weibo-bar" style = "height:400px;width:100%"><h4>微博地域分析</h4><div id="progress"></div></div></div>');
+          if($('#chart-weibo').children().hasClass('wMap')){
+            // $('.tab-weibo').remove();
+            $('.wMap').remove();
           }
           $('#chart-weibo').append(weibo_map).append(weibo_bar);
           // $('#chart-weibo').attr('style','height:400px;width:60%');
@@ -2170,7 +2171,7 @@ APP.analytics = function () {
                 },
                 roamController: {
                     show: true,
-                    x: 750, 
+                    x: 650, 
                     mapTypeControl: {
                         'china': true
                     }
