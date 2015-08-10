@@ -1527,6 +1527,79 @@ App.module.settings = function () {
   $(form).keyup(enableSubmit).submit(processChange);
 };
 
+// chart
+App.module.line = function (path) {
+  $.getJSON('/api/line' + path, function (data) {
+    echarts.init($('#line-chart')[0], 'macarons').setOption({
+      color: ['#00a65a', '#00c0ef', '#dd4b39'],
+      tooltip: {
+        trigger: 'axis'
+      },
+      legend: {
+        data: ['正面','中性','负面']
+      },
+      grid: {
+        x: 40,
+        y: 30,
+        x2: 25,
+        y2: 30
+      },
+      xAxis: [
+        {
+          type: 'category',
+          boundaryGap: false,
+          data: data.date
+        }
+      ],
+      yAxis: [
+        {
+          type : 'value'
+        }
+      ],
+      series: [
+        {
+          name: '正面',
+          type: 'line',
+          data: data.positive
+        },
+        {
+          name: '中性',
+          type: 'line',
+          data: data.neutral
+        },
+        {
+          name: '负面',
+          type: 'line',
+          data: data.negative
+        }
+      ]
+    });
+  });
+};
+
+App.module.pie = function (path) {
+  $.getJSON('/api/pie' + path, function (data) {
+    echarts.init($('#pie-chart')[0], 'macarons').setOption({
+      tooltip: {
+        trigger: 'item',
+        formatter: '{a} <br/>{b} : {c} ({d}%)'
+      },
+      legend: {
+        data: data.name
+      },
+      series: [
+        {
+          name: '信息比例',
+          type: 'pie',
+          radius: '55%',
+          center: ['50%', '60%'],
+          data: data.value
+        }
+      ]
+    });
+  });
+};
+
 // util
 App.module.search = function () {
   var form  = document.forms.search,
@@ -1900,75 +1973,8 @@ App.page.user = function (module) {
 // util
 App.page.dashboard = function (module, path) {
   module.infoBox();
-
-  $.getJSON('/api/line' + path, function (data) {
-    echarts.init($('#line-chart')[0], 'macarons').setOption({
-      color: ['#00a65a', '#00c0ef', '#dd4b39'],
-      tooltip: {
-        trigger: 'axis'
-      },
-      legend: {
-        data: ['正面','中性','负面']
-      },
-      grid: {
-        x: 40,
-        y: 30,
-        x2: 25,
-        y2: 30
-      },
-      xAxis: [
-        {
-          type: 'category',
-          boundaryGap: false,
-          data: data.date
-        }
-      ],
-      yAxis: [
-        {
-          type : 'value'
-        }
-      ],
-      series: [
-        {
-          name: '正面',
-          type: 'line',
-          data: data.positive
-        },
-        {
-          name: '中性',
-          type: 'line',
-          data: data.neutral
-        },
-        {
-          name: '负面',
-          type: 'line',
-          data: data.negative
-        }
-      ]
-    });
-  });
-
-  $.getJSON('/api/pie' + path, function (data) {
-    echarts.init($('#pie-chart')[0], 'macarons').setOption({
-      tooltip: {
-        trigger: 'item',
-        formatter: '{a} <br/>{b} : {c} ({d}%)'
-      },
-      legend: {
-        data: data.name
-      },
-      series: [
-        {
-          name: '信息比例',
-          type: 'pie',
-          radius: '55%',
-          center: ['50%', '60%'],
-          data: data.value
-        }
-      ]
-    });
-  });
-
+  module.line(path);
+  module.pie(path);
   module.inspection();
 };
 
@@ -1986,8 +1992,8 @@ App.page.event = function (module, path) {
 
 App.page.eventDetail = function (module, path, type, id) {
   module.collect(type, id);
-  module.chart.line(path, type);
-  module.chart.pie(path, type);
+  module.line(path, type);
+  module.pie(path, type);
   module.table(module, path);
   module.sns(module, path, type);
 };
