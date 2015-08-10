@@ -1902,6 +1902,10 @@ App.page.custom = function (module) {
   module.custom();
 };
 
+App.page.customDetail = function (module, path, type) {
+  module.table(module, path);
+  module.sns(module, path, type);
+};
 
 //
 // Initialization
