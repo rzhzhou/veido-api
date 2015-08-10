@@ -1397,6 +1397,8 @@ App.module.menu = function (path, type) {
 
         if (type === 'category' || type === 'location') {
           return thisHref === path;
+        } else if (type === 'dashboard') {
+          return thisHref === '/';
         } else {
           return thisHref.split('/')[1] === type;
         }
