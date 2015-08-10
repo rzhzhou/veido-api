@@ -392,6 +392,10 @@ App.page.newsDetail = function (module, path, type, id) {
   module.collect(type, id);
 };
 
+App.page.event = function (module, path) {
+  module.table(module, path);
+};
+
 App.page.eventDetail = function (module, type, id) {
   console.log('Page type is ' + type);
   console.log('Page id is ' + id);
