@@ -1560,10 +1560,60 @@ App.module.inspection = function () {
   });
 };
 
-App.module.table = function () {
-  if (typeof $.fn.twbPagination !== 'function') {
-    throw new Error('login module requires twbsPagination plugin');
-  }
+App.module.returnTop = function(el) {
+  var top       = el.offset().top,
+      scrollTop = top > 160 ? top - 120 : 0;
+
+  $('body').animate({scrollTop: scrollTop});
+};
+
+App.module.table = function (module, path) {
+  $('.table-custom').each(function() {
+    var $this       = $(this),
+        $pagination = $this.parent(),
+        content     = this.tBodies[0],
+        type        = this.id,
+
+        renderTable = function(data) {
+          var items = data.data,
+
+              table = $.map(items, function(item) {
+                var url       = '/' + type + '/' + item.id + '/',
+                    title     = '<td><a href="' + url + '" title="' + item.title + '" target="_blank">' + item.title + '</a></td>',
+                    source    = '<td>' + item.source   + '</td>',
+                    location  = '<td>' + item.location + '</td>',
+                    time      = '<td>' + item.time     + '</td>',
+                    hot       = '<td class="text-center">' + item.hot + '</td>',
+                    row       = '<tr>' + title + source + location + time + hot + '</tr>';
+
+                return row;
+              });
+
+          $(content).html(table);
+        };
+
+    $.getJSON('/api' + path + type + '/1/', function(data) {
+      renderTable(data);
+
+      $pagination.twbsPagination({
+        totalPages: data.total,
+        visiblePages: 7,
+        first: '第一页',
+        prev: '上一页',
+        next: '下一页',
+        last: '最后一页',
+        paginationClass: 'pagination pagination-sm no-margin pull-right',
+        onPageClick: function(event, page) {
+          module.returnTop($this);
+
+          $.getJSON('/api' + path + type + '/' + page + '/', function(data) {
+            renderTable(data);
+            $pagination.twbsPagination({totalPages: data.total});
+          });
+        }
+      });
+    });
+  });
 };
 
 
@@ -1608,7 +1658,9 @@ App.page.dashboard = function (module, path, type) {
   module.inspection();
 };
 
-
+App.page.news = function (module, path) {
+  module.table(module, path);
+};
 
 App.page.newsDetail = function (module, type, id) {
   console.log('Page type is ' + type);
