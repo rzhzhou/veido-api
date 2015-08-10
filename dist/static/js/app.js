@@ -1392,21 +1392,24 @@ App.module.menu = function (path, type) {
   var menu     = $('.sidebar-menu'),
       parent   = menu.parent(),
 
-      vaildURL = function () {
-        var thisHref = this.getAttribute('href');
+      validate = function () {
+        var href = this.getAttribute('href');
 
-        if (type === 'category' || type === 'location') {
-          return thisHref === path;
-        } else if (type === 'dashboard') {
-          return thisHref === '/';
-        } else {
-          return thisHref.split('/')[1] === type;
+        switch (true) {
+        case type === 'dashboard':
+          return href === '/';
+        // both 'category' and 'location' are parent treeview
+        case type === 'category':
+        case type === 'location':
+          return href === path;
+        default:
+          return href.split('/')[1] === type;
         }
       };
 
   menu
     .detach()
-    .find('a').filter(vaildURL)
+    .find('a').filter(validate)
     .parent().addClass('active')
     .closest('.treeview-menu').addClass('menu-open')
     .closest('.treeview').addClass('active');
