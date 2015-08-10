@@ -1810,6 +1810,73 @@ App.module.custom = function () {
   }
 };
 
+App.module.admin = function () {
+  var $admin  = $('.user-admin'),
+      $input  = $admin.find('input'),
+      $button = $admin.find('button'),
+      $reset  = $button.eq(0),
+      $remove = $button.eq(1),
+      id      = [],
+
+      action = function(obj, api) {
+        obj.click(function() {
+          id.length = 0;
+
+          $input.filter(':checked').each(function(index, element) {
+            id.push( $(element).parent().next().data('id') );
+          });
+
+          if (id.length) {
+            $.post(api, {id: id.toString()}, function(response) {
+              if (response.status) {
+                location.reload();
+              }
+            });
+          }
+        });
+      };
+
+  action($reset, '/api/user/reset/');
+  action($remove, '/api/user/remove/');
+};
+
+App.module.register = function () {
+  var form     = document.forms.add,
+      action   = form.action,
+      elements = form.elements,
+      username = elements.username,
+      password = elements.password,
+      retype   = elements.retype,
+      submit   = elements[3],
+      $msg     = $(form).find('p'),
+
+      enableSubmit = function() {
+        submit.disabled = !(username.value && password.value && retype.value);
+      },
+
+      processAdd   = function(event) {
+        event.preventDefault();
+
+        var processResponse = function(response) {
+          if (response.status) {
+            location.reload();
+          } else {
+            $msg.text('抱歉，添加失败！').show();
+          }
+        };
+
+        if (password.value === retype.value) {
+          $.post(action, $([username, password]).serialize(), processResponse);
+        } else {
+          $msg.text('两次输入密码不一致！').show();
+          submit.disabled = true;
+          password.value  = '';
+          retype.value    = '';
+        }
+      };
+
+  $(form).keyup(enableSubmit).submit(processAdd);
+};
 
 
 //
@@ -1952,6 +2019,11 @@ App.page.settings = function () {
       };
 
   $(form).keyup(enableSubmit).submit(processChange);
+};
+
+App.page.user = function (module) {
+  module.admin();
+  module.register();
 };
 
 //
