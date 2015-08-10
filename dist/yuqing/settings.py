@@ -48,6 +48,10 @@ def _load_config():
 
     USE_TZ = cp.get(SECTION, 'USE_TZ')
 
+    MEDIA_ROOT = cp.get(SECTION, 'MEDIA_ROOT')
+
+    STATIC_ROOT = cp.get(SECTION, 'STATIC_ROOT')
+
     # MySQL
     mysql_conn_str_default = cp.get(SECTION, 'mysql_conn_str_default')
     mysql_conn_str_master = cp.get(SECTION, 'mysql_conn_str_master')
