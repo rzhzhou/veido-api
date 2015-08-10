@@ -12,25 +12,24 @@ var browserSync = require('browser-sync').create(),
 
 
 // miscellaneous
+gulp.task('vendor', function () {
+  var files = [
+    'bower_components/jquery/dist/jquery.js',
+    'bower_components/bootstrap/dist/js/bootstrap.js',
+    'bower_components/DataTables/media/js/jquery.dataTables.js',
+    'bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.js',
+    'bower_components/admin-lte/plugins/slimScroll/jquery.slimscroll.js',
+    'bower_components/twbs-pagination/jquery.twbsPagination.js',
+    'src/js/adminlte/app.js',
+    'bower_components/echarts/build/source/echarts-all.js'
+  ];
 
-var jsFiles = [
-  'bower_components/admin-lte/plugins/slimScroll/jquery.slimscroll.js',
-  'src/js/adminlte/app.js',
-  'bower_components/twbs-pagination/jquery.twbsPagination.js',
-  'src/js/app.js'
-];
-
-var dataTablesFiles = [
-  'bower_components/DataTables/media/js/jquery.dataTables.js',
-  'bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.js'
-];
-
-gulp.task('dataTables', function() {
-  return gulp.src(dataTablesFiles)
-    .pipe(concat('dataTables.min.js'))
+  return gulp.src(files)
+    .pipe(concat('vendor.js'))
     .pipe(uglify())
-    .pipe(gulp.dest('dist/vendor/dataTables'));
+    .pipe(gulp.dest('dist/static/js'));
 });
+
 
 gulp.task('clean-css', function() {
   del.sync(['dist/static/css/*.css']);
@@ -50,8 +49,8 @@ gulp.task('build-css', ['clean-css'], function() {
     .pipe(gulp.dest('dist/static/css'));
 });
 
-gulp.task('build-js', ['clean-js'], function() {
-  return gulp.src(jsFiles)
+gulp.task('build-js', ['clean-js', 'vendor'], function() {
+  return gulp.src('src/js/app.js')
     .pipe(concat('app.js'))
     .pipe(uglify())
     .pipe(gulp.dest('dist/static/js'));
