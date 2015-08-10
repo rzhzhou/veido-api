@@ -449,6 +449,10 @@ App.page.weixinDetail = function () {
   // placeholder for future usage
 };
 
+App.page.weibo = function (module, path, type) {
+  module.sns(module, path, type);
+};
+
 App.page.weiboDetail = function () {
   // placeholder for future usage
 };
