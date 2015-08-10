@@ -857,6 +857,7 @@ APP.analytics = function () {
                         saveAsImage : {show: true}
                     }
                 },
+                calculable : true,
                 roamController: {
                     show: true,
                     x: '85%',
@@ -1034,8 +1035,9 @@ APP.analytics = function () {
   }, showAnalytics);
 
   showAnalytics(moment().subtract(6, 'days'), moment());
+  $('.analytics-all>li:first-child>a').attr("href","/analytics/");
 
-  if (location.pathname === '/analytics/0/') {
+  if (location.pathname === '/analytics/') {
     start = moment().subtract(6, 'days').format('YYYY-MM-DD');
     end = moment().format('YYYY-MM-DD');
 

@@ -28,7 +28,8 @@ class DispatchView(APIView, BaseTemplateView):
             if page:
                 return func(start, end, page)
             else:
-                result = eval(RedisQueryApi().hget('cache', type))
+                data = RedisQueryApi().hget('cache', type)
+                result = eval(data) if data else []
                 if result:
                     return Response(result)
                 return func(start, end)
