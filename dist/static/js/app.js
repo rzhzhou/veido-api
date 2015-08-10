@@ -2161,6 +2161,7 @@ APP.analytics = function () {
                         saveAsImage : {show: true}
                     }
                 },
+                calculable : true,
                 roamController: {
                     show: true,
                     x: '85%',
