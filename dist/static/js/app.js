@@ -1747,6 +1747,13 @@ App.page.weixin = function (module, path, type) {
   module.sns(module, path, type);
 };
 
+App.page.weixinDetail = function () {
+  // placeholder for future usage
+};
+
+App.page.weiboDetail = function () {
+  // placeholder for future usage
+};
 
 App.page.categoryDetail = function (module, type, id) {
   console.log('Page type is ' + type);
