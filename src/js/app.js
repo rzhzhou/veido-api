@@ -441,6 +441,11 @@ App.page.eventDetail = function (module, path, type, id) {
   module.sns(module, path, type);
 };
 
+App.page.weixin = function (module, path, type) {
+  module.sns(module, path, type);
+};
+
+
 App.page.categoryDetail = function (module, type, id) {
   console.log('Page type is ' + type);
   console.log('Page id is ' + id);
