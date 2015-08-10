@@ -1934,7 +1934,7 @@ APP.analytics = function () {
       $statistic = $('#statistic'),
       $dataList = $('#data-list'),
       $statisticTotal = $('.statistic-total').children('span'),
-      $statisticRisk = $('.statistic-risk').children('span'),
+      $statisticRisk = $('.statistic-risk').children('span');
 
       chart = {
         trend: function (start, end) {
@@ -2336,6 +2336,7 @@ APP.analytics = function () {
   }, showAnalytics);
 
   showAnalytics(moment().subtract(6, 'days'), moment());
+
 
   if (location.pathname === '/analytics/0/') {
     start = moment().subtract(6, 'days').format('YYYY-MM-DD');

@@ -5,7 +5,7 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.views.static import serve
 from yqj.views import *
-from analytics.views import AnalyticsView
+from analytics.views import AnalyticsChildView
 
 from django.conf import settings
 
@@ -38,7 +38,8 @@ urlpatterns += patterns('yqj.views',
     url(r'^weibo/$', WeiboView.as_view()),
     url(r'^custom/$', CustomListView.as_view()),
     url(r'^custom/(\d+)/$', CustomView.as_view()),
-    url(r'^analytics/', AnalyticsView.as_view()),
+    # url(r'^analytics/$', AnalyticsParentsView.as_view()),
+    url(r'^analytics/(?P<id>\d+)/$', AnalyticsChildView.as_view()),
     # url(r'^product/(\d*)/?$', ProductView.as_view()),
     url(r'^product/(?P<id>\d*)/?$', ProductView.as_view()),
     url(r'^collection/$', CollectionView.as_view()),
