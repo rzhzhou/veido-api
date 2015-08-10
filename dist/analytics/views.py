@@ -11,6 +11,7 @@ from rest_framework.views import APIView
 from base.views import BaseTemplateView
 from django.conf import settings
 from yqj.models import Article, Area, Weixin, Weibo
+from yqj.redisconnect import RedisQueryApi
 
 
 class DispatchView(APIView, BaseTemplateView):
@@ -27,9 +28,13 @@ class DispatchView(APIView, BaseTemplateView):
             if page:
                 return func(start, end, page)
             else:
+                result = eval(RedisQueryApi().hget('cache', type))
+                if result:
+                    return Response(result)
                 return func(start, end)
         except Exception, e:
             return Response({})
+ 
 
     def statistic(self, start, end):
         start = parse_date(start)
