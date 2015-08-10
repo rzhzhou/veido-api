@@ -453,15 +453,8 @@ App.page.weibo = function (module, path, type) {
   module.sns(module, path, type);
 };
 
-App.page.categoryDetail = function (module, type, id) {
-  console.log('Page type is ' + type);
-  console.log('Page id is ' + id);
-  console.dir(module);
-
-  // module.table();
-
-  console.log(typeof type);
-  console.log(typeof id);
+App.page.categoryDetail = function (module, path) {
+  module.table(module, path);
 };
 
 
