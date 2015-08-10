@@ -1560,7 +1560,7 @@ App.module.inspection = function () {
   });
 };
 
-App.module.returnTop = function(el) {
+App.module.returnTop = function (el) {
   var top       = el.offset().top,
       scrollTop = top > 160 ? top - 120 : 0;
 
@@ -1568,7 +1568,7 @@ App.module.returnTop = function(el) {
 };
 
 App.module.table = function (module, path) {
-  $('.table-custom').each(function() {
+  $('.table-custom').each(function () {
     var $this       = $(this),
         $pagination = $this.parent(),
         content     = this.tBodies[0],
@@ -1613,6 +1613,34 @@ App.module.table = function (module, path) {
         }
       });
     });
+  });
+};
+
+App.module.collect = function (type, id) {
+  $('.collection').click(function () {
+    var star = $(this).find('i'),
+        text = $(this).find('span'),
+
+        collect = function(api, nextAction) {
+          var data = {
+                type: type === 'news' ? 'article' : 'topic',
+                id: id
+              };
+
+          $.post(api, data, function(response) {
+            if (response.status) {
+              star.toggleClass('fa-star-o');
+              star.toggleClass('fa-star');
+              text.text(nextAction);
+            }
+          });
+        };
+
+    if ( star.hasClass('fa-star') ) {
+      collect('/api/collection/remove/', '添加收藏');
+    } else {
+      collect('/api/collection/add/', '取消收藏');
+    }
   });
 };
 
@@ -1662,9 +1690,8 @@ App.page.news = function (module, path) {
   module.table(module, path);
 };
 
-App.page.newsDetail = function (module, type, id) {
-  console.log('Page type is ' + type);
-  console.log('Page id is ' + id);
+App.page.newsDetail = function (module, path, type, id) {
+  module.collect(type, id);
 };
 
 App.page.eventDetail = function (module, type, id) {
