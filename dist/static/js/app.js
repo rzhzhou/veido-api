@@ -1313,6 +1313,26 @@ require.config({
   }
 });
 
+// twbsPagination
+(function () {
+  if (typeof $.fn.twbsPagination !== 'function') {
+    throw new Error('twbsPagination required');
+  }
+
+  var options = {
+    first: '第一页',
+    prev: '上一页',
+    next: '下一页',
+    last: '最后一页',
+    paginationClass: 'pagination pagination-sm no-margin pull-right'
+  };
+
+  $.extend($.fn.twbsPagination.defaults, options);
+}());
+
+
+
+
 
 //
 // Application
@@ -1741,11 +1761,6 @@ App.module.table = function (module, path) {
       $pagination.twbsPagination({
         totalPages: data.total,
         visiblePages: 7,
-        first: '第一页',
-        prev: '上一页',
-        next: '下一页',
-        last: '最后一页',
-        paginationClass: 'pagination pagination-sm no-margin pull-right',
         onPageClick: function(event, page) {
           module.returnTop($this);
 
@@ -1807,12 +1822,7 @@ App.module.sns = function (module, path, type) {
 
       $pagination.twbsPagination({
         totalPages: data.total,
-        first: '第一页',
-        prev: '上一页',
-        next: '下一页',
-        last: '最后一页',
-        paginationClass: 'pagination pagination-sm no-margin pull-right',
-        onPageClick: function(event, page) {
+        onPageClick: function (event, page) {
           module.returnTop($sns);
           $.getJSON('/api' + path + snsType() + '/' + page + '/', function(data) {
             $content.html(data.html);
