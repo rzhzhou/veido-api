@@ -1372,6 +1372,7 @@ var App = {
 // Modules
 //
 
+// user
 App.module.login = function () {
   var form     = document.forms.login,
       action   = form.action,
@@ -1513,6 +1514,7 @@ App.module.settings = function () {
   $(form).keyup(enableSubmit).submit(processChange);
 };
 
+// util
 App.module.search = function () {
   var form  = document.forms.search,
       input = form.elements.keywords;
@@ -1952,18 +1954,25 @@ App.module.custom = function () {
 };
 
 
-
-
-
-
 //
 // Pages
 //
 
+// user
 App.page.login = function (module) {
   module.login();
 };
 
+App.page.settings = function (module) {
+  module.settings();
+};
+
+App.page.user = function (module) {
+  module.admin();
+  module.register();
+};
+
+// util
 App.page.dashboard = function (module, path, type) {
   module.infoBox();
   module.chart.line(path, type);
@@ -2029,14 +2038,6 @@ App.page.collection = function (module, path) {
   module.table(module, path);
 };
 
-App.page.settings = function (module) {
-  module.settings();
-};
-
-App.page.user = function (module) {
-  module.admin();
-  module.register();
-};
 
 //
 // Initialization
