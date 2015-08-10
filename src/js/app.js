@@ -379,6 +379,100 @@ App.module.sns = function (module, path, type) {
   });
 };
 
+App.module.dataTable = function (path) {
+  $.fn.dataTable.ext.errMode = 'throw';
+
+  $('.initDataTable').each(function () {
+    var table = $(this).DataTable({
+      'ajax': {
+        'url': '/api' + path,
+        'dataSrc': this.id,
+        'cache': true
+      },
+      'autoWidth': false,
+      'pageLength': 25,
+      'order': [],
+      'language': {
+        'processing':         '处理中...',
+        'search':             '',
+        'searchPlaceholder':  '输入关键字过滤...',
+        'lengthMenu':         '显示 _MENU_ 条',
+        'info':               '显示第 _START_ 至 _END_ 条，共 _TOTAL_ 条',
+        'infoEmpty':          '信息空',
+        'infoFiltered':       '(由 _MAX_ 项结果过滤)',
+        'infoPostFix':        '',
+        'loadingRecords':     '载入中...',
+        'zeroRecords':        '无匹配结果',
+        'emptyTable':         '无结果',
+        'paginate': {
+          'first':            '第一页',
+          'previous':         '上一页',
+          'next':             '下一页',
+          'last':             '最后一页'
+        },
+        'aria': {
+          'sortAscending':    '正序排列',
+          'sortDescending':   '倒序排列'
+        }
+      },
+      // "columnDefs": [{
+      //   "className": "star",
+      //   "targets": 0,
+      //   "searchable": false,
+      //   "orderable": false
+      // },{
+      //   "className": "index",
+      //   "targets": -1
+      // }],
+      'deferLoading': 100,
+      'drawCallback': function () {
+        $('[data-toggle="tooltip"]').tooltip();
+      }
+    });
+
+    table.on('click', 'tbody > tr', function () {
+      if ( $(this).hasClass('selected') ) {
+        $(this).removeClass('selected');
+      } else {
+        table.$('tr.selected').removeClass('selected');
+        $(this).addClass('selected');
+      }
+    });
+  });
+
+
+  // table.on('draw.dt', function () {
+  //   var collection = function(obj, api) {
+  //     obj.each(function(index, element) {
+  //       $(element).click(function(event) {
+  //         event.preventDefault();
+
+  //         var $this = $(this);
+
+  //         var article = $this.parent().next().find('a');
+  //         var data = {
+  //           id: article.data('id'),
+  //           type: article.data('type')
+  //         };
+
+  //         var action = function(status) {
+  //           if (status) {
+  //             $this.toggleClass('fa-star-o');
+  //             $this.toggleClass('fa-star');
+  //             table.ajax.reload(null, false);
+  //           }
+  //         };
+
+  //         $.post(api, data, action);
+  //       });
+  //     });
+  //   };
+
+  //   collection( $('.fa-star-o'), '/api/collection/add/');
+  //   collection( $('.fa-star'), '/api/collection/remove/');
+  // });
+};
+
 
 //
 // Pages
@@ -460,6 +554,10 @@ App.page.categoryDetail = function (module, path) {
 App.page.locationDetail = function (module, path, type) {
   module.table(module, path);
   module.sns(module, path, type);
+};
+
+App.page.inspection = function (module, path) {
+  module.dataTable(path);
 };
 
 //
