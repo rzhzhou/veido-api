@@ -605,6 +605,10 @@ App.page.customDetail = function (module, path, type) {
   module.sns(module, path, type);
 };
 
+App.page.collection = function (module, path) {
+  module.table(module, path);
+};
+
 //
 // Initialization
 //
