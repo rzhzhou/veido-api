@@ -34,7 +34,7 @@ class DispatchView(APIView, BaseTemplateView):
                 return func(start, end)
         except Exception, e:
             return Response({})
- 
+
 
     def statistic(self, start, end):
         start = parse_date(start)
@@ -124,6 +124,11 @@ class DispatchView(APIView, BaseTemplateView):
         })
 
 
-class AnalyticsView(BaseTemplateView):
+class AnalyticsParentsView(BaseTemplateView):
     def get(self, request):
+        return self.render_to_response('analytics/analytics_all.html')
+
+
+class AnalyticsChildView(BaseTemplateView):
+    def get(self, request, id):
         return self.render_to_response('analytics/analytics.html', {'industry': {'name': u'综合'}})
