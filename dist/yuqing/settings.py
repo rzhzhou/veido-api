@@ -20,6 +20,7 @@ def _load_config():
     global DEBUG, TEMPLATE_DEBUG, ALLOWED_HOSTS
     global COMPANY_NAME, LANGUAGE_CODE, TIME_ZONE, USE_I18N, USE_L10N, USE_TZ
     global MYSQL_CONN_STR_DEFAULT, MYSQL_CONN_STR_MASTER, MONGO_CONN_STR, REDIS_CONN_STR
+    global MEDIA_ROOT, STATIC_ROOT
 
     cp = SafeConfigParser()
     cp.read(os.path.join(BASE_DIR, "../config.cfg"))
