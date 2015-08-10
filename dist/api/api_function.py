@@ -74,7 +74,6 @@ def year_range(min_date, max_date, date_range, articles):
     data['positive'] = [positive[date] for date in time1 ]
     data['neutral'] = [neutral[date] for date in time1 ]
     data['date'] = time1
-    print data['negative']
     return JsonResponse(data)
 
 
@@ -97,7 +96,7 @@ def season_range(min_date, max_date, date_range, articles):
                 neutral[date] += 1
         start_time = GetFirstDaySeason(max_date) - relativedelta(months = 12)
         # #datetime.date(min_date.year,start_month,1)
-        range_date = [ start_time + relativedelta(months = i) for i in range(0, 13, 3) ]                      
+        range_date = [ start_time + relativedelta(months = i) for i in range(0, 13, 3) ]
         data = {}
         data['negative'] = [ negative[date] for date in range_date]
         data['positive'] = [ positive[date] for date in range_date]
@@ -161,7 +160,7 @@ def days_range(min_date, max_date, date_range, articles):
         # min_date
         negative, positive, neutral = defaultdict(int), defaultdict(int), defaultdict(int)
         for art in articles:
-            factor = art.feeling_factor           
+            factor = art.feeling_factor
             days = art.pubtime.date()
             if factor > 0.9:
                 positive[days] += 1

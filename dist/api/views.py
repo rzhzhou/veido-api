@@ -15,11 +15,12 @@ from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template.loader import render_to_string
 from django.views.generic import View
-from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
 from base import authenticate, login_required
+from base.views import BaseAPIView
 from yqj.models import (Article, Area, Weixin, Weibo, Topic, RelatedData,
     Category, save_user, Collection, Topic, hash_password, User, Custom,
     Inspection, CustomKeyword,Product, ProductKeyword, Group)
@@ -48,8 +49,6 @@ def login_view(request):
 
 @api_view(['POST'])
 def registe_view(request):
-    print request.method
-
     try:
         username = request.POST['username']
         password = request.POST['password']
@@ -67,173 +66,11 @@ def registe_view(request):
     return JsonResponse ({'status': True})
 
 
-class TableAPIView(APIView):
-    COLLECTED_TEXT = u'<i class="fa fa-star" data-toggle="tooltip", data-placement="right" title="取消收藏">'
-    NO_COLLECTED_TEXT = u'<i class="fa fa-star-o" data-toggle="tooltip", data-placement="right" title="添加收藏">'
-
-    LIMIT_NUMBER = 300
-    NEWS_PAGE_LIMIT = 25
-    EVENT_PAGE_LIMIT = 25
-    def __init__(self, request=None):
-        self.request = request
-
-    def collected_html(self, item):
-        items = self.collected
-        return self.COLLECTED_TEXT if self.isIn(item, items) else self.NO_COLLECTED_TEXT
-
-    def isIn(self, item, items):
-        if isinstance(item, models.Model):
-            item_id = item.id
-        else:
-            item_id = item['id']
-
-        if item_id is None:
-            raise TypeError('item should has id atrribute or id key')
-
-        return any(filter(lambda x: x.id == item_id, items))
-
-    @property
-    def collected(self):
-        if getattr(self, '_collected', None) is None:
-            self._collected = self.collected_items()
-        return self._collected
-
-    def collected_items(self):
-        #return []
-        #try:
-        user = self.request.myuser
-        try:
-            self.collection = user.collection
-        except Collection.DoesNotExist:
-            self.collection = Collection(user=self.request.myuser)
-            self.collection.save(using='master')
-        return user.collection.articles.all()
-        #except:
-        #    return []
-
-    def title_html(self, *args):
-        title_format = u'<a href="{0}" title="{1}" target="_blank" data-id="{2}" data-type="{3}">{1}</a>'
-        return title_format.format(*args)
-
-    def set_css_to_weixin(self, items):
-        html = ""
-        count = u'0'
-        for item in items:
-            html += """<li class="media">"""
-            html += """<div class="media-left">"""
-            html +=  u'<img class="media-object" src="%s" alt="%s">' % (item.publisher.photo, item.publisher.publisher)
-            html += """</div>
-                       <div class="media-body"> """
-            html +=  u'<h4 class="media-heading">%s</h4>' % (item.publisher.publisher)
-            html +=  u'<p><a href="/weixin/%s/" target="_blank">%s</a></p>' % (item.id, item.title)
-            html += """<div class="media-meta">
-                       <div class="info pull-right">"""
-            html +=  u'<span>阅读 %s</span>' % count
-            html +=  u'<span><i class="fa fa-thumbs-o-up"></i> %s</span>' % count
-            html += """</div>"""
-            html +=  u'<div class="time pull-left">%s</div>' % item.pubtime.replace(tzinfo=None).strftime('%Y-%m-%d %H:%M')
-            html += """</div></div></li>"""
-        return html
-
-    def set_css_to_weibo(self, items):
-        html = ""
-        count = u'0'
-        for item in items:
-            html += """<li class="media">"""
-            html += """<div class="media-left">"""
-            html +=  u'<img class="media-object" src="%s" alt="%s">' % (item.publisher.photo, item.publisher.publisher)
-            html += """</div>
-                       <div class="media-body"> """
-            html +=  u'<h4 class="media-heading">%s</h4>' % (item.publisher.publisher)
-            if len(item.content) < 200:
-                 html +=  u'<p>%s</p>' % (item.content)
-            else:
-                 html +=  u'<p><a href="%s" target="_blank">%s</a></p>' % (item.url, item.title)
-            html += """<div class="media-meta">
-                       <div class="info pull-right">"""
-            html +=  u'<span>转载 %s</span>' % count
-            html +=  u'<span>评论 %s</span>' % count
-            html +=  u'<span><i class="fa fa-thumbs-o-up"></i> %s</span>' % count
-            html += """</div>"""
-            html +=  u'<div class="time pull-left">%s</div>' % item.pubtime.replace(tzinfo=None).strftime('%Y-%m-%d %H:%M')
-            html += """</div></div></li>"""
-        return html
-
-    def paging(self, items, limit, page):
-        #limit  每页显示的记录数 page 页码
-        #items = model.objects.all()
-        # 实例化一个分页对象
-        paginator = Paginator(items, limit)
-
-        try:
-            # 获取某页对应的记录
-            items = paginator.page(page)
-        except PageNotAnInteger:
-            # 如果页码不是个整数 取第一页的记录
-            items = paginator.page(1)
-        except EmptyPage:
-            # 如果页码太大，没有相应的记录 取最后一页的记录
-            items = paginator.page(paginator.num_pages)
-
-        return {'items': items, 'total_number': paginator.num_pages}
-
-    def pagingfromredis(self, model, limit, page):
-        items = [eval(item) for item in RedisQueryApi().lrange('sort_weibohot', 0, -1)]
-        # 实例化一个分页对象
-        paginator = Paginator(items, limit)
-	try:
-            # 获取某页对应的记录
-            items = paginator.page(page)
-        except PageNotAnInteger:
-            # 如果页码不是个整数 取第一页的记录
-            items = paginator.page(1)
-        except EmptyPage:
-            # 如果页码太大，没有相应的记录 取最后一页的记录
-            items = paginator.page(paginator.num_pages)
-
-        return {'items': items, 'total_number': paginator.num_pages}
-
-    def news_to_json(self, items):
-        result = []
-        for data in items:
-            item = {}
-            item['title'] = data.title
-            item['id'] = data.id
-            item['source'] = data.publisher.publisher
-            item['location'] = data.area.name
-            item['time'] = data.pubtime.replace(tzinfo=None).strftime('%Y-%m-%d')
-            try:
-                item['hot'] = RelatedData.objects.filter(uuid=data.uuid)[0].articles.all().count()
-            except IndexError:
-                item['hot'] = 0
-            result.append(item)
-        return result
-
-    def event_to_json(self, items):
-        result = []
-        for data in items:
-            item = {}
-            item['title'] = data.title
-            item['id'] = data.id
-            item['source'] = data.source
-            item['location'] = data.area.name
-            try:
-                item['time'] = data.articles.order_by('pubtime')[0].pubtime.replace(tzinfo=None).strftime('%Y-%m-%d')
-            except IndexError:
-                item['time'] = datetime.now().strftime('%Y-%m-%d')
-            item['hot'] = data.articles.count() + data.weixin.count() + data.weibo.count()
-            result.append(item)
-
-        results = sorted(result, key=lambda item: item['time'], reverse=True)
-
-        return results
-
-
 def get_date_from_iso(datetime_str):
     #return datetime.strptime("2008-09-03T20:56:35.450686Z", "%Y-%m-%dT%H:%M:%S.%fZ")
     return datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S.%fZ")
 
-class ArticleTableView(TableAPIView):
+class ArticleTableView(BaseAPIView):
     def get(self, request, id, page):
         try:
             category = Category.objects.get(id=id)
@@ -265,7 +102,7 @@ class ArticleTableView(TableAPIView):
         return Response({'total': datas['total_number'], 'data': result})
 
 
-class NewsTableView(TableAPIView):
+class NewsTableView(BaseAPIView):
     """
     def get(self, request):
         result = []
@@ -327,7 +164,7 @@ class NewsTableView(TableAPIView):
         return Response({'total': datas['total_number'], 'data': result})
 
 
-class LocationTableView(TableAPIView):
+class LocationTableView(BaseAPIView):
     def get(self, request, location_id, page):
         try:
             id = int(location_id)
@@ -357,7 +194,7 @@ class LocationTableView(TableAPIView):
         return Response({'total': datas['total_number'], 'data': result})
 
 
-class LocationWeixinView(TableAPIView):
+class LocationWeixinView(BaseAPIView):
     LOCATION_WEIXIN_LIMIT = 10
     def get(self, request, location_id, page):
         try:
@@ -372,7 +209,7 @@ class LocationWeixinView(TableAPIView):
         return Response({'html': html, 'total': datas['total_number']})
 
 
-class LocationWeiboView(TableAPIView):
+class LocationWeiboView(BaseAPIView):
     LOCATION_WEIBO_LIMIT = 10
     def get(self, request, location_id, page):
         try:
@@ -387,7 +224,7 @@ class LocationWeiboView(TableAPIView):
         return Response({'html': html, 'total': datas['total_number']})
 
 
-class EventTableView(TableAPIView):
+class EventTableView(BaseAPIView):
     def collected_items(self):
         user = self.request.myuser
         return user.collection.events.all()
@@ -417,7 +254,7 @@ class EventTableView(TableAPIView):
         return Response({'total': datas['total_number'], 'data': list(datas["items"])})
 
 
-class EventDetailTableView(TableAPIView):
+class EventDetailTableView(BaseAPIView):
     def get(self, request, id, page):
         try:
             event = Topic.objects.get(id=int(id))
@@ -445,7 +282,7 @@ class EventDetailTableView(TableAPIView):
         pass
 
 
-class EventDetailWeixinView(TableAPIView):
+class EventDetailWeixinView(BaseAPIView):
     EVENT_WEIXIN_LIMIT = 10
     def get(self, request, id, page):
         try:
@@ -459,7 +296,7 @@ class EventDetailWeixinView(TableAPIView):
         return Response({'html': html, 'total': datas['total_number']})
 
 
-class EventDetailWeiboView(TableAPIView):
+class EventDetailWeiboView(BaseAPIView):
     EVENT_WEIBO_LIMIT = 10
     def get(self, request, id, page):
         try:
@@ -623,7 +460,7 @@ class SearchView(CollectView):
         return Topic.objects.raw(u"SELECT * FROM topic WHERE title like '%%{0}%%' LIMIT {1}".format(key, self.LIMIT))
 
 
-class CustomTableView(TableAPIView):
+class CustomTableView(BaseAPIView):
     def get_bak(self, request, custom_id):
         customname = [u'电梯',u'锅炉', u'两会']
         try:
@@ -664,7 +501,7 @@ class CustomTableView(TableAPIView):
         return Response({'total': datas['total_number'], 'data': result})
 
 
-class ProductTableView(TableAPIView):
+class ProductTableView(BaseAPIView):
     def get(self, request, id, page):
         if id:
             try:
@@ -692,7 +529,7 @@ class ProductTableView(TableAPIView):
         return Response({'total': datas['total_number'], 'data': result})
 
 
-class CustomWeixinView(TableAPIView):
+class CustomWeixinView(BaseAPIView):
     CUSTOM_WEIXIN_LIMIT = 10
     def get(self, request, custom_id, page):
         user = request.myuser
@@ -707,7 +544,7 @@ class CustomWeixinView(TableAPIView):
         return Response({'html': html, 'total': datas['total_number']})
 
 
-class CustomWeiboView(TableAPIView):
+class CustomWeiboView(BaseAPIView):
     CUSTOM_WEIBO_LIMIT = 10
     def get(self, request, custom_id, page):
         user = request.myuser
@@ -750,7 +587,7 @@ class CustomModifyView(View):
             status = self.delete(user)
         return JsonResponse({'status': status['status']})
 
-class InspectionLocalView(TableAPIView):
+class InspectionLocalView(BaseAPIView):
     def get(self, request):
         user = request.myuser
         company = user.group.company
@@ -762,7 +599,7 @@ class InspectionLocalView(TableAPIView):
         return HttpResponse(inspection)
 
 
-class InspectionNationalView(TableAPIView):
+class InspectionNationalView(BaseAPIView):
     def get(self, request):
         user = request.myuser
         user.company = user.group.company
@@ -774,7 +611,7 @@ class InspectionNationalView(TableAPIView):
         return HttpResponse(inspection)
 
 
-class InspectionTableView(TableAPIView):
+class InspectionTableView(BaseAPIView):
     def get(self, request):
         result = []
         news = Inspection.objects.order_by('-pubtime').all()
@@ -811,7 +648,7 @@ class InspectionTableView(TableAPIView):
 
 
 
-class WeixinTableView(TableAPIView):
+class WeixinTableView(BaseAPIView):
     Weixin_table_limit = 20
     def get(self, request, weixin_type, page):
         if weixin_type == 'new':
@@ -823,7 +660,7 @@ class WeixinTableView(TableAPIView):
         return Response({'html': html, 'total': datas['total_number']})
 
 
-class WeiboTableView(TableAPIView):
+class WeiboTableView(BaseAPIView):
     Weibo_table_limit = 20
     def set_css_to_hotweibo(self, items):
         html = ""
