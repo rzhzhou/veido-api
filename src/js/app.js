@@ -1,15 +1,11 @@
+/* global echarts */
+
 'use strict';
 
 
 //
 // configuration
 //
-
-require.config({
-  paths: {
-    echarts: '/vendor/echarts'
-  }
-});
 
 // twbsPagination
 (function () {
@@ -27,9 +23,6 @@ require.config({
 
   $.extend($.fn.twbsPagination.defaults, options);
 }());
-
-
-
 
 
 //
@@ -322,84 +315,6 @@ App.module.infoBox = function () {
   $('.info-box-content').each(animate);
 };
 
-App.module.chart = {
-  line: function (path) {
-    require(['echarts', 'echarts/chart/line'], function(ec) {
-      $.getJSON('/api/line' + path, function(data) {
-        ec.init(document.getElementById('line-chart'), 'macarons').setOption({
-          color: ['#00a65a', '#00c0ef', '#dd4b39'],
-          tooltip: {
-            trigger: 'axis'
-          },
-          legend: {
-            data: ['正面','中性','负面']
-          },
-          grid: {
-            x: 40,
-            y: 30,
-            x2: 25,
-            y2: 30
-          },
-          xAxis: [
-            {
-              type: 'category',
-              boundaryGap: false,
-              data: data.date
-            }
-          ],
-          yAxis: [
-            {
-              type : 'value'
-            }
-          ],
-          series: [
-            {
-              name: '正面',
-              type: 'line',
-              data: data.positive
-            },
-            {
-              name: '中性',
-              type: 'line',
-              data: data.neutral
-            },
-            {
-              name: '负面',
-              type: 'line',
-              data: data.negative
-            }
-          ]
-        });
-      });
-    });
-  },
-
-  pie: function (path) {
-    require(['echarts', 'echarts/chart/pie'], function(ec) {
-      $.getJSON('/api/pie' + path, function(data) {
-        ec.init(document.getElementById('pie-chart'), 'macarons').setOption({
-          tooltip: {
-            trigger: 'item',
-            formatter: '{a} <br/>{b} : {c} ({d}%)'
-          },
-          legend: {
-            data: data.name
-          },
-          series: [
-            {
-              name: '信息比例',
-              type: 'pie',
-              radius: '55%',
-              center: ['50%', '60%'],
-              data: data.value
-            }
-          ]
-        });
-      });
-    });
-  }
-};
-
 App.module.inspection = function () {
   var $inspection = $('#inspection'),
       $content    = $inspection.children('.box-body').find('tbody');
@@ -681,10 +596,77 @@ App.page.user = function (module) {
 };
 
 // util
-App.page.dashboard = function (module, path, type) {
+App.page.dashboard = function (module, path) {
   module.infoBox();
-  module.chart.line(path, type);
-  module.chart.pie(path, type);
+
+  $.getJSON('/api/line' + path, function (data) {
+    echarts.init($('#line-chart')[0], 'macarons').setOption({
+      color: ['#00a65a', '#00c0ef', '#dd4b39'],
+      tooltip: {
+        trigger: 'axis'
+      },
+      legend: {
+        data: ['正面','中性','负面']
+      },
+      grid: {
+        x: 40,
+        y: 30,
+        x2: 25,
+        y2: 30
+      },
+      xAxis: [
+        {
+          type: 'category',
+          boundaryGap: false,
+          data: data.date
+        }
+      ],
+      yAxis: [
+        {
+          type : 'value'
+        }
+      ],
+      series: [
+        {
+          name: '正面',
+          type: 'line',
+          data: data.positive
+        },
+        {
+          name: '中性',
+          type: 'line',
+          data: data.neutral
+        },
+        {
+          name: '负面',
+          type: 'line',
+          data: data.negative
+        }
+      ]
+    });
+  });
+
+  $.getJSON('/api/pie' + path, function (data) {
+    echarts.init($('#pie-chart')[0], 'macarons').setOption({
+      tooltip: {
+        trigger: 'item',
+        formatter: '{a} <br/>{b} : {c} ({d}%)'
+      },
+      legend: {
+        data: data.name
+      },
+      series: [
+        {
+          name: '信息比例',
+          type: 'pie',
+          radius: '55%',
+          center: ['50%', '60%'],
+          data: data.value
+        }
+      ]
+    });
+  });
+
   module.inspection();
 };
 
