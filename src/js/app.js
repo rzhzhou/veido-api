@@ -457,6 +457,10 @@ App.page.categoryDetail = function (module, path) {
   module.table(module, path);
 };
 
+App.page.locationDetail = function (module, path, type) {
+  module.table(module, path);
+  module.sns(module, path, type);
+};
 
 //
 // Initialization
