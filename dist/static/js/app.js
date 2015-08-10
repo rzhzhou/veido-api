@@ -1755,10 +1755,6 @@ App.page.weibo = function (module, path, type) {
   module.sns(module, path, type);
 };
 
-App.page.weiboDetail = function () {
-  // placeholder for future usage
-};
-
 App.page.categoryDetail = function (module, type, id) {
   console.log('Page type is ' + type);
   console.log('Page id is ' + id);
