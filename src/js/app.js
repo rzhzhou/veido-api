@@ -609,6 +609,49 @@ App.page.collection = function (module, path) {
   module.table(module, path);
 };
 
+App.page.settings = function () {
+  var form        = document.forms.info,
+      action      = form.action,
+      elements    = form.elements,
+      username    = elements.username,
+      oldPassword = elements.oldPassword,
+      newPassword = elements.newPassword,
+      retype      = elements.retype,
+      submit      = elements[4],
+      $msg        = $(form).find('p'),
+
+
+      enableSubmit = function() {
+        submit.disabled = !(username.value && oldPassword.value && newPassword.value && retype.value);
+      },
+
+      processChange = function(event) {
+        event.preventDefault();
+
+        var processResponse = function(response) {
+          if (response.status) {
+            $msg.text('更新成功！').show();
+            location.href = '/login/';
+          } else {
+            $msg.text('原密码错误！').show();
+            oldPassword.value = '';
+            newPassword.value = '';
+            retype.value      = '';
+          }
+        };
+
+        if (newPassword.value === retype.value) {
+          $.post(action, $([username, oldPassword, newPassword]).serialize(), processResponse);
+        } else {
+          $msg.text('两次输入密码不一致！').show();
+          newPassword.value = '';
+          retype.value      = '';
+        }
+      };
+
+  $(form).keyup(enableSubmit).submit(processChange);
+};
+
 //
 // Initialization
 //
