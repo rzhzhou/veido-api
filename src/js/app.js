@@ -5,9 +5,7 @@
 //
 // configuration
 //
- $('.analytics-all>li:first-child>a').click( function () {
-          $(this).attr('href','/analytics/');
-        });
+
 require.config({
   paths: {
     echarts: '/vendor/echarts'
@@ -859,7 +857,6 @@ APP.analytics = function () {
                         saveAsImage : {show: true}
                     }
                 },
-                calculable : true,
                 roamController: {
                     show: true,
                     x: '85%',
@@ -1039,7 +1036,7 @@ APP.analytics = function () {
   showAnalytics(moment().subtract(6, 'days'), moment());
 
 
-  if (location.pathname === '/analytics/') {
+  if (location.pathname === '/analytics/0/') {
     start = moment().subtract(6, 'days').format('YYYY-MM-DD');
     end = moment().format('YYYY-MM-DD');
 
