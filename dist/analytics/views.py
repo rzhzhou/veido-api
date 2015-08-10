@@ -23,15 +23,18 @@ class DispatchView(APIView, BaseTemplateView):
             start = parameter['start']
             end = parameter['end']
             page = parameter['page'] if parameter.has_key('page') else 0
-
             func = getattr(globals()['DispatchView'](), type)
             if page:
                 return func(start, end, page)
             else:
-                data = RedisQueryApi().hget('cache', type)
-                result = eval(data) if data else []
-                if result:
-                    return Response(result)
+                time = RedisQueryApi().hget('cache', "end")
+                end_time = datetime.strptime(end, '%Y-%m-%d')
+                redis_time = datetime.strptime(time, '%Y-%m-%d')
+                if redis_time>=end_time:
+                    data = RedisQueryApi().hget('cache', type)
+                    result = eval(data) if data else []
+                    if result:
+                        return Response(result)
                 return func(start, end)
         except Exception, e:
             return Response({})
