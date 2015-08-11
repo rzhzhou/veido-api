@@ -93,15 +93,16 @@ class DispatchView(APIView, BaseTemplateView):
             count = Weibo.objects.filter(area__in=one_pro, pubtime__range=(start,end)).count()
             name =  Area.objects.get(id=i).name
             provice_count.append({'name': name, 'value': count})
-        sort_result = sorted(provice_count, key=lambda x:x['value'], reverse=True)[:6]
-        sort_percent = []
-        for result in sort_result:
-            percent =  result['value']*100/sort_result[0]['value'] if result['value'] else 0
-            sort_percent.append({'percent': percent})
-        index = 0
-        for items in sort_result:
-            items.update(sort_percent[index])
-            index+=1
+        sort_result = sorted(provice_count, key=lambda x:x['value'])[-6:]
+        # sort_result = sorted(provice_count, key=lambda x:x['value'], reverse=True)[:6]
+        # sort_percent = []
+        # for result in sort_result:
+        #     percent =  result['value']*100/sort_result[0]['value'] if result['value'] else 0
+        #     sort_percent.append({'percent': percent})
+        # index = 0
+        # for items in sort_result:
+        #     items.update(sort_percent[index])
+        #     index+=1
         return Response({'provice_count':provice_count, 'sort_result': sort_result})
 
     def chart_trend(self, start, end):
