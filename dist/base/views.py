@@ -123,7 +123,7 @@ class BaseTemplateView(LoginRequiredMixin, BaseView):
             #for ctg in categories:
             #    ctg.id = encrypt(ctg.id)
             context['categories'] = categories
-            context['industries'] = categories
+            context['industries'] = [{'id': 0, 'name': u'综合'}]
 
         if self.INCLUDE_USER:
             user = self.request.myuser
