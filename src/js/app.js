@@ -1,189 +1,305 @@
-/* global moment */
+/* global moment , echarts*/
 
 'use strict';
+
 
 //
 // configuration
 //
 
-require.config({
-  paths: {
-    echarts: '/vendor/echarts'
+// twbsPagination
+(function () {
+  if (typeof $.fn.twbsPagination !== 'function') {
+    throw new Error('twbsPagination required');
   }
-});
+
+  var options = {
+    first: '第一页',
+    prev: '上一页',
+    next: '下一页',
+    last: '最后一页',
+    paginationClass: 'pagination pagination-sm no-margin pull-right'
+  };
+
+  $.extend($.fn.twbsPagination.defaults, options);
+}());
 
 
 //
-// functions
+// Application
 //
 
-var APP = {};
+var App = {
+  // Modules
+  module: {},
 
-APP.url = location.pathname;
+  // Pages
+  page: {},
 
-APP.type = (function() {
-  var path = APP.url.split('/').slice(1, -1),
-      type = '';
+  // Router
+  route: function () {
+    var module  = this.module,
+        page    = this.page,
+        path    = location.pathname,
+        summary = /^\/(\w+)\/$/,
+        detail  = /^\/(\w+)\/(\d+)\/$/,
+        match   = null,
+        type,
+        id;
 
-  switch (path.length) {
-    case 0:
-      type = 'dashboard';
+    switch (true) {
+    case path === '/':
+      type  = 'dashboard';
       break;
-    case 1:
-      type = path[0];
+    case summary.test(path):
+      match = summary.exec(path);
+      type  = match[1];
       break;
-    case 2:
-      type = path[0] + 'Item';
+    case detail.test(path):
+      match = detail.exec(path);
+      type  = match[1];
+      id    = +match[2];
       break;
+    }
+
+    if (type === 'login') {
+      return page.login(module);
+    }
+
+    // common
+    module.search();
+    module.menu(path, type);
+
+    if (id === undefined) {
+      return page[type](module, path, type);
+    } else {
+      return page[type + 'Detail'](module, path, type, id);
+    }
   }
+};
 
-  return type;
-})();
 
-APP.user = {
-  login: function() {
-    var form     = document.forms.login,
-        action   = form.action,
-        elements = form.elements,
-        username = elements.username,
-        password = elements.password,
-        submit   = elements[2],
-        $msg     = $(form).find('p'),
+//
+// Modules
+//
 
-        enableSubmit = function() {
-          submit.disabled = !(username.value && password.value);
-        },
+// user
+App.module.login = function () {
+  var form     = document.forms.login,
+      action   = form.action,
+      elements = form.elements,
+      username = elements.username,
+      password = elements.password,
+      submit   = elements[2],
+      $msg     = $(form).find('p'),
 
-        processLogin = function(event) {
-          event.preventDefault();
+      enableSubmit = function() {
+        submit.disabled = !(username.value && password.value);
+      },
 
-          $.post(action, $(form).serialize(), function(response) {
-            if (response.status) {
-              location.href = location.search ? location.search.substr(1).split('=')[1] : '/';
-            } else {
-              $msg.text('用户名或密码错误！');
-              submit.disabled = true;
-              password.value  = '';
-            }
-          });
+      processLogin = function(event) {
+        event.preventDefault();
+
+        $.post(action, $(form).serialize(), function(response) {
+          if (response.status) {
+            location.href = location.search ? location.search.substr(1).split('=')[1] : '/';
+          } else {
+            $msg.text('用户名或密码错误！');
+            submit.disabled = true;
+            password.value  = '';
+          }
+        });
+      };
+
+  $(form).keyup(enableSubmit).submit(processLogin);
+};
+
+App.module.register = function () {
+  var form     = document.forms.add,
+      action   = form.action,
+      elements = form.elements,
+      username = elements.username,
+      password = elements.password,
+      retype   = elements.retype,
+      submit   = elements[3],
+      $msg     = $(form).find('p'),
+
+      enableSubmit = function() {
+        submit.disabled = !(username.value && password.value && retype.value);
+      },
+
+      processAdd   = function(event) {
+        event.preventDefault();
+
+        var processResponse = function(response) {
+          if (response.status) {
+            location.reload();
+          } else {
+            $msg.text('抱歉，添加失败！').show();
+          }
         };
 
-    $(form).keyup(enableSubmit).submit(processLogin);
-  },
+        if (password.value === retype.value) {
+          $.post(action, $([username, password]).serialize(), processResponse);
+        } else {
+          $msg.text('两次输入密码不一致！').show();
+          submit.disabled = true;
+          password.value  = '';
+          retype.value    = '';
+        }
+      };
 
-  change: function() {
-    var form        = document.forms.info,
-        action      = form.action,
-        elements    = form.elements,
-        username    = elements.username,
-        oldPassword = elements.oldPassword,
-        newPassword = elements.newPassword,
-        retype      = elements.retype,
-        submit      = elements[4],
-        $msg        = $(form).find('p'),
+  $(form).keyup(enableSubmit).submit(processAdd);
+};
+
+App.module.admin = function () {
+  var $admin  = $('.user-admin'),
+      $input  = $admin.find('input'),
+      $button = $admin.find('button'),
+      $reset  = $button.eq(0),
+      $remove = $button.eq(1),
+      id      = [],
+
+      action = function(obj, api) {
+        obj.click(function() {
+          id.length = 0;
+
+          $input.filter(':checked').each(function(index, element) {
+            id.push( $(element).parent().next().data('id') );
+          });
+
+          if (id.length) {
+            $.post(api, {id: id.toString()}, function(response) {
+              if (response.status) {
+                location.reload();
+              }
+            });
+          }
+        });
+      };
+
+  action($reset, '/api/user/reset/');
+  action($remove, '/api/user/remove/');
+};
+
+App.module.settings = function () {
+  var form        = document.forms.info,
+      action      = form.action,
+      elements    = form.elements,
+      username    = elements.username,
+      oldPassword = elements.oldPassword,
+      newPassword = elements.newPassword,
+      retype      = elements.retype,
+      submit      = elements[4],
+      $msg        = $(form).find('p'),
 
 
-        enableSubmit = function() {
-          submit.disabled = !(username.value && oldPassword.value && newPassword.value && retype.value);
-        },
+      enableSubmit = function() {
+        submit.disabled = !(username.value && oldPassword.value && newPassword.value && retype.value);
+      },
 
-        processChange = function(event) {
-          event.preventDefault();
+      processChange = function(event) {
+        event.preventDefault();
 
-          var processResponse = function(response) {
-            if (response.status) {
-              $msg.text('更新成功！').show();
-              location.href = '/login/';
-            } else {
-              $msg.text('原密码错误！').show();
-              oldPassword.value = '';
-              newPassword.value = '';
-              retype.value      = '';
-            }
-          };
-
-          if (newPassword.value === retype.value) {
-            $.post(action, $([username, oldPassword, newPassword]).serialize(), processResponse);
+        var processResponse = function(response) {
+          if (response.status) {
+            $msg.text('更新成功！').show();
+            location.href = '/login/';
           } else {
-            $msg.text('两次输入密码不一致！').show();
+            $msg.text('原密码错误！').show();
+            oldPassword.value = '';
             newPassword.value = '';
             retype.value      = '';
           }
         };
 
-    $(form).keyup(enableSubmit).submit(processChange);
-  },
+        if (newPassword.value === retype.value) {
+          $.post(action, $([username, oldPassword, newPassword]).serialize(), processResponse);
+        } else {
+          $msg.text('两次输入密码不一致！').show();
+          newPassword.value = '';
+          retype.value      = '';
+        }
+      };
 
-  admin: function() {
-    var $admin  = $('.user-admin'),
-        $input  = $admin.find('input'),
-        $button = $admin.find('button'),
-        $reset  = $button.eq(0),
-        $remove = $button.eq(1),
-        id      = [],
-
-        action = function(obj, api) {
-          obj.click(function() {
-            id.length = 0;
-
-            $input.filter(':checked').each(function(index, element) {
-              id.push( $(element).parent().next().data('id') );
-            });
-
-            if (id.length) {
-              $.post(api, {id: id.toString()}, function(response) {
-                if (response.status) {
-                  location.reload();
-                }
-              });
-            }
-          });
-        };
-
-    action($reset, '/api/user/reset/');
-    action($remove, '/api/user/remove/');
-  },
-
-  add: function() {
-    var form     = document.forms.add,
-        action   = form.action,
-        elements = form.elements,
-        username = elements.username,
-        password = elements.password,
-        retype   = elements.retype,
-        submit   = elements[3],
-        $msg     = $(form).find('p'),
-
-        enableSubmit = function() {
-          submit.disabled = !(username.value && password.value && retype.value);
-        },
-
-        processAdd   = function(event) {
-          event.preventDefault();
-
-          var processResponse = function(response) {
-            if (response.status) {
-              location.reload();
-            } else {
-              $msg.text('抱歉，添加失败！').show();
-            }
-          };
-
-          if (password.value === retype.value) {
-            $.post(action, $([username, password]).serialize(), processResponse);
-          } else {
-            $msg.text('两次输入密码不一致！').show();
-            submit.disabled = true;
-            password.value  = '';
-            retype.value    = '';
-          }
-        };
-
-    $(form).keyup(enableSubmit).submit(processAdd);
-  }
+  $(form).keyup(enableSubmit).submit(processChange);
 };
 
-APP.search = function() {
+// chart
+App.module.line = function (path) {
+  $.getJSON('/api/line' + path, function (data) {
+    echarts.init($('#line-chart')[0], 'macarons').setOption({
+      color: ['#00a65a', '#00c0ef', '#dd4b39'],
+      tooltip: {
+        trigger: 'axis'
+      },
+      legend: {
+        data: ['正面','中性','负面']
+      },
+      grid: {
+        x: 40,
+        y: 30,
+        x2: 25,
+        y2: 30
+      },
+      xAxis: [
+        {
+          type: 'category',
+          boundaryGap: false,
+          data: data.date
+        }
+      ],
+      yAxis: [
+        {
+          type : 'value'
+        }
+      ],
+      series: [
+        {
+          name: '正面',
+          type: 'line',
+          data: data.positive
+        },
+        {
+          name: '中性',
+          type: 'line',
+          data: data.neutral
+        },
+        {
+          name: '负面',
+          type: 'line',
+          data: data.negative
+        }
+      ]
+    });
+  });
+};
+
+App.module.pie = function (path) {
+  $.getJSON('/api/pie' + path, function (data) {
+    echarts.init($('#pie-chart')[0], 'macarons').setOption({
+      tooltip: {
+        trigger: 'item',
+        formatter: '{a} <br/>{b} : {c} ({d}%)'
+      },
+      legend: {
+        data: data.name
+      },
+      series: [
+        {
+          name: '信息比例',
+          type: 'pie',
+          radius: '55%',
+          center: ['50%', '60%'],
+          data: data.value
+        }
+      ]
+    });
+  });
+};
+
+// util
+App.module.search = function () {
   var form  = document.forms.search,
       input = form.elements.keywords;
 
@@ -199,22 +315,29 @@ APP.search = function() {
   });
 };
 
-APP.menu = function() {
+App.module.menu = function (path, type) {
   var menu     = $('.sidebar-menu'),
       parent   = menu.parent(),
-      vaildURL = function() {
-        var thisHref = this.getAttribute('href');
 
-        if (APP.type === 'categoryItem' || APP.type === 'locationItem' || APP.type === 'analyticsItem') {
-          return thisHref === APP.url;
-        } else {
-          return thisHref.split('/')[1] === APP.url.split('/')[1];
+      validate = function () {
+        var href = this.getAttribute('href');
+
+        switch (true) {
+        case type === 'dashboard':
+          return href === '/';
+        // both 'category' and 'location' are parent treeview
+        case type === 'category':
+        case type === 'location':
+        case type === 'analytics':
+          return href === path;
+        default:
+          return href.split('/')[1] === type;
         }
       };
 
   menu
     .detach()
-    .find('a').filter(vaildURL)
+    .find('a').filter(validate)
     .parent().addClass('active')
     .closest('.treeview-menu').addClass('menu-open')
     .closest('.treeview').addClass('active');
@@ -222,93 +345,80 @@ APP.menu = function() {
   menu.appendTo(parent);
 };
 
-APP.chart = {
-  line: function() {
-    require(['echarts', 'echarts/chart/line'], function(ec) {
-      $.getJSON('/api/line' + APP.url, function(data) {
-        ec.init(document.getElementById('line-chart'), 'macarons').setOption({
-          color: ['#00a65a', '#00c0ef', '#dd4b39'],
-          tooltip: {
-            trigger: 'axis'
-          },
-          legend: {
-            data: ['正面','中性','负面']
-          },
-          grid: {
-            x: 40,
-            y: 30,
-            x2: 25,
-            y2: 30
-          },
-          xAxis: [
-            {
-              type: 'category',
-              boundaryGap: false,
-              data: data.date
-            }
-          ],
-          yAxis: [
-            {
-              type : 'value'
-            }
-          ],
-          series: [
-            {
-              name: '正面',
-              type: 'line',
-              data: data.positive
-            },
-            {
-              name: '中性',
-              type: 'line',
-              data: data.neutral
-            },
-            {
-              name: '负面',
-              type: 'line',
-              data: data.negative
-            }
-          ]
-        });
-      });
-    });
-  },
+App.module.infoBox = function () {
+  var animate = function (index, element) {
+    var infoBoxNumber = $(element).find('.info-box-number'),
+        progressBar = $(element).find('.progress-bar'),
+        progressDescription = $(element).find('.progress-description'),
 
-  pie: function() {
-    require(['echarts', 'echarts/chart/pie'], function(ec) {
-      $.getJSON('/api/pie' + APP.url, function(data) {
-        ec.init(document.getElementById('pie-chart'), 'macarons').setOption({
-          tooltip: {
-            trigger: 'item',
-            formatter: '{a} <br/>{b} : {c} ({d}%)'
-          },
-          legend: {
-            data: data.name
-          },
-          series: [
-            {
-              name: '信息比例',
-              type: 'pie',
-              radius: '55%',
-              center: ['50%', '60%'],
-              data: data.value
-            }
-          ]
-        });
-      });
-    });
-  }
+        duration = 2000,
+        refreshInterval = 100,
+        loop = Math.floor(duration / refreshInterval),
+        loopCount = 0,
+
+        numberValue = 0,
+        numberFinal = $(element).data('number'),
+        numberIncrement = Math.floor(numberFinal / loop),
+
+        percentValue = 0,
+        percentFinal = $(element).data('percent'),
+        percentIncrement = Math.floor(percentFinal / loop),
+
+        intervalID,
+
+        countTo = function() {
+          numberValue += numberIncrement;
+          percentValue += percentIncrement;
+
+          loopCount++;
+
+          if (loopCount >= loop) {
+            clearInterval(intervalID);
+            numberValue = numberFinal;
+            percentValue = percentFinal;
+          }
+
+          infoBoxNumber.text( numberValue.toFixed() );
+          progressBar.width( percentValue + '%' );
+          progressDescription.text( '占总数据 ' + percentValue.toFixed() + '%' );
+        };
+
+    intervalID = setInterval(countTo, refreshInterval);
+  };
+
+  $('.info-box-content').each(animate);
 };
 
-APP.returnTop = function(el) {
+App.module.inspection = function () {
+  var $inspection = $('#inspection'),
+      $content    = $inspection.children('.box-body').find('tbody');
+
+  $content.load('/api/dashboard/local-inspection/');
+
+  $inspection.on('click', 'button', function (event) {
+    event.preventDefault();
+
+    if ( $(this).hasClass('active') ) {
+      return false;
+    }
+
+    $(this)
+      .addClass('active')
+      .siblings().removeClass('active');
+
+    $content.load('/api/dashboard/' + this.id + '/');
+  });
+};
+
+App.module.returnTop = function (el) {
   var top       = el.offset().top,
       scrollTop = top > 160 ? top - 120 : 0;
 
   $('body').animate({scrollTop: scrollTop});
 };
 
-APP.table = function() {
-  $('.table-custom').each(function() {
+App.module.table = function (module, path) {
+  $('.table-custom').each(function () {
     var $this       = $(this),
         $pagination = $this.parent(),
         content     = this.tBodies[0],
@@ -332,21 +442,16 @@ APP.table = function() {
           $(content).html(table);
         };
 
-    $.getJSON('/api' + APP.url + type + '/1/', function(data) {
+    $.getJSON('/api' + path + type + '/1/', function(data) {
       renderTable(data);
 
       $pagination.twbsPagination({
         totalPages: data.total,
         visiblePages: 7,
-        first: '第一页',
-        prev: '上一页',
-        next: '下一页',
-        last: '最后一页',
-        paginationClass: 'pagination pagination-sm no-margin pull-right',
         onPageClick: function(event, page) {
-          APP.returnTop($this);
+          module.returnTop($this);
 
-          $.getJSON('/api' + APP.url + type + '/' + page + '/', function(data) {
+          $.getJSON('/api' + path + type + '/' + page + '/', function(data) {
             renderTable(data);
             $pagination.twbsPagination({totalPages: data.total});
           });
@@ -356,13 +461,73 @@ APP.table = function() {
   });
 };
 
-APP.dataTable = function() {
+App.module.collect = function (type, id) {
+  $('.collection').click(function () {
+    var star = $(this).find('i'),
+        text = $(this).find('span'),
+
+        collect = function(api, nextAction) {
+          var data = {
+                type: type === 'news' ? 'article' : 'topic',
+                id: id
+              };
+
+          $.post(api, data, function(response) {
+            if (response.status) {
+              star.toggleClass('fa-star-o');
+              star.toggleClass('fa-star');
+              text.text(nextAction);
+            }
+          });
+        };
+
+    if ( star.hasClass('fa-star') ) {
+      collect('/api/collection/remove/', '添加收藏');
+    } else {
+      collect('/api/collection/add/', '取消收藏');
+    }
+  });
+};
+
+App.module.sns = function (module, path, type) {
+  var $sns = $('.sns');
+
+  $sns.each(function(index, element) {
+    var $content    = $(element),
+        $pagination = $content.parent().next(),
+
+        snsType = function() {
+          if (type === 'weixin' || type === 'weibo') {
+            return $pagination.data('type');
+          } else {
+            return $pagination.data('type').replace('-', '/');
+          }
+        };
+
+    $.getJSON('/api' + path + snsType() + '/1/', function(data) {
+      $content.html(data.html);
+
+      $pagination.twbsPagination({
+        totalPages: data.total,
+        onPageClick: function (event, page) {
+          module.returnTop($sns);
+          $.getJSON('/api' + path + snsType() + '/' + page + '/', function(data) {
+            $content.html(data.html);
+            $pagination.twbsPagination({totalPages: data.total});
+          });
+        }
+      });
+    });
+  });
+};
+
+App.module.dataTable = function (path) {
   $.fn.dataTable.ext.errMode = 'throw';
 
-  $('.initDataTable').each(function() {
+  $('.initDataTable').each(function () {
     var table = $(this).DataTable({
       'ajax': {
-        'url': '/api' + location.pathname,
+        'url': '/api' + path,
         'dataSrc': this.id,
         'cache': true
       },
@@ -402,12 +567,12 @@ APP.dataTable = function() {
       //   "targets": -1
       // }],
       'deferLoading': 100,
-      'drawCallback': function() {
+      'drawCallback': function () {
         $('[data-toggle="tooltip"]').tooltip();
       }
     });
 
-    table.on('click', 'tbody > tr', function() {
+    table.on('click', 'tbody > tr', function () {
       if ( $(this).hasClass('selected') ) {
         $(this).removeClass('selected');
       } else {
@@ -418,7 +583,7 @@ APP.dataTable = function() {
   });
 
 
-  // table.on('draw.dt', function() {
+  // table.on('draw.dt', function () {
   //   var collection = function(obj, api) {
   //     obj.each(function(index, element) {
   //       $(element).click(function(event) {
@@ -450,44 +615,7 @@ APP.dataTable = function() {
   // });
 };
 
-APP.sns = function() {
-  var $sns = $('.sns');
-
-  $sns.each(function(index, element) {
-    var $content    = $(element),
-        $pagination = $content.parent().next(),
-
-        type = function() {
-          if (APP.type === 'weixin' || APP.type === 'weibo') {
-            return $pagination.data('type');
-          } else {
-            return $pagination.data('type').replace('-', '/');
-          }
-        };
-
-    $.getJSON('/api' + APP.url + type() + '/1/', function(data) {
-      $content.html(data.html);
-
-      $pagination.twbsPagination({
-        totalPages: data.total,
-        first: '第一页',
-        prev: '上一页',
-        next: '下一页',
-        last: '最后一页',
-        paginationClass: 'pagination pagination-sm no-margin pull-right',
-        onPageClick: function(event, page) {
-          APP.returnTop($sns);
-          $.getJSON('/api' + APP.url + type() + '/' + page + '/', function(data) {
-            $content.html(data.html);
-            $pagination.twbsPagination({totalPages: data.total});
-          });
-        }
-      });
-    });
-  });
-};
-
-APP.custom = function() {
+App.module.custom = function () {
   var form     = document.forms.addKeyword,
       action   = form.action,
       elements = form.elements,
@@ -522,123 +650,108 @@ APP.custom = function() {
   }
 };
 
-APP.collection = function() {
-  $('.collection').click(function() {
-    var star = $(this).find('i'),
-        text = $(this).find('span'),
 
-        collect = function(api, nextAction) {
-          var urlArray = APP.url.split('/'),
-              data = {
-                type: urlArray[1] === 'news' ? 'article' : 'topic',
-                id: urlArray[2]
-              };
+//
+// Pages
+//
 
-          $.post(api, data, function(response) {
-            if (response.status) {
-              star.toggleClass('fa-star-o');
-              star.toggleClass('fa-star');
-              text.text(nextAction);
-            }
-          });
-        };
-
-    if ( star.hasClass('fa-star') ) {
-      collect('/api/collection/remove/', '添加收藏');
-    } else {
-      collect('/api/collection/add/', '取消收藏');
-    }
-  });
+// user
+App.page.login = function (module) {
+  module.login();
 };
 
-APP.dashboard = function() {
-  $('.info-box-content').each(function(index, element) {
-    var infoBoxNumber = $(element).find('.info-box-number'),
-        progressBar = $(element).find('.progress-bar'),
-        progressDescription = $(element).find('.progress-description'),
-
-        duration = 2000,
-        refreshInterval = 100,
-        loop = Math.floor(duration / refreshInterval),
-        loopCount = 0,
-
-        numberValue = 0,
-        numberFinal = $(element).data('number'),
-        numberIncrement = Math.floor(numberFinal / loop),
-
-        percentValue = 0,
-        percentFinal = $(element).data('percent'),
-        percentIncrement = Math.floor(percentFinal / loop),
-
-        intervalID,
-
-        countTo = function() {
-          numberValue += numberIncrement;
-          percentValue += percentIncrement;
-
-          loopCount++;
-
-          if (loopCount >= loop) {
-            clearInterval(intervalID);
-            numberValue = numberFinal;
-            percentValue = percentFinal;
-          }
-
-          infoBoxNumber.text( numberValue.toFixed() );
-          progressBar.width( percentValue + '%' );
-          progressDescription.text( '占总数据 ' + percentValue.toFixed() + '%' );
-        };
-
-    intervalID = setInterval(countTo, refreshInterval);
-  });
+App.page.settings = function (module) {
+  module.settings();
 };
 
-APP.product = function() {
-  $('.filter-list')
-    .find('a').filter(function() { return this.href === location.href; })
-    .parent().addClass('active');
+App.page.user = function (module) {
+  module.admin();
+  module.register();
 };
 
+// util
+App.page.dashboard = function (module, path) {
+  module.infoBox();
+  module.line(path);
+  module.pie(path);
+  module.inspection();
+};
 
-APP.inspection = function () {
-  var $inspection = $('#inspection'),
-      $content    = $inspection.children('.box-body').find('tbody');
+App.page.news = function (module, path) {
+  module.table(module, path);
+};
 
-  $content.load('/api/dashboard/local-inspection/');
+App.page.newsDetail = function (module, path, type, id) {
+  module.collect(type, id);
+};
 
-  $inspection.on('click', 'button', function (event) {
-    event.preventDefault();
+App.page.event = function (module, path) {
+  module.table(module, path);
+};
 
-    if ( $(this).hasClass('active') ) {
-      return false;
-    }
+App.page.eventDetail = function (module, path, type, id) {
+  module.collect(type, id);
+  module.line(path, type);
+  module.pie(path, type);
+  module.table(module, path);
+  module.sns(module, path, type);
+};
 
-    $(this)
-      .addClass('active')
-      .siblings().removeClass('active');
+App.page.weixin = function (module, path, type) {
+  module.sns(module, path, type);
+};
 
-    $content.load('/api/dashboard/' + this.id + '/');
-  });
+App.page.weixinDetail = function () {
+  // placeholder for future usage
+};
+
+App.page.weibo = function (module, path, type) {
+  module.sns(module, path, type);
+};
+
+App.page.categoryDetail = function (module, path) {
+  module.table(module, path);
+};
+
+App.page.locationDetail = function (module, path, type) {
+  module.table(module, path);
+  module.sns(module, path, type);
+};
+
+App.page.inspection = function (module, path) {
+  module.dataTable(path);
+};
+
+App.page.custom = function (module) {
+  module.custom();
+};
+
+App.page.customDetail = function (module, path, type) {
+  module.table(module, path);
+  module.sns(module, path, type);
+};
+
+App.page.collection = function (module, path) {
+  module.table(module, path);
 };
 
 
-APP.analytics = function () {
+App.page.analyticsDetail = function (module, path, type, id) {
   var start = '',
       end = '',
-      api = '/api' + APP.url,
+      api = '/api' + path,
       $dateRangePicker = $('.date-range-picker'),
       $dateRangeLabel = $dateRangePicker.children('span'),
       $chart = $('#chart'),
       $statistic = $('#statistic'),
       $dataList = $('#data-list'),
       $statisticTotal = $('.statistic-total').children('span'),
-      $statisticRisk = $('.statistic-risk').children('span');
+      $statisticRisk = $('.statistic-risk').children('span'),
 
       chart = {
         trend: function (start, end) {
-           require(['echarts', 'echarts/chart/line','echarts/theme/macarons',], function (ec ) {
-             $.getJSON(api, {type: 'chart-trend', start: start, end: end}, function (data) {
-               ec.init( document .getElementById('chart-trend'), 'macarons').setOption({
+          $.getJSON(api, {type: 'chart-trend', start: start, end: end}, function (data) {
+               echarts.init(document .getElementById('chart-trend'), 'macarons').setOption({
                   tooltip : {
                     backgroundColor:'rgba(50,50,50,0.5)',
                     trigger:'axis',
@@ -714,13 +827,11 @@ APP.analytics = function () {
                       },
                       ]
                  });
-             })
-           })
+             });
         },
         type: function (start, end) {
-          require(['echarts', 'echarts/chart/pie','echarts/theme/macarons',], function (ec ) {
-             $.getJSON(api, {type: 'chart-type', start: start, end: end}, function (data) {
-                ec.init(document.getElementById('chart-type')).setOption({
+          $.getJSON(api, {type: 'chart-type', start: start, end: end}, function (data) {
+                echarts.init(document.getElementById('chart-type')).setOption({
                  tooltip : {
                   backgroundColor:'rgba(50,50,50,0.5)',
                   trigger: 'item',
@@ -755,14 +866,12 @@ APP.analytics = function () {
                  ]
                 });
              });
-          });
         },
 
         emotion: function (start, end) {
           $('#chart-emotion').attr('style','height:400px;width:100%');
-          require(['echarts', 'echarts/chart/pie'],function (ec){
-            $.getJSON(api, { type : 'chart_emotion', start : start, end : end},function(data) {
-                ec.init(document.getElementById('chart-emotion')).setOption({
+          $.getJSON(api, { type : 'chart_emotion', start : start, end : end},function(data) {
+                echarts.init(document.getElementById('chart-emotion')).setOption({
                   tooltip : {
                       backgroundColor:'rgba(50,50,50,0.5)',
                       trigger: 'item',
@@ -812,8 +921,6 @@ APP.analytics = function () {
                   ]
                 });
             });
-          });
-
         },
 
         weibo: function (start, end) {
@@ -825,10 +932,10 @@ APP.analytics = function () {
           }
           $('#chart-weibo').append(weiboMap).append( weiboBar );
           // $('#chart-weibo').attr('style','height:400px;width:60%');
-          $.getJSON(api, { type : 'chart-weibo', start : start, end : end },function(data){
+          $.getJSON(api, { type : 'chart-weibo', start : start, end : end }, function (data) {
             var item = data.sort_result;
-            require(['echarts', 'echarts/chart/map'],function (ec){
-              ec.init(document.getElementById('weibo-map')).setOption({
+
+              echarts.init(document.getElementById('weibo-map')).setOption({
                 tooltip : {
                     trigger: 'item'
                 },
@@ -878,10 +985,8 @@ APP.analytics = function () {
                     },
                 ]
               });
-            });
 
-            require(['echarts', 'echarts/chart/bar'],function (ec){
-              ec.init(document.getElementById('weibo-bar')).setOption({
+              echarts.init(document.getElementById('weibo-bar')).setOption({
                 title : {
                         text: '微博地域分析',
                         subtext:'',
@@ -963,7 +1068,6 @@ APP.analytics = function () {
                     },
                 ]
               });
-            });
           });
         }
       },
@@ -1103,7 +1207,7 @@ APP.analytics = function () {
   showAnalytics(moment().subtract(6, 'days'), moment());
 
 
-  if (location.pathname === '/analytics/0/') {
+  if (id === 0) {
     start = moment().subtract(6, 'days').format('YYYY-MM-DD');
     end = moment().format('YYYY-MM-DD');
 
@@ -1117,108 +1221,9 @@ APP.analytics = function () {
 
 
 //
-// url based router
+// Initialization
 //
 
-$(function() {
-  var router = {
-    common: function() {
-      APP.search();
-      APP.menu();
-    },
-    login: function() {
-      APP.user.login();
-    },
-    dashboard: function() {
-      this.common();
-      APP.dashboard();
-      APP.inspection();
-      APP.chart.line();
-      APP.chart.pie();
-    },
-    news: function() {
-      this.common();
-      APP.table();
-    },
-    newsItem: function() {
-      this.common();
-      APP.collection();
-    },
-    event: function() {
-      this.common();
-      APP.table();
-    },
-    eventItem: function() {
-      this.common();
-      APP.collection();
-      APP.chart.line();
-      APP.chart.pie();
-      APP.table();
-      APP.sns();
-    },
-    weixin: function() {
-      this.common();
-      APP.sns();
-    },
-    weibo: function() {
-      this.weixin();
-    },
-    weixinItem: function() {
-      this.common();
-    },
-    categoryItem: function() {
-      this.common();
-      APP.table();
-    },
-    locationItem: function() {
-      this.common();
-      APP.table();
-      APP.sns();
-    },
-    inspection: function() {
-      this.common();
-      APP.dataTable();
-    },
-    custom: function() {
-      this.common();
-      APP.custom();
-    },
-    customItem: function() {
-      this.common();
-      APP.table();
-      APP.sns();
-    },
-    product: function() {
-      this.common();
-      APP.product();
-      APP.table();
-    },
-    productItem: function() {
-      this.common();
-      this.product();
-    },
-    analyticsItem: function () {
-      this.common();
-      APP.analytics();
-    },
-    collection: function() {
-      this.common();
-      APP.table();
-    },
-    settings: function() {
-      this.common();
-      APP.user.change();
-    },
-    user: function() {
-      this.common();
-      APP.user.admin();
-      APP.user.add();
-    },
-    searchItem: function() {
-      this.common();
-      APP.dataTable();
-    }
-  };
-
-  return router[APP.type]();
+$(function () {
+  App.route();
 });
