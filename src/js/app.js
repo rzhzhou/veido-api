@@ -817,8 +817,8 @@ APP.analytics = function () {
         },
 
         weibo: function (start, end) {
-          var weiboMap = $('<div class="wMap aa col-md-8 col-xs-12"><div class = "tab-weibo" id = "weibo-map" style = "height:400px"></div></div>');
-          var  weiboBar  = $('<div class="wMap ab col-md-4 col-xs-0"><div class = "tab-weibo" id = "weibo-bar" style = "height:400px"><div id="progress"></div></div></div>');
+          var weiboMap = $('<div class="wMap col-md-8 col-xs-12"><div class = "tab-weibo" id = "weibo-map" style = "height:400px"></div></div>');
+          var  weiboBar  = $('<div class="wMap col-md-4 col-xs-0"><div class = "tab-weibo" id = "weibo-bar" style = "height:400px"></div></div>');
           if($('#chart-weibo').children().hasClass('wMap')){
             // $('.tab-weibo').remove();
             $('.wMap').remove();
@@ -839,7 +839,7 @@ APP.analytics = function () {
                 },
                 dataRange: {
                     min: 0,
-                    max: item[0].value,
+                    max: item[5].value,
                     x: 'left',
                     y: 'bottom',
                     text:['高','低'],           // 文本，默认为数值文本
@@ -878,25 +878,92 @@ APP.analytics = function () {
                     },
                 ]
               });
-           });
+            });
 
-
-            $('#weibo-bar').each(function(){
-                var sortTable  =$.map(item,function(item){
-                  var area                = '<span class="area">'+item.name+'</span>',
-                         num               = '<span class="num">'+item.value+'</span>',
-                         progressBar = '<div class="progress"><div class="progress-bar" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width: '+item.percent+'%"></div></div>',
-                         progress         = area + num + progressBar;
-                  return progress;
-                });
-
-              $('#progress').html(sortTable);
-              $('.num').css({
-                  float:'right',
-                  marginTop:'-20px',
-
+            require(['echarts', 'echarts/chart/bar'],function (ec){
+              ec.init(document.getElementById('weibo-bar')).setOption({
+                title : {
+                        text: '微博地域分析',
+                        subtext:'',
+                        x:45
+                },
+                tooltip : {
+                    trigger: 'axis',
+                    axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+                        type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                    }
+                },
+                legend: {
+                    show:false,
+                    data:['微博文']
+                },
+                toolbox: {
+                    show : false,
+                    feature : {
+                        mark : {show: true},
+                        dataView : {show: true, readOnly: false},
+                        magicType : {show: true, type: ['line', 'bar', 'stack', 'tiled']},
+                        restore : {show: true},
+                        saveAsImage : {show: true}
+                    }
+                },
+                calculable : false,
+                grid:{
+                  borderWidth:0
+                },
+                xAxis : [
+                    {
+                        show:false,
+                        type : 'value'
+                    }
+                ],
+                yAxis : [
+                    {
+                        show:true,
+                        axisLine:false,
+                        axisTick:false,
+                        type : 'category',
+                        splitLine:false,
+                        splitArea:{
+                          show:false
+                        },
+                        axisLabel:{
+                          show:true,
+                          textStyle:{
+                            fontSize:14,
+                            fontWeight:'bolder'
+                          }
+                        },
+                        data : [item[0].name,item[1].name,item[2].name,item[3].name,item[4].name,item[5].name]
+                        // [item[0].name,item[1].name,item[2].name,item[3].name,item[4].name,item[5].name]
+                    }
+                ],
+                series : [
+                    {
+                        name:'微博文',
+                        type:'bar',
+                        stack: '总量',
+                        barWidth:25,
+                        itemStyle : {
+                          normal: {
+                            label : {
+                              show: true,
+                              textStyle:{
+                                color:'#000000',
+                                fontSize:14,
+                                fontWeight:'bolder'
+                              },
+                              position: 'right'
+                            },
+                            color:'#3C8DBC'
+                          }
+                        },
+                        data: [item[0].value,item[1].value,item[2].value,item[3].value,item[4].value,item[5].value]
+                        // [item[0].value,item[1].value,item[2].value,item[3].value,item[4].value,item[5].value]
+                    },
+                ]
               });
-            })
+            });
           });
         }
       },
