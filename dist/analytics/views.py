@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 
 from base.views import BaseTemplateView
 from django.conf import settings
-from yqj.models import Article, Area, Weixin, Weibo
+from yqj.models import Article, Area, Category, Inspection, Weixin, Weibo
 from yqj.redisconnect import RedisQueryApi
 
 
@@ -45,7 +45,11 @@ class DispatchView(APIView, BaseTemplateView):
         start = parse_date(start)
         end = parse_date(end)
         total = Article.objects.filter(pubtime__range=(start, end)).count()
-        risk = total
+        event_count = Category.objects.get(name=u'事件').articles.filter(pubtime__range=(start, end)).count()
+        hot_count = Category.objects.get(name=u'质监热点').articles.filter(pubtime__range=(start, end)).count()
+        inspection_count = Inspection.objects.filter(pubtime__range=(start, end)).count()
+
+        risk = event_count + hot_count + inspection_count
         return Response({'total': total, 'risk': risk})
 
     def chart_type(self, start, end):
