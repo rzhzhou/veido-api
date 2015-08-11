@@ -908,6 +908,9 @@ APP.analytics = function () {
                     }
                 },
                 calculable : false,
+                grid:{
+                  borderWidth:0
+                },
                 xAxis : [
                     {
                         show:false,
