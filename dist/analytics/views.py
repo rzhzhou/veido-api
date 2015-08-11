@@ -22,8 +22,11 @@ class DispatchView(APIView, BaseTemplateView):
             type = parameter['type'].replace('-', '_')
             start = parameter['start']
             end = parameter['end']
-            page = parameter['page'] if parameter.has_key('page') else 0
+            cache = int(parameter['cache']) if parameter.has_key('cache') else 0
             func = getattr(globals()['DispatchView'](), type)
+
+            if not cache:
+                return func(start, end)
 
             date_range = RedisQueryApi().hget('cache', 'date_range')
             if date_range:
