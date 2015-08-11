@@ -24,21 +24,19 @@ class DispatchView(APIView, BaseTemplateView):
             end = parameter['end']
             page = parameter['page'] if parameter.has_key('page') else 0
             func = getattr(globals()['DispatchView'](), type)
-            if page:
-                return func(start, end, page)
-            else:
-                date_range = RedisQueryApi().hget('cache', 'date_range')
-                if date_range:
-                    date_start = datetime.strptime(eval(date_range)['start'], '%Y-%m-%d')
-                    date_end = datetime.strptime(eval(date_range)['end'], '%Y-%m-%d') 
-                    start_time = datetime.strptime(start, '%Y-%m-%d')
-                    end_time = datetime.strptime(end, '%Y-%m-%d')
-                    if date_start==start_time and date_end==end_time:
-                        data = RedisQueryApi().hget('cache', type)
-                        result = eval(data) if data else []
-                        if result:
-                            return Response(result)
-                return func(start, end)
+
+            date_range = RedisQueryApi().hget('cache', 'date_range')
+            if date_range:
+                date_start = datetime.strptime(eval(date_range)['start'], '%Y-%m-%d')
+                date_end = datetime.strptime(eval(date_range)['end'], '%Y-%m-%d')
+                start_time = datetime.strptime(start, '%Y-%m-%d')
+                end_time = datetime.strptime(end, '%Y-%m-%d')
+                if date_start==start_time and date_end==end_time:
+                    data = RedisQueryApi().hget('cache', type)
+                    result = eval(data) if data else []
+                    if result:
+                        return Response(result)
+            return func(start, end)
         except Exception, e:
             return Response({})
 
@@ -49,15 +47,6 @@ class DispatchView(APIView, BaseTemplateView):
         total = Article.objects.filter(pubtime__range=(start, end)).count()
         risk = total
         return Response({'total': total, 'risk': risk})
-
-    def data_list(self, start, end, page):
-        start = parse_date(start)
-        end = parse_date(end)
-        items = Article.objects.filter(pubtime__range=(start, end)).order_by('-pubtime')
-        datas = self.paging(items, settings.NEWS_PAGE_LIMIT, page)
-        result = self.news_to_json(datas['items'])
-        news = render_to_string('analytics/data_list_tmpl.html', {'data_list': result})
-        return Response({'total': datas['total_number'], 'html':news})
 
     def chart_type(self, start, end):
         start = parse_date(start)
