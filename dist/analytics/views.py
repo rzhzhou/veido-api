@@ -27,14 +27,14 @@ class DispatchView(APIView, BaseTemplateView):
             if page:
                 return func(start, end, page)
             else:
-                time = RedisQueryApi().hget('cache', "end")
-                end_time = datetime.strptime(end, '%Y-%m-%d')
-                redis_time = datetime.strptime(time, '%Y-%m-%d')
-                if redis_time>=end_time:
-                    data = RedisQueryApi().hget('cache', type)
-                    result = eval(data) if data else []
-                    if result:
-                        return Response(result)
+                # time = RedisQueryApi().hget('cache', "end")
+                # end_time = datetime.strptime(end, '%Y-%m-%d')
+                # redis_time = datetime.strptime(time, '%Y-%m-%d')
+                # if redis_time>=end_time:
+                data = RedisQueryApi().hget('cache', type)
+                result = eval(data) if data else []
+                if result:
+                    return Response(result)
                 return func(start, end)
         except Exception, e:
             return Response({})
@@ -88,38 +88,7 @@ class DispatchView(APIView, BaseTemplateView):
             count = Weibo.objects.filter(area__in=areas_id, pubtime__range=(start,end)).count()
             provice_count.append({'name': province.name, 'value': count})
         sort_result = sorted(provice_count, key=lambda x:x['value'])[-6:]
-        name = map(lambda n : n['name'], sort_result)
-        value = map(lambda n : n['value'], sort_result)
-            # name = sort_result.keys()
-            # print name
-            # value = sort_result.values()
-            # print value
-            # districts = Area.objects.fliter(parent_id__in=city_id)
-        # pro_id = []
-        # for item in pro_area:
-        #     pro_id.append(item.id)
-        # provice_count = []
-        # for i in pro_id:
-        #     city_area = Area.objects.filter(parent_id=i)
-        #     city_id = []
-        #     for c in city_area:
-        #         city_id.append(c.id)
-        #     one_pro = Area.objects.filter(Q(parent_id__in=city_id)|Q(parent_id=i)|Q(id=i))
-        #     count = Weibo.objects.filter(area__in=one_pro, pubtime__range=(start,end)).count()
-        #     name =  Area.objects.get(id=i).name
-        #     provice_count.append({'name': name, 'value': count})
-        # sort_result = sorted(provice_count, key=lambda x:x['value'])[-6:]
-        # sort_result = sorted(provice_count, key=lambda x:x['value'], reverse=True)[:6]
-        # sort_percent = []
-        # for result in sort_result:
-        #     percent =  result['value']*100/sort_result[0]['value'] if result['value'] else 0
-        #     sort_percent.append({'percent': percent})
-        # index = 0
-        # for items in sort_result:
-        #     items.update(sort_percent[index])
-        #     index+=1
-        # return Response({'provice_count':provice_count, 'sort_result': sort_result})
-        return Response({'provice_count':provice_count, 'name': name, 'value':value})
+        return Response({'provice_count':provice_count, 'sort_result': sort_result})
 
     def chart_trend(self, start, end):
         start = parse_date(start)
