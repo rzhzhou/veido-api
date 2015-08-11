@@ -79,21 +79,36 @@ class DispatchView(APIView, BaseTemplateView):
     def chart_weibo(self, start, end):
         start = parse_date(start)
         end = parse_date(end)
-        pro_area = Area.objects.filter(level=2)
-        pro_id = []
-        for item in pro_area:
-            pro_id.append(item.id)
         provice_count = []
-        for i in pro_id:
-            city_area = Area.objects.filter(parent_id=i)
-            city_id = []
-            for c in city_area:
-                city_id.append(c.id)
-            one_pro = Area.objects.filter(Q(parent_id__in=city_id)|Q(parent_id=i)|Q(id=i))
-            count = Weibo.objects.filter(area__in=one_pro, pubtime__range=(start,end)).count()
-            name =  Area.objects.get(id=i).name
-            provice_count.append({'name': name, 'value': count})
+        provinces = Area.objects.filter(level=2)
+        for province in provinces:
+            citys = Area.objects.filter(parent_id=province.id)
+            city_id = map(lambda c: c.id, citys)
+            areas_id = Area.objects.filter(Q(parent_id__in=city_id)|Q(parent_id=province.id)|Q(id=province.id))
+            count = Weibo.objects.filter(area__in=areas_id, pubtime__range=(start,end)).count()
+            provice_count.append({'name': province.name, 'value': count})
         sort_result = sorted(provice_count, key=lambda x:x['value'])[-6:]
+        name = map(lambda n : n['name'], sort_result)
+        value = map(lambda n : n['value'], sort_result)
+            # name = sort_result.keys()
+            # print name
+            # value = sort_result.values()
+            # print value
+            # districts = Area.objects.fliter(parent_id__in=city_id)
+        # pro_id = []
+        # for item in pro_area:
+        #     pro_id.append(item.id)
+        # provice_count = []
+        # for i in pro_id:
+        #     city_area = Area.objects.filter(parent_id=i)
+        #     city_id = []
+        #     for c in city_area:
+        #         city_id.append(c.id)
+        #     one_pro = Area.objects.filter(Q(parent_id__in=city_id)|Q(parent_id=i)|Q(id=i))
+        #     count = Weibo.objects.filter(area__in=one_pro, pubtime__range=(start,end)).count()
+        #     name =  Area.objects.get(id=i).name
+        #     provice_count.append({'name': name, 'value': count})
+        # sort_result = sorted(provice_count, key=lambda x:x['value'])[-6:]
         # sort_result = sorted(provice_count, key=lambda x:x['value'], reverse=True)[:6]
         # sort_percent = []
         # for result in sort_result:
@@ -103,7 +118,8 @@ class DispatchView(APIView, BaseTemplateView):
         # for items in sort_result:
         #     items.update(sort_percent[index])
         #     index+=1
-        return Response({'provice_count':provice_count, 'sort_result': sort_result})
+        # return Response({'provice_count':provice_count, 'sort_result': sort_result})
+        return Response({'provice_count':provice_count, 'name': name, 'value':value})
 
     def chart_trend(self, start, end):
         start = parse_date(start)
