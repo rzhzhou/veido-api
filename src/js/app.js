@@ -826,7 +826,7 @@ APP.analytics = function () {
           $('#chart-weibo').append(weiboMap).append( weiboBar );
           // $('#chart-weibo').attr('style','height:400px;width:60%');
           $.getJSON(api, { type : 'chart-weibo', start : start, end : end },function(data){
-            // var item = data.sort_result;
+            var item = data.sort_result;
             require(['echarts', 'echarts/chart/map'],function (ec){
               ec.init(document.getElementById('weibo-map')).setOption({
                 tooltip : {
@@ -839,7 +839,7 @@ APP.analytics = function () {
                 },
                 dataRange: {
                     min: 0,
-                    max: data.value[5],
+                    max: item[5].value,
                     x: 'left',
                     y: 'bottom',
                     text:['高','低'],           // 文本，默认为数值文本
@@ -931,7 +931,7 @@ APP.analytics = function () {
                             fontWeight:'bolder'
                           }
                         },
-                        data : data.name
+                        data : [item[0].name,item[1].name,item[2].name,item[3].name,item[4].name,item[5].name]
                         // [item[0].name,item[1].name,item[2].name,item[3].name,item[4].name,item[5].name]
                     }
                 ],
@@ -955,7 +955,7 @@ APP.analytics = function () {
                             color:'#3C8DBC'
                           }
                         },
-                        data: data.value
+                        data: [item[0].value,item[1].value,item[2].value,item[3].value,item[4].value,item[5].value]
                         // [item[0].value,item[1].value,item[2].value,item[3].value,item[4].value,item[5].value]
                     },
                 ]
