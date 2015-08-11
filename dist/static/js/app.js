@@ -1673,7 +1673,7 @@ App.page.analyticsDetail = function (module, path, type, id) {
 
         $statistic.trigger('showStatistic');
 
-        $dataList.trigger('showDataList');
+        // $dataList.trigger('showDataList');
       };
 
   $chart.on('showChart', showChart);
