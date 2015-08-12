@@ -1263,7 +1263,6 @@ App.page.collection = function (module, path) {
   module.table(module, path);
 };
 
-
 App.page.analyticsDetail = function (module, path, type, id) {
   var start = '',
       end = '',
@@ -1731,7 +1730,7 @@ App.page.analyticsDetail = function (module, path, type, id) {
     start = moment().subtract(6, 'days').format('YYYY-MM-DD');
     end = moment().format('YYYY-MM-DD');
 
-    for (var type in chart) {
+    for (type in chart) {
       if(chart.hasOwnProperty(type)) {
         chart[type](start, end);
       }
