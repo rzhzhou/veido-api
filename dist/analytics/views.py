@@ -27,7 +27,7 @@ class DispatchView(APIView, BaseTemplateView):
             cache = int(parameter['cache']) if parameter.has_key('cache') else 1
             func = getattr(globals()['DispatchView'](), type)
 
-            # cache is flag,if cache=1 read redis, else read mysql 
+            # cache is flag,if cache=1 read redis, else read mysql
             if cache:
                 now = datetime.now()
                 today = date(now.year, now.month, now.day) + timedelta(days=1)
@@ -42,7 +42,7 @@ class DispatchView(APIView, BaseTemplateView):
                 read this month of data in redis
                 read last month of data in redis
                 '''
-                if end == today and date_range == 7: 
+                if end == today and date_range == 7:
                     data = RedisQueryApi().hget('CacheSevenDays', type)
                 elif end == today and date_range == 30:
                     data = RedisQueryApi().hget('CacheThrityDays', type)
@@ -97,7 +97,7 @@ class DispatchView(APIView, BaseTemplateView):
         sort_result = sorted(provice_count, key=lambda x:x['value'])[-10:]
         name = map(lambda n: n['name'], sort_result)
         value = map(lambda v: v['value'], sort_result)
-        return Response({'proviceCount':provice_count, 'name': name, 'value': value})
+        return Response({'province': provice_count, 'name': name, 'value': value})
 
     def chart_trend(self, start, end):
         days = (end - start).days
@@ -105,8 +105,8 @@ class DispatchView(APIView, BaseTemplateView):
 
         date_range = [(i, i + timedelta(days = 1)) for i in date]
         query_str = map(
-            lambda x: "sum(case when pubtime < '%s' and pubtime > '%s' then 1 else 0 end)" 
-            % (x[1], x[0]), 
+            lambda x: "sum(case when pubtime < '%s' and pubtime > '%s' then 1 else 0 end)"
+            % (x[1], x[0]),
             date_range
         )
 
@@ -114,7 +114,7 @@ class DispatchView(APIView, BaseTemplateView):
         news_data = [i for i in sum_result('article')[0]]
         weixin_data = [i for i in sum_result('weixin')[0]]
         weibo_data = [i for i in sum_result('weibo')[0]]
-        
+
         total_data = map(lambda x: news_data[x] + weixin_data[x] + weibo_data[x] , xrange(days))
 
         date = map(lambda x: x.strftime("%m-%d"), date)
