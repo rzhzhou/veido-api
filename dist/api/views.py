@@ -1,7 +1,7 @@
 #coding=utf-8
 
 import os
-from datetime import datetime 
+from datetime import datetime, timedelta
 from collections import defaultdict
 from dateutil.relativedelta import relativedelta
 from django.views.generic import View
@@ -227,7 +227,7 @@ class TableAPIView(APIView):
             try:
                 item['time'] = data.articles.order_by('pubtime')[0].pubtime.replace(tzinfo=None).strftime('%Y-%m-%d')
             except IndexError:
-                item['time'] = datetime.datetime.now().strftime('%Y-%m-%d')
+                item['time'] = datetime.now().strftime('%Y-%m-%d')
             item['hot'] = data.articles.count() + data.weixin.count() + data.weibo.count()
             result.append(item)
 
@@ -237,8 +237,8 @@ class TableAPIView(APIView):
 
 
 def get_date_from_iso(datetime_str):
-    #return datetime.datetime.strptime("2008-09-03T20:56:35.450686Z", "%Y-%m-%dT%H:%M:%S.%fZ")
-    return datetime.datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S.%fZ")
+    #return datetime.strptime("2008-09-03T20:56:35.450686Z", "%Y-%m-%dT%H:%M:%S.%fZ")
+    return datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S.%fZ")
 
 class ArticleTableView(TableAPIView):
     def get(self, request, id, page):
@@ -483,7 +483,7 @@ class EventTableView(TableAPIView):
             if time:
                 pubtime = time[0].pubtime
             else:
-                pubtime = datetime.datetime.now()
+                pubtime = datetime.now()
             one_record = [collected_html, title, item.source, item.area.name, pubtime.date(), hot_index]
             result.append(one_record)
         return Response({"event": result})
@@ -570,7 +570,7 @@ class CollectView(APIView):
         if time:
             pubtime = time[0].pubtime
         else:
-            pubtime = datetime.datetime.now()
+            pubtime = datetime.now()
         one_record = [title, item.source, item.area.name, pubtime.date(), hot_index]
         #one_record = [view.collected_html(item), title, item.source, item.area.name, pubtime.date(), hot_index]
         return one_record
@@ -923,7 +923,7 @@ class WeiboTableView(TableAPIView):
             html +=  u'<span>评论 %s</span>' % item['comments_count']
             html +=  u'<span><i class="fa fa-thumbs-o-up"></i> %s</span>' % item['attitudes_count']
             html += """</div>"""
-            html +=  u'<div class="time pull-left">%s</div>' % datetime.datetime.fromtimestamp(item['pubtime']).strftime('%Y-%m-%d %H:%M')
+            html +=  u'<div class="time pull-left">%s</div>' % datetime.fromtimestamp(item['pubtime']).strftime('%Y-%m-%d %H:%M')
             html += """</div></div></li>"""
 
         return html
@@ -1062,17 +1062,17 @@ def get_count_feeling(start_d, end_d, feeling_type):
         while day < end_d:
             num = d[day] if day in d else 0
             result.append(num)
-            day = day + datetime.timedelta(days=1)
+            day = day + timedelta(days=1)
         return result
 
 @login_required
 def chart_line_index_view(request):
-    today = datetime.datetime.today().date()
-    start_d = today - datetime.timedelta(days=6)
-    end_d = today + datetime.timedelta(days=1)
+    today = datetime.today().date()
+    start_d = today - timedelta(days=6)
+    end_d = today + timedelta(days=1)
 
     data = {}
-    data['date'] = [(today - datetime.timedelta(days=x)).strftime("%m-%d") for x in reversed(range(7))]
+    data['date'] = [(today - timedelta(days=x)).strftime("%m-%d") for x in reversed(range(7))]
     data['positive'] = get_count_feeling(start_d, end_d, 'positive')
     data['neutral'] = get_count_feeling(start_d, end_d, 'netrual')
     data['negative'] = get_count_feeling(start_d, end_d, 'negative')
