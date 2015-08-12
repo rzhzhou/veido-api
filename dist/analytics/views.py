@@ -97,7 +97,7 @@ class DispatchView(APIView, BaseTemplateView):
         sort_result = sorted(provice_count, key=lambda x:x['value'])[-10:]
         name = map(lambda n: n['name'], sort_result)
         value = map(lambda v: v['value'], sort_result)
-        return Response({'provice_count':provice_count, 'name': name, 'value': value})
+        return Response({'proviceCount':provice_count, 'name': name, 'value': value})
 
     def chart_trend(self, start, end):
         days = (end - start).days
