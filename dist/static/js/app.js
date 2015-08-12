@@ -1,494 +1,3 @@
-/*! Copyright (c) 2011 Piotr Rochala (http://rocha.la)
- * Dual licensed under the MIT (http://www.opensource.org/licenses/mit-license.php)
- * and GPL (http://www.opensource.org/licenses/gpl-license.php) licenses.
- *
- * Version: 1.3.3
- *
- */
-(function ($) {
-
-  $.fn.extend({
-    slimScroll: function (options) {
-
-      var defaults = {
-        // width in pixels of the visible scroll area
-        width: 'auto',
-        // height in pixels of the visible scroll area
-        height: '250px',
-        // width in pixels of the scrollbar and rail
-        size: '7px',
-        // scrollbar color, accepts any hex/color value
-        color: '#000',
-        // scrollbar position - left/right
-        position: 'right',
-        // distance in pixels between the side edge and the scrollbar
-        distance: '1px',
-        // default scroll position on load - top / bottom / $('selector')
-        start: 'top',
-        // sets scrollbar opacity
-        opacity: .4,
-        // enables always-on mode for the scrollbar
-        alwaysVisible: false,
-        // check if we should hide the scrollbar when user is hovering over
-        disableFadeOut: false,
-        // sets visibility of the rail
-        railVisible: false,
-        // sets rail color
-        railColor: '#333',
-        // sets rail opacity
-        railOpacity: .2,
-        // whether  we should use jQuery UI Draggable to enable bar dragging
-        railDraggable: true,
-        // defautlt CSS class of the slimscroll rail
-        railClass: 'slimScrollRail',
-        // defautlt CSS class of the slimscroll bar
-        barClass: 'slimScrollBar',
-        // defautlt CSS class of the slimscroll wrapper
-        wrapperClass: 'slimScrollDiv',
-        // check if mousewheel should scroll the window if we reach top/bottom
-        allowPageScroll: false,
-        // scroll amount applied to each mouse wheel step
-        wheelStep: 20,
-        // scroll amount applied when user is using gestures
-        touchScrollStep: 200,
-        // sets border radius
-        borderRadius: '7px',
-        // sets border radius of the rail
-        railBorderRadius: '7px'
-      };
-
-      var o = $.extend(defaults, options);
-
-      // do it for every element that matches selector
-      this.each(function () {
-
-        var isOverPanel, isOverBar, isDragg, queueHide, touchDif,
-                barHeight, percentScroll, lastScroll,
-                divS = '<div></div>',
-                minBarHeight = 30,
-                releaseScroll = false;
-
-        // used in event handlers and for better minification
-        var me = $(this);
-
-        // ensure we are not binding it again
-        if (me.parent().hasClass(o.wrapperClass))
-        {
-          // start from last bar position
-          var offset = me.scrollTop();
-
-          // find bar and rail
-          bar = me.parent().find('.' + o.barClass);
-          rail = me.parent().find('.' + o.railClass);
-
-          getBarHeight();
-
-          // check if we should scroll existing instance
-          if ($.isPlainObject(options))
-          {
-            // Pass height: auto to an existing slimscroll object to force a resize after contents have changed
-            if ('height' in options && options.height == 'auto') {
-              me.parent().css('height', 'auto');
-              me.css('height', 'auto');
-              var height = me.parent().parent().height();
-              me.parent().css('height', height);
-              me.css('height', height);
-            }
-
-            if ('scrollTo' in options)
-            {
-              // jump to a static point
-              offset = parseInt(o.scrollTo);
-            }
-            else if ('scrollBy' in options)
-            {
-              // jump by value pixels
-              offset += parseInt(o.scrollBy);
-            }
-            else if ('destroy' in options)
-            {
-              // remove slimscroll elements
-              bar.remove();
-              rail.remove();
-              me.unwrap();
-              return;
-            }
-
-            // scroll content by the given offset
-            scrollContent(offset, false, true);
-          }
-
-          return;
-        }
-        else if ($.isPlainObject(options))
-        {
-          if ('destroy' in options)
-          {
-            return;
-          }
-        }
-
-        // optionally set height to the parent's height
-        o.height = (o.height == 'auto') ? me.parent().height() : o.height;
-
-        // wrap content
-        var wrapper = $(divS)
-                .addClass(o.wrapperClass)
-                .css({
-                  position: 'relative',
-                  overflow: 'hidden',
-                  width: o.width,
-                  height: o.height
-                });
-
-        // update style for the div
-        me.css({
-          overflow: 'hidden',
-          width: o.width,
-          height: o.height,
-          //Fix for IE10
-          "-ms-touch-action": "none"
-        });
-
-        // create scrollbar rail
-        var rail = $(divS)
-                .addClass(o.railClass)
-                .css({
-                  width: o.size,
-                  height: '100%',
-                  position: 'absolute',
-                  top: 0,
-                  display: (o.alwaysVisible && o.railVisible) ? 'block' : 'none',
-                  'border-radius': o.railBorderRadius,
-                  background: o.railColor,
-                  opacity: o.railOpacity,
-                  zIndex: 90
-                });
-
-        // create scrollbar
-        var bar = $(divS)
-                .addClass(o.barClass)
-                .css({
-                  background: o.color,
-                  width: o.size,
-                  position: 'absolute',
-                  top: 0,
-                  opacity: o.opacity,
-                  display: o.alwaysVisible ? 'block' : 'none',
-                  'border-radius': o.borderRadius,
-                  BorderRadius: o.borderRadius,
-                  MozBorderRadius: o.borderRadius,
-                  WebkitBorderRadius: o.borderRadius,
-                  zIndex: 99
-                });
-
-        // set position
-        var posCss = (o.position == 'right') ? {right: o.distance} : {left: o.distance};
-        rail.css(posCss);
-        bar.css(posCss);
-
-        // wrap it
-        me.wrap(wrapper);
-
-        // append to parent div
-        me.parent().append(bar);
-        me.parent().append(rail);
-
-        // make it draggable and no longer dependent on the jqueryUI
-        if (o.railDraggable) {
-          bar.bind("mousedown", function (e) {
-            var $doc = $(document);
-            isDragg = true;
-            t = parseFloat(bar.css('top'));
-            pageY = e.pageY;
-
-            $doc.bind("mousemove.slimscroll", function (e) {
-              currTop = t + e.pageY - pageY;
-              bar.css('top', currTop);
-              scrollContent(0, bar.position().top, false);// scroll content
-            });
-
-            $doc.bind("mouseup.slimscroll", function (e) {
-              isDragg = false;
-              hideBar();
-              $doc.unbind('.slimscroll');
-            });
-            return false;
-          }).bind("selectstart.slimscroll", function (e) {
-            e.stopPropagation();
-            e.preventDefault();
-            return false;
-          });
-        }
-
-        // on rail over
-        rail.hover(function () {
-          showBar();
-        }, function () {
-          hideBar();
-        });
-
-        // on bar over
-        bar.hover(function () {
-          isOverBar = true;
-        }, function () {
-          isOverBar = false;
-        });
-
-        // show on parent mouseover
-        me.hover(function () {
-          isOverPanel = true;
-          showBar();
-          hideBar();
-        }, function () {
-          isOverPanel = false;
-          hideBar();
-        });
-
-        if (window.navigator.msPointerEnabled) {          
-          // support for mobile
-          me.bind('MSPointerDown', function (e, b) {
-            if (e.originalEvent.targetTouches.length)
-            {
-              // record where touch started
-              touchDif = e.originalEvent.targetTouches[0].pageY;
-            }
-          });
-
-          me.bind('MSPointerMove', function (e) {
-            // prevent scrolling the page if necessary
-            e.originalEvent.preventDefault();
-            if (e.originalEvent.targetTouches.length)
-            {
-              // see how far user swiped
-              var diff = (touchDif - e.originalEvent.targetTouches[0].pageY) / o.touchScrollStep;
-              // scroll content
-              scrollContent(diff, true);
-              touchDif = e.originalEvent.targetTouches[0].pageY;
-              
-            }
-          });
-        } else {
-          // support for mobile
-          me.bind('touchstart', function (e, b) {
-            if (e.originalEvent.touches.length)
-            {
-              // record where touch started
-              touchDif = e.originalEvent.touches[0].pageY;
-            }
-          });
-
-          me.bind('touchmove', function (e) {
-            // prevent scrolling the page if necessary
-            if (!releaseScroll)
-            {
-              e.originalEvent.preventDefault();
-            }
-            if (e.originalEvent.touches.length)
-            {
-              // see how far user swiped
-              var diff = (touchDif - e.originalEvent.touches[0].pageY) / o.touchScrollStep;
-              // scroll content
-              scrollContent(diff, true);
-              touchDif = e.originalEvent.touches[0].pageY;
-            }
-          });
-        }
-
-        // set up initial height
-        getBarHeight();
-
-        // check start position
-        if (o.start === 'bottom')
-        {
-          // scroll content to bottom
-          bar.css({top: me.outerHeight() - bar.outerHeight()});
-          scrollContent(0, true);
-        }
-        else if (o.start !== 'top')
-        {
-          // assume jQuery selector
-          scrollContent($(o.start).position().top, null, true);
-
-          // make sure bar stays hidden
-          if (!o.alwaysVisible) {
-            bar.hide();
-          }
-        }
-
-        // attach scroll events
-        attachWheel();
-
-        function _onWheel(e)
-        {
-          // use mouse wheel only when mouse is over
-          if (!isOverPanel) {
-            return;
-          }
-
-          var e = e || window.event;
-
-          var delta = 0;
-          if (e.wheelDelta) {
-            delta = -e.wheelDelta / 120;
-          }
-          if (e.detail) {
-            delta = e.detail / 3;
-          }
-
-          var target = e.target || e.srcTarget || e.srcElement;
-          if ($(target).closest('.' + o.wrapperClass).is(me.parent())) {
-            // scroll content
-            scrollContent(delta, true);
-          }
-
-          // stop window scroll
-          if (e.preventDefault && !releaseScroll) {
-            e.preventDefault();
-          }
-          if (!releaseScroll) {
-            e.returnValue = false;
-          }
-        }
-
-        function scrollContent(y, isWheel, isJump)
-        {
-          releaseScroll = false;
-          var delta = y;
-          var maxTop = me.outerHeight() - bar.outerHeight();
-
-          if (isWheel)
-          {
-            // move bar with mouse wheel
-            delta = parseInt(bar.css('top')) + y * parseInt(o.wheelStep) / 100 * bar.outerHeight();
-
-            // move bar, make sure it doesn't go out
-            delta = Math.min(Math.max(delta, 0), maxTop);
-
-            // if scrolling down, make sure a fractional change to the
-            // scroll position isn't rounded away when the scrollbar's CSS is set
-            // this flooring of delta would happened automatically when
-            // bar.css is set below, but we floor here for clarity
-            delta = (y > 0) ? Math.ceil(delta) : Math.floor(delta);
-
-            // scroll the scrollbar
-            bar.css({top: delta + 'px'});
-          }
-
-          // calculate actual scroll amount
-          percentScroll = parseInt(bar.css('top')) / (me.outerHeight() - bar.outerHeight());
-          delta = percentScroll * (me[0].scrollHeight - me.outerHeight());
-
-          if (isJump)
-          {
-            delta = y;
-            var offsetTop = delta / me[0].scrollHeight * me.outerHeight();
-            offsetTop = Math.min(Math.max(offsetTop, 0), maxTop);
-            bar.css({top: offsetTop + 'px'});
-          }
-
-          // scroll content
-          me.scrollTop(delta);
-
-          // fire scrolling event
-          me.trigger('slimscrolling', ~~delta);
-
-          // ensure bar is visible
-          showBar();
-
-          // trigger hide when scroll is stopped
-          hideBar();
-        }
-
-        function attachWheel()
-        {
-          if (window.addEventListener)
-          {
-            this.addEventListener('DOMMouseScroll', _onWheel, false);
-            this.addEventListener('mousewheel', _onWheel, false);
-          }
-          else
-          {
-            document.attachEvent("onmousewheel", _onWheel)
-          }
-        }
-
-        function getBarHeight()
-        {
-          // calculate scrollbar height and make sure it is not too small
-          barHeight = Math.max((me.outerHeight() / me[0].scrollHeight) * me.outerHeight(), minBarHeight);
-          bar.css({height: barHeight + 'px'});
-
-          // hide scrollbar if content is not long enough
-          var display = barHeight == me.outerHeight() ? 'none' : 'block';
-          bar.css({display: display});
-        }
-
-        function showBar()
-        {
-          // recalculate bar height
-          getBarHeight();
-          clearTimeout(queueHide);
-
-          // when bar reached top or bottom
-          if (percentScroll == ~~percentScroll)
-          {
-            //release wheel
-            releaseScroll = o.allowPageScroll;
-
-            // publish approporiate event
-            if (lastScroll != percentScroll)
-            {
-              var msg = (~~percentScroll == 0) ? 'top' : 'bottom';
-              me.trigger('slimscroll', msg);
-            }
-          }
-          else
-          {
-            releaseScroll = false;
-          }
-          lastScroll = percentScroll;
-
-          // show only when required
-          if (barHeight >= me.outerHeight()) {
-            //allow window scroll
-            releaseScroll = true;
-            return;
-          }
-          bar.stop(true, true).fadeIn('fast');
-          if (o.railVisible) {
-            rail.stop(true, true).fadeIn('fast');
-          }
-        }
-
-        function hideBar()
-        {
-          // only hide when options allow it
-          if (!o.alwaysVisible)
-          {
-            queueHide = setTimeout(function () {
-              if (!(o.disableFadeOut && isOverPanel) && !isOverBar && !isDragg)
-              {
-                bar.fadeOut('slow');
-                rail.fadeOut('slow');
-              }
-            }, 1000);
-          }
-        }
-
-      });
-
-      // maintain chainability
-      return this;
-    }
-  });
-
-  $.fn.extend({
-    slimscroll: $.fn.slimScroll
-  });
-
-})(jQuery);
-
 /*! AdminLTE app.js
  * ================
  * Main JS application file for AdminLTE v2. This file
@@ -1017,305 +526,36 @@ function _init() {
     });
   };
 }(jQuery));
-/*!
- * jQuery pagination plugin v1.2.5
- * http://esimakin.github.io/twbs-pagination/
- *
- * Copyright 2014, Eugene Simakin
- * Released under Apache 2.0 license
- * http://apache.org/licenses/LICENSE-2.0.html
- */
-;
-(function ($, window, document, undefined) {
-
-    'use strict';
-
-    var old = $.fn.twbsPagination;
-
-    // PROTOTYPE AND CONSTRUCTOR
-
-    var TwbsPagination = function (element, options) {
-        this.$element = $(element);
-        this.options = $.extend({}, $.fn.twbsPagination.defaults, options);
-
-        if (this.options.startPage < 1 || this.options.startPage > this.options.totalPages) {
-            throw new Error('Start page option is incorrect');
-        }
-
-        this.options.totalPages = parseInt(this.options.totalPages);
-        if (isNaN(this.options.totalPages)) {
-            throw new Error('Total pages option is not correct!');
-        }
-
-        this.options.visiblePages = parseInt(this.options.visiblePages);
-        if (isNaN(this.options.visiblePages)) {
-            throw new Error('Visible pages option is not correct!');
-        }
-
-        if (this.options.totalPages < this.options.visiblePages) {
-            this.options.visiblePages = this.options.totalPages;
-        }
-
-        if (this.options.onPageClick instanceof Function) {
-            this.$element.first().bind('page', this.options.onPageClick);
-        }
-
-        if (this.options.href) {
-            var m, regexp = this.options.href.replace(/[-\/\\^$*+?.|[\]]/g, '\\$&');
-            regexp = regexp.replace(this.options.hrefVariable, '(\\d+)');
-            if ((m = new RegExp(regexp, 'i').exec(window.location.href)) != null) {
-                this.options.startPage = parseInt(m[1], 10);
-            }
-        }
-
-        var tagName = (typeof this.$element.prop === 'function') ?
-            this.$element.prop('tagName') : this.$element.attr('tagName');
-
-        if (tagName === 'UL') {
-            this.$listContainer = this.$element;
-        } else {
-            this.$listContainer = $('<ul></ul>');
-        }
-
-        this.$listContainer.addClass(this.options.paginationClass);
-
-        if (tagName !== 'UL') {
-            this.$element.append(this.$listContainer);
-        }
-
-        this.render(this.getPages(this.options.startPage));
-        this.setupEvents();
-
-        return this;
-    };
-
-    TwbsPagination.prototype = {
-
-        constructor: TwbsPagination,
-
-        destroy: function () {
-            this.$element.empty();
-            this.$element.removeData('twbs-pagination');
-            this.$element.unbind('page');
-            return this;
-        },
-
-        show: function (page) {
-            if (page < 1 || page > this.options.totalPages) {
-                throw new Error('Page is incorrect.');
-            }
-
-            this.render(this.getPages(page));
-            this.setupEvents();
-
-            this.$element.trigger('page', page);
-            return this;
-        },
-
-        buildListItems: function (pages) {
-            var $listItems = $();
-
-            if (this.options.first) {
-                $listItems = $listItems.add(this.buildItem('first', 1));
-            }
-
-            if (this.options.prev) {
-                var prev = pages.currentPage > 1 ? pages.currentPage - 1 : this.options.loop ? this.options.totalPages  : 1;
-                $listItems = $listItems.add(this.buildItem('prev', prev));
-            }
-
-            for (var i = 0; i < pages.numeric.length; i++) {
-                $listItems = $listItems.add(this.buildItem('page', pages.numeric[i]));
-            }
-
-            if (this.options.next) {
-                var next = pages.currentPage < this.options.totalPages ? pages.currentPage + 1 : this.options.loop ? 1 : this.options.totalPages;
-                $listItems = $listItems.add(this.buildItem('next', next));
-            }
-
-            if (this.options.last) {
-                $listItems = $listItems.add(this.buildItem('last', this.options.totalPages));
-            }
-
-            return $listItems;
-        },
-
-        buildItem: function (type, page) {
-            var itemContainer = $('<li></li>'),
-                itemContent = $('<a></a>'),
-                itemText = null;
-
-            switch (type) {
-                case 'page':
-                    itemText = page;
-                    itemContainer.addClass(this.options.pageClass);
-                    break;
-                case 'first':
-                    itemText = this.options.first;
-                    itemContainer.addClass(this.options.firstClass);
-                    break;
-                case 'prev':
-                    itemText = this.options.prev;
-                    itemContainer.addClass(this.options.prevClass);
-                    break;
-                case 'next':
-                    itemText = this.options.next;
-                    itemContainer.addClass(this.options.nextClass);
-                    break;
-                case 'last':
-                    itemText = this.options.last;
-                    itemContainer.addClass(this.options.lastClass);
-                    break;
-                default:
-                    break;
-            }
-
-            itemContainer.data('page', page);
-            itemContainer.data('page-type', type);
-            itemContainer.append(itemContent.attr('href', this.makeHref(page)).html(itemText));
-            return itemContainer;
-        },
-
-        getPages: function (currentPage) {
-            var pages = [];
-
-            var half = Math.floor(this.options.visiblePages / 2);
-            var start = currentPage - half + 1 - this.options.visiblePages % 2;
-            var end = currentPage + half;
-
-            // handle boundary case
-            if (start <= 0) {
-                start = 1;
-                end = this.options.visiblePages;
-            }
-            if (end > this.options.totalPages) {
-                start = this.options.totalPages - this.options.visiblePages + 1;
-                end = this.options.totalPages;
-            }
-
-            var itPage = start;
-            while (itPage <= end) {
-                pages.push(itPage);
-                itPage++;
-            }
-
-            return {"currentPage": currentPage, "numeric": pages};
-        },
-
-        render: function (pages) {
-            this.$listContainer.children().remove();
-            this.$listContainer.append(this.buildListItems(pages));
-
-            var children = this.$listContainer.children();
-            children.filter(function () {
-                return $(this).data('page') === pages.currentPage && $(this).data('page-type') === 'page';
-            }).addClass(this.options.activeClass);
-
-            children.filter(function () {
-                return $(this).data('page-type') === 'first';
-            }).toggleClass(this.options.disabledClass, pages.currentPage === 1);
-
-            children.filter(function () {
-                return $(this).data('page-type') === 'last';
-            }).toggleClass(this.options.disabledClass, pages.currentPage === this.options.totalPages);
-
-            children.filter(function () {
-                return $(this).data('page-type') === 'prev';
-            }).toggleClass(this.options.disabledClass, !this.options.loop && pages.currentPage === 1);
-
-            children.filter(function () {
-                return $(this).data('page-type') === 'next';
-            }).toggleClass(this.options.disabledClass, !this.options.loop && pages.currentPage === this.options.totalPages);
-        },
-
-        setupEvents: function () {
-            var base = this;
-            this.$listContainer.find('li').each(function () {
-                var $this = $(this);
-                $this.off();
-                if ($this.hasClass(base.options.disabledClass) || $this.hasClass(base.options.activeClass)) {
-                    $this.click(function (evt) {
-                        evt.preventDefault();
-                    });
-                    return;
-                }
-                $this.click(function (evt) {
-                    // Prevent click event if href is not set.
-                    !base.options.href && evt.preventDefault();
-                    base.show(parseInt($this.data('page'), 10));
-                });
-            });
-        },
-
-        makeHref: function (c) {
-            return this.options.href ? this.options.href.replace(this.options.hrefVariable, c) : "#";
-        }
-
-    };
-
-    // PLUGIN DEFINITION
-
-    $.fn.twbsPagination = function (option) {
-        var args = Array.prototype.slice.call(arguments, 1);
-        var methodReturn;
-
-        var $this = $(this);
-        var data = $this.data('twbs-pagination');
-        var options = typeof option === 'object' && option;
-
-        if (!data) $this.data('twbs-pagination', (data = new TwbsPagination(this, options) ));
-        if (typeof option === 'string') methodReturn = data[ option ].apply(data, args);
-
-        return ( methodReturn === undefined ) ? $this : methodReturn;
-    };
-
-    $.fn.twbsPagination.defaults = {
-        totalPages: 0,
-        startPage: 1,
-        visiblePages: 5,
-        href: false,
-        hrefVariable: '{{number}}',
-        first: 'First',
-        prev: 'Previous',
-        next: 'Next',
-        last: 'Last',
-        loop: false,
-        onPageClick: null,
-        paginationClass: 'pagination',
-        nextClass: 'next',
-        prevClass: 'prev',
-        lastClass: 'last',
-        firstClass: 'first',
-        pageClass: 'page',
-        activeClass: 'active',
-        disabledClass: 'disabled'
-    };
-
-    $.fn.twbsPagination.Constructor = TwbsPagination;
-
-    $.fn.twbsPagination.noConflict = function () {
-        $.fn.twbsPagination = old;
-        return this;
-    };
-
-})(jQuery, window, document);
+/* global echarts */
 
 'use strict';
+
 
 //
 // configuration
 //
 
-require.config({
-  paths: {
-    echarts: '/vendor/echarts'
+// twbsPagination
+(function () {
+  if (typeof $.fn.twbsPagination !== 'function') {
+    throw new Error('twbsPagination required');
   }
-});
+
+  var options = {
+    first: '第一页',
+    prev: '上一页',
+    next: '下一页',
+    last: '最后一页',
+    paginationClass: 'pagination pagination-sm no-margin pull-right'
+  };
+
+  $.extend($.fn.twbsPagination.defaults, options);
+}());
+
 
 //
 // plugins
 //
-
 (function ($) {
   $.fn.showRisk = function () {
     var $riskScore      = this.find('td.risk-score'),
@@ -1342,176 +582,441 @@ require.config({
 
 
 //
-// functions
+// Application
 //
 
-var APP = {};
+var App = {
+  // Modules
+  module: {},
 
-APP.url = location.pathname;
+  // Pages
+  page: {},
 
-APP.type = (function() {
-  var path = APP.url.split('/').slice(1, -1),
-      type = '';
+  // Router
+  route: function () {
+    var module  = this.module,
+        page    = this.page,
+        path    = location.pathname,
+        summary = /^\/(\w+)\/$/,
+        detail  = /^\/(\w+)\/(\d+)\/$/,
+        match   = null,
+        type,
+        id;
 
-  switch (path.length) {
-    case 0:
-      type = 'dashboard';
+    switch (true) {
+    case path === '/':
+      type  = 'dashboard';
       break;
-    case 1:
-      type = path[0];
+    case summary.test(path):
+      match = summary.exec(path);
+      type  = match[1];
       break;
-    case 2:
-      type = path[0] + 'Item';
+    case detail.test(path):
+      match = detail.exec(path);
+      type  = match[1];
+      id    = +match[2];
       break;
+    }
+
+    if (type === 'login') {
+      return page.login(module);
+    }
+
+    // common
+    module.search();
+    module.menu(path, type);
+
+    if (id === undefined) {
+      return page[type](module, path, type);
+    } else {
+      return page[type + 'Detail'](module, path, type, id);
+    }
   }
+};
 
-  return type;
-})();
 
-APP.user = {
-  login: function() {
-    var form     = document.forms.login,
-        action   = form.action,
-        elements = form.elements,
-        username = elements.username,
-        password = elements.password,
-        submit   = elements[2],
-        $msg     = $(form).find('p'),
+//
+// Modules
+//
 
-        enableSubmit = function() {
-          submit.disabled = !(username.value && password.value);
-        },
+// user
+App.module.login = function () {
+  var form     = document.forms.login,
+      action   = form.action,
+      elements = form.elements,
+      username = elements.username,
+      password = elements.password,
+      submit   = elements[2],
+      $msg     = $(form).find('p'),
 
-        processLogin = function(event) {
-          event.preventDefault();
+      enableSubmit = function() {
+        submit.disabled = !(username.value && password.value);
+      },
 
-          $.post(action, $(form).serialize(), function(response) {
-            if (response.status) {
-              location.href = location.search ? location.search.substr(1).split('=')[1] : '/';
-            } else {
-              $msg.text('用户名或密码错误！');
-              submit.disabled = true;
-              password.value  = '';
-            }
-          });
+      processLogin = function(event) {
+        event.preventDefault();
+
+        $.post(action, $(form).serialize(), function(response) {
+          if (response.status) {
+            location.href = location.search ? location.search.substr(1).split('=')[1] : '/';
+          } else {
+            $msg.text('用户名或密码错误！');
+            submit.disabled = true;
+            password.value  = '';
+          }
+        });
+      };
+
+  $(form).keyup(enableSubmit).submit(processLogin);
+};
+
+App.module.register = function () {
+  var form     = document.forms.add,
+      action   = form.action,
+      elements = form.elements,
+      username = elements.username,
+      password = elements.password,
+      retype   = elements.retype,
+      submit   = elements[3],
+      $msg     = $(form).find('p'),
+
+      enableSubmit = function() {
+        submit.disabled = !(username.value && password.value && retype.value);
+      },
+
+      processAdd   = function(event) {
+        event.preventDefault();
+
+        var processResponse = function(response) {
+          if (response.status) {
+            location.reload();
+          } else {
+            $msg.text('抱歉，添加失败！').show();
+          }
         };
 
-    $(form).keyup(enableSubmit).submit(processLogin);
-  },
+        if (password.value === retype.value) {
+          $.post(action, $([username, password]).serialize(), processResponse);
+        } else {
+          $msg.text('两次输入密码不一致！').show();
+          submit.disabled = true;
+          password.value  = '';
+          retype.value    = '';
+        }
+      };
 
-  change: function() {
-    var form        = document.forms.info,
-        action      = form.action,
-        elements    = form.elements,
-        username    = elements.username,
-        oldPassword = elements.oldPassword,
-        newPassword = elements.newPassword,
-        retype      = elements.retype,
-        submit      = elements[4],
-        $msg        = $(form).find('p'),
+  $(form).keyup(enableSubmit).submit(processAdd);
+};
+
+App.module.admin = function () {
+  var $admin  = $('.user-admin'),
+      $input  = $admin.find('input'),
+      $button = $admin.find('button'),
+      $reset  = $button.eq(0),
+      $remove = $button.eq(1),
+      id      = [],
+
+      action = function(obj, api) {
+        obj.click(function() {
+          id.length = 0;
+
+          $input.filter(':checked').each(function(index, element) {
+            id.push( $(element).parent().next().data('id') );
+          });
+
+          if (id.length) {
+            $.post(api, {id: id.toString()}, function(response) {
+              if (response.status) {
+                location.reload();
+              }
+            });
+          }
+        });
+      };
+
+  action($reset, '/api/user/reset/');
+  action($remove, '/api/user/remove/');
+};
+
+App.module.settings = function () {
+  var form        = document.forms.info,
+      action      = form.action,
+      elements    = form.elements,
+      username    = elements.username,
+      oldPassword = elements.oldPassword,
+      newPassword = elements.newPassword,
+      retype      = elements.retype,
+      submit      = elements[4],
+      $msg        = $(form).find('p'),
 
 
-        enableSubmit = function() {
-          submit.disabled = !(username.value && oldPassword.value && newPassword.value && retype.value);
-        },
+      enableSubmit = function() {
+        submit.disabled = !(username.value && oldPassword.value && newPassword.value && retype.value);
+      },
 
-        processChange = function(event) {
-          event.preventDefault();
+      processChange = function(event) {
+        event.preventDefault();
 
-          var processResponse = function(response) {
-            if (response.status) {
-              $msg.text('更新成功！').show();
-              location.href = '/login/';
-            } else {
-              $msg.text('原密码错误！').show();
-              oldPassword.value = '';
-              newPassword.value = '';
-              retype.value      = '';
-            }
-          };
-
-          if (newPassword.value === retype.value) {
-            $.post(action, $([username, oldPassword, newPassword]).serialize(), processResponse);
+        var processResponse = function(response) {
+          if (response.status) {
+            $msg.text('更新成功！').show();
+            location.href = '/login/';
           } else {
-            $msg.text('两次输入密码不一致！').show();
+            $msg.text('原密码错误！').show();
+            oldPassword.value = '';
             newPassword.value = '';
             retype.value      = '';
           }
         };
 
-    $(form).keyup(enableSubmit).submit(processChange);
-  },
+        if (newPassword.value === retype.value) {
+          $.post(action, $([username, oldPassword, newPassword]).serialize(), processResponse);
+        } else {
+          $msg.text('两次输入密码不一致！').show();
+          newPassword.value = '';
+          retype.value      = '';
+        }
+      };
 
-  admin: function() {
-    var $admin  = $('.user-admin'),
-        $input  = $admin.find('input'),
-        $button = $admin.find('button'),
-        $reset  = $button.eq(0),
-        $remove = $button.eq(1),
-        id      = [],
-
-        action = function(obj, api) {
-          obj.click(function() {
-            id.length = 0;
-
-            $input.filter(':checked').each(function(index, element) {
-              id.push( $(element).parent().next().data('id') );
-            });
-
-            if (id.length) {
-              $.post(api, {id: id.toString()}, function(response) {
-                if (response.status) {
-                  location.reload();
-                }
-              });
-            }
-          });
-        };
-
-    action($reset, '/api/user/reset/');
-    action($remove, '/api/user/remove/');
-  },
-
-  add: function() {
-    var form     = document.forms.add,
-        action   = form.action,
-        elements = form.elements,
-        username = elements.username,
-        password = elements.password,
-        retype   = elements.retype,
-        submit   = elements[3],
-        $msg     = $(form).find('p'),
-
-        enableSubmit = function() {
-          submit.disabled = !(username.value && password.value && retype.value);
-        },
-
-        processAdd   = function(event) {
-          event.preventDefault();
-
-          var processResponse = function(response) {
-            if (response.status) {
-              location.reload();
-            } else {
-              $msg.text('抱歉，添加失败！').show();
-            }
-          };
-
-          if (password.value === retype.value) {
-            $.post(action, $([username, password]).serialize(), processResponse);
-          } else {
-            $msg.text('两次输入密码不一致！').show();
-            submit.disabled = true;
-            password.value  = '';
-            retype.value    = '';
-          }
-        };
-
-    $(form).keyup(enableSubmit).submit(processAdd);
-  }
+  $(form).keyup(enableSubmit).submit(processChange);
 };
 
-APP.search = function() {
+// chart
+App.module.line = function (path) {
+  $.getJSON('/api/line' + path, function (data) {
+    echarts.init($('#line-chart')[0], 'macarons').setOption({
+      color: ['#00a65a', '#00c0ef', '#dd4b39'],
+      tooltip: {
+        trigger: 'axis'
+      },
+      legend: {
+        data: ['正面','中性','负面']
+      },
+      grid: {
+        x: 40,
+        y: 30,
+        x2: 25,
+        y2: 30
+      },
+      xAxis: [
+        {
+          type: 'category',
+          boundaryGap: false,
+          data: data.date
+        }
+      ],
+      yAxis: [
+        {
+          type : 'value'
+        }
+      ],
+      series: [
+        {
+          name: '正面',
+          type: 'line',
+          data: data.positive
+        },
+        {
+          name: '中性',
+          type: 'line',
+          data: data.neutral
+        },
+        {
+          name: '负面',
+          type: 'line',
+          data: data.negative
+        }
+      ]
+    });
+  });
+};
+
+App.module.pie = function (path) {
+  $.getJSON('/api/pie' + path, function (data) {
+    echarts.init($('#pie-chart')[0], 'macarons').setOption({
+      tooltip: {
+        trigger: 'item',
+        formatter: '{a} <br/>{b} : {c} ({d}%)'
+      },
+      legend: {
+        data: data.name
+      },
+      series: [
+        {
+          name: '信息比例',
+          type: 'pie',
+          radius: '55%',
+          center: ['50%', '60%'],
+          data: data.value
+        }
+      ]
+    });
+  });
+};
+
+App.module.map = function (path) {
+  $.getJSON('/api/map/' , function (result) {
+    var city = result.regionData,
+        data = [],
+        city2;
+
+    for (var c in city) {
+      data[c] = city[c].rank;
+      switch (data[c]) {
+      case 'A':
+        data[c] = 1;
+        break;
+      case 'B':
+        data[c] = 1;
+        break;
+      case 'C':
+        data[c] = 2;
+        break;
+      case 'D':
+        data[c] = 3;
+        break;
+      case 'E':
+        data[c] = 3;
+        break;
+      default:
+        data[c] = 3;
+        break;
+      }
+    }
+
+    echarts.util.mapData.params.params.wh = {
+      getGeoJson: function (callback) {
+      $.getJSON('/static/wh.json', callback);
+      }
+    };
+
+    echarts.init(document.getElementById('map-chart')).setOption({
+      title: {
+        subtext: ''
+      },
+      tooltip: {
+        trigger: 'item',
+        formatter: function(a) {
+          for (var i in city) {
+            if (a[1] == city[i].region_name) {
+              city2 = data[i];
+              switch (city2) {
+              case 1:
+                city2 = 'A';
+                break;
+              case 2:
+                city2 = 'B';
+                break;
+              case 3:
+                city2 = 'C';
+                break;
+              default:
+                city2 = 'erro';
+                break;
+              }
+            }
+          }
+          return a[1] + '<br>' + '风险等级  ' + city2;
+        }
+      },
+      legend: {
+        orient: 'vertical',
+        x: 'right',
+        data: ['']
+      },
+      dataRange: {
+        min: 0,
+        max: 3,
+        splitNumber: 3,
+        color: ['#fa9529', '#fff26e', '#cee19e', ],
+        formatter: function(v, v2) {
+          if (v2 == '1') {
+            return 'A' + '-低风险';
+          } else if (v2 == '2') {
+            return 'B' + '-中风险';
+          } else if (v2 == '3') {
+            return 'C' + '-高风险';
+          }
+        },
+        x: "right"
+      },
+      series: [{
+        name: '数据名称',
+        type: 'map',
+        mapType: 'wh',
+        selectedMode: 'single',
+        itemStyle: {
+          normal: {
+            label: {
+              show: false
+            }
+          },
+          //区域名称
+          emphasis: {
+            label: {
+              show: true
+            }
+          }
+        },
+        data: [{
+          name: '江岸区',
+          value: data[4]
+        },
+        {
+          name: '江汉区',
+          value: data[6]
+        },
+        {
+          name: '硚口区',
+          value: data[10]
+        },
+        {
+          name: '汉阳区',
+          value: data[11]
+        },
+        {
+          name: '武昌区',
+          value: data[0]
+        },
+        {
+          name: '洪山区',
+          value: data[1]
+        },
+        {
+          name: '青山区',
+          value: data[3]
+        },
+        {
+          name: '东西湖区',
+          value: data[9]
+        },
+        {
+          name: '蔡甸区',
+          value: data[12]
+        },
+        {
+          name: '江夏区',
+          value: data[2]
+        },
+        {
+          name: '黄陂区',
+          value: data[7]
+        },
+        {
+          name: '新洲区',
+          value: data[8]
+        },
+        {
+          name: '汉南区',
+          value: data[13]
+        }]
+      }]
+    });
+  });
+};
+
+// util
+App.module.search = function () {
   var form  = document.forms.search,
       input = form.elements.keywords;
 
@@ -1527,22 +1032,28 @@ APP.search = function() {
   });
 };
 
-APP.menu = function() {
+App.module.menu = function (path, type) {
   var menu     = $('.sidebar-menu'),
       parent   = menu.parent(),
-      vaildURL = function() {
-        var thisHref = this.getAttribute('href');
 
-        if (APP.type === 'dashboard' || APP.type === 'categoryItem' || APP.type === 'locationItem') {
-          return thisHref === APP.url;
-        } else {
-          return thisHref.split('/')[1] === APP.url.split('/')[1];
+      validate = function () {
+        var href = this.getAttribute('href');
+
+        switch (true) {
+        case type === 'dashboard':
+          return href === '/';
+        // both 'category' and 'location' are parent treeview
+        case type === 'category':
+        case type === 'location':
+          return href === path;
+        default:
+          return href.split('/')[1] === type;
         }
       };
 
   menu
     .detach()
-    .find('a').filter(vaildURL)
+    .find('a').filter(validate)
     .parent().addClass('active')
     .closest('.treeview-menu').addClass('menu-open')
     .closest('.treeview').addClass('active');
@@ -1550,93 +1061,80 @@ APP.menu = function() {
   menu.appendTo(parent);
 };
 
-APP.chart = {
-  line: function() {
-    require(['echarts', 'echarts/chart/line'], function(ec) {
-      $.getJSON('/api/line' + APP.url, function(data) {
-        ec.init(document.getElementById('line-chart'), 'macarons').setOption({
-          color: ['#00a65a', '#00c0ef', '#dd4b39'],
-          tooltip: {
-            trigger: 'axis'
-          },
-          legend: {
-            data: ['正面','中性','负面']
-          },
-          grid: {
-            x: 40,
-            y: 30,
-            x2: 25,
-            y2: 30
-          },
-          xAxis: [
-            {
-              type: 'category',
-              boundaryGap: false,
-              data: data.date
-            }
-          ],
-          yAxis: [
-            {
-              type : 'value'
-            }
-          ],
-          series: [
-            {
-              name: '正面',
-              type: 'line',
-              data: data.positive
-            },
-            {
-              name: '中性',
-              type: 'line',
-              data: data.neutral
-            },
-            {
-              name: '负面',
-              type: 'line',
-              data: data.negative
-            }
-          ]
-        });
-      });
-    });
-  },
+App.module.infoBox = function () {
+  var animate = function (index, element) {
+    var infoBoxNumber = $(element).find('.info-box-number'),
+        progressBar = $(element).find('.progress-bar'),
+        progressDescription = $(element).find('.progress-description'),
 
-  pie: function() {
-    require(['echarts', 'echarts/chart/pie'], function(ec) {
-      $.getJSON('/api/pie' + APP.url, function(data) {
-        ec.init(document.getElementById('pie-chart'), 'macarons').setOption({
-          tooltip: {
-            trigger: 'item',
-            formatter: '{a} <br/>{b} : {c} ({d}%)'
-          },
-          legend: {
-            data: data.name
-          },
-          series: [
-            {
-              name: '信息比例',
-              type: 'pie',
-              radius: '55%',
-              center: ['50%', '60%'],
-              data: data.value
-            }
-          ]
-        });
-      });
-    });
-  }
+        duration = 2000,
+        refreshInterval = 100,
+        loop = Math.floor(duration / refreshInterval),
+        loopCount = 0,
+
+        numberValue = 0,
+        numberFinal = $(element).data('number'),
+        numberIncrement = Math.floor(numberFinal / loop),
+
+        percentValue = 0,
+        percentFinal = $(element).data('percent'),
+        percentIncrement = Math.floor(percentFinal / loop),
+
+        intervalID,
+
+        countTo = function() {
+          numberValue += numberIncrement;
+          percentValue += percentIncrement;
+
+          loopCount++;
+
+          if (loopCount >= loop) {
+            clearInterval(intervalID);
+            numberValue = numberFinal;
+            percentValue = percentFinal;
+          }
+
+          infoBoxNumber.text( numberValue.toFixed() );
+          progressBar.width( percentValue + '%' );
+          progressDescription.text( '占总数据 ' + percentValue.toFixed() + '%' );
+        };
+
+    intervalID = setInterval(countTo, refreshInterval);
+  };
+
+  $('.info-box-content').each(animate);
 };
 
-APP.returnTop = function(el) {
+App.module.inspection = function () {
+  var $inspection = $('#inspection'),
+      $content    = $inspection.children('.box-body').find('tbody');
+
+  $content.load('/api/dashboard/local-inspection/');
+
+  $inspection.on('click', 'button', function (event) {
+    event.preventDefault();
+
+    if ( $(this).hasClass('active') ) {
+      return false;
+    }
+
+    $(this)
+      .addClass('active')
+      .siblings().removeClass('active');
+
+    $content.load('/api/dashboard/' + this.id + '/');
+  });
+};
+
+App.module.returnTop = function (el) {
   var top       = el.offset().top,
       scrollTop = top > 160 ? top - 120 : 0;
 
   $('body').animate({scrollTop: scrollTop});
 };
 
-APP.table = function() {
-  $('.table-custom').each(function() {
+App.module.table = function (module, path) {
+  $('.table-custom').each(function () {
     var $this       = $(this),
         $pagination = $this.parent(),
         content     = this.tBodies[0],
@@ -1660,21 +1158,16 @@ APP.table = function() {
           $(content).html(table);
         };
 
-    $.getJSON('/api' + APP.url + type + '/1/', function(data) {
+    $.getJSON('/api' + path + type + '/1/', function(data) {
       renderTable(data);
 
       $pagination.twbsPagination({
         totalPages: data.total,
         visiblePages: 7,
-        first: '第一页',
-        prev: '上一页',
-        next: '下一页',
-        last: '最后一页',
-        paginationClass: 'pagination pagination-sm no-margin pull-right',
         onPageClick: function(event, page) {
-          APP.returnTop($this);
+          module.returnTop($this);
 
-          $.getJSON('/api' + APP.url + type + '/' + page + '/', function(data) {
+          $.getJSON('/api' + path + type + '/' + page + '/', function(data) {
             renderTable(data);
             $pagination.twbsPagination({totalPages: data.total});
           });
@@ -1684,13 +1177,73 @@ APP.table = function() {
   });
 };
 
+App.module.collect = function (type, id) {
+  $('.collection').click(function () {
+    var star = $(this).find('i'),
+        text = $(this).find('span'),
 
-APP.dataTable = function() {
+        collect = function(api, nextAction) {
+          var data = {
+                type: type === 'news' ? 'article' : 'topic',
+                id: id
+              };
+
+          $.post(api, data, function(response) {
+            if (response.status) {
+              star.toggleClass('fa-star-o');
+              star.toggleClass('fa-star');
+              text.text(nextAction);
+            }
+          });
+        };
+
+    if ( star.hasClass('fa-star') ) {
+      collect('/api/collection/remove/', '添加收藏');
+    } else {
+      collect('/api/collection/add/', '取消收藏');
+    }
+  });
+};
+
+App.module.sns = function (module, path, type) {
+  var $sns = $('.sns');
+
+  $sns.each(function(index, element) {
+    var $content    = $(element),
+        $pagination = $content.parent().next(),
+
+        snsType = function() {
+          if (type === 'weixin' || type === 'weibo') {
+            return $pagination.data('type');
+          } else {
+            return $pagination.data('type').replace('-', '/');
+          }
+        };
+
+    $.getJSON('/api' + path + snsType() + '/1/', function(data) {
+      $content.html(data.html);
+
+      $pagination.twbsPagination({
+        totalPages: data.total,
+        onPageClick: function (event, page) {
+          module.returnTop($sns);
+          $.getJSON('/api' + path + snsType() + '/' + page + '/', function(data) {
+            $content.html(data.html);
+            $pagination.twbsPagination({totalPages: data.total});
+          });
+        }
+      });
+    });
+  });
+};
+
+App.module.dataTable = function (path) {
   $.fn.dataTable.ext.errMode = 'throw';
-  $('.initDataTable').each(function() {
+
+  $('.initDataTable').each(function () {
     var table = $(this).DataTable({
       'ajax': {
-        'url': '/api' + location.pathname,
+        'url': '/api' + path,
         'dataSrc': this.id,
         'cache': true
       },
@@ -1730,12 +1283,12 @@ APP.dataTable = function() {
       //   "targets": -1
       // }],
       'deferLoading': 100,
-      'drawCallback': function() {
+      'drawCallback': function () {
         $('[data-toggle="tooltip"]').tooltip();
       }
     });
 
-    table.on('click', 'tbody > tr', function() {
+    table.on('click', 'tbody > tr', function () {
       if ( $(this).hasClass('selected') ) {
         $(this).removeClass('selected');
       } else {
@@ -1746,7 +1299,7 @@ APP.dataTable = function() {
   });
 
 
-  // table.on('draw.dt', function() {
+  // table.on('draw.dt', function () {
   //   var collection = function(obj, api) {
   //     obj.each(function(index, element) {
   //       $(element).click(function(event) {
@@ -1778,44 +1331,7 @@ APP.dataTable = function() {
   // });
 };
 
-APP.sns = function() {
-  var $sns = $('.sns');
-
-  $sns.each(function(index, element) {
-    var $content    = $(element),
-        $pagination = $content.parent().next(),
-
-        type = function() {
-          if (APP.type === 'weixin' || APP.type === 'weibo') {
-            return $pagination.data('type');
-          } else {
-            return $pagination.data('type').replace('-', '/');
-          }
-        };
-
-    $.getJSON('/api' + APP.url + type() + '/1/', function(data) {
-      $content.html(data.html);
-
-      $pagination.twbsPagination({
-        totalPages: data.total,
-        first: '第一页',
-        prev: '上一页',
-        next: '下一页',
-        last: '最后一页',
-        paginationClass: 'pagination pagination-sm no-margin pull-right',
-        onPageClick: function(event, page) {
-          APP.returnTop($sns);
-          $.getJSON('/api' + APP.url + type() + '/' + page + '/', function(data) {
-            $content.html(data.html);
-            $pagination.twbsPagination({totalPages: data.total});
-          });
-        }
-      });
-    });
-  });
-};
-
-APP.custom = function() {
+App.module.custom = function () {
   var form     = document.forms.addKeyword,
       action   = form.action,
       elements = form.elements,
@@ -1850,105 +1366,94 @@ APP.custom = function() {
   }
 };
 
-APP.collection = function() {
-  $('.collection').click(function() {
-    var star = $(this).find('i'),
-        text = $(this).find('span'),
 
-        collect = function(api, nextAction) {
-          var urlArray = APP.url.split('/'),
-              data = {
-                type: urlArray[1] === 'news' ? 'article' : 'topic',
-                id: urlArray[2]
-              };
+//
+// Pages
+//
 
-          $.post(api, data, function(response) {
-            if (response.status) {
-              star.toggleClass('fa-star-o');
-              star.toggleClass('fa-star');
-              text.text(nextAction);
-            }
-          });
-        };
-
-    if ( star.hasClass('fa-star') ) {
-      collect('/api/collection/remove/', '添加收藏');
-    } else {
-      collect('/api/collection/add/', '取消收藏');
-    }
-  });
+// user
+App.page.login = function (module) {
+  module.login();
 };
 
-APP.dashboard = function() {
-  $('.info-box-content').each(function(index, element) {
-    var infoBoxNumber = $(element).find('.info-box-number'),
-        progressBar = $(element).find('.progress-bar'),
-        progressDescription = $(element).find('.progress-description'),
-
-        duration = 2000,
-        refreshInterval = 100,
-        loop = Math.floor(duration / refreshInterval),
-        loopCount = 0,
-
-        numberValue = 0,
-        numberFinal = $(element).data('number'),
-        numberIncrement = Math.floor(numberFinal / loop),
-
-        percentValue = 0,
-        percentFinal = $(element).data('percent'),
-        percentIncrement = Math.floor(percentFinal / loop),
-
-        intervalID,
-
-        countTo = function() {
-          numberValue += numberIncrement;
-          percentValue += percentIncrement;
-
-          loopCount++;
-
-          if (loopCount >= loop) {
-            clearInterval(intervalID);
-            numberValue = numberFinal;
-            percentValue = percentFinal;
-          }
-
-          infoBoxNumber.text( numberValue.toFixed() );
-          progressBar.width( percentValue + '%' );
-          progressDescription.text( '占总数据 ' + percentValue.toFixed() + '%' );
-        };
-
-    intervalID = setInterval(countTo, refreshInterval);
-  });
+App.page.settings = function (module) {
+  module.settings();
 };
 
-APP.product = function() {
-  $('.filter-list')
-    .find('a').filter(function() { return this.href === location.href; })
-    .parent().addClass('active');
+App.page.user = function (module) {
+  module.admin();
+  module.register();
 };
 
-APP.inspection = function () {
-  var $inspection = $('#inspection'),
-      $content    = $inspection.children('.box-body').find('tbody');
-
-  $content.load('/api/dashboard/local-inspection/');
-
-  $inspection.on('click', 'button', function (event) {
-    event.preventDefault();
-
-    if ( $(this).hasClass('active') ) {
-      return false;
-    }
-
-    $(this)
-      .addClass('active')
-      .siblings().removeClass('active');
-
-    $content.load('/api/dashboard/' + this.id + '/');
-  });
+// util
+App.page.dashboard = function (module, path) {
+  module.infoBox();
+  module.map(path);
+  $('.table-risk').showRisk();
+  module.line(path);
+  module.pie(path);
+  module.inspection();
 };
 
-APP.riskList = function () {
+App.page.news = function (module, path) {
+  module.table(module, path);
+};
+
+App.page.newsDetail = function (module, path, type, id) {
+  module.collect(type, id);
+};
+
+App.page.event = function (module, path) {
+  module.table(module, path);
+};
+
+App.page.eventDetail = function (module, path, type, id) {
+  module.collect(type, id);
+  module.line(path, type);
+  module.pie(path, type);
+  module.table(module, path);
+  module.sns(module, path, type);
+};
+
+App.page.weixin = function (module, path, type) {
+  module.sns(module, path, type);
+};
+
+App.page.weixinDetail = function () {
+  // placeholder for future usage
+};
+
+App.page.weibo = function (module, path, type) {
+  module.sns(module, path, type);
+};
+
+App.page.categoryDetail = function (module, path) {
+  module.table(module, path);
+};
+
+App.page.locationDetail = function (module, path, type) {
+  module.table(module, path);
+  module.sns(module, path, type);
+};
+
+App.page.inspection = function (module, path) {
+  module.dataTable(path);
+};
+
+App.page.custom = function (module) {
+  module.custom();
+};
+
+App.page.customDetail = function (module, path, type) {
+  module.table(module, path);
+  module.sns(module, path, type);
+};
+
+App.page.collection = function (module, path) {
+  module.table(module, path);
+};
+
+App.page.risk = function (module) {
   var $risk = $('#risk'),
       $paginationContainer = $risk.parent(),
 
@@ -1973,13 +1478,8 @@ APP.riskList = function () {
     $paginationContainer.twbsPagination({
       totalPages: data.total,
       visiblePages: 7,
-      first: '第一页',
-      prev: '上一页',
-      next: '下一页',
-      last: '最后一页',
-      paginationClass: 'pagination pagination-sm no-margin pull-right',
       onPageClick: function(event, pageNumber) {
-        APP.returnTop($(this));
+        module.returnTop($(this));
         $.get(toAPI(pageNumber), function(data) {
           renderTable(data.html);
           $paginationContainer.twbsPagination({totalPages: data.total});
@@ -1989,110 +1489,10 @@ APP.riskList = function () {
   });
 };
 
-//
-// url based router
-//
 
-$(function() {
-  var router = {
-    common: function() {
-      APP.search();
-      APP.menu();
-    },
-    login: function() {
-      APP.user.login();
-    },
-    dashboard: function() {
-      this.common();
-      APP.dashboard();
-      APP.inspection();
-      $('.table-risk').showRisk();
-      APP.chart.line();
-      APP.chart.pie();
-    },
-    news: function() {
-      this.common();
-      APP.table();
-    },
-    newsItem: function() {
-      this.common();
-      APP.collection();
-    },
-    event: function() {
-      this.common();
-      APP.table();
-    },
-    eventItem: function() {
-      this.common();
-      APP.collection();
-      APP.chart.line();
-      APP.chart.pie();
-      APP.table();
-      APP.sns();
-    },
-    weixin: function() {
-      this.common();
-      APP.sns();
-    },
-    weibo: function() {
-      this.weixin();
-    },
-    weixinItem: function() {
-      this.common();
-    },
-    categoryItem: function() {
-      this.common();
-      APP.table();
-    },
-    locationItem: function() {
-      this.common();
-      APP.table();
-      APP.sns();
-    },
-    inspection: function() {
-      this.common();
-      APP.dataTable();
-    },
-    custom: function() {
-      this.common();
-      APP.custom();
-    },
-    customItem: function() {
-      this.common();
-      APP.table();
-      APP.sns();
-    },
-    product: function() {
-      this.common();
-      APP.product();
-      APP.table();
-    },
-    productItem: function() {
-      this.common();
-      this.product();
-    },
-    risk: function() {
-      this.common();
-      APP.riskList();
-    },
-    collection: function() {
-      this.common();
-      APP.table();
-    },
-    settings: function() {
-      this.common();
-      APP.user.change();
-    },
-    user: function() {
-      this.common();
-      APP.user.admin();
-      APP.user.add();
-    },
-    searchItem: function() {
-      this.common();
-      APP.dataTable();
-    }
-  };
-
-  return router[APP.type]();
+//
+// Initialization
+//
+$(function () {
+  App.route();
 });

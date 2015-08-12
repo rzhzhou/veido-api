@@ -52,4 +52,5 @@ urlpatterns += patterns('api.views',
     url(r'^pie/$', 'chart_pie_index_view'),
     url(r'^line/event/(\d+)/$', 'chart_line_event_view'),
     url(r'^pie/event/(\d+)/$', 'chart_pie_event_view'),
+    url(r'^map/$', 'map_view'),
     )

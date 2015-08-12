@@ -32,7 +32,8 @@ def sidebarUtil(request):
         "news": conf.get(username, "news"),
         "event": conf.get(username, "event"),
         "location": conf.get(username, "location"),
-        "custom":conf.get(username, "custom")
+        "custom":conf.get(username, "custom"),
+        "site":conf.get(username, "site")
     }
     return sidebar_name
 

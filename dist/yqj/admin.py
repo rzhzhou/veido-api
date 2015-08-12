@@ -135,13 +135,31 @@ class TopicAdmin(admin.ModelAdmin):
     list_filter = ('source',)
     search_fields = ('title', 'source')
     #
-    def save_model(self,request, obj, form, change):
+    def save_model(self, request, obj, form, change):
         obj.keywords = jieba.analyse.extract_tags(obj.title, topK=3, withWeight=True, allowPOS=())
          # return <type 'list'> contain tuple
 
         if not change:
             CrawlerTask(obj.title, 'zjld', u"事件").type_task()
+        else:
+            key_list = Topic.objects.filter(id=obj.id)
+            if not key_list:
+                return
+            old_keyword = key_list[0].title
+            if old_keyword == obj.title:
+                return
+            CrawlerTask(obj.title, "zjld", u"事件").update_task(old_keyword)
         obj.save()
+
+    def delete_model(self, request, obj,):
+        key_list = Topic.objects.filter(id=obj.id)
+        if not key_list:
+            return
+        del_index = key_list[0].title
+        if not del_index:
+            return
+        CrawlerTask(del_index, "zjld", u"事件").del_task()
+        obj.delete()
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "area":

@@ -27,6 +27,9 @@ from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
 from yqj.redisconnect import RedisQueryApi
 from django.db import connection
+import requests
+import json
+from api import map2alive  
 
 def login_view(request):
     try:
@@ -936,10 +939,18 @@ def upload_image(request):
     try:
         f = request.FILES['image']
     except KeyError:
-        return HttpResponse(status=400)
+        return HttpResponseRedirect('/settings/')
 
     media_path = settings.MEDIA_ROOT
     filename = str(user.id) + os.path.splitext(f.name)[1]
+    file_list = os.listdir(media_path)
+    name_list =  map(lambda x: x.split('.')[0], file_list)
+
+    count = 0
+    for i in name_list :
+        if i == str(user.id):
+            os.remove(media_path + '/' + file_list[count])
+        count += 1
 
     try:
         new_file = open(os.path.join(media_path, filename), 'w')
@@ -1128,4 +1139,31 @@ def chart_pie_event_view(request, topic_id):
              {u'name': u'自媒体', u'value': topic.weibo.count()+topic.weixin.count()}]
     value = [item for item in value if item['value']]
     return JsonResponse({u'name': name, u'value': value})
+
+
+def map_view(request):
+    # login_url = "http://192.168.0.215/auth"
+    # login_data = {
+    #     "u": "wuhanzhijian", 
+    #     "p": "aebcb993a42143aa78b76a57666ec77d6bb55bec",
+    # }
+    # login_res = requests.post(login_url,data=login_data)
+    # login_json = json.loads(login_res.text)
+    # login_cookie = login_json["token"]
+    login_cookie = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhY2NvdW50X2l"\
+        "kIjoxLCJ1c2VyX2lkIjoxLCJhX25hbWUiOiJ3dWhhbnpoaWppYW4iLCJhX3JlYWx"\
+        "uYW1lIjoi566h55CG5ZGYIiwiYV9wd2QiOiI3YjNkNzgzMzFlNDQ0YzNmODBkO"\
+        "Dc1Njc4YjA1ODkyYmFiMmY1MTU3IiwiYV9waG9uZSI6bnVsbCwiYV9lbWFpbCI6"\
+        "Ind1aGFuemhpamlhbkBzaGVuZHUuaW5mbyIsImFfbG9nbyI6bnVsbCwic3Rh"\
+        "dHVzIjoxLCJzeXN0ZW1faWQiOjEsImlzcm9vdCI6MSwiU3lzQWNjb3VudFNhbHQiO"\
+        "nsic2FsdCI6ImZjMDhlNDFlZjkzZjIwYTYyYjhmY2I4ODc1ZThmNTJmZTJkZGExYTkifX0.x4IP"\
+        "k4Cnka7Z2izoZ2uTMjh7lzpsrJA3zs7hWTqnhFk"
+    url = "http://192.168.0.215/api/dashboard?ed=2015-07-23&edId=9335&sd=2015-06-23&sdId=9305"
+    headers = {
+        "Authorization" : "Bearer "+login_cookie,
+    }
+    res = requests.get(url, headers=headers)
+    data = json.loads(res.text)
+    risk_data = data["regionData"]
+    return JsonResponse({"regionData": risk_data })
 
