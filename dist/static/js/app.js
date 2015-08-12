@@ -552,6 +552,14 @@ function _init() {
   $.extend($.fn.twbsPagination.defaults, options);
 }());
 
+// moment
+(function () {
+  if (typeof moment !== 'function') {
+    throw new Error('moment required');
+  }
+
+  moment.defaultFormat = 'YYYY-MM-DD';
+}());
 
 //
 // Application
@@ -1179,11 +1187,11 @@ App.module.custom = function () {
 };
 
 App.module.dateRange = (function () {
-  var show = function ($label, start, end) {
-        $label.html(start + ' ~ ' + end);
+  var show = function ($el, start, end) {
+        $el.children('span').html(start + ' ~ ' + end);
       },
 
-      init = function ($el, fn) {
+      init = function ($el, start, end, callback) {
         $el.daterangepicker({
           ranges: {
             '过去7天': [moment().subtract(6, 'days'), moment()],
@@ -1208,7 +1216,7 @@ App.module.dateRange = (function () {
           'parentEl': '.content-header',
           'applyClass': 'btn-success',
           'cancelClass': 'btn-default'
-        }, fn);
+        }, callback);
       };
 
   return {
@@ -1216,6 +1224,18 @@ App.module.dateRange = (function () {
     init: init
   };
 }());
+
+App.module.statistic = function ($el, api) {
+  var $total = $el.find('.statistic-total > span'),
+      $risk = $el.find('.statistic-risk > span');
+
+  $el.on('dateChange', function (event, start, end) {
+    $.getJSON(api, {type: 'statistic', start: start, end: end}, function (statistic) {
+      $total.text(statistic.total);
+      $risk.text(statistic.risk);
+    });
+  });
+};
 
 App.module.dataList = function (module, $dataList, api, start, end) {
   $dataList.on('showDataList', function () {
@@ -1348,17 +1368,12 @@ App.page.collection = function (module, path) {
 };
 
 App.page.analyticsDetail = function (module, path, type, id) {
-  var start = '',
-      end = '',
-      api = '/api' + path,
-      $dateRangePicker = $('.date-range-picker'),
-      $dateRangeLabel = $dateRangePicker.children('span'),
+  var api = '/api' + path,
+      $el = $('.date-range-picker'),
       $chart = $('#chart'),
       $statistic = $('#statistic'),
-      // $dataList = $('#data-list'),
-      $statisticTotal = $('.statistic-total').children('span'),
-      $statisticRisk = $('.statistic-risk').children('span'),
-
+      start = moment().subtract(6, 'days').format(),
+      end = moment().format(),
       chart = {
         trend: function (start, end) {
           $.getJSON(api, {type: 'chart-trend', start: start, end: end}, function (data) {
@@ -1675,52 +1690,30 @@ App.page.analyticsDetail = function (module, path, type, id) {
       showChart = function () {
         var chartType = $chart.find('.tab-pane.active')[0].id.slice(6);
         chart[chartType](start, end);
-      },
-
-      showStatistic = function () {
-        $.getJSON(api, {type: 'statistic', start: start, end: end}, function (statistic) {
-          $statisticTotal.text(statistic.total);
-          $statisticRisk.text(statistic.risk);
-        });
-      },
-
-      showAnalytics = function (startMoment, endMoment) {
-        start = startMoment.format('YYYY-MM-DD');
-        end   = endMoment.format('YYYY-MM-DD');
-
-        module.dateRange.show($dateRangeLabel, start, end);
-
-        $chart
-          .trigger('showChart')
-          .off('shown.bs.tab')
-          .on('shown.bs.tab', showChart);
-
-        $statistic.trigger('showStatistic');
-
-        // $dataList.trigger('showDataList');
       };
 
-  $chart.on('showChart', showChart);
+  module.dateRange.show($el, start, end);
+  module.dateRange.init($el, start, end);
 
-  $statistic.on('showStatistic', showStatistic);
+  module.statistic($statistic, api);
 
-  // module.dataList(module, $dataList, api, start, end);
+  $chart.on({
+    'dateChange': showChart,
+    'shown.bs.tab': showChart
+  });
 
-  module.dateRange.init($dateRangePicker, showAnalytics);
+  $el.on('apply.daterangepicker', function (event, picker) {
+    start = picker.startDate.format();
+    end = picker.endDate.format();
 
-  showAnalytics(moment().subtract(6, 'days'), moment());
+    module.dateRange.show($el, start, end);
 
+    $chart.trigger('dateChange');
+    $statistic.trigger('dateChange', [start, end]);
+  });
 
-  if (id === 0) {
-    start = moment().subtract(6, 'days').format('YYYY-MM-DD');
-    end = moment().format('YYYY-MM-DD');
-
-    for (type in chart) {
-      if(chart.hasOwnProperty(type)) {
-        chart[type](start, end);
-      }
-    }
-  }
+  $chart.trigger('dateChange');
+  $statistic.trigger('dateChange', [start, end]);
 };
 
 
