@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
+from dateutil.relativedelta import relativedelta
 
 from django.http import HttpResponse
 from django.db.models import Q
@@ -21,33 +22,38 @@ class DispatchView(APIView, BaseTemplateView):
         parameter = request.GET
         try:
             type = parameter['type'].replace('-', '_')
-            start = parameter['start']
-            end = parameter['end']
-            cache = int(parameter['cache']) if parameter.has_key('cache') else 0
+            start = parse_date(parameter['start'])
+            end = parse_date(parameter['end']) + timedelta(days=1)
+            cache = int(parameter['cache']) if parameter.has_key('cache') else 1
             func = getattr(globals()['DispatchView'](), type)
 
-            if not cache:
-                return func(start, end)
+            if cache:
+                now = datetime.now()
+                today = date(now.year, now.month, now.day) + timedelta(days=1)
+                first_day_of_month = date(now.year, now.month, 1)
+                date_range = (end - start).days
 
-            date_range = RedisQueryApi().hget('cache', 'date_range')
-            if date_range:
-                date_start = datetime.strptime(eval(date_range)['start'], '%Y-%m-%d')
-                date_end = datetime.strptime(eval(date_range)['end'], '%Y-%m-%d')
-                start_time = datetime.strptime(start, '%Y-%m-%d')
-                end_time = datetime.strptime(end, '%Y-%m-%d')
-                if date_start==start_time and date_end==end_time:
-                    data = RedisQueryApi().hget('cache', type)
-                    result = eval(data) if data else []
-                    if result:
-                        return Response(result)
+                data = None
+
+                if end == today and date_range == 7:
+                    data = RedisQueryApi().hget('CacheSevenDays', type)
+                elif end == today and date_range == 30:
+                    data = RedisQueryApi().hget('CacheThrityDays', type)
+                elif end == today and start == first_day_of_month:
+                    data = RedisQueryApi().hget('CacheThisMonth', type)
+                elif end == first_day_of_month and start == first_day_of_month - relativedelta(months=1):
+                    data = RedisQueryApi().hget('CacheLastMonth', type)
+
+                if data:
+                    return Response(eval(data))
+
             return func(start, end)
+
         except Exception, e:
             return Response({})
 
 
     def statistic(self, start, end):
-        start = parse_date(start)
-        end = parse_date(end)
         total = Article.objects.filter(pubtime__range=(start, end)).count()
         event_count = Category.objects.get(name=u'事件').articles.filter(pubtime__range=(start, end)).count()
         hot_count = Category.objects.get(name=u'质监热点').articles.filter(pubtime__range=(start, end)).count()
@@ -57,16 +63,12 @@ class DispatchView(APIView, BaseTemplateView):
         return Response({'total': total, 'risk': risk})
 
     def chart_type(self, start, end):
-        start = parse_date(start)
-        end = parse_date(end)
         article = Article.objects.filter(pubtime__range=(start,end)).count()
         weixin = Weixin.objects.filter(pubtime__range=(start,end)).count()
         weibo = Weibo.objects.filter(pubtime__range=(start,end)).count()
         return Response({'news': article, 'weixin': weixin, 'weibo': weibo})
 
     def chart_emotion(self, start, end):
-        start = parse_date(start)
-        end = parse_date(end)
         positive = Article.objects.filter(pubtime__range=(start,end),
                 feeling_factor__gte=0.6).count()
         normal = Article.objects.filter(pubtime__range=(start,end),
@@ -77,8 +79,6 @@ class DispatchView(APIView, BaseTemplateView):
         return Response({'positive':positive, 'normal': normal, 'negative': negative})
 
     def chart_weibo(self, start, end):
-        start = parse_date(start)
-        end = parse_date(end)
         provice_count = []
         provinces = Area.objects.filter(level=2)
         for province in provinces:
@@ -89,12 +89,11 @@ class DispatchView(APIView, BaseTemplateView):
             provice_count.append({'name': province.name, 'value': count})
         sort_result = sorted(provice_count, key=lambda x:x['value'])[-10:]
         name = map(lambda n: n['name'], sort_result)
+        print name
         value = map(lambda v: v['value'], sort_result)
         return Response({'provice_count':provice_count, 'name': name, 'value': value})
 
     def chart_trend(self, start, end):
-        start = parse_date(start)
-        end = parse_date(end)
         days = (end - start).days
         date = [(start + timedelta(days=x)) for x in xrange(days)]
 
