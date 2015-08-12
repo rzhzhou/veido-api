@@ -1496,7 +1496,7 @@ App.page.analyticsDetail = function (module, path, type, id) {
         },
 
         emotion: function (start, end) {
-          $.getJSON(api, { type : 'chart_emotion', start : start, end : end},function(data) {
+          $.getJSON(api, { type : 'chart-emotion', start : start, end : end},function(data) {
             echarts.init(document.getElementById('chart-emotion')).setOption({
               tooltip : {
                 backgroundColor:'rgba(50,50,50,0.5)',
