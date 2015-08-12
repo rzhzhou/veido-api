@@ -79,8 +79,10 @@ class DispatchView(APIView, BaseTemplateView):
             areas_id = Area.objects.filter(Q(parent_id__in=city_id)|Q(parent_id=province.id)|Q(id=province.id))
             count = Weibo.objects.filter(area__in=areas_id, pubtime__range=(start,end)).count()
             provice_count.append({'name': province.name, 'value': count})
-        sort_result = sorted(provice_count, key=lambda x:x['value'])[-6:]
-        return Response({'provice_count':provice_count, 'sort_result': sort_result})
+        sort_result = sorted(provice_count, key=lambda x:x['value'])[-10:]
+        name = map(lambda n: n['name'], sort_result)
+        value = map(lambda v: v['value'], sort_result)
+        return Response({'provice_count':provice_count, 'name': name, 'value': value})
 
     def chart_trend(self, start, end):
         start = parse_date(start)
