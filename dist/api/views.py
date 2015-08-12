@@ -875,10 +875,18 @@ def upload_image(request):
     try:
         f = request.FILES['image']
     except KeyError:
-        return HttpResponse(status=400)
+        return HttpResponseRedirect('/settings/')
 
     media_path = settings.MEDIA_ROOT
     filename = str(user.id) + os.path.splitext(f.name)[1]
+    file_list = os.listdir(media_path)
+    name_list =  map(lambda x: x.split('.')[0], file_list)
+
+    count = 0
+    for i in name_list :
+        if i == str(user.id):
+            os.remove(media_path + '/' + file_list[count])
+        count += 1
 
     try:
         new_file = open(os.path.join(media_path, filename), 'w')
