@@ -1377,122 +1377,122 @@ App.page.analyticsDetail = function (module, path, type, id) {
       chart = {
         trend: function (start, end) {
           $.getJSON(api, {type: 'chart-trend', start: start, end: end}, function (data) {
-               echarts.init(document .getElementById('chart-trend'), 'macarons').setOption({
-                  tooltip : {
-                    backgroundColor:'rgba(50,50,50,0.5)',
-                    trigger:'axis',
-                    axisPointer : {
-                      type : 'line',
-                      lineStyle : {
-                        color : '#008acd',
-                      }
-                    }
+            echarts.init(document .getElementById('chart-trend'), 'macarons').setOption({
+              tooltip : {
+                backgroundColor:'rgba(50,50,50,0.5)',
+                trigger:'axis',
+                axisPointer : {
+                  type : 'line',
+                  lineStyle : {
+                    color : '#008acd',
+                  }
+                }
+              },
+              shadowStyle : {
+                color : 'rgba(200,200,200,0.2)'
+              },
+              legend : {
+                data : ['全部' , '新闻' ,  '微博' ,   '微信']
+              },
+              grid: {
+                x: 50,
+                y: 30,
+                x2: 25,
+                y2: 65
+               },
+              toolbox: {
+                show: true,
+                feature: {
+                  mark: {
+                    show: false
                   },
-                  shadowStyle : {
-                    color : 'rgba(200,200,200,0.2)'
-                  },
-                  legend : {
-                    data : ['全部' , '新闻' ,  '微博' ,   '微信']
-                  },
-                  grid: {
-                    x: 50,
-                    y: 30,
-                    x2: 25,
-                    y2: 65
-                   },
-                  toolbox: {
+                 dataView: {
                     show: true,
-                    feature: {
-                      mark: {
-                        show: false
-                      },
-                     dataView: {
-                        show: true,
-                        readOnly: false
-                      },
-                      magicType: {
-                        show: false,
-                        type: ['line']
-                      },
-                      restore: {
-                        show: false
-                       },
-                       saveAsImage: {
-                         show: true
-                        }
-                      }
-                    },
-                    calculable: true,
-                    xAxis: [{
-                      type: 'category',
-                      boundaryGap: false,
-                      data: data.date
-                    }],
-                    yAxis: [{
-                      type: 'value'
-                    }],
-                    series: [{
-                      name: '全部',
-                      type: 'line',
-                      data:data.total_data
-                    },
-                    {
-                      name: '新闻',
-                      type: 'line',
-                      data:data.news_data
-                      },
-                      {
-                      name: '微博',
-                      type: 'line',
-                      data:data.weibo_data
-                      },
-                      {
-                      name: '微信',
-                      type: 'line',
-                      data:data.weixin_data
-                      },
-                      ]
-                 });
-             });
+                    readOnly: false
+                  },
+                  magicType: {
+                    show: false,
+                    type: ['line']
+                  },
+                  restore: {
+                    show: false
+                   },
+                   saveAsImage: {
+                     show: true
+                    }
+                  }
+                },
+                calculable: true,
+                xAxis: [{
+                  type: 'category',
+                  boundaryGap: false,
+                  data: data.date
+                }],
+                yAxis: [{
+                  type: 'value'
+                }],
+                series: [{
+                  name: '全部',
+                  type: 'line',
+                  data:data.total
+                },
+                {
+                  name: '新闻',
+                  type: 'line',
+                  data:data.news
+                  },
+                  {
+                  name: '微博',
+                  type: 'line',
+                  data:data.weibo
+                  },
+                  {
+                  name: '微信',
+                  type: 'line',
+                  data:data.weixin
+                  },
+                ]
+            });
+          });
         },
 
         type: function (start, end) {
           $.getJSON(api, {type: 'chart-type', start: start, end: end}, function (data) {
-                echarts.init(document.getElementById('chart-type')).setOption({
-                 tooltip : {
-                  backgroundColor:'rgba(50,50,50,0.5)',
-                  trigger: 'item',
-                  formatter: "{a} <br/>{b} : {c} ({d}%)"
-                 },
-                 legend: {
-                   orient : 'vertical',
-                   x : 'left',
-                   y : 'bottom',
-                   data:['新闻','微博','微信']
-                 },
-                 toolbox: {
-                   show : true,
-                   feature : {
-                     dataView : {show: true, readOnly: false},
-                     saveAsImage : {show: true}
-                   }
-                 },
-                 calculable : true,
-                 series : [
-                   {
-                      name:'访问来源',
-                      type:'pie',
-                      radius : '55%',
-                      center: ['50%', '60%'],
-                      data:[
-                        {value:data.news, name:'新闻'},
-                        {value:data.weibo, name:'微博'},
-                        {value:data.weixin, name:'微信'}
-                      ]
-                   }
-                 ]
-                });
-             });
+            echarts.init(document.getElementById('chart-type')).setOption({
+              tooltip : {
+                backgroundColor:'rgba(50,50,50,0.5)',
+                trigger : 'item',
+                formatter : '{a} <br/>{b} : {c} ({d}%)'
+              },
+              legend: {
+                orient : 'vertical',
+                x : 'left',
+                y : 'bottom',
+                data : ['新闻','微博','微信']
+              },
+              toolbox : {
+                show : true,
+                feature : {
+                  dataView : {show: true, readOnly: false},
+                  saveAsImage : {show : true,}
+                }
+              },
+              calculable : true,
+              series : [
+                {
+                  name : '访问来源',
+                  type : 'pie',
+                  radius : '55%',
+                  center : ['50%', '60%'],
+                  data : [
+                     {value : data.news, name:'新闻'},
+                     {value : data.weibo, name:'微博'},
+                     {value : data.weixin, name:'微信'}
+                  ]
+                }
+              ]
+            });
+          });
         },
 
         emotion: function (start, end) {
