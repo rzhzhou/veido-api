@@ -1715,15 +1715,6 @@ App.page.analyticsDetail = function (module, path, type, id) {
 
   $chart.trigger('dateChange');
   $statistic.trigger('dateChange', [start, end]);
-
-
-  if (id === 0) {
-    for (var name in chart) {
-      if(chart.hasOwnProperty(type)) {
-        chart[name](start, end);
-      }
-    }
-  }
 };
 
 
