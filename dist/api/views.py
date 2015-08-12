@@ -1,7 +1,7 @@
 #coding=utf-8
 
 import os
-import datetime
+from datetime import datetime 
 from collections import defaultdict
 from dateutil.relativedelta import relativedelta
 from django.views.generic import View
@@ -277,27 +277,27 @@ class RisksTableView(TableAPIView):
         company = user.group.company
         group = Group.objects.get(company=company).id
         score_list = LocaltionScore.objects.filter(group=group)
-        socre_id = []
+        risk_id = []
         for item in score_list:
-            socre_id.append(item.article_id)
+            risk_id.append(item.risk_id)
 
-        article_list = Article.objects.filter(id__in=socre_id)
+        risk_lists = Risk.objects.filter(id__in=risk_id)
         risk_list = []
-        for item in article_list:
+        for item in risk_lists:
             data = {}
             try:
-                relevance = LocaltionScore.objects.get(article_id=item.id).score
+                relevance = LocaltionScore.objects.get(risk_id=item.id).score
             except LocaltionScore.DoesNotExist:
                 relevance = 0
             try:
-                score = RiskScore.objects.get(article=item.id).score
+                score = RiskScore.objects.get(risk=item.id).score
             except RiskScore.DoesNotExist:
                 score = 0
             data['relevance'] = relevance
             data['title'] = item.title
             data['source'] = item.source
             data['score'] = score
-            data['pubtime'] = item.pubtime
+            data['pubtime'] = datetime.now()
             data['id'] = item.id
             risk_list.append(data)
         return risk_list

@@ -1,8 +1,7 @@
 #coding=utf-8
 import os
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta
 import ConfigParser
-import time
 
 from django.utils import timezone
 from django.conf import settings
@@ -33,8 +32,7 @@ def sidebarUtil(request):
         "news": conf.get(username, "news"),
         "event": conf.get(username, "event"),
         "location": conf.get(username, "location"),
-        "custom":conf.get(username, "custom"),
-        "site":conf.get(username, "site")
+        "custom":conf.get(username, "custom")
     }
     return sidebar_name
 
@@ -71,7 +69,46 @@ def index_view(request):
         news_list_number = event_list_number = 10
         weixin_list_number = weibo_list_number = 5
 
-        news_list = Article.objects.filter(pubtime__gt= date.today(), website_type='hot')[:10]
+        start_date = datetime.now() + timedelta(days=-7)
+        # news_lists = Article.objects.filter(website_type='hot', pubtime__gt=start_date).order_by('-pubtime')[:news_list_number]
+        # news_lists = Category.objects.get(name='质监热点').articles.filter(pubtime__gt=start_date).order_by('-pubtime')[:news_list_number]
+        custom_id_list=[]
+        keywords = CustomKeyword.objects.filter(group_id=4)
+        #group_id = 4
+        for keyword in keywords:
+            custom_id = keyword.custom_id
+            if custom_id:
+                custom_id_list.append(custom_id)
+
+        # custom_set = Custom.objects.filter(id__in=custom_id_list)
+        # article_set = [i.articles.all() for i in custom_set]
+        # article_set_list = reduce(lambda x, y: list(set(x).union(set(y))), article_set)
+        # article_id = [article_set_list[i].id for i in range(len(article_set_list))]
+        try:
+            cursor = connection.cursor()
+            sql = 'select article_id from custom_articles where %s'\
+                %(
+                    reduce(
+                        lambda x, y: x + " or " + y,
+                        ["custom_id=%s" for x in custom_id_list]
+                        )
+                    )
+            cursor.execute(sql,custom_id_list)
+            row = cursor.fetchall()
+            article_id = []
+            for r in row:
+                article_id.append(r[0])
+        except:
+            article_id = []
+
+        hot_list = Category.objects.get(name='质监热点').articles.all()
+        for n in hot_list:
+            article_id.append(n.id)
+
+        news_list = Article.objects.filter(id__in=article_id)[:10]
+
+
+
         for item in news_list:
             try:
                 setattr(item, 'hot_index', RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count())
@@ -86,7 +123,7 @@ def index_view(request):
                 setattr(iteml, 'time', datetime.now().strftime('%Y-%m-%d'))
         event_list=sorted(event_list, key=lambda x: x.time, reverse=True)[:event_list_number]
         for item in event_list:
-             setattr(item, 'hot_index', item.articles.all().count()+item.weixin.all().count()+item.weibo.all().count())
+            setattr(item, 'hot_index', item.articles.all().count()+item.weixin.all().count()+item.weibo.all().count())
 
         weibo_data = [eval(item) for item in RedisQueryApi().lrange('sort_weibohot', 0, -1)[:5]]
         for data in weibo_data:
@@ -103,27 +140,28 @@ def index_view(request):
 
         group = Group.objects.get(company=user.company).id
         score_list = LocaltionScore.objects.filter(group=group)
+
         risk_id = []
         for item in score_list:
             risk_id.append(item.risk_id)
 
-        risk = Risk.objects.filter(id__in=risk_id)[:6]    
+        risk_lists = Risk.objects.filter(id__in=risk_id)[:6]
         risk_list = []
-        for item in risk:
+        for item in risk_lists:
             data = {}
             try:
-                relevance = LocaltionScore.objects.get(risk=item.id).score
-            except:
+                relevance = LocaltionScore.objects.get(risk_id=item.id).score
+            except LocaltionScore.DoesNotExist:
                 relevance = 0
             try:
                 score = RiskScore.objects.get(risk=item.id).score
             except RiskScore.DoesNotExist:
                 score = 0
-            data['relevance'] = 0       #relevance
+            data['relevance'] = relevance
             data['title'] = item.title
             data['source'] = item.source
-            data['score'] = 0 #score
-            data['time'] = item.pubtime
+            data['score'] = score
+            data['time'] =  datetime.now()
             data['id'] = item.id
             risk_list.append(data)
             
@@ -273,25 +311,28 @@ class RisksView(BaseView):
 
 class RisksDetailView(BaseView):
     def get(self, request, risk_id):
-        sidebar_name = sidebarUtil(request)
         try:
             risk_id = int(risk_id)
-            risk = Risk.objects.get(id=risk_id)
-            eval_keywords_list = eval(risk.keywords) if risk.keywords else []
-            keywords_list = [{"name": name, "number": number} for name, number in eval_keywords_list]
-        except Risk.DoesNotExist:
-            return self.render_to_response('risk/risk.html', {'risk': '', 'weixin_list': [], 'weibo_list': [], 'name': sidebar_name})
+            risk_article = Article.objects.get(id=risk_id)
+        except Article.DoesNotExist:
+            return self.render_to_response('news/news.html', {'article': '', 'relate': []})
+
+        try:
+            r = RelatedData.objects.filter(uuid=risk_article.uuid)[0]
+            relateddata = list(r.articles.all())
+        except IndexError:
+            relateddata = []
+
         user = self.request.myuser
         try:
             collection = user.collection
         except Collection.DoesNotExist:
             collection = Collection(user=user)
             collection.save(using='master')
-        # this my problem  events 
-        items = user.collection.events.all()
-        iscollected = any(filter(lambda x: x.id == risk.id, items))
+        items = user.collection.articles.all()
+        iscollected = any(filter(lambda x: x.id == risk_article.id, items))
         sidebar_name = sidebarUtil(request)
-        return self.render_to_response('risk/risk.html', {'risk': risk,  'keywords_list': keywords_list, 'isCollected': iscollected, 'name': sidebar_name})
+        return self.render_to_response('news/news.html', {'article': SetLogo(risk_article), 'relate': relateddata,  'isCollected': iscollected, 'name': sidebar_name})
 
 
 class NewsView(BaseView):
