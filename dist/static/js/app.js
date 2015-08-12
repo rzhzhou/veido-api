@@ -854,6 +854,167 @@ App.module.pie = function (path) {
   });
 };
 
+App.module.map = function (path) {
+  $.getJSON('/api/map/' , function (result) {
+    var city = result.regionData,
+        data = [],
+        city2;
+
+    for (var c in city) {
+      data[c] = city[c].rank;
+      switch (data[c]) {
+      case 'A':
+        data[c] = 1;
+        break;
+      case 'B':
+        data[c] = 1;
+        break;
+      case 'C':
+        data[c] = 2;
+        break;
+      case 'D':
+        data[c] = 3;
+        break;
+      case 'E':
+        data[c] = 3;
+        break;
+      default:
+        data[c] = 3;
+        break;
+      }
+    }
+
+    echarts.util.mapData.params.params.wh = {
+      getGeoJson: function (callback) {
+      $.getJSON('/static/wh.json', callback);
+      }
+    };
+
+    echarts.init(document.getElementById('map-chart')).setOption({
+      title: {
+        subtext: ''
+      },
+      tooltip: {
+        trigger: 'item',
+        formatter: function(a) {
+          for (var i in city) {
+            if (a[1] == city[i].region_name) {
+              city2 = data[i];
+              switch (city2) {
+              case 1:
+                city2 = 'A';
+                break;
+              case 2:
+                city2 = 'B';
+                break;
+              case 3:
+                city2 = 'C';
+                break;
+              default:
+                city2 = 'erro';
+                break;
+              }
+            }
+          }
+          return a[1] + '<br>' + '风险等级  ' + city2;
+        }
+      },
+      legend: {
+        orient: 'vertical',
+        x: 'right',
+        data: ['']
+      },
+      dataRange: {
+        min: 0,
+        max: 3,
+        splitNumber: 3,
+        color: ['#fa9529', '#fff26e', '#cee19e', ],
+        formatter: function(v, v2) {
+          if (v2 == '1') {
+            return 'A' + '-低风险';
+          } else if (v2 == '2') {
+            return 'B' + '-中风险';
+          } else if (v2 == '3') {
+            return 'C' + '-高风险';
+          }
+        },
+        x: "right"
+      },
+      series: [{
+        name: '数据名称',
+        type: 'map',
+        mapType: 'wh',
+        selectedMode: 'single',
+        itemStyle: {
+          normal: {
+            label: {
+              show: false
+            }
+          },
+          //区域名称
+          emphasis: {
+            label: {
+              show: true
+            }
+          }
+        },
+        data: [{
+          name: '江岸区',
+          value: data[4]
+        },
+        {
+          name: '江汉区',
+          value: data[6]
+        },
+        {
+          name: '硚口区',
+          value: data[10]
+        },
+        {
+          name: '汉阳区',
+          value: data[11]
+        },
+        {
+          name: '武昌区',
+          value: data[0]
+        },
+        {
+          name: '洪山区',
+          value: data[1]
+        },
+        {
+          name: '青山区',
+          value: data[3]
+        },
+        {
+          name: '东西湖区',
+          value: data[9]
+        },
+        {
+          name: '蔡甸区',
+          value: data[12]
+        },
+        {
+          name: '江夏区',
+          value: data[2]
+        },
+        {
+          name: '黄陂区',
+          value: data[7]
+        },
+        {
+          name: '新洲区',
+          value: data[8]
+        },
+        {
+          name: '汉南区',
+          value: data[13]
+        }]
+      }]
+    });
+  });
+};
+
 // util
 App.module.search = function () {
   var form  = document.forms.search,
@@ -1227,6 +1388,7 @@ App.page.user = function (module) {
 // util
 App.page.dashboard = function (module, path) {
   module.infoBox();
+  module.map(path);
   module.line(path);
   module.pie(path);
   module.inspection();
