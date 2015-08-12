@@ -925,7 +925,7 @@ App.page.analyticsDetail = function (module, path, type, id) {
 
         weibo: function (start, end) {
           $.getJSON(api, { type : 'chart-weibo', start : start, end : end }, function (data) {
-            var item = data.sort_result;
+            // var item = data.sort_result;
 
             echarts.init(document.getElementById('chart-weibo-map')).setOption({
               tooltip : {
@@ -938,7 +938,7 @@ App.page.analyticsDetail = function (module, path, type, id) {
               },
               dataRange: {
                   min: 0,
-                  max: item[9].value,
+                  max: data.value[9],
                   x: 'left',
                   y: 'bottom',
                   text:['高','低'],           // 文本，默认为数值文本
@@ -985,6 +985,7 @@ App.page.analyticsDetail = function (module, path, type, id) {
                       x:45
               },
               tooltip : {
+                  show: false,
                   trigger: 'axis',
                   axisPointer : {            // 坐标轴指示器，坐标轴触发有效
                       type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
@@ -1031,7 +1032,7 @@ App.page.analyticsDetail = function (module, path, type, id) {
                           fontWeight:'bolder'
                         }
                       },
-                      data : [item[0].name, item[1].name, item[2].name, item[3].name, item[4].name, item[5].name, item[6].name, item[7].name, item[8].name, item[9].name]
+                      data :data.name
                   }
               ],
               series : [
@@ -1054,7 +1055,7 @@ App.page.analyticsDetail = function (module, path, type, id) {
                           color:'#3C8DBC'
                         }
                       },
-                      data: [item[0].value, item[1].value, item[2].value, item[3].value, item[4].value, item[5].value, item[6].value, item[7].value, item[8].value, item[9].value]
+                      data: data.value
                   },
               ]
             });
