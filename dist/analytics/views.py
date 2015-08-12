@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 
 from base.views import BaseTemplateView
 from django.conf import settings
-from yqj.models import Article, Area, Weixin, Weibo
+from yqj.models import Article, Area, Category, Inspection, Weixin, Weibo
 from yqj.redisconnect import RedisQueryApi
 
 
@@ -22,22 +22,26 @@ class DispatchView(APIView, BaseTemplateView):
             type = parameter['type'].replace('-', '_')
             start = parameter['start']
             end = parameter['end']
-            page = parameter['page'] if parameter.has_key('page') else 0
+            cache = int(parameter['cache']) if parameter.has_key('cache') else 1
             func = getattr(globals()['DispatchView'](), type)
 
-            date_range = RedisQueryApi().hget('cache', 'date_range')
-            if date_range:
-                date_start = datetime.strptime(eval(date_range)['start'], '%Y-%m-%d')
-                date_end = datetime.strptime(eval(date_range)['end'], '%Y-%m-%d')
-                start_time = datetime.strptime(start, '%Y-%m-%d')
-                end_time = datetime.strptime(end, '%Y-%m-%d')
-                if date_start==start_time and date_end==end_time:
-                    data = RedisQueryApi().hget('cache', type)
+            if not cache:
+                return func(start, end)
+
+            names = ['SevenDays','LastMonth','ThisMonth','ThrityDays']
+            for name in names:
+                date_range = RedisQueryApi().hget(name, 'date_range')
+                date_start = eval(date_range)['start']
+                date_end = eval(date_range)['end']
+                if date_start==start and date_end==end:
+                    data = RedisQueryApi().hget(name, type)
                     result = eval(data) if data else []
                     if result:
                         return Response(result)
-            return func(start, end)
+                        break
+                    return func(start, end)
         except Exception, e:
+            print e
             return Response({})
 
 
@@ -45,7 +49,11 @@ class DispatchView(APIView, BaseTemplateView):
         start = parse_date(start)
         end = parse_date(end)
         total = Article.objects.filter(pubtime__range=(start, end)).count()
-        risk = total
+        event_count = Category.objects.get(name=u'事件').articles.filter(pubtime__range=(start, end)).count()
+        hot_count = Category.objects.get(name=u'质监热点').articles.filter(pubtime__range=(start, end)).count()
+        inspection_count = Inspection.objects.filter(pubtime__range=(start, end)).count()
+
+        risk = event_count + hot_count + inspection_count
         return Response({'total': total, 'risk': risk})
 
     def chart_type(self, start, end):
@@ -79,8 +87,11 @@ class DispatchView(APIView, BaseTemplateView):
             areas_id = Area.objects.filter(Q(parent_id__in=city_id)|Q(parent_id=province.id)|Q(id=province.id))
             count = Weibo.objects.filter(area__in=areas_id, pubtime__range=(start,end)).count()
             provice_count.append({'name': province.name, 'value': count})
-        sort_result = sorted(provice_count, key=lambda x:x['value'])[-6:]
-        return Response({'provice_count':provice_count, 'sort_result': sort_result})
+        sort_result = sorted(provice_count, key=lambda x:x['value'])[-10:]
+        name = map(lambda n: n['name'], sort_result)
+        print name
+        value = map(lambda v: v['value'], sort_result)
+        return Response({'provice_count':provice_count, 'name': name, 'value': value})
 
     def chart_trend(self, start, end):
         start = parse_date(start)
