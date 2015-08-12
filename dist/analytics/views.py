@@ -12,6 +12,7 @@ from rest_framework.views import APIView
 from base.views import BaseTemplateView
 from django.conf import settings
 from yqj.models import Article, Area, Category, Inspection, Weixin, Weibo
+from yqj.mysqlUtil import query
 from yqj.redisconnect import RedisQueryApi
 
 
@@ -101,12 +102,19 @@ class DispatchView(APIView, BaseTemplateView):
     def chart_trend(self, start, end):
         days = (end - start).days
         date = [(start + timedelta(days=x)) for x in xrange(days)]
-        news_data = map(lambda x: Article.objects.filter(pubtime__range=(
-            date[x], date[x] + timedelta(days=1))).count(), xrange(days))
-        weixin_data = map( lambda x: Weixin.objects.filter(pubtime__range=(
-            date[x], date[x] + timedelta(days=1))).count(), xrange(days))
-        weibo_data = map(lambda x: Weibo.objects.filter(pubtime__range=(
-            date[x], date[x] + timedelta(days=1))).count(), xrange(days))
+
+        date_range = [(i, i + timedelta(days = 1)) for i in date]
+        query_str = map(
+            lambda x: "sum(case when pubtime < '%s' and pubtime > '%s' then 1 else 0 end)" 
+            % (x[1], x[0]), 
+            date_range
+        )
+
+        sum_result =lambda x: query('select %s from %s' % (','.join(query_str), x))
+        news_data = [i for i in sum_result('article')[0]]
+        weixin_data = [i for i in sum_result('weixin')[0]]
+        weibo_data = [i for i in sum_result('weibo')[0]]
+        
         total_data = map(lambda x: news_data[x] + weixin_data[x] + weibo_data[x] , xrange(days))
 
         date = map(lambda x: x.strftime("%m-%d"), date)
