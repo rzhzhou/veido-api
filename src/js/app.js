@@ -938,7 +938,7 @@ App.page.analyticsDetail = function (module, path, type, id) {
               },
               dataRange: {
                   min: 0,
-                  max: item[5].value,
+                  max: item[9].value,
                   x: 'left',
                   y: 'bottom',
                   text:['高','低'],           // 文本，默认为数值文本
@@ -1031,8 +1031,7 @@ App.page.analyticsDetail = function (module, path, type, id) {
                           fontWeight:'bolder'
                         }
                       },
-                      data : [item[0].name,item[1].name,item[2].name,item[3].name,item[4].name,item[5].name]
-                      // [item[0].name,item[1].name,item[2].name,item[3].name,item[4].name,item[5].name]
+                      data : [item[0].name, item[1].name, item[2].name, item[3].name, item[4].name, item[5].name, item[6].name, item[7].name, item[8].name, item[9].name]
                   }
               ],
               series : [
@@ -1040,7 +1039,7 @@ App.page.analyticsDetail = function (module, path, type, id) {
                       name:'微博文',
                       type:'bar',
                       stack: '总量',
-                      barWidth:25,
+                      barWidth:20,
                       itemStyle : {
                         normal: {
                           label : {
@@ -1055,8 +1054,7 @@ App.page.analyticsDetail = function (module, path, type, id) {
                           color:'#3C8DBC'
                         }
                       },
-                      data: [item[0].value,item[1].value,item[2].value,item[3].value,item[4].value,item[5].value]
-                      // [item[0].value,item[1].value,item[2].value,item[3].value,item[4].value,item[5].value]
+                      data: [item[0].value, item[1].value, item[2].value, item[3].value, item[4].value, item[5].value, item[6].value, item[7].value, item[8].value, item[9].value]
                   },
               ]
             });
