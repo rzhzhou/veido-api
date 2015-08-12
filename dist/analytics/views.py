@@ -22,25 +22,26 @@ class DispatchView(APIView, BaseTemplateView):
             type = parameter['type'].replace('-', '_')
             start = parameter['start']
             end = parameter['end']
-            cache = int(parameter['cache']) if parameter.has_key('cache') else 0
+            cache = int(parameter['cache']) if parameter.has_key('cache') else 1
             func = getattr(globals()['DispatchView'](), type)
 
             if not cache:
                 return func(start, end)
 
-            date_range = RedisQueryApi().hget('cache', 'date_range')
-            if date_range:
-                date_start = datetime.strptime(eval(date_range)['start'], '%Y-%m-%d')
-                date_end = datetime.strptime(eval(date_range)['end'], '%Y-%m-%d')
-                start_time = datetime.strptime(start, '%Y-%m-%d')
-                end_time = datetime.strptime(end, '%Y-%m-%d')
-                if date_start==start_time and date_end==end_time:
-                    data = RedisQueryApi().hget('cache', type)
+            names = ['SevenDays','LastMonth','ThisMonth','ThrityDays']
+            for name in names:
+                date_range = RedisQueryApi().hget(name, 'date_range')
+                date_start = eval(date_range)['start']
+                date_end = eval(date_range)['end']
+                if date_start==start and date_end==end:
+                    data = RedisQueryApi().hget(name, type)
                     result = eval(data) if data else []
                     if result:
                         return Response(result)
-            return func(start, end)
+                        break
+                    return func(start, end)
         except Exception, e:
+            print e
             return Response({})
 
 
@@ -88,6 +89,7 @@ class DispatchView(APIView, BaseTemplateView):
             provice_count.append({'name': province.name, 'value': count})
         sort_result = sorted(provice_count, key=lambda x:x['value'])[-10:]
         name = map(lambda n: n['name'], sort_result)
+        print name
         value = map(lambda v: v['value'], sort_result)
         return Response({'provice_count':provice_count, 'name': name, 'value': value})
 
