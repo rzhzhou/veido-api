@@ -115,10 +115,10 @@ class DispatchView(APIView, BaseTemplateView):
 
         return Response({
             "date": date,
-            "news_data": news_data,
-            "weixin_data": weixin_data,
-            "weibo_data": weibo_data,
-            "total_data": total_data
+            "news": news_data,
+            "weixin": weixin_data,
+            "weibo": weibo_data,
+            "total": total_data
         })
 
 
