@@ -1217,6 +1217,51 @@ App.module.dateRange = (function () {
   };
 }());
 
+App.module.dataList = function (module, $dataList, api, start, end) {
+  $dataList.on('showDataList', function () {
+    var $paginationContainer = $dataList.parent(),
+
+        toParam = function (pageNumber) {
+          if (typeof pageNumber === 'undefined') {
+            pageNumber = 1;
+          }
+
+          return {
+            type: 'data-list',
+            start: start,
+            end: end,
+            page: pageNumber,
+          };
+        },
+
+        renderTable = function (pageContent) {
+          $('<tbody/>')
+            .html(pageContent)
+            .replaceAll($dataList.find('tbody'));
+        };
+
+    $.get(api, toParam(), function (data) {
+      renderTable(data.html);
+
+      $paginationContainer.twbsPagination({
+        totalPages: data.total,
+        visiblePages: 7,
+        first: '第一页',
+        prev: '上一页',
+        next: '下一页',
+        last: '最后一页',
+        paginationClass: 'pagination pagination-sm no-margin pull-right',
+        onPageClick: function(event, pageNumber) {
+          module.returnTop($(this));
+          $.get(api, toParam(pageNumber), function(data) {
+            renderTable(data.html);
+            $paginationContainer.twbsPagination({totalPages: data.total});
+          });
+        }
+      });
+    });
+  });
+};
 
 //
 // Pages
@@ -1310,7 +1355,7 @@ App.page.analyticsDetail = function (module, path, type, id) {
       $dateRangeLabel = $dateRangePicker.children('span'),
       $chart = $('#chart'),
       $statistic = $('#statistic'),
-      $dataList = $('#data-list'),
+      // $dataList = $('#data-list'),
       $statisticTotal = $('.statistic-total').children('span'),
       $statisticRisk = $('.statistic-risk').children('span'),
 
@@ -1642,50 +1687,6 @@ App.page.analyticsDetail = function (module, path, type, id) {
         });
       },
 
-      showDataList = function () {
-        var $paginationContainer = $dataList.parent(),
-
-            toParam = function (pageNumber) {
-              if (typeof pageNumber === 'undefined') {
-                pageNumber = 1;
-              }
-
-              return {
-                type: 'data-list',
-                start: start,
-                end: end,
-                page: pageNumber,
-              };
-            },
-
-            renderTable = function (pageContent) {
-              $('<tbody/>')
-                .html(pageContent)
-                .replaceAll($dataList.find('tbody'));
-            };
-
-        $.get(api, toParam(), function (data) {
-          renderTable(data.html);
-
-          $paginationContainer.twbsPagination({
-            totalPages: data.total,
-            visiblePages: 7,
-            first: '第一页',
-            prev: '上一页',
-            next: '下一页',
-            last: '最后一页',
-            paginationClass: 'pagination pagination-sm no-margin pull-right',
-            onPageClick: function(event, pageNumber) {
-              APP.returnTop($(this));
-              $.get(api, toParam(pageNumber), function(data) {
-                renderTable(data.html);
-                $paginationContainer.twbsPagination({totalPages: data.total});
-              });
-            }
-          });
-        });
-      },
-
       showAnalytics = function (startMoment, endMoment) {
         start = startMoment.format('YYYY-MM-DD');
         end   = endMoment.format('YYYY-MM-DD');
@@ -1706,7 +1707,7 @@ App.page.analyticsDetail = function (module, path, type, id) {
 
   $statistic.on('showStatistic', showStatistic);
 
-  $dataList.on('showDataList', showDataList);
+  // module.dataList(module, $dataList, api, start, end);
 
   module.dateRange.init($dateRangePicker, showAnalytics);
 
