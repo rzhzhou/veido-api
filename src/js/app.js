@@ -1007,144 +1007,142 @@ App.page.analyticsDetail = function (module, path, type, id) {
             });
         },
 
-        // weibo: function (start, end) {
-        //   $.getJSON(api, { type : 'chart-weibo', start : start, end : end }, function (data) {
-        //     // var item = data.sort_result;
+        weibo: function (start, end) {
+          $.getJSON(api, { type : 'chart-weibo', start : start, end : end }, function (data) {
+            echarts.init(document.getElementById('chart-weibo-map')).setOption({
+              tooltip : {
+                  trigger: 'item'
+              },
+              legend: {
+                  orient: 'vertical',
+                  x:'left',
+                  data:['微博文']
+              },
+              dataRange: {
+                  min: 0,
+                  max: data.value[9],
+                  x: 'left',
+                  y: 'bottom',
+                  text:['高','低'],           // 文本，默认为数值文本
+                  calculable : true
+              },
+              toolbox: {
+                  show: false,
+                  orient : 'vertical',
+                  x: 'right',
+                  y: 'center',
+                  feature : {
+                      mark : {show: true},
+                      dataView : {show: true, readOnly: false},
+                      restore : {show: true},
+                      saveAsImage : {show: true}
+                  }
+              },
+              roamController: {
+                  show: true,
+                  x: '85%',
+                  mapTypeControl: {
+                      'china': true
+                  }
+              },
+              series : [
+                  {
+                      name: '微博文',
+                      type: 'map',
+                      mapType: 'china',
+                      roam: false,
+                      itemStyle:{
+                          normal:{label:{show:true}},
+                          emphasis:{label:{show:true}}
+                      },
+                      data:data.provice_count
+                  },
+              ]
+            });
 
-        //     echarts.init(document.getElementById('chart-weibo-map')).setOption({
-        //       tooltip : {
-        //           trigger: 'item'
-        //       },
-        //       legend: {
-        //           orient: 'vertical',
-        //           x:'left',
-        //           data:['微博文']
-        //       },
-        //       dataRange: {
-        //           min: 0,
-        //           max: data.value[9],
-        //           x: 'left',
-        //           y: 'bottom',
-        //           text:['高','低'],           // 文本，默认为数值文本
-        //           calculable : true
-        //       },
-        //       toolbox: {
-        //           show: false,
-        //           orient : 'vertical',
-        //           x: 'right',
-        //           y: 'center',
-        //           feature : {
-        //               mark : {show: true},
-        //               dataView : {show: true, readOnly: false},
-        //               restore : {show: true},
-        //               saveAsImage : {show: true}
-        //           }
-        //       },
-        //       roamController: {
-        //           show: true,
-        //           x: '85%',
-        //           mapTypeControl: {
-        //               'china': true
-        //           }
-        //       },
-        //       series : [
-        //           {
-        //               name: '微博文',
-        //               type: 'map',
-        //               mapType: 'china',
-        //               roam: false,
-        //               itemStyle:{
-        //                   normal:{label:{show:true}},
-        //                   emphasis:{label:{show:true}}
-        //               },
-        //               data:data.provice_count
-        //           },
-        //       ]
-        //     });
-
-        //     echarts.init(document.getElementById('chart-weibo-bar')).setOption({
-        //       title : {
-        //               text: '微博地域分析',
-        //               subtext:'',
-        //               x:45
-        //       },
-        //       tooltip : {
-        //           show: false,
-        //           trigger: 'axis',
-        //           axisPointer : {            // 坐标轴指示器，坐标轴触发有效
-        //               type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
-        //           }
-        //       },
-        //       legend: {
-        //           show:false,
-        //           data:['微博文']
-        //       },
-        //       toolbox: {
-        //           show : false,
-        //           feature : {
-        //               mark : {show: true},
-        //               dataView : {show: true, readOnly: false},
-        //               magicType : {show: true, type: ['line', 'bar', 'stack', 'tiled']},
-        //               restore : {show: true},
-        //               saveAsImage : {show: true}
-        //           }
-        //       },
-        //       calculable : false,
-        //       grid:{
-        //         borderWidth:0
-        //       },
-        //       xAxis : [
-        //           {
-        //               show:false,
-        //               type : 'value'
-        //           }
-        //       ],
-        //       yAxis : [
-        //           {
-        //               show:true,
-        //               axisLine:false,
-        //               axisTick:false,
-        //               type : 'category',
-        //               splitLine:false,
-        //               splitArea:{
-        //                 show:false
-        //               },
-        //               axisLabel:{
-        //                 show:true,
-        //                 textStyle:{
-        //                   fontSize:14,
-        //                   fontWeight:'bolder'
-        //                 }
-        //               },
-        //               data :data.name
-        //           }
-        //       ],
-        //       series : [
-        //           {
-        //               name:'微博文',
-        //               type:'bar',
-        //               stack: '总量',
-        //               barWidth:20,
-        //               itemStyle : {
-        //                 normal: {
-        //                   label : {
-        //                     show: true,
-        //                     textStyle:{
-        //                       color:'#000000',
-        //                       fontSize:14,
-        //                       fontWeight:'bolder'
-        //                     },
-        //                     position: 'right'
-        //                   },
-        //                   color:'#3C8DBC'
-        //                 }
-        //               },
-        //               data: data.value
-        //           },
-        //       ]
-        //     });
-        //   });
-        // }
+            echarts.init(document.getElementById('chart-weibo-bar')).setOption({
+              title : {
+                      text: '微博地域分析',
+                      subtext:'',
+                      x:45
+              },
+              tooltip : {
+                  show: false,
+                  trigger: 'axis',
+                  axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+                      type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                  }
+              },
+              legend: {
+                  show:false,
+                  data:['微博文']
+              },
+              toolbox: {
+                  show : false,
+                  feature : {
+                      mark : {show: true},
+                      dataView : {show: true, readOnly: false},
+                      magicType : {show: true, type: ['line', 'bar', 'stack', 'tiled']},
+                      restore : {show: true},
+                      saveAsImage : {show: true}
+                  }
+              },
+              calculable : false,
+              grid:{
+                borderWidth:0
+              },
+              xAxis : [
+                  {
+                      show:false,
+                      type : 'value'
+                  }
+              ],
+              yAxis : [
+                  {
+                      show:true,
+                      axisLine:false,
+                      axisTick:false,
+                      type : 'category',
+                      splitLine:false,
+                      splitArea:{
+                        show:false
+                      },
+                      axisLabel:{
+                        show:true,
+                        textStyle:{
+                          fontSize:14,
+                          fontWeight:'bolder'
+                        }
+                      },
+                      data :data.name
+                  }
+              ],
+              series : [
+                  {
+                      name:'微博文',
+                      type:'bar',
+                      stack: '总量',
+                      barWidth:20,
+                      itemStyle : {
+                        normal: {
+                          label : {
+                            show: true,
+                            textStyle:{
+                              color:'#000000',
+                              fontSize:14,
+                              fontWeight:'bolder'
+                            },
+                            position: 'right'
+                          },
+                          color:'#3C8DBC'
+                        }
+                      },
+                      data: data.value
+                  },
+              ]
+            });
+          });
+        }
       },
 
       showChart = function () {
