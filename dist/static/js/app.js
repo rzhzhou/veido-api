@@ -552,6 +552,14 @@ function _init() {
   $.extend($.fn.twbsPagination.defaults, options);
 }());
 
+// moment
+(function () {
+  if (typeof moment !== 'function') {
+    throw new Error('moment required');
+  }
+
+  moment.defaultFormat = 'YYYY-MM-DD';
+}());
 
 //
 // Application
@@ -1179,11 +1187,11 @@ App.module.custom = function () {
 };
 
 App.module.dateRange = (function () {
-  var show = function ($label, start, end) {
-        $label.html(start + ' ~ ' + end);
+  var show = function ($el, start, end) {
+        $el.children('span').html(start + ' ~ ' + end);
       },
 
-      init = function ($el, fn) {
+      init = function ($el, start, end, callback) {
         $el.daterangepicker({
           ranges: {
             '过去7天': [moment().subtract(6, 'days'), moment()],
@@ -1208,7 +1216,7 @@ App.module.dateRange = (function () {
           'parentEl': '.content-header',
           'applyClass': 'btn-success',
           'cancelClass': 'btn-default'
-        }, fn);
+        }, callback);
       };
 
   return {
@@ -1216,6 +1224,18 @@ App.module.dateRange = (function () {
     init: init
   };
 }());
+
+App.module.statistic = function ($el, api) {
+  var $total = $el.find('.statistic-total > span'),
+      $risk = $el.find('.statistic-risk > span');
+
+  $el.on('dateChange', function (event, start, end) {
+    $.getJSON(api, {type: 'statistic', start: start, end: end}, function (statistic) {
+      $total.text(statistic.total);
+      $risk.text(statistic.risk);
+    });
+  });
+};
 
 App.module.dataList = function (module, $dataList, api, start, end) {
   $dataList.on('showDataList', function () {
@@ -1348,17 +1368,12 @@ App.page.collection = function (module, path) {
 };
 
 App.page.analyticsDetail = function (module, path, type, id) {
-  var start = '',
-      end = '',
-      api = '/api' + path,
-      $dateRangePicker = $('.date-range-picker'),
-      $dateRangeLabel = $dateRangePicker.children('span'),
+  var api = '/api' + path,
+      $el = $('.date-range-picker'),
       $chart = $('#chart'),
       $statistic = $('#statistic'),
-      // $dataList = $('#data-list'),
-      $statisticTotal = $('.statistic-total').children('span'),
-      $statisticRisk = $('.statistic-risk').children('span'),
-
+      start = moment().subtract(6, 'days').format(),
+      end = moment().format(),
       chart = {
         trend: function (start, end) {
           $.getJSON(api, {type: 'chart-trend', start: start, end: end}, function (data) {
@@ -1535,195 +1550,171 @@ App.page.analyticsDetail = function (module, path, type, id) {
             });
         },
 
-        // weibo: function (start, end) {
-        //   $.getJSON(api, { type : 'chart-weibo', start : start, end : end }, function (data) {
-        //     // var item = data.sort_result;
+        weibo: function (start, end) {
+          $.getJSON(api, { type : 'chart-weibo', start : start, end : end }, function (data) {
+            echarts.init(document.getElementById('chart-weibo-map')).setOption({
+              tooltip : {
+                  trigger: 'item'
+              },
+              legend: {
+                  orient: 'vertical',
+                  x:'left',
+                  data:['微博文']
+              },
+              dataRange: {
+                  min: 0,
+                  max: data.value[9],
+                  x: 'left',
+                  y: 'bottom',
+                  text:['高','低'],           // 文本，默认为数值文本
+                  calculable : true
+              },
+              toolbox: {
+                  show: false,
+                  orient : 'vertical',
+                  x: 'right',
+                  y: 'center',
+                  feature : {
+                      mark : {show: true},
+                      dataView : {show: true, readOnly: false},
+                      restore : {show: true},
+                      saveAsImage : {show: true}
+                  }
+              },
+              roamController: {
+                  show: true,
+                  x: '85%',
+                  mapTypeControl: {
+                      'china': true
+                  }
+              },
+              series : [
+                  {
+                      name: '微博文',
+                      type: 'map',
+                      mapType: 'china',
+                      roam: false,
+                      itemStyle:{
+                          normal:{label:{show:true}},
+                          emphasis:{label:{show:true}}
+                      },
+                      data:data.provice_count
+                  },
+              ]
+            });
 
-        //     echarts.init(document.getElementById('chart-weibo-map')).setOption({
-        //       tooltip : {
-        //           trigger: 'item'
-        //       },
-        //       legend: {
-        //           orient: 'vertical',
-        //           x:'left',
-        //           data:['微博文']
-        //       },
-        //       dataRange: {
-        //           min: 0,
-        //           max: data.value[9],
-        //           x: 'left',
-        //           y: 'bottom',
-        //           text:['高','低'],           // 文本，默认为数值文本
-        //           calculable : true
-        //       },
-        //       toolbox: {
-        //           show: false,
-        //           orient : 'vertical',
-        //           x: 'right',
-        //           y: 'center',
-        //           feature : {
-        //               mark : {show: true},
-        //               dataView : {show: true, readOnly: false},
-        //               restore : {show: true},
-        //               saveAsImage : {show: true}
-        //           }
-        //       },
-        //       roamController: {
-        //           show: true,
-        //           x: '85%',
-        //           mapTypeControl: {
-        //               'china': true
-        //           }
-        //       },
-        //       series : [
-        //           {
-        //               name: '微博文',
-        //               type: 'map',
-        //               mapType: 'china',
-        //               roam: false,
-        //               itemStyle:{
-        //                   normal:{label:{show:true}},
-        //                   emphasis:{label:{show:true}}
-        //               },
-        //               data:data.provice_count
-        //           },
-        //       ]
-        //     });
-
-        //     echarts.init(document.getElementById('chart-weibo-bar')).setOption({
-        //       title : {
-        //               text: '微博地域分析',
-        //               subtext:'',
-        //               x:45
-        //       },
-        //       tooltip : {
-        //           show: false,
-        //           trigger: 'axis',
-        //           axisPointer : {            // 坐标轴指示器，坐标轴触发有效
-        //               type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
-        //           }
-        //       },
-        //       legend: {
-        //           show:false,
-        //           data:['微博文']
-        //       },
-        //       toolbox: {
-        //           show : false,
-        //           feature : {
-        //               mark : {show: true},
-        //               dataView : {show: true, readOnly: false},
-        //               magicType : {show: true, type: ['line', 'bar', 'stack', 'tiled']},
-        //               restore : {show: true},
-        //               saveAsImage : {show: true}
-        //           }
-        //       },
-        //       calculable : false,
-        //       grid:{
-        //         borderWidth:0
-        //       },
-        //       xAxis : [
-        //           {
-        //               show:false,
-        //               type : 'value'
-        //           }
-        //       ],
-        //       yAxis : [
-        //           {
-        //               show:true,
-        //               axisLine:false,
-        //               axisTick:false,
-        //               type : 'category',
-        //               splitLine:false,
-        //               splitArea:{
-        //                 show:false
-        //               },
-        //               axisLabel:{
-        //                 show:true,
-        //                 textStyle:{
-        //                   fontSize:14,
-        //                   fontWeight:'bolder'
-        //                 }
-        //               },
-        //               data :data.name
-        //           }
-        //       ],
-        //       series : [
-        //           {
-        //               name:'微博文',
-        //               type:'bar',
-        //               stack: '总量',
-        //               barWidth:20,
-        //               itemStyle : {
-        //                 normal: {
-        //                   label : {
-        //                     show: true,
-        //                     textStyle:{
-        //                       color:'#000000',
-        //                       fontSize:14,
-        //                       fontWeight:'bolder'
-        //                     },
-        //                     position: 'right'
-        //                   },
-        //                   color:'#3C8DBC'
-        //                 }
-        //               },
-        //               data: data.value
-        //           },
-        //       ]
-        //     });
-        //   });
-        // }
+            echarts.init(document.getElementById('chart-weibo-bar')).setOption({
+              title : {
+                      text: '微博地域分析',
+                      subtext:'',
+                      x:45
+              },
+              tooltip : {
+                  show: false,
+                  trigger: 'axis',
+                  axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+                      type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                  }
+              },
+              legend: {
+                  show:false,
+                  data:['微博文']
+              },
+              toolbox: {
+                  show : false,
+                  feature : {
+                      mark : {show: true},
+                      dataView : {show: true, readOnly: false},
+                      magicType : {show: true, type: ['line', 'bar', 'stack', 'tiled']},
+                      restore : {show: true},
+                      saveAsImage : {show: true}
+                  }
+              },
+              calculable : false,
+              grid:{
+                borderWidth:0
+              },
+              xAxis : [
+                  {
+                      show:false,
+                      type : 'value'
+                  }
+              ],
+              yAxis : [
+                  {
+                      show:true,
+                      axisLine:false,
+                      axisTick:false,
+                      type : 'category',
+                      splitLine:false,
+                      splitArea:{
+                        show:false
+                      },
+                      axisLabel:{
+                        show:true,
+                        textStyle:{
+                          fontSize:14,
+                          fontWeight:'bolder'
+                        }
+                      },
+                      data :data.name
+                  }
+              ],
+              series : [
+                  {
+                      name:'微博文',
+                      type:'bar',
+                      stack: '总量',
+                      barWidth:20,
+                      itemStyle : {
+                        normal: {
+                          label : {
+                            show: true,
+                            textStyle:{
+                              color:'#000000',
+                              fontSize:14,
+                              fontWeight:'bolder'
+                            },
+                            position: 'right'
+                          },
+                          color:'#3C8DBC'
+                        }
+                      },
+                      data: data.value
+                  },
+              ]
+            });
+          });
+        }
       },
 
       showChart = function () {
         var chartType = $chart.find('.tab-pane.active')[0].id.slice(6);
         chart[chartType](start, end);
-      },
-
-      showStatistic = function () {
-        $.getJSON(api, {type: 'statistic', start: start, end: end}, function (statistic) {
-          $statisticTotal.text(statistic.total);
-          $statisticRisk.text(statistic.risk);
-        });
-      },
-
-      showAnalytics = function (startMoment, endMoment) {
-        start = startMoment.format('YYYY-MM-DD');
-        end   = endMoment.format('YYYY-MM-DD');
-
-        module.dateRange.show($dateRangeLabel, start, end);
-
-        $chart
-          .trigger('showChart')
-          .off('shown.bs.tab')
-          .on('shown.bs.tab', showChart);
-
-        $statistic.trigger('showStatistic');
-
-        // $dataList.trigger('showDataList');
       };
 
-  $chart.on('showChart', showChart);
+  module.dateRange.show($el, start, end);
+  module.dateRange.init($el, start, end);
 
-  $statistic.on('showStatistic', showStatistic);
+  module.statistic($statistic, api);
 
-  // module.dataList(module, $dataList, api, start, end);
+  $chart.on({
+    'dateChange': showChart,
+    'shown.bs.tab': showChart
+  });
 
-  module.dateRange.init($dateRangePicker, showAnalytics);
+  $el.on('apply.daterangepicker', function (event, picker) {
+    start = picker.startDate.format();
+    end = picker.endDate.format();
 
-  showAnalytics(moment().subtract(6, 'days'), moment());
+    module.dateRange.show($el, start, end);
 
+    $chart.trigger('dateChange');
+    $statistic.trigger('dateChange', [start, end]);
+  });
 
-  if (id === 0) {
-    start = moment().subtract(6, 'days').format('YYYY-MM-DD');
-    end = moment().format('YYYY-MM-DD');
-
-    for (type in chart) {
-      if(chart.hasOwnProperty(type)) {
-        chart[type](start, end);
-      }
-    }
-  }
+  $chart.trigger('dateChange');
+  $statistic.trigger('dateChange', [start, end]);
 };
 
 
