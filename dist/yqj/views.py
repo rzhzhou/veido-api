@@ -11,7 +11,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import View
 from yqj.models import Article, Weixin, Weibo, RelatedData, Category, Group,\
                        Area, Topic, Inspection, Custom, CustomKeyword, Collection, ArticlePublisher, Product,\
-                       ProductKeyword, LocaltionScore, GroupAuthUser, RiskScore
+                       ProductKeyword, LocaltionScore, GroupAuthUser, RiskScore, Risk
 from yqj import login_required
 from yqj.redisconnect import RedisQueryApi
 from django.db.models import Count,Q
@@ -32,8 +32,7 @@ def sidebarUtil(request):
         "news": conf.get(username, "news"),
         "event": conf.get(username, "event"),
         "location": conf.get(username, "location"),
-        "custom":conf.get(username, "custom"),
-        "site":conf.get(username, "site")
+        "custom":conf.get(username, "custom")
     }
     return sidebar_name
 
@@ -109,6 +108,7 @@ def index_view(request):
         news_list = Article.objects.filter(id__in=article_id)[:10]
 
 
+
         for item in news_list:
             try:
                 setattr(item, 'hot_index', RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count())
@@ -123,7 +123,7 @@ def index_view(request):
                 setattr(iteml, 'time', datetime.now().strftime('%Y-%m-%d'))
         event_list=sorted(event_list, key=lambda x: x.time, reverse=True)[:event_list_number]
         for item in event_list:
-             setattr(item, 'hot_index', item.articles.all().count()+item.weixin.all().count()+item.weibo.all().count())
+            setattr(item, 'hot_index', item.articles.all().count()+item.weixin.all().count()+item.weibo.all().count())
 
         weibo_data = [eval(item) for item in RedisQueryApi().lrange('sort_weibohot', 0, -1)[:5]]
         for data in weibo_data:
@@ -137,26 +137,34 @@ def index_view(request):
         for data in weixin_data:
             data = SetLogo(data)
 
+
         group = Group.objects.get(company=user.company).id
         score_list = LocaltionScore.objects.filter(group=group)
 
-        risk_list = []
+        risk_id = []
         for item in score_list:
+            risk_id.append(item.risk_id)
+
+        risk_lists = Risk.objects.filter(id__in=risk_id)[:6]
+        risk_list = []
+        for item in risk_lists:
             data = {}
-            data['relevance'] = item.score
-            article_list = Article.objects.filter(id=item.article.id).order_by('-pubtime')
-            for items in article_list:
-                try:
-                    score = RiskScore.objects.get(article=items.id).score
-                except RiskScore.DoesNotExist:
-                    score = 0
-                data['title'] = items.title
-                data['source'] = items.source
-                data['score'] = score
-                data['time'] = items.pubtime
-                data['id'] = items.id
-                risk_list.append(data)
-        risk_list=sorted(risk_list, key=lambda x: x['time'], reverse=True)[:6]
+            try:
+                relevance = LocaltionScore.objects.get(risk_id=item.id).score
+            except LocaltionScore.DoesNotExist:
+                relevance = 0
+            try:
+                score = RiskScore.objects.get(risk=item.id).score
+            except RiskScore.DoesNotExist:
+                score = 0
+            data['relevance'] = relevance
+            data['title'] = item.title
+            data['source'] = item.source
+            data['score'] = score
+            data['time'] =  datetime.now()
+            data['id'] = item.id
+            risk_list.append(data)
+            
         sidebar_name = sidebarUtil(request)
         return render_to_response("dashboard/dashboard.html",
             {'user': user,

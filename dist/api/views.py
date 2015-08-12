@@ -1,7 +1,7 @@
 #coding=utf-8
 
 import os
-import datetime
+from datetime import datetime 
 from collections import defaultdict
 from dateutil.relativedelta import relativedelta
 from django.views.generic import View
@@ -16,7 +16,7 @@ from rest_framework.decorators import api_view
 from yqj.models import (Article, Area, Weixin, Weibo, Topic, RelatedData, Category,
                         save_user, Collection, Topic, hash_password, User, Custom,
                         Inspection, CustomKeyword,Product, ProductKeyword, Group,
-                        LocaltionScore, RiskScore)
+                        LocaltionScore, RiskScore, Risk)
 from yqj.views import SetLogo
 from serializers import ArticleSerializer
 from yqj import authenticate, login_required
@@ -277,6 +277,33 @@ class RisksTableView(TableAPIView):
         company = user.group.company
         group = Group.objects.get(company=company).id
         score_list = LocaltionScore.objects.filter(group=group)
+        risk_id = []
+        for item in score_list:
+            risk_id.append(item.risk_id)
+
+        risk_lists = Risk.objects.filter(id__in=risk_id)
+        risk_list = []
+        for item in risk_lists:
+            data = {}
+            try:
+                relevance = LocaltionScore.objects.get(risk_id=item.id).score
+            except LocaltionScore.DoesNotExist:
+                relevance = 0
+            try:
+                score = RiskScore.objects.get(risk=item.id).score
+            except RiskScore.DoesNotExist:
+                score = 0
+            data['relevance'] = relevance
+            data['title'] = item.title
+            data['source'] = item.source
+            data['score'] = score
+            data['pubtime'] = datetime.now()
+            data['id'] = item.id
+            risk_list.append(data)
+        return risk_list
+        ''' 
+        # This method is sorting in the memory 
+        score_list = LocaltionScore.objects.filter(group=group)
         risk_list = []
         for item in score_list:
             data = {}
@@ -295,7 +322,7 @@ class RisksTableView(TableAPIView):
                 risk_list.append(data)
         risk_list = sorted(risk_list, key=lambda x: x['pubtime'], reverse=True)
         return risk_list
-            
+        '''    
     def get(self, request, page):
         items = self.get_score_article(request)
         datas = self.paging(items, self.RISK_PAGE_LIMIT, page)
@@ -304,6 +331,44 @@ class RisksTableView(TableAPIView):
 
         # return Response({'total': datas['total_number'], 'data': list(datas['items'])})
 
+class RisksDetailTableView(TableAPIView):
+
+    def get(self, request, id, page):
+        try:
+            risk = Risk.objects.get(id=int(id))
+        except Risk.DoesNotExist:
+            return Response({'risk': ''})
+        items = risk.articles.all()
+        datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
+        result = self.news_to_json(datas['items'])
+        return Response({'total': datas['total_number'], 'data': result})
+
+class RisksDetailWeixinView(TableAPIView):
+    EVENT_WEIXIN_LIMIT = 10
+    def get(self, request, id, page):
+        try:
+            risk = Risk.objects.get(id=int(id))
+        except Risk.DoesNotExist:
+            return Response({'html': '', 'total': 0})
+        items = risk.weixin.all()
+        datas = self.paging(items, self.EVENT_WEIXIN_LIMIT, page)
+        items = [SetLogo(data) for data in datas['items']]
+        html = self.set_css_to_weixin(items)
+        return Response({'html': html, 'total': datas['total_number']})
+
+
+class RisksDetailWeiboView(TableAPIView):
+    EVENT_WEIBO_LIMIT = 10
+    def get(self, request, id, page):
+        try:
+            risk = Risk.objects.get(id=int(id))
+        except Risk.DoesNotExist:
+            return Response({'html': '', 'total': 0})
+        items = risk.weibo.all()
+        datas = self.paging(items, self.EVENT_WEIBO_LIMIT, page)
+        items = [SetLogo(data) for data in datas['items']]
+        html = self.set_css_to_weibo(items)
+        return Response({'html': html, 'total': datas['total_number']})
 
 class NewsTableView(TableAPIView):
     """
@@ -327,34 +392,7 @@ class NewsTableView(TableAPIView):
         return Response({"news": result})
     """
     def get_custom_artice(self):
-        custom_id_list = []
-        keywords = CustomKeyword.objects.filter(group_id=4)
-        for keyword in keywords:
-            custom_id = keyword.custom_id
-            if custom_id:
-                custom_id_list.append(custom_id)
-        try:
-            cursor = connection.cursor()
-            sql = 'select article_id from custom_articles where %s'\
-                %(
-                    reduce(
-                        lambda x, y: x + " or " + y,
-                        ["custom_id=%s" for x in custom_id_list]
-                        )
-                    )
-            cursor.execute(sql,custom_id_list)
-            row = cursor.fetchall()
-            article_id = []
-            for r in row:
-                article_id.append(r[0])
-        except:
-            article_id = []
-        news_list = Category.objects.get(name='质监热点').articles.all()
-
-        for n in news_list:
-            article_id.append(n.id)
-
-        articles = Article.objects.filter(id__in=article_id)
+        articles = Article.objects.filter(website_type='hot')
 
         return articles
 
