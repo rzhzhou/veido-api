@@ -1070,7 +1070,7 @@ App.page.analyticsDetail = function (module, path, type, id) {
                     normal:{label:{show:true}},
                     emphasis:{label:{show:true}}
                   },
-                  data:data.proviceCount
+                  data: data.province
                 },
               ]
             });
