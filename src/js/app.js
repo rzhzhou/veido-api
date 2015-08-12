@@ -968,192 +968,191 @@ App.page.analyticsDetail = function (module, path, type, id) {
         },
 
         emotion: function (start, end) {
-          $('#chart-emotion').attr('style','height:400px;width:100%');
-          $.getJSON(api, { type : 'chart_emotion', start : start, end : end},function(data) {
-                echarts.init(document.getElementById('chart-emotion')).setOption({
-                  tooltip : {
-                      backgroundColor:'rgba(50,50,50,0.5)',
-                      trigger: 'item',
-                      formatter: "{a} <br/>{b} : {c} ({d}%)"
-                  },
-                  legend: {
-                      orient : 'vertical',
-                      x : 'left',
-                      y : 'bottom',
-                      data:['正面','中性','负面']
-                  },
-                  toolbox: {
-                      show : true,
-                      feature : {
-                          mark : {show: false},
-                          dataView : {show: true, readOnly: false},
-                          magicType : {
-                              show: false,
-                              type: ['pie'],
-                              option: {
-                                  funnel: {
-                                      x: '25%',
-                                      width: '50%',
-                                      funnelAlign: 'left',
-                                      max: 2000
-                                  }
-                              }
-                          },
-                          restore : {show: false},
-                          saveAsImage : {show: true}
+          $.getJSON(api, { type : 'chart-emotion', start : start, end : end},function(data) {
+            echarts.init(document.getElementById('chart-emotion')).setOption({
+              tooltip : {
+                backgroundColor:'rgba(50,50,50,0.5)',
+                trigger: 'item',
+                formatter: '{a} <br/>{b} : {c} ({d}%)'
+              },
+              legend: {
+                orient : 'vertical',
+                x : 'left',
+                y : 'bottom',
+                data:['正面','中性','负面']
+              },
+              toolbox: {
+                show : true,
+                feature : {
+                  mark : {show: false},
+                  dataView : {show: true, readOnly: false},
+                  magicType : {
+                    show: false,
+                    type: ['pie'],
+                    option: {
+                      funnel: {
+                        x: '25%',
+                        width: '50%',
+                        funnelAlign: 'left',
+                        max: 2000
                       }
+                    }
                   },
-                  calculable : true,
-                  series : [
-                      {
-                          name:'访问来源',
-                          type:'pie',
-                          radius : '55%',
-                          center: ['50%', '60%'],
-                          data:
-                          [
-                              {value : data.positive, name:'正面'},
-                              {value : data.normal, name:'中性'},
-                              {value : data.negative, name:'负面'},
-                          ]
-                      }
+                  restore : {show: false},
+                  saveAsImage : {show: true}
+                }
+              },
+              calculable : true,
+              series : [
+                {
+                  name:'访问来源',
+                  type:'pie',
+                  radius : '55%',
+                  center: ['50%', '60%'],
+                  data:
+                  [
+                    {value : data.positive, name:'正面'},
+                    {value : data.normal, name:'中性'},
+                    {value : data.negative, name:'负面'},
                   ]
-                });
+                }
+              ]
             });
+          });
         },
 
         weibo: function (start, end) {
           $.getJSON(api, { type : 'chart-weibo', start : start, end : end }, function (data) {
             echarts.init(document.getElementById('chart-weibo-map')).setOption({
               tooltip : {
-                  trigger: 'item'
+                trigger: 'item'
               },
               legend: {
-                  orient: 'vertical',
-                  x:'left',
-                  data:['微博文']
+                show:false,
+                orient: 'vertical',
+                x:'left',
+                data:['微博文']
               },
               dataRange: {
-                  min: 0,
-                  max: data.value[9],
-                  x: 'left',
-                  y: 'bottom',
-                  text:['高','低'],           // 文本，默认为数值文本
-                  calculable : true
+                min: 0,
+                max: data.value[9],
+                x: 'left',
+                y: 'bottom',
+                text:['高','低'],           // 文本，默认为数值文本
+                calculable : true
               },
               toolbox: {
-                  show: false,
-                  orient : 'vertical',
-                  x: 'right',
-                  y: 'center',
-                  feature : {
-                      mark : {show: true},
-                      dataView : {show: true, readOnly: false},
-                      restore : {show: true},
-                      saveAsImage : {show: true}
-                  }
+                show: false,
+                orient : 'vertical',
+                x: 'right',
+                y: 'center',
+                feature : {
+                  mark : {show: true},
+                  dataView : {show: true, readOnly: false},
+                  restore : {show: true},
+                  saveAsImage : {show: true}
+                }
               },
               roamController: {
-                  show: true,
-                  x: '85%',
-                  mapTypeControl: {
-                      'china': true
-                  }
+                show: true,
+                x: '85%',
+                mapTypeControl: {
+                  'china': true
+                }
               },
               series : [
-                  {
-                      name: '微博文',
-                      type: 'map',
-                      mapType: 'china',
-                      roam: false,
-                      itemStyle:{
-                          normal:{label:{show:true}},
-                          emphasis:{label:{show:true}}
-                      },
-                      data:data.provice_count
+                {
+                  name: '微博文',
+                  type: 'map',
+                  mapType: 'china',
+                  roam: false,
+                  itemStyle:{
+                    normal:{label:{show:true}},
+                    emphasis:{label:{show:true}}
                   },
+                  data:data.proviceCount
+                },
               ]
             });
 
             echarts.init(document.getElementById('chart-weibo-bar')).setOption({
               title : {
-                      text: '微博地域分析',
-                      subtext:'',
-                      x:45
+                text: '微博地域分析',
+                x:45
               },
               tooltip : {
-                  show: false,
-                  trigger: 'axis',
-                  axisPointer : {            // 坐标轴指示器，坐标轴触发有效
-                      type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
-                  }
+                show: false,
+                trigger: 'axis',
+                axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+                    type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                }
               },
               legend: {
-                  show:false,
-                  data:['微博文']
+                show:false,
+                data:['微博文']
               },
               toolbox: {
-                  show : false,
-                  feature : {
-                      mark : {show: true},
-                      dataView : {show: true, readOnly: false},
-                      magicType : {show: true, type: ['line', 'bar', 'stack', 'tiled']},
-                      restore : {show: true},
-                      saveAsImage : {show: true}
-                  }
+                show : false,
+                feature : {
+                  mark : {show: true},
+                  dataView : {show: true, readOnly: false},
+                  magicType : {show: true, type: ['line', 'bar', 'stack', 'tiled']},
+                  restore : {show: true},
+                  saveAsImage : {show: true}
+                }
               },
               calculable : false,
               grid:{
                 borderWidth:0
               },
               xAxis : [
-                  {
-                      show:false,
-                      type : 'value'
-                  }
+                {
+                  show:false,
+                  type : 'value'
+                }
               ],
               yAxis : [
-                  {
-                      show:true,
-                      axisLine:false,
-                      axisTick:false,
-                      type : 'category',
-                      splitLine:false,
-                      splitArea:{
-                        show:false
-                      },
-                      axisLabel:{
-                        show:true,
-                        textStyle:{
-                          fontSize:14,
-                          fontWeight:'bolder'
-                        }
-                      },
-                      data :data.name
-                  }
+                {
+                  show:true,
+                  axisLine:false,
+                  axisTick:false,
+                  type : 'category',
+                  splitLine:false,
+                  splitArea:{
+                    show:false
+                  },
+                  axisLabel:{
+                    show:true,
+                    textStyle:{
+                      fontSize:14,
+                      fontWeight:'bolder'
+                    }
+                  },
+                  data :data.name
+                }
               ],
               series : [
-                  {
-                      name:'微博文',
-                      type:'bar',
-                      stack: '总量',
-                      barWidth:20,
-                      itemStyle : {
-                        normal: {
-                          label : {
-                            show: true,
-                            textStyle:{
-                              color:'#000000',
-                              fontSize:14,
-                              fontWeight:'bolder'
-                            },
-                            position: 'right'
-                          },
-                          color:'#3C8DBC'
-                        }
+                {
+                  name:'微博文',
+                  type:'bar',
+                  stack: '总量',
+                  barWidth:20,
+                  itemStyle : {
+                    normal: {
+                      label : {
+                        show: true,
+                        textStyle:{
+                          color:'#000000',
+                          fontSize:14,
+                          fontWeight:'bolder'
+                        },
+                        position: 'right'
                       },
-                      data: data.value
+                      color:'#3C8DBC'
+                    }
                   },
+                  data: data.value
+                },
               ]
             });
           });
