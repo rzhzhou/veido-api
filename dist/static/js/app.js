@@ -1389,6 +1389,7 @@ App.page.user = function (module) {
 App.page.dashboard = function (module, path) {
   module.infoBox();
   module.map(path);
+  $('.table-risk').showRisk();
   module.line(path);
   module.pie(path);
   module.inspection();
