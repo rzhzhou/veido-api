@@ -26,6 +26,7 @@ class DispatchView(APIView, BaseTemplateView):
             cache = int(parameter['cache']) if parameter.has_key('cache') else 1
             func = getattr(globals()['DispatchView'](), type)
 
+            # cache is flag,if cache=1 read redis, else read mysql 
             if cache:
                 now = datetime.now()
                 today = date(now.year, now.month, now.day) + timedelta(days=1)
@@ -34,7 +35,13 @@ class DispatchView(APIView, BaseTemplateView):
 
                 data = None
 
-                if end == today and date_range == 7:
+                '''
+                read over the past 7 days of data in redis
+                read over the past 30 days of data in redis
+                read this month of data in redis
+                read last month of data in redis
+                '''
+                if end == today and date_range == 7: 
                     data = RedisQueryApi().hget('CacheSevenDays', type)
                 elif end == today and date_range == 30:
                     data = RedisQueryApi().hget('CacheThrityDays', type)
@@ -69,11 +76,11 @@ class DispatchView(APIView, BaseTemplateView):
 
     def chart_emotion(self, start, end):
         positive = Article.objects.filter(pubtime__range=(start,end),
-                feeling_factor__gte=0.6).count()
+                feeling_factor__gte=0.9).count()
         normal = Article.objects.filter(pubtime__range=(start,end),
-            feeling_factor__gte=0.5, feeling_factor__lt=0.6).count()
+            feeling_factor__gte=0.1, feeling_factor__lt=0.9).count()
 
-        negative = Article.objects.filter(pubtime__range=(start,end), feeling_factor__lt=0.5).count()
+        negative = Article.objects.filter(pubtime__range=(start,end), feeling_factor__lt=0.1).count()
 
         return Response({'positive':positive, 'normal': normal, 'negative': negative})
 
@@ -88,7 +95,6 @@ class DispatchView(APIView, BaseTemplateView):
             provice_count.append({'name': province.name, 'value': count})
         sort_result = sorted(provice_count, key=lambda x:x['value'])[-10:]
         name = map(lambda n: n['name'], sort_result)
-        print name
         value = map(lambda v: v['value'], sort_result)
         return Response({'provice_count':provice_count, 'name': name, 'value': value})
 
