@@ -658,44 +658,37 @@ App.module.custom = function () {
   }
 };
 
-App.module.dateRange = (function () {
-  var show = function ($el, start, end) {
-        $el.children('span').html(start + ' ~ ' + end);
+App.module.dateRange = function ($dateRange) {
+  $dateRange
+    .on('show.dateRange', function (event, start, end) {
+      $(this).children('span').html(start + ' ~ ' + end);
+    })
+    .daterangepicker({
+      ranges: {
+        '过去7天': [moment().subtract(6, 'days'), moment()],
+        '过去30天': [moment().subtract(29, 'days'), moment()],
+        '这个月': [moment().startOf('month'), moment().endOf('month')],
+        '上个月': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
       },
-
-      init = function ($el, start, end, callback) {
-        $el.daterangepicker({
-          ranges: {
-            '过去7天': [moment().subtract(6, 'days'), moment()],
-            '过去30天': [moment().subtract(29, 'days'), moment()],
-            '这个月': [moment().startOf('month'), moment().endOf('month')],
-            '上个月': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-          },
-          'locale': {
-            'format': 'YYYY-MM-DD',
-            'separator': ' - ',
-            'applyLabel': '确定',
-            'cancelLabel': '取消',
-            'fromLabel': '从',
-            'toLabel': '到',
-            'customRangeLabel': '自定义'
-          },
-          'startDate': moment().subtract(6, 'days'),
-          'endDate': moment(),
-          'minDate': '2010-01-01',
-          'maxDate': moment(),
-          'opens': 'left',
-          'parentEl': '.content-header',
-          'applyClass': 'btn-success',
-          'cancelClass': 'btn-default'
-        }, callback);
-      };
-
-  return {
-    show: show,
-    init: init
-  };
-}());
+      'locale': {
+        'format': 'YYYY-MM-DD',
+        'separator': ' - ',
+        'applyLabel': '确定',
+        'cancelLabel': '取消',
+        'fromLabel': '从',
+        'toLabel': '到',
+        'customRangeLabel': '自定义'
+      },
+      'startDate': moment().subtract(6, 'days'),
+      'endDate': moment(),
+      'minDate': '2010-01-01',
+      'maxDate': moment(),
+      'opens': 'left',
+      'parentEl': '.content-header',
+      'applyClass': 'btn-success',
+      'cancelClass': 'btn-default'
+    });
+};
 
 App.module.statistic = function ($el, api) {
   var $total = $el.find('.statistic-total > span'),
@@ -845,15 +838,15 @@ App.page.collection = function (module, path) {
 
 App.page.analyticsDetail = function (module, path) {
   var api = '/api' + path,
-      $el = $('.date-range-picker'),
+      $dateRange = $('.date-range-picker'),
       $chart = $('#chart'),
       $statistic = $('#statistic'),
       start = moment().subtract(6, 'days').format(),
       end = moment().format();
 
   // init analytics
-  module.dateRange.show($el, start, end);
-  module.dateRange.init($el, start, end);
+  module.dateRange($dateRange);
+  $dateRange.trigger('show.dateRange', [start, end]);
 
   $chart.on('show.chart', function (event, start, end) {
     var chart = {},
@@ -1234,12 +1227,11 @@ App.page.analyticsDetail = function (module, path) {
     $chart.trigger('show.chart', [start, end]);
   });
 
-  $el.on('apply.daterangepicker', function (event, picker) {
+  $dateRange.on('apply.daterangepicker', function (event, picker) {
     start = picker.startDate.format();
     end = picker.endDate.format();
 
-    module.dateRange.show($el, start, end);
-
+    $dateRange.trigger('show.dateRange', [start, end]);
     $chart.trigger('show.chart', [start, end]);
     $statistic.trigger('show.statistic', [start, end]);
   });
