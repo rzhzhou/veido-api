@@ -1110,34 +1110,21 @@ def chart_line_event_view(request, topic_id):
     min_date = min(x.pubtime.date() for x in articles)
     max_date = max(x.pubtime.date() for x in articles)
     date_range = max_date - min_date
-    #data range by year   less one axis has data
-    if date_range.days > 6 * 55:
-        return year_range(min_date, max_date, date_range, articles)
-    #data range by season   less two axis has data
-    elif date_range.days > 6 * 30:
-        return season_range(min_date, max_date, date_range, articles)
-    #data range by month    less two axis has data
-    elif  date_range.days >= 3 * 10:
-        return months_range(min_date, max_date, date_range, articles)
-    #data range by weeks    less one axis has data
-    elif date_range.days > 7:
-        return week_range(min_date, max_date, date_range, articles)
-    #data range by days     less one axis has data
-    elif date_range.days >= 0:
-        return days_range(min_date, max_date, date_range, articles)
-    else:
-        return unstable()
-
+    return chart_line(date_range, min_date, max_date, articles)
+    
 def chart_line_risk_view(request, risk_id):
     try:
         articles = Risk.objects.get(id=risk_id).articles.all()
     except Risk.DoesNotExist:
-        return HttpResponse(status=404)
+        return HttpResponse(status=400)
     if not articles:
-        return HttpResponse(status=404)
+        return HttpResponse(status=400)
     min_date = min(x.pubtime.date() for x in articles)
     max_date = max(x.pubtime.date() for x in articles)
     date_range = max_date - min_date
+    return chart_line(date_range, min_date, max_date, articles)
+    
+def chart_line(date_range, min_date, max_date, articles):
     #data range by year   less one axis has data
     if date_range.days > 6 * 55:
         return year_range(min_date, max_date, date_range, articles)
