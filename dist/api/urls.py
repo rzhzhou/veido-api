@@ -54,6 +54,8 @@ urlpatterns += patterns('api.views',
 
     url(r'^line/$', 'chart_line_index_view'),
     url(r'^pie/$', 'chart_pie_index_view'),
+    url(r'^line/risk/(\d+)/$', 'chart_line_risk_view'),
+    url(r'^pie/risk/(\d+)/$', 'chart_pie_risk_view'),
     url(r'^line/event/(\d+)/$', 'chart_line_event_view'),
     url(r'^pie/event/(\d+)/$', 'chart_pie_event_view'),
     url(r'^map/$', 'map_view'),

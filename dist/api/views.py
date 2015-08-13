@@ -1128,6 +1128,33 @@ def chart_line_event_view(request, topic_id):
     else:
         return unstable()
 
+def chart_line_risk_view(request, risk_id):
+    try:
+        articles = Risk.objects.get(id=risk_id).articles.all()
+    except Risk.DoesNotExist:
+        return HttpResponse(status=404)
+    if not articles:
+        return HttpResponse(status=404)
+    min_date = min(x.pubtime.date() for x in articles)
+    max_date = max(x.pubtime.date() for x in articles)
+    date_range = max_date - min_date
+    #data range by year   less one axis has data
+    if date_range.days > 6 * 55:
+        return year_range(min_date, max_date, date_range, articles)
+    #data range by season   less two axis has data
+    elif date_range.days > 6 * 30:
+        return season_range(min_date, max_date, date_range, articles)
+    #data range by month    less two axis has data
+    elif  date_range.days >= 3 * 10:
+        return months_range(min_date, max_date, date_range, articles)
+    #data range by weeks    less one axis has data
+    elif date_range.days > 7:
+        return week_range(min_date, max_date, date_range, articles)
+    #data range by days     less one axis has data
+    elif date_range.days >= 0:
+        return days_range(min_date, max_date, date_range, articles)
+    else:
+        return unstable()
 
 @api_view(['GET'])
 @login_required
@@ -1151,6 +1178,17 @@ def chart_pie_event_view(request, topic_id):
     value = [item for item in value if item['value']]
     return JsonResponse({u'name': name, u'value': value})
 
+def chart_pie_risk_view(request, risk_id):
+    try:
+        risk = Risk.objects.get(id=int(risk_id))
+    except (KeyError, ValueError, Risk.DoesNotExist):
+        return HttpResponse(status=400)
+    name = [u'新闻媒体', u'政府网站', u'自媒体']
+    value = [{u'name': u'新闻媒体', u'value': risk.articles.filter(publisher__searchmode=1).count()},
+             {u'name': u'政府网站', u'value': risk.articles.filter(publisher__searchmode=0).count()},
+             {u'name': u'自媒体', u'value': risk.weibo.count()+risk.weixin.count()}]
+    value = [item for item in value if item['value']]
+    return JsonResponse({u'name': name, u'value': value})
 
 def map_view(request):
     # login_url = "http://192.168.0.215/auth"
