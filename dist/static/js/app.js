@@ -1462,7 +1462,7 @@ App.page.analyticsDetail = function (module, path, type, id) {
             start: start,
             end: end
           }, function (data) {
-            echarts.init(document.getElementById('chart-type')).setOption({
+            echarts.init(document.getElementById('chart-type'), 'macarons').setOption({
               tooltip: {
                 backgroundColor: 'rgba(50,50,50,0.5)',
                 trigger: 'item',
@@ -1513,7 +1513,7 @@ App.page.analyticsDetail = function (module, path, type, id) {
             start: start,
             end: end
           }, function (data) {
-            echarts.init(document.getElementById('chart-emotion')).setOption({
+            echarts.init(document.getElementById('chart-emotion'), 'macarons').setOption({
               tooltip: {
                 backgroundColor: 'rgba(50,50,50,0.5)',
                 trigger: 'item',
@@ -1582,7 +1582,7 @@ App.page.analyticsDetail = function (module, path, type, id) {
             start: start,
             end: end
           }, function (data) {
-            echarts.init(document.getElementById('chart-weibo-map')).setOption({
+            echarts.init(document.getElementById('chart-weibo-map'), 'macarons').setOption({
               tooltip: {
                 trigger: 'item'
               },
@@ -1649,7 +1649,7 @@ App.page.analyticsDetail = function (module, path, type, id) {
               }, ]
             });
 
-            echarts.init(document.getElementById('chart-weibo-bar')).setOption({
+            echarts.init(document.getElementById('chart-weibo-bar'), 'macarons').setOption({
               title: {
                 text: '微博地域分析',
                 x: 45
