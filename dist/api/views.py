@@ -392,13 +392,13 @@ class NewsTableView(TableAPIView):
         return Response({"news": result})
     """
     def get_custom_artice(self):
-        articles = Article.objects.filter(website_type='hot')
+        # articles = Article.objects.filter(website_type='hot')
+        articles = Category.objects.get(name='质监热点').articles.all()
+
 
         return articles
 
     def get(self, request, page):
-        # news_list = Article.objects.filter(website_type='hot')
-        # news_list = ArticleCategory.objects.get(name='质监热点').articles.all()
         items = self.get_custom_artice()
         datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
         result = self.news_to_json(datas['items'])

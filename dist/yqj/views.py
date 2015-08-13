@@ -58,7 +58,7 @@ def index_view(request):
         weixin_number = Weixin.objects.count()
         total = news_number + weixin_number + weibo_number
         event = Topic.objects.all().count()
-        event_news_number = Article.objects.filter(website_type='topic').count()
+        event_news_number = Category.objects.get(name=u'事件').articles.count()
         event_weixin_number = Weixin.objects.filter(website_type='topic').count()
         event_weibo_number = Weibo.objects.filter(website_type='topic').count()
         event_data_number = event_news_number + event_weixin_number + event_weibo_number
@@ -107,8 +107,6 @@ def index_view(request):
             article_id.append(n.id)
 
         news_list = Article.objects.filter(id__in=article_id)[:10]
-
-
 
         for item in news_list:
             try:
