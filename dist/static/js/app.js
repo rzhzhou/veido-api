@@ -1371,391 +1371,395 @@ App.page.collection = function (module, path) {
   module.table(module, path);
 };
 
-App.page.analyticsDetail = function (module, path, type, id) {
+App.page.analyticsDetail = function (module, path) {
   var api = '/api' + path,
       $el = $('.date-range-picker'),
       $chart = $('#chart'),
       $statistic = $('#statistic'),
       start = moment().subtract(6, 'days').format(),
-      end = moment().format(),
-      chart = {
-        trend: function (start, end) {
-          $.getJSON(api, {
-            type: 'chart-trend',
-            start: start,
-            end: end
-          }, function (data) {
-            echarts.init(document.getElementById('chart-trend'), 'macarons').setOption({
-              tooltip: {
-                backgroundColor: 'rgba(50,50,50,0.5)',
-                trigger: 'axis',
-                axisPointer: {
-                  type: 'line',
-                  lineStyle: {
-                    color: '#008acd',
-                  }
-                }
-              },
-              shadowStyle: {
-                color: 'rgba(200,200,200,0.2)'
-              },
-              legend: {
-                data: ['全部', '新闻', '微博', '微信']
-              },
-              grid: {
-                x: 50,
-                y: 30,
-                x2: 25,
-                y2: 65
-              },
-              toolbox: {
-                show: true,
-                feature: {
-                  mark: {
-                    show: false
-                  },
-                  dataView: {
-                    show: true,
-                    readOnly: false
-                  },
-                  magicType: {
-                    show: false,
-                    type: ['line']
-                  },
-                  restore: {
-                    show: false
-                  },
-                  saveAsImage: {
-                    show: true
-                  }
-                }
-              },
-              calculable: true,
-              xAxis: [{
-                type: 'category',
-                boundaryGap: false,
-                data: data.date
-              }],
-              yAxis: [{
-                type: 'value'
-              }],
-              series: [{
-                name: '全部',
-                type: 'line',
-                data: data.total
-              }, {
-                name: '新闻',
-                type: 'line',
-                data: data.news
-              }, {
-                name: '微博',
-                type: 'line',
-                data: data.weibo
-              }, {
-                name: '微信',
-                type: 'line',
-                data: data.weixin
-              }, ]
-            });
-          });
-        },
+      end = moment().format();
 
-        type: function (start, end) {
-          $.getJSON(api, {
-            type: 'chart-type',
-            start: start,
-            end: end
-          }, function (data) {
-            echarts.init(document.getElementById('chart-type'), 'macarons').setOption({
-              tooltip: {
-                backgroundColor: 'rgba(50,50,50,0.5)',
-                trigger: 'item',
-                formatter: '{a} <br/>{b} : {c} ({d}%)'
-              },
-              legend: {
-                orient: 'vertical',
-                x: 'left',
-                y: 'bottom',
-                data: ['新闻', '微博', '微信']
-              },
-              toolbox: {
-                show: true,
-                feature: {
-                  dataView: {
-                    show: true,
-                    readOnly: false
-                  },
-                  saveAsImage: {
-                    show: true,
-                  }
-                }
-              },
-              calculable: true,
-              series: [{
-                name: '访问来源',
-                type: 'pie',
-                radius: '55%',
-                center: ['50%', '60%'],
-                data: [{
-                  value: data.news,
-                  name: '新闻'
-                }, {
-                  value: data.weibo,
-                  name: '微博'
-                }, {
-                  value: data.weixin,
-                  name: '微信'
-                }]
-              }]
-            });
-          });
-        },
-
-        emotion: function (start, end) {
-          $.getJSON(api, {
-            type: 'chart-emotion',
-            start: start,
-            end: end
-          }, function (data) {
-            echarts.init(document.getElementById('chart-emotion'), 'macarons').setOption({
-              tooltip: {
-                backgroundColor: 'rgba(50,50,50,0.5)',
-                trigger: 'item',
-                formatter: '{a} <br/>{b} : {c} ({d}%)'
-              },
-              legend: {
-                orient: 'vertical',
-                x: 'left',
-                y: 'bottom',
-                data: ['正面', '中性', '负面']
-              },
-              toolbox: {
-                show: true,
-                feature: {
-                  mark: {
-                    show: false
-                  },
-                  dataView: {
-                    show: true,
-                    readOnly: false
-                  },
-                  magicType: {
-                    show: false,
-                    type: ['pie'],
-                    option: {
-                      funnel: {
-                        x: '25%',
-                        width: '50%',
-                        funnelAlign: 'left',
-                        max: 2000
-                      }
-                    }
-                  },
-                  restore: {
-                    show: false
-                  },
-                  saveAsImage: {
-                    show: true
-                  }
-                }
-              },
-              calculable: true,
-              series: [{
-                name: '访问来源',
-                type: 'pie',
-                radius: '55%',
-                center: ['50%', '60%'],
-                data: [{
-                  value: data.positive,
-                  name: '正面'
-                }, {
-                  value: data.normal,
-                  name: '中性'
-                }, {
-                  value: data.negative,
-                  name: '负面'
-                }, ]
-              }]
-            });
-          });
-        },
-
-        weibo: function (start, end) {
-          $.getJSON(api, {
-            type: 'chart-weibo',
-            start: start,
-            end: end
-          }, function (data) {
-            echarts.init(document.getElementById('chart-weibo-map'), 'macarons').setOption({
-              tooltip: {
-                trigger: 'item'
-              },
-              legend: {
-                show: false,
-                orient: 'vertical',
-                x: 'left',
-                data: ['微博文']
-              },
-              dataRange: {
-                min: 0,
-                max: data.value[9],
-                x: 'left',
-                y: 'bottom',
-                text: ['高', '低'], // 文本，默认为数值文本
-                calculable: true
-              },
-              toolbox: {
-                show: false,
-                orient: 'vertical',
-                x: 'right',
-                y: 'center',
-                feature: {
-                  mark: {
-                    show: true
-                  },
-                  dataView: {
-                    show: true,
-                    readOnly: false
-                  },
-                  restore: {
-                    show: true
-                  },
-                  saveAsImage: {
-                    show: true
-                  }
-                }
-              },
-              roamController: {
-                show: true,
-                x: '85%',
-                mapTypeControl: {
-                  'china': true
-                }
-              },
-              series: [{
-                name: '微博文',
-                type: 'map',
-                mapType: 'china',
-                roam: false,
-                itemStyle: {
-                  normal: {
-                    label: {
-                      show: true
-                    }
-                  },
-                  emphasis: {
-                    label: {
-                      show: true
-                    }
-                  }
-                },
-                data: data.province
-              }, ]
-            });
-
-            echarts.init(document.getElementById('chart-weibo-bar'), 'macarons').setOption({
-              title: {
-                text: '微博地域分析',
-                x: 45
-              },
-              tooltip: {
-                show: false,
-                trigger: 'axis',
-                axisPointer: { // 坐标轴指示器，坐标轴触发有效
-                  type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
-                }
-              },
-              legend: {
-                show: false,
-                data: ['微博文']
-              },
-              toolbox: {
-                show: false,
-                feature: {
-                  mark: {
-                    show: true
-                  },
-                  dataView: {
-                    show: true,
-                    readOnly: false
-                  },
-                  magicType: {
-                    show: true,
-                    type: ['line', 'bar', 'stack', 'tiled']
-                  },
-                  restore: {
-                    show: true
-                  },
-                  saveAsImage: {
-                    show: true
-                  }
-                }
-              },
-              calculable: false,
-              grid: {
-                borderWidth: 0
-              },
-              xAxis: [{
-                show: false,
-                type: 'value'
-              }],
-              yAxis: [{
-                show: true,
-                axisLine: false,
-                axisTick: false,
-                type: 'category',
-                splitLine: false,
-                splitArea: {
-                  show: false
-                },
-                axisLabel: {
-                  show: true,
-                  textStyle: {
-                    fontSize: 14,
-                    fontWeight: 'bolder'
-                  }
-                },
-                data: data.name
-              }],
-              series: [{
-                name: '微博文',
-                type: 'bar',
-                stack: '总量',
-                barWidth: 20,
-                itemStyle: {
-                  normal: {
-                    label: {
-                      show: true,
-                      textStyle: {
-                        color: '#000000',
-                        fontSize: 14,
-                        fontWeight: 'bolder'
-                      },
-                      position: 'right'
-                    },
-                    color: '#3C8DBC'
-                  }
-                },
-                data: data.value
-              }]
-            });
-          });
-        }
-      },
-
-      showChart = function () {
-        var chartType = $chart.find('.tab-pane.active')[0].id.slice(6);
-        chart[chartType](start, end);
-      };
-
+  // init analytics
   module.dateRange.show($el, start, end);
   module.dateRange.init($el, start, end);
 
-  module.statistic($statistic, api);
+  $chart.on('show.chart', function (event, start, end) {
+    var chart = {},
+        name = $(this).find('.tab-pane.active')[0].id.slice(6);
 
-  $chart.on({
-    'dateChange': showChart,
-    'shown.bs.tab': showChart
+    chart.trend = function (start, end) {
+      $.getJSON(api, {
+        type: 'chart-trend',
+        start: start,
+        end: end
+      }, function (data) {
+        echarts.init(document.getElementById('chart-trend'), 'macarons').setOption({
+          tooltip: {
+            backgroundColor: 'rgba(50,50,50,0.5)',
+            trigger: 'axis',
+            axisPointer: {
+              type: 'line',
+              lineStyle: {
+                color: '#008acd',
+              }
+            }
+          },
+          shadowStyle: {
+            color: 'rgba(200,200,200,0.2)'
+          },
+          legend: {
+            data: ['全部', '新闻', '微博', '微信']
+          },
+          grid: {
+            x: 50,
+            y: 30,
+            x2: 25,
+            y2: 65
+          },
+          toolbox: {
+            show: true,
+            feature: {
+              mark: {
+                show: false
+              },
+              dataView: {
+                show: true,
+                readOnly: false
+              },
+              magicType: {
+                show: false,
+                type: ['line']
+              },
+              restore: {
+                show: false
+              },
+              saveAsImage: {
+                show: true
+              }
+            }
+          },
+          calculable: true,
+          xAxis: [{
+            type: 'category',
+            boundaryGap: false,
+            data: data.date
+          }],
+          yAxis: [{
+            type: 'value'
+          }],
+          series: [{
+            name: '全部',
+            type: 'line',
+            data: data.total
+          }, {
+            name: '新闻',
+            type: 'line',
+            data: data.news
+          }, {
+            name: '微博',
+            type: 'line',
+            data: data.weibo
+          }, {
+            name: '微信',
+            type: 'line',
+            data: data.weixin
+          }, ]
+        });
+      });
+    };
+
+    chart.type = function (start, end) {
+      $.getJSON(api, {
+        type: 'chart-type',
+        start: start,
+        end: end
+      }, function (data) {
+        echarts.init(document.getElementById('chart-type'), 'macarons').setOption({
+          tooltip: {
+            backgroundColor: 'rgba(50,50,50,0.5)',
+            trigger: 'item',
+            formatter: '{a} <br/>{b} : {c} ({d}%)'
+          },
+          legend: {
+            orient: 'vertical',
+            x: 'left',
+            y: 'bottom',
+            data: ['新闻', '微博', '微信']
+          },
+          toolbox: {
+            show: true,
+            feature: {
+              dataView: {
+                show: true,
+                readOnly: false
+              },
+              saveAsImage: {
+                show: true,
+              }
+            }
+          },
+          calculable: true,
+          series: [{
+            name: '访问来源',
+            type: 'pie',
+            radius: '55%',
+            center: ['50%', '60%'],
+            data: [{
+              value: data.news,
+              name: '新闻'
+            }, {
+              value: data.weibo,
+              name: '微博'
+            }, {
+              value: data.weixin,
+              name: '微信'
+            }]
+          }]
+        });
+      });
+    };
+
+    chart.emotion = function (start, end) {
+      $.getJSON(api, {
+        type: 'chart-emotion',
+        start: start,
+        end: end
+      }, function (data) {
+        echarts.init(document.getElementById('chart-emotion'), 'macarons').setOption({
+          tooltip: {
+            backgroundColor: 'rgba(50,50,50,0.5)',
+            trigger: 'item',
+            formatter: '{a} <br/>{b} : {c} ({d}%)'
+          },
+          legend: {
+            orient: 'vertical',
+            x: 'left',
+            y: 'bottom',
+            data: ['正面', '中性', '负面']
+          },
+          toolbox: {
+            show: true,
+            feature: {
+              mark: {
+                show: false
+              },
+              dataView: {
+                show: true,
+                readOnly: false
+              },
+              magicType: {
+                show: false,
+                type: ['pie'],
+                option: {
+                  funnel: {
+                    x: '25%',
+                    width: '50%',
+                    funnelAlign: 'left',
+                    max: 2000
+                  }
+                }
+              },
+              restore: {
+                show: false
+              },
+              saveAsImage: {
+                show: true
+              }
+            }
+          },
+          calculable: true,
+          series: [{
+            name: '访问来源',
+            type: 'pie',
+            radius: '55%',
+            center: ['50%', '60%'],
+            data: [{
+              value: data.positive,
+              name: '正面'
+            }, {
+              value: data.normal,
+              name: '中性'
+            }, {
+              value: data.negative,
+              name: '负面'
+            }, ]
+          }]
+        });
+      });
+    };
+
+    chart.weibo = function (start, end) {
+      $.getJSON(api, {
+        type: 'chart-weibo',
+        start: start,
+        end: end
+      }, function (data) {
+        echarts.init(document.getElementById('chart-weibo-map'), 'macarons').setOption({
+          tooltip: {
+            trigger: 'item'
+          },
+          legend: {
+            show: false,
+            orient: 'vertical',
+            x: 'left',
+            data: ['微博文']
+          },
+          dataRange: {
+            min: 0,
+            max: data.value[9],
+            x: 'left',
+            y: 'bottom',
+            text: ['高', '低'], // 文本，默认为数值文本
+            calculable: true
+          },
+          toolbox: {
+            show: false,
+            orient: 'vertical',
+            x: 'right',
+            y: 'center',
+            feature: {
+              mark: {
+                show: true
+              },
+              dataView: {
+                show: true,
+                readOnly: false
+              },
+              restore: {
+                show: true
+              },
+              saveAsImage: {
+                show: true
+              }
+            }
+          },
+          roamController: {
+            show: true,
+            x: '85%',
+            mapTypeControl: {
+              'china': true
+            }
+          },
+          series: [{
+            name: '微博文',
+            type: 'map',
+            mapType: 'china',
+            roam: false,
+            itemStyle: {
+              normal: {
+                label: {
+                  show: true
+                }
+              },
+              emphasis: {
+                label: {
+                  show: true
+                }
+              }
+            },
+            data: data.province
+          }, ]
+        });
+
+        echarts.init(document.getElementById('chart-weibo-bar'), 'macarons').setOption({
+          title: {
+            text: '微博地域分析',
+            x: 45
+          },
+          tooltip: {
+            show: false,
+            trigger: 'axis',
+            axisPointer: { // 坐标轴指示器，坐标轴触发有效
+              type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
+            }
+          },
+          legend: {
+            show: false,
+            data: ['微博文']
+          },
+          toolbox: {
+            show: false,
+            feature: {
+              mark: {
+                show: true
+              },
+              dataView: {
+                show: true,
+                readOnly: false
+              },
+              magicType: {
+                show: true,
+                type: ['line', 'bar', 'stack', 'tiled']
+              },
+              restore: {
+                show: true
+              },
+              saveAsImage: {
+                show: true
+              }
+            }
+          },
+          calculable: false,
+          grid: {
+            borderWidth: 0
+          },
+          xAxis: [{
+            show: false,
+            type: 'value'
+          }],
+          yAxis: [{
+            show: true,
+            axisLine: false,
+            axisTick: false,
+            type: 'category',
+            splitLine: false,
+            splitArea: {
+              show: false
+            },
+            axisLabel: {
+              show: true,
+              textStyle: {
+                fontSize: 14,
+                fontWeight: 'bolder'
+              }
+            },
+            data: data.name
+          }],
+          series: [{
+            name: '微博文',
+            type: 'bar',
+            stack: '总量',
+            barWidth: 20,
+            itemStyle: {
+              normal: {
+                label: {
+                  show: true,
+                  textStyle: {
+                    color: '#000000',
+                    fontSize: 14,
+                    fontWeight: 'bolder'
+                  },
+                  position: 'right'
+                },
+                color: '#3C8DBC'
+              }
+            },
+            data: data.value
+          }]
+        });
+      });
+    };
+
+    chart[name](start, end);
+  });
+  $chart.trigger('show.chart', [start, end]);
+
+  module.statistic($statistic, api);
+  $statistic.trigger('show.statistic', [start, end]);
+
+  // listen for change
+  $chart.on('shown.bs.tab', function () {
+    $chart.trigger('show.chart', [start, end]);
   });
 
   $el.on('apply.daterangepicker', function (event, picker) {
@@ -1764,12 +1768,9 @@ App.page.analyticsDetail = function (module, path, type, id) {
 
     module.dateRange.show($el, start, end);
 
-    $chart.trigger('dateChange');
+    $chart.trigger('show.chart', [start, end]);
     $statistic.trigger('show.statistic', [start, end]);
   });
-
-  $chart.trigger('dateChange');
-  $statistic.trigger('show.statistic', [start, end]);
 };
 
 
