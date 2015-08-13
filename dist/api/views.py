@@ -392,13 +392,13 @@ class NewsTableView(TableAPIView):
         return Response({"news": result})
     """
     def get_custom_artice(self):
-        articles = Article.objects.filter(website_type='hot')
+        # articles = Article.objects.filter(website_type='hot')
+        articles = Category.objects.get(name='质监热点').articles.all()
+
 
         return articles
 
     def get(self, request, page):
-        # news_list = Article.objects.filter(website_type='hot')
-        # news_list = ArticleCategory.objects.get(name='质监热点').articles.all()
         items = self.get_custom_artice()
         datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
         result = self.news_to_json(datas['items'])
@@ -1110,6 +1110,21 @@ def chart_line_event_view(request, topic_id):
     min_date = min(x.pubtime.date() for x in articles)
     max_date = max(x.pubtime.date() for x in articles)
     date_range = max_date - min_date
+    return chart_line(date_range, min_date, max_date, articles)
+    
+def chart_line_risk_view(request, risk_id):
+    try:
+        articles = Risk.objects.get(id=risk_id).articles.all()
+    except Risk.DoesNotExist:
+        return HttpResponse(status=400)
+    if not articles:
+        return HttpResponse(status=400)
+    min_date = min(x.pubtime.date() for x in articles)
+    max_date = max(x.pubtime.date() for x in articles)
+    date_range = max_date - min_date
+    return chart_line(date_range, min_date, max_date, articles)
+    
+def chart_line(date_range, min_date, max_date, articles):
     #data range by year   less one axis has data
     if date_range.days > 6 * 55:
         return year_range(min_date, max_date, date_range, articles)
@@ -1127,7 +1142,6 @@ def chart_line_event_view(request, topic_id):
         return days_range(min_date, max_date, date_range, articles)
     else:
         return unstable()
-
 
 @api_view(['GET'])
 @login_required
@@ -1151,6 +1165,17 @@ def chart_pie_event_view(request, topic_id):
     value = [item for item in value if item['value']]
     return JsonResponse({u'name': name, u'value': value})
 
+def chart_pie_risk_view(request, risk_id):
+    try:
+        risk = Risk.objects.get(id=int(risk_id))
+    except (KeyError, ValueError, Risk.DoesNotExist):
+        return HttpResponse(status=400)
+    name = [u'新闻媒体', u'政府网站', u'自媒体']
+    value = [{u'name': u'新闻媒体', u'value': risk.articles.filter(publisher__searchmode=1).count()},
+             {u'name': u'政府网站', u'value': risk.articles.filter(publisher__searchmode=0).count()},
+             {u'name': u'自媒体', u'value': risk.weibo.count()+risk.weixin.count()}]
+    value = [item for item in value if item['value']]
+    return JsonResponse({u'name': name, u'value': value})
 
 def map_view(request):
     # login_url = "http://192.168.0.215/auth"

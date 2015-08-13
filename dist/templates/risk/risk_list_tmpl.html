@@ -1,7 +1,7 @@
 {% for risk in risk_list  %}
 <tr>
   <td>
-    <a href="/news/{{ risk.id }}/" target="_blank">{{ risk.title }}</a>
+    <a href="/risk/{{ risk.id }}/" target="_blank">{{ risk.title }}</a>
   </td>
   <td>{{ risk.source }}</td>
   <td>{{ risk.pubtime | date:"Y-m-d" }}</td>

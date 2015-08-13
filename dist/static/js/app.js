@@ -1489,10 +1489,19 @@ App.page.risk = function (module) {
   });
 };
 
+App.page.riskDetail = function (module, path, type, id) {
+  module.collect(type, id);
+  module.line(path, type);
+  module.pie(path, type);
+  module.table(module, path);
+  module.sns(module, path, type);
+};
+
 
 //
 // Initialization
 //
+
 $(function () {
   App.route();
 });
