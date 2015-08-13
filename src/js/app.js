@@ -701,8 +701,12 @@ App.module.statistic = function ($el, api) {
   var $total = $el.find('.statistic-total > span'),
       $risk = $el.find('.statistic-risk > span');
 
-  $el.on('dateChange', function (event, start, end) {
-    $.getJSON(api, {type: 'statistic', start: start, end: end}, function (statistic) {
+  $el.on('show.statistic', function (event, start, end) {
+    $.getJSON(api, {
+      type: 'statistic',
+      start: start,
+      end: end
+    }, function (statistic) {
       $total.text(statistic.total);
       $risk.text(statistic.risk);
     });
@@ -1233,11 +1237,11 @@ App.page.analyticsDetail = function (module, path, type, id) {
     module.dateRange.show($el, start, end);
 
     $chart.trigger('dateChange');
-    $statistic.trigger('dateChange', [start, end]);
+    $statistic.trigger('show.statistic', [start, end]);
   });
 
   $chart.trigger('dateChange');
-  $statistic.trigger('dateChange', [start, end]);
+  $statistic.trigger('show.statistic', [start, end]);
 };
 
 
