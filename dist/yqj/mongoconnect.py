@@ -80,6 +80,7 @@ class CrawlerTask(object):
             "baidu": "zjld.baidu.newstitle",
             "weibo": "zjld.weibo.newstitle",
             "sogou": "zjld.sogou.keywords",
+            "sogou_news": "zjld.sogou.newstitle",
         }
         weibodata = {
             "interval": 21600,
@@ -100,6 +101,12 @@ class CrawlerTask(object):
             "source": 'sogou'
         }
         weixin = self.insert_task(weixindata)
+
+        sogou_newsdata = {
+            "type": types.get("sogou_news"),
+            "source": "sogou",
+        }
+        sogou_news = self.insert_task(sogou_newsdata)
 
     def del_task(self):
         task_index = {

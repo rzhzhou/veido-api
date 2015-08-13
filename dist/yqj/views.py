@@ -11,7 +11,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import View
 from yqj.models import Article, Weixin, Weibo, RelatedData, Category, Group,\
                        Area, Topic, Inspection, Custom, CustomKeyword, Collection, ArticlePublisher, Product,\
-                       ProductKeyword, LocaltionScore, GroupAuthUser, RiskScore
+                       ProductKeyword, LocaltionScore, GroupAuthUser, RiskScore, Risk
 from yqj import login_required
 from yqj.redisconnect import RedisQueryApi
 from django.db.models import Count,Q
@@ -123,7 +123,7 @@ def index_view(request):
                 setattr(iteml, 'time', datetime.now().strftime('%Y-%m-%d'))
         event_list=sorted(event_list, key=lambda x: x.time, reverse=True)[:event_list_number]
         for item in event_list:
-             setattr(item, 'hot_index', item.articles.all().count()+item.weixin.all().count()+item.weibo.all().count())
+            setattr(item, 'hot_index', item.articles.all().count()+item.weixin.all().count()+item.weibo.all().count())
 
         weibo_data = [eval(item) for item in RedisQueryApi().lrange('sort_weibohot', 0, -1)[:5]]
         for data in weibo_data:
@@ -140,27 +140,28 @@ def index_view(request):
 
         group = Group.objects.get(company=user.company).id
         score_list = LocaltionScore.objects.filter(group=group)
-        socre_id = []
-        for item in score_list:
-            socre_id.append(item.article_id)
 
-        article_list = Article.objects.filter(id__in=socre_id)[:6]
+        risk_id = []
+        for item in score_list:
+            risk_id.append(item.risk_id)
+
+        risk_lists = Risk.objects.filter(id__in=risk_id)[:6]
         risk_list = []
-        for item in article_list:
+        for item in risk_lists:
             data = {}
             try:
-                relevance = LocaltionScore.objects.get(article_id=item.id).score
+                relevance = LocaltionScore.objects.get(risk_id=item.id).score
             except LocaltionScore.DoesNotExist:
                 relevance = 0
             try:
-                score = RiskScore.objects.get(article=item.id).score
+                score = RiskScore.objects.get(risk=item.id).score
             except RiskScore.DoesNotExist:
                 score = 0
             data['relevance'] = relevance
             data['title'] = item.title
             data['source'] = item.source
             data['score'] = score
-            data['time'] = item.pubtime
+            data['time'] =  datetime.now()
             data['id'] = item.id
             risk_list.append(data)
             

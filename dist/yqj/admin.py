@@ -1,4 +1,5 @@
-#coding=utf-8
+   #coding=utf-8
+
 from django.contrib import admin
 from django import forms
 from django.contrib import messages
@@ -6,7 +7,7 @@ from yqj.mongoconnect import CrawlerTask
 from models import WeixinPublisher, WeiboPublisher,Weibo, ArticlePublisher,\
                    Category, Group, User, Article, Topic, Custom,\
                    CustomKeyword, Area,Weixin, Product, ProductKeyword, save_user,\
-                   GroupAuthUser, LocaltionScore, Tarticle, RiskScore
+                   GroupAuthUser, LocaltionScore, RiskScore, Risk, LRisk, TRisk
 # from django.contrib.auth.models import User
 import jieba.analyse
 
@@ -58,37 +59,30 @@ class ArticleAdmin(admin.ModelAdmin):
             localscore.save()
         else:
             localscore.save()
-        # try:
-        #     lo = LocaltionScore.objects.get(article=article, group=company)
-        #     if lo:
-        #         lo.delete()
-        #         localscore.save()
-        # except:
-        #     localscore.save()
+
+        
         obj.save()  
-        # print obj.area
-        # obj.save()
 
 
-class TarticleAdmin(admin.ModelAdmin):
-    # fields = ('title', 'source', 'area', 'feeling_factor', 'pubtime', 'localtion_score')
-    list_display = ('title', 'source', 'area', 'feeling_factor', 'pubtime', 'website_type')
-    list_editable = ('source', 'feeling_factor', 'pubtime', 'website_type')
-    list_filter = ('pubtime', 'website_type')
-    search_fields = ('title', 'source', 'content', 'website_type')
-    raw_id_fields = ('area', 'publisher')
-    def save_model(self, request, obj, form, change):
-        score = int(obj.website_type)
-        article = obj
-        risk_score = RiskScore(score=score ,article=article)
+# class TarticleAdmin(admin.ModelAdmin):
+#     # fields = ('title', 'source', 'area', 'feeling_factor', 'pubtime', 'localtion_score')
+#     list_display = ('title', 'source', 'area', 'feeling_factor', 'pubtime', 'website_type')
+#     list_editable = ('source', 'feeling_factor', 'pubtime', 'website_type')
+#     list_filter = ('pubtime', 'website_type')
+#     search_fields = ('title', 'source', 'content', 'website_type')
+#     raw_id_fields = ('area', 'publisher')
+#     def save_model(self, request, obj, form, change):
+#         score = int(obj.website_type)
+#         article = obj
+#         risk_score = RiskScore(score=score ,article=article)
 
-        risk = RiskScore.objects.filter(article=article)
+#         risk = RiskScore.objects.filter(article=article)
 
-        if risk:
-            risk.delete()
-            risk_score.save()
-        else:
-            risk_score.save()
+#         if risk:
+#             risk.delete()
+#             risk_score.save()
+#         else:
+#             risk_score.save()
 
 
 
@@ -135,13 +129,31 @@ class TopicAdmin(admin.ModelAdmin):
     list_filter = ('source',)
     search_fields = ('title', 'source')
     #
-    def save_model(self,request, obj, form, change):
+    def save_model(self, request, obj, form, change):
         obj.keywords = jieba.analyse.extract_tags(obj.title, topK=3, withWeight=True, allowPOS=())
          # return <type 'list'> contain tuple
 
         if not change:
             CrawlerTask(obj.title, 'zjld', u"事件").type_task()
+        else:
+            key_list = Topic.objects.filter(id=obj.id)
+            if not key_list:
+                return
+            old_keyword = key_list[0].title
+            if old_keyword == obj.title:
+                return
+            CrawlerTask(obj.title, "zjld", u"事件").update_task(old_keyword)
         obj.save()
+
+    def delete_model(self, request, obj,):
+        key_list = Topic.objects.filter(id=obj.id)
+        if not key_list:
+            return
+        del_index = key_list[0].title
+        if not del_index:
+            return
+        CrawlerTask(del_index, "zjld", u"事件").del_task()
+        obj.delete()
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "area":
@@ -212,18 +224,96 @@ class GroupAuthUserAdmin(admin.ModelAdmin):
 
 
 class LocaltionScoreAdmin(admin.ModelAdmin):
-    fields = ('score', 'group', 'article')
-    list_display = ('score', 'group', 'article')
+    fields = ('score', 'group', 'risk')
+    list_display = ('score', 'group', 'risk')
     # list_editable = ('score', 'group')
     list_filter = ('score', 'group')
     search_fields = ('score', 'group')
 
 
 class RiskScoreAdmin(admin.ModelAdmin):
-    fields = ('score', 'article')
-    list_display = ('score', 'article')
+    fields = ('score', 'risk')
+    list_display = ('score', 'risk')
     # list_filter = ('score', 'article')
-    search_fields = ('score', 'article')
+    search_fields = ('score', 'risk')
+
+
+class RiskAdmin(admin.ModelAdmin):
+    fields = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
+    list_display = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
+    list_editable = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
+    list_filter = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
+    search_fields = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
+
+    def save_model(self, request, obj, form, change):
+        if not change:
+            CrawlerTask(obj.title, 'zjld', u"风险快讯").type_task()
+            obj.save()
+        else:           
+            key_list = Risk.objects.filter(id=obj.id)
+            if not key_list:
+                return
+            old_keyword = key_list[0].title
+            if not obj.title:
+                return
+            if old_keyword == obj.title:
+                return
+            CrawlerTask(obj.title, "zjld", u"风险快讯").update_task(old_keyword)
+            obj.save()
+
+    def delete_model(self, request, obj):
+        key_list = Risk.objects.filter(id=obj.id)
+        if not key_list:
+            return
+        del_index = key_list[0].title
+        CrawlerTask(del_index, "zjld", u"风险快讯").del_task()       
+        obj.delete()        
+
+
+class LRiskAdmin(admin.ModelAdmin):
+    fields = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
+    list_display = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
+    list_editable = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
+    list_filter = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
+    search_fields = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
+
+    def save_model(self, request, obj, form, change):
+        groupauth = GroupAuthUser.objects.get(auth=request.user)
+        company = groupauth.group
+        risk_id = obj.id
+        score = obj.score
+        localscore = LocaltionScore(score=score, group=company, risk_id=risk_id)
+
+        loca = LocaltionScore.objects.filter(risk_id=risk_id, group=company)
+        if loca:
+            loca.delete()
+            localscore.save()
+        else:
+            localscore.save()
+   
+        obj.save()  
+
+
+class TRiskAdmin(admin.ModelAdmin):
+    fields = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
+    list_display = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
+    list_editable = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
+    list_filter = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
+    search_fields = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
+
+    def save_model(self, request, obj, form, change):
+        score = obj.score
+        risk_id = obj.id
+        risk_score = RiskScore(score=score ,risk_id=risk_id)
+
+        risk = RiskScore.objects.filter(risk_id=risk_id)
+
+        if risk:
+            risk.delete()
+            risk_score.save()
+        else:
+            risk_score.save()
+
 # Register your models here.
 
 admin.site.register(WeixinPublisher)
@@ -242,6 +332,8 @@ admin.site.register(Product, ProductAdmin)
 admin.site.register(ProductKeyword, ProductKeywordAdmin)
 admin.site.register(GroupAuthUser, GroupAuthUserAdmin)
 admin.site.register(LocaltionScore, LocaltionScoreAdmin)
-admin.site.register(Tarticle, TarticleAdmin)
 admin.site.register(RiskScore, RiskScoreAdmin)
+admin.site.register(Risk, RiskAdmin)
+admin.site.register(LRisk, LRiskAdmin)
+admin.site.register(TRisk, TRiskAdmin)
 

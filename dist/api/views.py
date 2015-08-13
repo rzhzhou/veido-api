@@ -1,7 +1,7 @@
 #coding=utf-8
 
 import os
-import datetime
+from datetime import datetime, timedelta
 from collections import defaultdict
 from dateutil.relativedelta import relativedelta
 from django.views.generic import View
@@ -16,7 +16,7 @@ from rest_framework.decorators import api_view
 from yqj.models import (Article, Area, Weixin, Weibo, Topic, RelatedData, Category,
                         save_user, Collection, Topic, hash_password, User, Custom,
                         Inspection, CustomKeyword,Product, ProductKeyword, Group,
-                        LocaltionScore, RiskScore)
+                        LocaltionScore, RiskScore, Risk)
 from yqj.views import SetLogo
 from serializers import ArticleSerializer
 from yqj import authenticate, login_required
@@ -27,6 +27,9 @@ from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
 from yqj.redisconnect import RedisQueryApi
 from django.db import connection
+import requests
+import json
+from api import map2alive  
 
 def login_view(request):
     try:
@@ -224,7 +227,7 @@ class TableAPIView(APIView):
             try:
                 item['time'] = data.articles.order_by('pubtime')[0].pubtime.replace(tzinfo=None).strftime('%Y-%m-%d')
             except IndexError:
-                item['time'] = datetime.datetime.now().strftime('%Y-%m-%d')
+                item['time'] = datetime.now().strftime('%Y-%m-%d')
             item['hot'] = data.articles.count() + data.weixin.count() + data.weibo.count()
             result.append(item)
 
@@ -234,8 +237,8 @@ class TableAPIView(APIView):
 
 
 def get_date_from_iso(datetime_str):
-    #return datetime.datetime.strptime("2008-09-03T20:56:35.450686Z", "%Y-%m-%dT%H:%M:%S.%fZ")
-    return datetime.datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S.%fZ")
+    #return datetime.strptime("2008-09-03T20:56:35.450686Z", "%Y-%m-%dT%H:%M:%S.%fZ")
+    return datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S.%fZ")
 
 class ArticleTableView(TableAPIView):
     def get(self, request, id, page):
@@ -274,27 +277,27 @@ class RisksTableView(TableAPIView):
         company = user.group.company
         group = Group.objects.get(company=company).id
         score_list = LocaltionScore.objects.filter(group=group)
-        socre_id = []
+        risk_id = []
         for item in score_list:
-            socre_id.append(item.article_id)
+            risk_id.append(item.risk_id)
 
-        article_list = Article.objects.filter(id__in=socre_id)
+        risk_lists = Risk.objects.filter(id__in=risk_id)
         risk_list = []
-        for item in article_list:
+        for item in risk_lists:
             data = {}
             try:
-                relevance = LocaltionScore.objects.get(article_id=item.id).score
+                relevance = LocaltionScore.objects.get(risk_id=item.id).score
             except LocaltionScore.DoesNotExist:
                 relevance = 0
             try:
-                score = RiskScore.objects.get(article=item.id).score
+                score = RiskScore.objects.get(risk=item.id).score
             except RiskScore.DoesNotExist:
                 score = 0
             data['relevance'] = relevance
             data['title'] = item.title
             data['source'] = item.source
             data['score'] = score
-            data['pubtime'] = item.pubtime
+            data['pubtime'] = datetime.now()
             data['id'] = item.id
             risk_list.append(data)
         return risk_list
@@ -328,6 +331,44 @@ class RisksTableView(TableAPIView):
 
         # return Response({'total': datas['total_number'], 'data': list(datas['items'])})
 
+class RisksDetailTableView(TableAPIView):
+
+    def get(self, request, id, page):
+        try:
+            risk = Risk.objects.get(id=int(id))
+        except Risk.DoesNotExist:
+            return Response({'risk': ''})
+        items = risk.articles.all()
+        datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
+        result = self.news_to_json(datas['items'])
+        return Response({'total': datas['total_number'], 'data': result})
+
+class RisksDetailWeixinView(TableAPIView):
+    EVENT_WEIXIN_LIMIT = 10
+    def get(self, request, id, page):
+        try:
+            risk = Risk.objects.get(id=int(id))
+        except Risk.DoesNotExist:
+            return Response({'html': '', 'total': 0})
+        items = risk.weixin.all()
+        datas = self.paging(items, self.EVENT_WEIXIN_LIMIT, page)
+        items = [SetLogo(data) for data in datas['items']]
+        html = self.set_css_to_weixin(items)
+        return Response({'html': html, 'total': datas['total_number']})
+
+
+class RisksDetailWeiboView(TableAPIView):
+    EVENT_WEIBO_LIMIT = 10
+    def get(self, request, id, page):
+        try:
+            risk = Risk.objects.get(id=int(id))
+        except Risk.DoesNotExist:
+            return Response({'html': '', 'total': 0})
+        items = risk.weibo.all()
+        datas = self.paging(items, self.EVENT_WEIBO_LIMIT, page)
+        items = [SetLogo(data) for data in datas['items']]
+        html = self.set_css_to_weibo(items)
+        return Response({'html': html, 'total': datas['total_number']})
 
 class NewsTableView(TableAPIView):
     """
@@ -351,34 +392,7 @@ class NewsTableView(TableAPIView):
         return Response({"news": result})
     """
     def get_custom_artice(self):
-        custom_id_list = []
-        keywords = CustomKeyword.objects.filter(group_id=4)
-        for keyword in keywords:
-            custom_id = keyword.custom_id
-            if custom_id:
-                custom_id_list.append(custom_id)
-        try:
-            cursor = connection.cursor()
-            sql = 'select article_id from custom_articles where %s'\
-                %(
-                    reduce(
-                        lambda x, y: x + " or " + y,
-                        ["custom_id=%s" for x in custom_id_list]
-                        )
-                    )
-            cursor.execute(sql,custom_id_list)
-            row = cursor.fetchall()
-            article_id = []
-            for r in row:
-                article_id.append(r[0])
-        except:
-            article_id = []
-        news_list = Category.objects.get(name='质监热点').articles.all()
-
-        for n in news_list:
-            article_id.append(n.id)
-
-        articles = Article.objects.filter(id__in=article_id)
+        articles = Article.objects.filter(website_type='hot')
 
         return articles
 
@@ -469,7 +483,7 @@ class EventTableView(TableAPIView):
             if time:
                 pubtime = time[0].pubtime
             else:
-                pubtime = datetime.datetime.now()
+                pubtime = datetime.now()
             one_record = [collected_html, title, item.source, item.area.name, pubtime.date(), hot_index]
             result.append(one_record)
         return Response({"event": result})
@@ -556,7 +570,7 @@ class CollectView(APIView):
         if time:
             pubtime = time[0].pubtime
         else:
-            pubtime = datetime.datetime.now()
+            pubtime = datetime.now()
         one_record = [title, item.source, item.area.name, pubtime.date(), hot_index]
         #one_record = [view.collected_html(item), title, item.source, item.area.name, pubtime.date(), hot_index]
         return one_record
@@ -909,7 +923,7 @@ class WeiboTableView(TableAPIView):
             html +=  u'<span>评论 %s</span>' % item['comments_count']
             html +=  u'<span><i class="fa fa-thumbs-o-up"></i> %s</span>' % item['attitudes_count']
             html += """</div>"""
-            html +=  u'<div class="time pull-left">%s</div>' % datetime.datetime.fromtimestamp(item['pubtime']).strftime('%Y-%m-%d %H:%M')
+            html +=  u'<div class="time pull-left">%s</div>' % datetime.fromtimestamp(item['pubtime']).strftime('%Y-%m-%d %H:%M')
             html += """</div></div></li>"""
 
         return html
@@ -936,10 +950,18 @@ def upload_image(request):
     try:
         f = request.FILES['image']
     except KeyError:
-        return HttpResponse(status=400)
+        return HttpResponseRedirect('/settings/')
 
     media_path = settings.MEDIA_ROOT
     filename = str(user.id) + os.path.splitext(f.name)[1]
+    file_list = os.listdir(media_path)
+    name_list =  map(lambda x: x.split('.')[0], file_list)
+
+    count = 0
+    for i in name_list :
+        if i == str(user.id):
+            os.remove(media_path + '/' + file_list[count])
+        count += 1
 
     try:
         new_file = open(os.path.join(media_path, filename), 'w')
@@ -1048,17 +1070,17 @@ def get_count_feeling(start_d, end_d, feeling_type):
         while day < end_d:
             num = d[day] if day in d else 0
             result.append(num)
-            day = day + datetime.timedelta(days=1)
+            day = day + timedelta(days=1)
         return result
 
 @login_required
 def chart_line_index_view(request):
-    today = datetime.datetime.today().date()
-    start_d = today - datetime.timedelta(days=6)
-    end_d = today + datetime.timedelta(days=1)
+    today = datetime.today().date()
+    start_d = today - timedelta(days=6)
+    end_d = today + timedelta(days=1)
 
     data = {}
-    data['date'] = [(today - datetime.timedelta(days=x)).strftime("%m-%d") for x in reversed(range(7))]
+    data['date'] = [(today - timedelta(days=x)).strftime("%m-%d") for x in reversed(range(7))]
     data['positive'] = get_count_feeling(start_d, end_d, 'positive')
     data['neutral'] = get_count_feeling(start_d, end_d, 'netrual')
     data['negative'] = get_count_feeling(start_d, end_d, 'negative')
@@ -1128,4 +1150,31 @@ def chart_pie_event_view(request, topic_id):
              {u'name': u'自媒体', u'value': topic.weibo.count()+topic.weixin.count()}]
     value = [item for item in value if item['value']]
     return JsonResponse({u'name': name, u'value': value})
+
+
+def map_view(request):
+    # login_url = "http://192.168.0.215/auth"
+    # login_data = {
+    #     "u": "wuhanzhijian", 
+    #     "p": "aebcb993a42143aa78b76a57666ec77d6bb55bec",
+    # }
+    # login_res = requests.post(login_url,data=login_data)
+    # login_json = json.loads(login_res.text)
+    # login_cookie = login_json["token"]
+    login_cookie = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhY2NvdW50X2l"\
+        "kIjoxLCJ1c2VyX2lkIjoxLCJhX25hbWUiOiJ3dWhhbnpoaWppYW4iLCJhX3JlYWx"\
+        "uYW1lIjoi566h55CG5ZGYIiwiYV9wd2QiOiI3YjNkNzgzMzFlNDQ0YzNmODBkO"\
+        "Dc1Njc4YjA1ODkyYmFiMmY1MTU3IiwiYV9waG9uZSI6bnVsbCwiYV9lbWFpbCI6"\
+        "Ind1aGFuemhpamlhbkBzaGVuZHUuaW5mbyIsImFfbG9nbyI6bnVsbCwic3Rh"\
+        "dHVzIjoxLCJzeXN0ZW1faWQiOjEsImlzcm9vdCI6MSwiU3lzQWNjb3VudFNhbHQiO"\
+        "nsic2FsdCI6ImZjMDhlNDFlZjkzZjIwYTYyYjhmY2I4ODc1ZThmNTJmZTJkZGExYTkifX0.x4IP"\
+        "k4Cnka7Z2izoZ2uTMjh7lzpsrJA3zs7hWTqnhFk"
+    url = "http://192.168.0.215/api/dashboard?ed=2015-07-23&edId=9335&sd=2015-06-23&sdId=9305"
+    headers = {
+        "Authorization" : "Bearer "+login_cookie,
+    }
+    res = requests.get(url, headers=headers)
+    data = json.loads(res.text)
+    risk_data = data["regionData"]
+    return JsonResponse({"regionData": risk_data })
 
