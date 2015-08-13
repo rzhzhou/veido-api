@@ -1462,7 +1462,7 @@ App.page.risk = function (module) {
           pageNumber = 1;
         }
 
-        return '/api/risk/risk/' + pageNumber + '/';
+        return '/api/risk/news/' + pageNumber + '/';
       },
 
       renderTable = function (pageContent) {
