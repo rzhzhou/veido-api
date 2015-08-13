@@ -140,11 +140,9 @@ def index_view(request):
 
         group = Group.objects.get(company=user.company).id
         score_list = LocaltionScore.objects.filter(group=group)
-
         risk_id = []
         for item in score_list:
             risk_id.append(item.risk_id)
-
         risk_lists = Risk.objects.filter(id__in=risk_id)[:6]
         risk_list = []
         for item in risk_lists:
@@ -311,29 +309,23 @@ class RisksView(BaseView):
 
 class RisksDetailView(BaseView):
     def get(self, request, risk_id):
+        sidebar_name = sidebarUtil(request)
         try:
             risk_id = int(risk_id)
-            risk_article = Article.objects.get(id=risk_id)
-        except Article.DoesNotExist:
-            return self.render_to_response('news/news.html', {'article': '', 'relate': []})
-
-        try:
-            r = RelatedData.objects.filter(uuid=risk_article.uuid)[0]
-            relateddata = list(r.articles.all())
-        except IndexError:
-            relateddata = []
-
-        user = self.request.myuser
-        try:
-            collection = user.collection
-        except Collection.DoesNotExist:
-            collection = Collection(user=user)
-            collection.save(using='master')
-        items = user.collection.articles.all()
-        iscollected = any(filter(lambda x: x.id == risk_article.id, items))
-        sidebar_name = sidebarUtil(request)
-        return self.render_to_response('news/news.html', {'article': SetLogo(risk_article), 'relate': relateddata,  'isCollected': iscollected, 'name': sidebar_name})
-
+            risk = Risk.objects.get(id=risk_id)
+            eval_keywords_list = eval(risk.keywords) if risk.keywords else []
+            keywords_list = [{"name": name, "number": number} for name, number in eval_keywords_list]
+        except Risk.DoesNotExist:
+            return self.render_to_response('risk/risk.html', {'risk': '', 'weixin_list': [], 'weibo_list': [], 'name': sidebar_name})
+        # user = self.request.myuser
+        # try:
+        #     collection = user.collection
+        # except Collection.DoesNotExist:
+        #     collection = Collection(user=user)
+        #     collection.save(using='master')
+        # items = user.collection.Risks.all()
+        # iscollected = any(filter(lambda x: x.id == risk_article.id, items))
+        return self.render_to_response('risk/risk.html',{'risk': risk, 'keywords_list': keywords_list, 'name': sidebar_name})
 
 class NewsView(BaseView):
     def get(self, request):
