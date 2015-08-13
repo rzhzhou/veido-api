@@ -2075,6 +2075,14 @@ $(function() {
       this.common();
       APP.riskList();
     },
+    riskItem: function() {
+      this.common();
+      APP.collection();
+      APP.chart.line();
+      APP.chart.pie();
+      APP.table();
+      APP.sns();
+    },
     collection: function() {
       this.common();
       APP.table();

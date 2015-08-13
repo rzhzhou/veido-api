@@ -655,7 +655,7 @@ APP.riskList = function () {
           pageNumber = 1;
         }
 
-        return '/api/risk/risk/' + pageNumber + '/';
+        return '/api/risk/news/' + pageNumber + '/';
       },
 
       renderTable = function (pageContent) {
