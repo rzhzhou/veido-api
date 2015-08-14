@@ -20,12 +20,6 @@ from base.models import (Area, Article, ArticlePublisher, Category, Collection,
 from yqj.redisconnect import RedisQueryApi
 
 
-def SetLogo(obj):
-    if not obj.publisher.photo:
-        obj.publisher.photo = u'http://tp2.sinaimg.cn/3557640017/180/40054587155/1'
-    return obj
-
-
 @login_required
 def index_view(request):
     user = request.myuser
@@ -170,34 +164,6 @@ class LocationView(BaseTemplateView):
 
 def person_view(request, person_id):
     return HttpResponse('person')
-
-
-class WeixinView(BaseTemplateView):
-    def get(self, request):
-        hottest = [SetLogo(data) for data in Weixin.objects.order_by('-pubtime')[0:20]]
-        weixin = Weixin.objects.all()
-        latest = self.paging(weixin, 20, 1)
-        items = [SetLogo(data) for data in latest['items']]
-        html = self.set_css_to_weixin(items)
-        return self.render_to_response('weixin/weixin_list.html', {'weixin_latest_list': latest,
-                                                                   'weixin_hottest_list': hottest,
-                                                                   'html': html,
-                                                                   'total_page_number': latest['total_number']})
-
-
-class WeixinDetailView(BaseTemplateView):
-    def get(self, request, id):
-        try:
-            weixin_id = int(id)
-            weixin = Weixin.objects.get(id=weixin_id)
-        except Weixin.DoesNotExist:
-            return render_to_response('weixin/weixin.html', {'article': '', 'relate': []})
-        try:
-            r = RelatedData.objects.filter(uuid=weixin.uuid)[0]
-            relateddata = list(r.weixin.all()) + list(r.weibo.all()) + list(r.articles.all())
-        except IndexError:
-            relateddata = []
-        return self.render_to_response('weixin/weixin.html', {'article': SetLogo(weixin), 'relate': relateddata})
 
 
 class WeiboView(BaseTemplateView):

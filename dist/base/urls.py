@@ -9,6 +9,7 @@ from django.views.static import serve
 from yqj.views import *
 from news.views import NewsView, NewsDetailView
 from event.views import EventView, EventDetailView
+from weixin.views import WeixinView, WeixinDetailView
 
 
 urlpatterns = patterns('',
@@ -22,8 +23,6 @@ urlpatterns += patterns('yqj.views',
     url(r'^$', 'index_view'),
     url(r'^location/(\d+)/$', LocationView.as_view()),
     url(r'^category/(\d+)/$', CategoryView.as_view()),
-    url(r'^weixin/$', WeixinView.as_view()),
-    url(r'^weixin/(\d+)/$', WeixinDetailView.as_view()),
     url(r'^weibo/$', WeiboView.as_view()),
     url(r'^custom/$', CustomListView.as_view()),
     url(r'^custom/(\d+)/$', CustomView.as_view()),
@@ -47,4 +46,9 @@ urlpatterns += patterns('news.views',
 urlpatterns += patterns('event.views',
     url(r'^event/$', EventView.as_view()),
     url(r'^event/(\d+)/$', EventDetailView.as_view()),
+)
+
+urlpatterns += patterns('weixin.views',
+    url(r'^weixin/$', WeixinView.as_view()),
+    url(r'^weixin/(\d+)/$', WeixinDetailView.as_view()),
 )

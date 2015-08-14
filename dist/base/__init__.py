@@ -37,3 +37,9 @@ def get_user_image(user):
     if image_url is None:
         image_url = '/static/img/avatar.jpg'
     return image_url
+
+
+def set_logo(obj):
+    if not obj.publisher.photo:
+        obj.publisher.photo = u'http://tp2.sinaimg.cn/3557640017/180/40054587155/1'
+    return obj
