@@ -18,7 +18,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 def _load_config():
     global DEBUG, TEMPLATE_DEBUG, ALLOWED_HOSTS
-    global COMPANY_NAME, LANGUAGE_CODE, TIME_ZONE, USE_I18N, USE_L10N, USE_TZ
+    global COMPANY_NAME, LANGUAGE_CODE, TIME_ZONE, USE_I18N, USE_L10N, USE_TZ, NEWS_PAGE_LIMIT
     global MYSQL_CONN_STR_DEFAULT, MYSQL_CONN_STR_MASTER, MONGO_CONN_STR, REDIS_CONN_STR
     global MEDIA_ROOT, STATIC_ROOT
     global NEWS_PAGE_LIMIT
@@ -94,6 +94,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'base',
     'yqj',
+    'analytics',
     'rest_framework',
 )
 

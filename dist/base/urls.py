@@ -15,12 +15,14 @@ from custom.views import CustomView, CustomDetailView
 from product.views import ProductView
 from inspection.views import InspectionView
 from search.views import SearchView
+from analytics.views import AnalyticsChildView
 
 
 urlpatterns = patterns('',
 
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api/', include('api.urls')),
+    url(r'^api/', include('analytics.urls')),
     url(r'^vendor/(?P<path>.*)$', serve,  {'document_root': os.path.join(settings.BASE_DIR, 'vendor')}),
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
@@ -71,4 +73,8 @@ urlpatterns += patterns('inspection.views',
 
 urlpatterns += patterns('search.views',
     url(r'^search/(.+)/$', SearchView.as_view()),
+)
+
+urlpatterns += patterns('analytics.views',
+    url(r'^analytics/(?P<id>\d+)/$', AnalyticsChildView.as_view()),
 )

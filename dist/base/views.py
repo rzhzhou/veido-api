@@ -151,6 +151,7 @@ class BaseAPIView(BaseView, APIView):
     NEWS_PAGE_LIMIT = 25
     EVENT_PAGE_LIMIT = 25
     RISK_PAGE_LIMIT = 25
+
     def __init__(self, request=None):
         self.request = request
 
