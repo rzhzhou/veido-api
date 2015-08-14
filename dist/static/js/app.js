@@ -1,1 +1,1256 @@
-"use strict";function _init(){$.AdminLTE.layout={activate:function(){var e=this;e.fix(),e.fixSidebar(),$(window,".wrapper").resize(function(){e.fix(),e.fixSidebar()})},fix:function(){var e=$(".main-header").outerHeight()+$(".main-footer").outerHeight(),t=$(window).height(),i=$(".sidebar").height();$("body").hasClass("fixed")?$(".content-wrapper, .right-side").css("min-height",t-$(".main-footer").outerHeight()):t>=i?$(".content-wrapper, .right-side").css("min-height",t-e):$(".content-wrapper, .right-side").css("min-height",i)},fixSidebar:function(){return $("body").hasClass("fixed")?("undefined"==typeof $.fn.slimScroll&&console&&console.error("Error: the fixed layout requires the slimscroll plugin!"),void($.AdminLTE.options.sidebarSlimScroll&&"undefined"!=typeof $.fn.slimScroll&&($(".sidebar").slimScroll({destroy:!0}).height("auto"),$(".sidebar").slimscroll({height:$(window).height()-$(".main-header").height()+"px",color:"rgba(0,0,0,0.2)",size:"3px"})))):void("undefined"!=typeof $.fn.slimScroll&&$(".sidebar").slimScroll({destroy:!0}).height("auto"))}},$.AdminLTE.pushMenu=function(e){var t=this.options.screenSizes;$(e).click(function(e){e.preventDefault(),$(window).width()>t.sm-1?$("body").toggleClass("sidebar-collapse"):$("body").hasClass("sidebar-open")?($("body").removeClass("sidebar-open"),$("body").removeClass("sidebar-collapse")):$("body").addClass("sidebar-open")}),$(".content-wrapper").click(function(){$(window).width()<=t.sm-1&&$("body").hasClass("sidebar-open")&&$("body").removeClass("sidebar-open")})},$.AdminLTE.tree=function(e){var t=this;$("li a",$(e)).click(function(e){var i=$(this),n=i.next();if(n.is(".treeview-menu")&&n.is(":visible"))n.slideUp("normal",function(){n.removeClass("menu-open")}),n.parent("li").removeClass("active");else if(n.is(".treeview-menu")&&!n.is(":visible")){var a=i.parents("ul").first(),o=a.find("ul:visible").slideUp("normal");o.removeClass("menu-open");var s=i.parent("li");n.slideDown("normal",function(){n.addClass("menu-open"),a.find("li.active").removeClass("active"),s.addClass("active"),t.layout.fix()})}n.is(".treeview-menu")&&e.preventDefault()})},$.AdminLTE.boxWidget={activate:function(){var e=$.AdminLTE.options,t=this;$(e.boxWidgetOptions.boxWidgetSelectors.collapse).click(function(e){e.preventDefault(),t.collapse($(this))}),$(e.boxWidgetOptions.boxWidgetSelectors.remove).click(function(e){e.preventDefault(),t.remove($(this))})},collapse:function(e){var t=e.parents(".box").first(),i=t.find(".box-body, .box-footer");t.hasClass("collapsed-box")?(e.children(".fa-plus").removeClass("fa-plus").addClass("fa-minus"),i.slideDown(300,function(){t.removeClass("collapsed-box")})):(e.children(".fa-minus").removeClass("fa-minus").addClass("fa-plus"),i.slideUp(300,function(){t.addClass("collapsed-box")}))},remove:function(e){var t=e.parents(".box").first();t.slideUp()},options:$.AdminLTE.options.boxWidgetOptions}}if("undefined"==typeof jQuery)throw new Error("AdminLTE requires jQuery");$.AdminLTE={},$.AdminLTE.options={navbarMenuSlimscroll:!0,navbarMenuSlimscrollWidth:"3px",navbarMenuHeight:"200px",sidebarToggleSelector:"[data-toggle='offcanvas']",sidebarPushMenu:!0,sidebarSlimScroll:!0,enableBoxRefresh:!0,enableBSToppltip:!0,BSTooltipSelector:"[data-toggle='tooltip']",enableFastclick:!0,enableBoxWidget:!0,boxWidgetOptions:{boxWidgetIcons:{collapse:"fa fa-minus",open:"fa fa-plus",remove:"fa fa-times"},boxWidgetSelectors:{remove:'[data-widget="remove"]',collapse:'[data-widget="collapse"]'}},directChat:{enable:!0,contactToggleSelector:'[data-widget="chat-pane-toggle"]'},colors:{lightBlue:"#3c8dbc",red:"#f56954",green:"#00a65a",aqua:"#00c0ef",yellow:"#f39c12",blue:"#0073b7",navy:"#001F3F",teal:"#39CCCC",olive:"#3D9970",lime:"#01FF70",orange:"#FF851B",fuchsia:"#F012BE",purple:"#8E24AA",maroon:"#D81B60",black:"#222222",gray:"#d2d6de"},screenSizes:{xs:480,sm:768,md:992,lg:1200}},$(function(){var e=$.AdminLTE.options;_init(),$.AdminLTE.layout.activate(),$.AdminLTE.tree(".sidebar"),e.navbarMenuSlimscroll&&"undefined"!=typeof $.fn.slimscroll&&$(".navbar .menu").slimscroll({height:"200px",alwaysVisible:!1,size:"3px"}).css("width","100%"),e.sidebarPushMenu&&$.AdminLTE.pushMenu(e.sidebarToggleSelector),e.enableBSToppltip&&$(e.BSTooltipSelector).tooltip(),e.enableBoxWidget&&$.AdminLTE.boxWidget.activate(),e.enableFastclick&&"undefined"!=typeof FastClick&&FastClick.attach(document.body),e.directChat.enable&&$(e.directChat.contactToggleSelector).click(function(){var e=$(this).parents(".direct-chat").first();e.toggleClass("direct-chat-contacts-open")}),$('.btn-group[data-toggle="btn-toggle"]').each(function(){var e=$(this);$(this).find(".btn").click(function(t){e.find(".btn.active").removeClass("active"),$(this).addClass("active"),t.preventDefault()})})}),function(e){e.fn.boxRefresh=function(t){function i(e){e.append(o),a.onLoadStart.call(e)}function n(e){e.find(o).remove(),a.onLoadDone.call(e)}var a=e.extend({trigger:".refresh-btn",source:"",onLoadStart:function(e){},onLoadDone:function(e){}},t),o=e('<div class="overlay"><div class="fa fa-refresh fa-spin"></div></div>');return this.each(function(){if(""===a.source)return void(console&&console.log("Please specify a source first - boxRefresh()"));var t=e(this),o=t.find(a.trigger).first();o.click(function(e){e.preventDefault(),i(t),t.find(".box-body").load(a.source,function(){n(t)})})})}}(jQuery),function(e){e.fn.todolist=function(t){var i=e.extend({onCheck:function(e){},onUncheck:function(e){}},t);return this.each(function(){"undefined"!=typeof e.fn.iCheck?(e("input",this).on("ifChecked",function(t){var n=e(this).parents("li").first();n.toggleClass("done"),i.onCheck.call(n)}),e("input",this).on("ifUnchecked",function(t){var n=e(this).parents("li").first();n.toggleClass("done"),i.onUncheck.call(n)})):e("input",this).on("change",function(t){var n=e(this).parents("li").first();n.toggleClass("done"),i.onCheck.call(n)})})}}(jQuery),function(){if("function"!=typeof $.fn.twbsPagination)throw new Error("twbsPagination required");var e={first:"第一页",prev:"上一页",next:"下一页",last:"最后一页",paginationClass:"pagination pagination-sm no-margin pull-right"};$.extend($.fn.twbsPagination.defaults,e)}();var App={module:{},page:{},route:function(){var e,t,i=this.module,n=this.page,a=location.pathname,o=/^\/(\w+)\/$/,s=/^\/(\w+)\/(\d+)\/$/,l=null;switch(!0){case"/"===a:e="dashboard";break;case o.test(a):l=o.exec(a),e=l[1];break;case s.test(a):l=s.exec(a),e=l[1],t=+l[2]}return"login"===e?n.login(i):(i.search(),i.menu(a,e),void 0===t?n[e](i,a,e):n[e+"Detail"](i,a,e,t))}};App.module.login=function(){var e=document.forms.login,t=e.action,i=e.elements,n=i.username,a=i.password,o=i[2],s=$(e).find("p"),l=function(){o.disabled=!(n.value&&a.value)},r=function(i){i.preventDefault(),$.post(t,$(e).serialize(),function(e){e.status?location.href=location.search?location.search.substr(1).split("=")[1]:"/":(s.text("用户名或密码错误！"),o.disabled=!0,a.value="")})};$(e).keyup(l).submit(r)},App.module.register=function(){var e=document.forms.add,t=e.action,i=e.elements,n=i.username,a=i.password,o=i.retype,s=i[3],l=$(e).find("p"),r=function(){s.disabled=!(n.value&&a.value&&o.value)},c=function(e){e.preventDefault();var i=function(e){e.status?location.reload():l.text("抱歉，添加失败！").show()};a.value===o.value?$.post(t,$([n,a]).serialize(),i):(l.text("两次输入密码不一致！").show(),s.disabled=!0,a.value="",o.value="")};$(e).keyup(r).submit(c)},App.module.admin=function(){var e=$(".user-admin"),t=e.find("input"),i=e.find("button"),n=i.eq(0),a=i.eq(1),o=[],s=function(e,i){e.click(function(){o.length=0,t.filter(":checked").each(function(e,t){o.push($(t).parent().next().data("id"))}),o.length&&$.post(i,{id:o.toString()},function(e){e.status&&location.reload()})})};s(n,"/api/user/reset/"),s(a,"/api/user/remove/")},App.module.settings=function(){var e=document.forms.info,t=e.action,i=e.elements,n=i.username,a=i.oldPassword,o=i.newPassword,s=i.retype,l=i[4],r=$(e).find("p"),c=function(){l.disabled=!(n.value&&a.value&&o.value&&s.value)},d=function(e){e.preventDefault();var i=function(e){e.status?(r.text("更新成功！").show(),location.href="/login/"):(r.text("原密码错误！").show(),a.value="",o.value="",s.value="")};o.value===s.value?$.post(t,$([n,a,o]).serialize(),i):(r.text("两次输入密码不一致！").show(),o.value="",s.value="")};$(e).keyup(c).submit(d)},App.module.line=function(e){$.getJSON("/api/line"+e,function(e){echarts.init($("#line-chart")[0],"macarons").setOption({color:["#00a65a","#00c0ef","#dd4b39"],tooltip:{trigger:"axis"},legend:{data:["正面","中性","负面"]},grid:{x:40,y:30,x2:25,y2:30},xAxis:[{type:"category",boundaryGap:!1,data:e.date}],yAxis:[{type:"value"}],series:[{name:"正面",type:"line",data:e.positive},{name:"中性",type:"line",data:e.neutral},{name:"负面",type:"line",data:e.negative}]})})},App.module.pie=function(e){$.getJSON("/api/pie"+e,function(e){echarts.init($("#pie-chart")[0],"macarons").setOption({tooltip:{trigger:"item",formatter:"{a} <br/>{b} : {c} ({d}%)"},legend:{data:e.name},series:[{name:"信息比例",type:"pie",radius:"55%",center:["50%","60%"],data:e.value}]})})},App.module.search=function(){var e=document.forms.search,t=e.elements.keywords;$(e).submit(function(i){i.preventDefault();var n=$.trim(t.value);n&&(e.reset(),location.href="/search/"+n+"/")})},App.module.menu=function(e,t){var i=$(".sidebar-menu"),n=i.parent(),a=function(){var i=this.getAttribute("href");switch(!0){case"dashboard"===t:return"/"===i;case"category"===t:case"location"===t:return i===e;default:return i.split("/")[1]===t}};i.detach().find("a").filter(a).parent().addClass("active").closest(".treeview-menu").addClass("menu-open").closest(".treeview").addClass("active"),i.appendTo(n)},App.module.infoBox=function(){var e=function(e,t){var i,n=$(t).find(".info-box-number"),a=$(t).find(".progress-bar"),o=$(t).find(".progress-description"),s=2e3,l=100,r=Math.floor(s/l),c=0,d=0,u=$(t).data("number"),p=Math.floor(u/r),f=0,h=$(t).data("percent"),g=Math.floor(h/r),m=function(){d+=p,f+=g,c++,c>=r&&(clearInterval(i),d=u,f=h),n.text(d.toFixed()),a.width(f+"%"),o.text("占总数据 "+f.toFixed()+"%")};i=setInterval(m,l)};$(".info-box-content").each(e)},App.module.inspection=function(){var e=$("#inspection"),t=e.children(".box-body").find("tbody");t.load("/api/dashboard/local-inspection/"),e.on("click","button",function(e){return e.preventDefault(),$(this).hasClass("active")?!1:($(this).addClass("active").siblings().removeClass("active"),void t.load("/api/dashboard/"+this.id+"/"))})},App.module.returnTop=function(e){var t=e.offset().top,i=t>160?t-120:0;$("body").animate({scrollTop:i})},App.module.table=function(e,t){$(".table-custom").each(function(){var i=$(this),n=i.parent(),a=this.tBodies[0],o=this.id,s=function(e){var t=e.data,i=$.map(t,function(e){var t="/"+o+"/"+e.id+"/",i='<td><a href="'+t+'" title="'+e.title+'" target="_blank">'+e.title+"</a></td>",n="<td>"+e.source+"</td>",a="<td>"+e.location+"</td>",s="<td>"+e.time+"</td>",l='<td class="text-center">'+e.hot+"</td>",r="<tr>"+i+n+a+s+l+"</tr>";return r});$(a).html(i)};$.getJSON("/api"+t+o+"/1/",function(a){s(a),n.twbsPagination({totalPages:a.total,visiblePages:7,onPageClick:function(a,l){e.returnTop(i),$.getJSON("/api"+t+o+"/"+l+"/",function(e){s(e),n.twbsPagination({totalPages:e.total})})}})})})},App.module.collect=function(e,t){$(".collection").click(function(){var i=$(this).find("i"),n=$(this).find("span"),a=function(a,o){var s={type:"news"===e?"article":"topic",id:t};$.post(a,s,function(e){e.status&&(i.toggleClass("fa-star-o"),i.toggleClass("fa-star"),n.text(o))})};i.hasClass("fa-star")?a("/api/collection/remove/","添加收藏"):a("/api/collection/add/","取消收藏")})},App.module.sns=function(e,t,i){var n=$(".sns");n.each(function(a,o){var s=$(o),l=s.parent().next(),r=function(){return"weixin"===i||"weibo"===i?l.data("type"):l.data("type").replace("-","/")};$.getJSON("/api"+t+r()+"/1/",function(i){s.html(i.html),l.twbsPagination({totalPages:i.total,onPageClick:function(i,a){e.returnTop(n),$.getJSON("/api"+t+r()+"/"+a+"/",function(e){s.html(e.html),l.twbsPagination({totalPages:e.total})})}})})})},App.module.dataTable=function(e){$.fn.dataTable.ext.errMode="throw",$(".initDataTable").each(function(){var t=$(this).DataTable({ajax:{url:"/api"+e,dataSrc:this.id,cache:!0},autoWidth:!1,pageLength:25,order:[],language:{processing:"处理中...",search:"",searchPlaceholder:"输入关键字过滤...",lengthMenu:"显示 _MENU_ 条",info:"显示第 _START_ 至 _END_ 条，共 _TOTAL_ 条",infoEmpty:"信息空",infoFiltered:"(由 _MAX_ 项结果过滤)",infoPostFix:"",loadingRecords:"载入中...",zeroRecords:"无匹配结果",emptyTable:"无结果",paginate:{first:"第一页",previous:"上一页",next:"下一页",last:"最后一页"},aria:{sortAscending:"正序排列",sortDescending:"倒序排列"}},deferLoading:100,drawCallback:function(){$('[data-toggle="tooltip"]').tooltip()}});t.on("click","tbody > tr",function(){$(this).hasClass("selected")?$(this).removeClass("selected"):(t.$("tr.selected").removeClass("selected"),$(this).addClass("selected"))})})},App.module.custom=function(){var e=document.forms.addKeyword,t=e.action,i=e.elements,n=i[0],a=i[1],o=i[2],s=$(e).prev(),l=$(e).parent().prev().find("li"),r=function(){o.disabled=!a.value},c=function(i){i.preventDefault(),$.post(t,$(e).serialize(),function(e){e.status?(s.text("关键词添加成功！").show(),location.reload()):(s.text("关键词添加失败！").show(),a.value="")})};l.length>=5?n.disabled=!0:$(e).keyup(r).submit(c)},App.page.login=function(e){e.login()},App.page.settings=function(e){e.settings()},App.page.user=function(e){e.admin(),e.register()},App.page.dashboard=function(e,t){e.infoBox(),e.line(t),e.pie(t),e.inspection()},App.page.news=function(e,t){e.table(e,t)},App.page.newsDetail=function(e,t,i,n){e.collect(i,n)},App.page.event=function(e,t){e.table(e,t)},App.page.eventDetail=function(e,t,i,n){e.collect(i,n),e.line(t,i),e.pie(t,i),e.table(e,t),e.sns(e,t,i)},App.page.weixin=function(e,t,i){e.sns(e,t,i)},App.page.weixinDetail=function(){},App.page.weibo=function(e,t,i){e.sns(e,t,i)},App.page.categoryDetail=function(e,t){e.table(e,t)},App.page.locationDetail=function(e,t,i){e.table(e,t),e.sns(e,t,i)},App.page.inspection=function(e,t){e.dataTable(t)},App.page.custom=function(e){e.custom()},App.page.customDetail=function(e,t,i){e.table(e,t),e.sns(e,t,i)},App.page.collection=function(e,t){e.table(e,t)},$(function(){App.route()});
+/*! AdminLTE app.js
+ * ================
+ * Main JS application file for AdminLTE v2. This file
+ * should be included in all pages. It controls some layout
+ * options and implements exclusive AdminLTE plugins.
+ *
+ * @Author  Almsaeed Studio
+ * @Support <http://www.almsaeedstudio.com>
+ * @Email   <support@almsaeedstudio.com>
+ * @version 2.0.5
+ * @license MIT <http://opensource.org/licenses/MIT>
+ */
+
+'use strict';
+
+//Make sure jQuery has been loaded before app.js
+if (typeof jQuery === "undefined") {
+  throw new Error("AdminLTE requires jQuery");
+}
+
+/* AdminLTE
+ *
+ * @type Object
+ * @description $.AdminLTE is the main object for the template's app.
+ *              It's used for implementing functions and options related
+ *              to the template. Keeping everything wrapped in an object
+ *              prevents conflict with other plugins and is a better
+ *              way to organize our code.
+ */
+$.AdminLTE = {};
+
+/* --------------------
+ * - AdminLTE Options -
+ * --------------------
+ * Modify these options to suit your implementation
+ */
+$.AdminLTE.options = {
+  //Add slimscroll to navbar menus
+  //This requires you to load the slimscroll plugin
+  //in every page before app.js
+  navbarMenuSlimscroll: true,
+  navbarMenuSlimscrollWidth: "3px", //The width of the scroll bar
+  navbarMenuHeight: "200px", //The height of the inner menu
+  //Sidebar push menu toggle button selector
+  sidebarToggleSelector: "[data-toggle='offcanvas']",
+  //Activate sidebar push menu
+  sidebarPushMenu: true,
+  //Activate sidebar slimscroll if the fixed layout is set (requires SlimScroll Plugin)
+  sidebarSlimScroll: true,
+  //BoxRefresh Plugin
+  enableBoxRefresh: true,
+  //Bootstrap.js tooltip
+  enableBSToppltip: true,
+  BSTooltipSelector: "[data-toggle='tooltip']",
+  //Enable Fast Click. Fastclick.js creates a more
+  //native touch experience with touch devices. If you
+  //choose to enable the plugin, make sure you load the script
+  //before AdminLTE's app.js
+  enableFastclick: true,
+  //Box Widget Plugin. Enable this plugin
+  //to allow boxes to be collapsed and/or removed
+  enableBoxWidget: true,
+  //Box Widget plugin options
+  boxWidgetOptions: {
+    boxWidgetIcons: {
+      //The icon that triggers the collapse event
+      collapse: 'fa fa-minus',
+      //The icon that trigger the opening event
+      open: 'fa fa-plus',
+      //The icon that triggers the removing event
+      remove: 'fa fa-times'
+    },
+    boxWidgetSelectors: {
+      //Remove button selector
+      remove: '[data-widget="remove"]',
+      //Collapse button selector
+      collapse: '[data-widget="collapse"]'
+    }
+  },
+  //Direct Chat plugin options
+  directChat: {
+    //Enable direct chat by default
+    enable: true,
+    //The button to open and close the chat contacts pane
+    contactToggleSelector: '[data-widget="chat-pane-toggle"]'
+  },
+  //Define the set of colors to use globally around the website
+  colors: {
+    lightBlue: "#3c8dbc",
+    red: "#f56954",
+    green: "#00a65a",
+    aqua: "#00c0ef",
+    yellow: "#f39c12",
+    blue: "#0073b7",
+    navy: "#001F3F",
+    teal: "#39CCCC",
+    olive: "#3D9970",
+    lime: "#01FF70",
+    orange: "#FF851B",
+    fuchsia: "#F012BE",
+    purple: "#8E24AA",
+    maroon: "#D81B60",
+    black: "#222222",
+    gray: "#d2d6de"
+  },
+  //The standard screen sizes that bootstrap uses.
+  //If you change these in the variables.less file, change
+  //them here too.
+  screenSizes: {
+    xs: 480,
+    sm: 768,
+    md: 992,
+    lg: 1200
+  }
+};
+
+/* ------------------
+ * - Implementation -
+ * ------------------
+ * The next block of code implements AdminLTE's
+ * functions and plugins as specified by the
+ * options above.
+ */
+$(function () {
+  //Easy access to options
+  var o = $.AdminLTE.options;
+
+  //Set up the object
+  _init();
+
+  //Activate the layout maker
+  $.AdminLTE.layout.activate();
+
+  //Enable sidebar tree view controls
+  $.AdminLTE.tree('.sidebar');
+
+  //Add slimscroll to navbar dropdown
+  if (o.navbarMenuSlimscroll && typeof $.fn.slimscroll != 'undefined') {
+    $(".navbar .menu").slimscroll({
+      height: "200px",
+      alwaysVisible: false,
+      size: "3px"
+    }).css("width", "100%");
+  }
+
+  //Activate sidebar push menu
+  if (o.sidebarPushMenu) {
+    $.AdminLTE.pushMenu(o.sidebarToggleSelector);
+  }
+
+  //Activate Bootstrap tooltip
+  if (o.enableBSToppltip) {
+    $(o.BSTooltipSelector).tooltip();
+  }
+
+  //Activate box widget
+  if (o.enableBoxWidget) {
+    $.AdminLTE.boxWidget.activate();
+  }
+
+  //Activate fast click
+  if (o.enableFastclick && typeof FastClick != 'undefined') {
+    FastClick.attach(document.body);
+  }
+
+  //Activate direct chat widget
+  if (o.directChat.enable) {
+    $(o.directChat.contactToggleSelector).click(function () {
+      var box = $(this).parents('.direct-chat').first();
+      box.toggleClass('direct-chat-contacts-open');
+    });
+  }
+
+  /*
+   * INITIALIZE BUTTON TOGGLE
+   * ------------------------
+   */
+  $('.btn-group[data-toggle="btn-toggle"]').each(function () {
+    var group = $(this);
+    $(this).find(".btn").click(function (e) {
+      group.find(".btn.active").removeClass("active");
+      $(this).addClass("active");
+      e.preventDefault();
+    });
+
+  });
+});
+
+/* ----------------------------------
+ * - Initialize the AdminLTE Object -
+ * ----------------------------------
+ * All AdminLTE functions are implemented below.
+ */
+function _init() {
+
+  /* Layout
+   * ======
+   * Fixes the layout height in case min-height fails.
+   *
+   * @type Object
+   * @usage $.AdminLTE.layout.activate()
+   *        $.AdminLTE.layout.fix()
+   *        $.AdminLTE.layout.fixSidebar()
+   */
+  $.AdminLTE.layout = {
+    activate: function () {
+      var _this = this;
+      _this.fix();
+      _this.fixSidebar();
+      $(window, ".wrapper").resize(function () {
+        _this.fix();
+        _this.fixSidebar();
+      });
+    },
+    fix: function () {
+      //Get window height and the wrapper height
+      var neg = $('.main-header').outerHeight() + $('.main-footer').outerHeight();
+      var window_height = $(window).height();
+      var sidebar_height = $(".sidebar").height();
+      //Set the min-height of the content and sidebar based on the
+      //the height of the document.
+      if ($("body").hasClass("fixed")) {
+        $(".content-wrapper, .right-side").css('min-height', window_height - $('.main-footer').outerHeight());
+      } else {
+        if (window_height >= sidebar_height) {
+          $(".content-wrapper, .right-side").css('min-height', window_height - neg);
+        } else {
+          $(".content-wrapper, .right-side").css('min-height', sidebar_height);
+        }
+      }
+    },
+    fixSidebar: function () {
+      //Make sure the body tag has the .fixed class
+      if (!$("body").hasClass("fixed")) {
+        if (typeof $.fn.slimScroll != 'undefined') {
+          $(".sidebar").slimScroll({destroy: true}).height("auto");
+        }
+        return;
+      } else if (typeof $.fn.slimScroll == 'undefined' && console) {
+        console.error("Error: the fixed layout requires the slimscroll plugin!");
+      }
+      //Enable slimscroll for fixed layout
+      if ($.AdminLTE.options.sidebarSlimScroll) {
+        if (typeof $.fn.slimScroll != 'undefined') {
+          //Distroy if it exists
+          $(".sidebar").slimScroll({destroy: true}).height("auto");
+          //Add slimscroll
+          $(".sidebar").slimscroll({
+            height: ($(window).height() - $(".main-header").height()) + "px",
+            color: "rgba(0,0,0,0.2)",
+            size: "3px"
+          });
+        }
+      }
+    }
+  };
+
+  /* PushMenu()
+   * ==========
+   * Adds the push menu functionality to the sidebar.
+   *
+   * @type Function
+   * @usage: $.AdminLTE.pushMenu("[data-toggle='offcanvas']")
+   */
+  $.AdminLTE.pushMenu = function (toggleBtn) {
+    //Get the screen sizes
+    var screenSizes = this.options.screenSizes;
+
+    //Enable sidebar toggle
+    $(toggleBtn).click(function (e) {
+      e.preventDefault();
+
+      //Enable sidebar push menu
+      if ($(window).width() > (screenSizes.sm - 1)) {
+        $("body").toggleClass('sidebar-collapse');
+      }
+      //Handle sidebar push menu for small screens
+      else {
+        if ($("body").hasClass('sidebar-open')) {
+          $("body").removeClass('sidebar-open');
+          $("body").removeClass('sidebar-collapse')
+        } else {
+          $("body").addClass('sidebar-open');
+        }
+      }
+    });
+
+    $(".content-wrapper").click(function () {
+      //Enable hide menu when clicking on the content-wrapper on small screens
+      if ($(window).width() <= (screenSizes.sm - 1) && $("body").hasClass("sidebar-open")) {
+        $("body").removeClass('sidebar-open');
+      }
+    });
+
+  };
+
+  /* Tree()
+   * ======
+   * Converts the sidebar into a multilevel
+   * tree view menu.
+   *
+   * @type Function
+   * @Usage: $.AdminLTE.tree('.sidebar')
+   */
+  $.AdminLTE.tree = function (menu) {
+    var _this = this;
+
+    $("li a", $(menu)).click(function (e) {
+      //Get the clicked link and the next element
+      var $this = $(this);
+      var checkElement = $this.next();
+
+      //Check if the next element is a menu and is visible
+      if ((checkElement.is('.treeview-menu')) && (checkElement.is(':visible'))) {
+        //Close the menu
+        checkElement.slideUp('normal', function () {
+          checkElement.removeClass('menu-open');
+          //Fix the layout in case the sidebar stretches over the height of the window
+          //_this.layout.fix();
+        });
+        checkElement.parent("li").removeClass("active");
+      }
+      //If the menu is not visible
+      else if ((checkElement.is('.treeview-menu')) && (!checkElement.is(':visible'))) {
+        //Get the parent menu
+        var parent = $this.parents('ul').first();
+        //Close all open menus within the parent
+        var ul = parent.find('ul:visible').slideUp('normal');
+        //Remove the menu-open class from the parent
+        ul.removeClass('menu-open');
+        //Get the parent li
+        var parent_li = $this.parent("li");
+
+        //Open the target menu and add the menu-open class
+        checkElement.slideDown('normal', function () {
+          //Add the class active to the parent li
+          checkElement.addClass('menu-open');
+          parent.find('li.active').removeClass('active');
+          parent_li.addClass('active');
+          //Fix the layout in case the sidebar stretches over the height of the window
+          _this.layout.fix();
+        });
+      }
+      //if this isn't a link, prevent the page from being redirected
+      if (checkElement.is('.treeview-menu')) {
+        e.preventDefault();
+      }
+    });
+  };
+
+  /* BoxWidget
+   * =========
+   * BoxWidget is plugin to handle collapsing and
+   * removing boxes from the screen.
+   *
+   * @type Object
+   * @usage $.AdminLTE.boxWidget.activate()
+   *        Set all of your option in the main $.AdminLTE.options object
+   */
+  $.AdminLTE.boxWidget = {
+    activate: function () {
+      var o = $.AdminLTE.options;
+      var _this = this;
+      //Listen for collapse event triggers
+      $(o.boxWidgetOptions.boxWidgetSelectors.collapse).click(function (e) {
+        e.preventDefault();
+        _this.collapse($(this));
+      });
+
+      //Listen for remove event triggers
+      $(o.boxWidgetOptions.boxWidgetSelectors.remove).click(function (e) {
+        e.preventDefault();
+        _this.remove($(this));
+      });
+    },
+    collapse: function (element) {
+      //Find the box parent
+      var box = element.parents(".box").first();
+      //Find the body and the footer
+      var bf = box.find(".box-body, .box-footer");
+      if (!box.hasClass("collapsed-box")) {
+        //Convert minus into plus
+        element.children(".fa-minus").removeClass("fa-minus").addClass("fa-plus");
+        bf.slideUp(300, function () {
+          box.addClass("collapsed-box");
+        });
+      } else {
+        //Convert plus into minus
+        element.children(".fa-plus").removeClass("fa-plus").addClass("fa-minus");
+        bf.slideDown(300, function () {
+          box.removeClass("collapsed-box");
+        });
+      }
+    },
+    remove: function (element) {
+      //Find the box parent
+      var box = element.parents(".box").first();
+      box.slideUp();
+    },
+    options: $.AdminLTE.options.boxWidgetOptions
+  };
+}
+
+/* ------------------
+ * - Custom Plugins -
+ * ------------------
+ * All custom plugins are defined below.
+ */
+
+/*
+ * BOX REFRESH BUTTON
+ * ------------------
+ * This is a custom plugin to use with the compenet BOX. It allows you to add
+ * a refresh button to the box. It converts the box's state to a loading state.
+ *
+ * @type plugin
+ * @usage $("#box-widget").boxRefresh( options );
+ */
+(function ($) {
+
+  $.fn.boxRefresh = function (options) {
+
+    // Render options
+    var settings = $.extend({
+      //Refressh button selector
+      trigger: ".refresh-btn",
+      //File source to be loaded (e.g: ajax/src.php)
+      source: "",
+      //Callbacks
+      onLoadStart: function (box) {
+      }, //Right after the button has been clicked
+      onLoadDone: function (box) {
+      } //When the source has been loaded
+
+    }, options);
+
+    //The overlay
+    var overlay = $('<div class="overlay"><div class="fa fa-refresh fa-spin"></div></div>');
+
+    return this.each(function () {
+      //if a source is specified
+      if (settings.source === "") {
+        if (console) {
+          console.log("Please specify a source first - boxRefresh()");
+        }
+        return;
+      }
+      //the box
+      var box = $(this);
+      //the button
+      var rBtn = box.find(settings.trigger).first();
+
+      //On trigger click
+      rBtn.click(function (e) {
+        e.preventDefault();
+        //Add loading overlay
+        start(box);
+
+        //Perform ajax call
+        box.find(".box-body").load(settings.source, function () {
+          done(box);
+        });
+      });
+    });
+
+    function start(box) {
+      //Add overlay and loading img
+      box.append(overlay);
+
+      settings.onLoadStart.call(box);
+    }
+
+    function done(box) {
+      //Remove overlay and loading img
+      box.find(overlay).remove();
+
+      settings.onLoadDone.call(box);
+    }
+
+  };
+
+})(jQuery);
+
+/*
+ * TODO LIST CUSTOM PLUGIN
+ * -----------------------
+ * This plugin depends on iCheck plugin for checkbox and radio inputs
+ *
+ * @type plugin
+ * @usage $("#todo-widget").todolist( options );
+ */
+(function ($) {
+
+  $.fn.todolist = function (options) {
+    // Render options
+    var settings = $.extend({
+      //When the user checks the input
+      onCheck: function (ele) {
+      },
+      //When the user unchecks the input
+      onUncheck: function (ele) {
+      }
+    }, options);
+
+    return this.each(function () {
+
+      if (typeof $.fn.iCheck != 'undefined') {
+        $('input', this).on('ifChecked', function (event) {
+          var ele = $(this).parents("li").first();
+          ele.toggleClass("done");
+          settings.onCheck.call(ele);
+        });
+
+        $('input', this).on('ifUnchecked', function (event) {
+          var ele = $(this).parents("li").first();
+          ele.toggleClass("done");
+          settings.onUncheck.call(ele);
+        });
+      } else {
+        $('input', this).on('change', function (event) {
+          var ele = $(this).parents("li").first();
+          ele.toggleClass("done");
+          settings.onCheck.call(ele);
+        });
+      }
+    });
+  };
+}(jQuery));
+/* global echarts */
+
+'use strict';
+
+
+//
+// configuration
+//
+
+// twbsPagination
+(function () {
+  if (typeof $.fn.twbsPagination !== 'function') {
+    throw new Error('twbsPagination required');
+  }
+
+  var options = {
+    first: '第一页',
+    prev: '上一页',
+    next: '下一页',
+    last: '最后一页',
+    paginationClass: 'pagination pagination-sm no-margin pull-right'
+  };
+
+  $.extend($.fn.twbsPagination.defaults, options);
+}());
+
+
+//
+// Application
+//
+
+var App = {
+  // Modules
+  module: {},
+
+  // Pages
+  page: {},
+
+  // Router
+  route: function () {
+    var module  = this.module,
+        page    = this.page,
+        path    = location.pathname,
+        rule    = /^\/(?:(\w+)\/)?(?:(\d+)\/)?/,
+        match   = rule.exec(path).slice(1),
+        type    = match[0] === undefined ? 'dashboard' : match[0],
+        id      = match[1];
+
+    if (type === 'login') {
+      return page.login(module);
+    }
+
+    // common
+    module.search();
+    module.menu(path, type);
+
+    if (id === undefined) {
+      return page[type](module, path, type);
+    } else {
+      return page[type + 'Detail'](module, path, type, id);
+    }
+  }
+};
+
+
+//
+// Modules
+//
+
+// user
+App.module.login = function () {
+  var form     = document.forms.login,
+      action   = form.action,
+      elements = form.elements,
+      username = elements.username,
+      password = elements.password,
+      submit   = elements[2],
+      $msg     = $(form).find('p'),
+
+      enableSubmit = function() {
+        submit.disabled = !(username.value && password.value);
+      },
+
+      processLogin = function(event) {
+        event.preventDefault();
+
+        $.post(action, $(form).serialize(), function(response) {
+          if (response.status) {
+            location.href = location.search ? location.search.substr(1).split('=')[1] : '/';
+          } else {
+            $msg.text('用户名或密码错误！');
+            submit.disabled = true;
+            password.value  = '';
+          }
+        });
+      };
+
+  $(form).keyup(enableSubmit).submit(processLogin);
+};
+
+App.module.register = function () {
+  var form     = document.forms.add,
+      action   = form.action,
+      elements = form.elements,
+      username = elements.username,
+      password = elements.password,
+      retype   = elements.retype,
+      submit   = elements[3],
+      $msg     = $(form).find('p'),
+
+      enableSubmit = function() {
+        submit.disabled = !(username.value && password.value && retype.value);
+      },
+
+      processAdd   = function(event) {
+        event.preventDefault();
+
+        var processResponse = function(response) {
+          if (response.status) {
+            location.reload();
+          } else {
+            $msg.text('抱歉，添加失败！').show();
+          }
+        };
+
+        if (password.value === retype.value) {
+          $.post(action, $([username, password]).serialize(), processResponse);
+        } else {
+          $msg.text('两次输入密码不一致！').show();
+          submit.disabled = true;
+          password.value  = '';
+          retype.value    = '';
+        }
+      };
+
+  $(form).keyup(enableSubmit).submit(processAdd);
+};
+
+App.module.admin = function () {
+  var $admin  = $('.user-admin'),
+      $input  = $admin.find('input'),
+      $button = $admin.find('button'),
+      $reset  = $button.eq(0),
+      $remove = $button.eq(1),
+      id      = [],
+
+      action = function(obj, api) {
+        obj.click(function() {
+          id.length = 0;
+
+          $input.filter(':checked').each(function(index, element) {
+            id.push( $(element).parent().next().data('id') );
+          });
+
+          if (id.length) {
+            $.post(api, {id: id.toString()}, function(response) {
+              if (response.status) {
+                location.reload();
+              }
+            });
+          }
+        });
+      };
+
+  action($reset, '/api/user/reset/');
+  action($remove, '/api/user/remove/');
+};
+
+App.module.settings = function () {
+  var form        = document.forms.info,
+      action      = form.action,
+      elements    = form.elements,
+      username    = elements.username,
+      oldPassword = elements.oldPassword,
+      newPassword = elements.newPassword,
+      retype      = elements.retype,
+      submit      = elements[4],
+      $msg        = $(form).find('p'),
+
+
+      enableSubmit = function() {
+        submit.disabled = !(username.value && oldPassword.value && newPassword.value && retype.value);
+      },
+
+      processChange = function(event) {
+        event.preventDefault();
+
+        var processResponse = function(response) {
+          if (response.status) {
+            $msg.text('更新成功！').show();
+            location.href = '/login/';
+          } else {
+            $msg.text('原密码错误！').show();
+            oldPassword.value = '';
+            newPassword.value = '';
+            retype.value      = '';
+          }
+        };
+
+        if (newPassword.value === retype.value) {
+          $.post(action, $([username, oldPassword, newPassword]).serialize(), processResponse);
+        } else {
+          $msg.text('两次输入密码不一致！').show();
+          newPassword.value = '';
+          retype.value      = '';
+        }
+      };
+
+  $(form).keyup(enableSubmit).submit(processChange);
+};
+
+// chart
+App.module.line = function (path) {
+  $.getJSON('/api/line' + path, function (data) {
+    echarts.init($('#line-chart')[0], 'macarons').setOption({
+      color: ['#00a65a', '#00c0ef', '#dd4b39'],
+      tooltip: {
+        trigger: 'axis'
+      },
+      legend: {
+        data: ['正面','中性','负面']
+      },
+      grid: {
+        x: 40,
+        y: 30,
+        x2: 25,
+        y2: 30
+      },
+      xAxis: [
+        {
+          type: 'category',
+          boundaryGap: false,
+          data: data.date
+        }
+      ],
+      yAxis: [
+        {
+          type : 'value'
+        }
+      ],
+      series: [
+        {
+          name: '正面',
+          type: 'line',
+          data: data.positive
+        },
+        {
+          name: '中性',
+          type: 'line',
+          data: data.neutral
+        },
+        {
+          name: '负面',
+          type: 'line',
+          data: data.negative
+        }
+      ]
+    });
+  });
+};
+
+App.module.pie = function (path) {
+  $.getJSON('/api/pie' + path, function (data) {
+    echarts.init($('#pie-chart')[0], 'macarons').setOption({
+      tooltip: {
+        trigger: 'item',
+        formatter: '{a} <br/>{b} : {c} ({d}%)'
+      },
+      legend: {
+        data: data.name
+      },
+      series: [
+        {
+          name: '信息比例',
+          type: 'pie',
+          radius: '55%',
+          center: ['50%', '60%'],
+          data: data.value
+        }
+      ]
+    });
+  });
+};
+
+// util
+App.module.search = function () {
+  var form  = document.forms.search,
+      input = form.elements.keywords;
+
+  $(form).submit(function(event) {
+    event.preventDefault();
+
+    var keywords = $.trim(input.value);
+
+    if (keywords) {
+      form.reset();
+      location.href = '/search/' + keywords + '/';
+    }
+  });
+};
+
+App.module.menu = function (path, type) {
+  var menu     = $('.sidebar-menu'),
+      parent   = menu.parent(),
+
+      validate = function () {
+        var href = this.getAttribute('href');
+
+        switch (true) {
+        case type === 'dashboard':
+          return href === '/';
+        // both 'category' and 'location' are parent treeview
+        case type === 'category':
+        case type === 'location':
+          return href === path;
+        default:
+          return href.split('/')[1] === type;
+        }
+      };
+
+  menu
+    .detach()
+    .find('a').filter(validate)
+    .parent().addClass('active')
+    .closest('.treeview-menu').addClass('menu-open')
+    .closest('.treeview').addClass('active');
+
+  menu.appendTo(parent);
+};
+
+App.module.infoBox = function () {
+  var animate = function (index, element) {
+    var infoBoxNumber = $(element).find('.info-box-number'),
+        progressBar = $(element).find('.progress-bar'),
+        progressDescription = $(element).find('.progress-description'),
+
+        duration = 2000,
+        refreshInterval = 100,
+        loop = Math.floor(duration / refreshInterval),
+        loopCount = 0,
+
+        numberValue = 0,
+        numberFinal = $(element).data('number'),
+        numberIncrement = Math.floor(numberFinal / loop),
+
+        percentValue = 0,
+        percentFinal = $(element).data('percent'),
+        percentIncrement = Math.floor(percentFinal / loop),
+
+        intervalID,
+
+        countTo = function() {
+          numberValue += numberIncrement;
+          percentValue += percentIncrement;
+
+          loopCount++;
+
+          if (loopCount >= loop) {
+            clearInterval(intervalID);
+            numberValue = numberFinal;
+            percentValue = percentFinal;
+          }
+
+          infoBoxNumber.text( numberValue.toFixed() );
+          progressBar.width( percentValue + '%' );
+          progressDescription.text( '占总数据 ' + percentValue.toFixed() + '%' );
+        };
+
+    intervalID = setInterval(countTo, refreshInterval);
+  };
+
+  $('.info-box-content').each(animate);
+};
+
+App.module.inspection = function () {
+  var $inspection = $('#inspection'),
+      $content    = $inspection.children('.box-body').find('tbody');
+
+  $content.load('/api/dashboard/local-inspection/');
+
+  $inspection.on('click', 'button', function (event) {
+    event.preventDefault();
+
+    if ( $(this).hasClass('active') ) {
+      return false;
+    }
+
+    $(this)
+      .addClass('active')
+      .siblings().removeClass('active');
+
+    $content.load('/api/dashboard/' + this.id + '/');
+  });
+};
+
+App.module.returnTop = function (el) {
+  var top       = el.offset().top,
+      scrollTop = top > 160 ? top - 120 : 0;
+
+  $('body').animate({scrollTop: scrollTop});
+};
+
+App.module.table = function (module, path) {
+  $('.table-custom').each(function () {
+    var $this       = $(this),
+        $pagination = $this.parent(),
+        content     = this.tBodies[0],
+        type        = this.id,
+
+        renderTable = function(data) {
+          var items = data.data,
+
+              table = $.map(items, function(item) {
+                var url       = '/' + type + '/' + item.id + '/',
+                    title     = '<td><a href="' + url + '" title="' + item.title + '" target="_blank">' + item.title + '</a></td>',
+                    source    = '<td>' + item.source   + '</td>',
+                    location  = '<td>' + item.location + '</td>',
+                    time      = '<td>' + item.time     + '</td>',
+                    hot       = '<td class="text-center">' + item.hot + '</td>',
+                    row       = '<tr>' + title + source + location + time + hot + '</tr>';
+
+                return row;
+              });
+
+          $(content).html(table);
+        };
+
+    $.getJSON('/api' + path + type + '/1/', function(data) {
+      renderTable(data);
+
+      $pagination.twbsPagination({
+        totalPages: data.total,
+        visiblePages: 7,
+        onPageClick: function(event, page) {
+          module.returnTop($this);
+
+          $.getJSON('/api' + path + type + '/' + page + '/', function(data) {
+            renderTable(data);
+            $pagination.twbsPagination({totalPages: data.total});
+          });
+        }
+      });
+    });
+  });
+};
+
+App.module.collect = function (type, id) {
+  $('.collection').click(function () {
+    var star = $(this).find('i'),
+        text = $(this).find('span'),
+
+        collect = function(api, nextAction) {
+          var data = {
+                type: type === 'news' ? 'article' : 'topic',
+                id: id
+              };
+
+          $.post(api, data, function(response) {
+            if (response.status) {
+              star.toggleClass('fa-star-o');
+              star.toggleClass('fa-star');
+              text.text(nextAction);
+            }
+          });
+        };
+
+    if ( star.hasClass('fa-star') ) {
+      collect('/api/collection/remove/', '添加收藏');
+    } else {
+      collect('/api/collection/add/', '取消收藏');
+    }
+  });
+};
+
+App.module.sns = function (module, path, type) {
+  var $sns = $('.sns');
+
+  $sns.each(function(index, element) {
+    var $content    = $(element),
+        $pagination = $content.parent().next(),
+
+        snsType = function() {
+          if (type === 'weixin' || type === 'weibo') {
+            return $pagination.data('type');
+          } else {
+            return $pagination.data('type').replace('-', '/');
+          }
+        };
+
+    $.getJSON('/api' + path + snsType() + '/1/', function(data) {
+      $content.html(data.html);
+
+      $pagination.twbsPagination({
+        totalPages: data.total,
+        onPageClick: function (event, page) {
+          module.returnTop($sns);
+          $.getJSON('/api' + path + snsType() + '/' + page + '/', function(data) {
+            $content.html(data.html);
+            $pagination.twbsPagination({totalPages: data.total});
+          });
+        }
+      });
+    });
+  });
+};
+
+App.module.dataTable = function (path) {
+  $.fn.dataTable.ext.errMode = 'throw';
+
+  $('.initDataTable').each(function () {
+    var table = $(this).DataTable({
+      'ajax': {
+        'url': '/api' + path,
+        'dataSrc': this.id,
+        'cache': true
+      },
+      'autoWidth': false,
+      'pageLength': 25,
+      'order': [],
+      'language': {
+        'processing':         '处理中...',
+        'search':             '',
+        'searchPlaceholder':  '输入关键字过滤...',
+        'lengthMenu':         '显示 _MENU_ 条',
+        'info':               '显示第 _START_ 至 _END_ 条，共 _TOTAL_ 条',
+        'infoEmpty':          '信息空',
+        'infoFiltered':       '(由 _MAX_ 项结果过滤)',
+        'infoPostFix':        '',
+        'loadingRecords':     '载入中...',
+        'zeroRecords':        '无匹配结果',
+        'emptyTable':         '无结果',
+        'paginate': {
+          'first':            '第一页',
+          'previous':         '上一页',
+          'next':             '下一页',
+          'last':             '最后一页'
+        },
+        'aria': {
+          'sortAscending':    '正序排列',
+          'sortDescending':   '倒序排列'
+        }
+      },
+      // "columnDefs": [{
+      //   "className": "star",
+      //   "targets": 0,
+      //   "searchable": false,
+      //   "orderable": false
+      // },{
+      //   "className": "index",
+      //   "targets": -1
+      // }],
+      'deferLoading': 100,
+      'drawCallback': function () {
+        $('[data-toggle="tooltip"]').tooltip();
+      }
+    });
+
+    table.on('click', 'tbody > tr', function () {
+      if ( $(this).hasClass('selected') ) {
+        $(this).removeClass('selected');
+      } else {
+        table.$('tr.selected').removeClass('selected');
+        $(this).addClass('selected');
+      }
+    });
+  });
+
+
+  // table.on('draw.dt', function () {
+  //   var collection = function(obj, api) {
+  //     obj.each(function(index, element) {
+  //       $(element).click(function(event) {
+  //         event.preventDefault();
+
+  //         var $this = $(this);
+
+  //         var article = $this.parent().next().find('a');
+  //         var data = {
+  //           id: article.data('id'),
+  //           type: article.data('type')
+  //         };
+
+  //         var action = function(status) {
+  //           if (status) {
+  //             $this.toggleClass('fa-star-o');
+  //             $this.toggleClass('fa-star');
+  //             table.ajax.reload(null, false);
+  //           }
+  //         };
+
+  //         $.post(api, data, action);
+  //       });
+  //     });
+  //   };
+
+  //   collection( $('.fa-star-o'), '/api/collection/add/');
+  //   collection( $('.fa-star'), '/api/collection/remove/');
+  // });
+};
+
+App.module.custom = function () {
+  var form     = document.forms.addKeyword,
+      action   = form.action,
+      elements = form.elements,
+      fieldset = elements[0],
+      keyword  = elements[1],
+      button   = elements[2],
+      $msg     = $(form).prev(),
+      $list    = $(form).parent().prev().find('li'),
+
+      enableSubmit = function() {
+        button.disabled = !(keyword.value);
+      },
+
+      processAdd = function(event) {
+        event.preventDefault();
+
+        $.post(action, $(form).serialize(), function(response) {
+          if (response.status) {
+            $msg.text('关键词添加成功！').show();
+            location.reload();
+          } else {
+            $msg.text('关键词添加失败！').show();
+            keyword.value = '';
+          }
+        });
+      };
+
+  if ($list.length >= 5) {
+    fieldset.disabled = true;
+  } else {
+    $(form).keyup(enableSubmit).submit(processAdd);
+  }
+};
+
+
+//
+// Pages
+//
+
+// user
+App.page.login = function (module) {
+  module.login();
+};
+
+App.page.settings = function (module) {
+  module.settings();
+};
+
+App.page.user = function (module) {
+  module.admin();
+  module.register();
+};
+
+// util
+App.page.dashboard = function (module, path) {
+  module.infoBox();
+  module.line(path);
+  module.pie(path);
+  module.inspection();
+};
+
+App.page.news = function (module, path) {
+  module.table(module, path);
+};
+
+App.page.newsDetail = function (module, path, type, id) {
+  module.collect(type, id);
+};
+
+App.page.event = function (module, path) {
+  module.table(module, path);
+};
+
+App.page.eventDetail = function (module, path, type, id) {
+  module.collect(type, id);
+  module.line(path, type);
+  module.pie(path, type);
+  module.table(module, path);
+  module.sns(module, path, type);
+};
+
+App.page.weixin = function (module, path, type) {
+  module.sns(module, path, type);
+};
+
+App.page.weixinDetail = function () {
+  // placeholder for future usage
+};
+
+App.page.weibo = function (module, path, type) {
+  module.sns(module, path, type);
+};
+
+App.page.categoryDetail = function (module, path) {
+  module.table(module, path);
+};
+
+App.page.locationDetail = function (module, path, type) {
+  module.table(module, path);
+  module.sns(module, path, type);
+};
+
+App.page.inspection = function (module, path) {
+  module.dataTable(path);
+};
+
+App.page.custom = function (module) {
+  module.custom();
+};
+
+App.page.customDetail = function (module, path, type) {
+  module.table(module, path);
+  module.sns(module, path, type);
+};
+
+App.page.collection = function (module, path) {
+  module.table(module, path);
+};
+
+
+//
+// Initialization
+//
+
+$(function () {
+  App.route();
+});

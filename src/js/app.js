@@ -41,26 +41,10 @@ var App = {
     var module  = this.module,
         page    = this.page,
         path    = location.pathname,
-        summary = /^\/(\w+)\/$/,
-        detail  = /^\/(\w+)\/(\d+)\/$/,
-        match   = null,
-        type,
-        id;
-
-    switch (true) {
-    case path === '/':
-      type  = 'dashboard';
-      break;
-    case summary.test(path):
-      match = summary.exec(path);
-      type  = match[1];
-      break;
-    case detail.test(path):
-      match = detail.exec(path);
-      type  = match[1];
-      id    = +match[2];
-      break;
-    }
+        rule    = /^\/(?:(\w+)\/)?(?:(\d+)\/)?/,
+        match   = rule.exec(path).slice(1),
+        type    = match[0] === undefined ? 'dashboard' : match[0],
+        id      = match[1];
 
     if (type === 'login') {
       return page.login(module);
