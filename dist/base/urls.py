@@ -13,6 +13,7 @@ from weixin.views import WeixinView, WeixinDetailView
 from weibo.views import WeiboView
 from custom.views import CustomView, CustomDetailView
 from product.views import ProductView
+from inspection.views import InspectionView
 
 
 urlpatterns = patterns('',
@@ -29,7 +30,6 @@ urlpatterns += patterns('yqj.views',
     url(r'^collection/$', CollectionView.as_view()),
     url(r'^settings/$', SettingsView.as_view()),
     url(r'^user/$', UserAdminView.as_view()),
-    url(r'^inspection/$', InspectionView.as_view()),
     url(r'^login/$', 'login_view'),
     url(r'^logout/$', 'logout_view'),
     url(r'^search/(.+)/$', SearchView.as_view()),
@@ -61,4 +61,8 @@ urlpatterns += patterns('custom.views',
 
 urlpatterns += patterns('product.views',
     url(r'^product/(?P<id>\d*)/?$', ProductView.as_view()),
+)
+
+urlpatterns += patterns('inspection.views',
+    url(r'^inspection/$', InspectionView.as_view()),
 )

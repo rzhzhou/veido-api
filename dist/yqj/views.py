@@ -229,8 +229,3 @@ def logout_view(request):
 class SearchView(BaseTemplateView):
     def get(self, request, keyword):
         return self.render_to_response('search/result.html')
-
-
-class InspectionView(BaseTemplateView):
-    def get(self, request):
-        return self.render_to_response('inspection/inspection_list.html', {})
