@@ -389,7 +389,10 @@ class CollectView(APIView):
         url = u'/news/%s' % item.id
         view = ArticleTableView(self.request)
         title = view.title_html(url, item.title, item.id, 'article')
-        hot_index = RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count()
+        try:
+            hot_index = RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count()
+        except:
+            hot_index =0
         line = [title, item.publisher.publisher, item.area.name, item.pubtime.date(), hot_index]
         #line = [view.collected_html(item), title, item.publisher.publisher, item.area.name, item.pubtime.date(), hot_index]
         return line
