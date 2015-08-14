@@ -9,6 +9,7 @@ from django.utils.dateparse import parse_date
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from base import sidebarUtil
 from base.views import BaseTemplateView
 from django.conf import settings
 from base.models import Article, Area, Category, Inspection, Weixin, Weibo
@@ -135,4 +136,5 @@ class DispatchView(APIView, BaseTemplateView):
 
 class AnalyticsChildView(BaseTemplateView):
     def get(self, request, id):
-        return self.render_to_response('analytics/analytics.html', {'industry': {'name': u'综合'}})
+        sidebar_name = sidebarUtil(request)
+        return self.render_to_response('analytics/analytics.html', {'industry': {'name': u'综合'}, 'name': sidebar_name})
