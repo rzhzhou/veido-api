@@ -1,5 +1,7 @@
 from django.http import HttpResponseRedirect
-from yqj.models import User, AnonymousUser, hash_password
+
+from base.models import AnonymousUser, User, hash_password
+
 
 def authenticate(username, raw_password):
     try:
@@ -14,7 +16,7 @@ def authenticate(username, raw_password):
 
 
 def login_required(view_func):
-    
+
     def wrapper(request, *args, **kwargs):
         if not request.myuser.is_authenticated():
             #next_url = '/login/' if request.path == '/' else '/login/?next=%s' % request.path
