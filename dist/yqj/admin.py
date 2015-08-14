@@ -1,16 +1,21 @@
-#coding=utf-8
-from django.contrib import admin
-from django import forms
-from django.contrib import messages
-from yqj.mongoconnect import CrawlerTask
-from models import WeixinPublisher, WeiboPublisher,Weibo, ArticlePublisher,\
-                   Category, Group, User, Article, Topic, Custom,\
-                   CustomKeyword, Area,Weixin, Product, ProductKeyword, save_user
+# -*- coding: utf-8 -*-
 import jieba.analyse
+
+from django import forms
+from django.contrib import admin, messages
+
+from yqj.mongoconnect import CrawlerTask
+from base.models import (Area, Article, ArticlePublisher, Category, Custom, Group,
+    CustomKeyword, Product, ProductKeyword, Topic, User, Weibo, WeiboPublisher,
+    Weixin, WeixinPublisher, save_user)
+
 
 def show_pubtime(obj):
     return obj.pubtime.replace(tzinfo=None).strftime('%Y-%m-%d %H:%M')
+
+
 show_pubtime.short_description = u'发布时间'
+
 
 class WeiboAdmin(admin.ModelAdmin):
     list_display = ('title', 'source', 'website_type', 'area','pubtime')
@@ -22,6 +27,7 @@ class WeiboAdmin(admin.ModelAdmin):
         if db_field.name == "area":
             kwargs["queryset"] = Area.objects.filter(level__lt=3)
         return super(WeiboAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+
 
 class WeixinAdmin(admin.ModelAdmin):
     fields=('author','title','url','content','origin_source','source','website_type','pubtime','publisher','area','uuid','readnum','likenum')
@@ -57,7 +63,7 @@ class CustomKeywordAdmin(admin.ModelAdmin):
             # messages.error(request,
             #         "The Parking Location field cannot be changedaaaaaaaaaaa.")
             obj.save()
-        else:           
+        else:
             key_list = CustomKeyword.objects.filter(id=obj.id)
             if len(key_list) == 0:
                 return
@@ -76,8 +82,9 @@ class CustomKeywordAdmin(admin.ModelAdmin):
         del_index = key_list[0].review
         if not del_index:
             del_index = key_list[0].custom
-        CrawlerTask(del_index, "zjld", u"关键词").del_task()       
+        CrawlerTask(del_index, "zjld", u"关键词").del_task()
         obj.delete()
+
 
 class TopicAdmin(admin.ModelAdmin):
     fields = ('title', 'abstract', 'source', 'area', 'keywords')
@@ -140,7 +147,7 @@ class ProductKeywordAdmin(admin.ModelAdmin):
             # messages.error(request,
             #         "The Parking Location field cannot be changedaaaaaaaaaaa.")
             obj.save()
-        else:           
+        else:
             key_list = ProductKeyword.objects.filter(id=obj.id)
             if len(key_list) == 0:
                 return
@@ -159,7 +166,7 @@ class ProductKeywordAdmin(admin.ModelAdmin):
         del_index = key_list[0].review
         if not del_index:
             del_index = key_list[0].product
-        CrawlerTask(del_index, "zjld", u"关键词").del_task()       
+        CrawlerTask(del_index, "zjld", u"关键词").del_task()
         obj.delete()
 
 
@@ -171,9 +178,6 @@ class UserAdmin(admin.ModelAdmin):
     def save_model(self,request, obj, form, change):
         save_user(obj.username, obj.password, obj.area, obj.group, obj.isAdmin)
 
-
-
-# Register your models here.
 
 admin.site.register(WeixinPublisher)
 admin.site.register(WeiboPublisher)
@@ -189,4 +193,3 @@ admin.site.register(Custom)
 admin.site.register(CustomKeyword, CustomKeywordAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(ProductKeyword, ProductKeywordAdmin)
-

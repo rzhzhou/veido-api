@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
-from django.core.paginator import Paginator
-from django.core.paginator import EmptyPage
-from django.core.paginator import PageNotAnInteger
+from django.core.paginator import EmptyPage, Paginator, PageNotAnInteger
 from django.db.models import Q
 from django.shortcuts import render_to_response
 from django.views.generic import View
 from rest_framework.views import APIView
 
 from base import login_required, get_user_image
-from yqj.models import Area, Category, RelatedData
+from base.models import Area, Category, RelatedData
 from yqj.redisconnect import RedisQueryApi
 
 

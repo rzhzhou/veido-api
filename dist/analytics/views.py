@@ -2,6 +2,7 @@
 from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
+from django.conf import settings
 from django.http import HttpResponse
 from django.db.models import Q
 from django.template.loader import render_to_string
@@ -10,8 +11,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from base.views import BaseTemplateView
-from django.conf import settings
-from yqj.models import Article, Area, Category, Inspection, Weixin, Weibo
+from base.models import Article, Area, Category, Inspection, Weixin, Weibo
 from yqj.mysqlUtil import query
 from yqj.redisconnect import RedisQueryApi
 

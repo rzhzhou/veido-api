@@ -19,16 +19,14 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
-from base import authenticate, login_required
+from base import authenticate, login_required, set_logo
 from base.views import BaseAPIView
-from yqj.models import (Article, Area, Weixin, Weibo, Topic, RelatedData,
-    Category, save_user, Collection, Topic, hash_password, User, Custom,
-    Inspection, CustomKeyword,Product, ProductKeyword, Group)
+from base.models import (Area, Article, Category, Collection, Custom,
+    CustomKeyword, Group, Inspection, Product, ProductKeyword, RelatedData,
+    Topic, User, Weibo, Weixin, save_user, hash_password)
 from yqj.redisconnect import RedisQueryApi
-from yqj.views import SetLogo
 from api.api_function import (GetFirstDaySeason, get_season, year_range,
     season_range, months_range, days_range, week_range, unstable)
-
 
 
 def login_view(request):
@@ -46,6 +44,7 @@ def login_view(request):
         return response
     else:
         return JsonResponse({'status': False})
+
 
 @api_view(['POST'])
 def registe_view(request):
@@ -69,6 +68,7 @@ def registe_view(request):
 def get_date_from_iso(datetime_str):
     #return datetime.strptime("2008-09-03T20:56:35.450686Z", "%Y-%m-%dT%H:%M:%S.%fZ")
     return datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S.%fZ")
+
 
 class ArticleTableView(BaseAPIView):
     def get(self, request, id, page):
@@ -204,7 +204,7 @@ class LocationWeixinView(BaseAPIView):
             return Response({'html': '', 'total': 0})
         items = Weixin.objects.filter(area=area)
         datas = self.paging(items, self.LOCATION_WEIXIN_LIMIT, page)
-        items = [SetLogo(data) for data in datas['items']]
+        items = [set_logo(data) for data in datas['items']]
         html = self.set_css_to_weixin(items)
         return Response({'html': html, 'total': datas['total_number']})
 
@@ -219,7 +219,7 @@ class LocationWeiboView(BaseAPIView):
             return Response({'html': '', 'total': 0})
         items = Weibo.objects.filter(area=area)
         datas = self.paging(items, self.LOCATION_WEIBO_LIMIT, page)
-        items = [SetLogo(data) for data in datas['items']]
+        items = [set_logo(data) for data in datas['items']]
         html = self.set_css_to_weibo(items)
         return Response({'html': html, 'total': datas['total_number']})
 
@@ -291,7 +291,7 @@ class EventDetailWeixinView(BaseAPIView):
             return Response({'html': '', 'total': 0})
         items = event.weixin.all()
         datas = self.paging(items, self.EVENT_WEIXIN_LIMIT, page)
-        items = [SetLogo(data) for data in datas['items']]
+        items = [set_logo(data) for data in datas['items']]
         html = self.set_css_to_weixin(items)
         return Response({'html': html, 'total': datas['total_number']})
 
@@ -305,7 +305,7 @@ class EventDetailWeiboView(BaseAPIView):
             return Response({'html': '', 'total': 0})
         items = event.weibo.all()
         datas = self.paging(items, self.EVENT_WEIBO_LIMIT, page)
-        items = [SetLogo(data) for data in datas['items']]
+        items = [set_logo(data) for data in datas['items']]
         html = self.set_css_to_weibo(items)
         return Response({'html': html, 'total': datas['total_number']})
 
@@ -391,7 +391,7 @@ class CollecModifyView(View):
         return self.data_type.lower()
 
     def get_related_model(self):
-        return models.get_model('yqj', self.data_type.capitalize() + 'Collection')
+        return models.get_model('base', self.data_type.capitalize() + 'Collection')
 
     def _create_collection(self):
         #add a collection to the user
@@ -407,10 +407,10 @@ class CollecModifyView(View):
         return self._create_collection()
 
     def get_model(self):
-        return models.get_model('yqj', self.data_type.capitalize())
+        return models.get_model('base', self.data_type.capitalize())
 
     def get_collection_model(self):
-        return models.get_model('yqj', self.data_type.capitalize() + 'Collection')
+        return models.get_model('base', self.data_type.capitalize() + 'Collection')
 
     def post(self, request, action, *args, **kwargs):
         try:
@@ -539,7 +539,7 @@ class CustomWeixinView(BaseAPIView):
             return Response({'html': '', 'total': 0})
         items = keyword.custom.weixin.all()
         datas = self.paging(items, self.CUSTOM_WEIXIN_LIMIT, page)
-        items = [SetLogo(data) for data in datas['items']]
+        items = [set_logo(data) for data in datas['items']]
         html = self.set_css_to_weixin(items)
         return Response({'html': html, 'total': datas['total_number']})
 
@@ -554,7 +554,7 @@ class CustomWeiboView(BaseAPIView):
             return Response({'html': '', 'total': 0})
         items = keyword.custom.weibo.all()
         datas = self.paging(items, self.CUSTOM_WEIBO_LIMIT, page)
-        items = [SetLogo(data) for data in datas['items']]
+        items = [set_logo(data) for data in datas['items']]
         html = self.set_css_to_weibo(items)
         return Response({'html': html, 'total': datas['total_number']})
 
@@ -645,9 +645,6 @@ class InspectionTableView(BaseAPIView):
         return result
 
 
-
-
-
 class WeixinTableView(BaseAPIView):
     Weixin_table_limit = 20
     def get(self, request, weixin_type, page):
@@ -655,7 +652,7 @@ class WeixinTableView(BaseAPIView):
             datas = self.paging(Weixin.objects.all(), self.Weixin_table_limit, page)
         elif weixin_type == 'hot':
             datas = self.paging(Weixin.objects.all(), self.Weixin_table_limit, page)
-        items = [SetLogo(data) for data in datas['items']]
+        items = [set_logo(data) for data in datas['items']]
         html = self.set_css_to_weixin(items)
         return Response({'html': html, 'total': datas['total_number']})
 
@@ -697,7 +694,7 @@ class WeiboTableView(BaseAPIView):
                     data['photo'] = u'http://tp2.sinaimg.cn/3557640017/180/40054587155/1'
             html = self.set_css_to_hotweibo(hot_datas['items'])
             return Response({'html': html, 'total': hot_datas['total_number']})
-        items = [SetLogo(data) for data in datas['items']]
+        items = [set_logo(data) for data in datas['items']]
         html = self.set_css_to_weibo(items)
         return Response({'html': html, 'total': datas['total_number']})
 
@@ -909,4 +906,3 @@ def chart_pie_event_view(request, topic_id):
              {u'name': u'自媒体', u'value': topic.weibo.count()+topic.weixin.count()}]
     value = [item for item in value if item['value']]
     return JsonResponse({u'name': name, u'value': value})
-
