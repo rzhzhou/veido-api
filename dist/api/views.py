@@ -225,10 +225,7 @@ class NewsTableView(BaseAPIView):
         return Response({"news": result})
     """
     def get_custom_artice(self):
-        # articles = Article.objects.filter(website_type='hot')
         articles = Category.objects.get(name='质监热点').articles.all()
-
-
         return articles
 
     def get(self, request, page):
