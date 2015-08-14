@@ -391,7 +391,7 @@ class CollecModifyView(View):
         return self.data_type.lower()
 
     def get_related_model(self):
-        return models.get_model('yqj', self.data_type.capitalize() + 'Collection')
+        return models.get_model('base', self.data_type.capitalize() + 'Collection')
 
     def _create_collection(self):
         #add a collection to the user
@@ -407,10 +407,10 @@ class CollecModifyView(View):
         return self._create_collection()
 
     def get_model(self):
-        return models.get_model('yqj', self.data_type.capitalize())
+        return models.get_model('base', self.data_type.capitalize())
 
     def get_collection_model(self):
-        return models.get_model('yqj', self.data_type.capitalize() + 'Collection')
+        return models.get_model('base', self.data_type.capitalize() + 'Collection')
 
     def post(self, request, action, *args, **kwargs):
         try:
