@@ -1,17 +1,20 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import render_to_response
 
+from base import sidebarUtil
 from base.views import BaseTemplateView
 from base.models import Topic
 
 
 class EventView(BaseTemplateView):
     def get(self,request):
-        return self.render_to_response('event/event_list.html')
+        sidebar_name = sidebarUtil(request)
+        return self.render_to_response('event/event_list.html',{'name': sidebar_name})
 
 
 class EventDetailView(BaseTemplateView):
     def get(self, request, id):
+        sidebar_name = sidebarUtil(request)
         try:
             event_id = int(id)
             event = Topic.objects.get(id=event_id)
@@ -27,11 +30,10 @@ class EventDetailView(BaseTemplateView):
             collection.save(using='master')
         items = user.collection.events.all()
         iscollected = any(filter(lambda x: x.id == event.id, items))
-        #weixin_list = [SetLogo(item) for item in event.weixin.all()][:10]
-        #weibo_list = [SetLogo(item) for item in event.weibo.all()][:10]
-        #for item in weibo_list:
-        #    SetLogo(item)
-        #    if len(item.content) < 144:
-        #        setattr(item, 'short', True)
-        #return self.render_to_response('event/event.html', {'event': event, 'weixin_list': weixin_list, 'weibo_list': weibo_list})
-        return self.render_to_response('event/event.html', {'event': event, 'keywords_list': keywords_list, 'isCollected': iscollected})
+        return self.render_to_response('event/event.html', 
+            {
+                'event': event,
+                'keywords_list': keywords_list,
+                'isCollected': iscollected,
+                'name': sidebar_name
+                })

@@ -1,4 +1,5 @@
 import os
+import ConfigParser
 
 from django.conf import settings
 from django.http import HttpResponseRedirect
@@ -43,3 +44,20 @@ def set_logo(obj):
     if not obj.publisher.photo:
         obj.publisher.photo = u'http://tp2.sinaimg.cn/3557640017/180/40054587155/1'
     return obj
+
+
+def sidebarUtil(request):
+    BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+    user = request.myuser
+    conf = ConfigParser.ConfigParser()
+    conf.read(os.path.join(BASE_DIR, "../sidebar.cfg"))
+    username = user.username
+
+    sidebar_name = {
+        "news": conf.get(username, "news"),
+        "event": conf.get(username, "event"),
+        "location": conf.get(username, "location"),
+        "custom": conf.get(username, "custom"),
+        "site": conf.get(username, "site")
+    }
+    return sidebar_name
