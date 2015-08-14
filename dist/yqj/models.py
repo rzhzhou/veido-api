@@ -142,10 +142,12 @@ class Topic(models.Model):
     articles = models.ManyToManyField(Article, related_name='topics', related_query_name='topic', null=True, blank=True, verbose_name=u'文章')
     weibo = models.ManyToManyField(Weibo, related_name='topics', related_query_name='topic', null=True, blank=True, verbose_name=u'微博')
     weixin = models.ManyToManyField(Weixin, related_name='topics', related_query_name='topic', null=True, blank=True, verbose_name=u'微信')
-
+    pubtime = models.DateTimeField(auto_now=False, null=True, blank=True, verbose_name=u'发布时间')
+    
     class Meta:
         db_table = 'topic'
         verbose_name_plural = u'聚类事件'
+        ordering = ['-pubtime']
 
     def __unicode__(self):
         return self.title

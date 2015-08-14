@@ -114,13 +114,12 @@ def index_view(request):
             except IndexError:
                 setattr(item, 'hot_index', 0)
 
-        event_list = Topic.objects.all()
+        event_list = Topic.objects.all()[:event_list_number]
         for iteml in event_list:
             try:
-                setattr(iteml, 'time', iteml.articles.order_by('pubtime')[0].pubtime.replace(tzinfo=None).strftime('%Y-%m-%d'))
-            except IndexError:
+                setattr(iteml, 'time', iteml.pubtime.replace(tzinfo=None).strftime('%Y-%m-%d'))
+            except:
                 setattr(iteml, 'time', datetime.now().strftime('%Y-%m-%d'))
-        event_list=sorted(event_list, key=lambda x: x.time, reverse=True)[:event_list_number]
         for item in event_list:
             setattr(item, 'hot_index', item.articles.all().count()+item.weixin.all().count()+item.weibo.all().count())
 
