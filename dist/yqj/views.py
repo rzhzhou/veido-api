@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
 from datetime import datetime, timedelta
-import ConfigParser
 
 from django.conf import settings
 from django.core.paginator import EmptyPage
@@ -13,30 +12,12 @@ from django.shortcuts import render, render_to_response
 from django.template.loader import render_to_string
 from django.utils import timezone
 
-from base import login_required, get_user_image, set_logo
+from base import login_required, get_user_image, set_logo, sidebarUtil
 from base.views import BaseTemplateView
 from base.models import (Area, Article, ArticlePublisher, Category, Collection,
     Custom, CustomKeyword, Group, Inspection, LocaltionScore, Product, ProductKeyword,
     RelatedData, Risk, RiskScore, Topic, Weibo, Weixin)
 from yqj.redisconnect import RedisQueryApi
-
-
-def sidebarUtil(request):
-    BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-    user = request.myuser
-    conf = ConfigParser.ConfigParser()
-    conf.read(os.path.join(BASE_DIR, "../sidebar.cfg"))
-    username = user.username
-
-    sidebar_name = {
-        "news": conf.get(username, "news"),
-        "event": conf.get(username, "event"),
-        "location": conf.get(username, "location"),
-        "custom": conf.get(username, "custom"),
-        "site": conf.get(username, "site")
-    }
-    return sidebar_name
-
 
 @login_required
 def index_view(request):
