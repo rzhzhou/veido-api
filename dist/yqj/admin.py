@@ -128,10 +128,10 @@ class CustomKeywordAdmin(admin.ModelAdmin):
 
 
 class TopicAdmin(admin.ModelAdmin):
-    fields = ('title', 'abstract', 'source', 'area', 'keywords', 'pubtime',)
-    list_display = ('title', 'source',  'pubtime', 'area',)
-    list_editable = ('source', 'area', 'pubtime',)
-    list_filter = ('source','pubtime',)
+    fields = ('title', 'abstract', 'source', 'area', 'keywords')
+    list_display = ('title', 'source', 'area',)
+    list_editable = ('source', 'area')
+    list_filter = ('source',)
     search_fields = ('title', 'source')
     #
     def save_model(self, request, obj, form, change):
