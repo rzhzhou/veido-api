@@ -1,5 +1,4 @@
-
-from yqj.models import AnonymousUser, User
+from base.models import AnonymousUser, User
 
 class UserAuthenticationMiddlerware(object):
     def process_request(self, request):
