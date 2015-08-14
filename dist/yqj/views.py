@@ -13,7 +13,7 @@ from django.shortcuts import render, render_to_response
 from django.template.loader import render_to_string
 from django.utils import timezone
 
-from base import login_required, get_user_image
+from base import login_required, get_user_image, set_logo
 from base.views import BaseTemplateView
 from base.models import (Area, Article, ArticlePublisher, Category, Collection,
     Custom, CustomKeyword, Group, Inspection, LocaltionScore, Product, ProductKeyword,
@@ -36,12 +36,6 @@ def sidebarUtil(request):
         "site": conf.get(username, "site")
     }
     return sidebar_name
-
-
-def SetLogo(obj):
-    if not obj.publisher.photo:
-        obj.publisher.photo = u'http://tp2.sinaimg.cn/3557640017/180/40054587155/1'
-    return obj
 
 
 @login_required
@@ -134,7 +128,7 @@ def index_view(request):
 
         weixin_data = Weixin.objects.all()[0:weixin_list_number]
         for data in weixin_data:
-            data = SetLogo(data)
+            data = set_logo(data)
 
 
         group = Group.objects.get(company=user.company).id
@@ -184,33 +178,6 @@ def index_view(request):
         return HttpResponse(status=401)
 
 
-class CategoryView(BaseTemplateView):
-    def get(self, request, category_id):
-        try:
-            category = Category.objects.get(id=category_id)
-        except Category.DoesNotExist:
-            category = ''
-        return self.render_to_response('category/category.html', {'category': category})
-
-
-class LocationView(BaseTemplateView):
-    def get(self, request, location_id):
-        """
-        try:
-            location = Area.objects.get(id=int(location_id))
-        except Area.DoesNotExist:
-            location = ''
-        weixin = [SetLogo(data) for data in Weixin.objects.filter(area=location)][:10]
-        weibo = [SetLogo(data) for data in Weibo.objects.filter(area=location)][:10]
-        return self.render_to_response("location/location.html", {'location': location, 'weixin_list': weixin, 'weibo_list': weibo})
-        """
-        try:
-            location = Area.objects.get(id=int(location_id))
-        except Area.DoesNotExist:
-            location = ''
-        return self.render_to_response("location/location.html", {'location': location})
-
-
 def person_view(request, person_id):
     return HttpResponse('person')
 
@@ -241,124 +208,6 @@ class RisksDetailView(BaseTemplateView):
         return self.render_to_response('risk/risk.html',{'risk': risk, 'keywords_list': keywords_list, 'name': sidebar_name})
 
 
-class NewsView(BaseTemplateView):
-    def get(self, request):
-        sidebar_name = sidebarUtil(request)
-        return self.render_to_response('news/news_list.html', {'name': sidebar_name})
-
-
-class NewsDetailView(BaseTemplateView):
-    def get(self, request, news_id):
-        sidebar_name = sidebarUtil(request)
-        try:
-            news_id = int(news_id)
-            news = Article.objects.get(id=news_id)
-        except Article.DoesNotExist:
-            return self.render_to_response('news/news.html', {'article': '', 'relate': [], 'name': sidebar_name})
-
-        try:
-            r = RelatedData.objects.filter(uuid=news.uuid)[0]
-            relateddata = list(r.articles.all())
-        except IndexError:
-            relateddata = []
-        try:
-            event = Topic.objects.filter(articles__id=news_id)[0]
-        except IndexError:
-            event = ''
-        user = self.request.myuser
-        try:
-            collection = user.collection
-        except Collection.DoesNotExist:
-            collection = Collection(user=user)
-            collection.save(using='master')
-        items = user.collection.articles.all()
-        iscollected = any(filter(lambda x: x.id == news.id, items))
-        return self.render_to_response('news/news.html', {'article': SetLogo(news), 'relate': relateddata, 'event': event, 'isCollected': iscollected, 'name': sidebar_name})
- #sim_article(news.title,news.pubtime
-
-
-class EventView(BaseTemplateView):
-    def get(self,request):
-        sidebar_name = sidebarUtil(request)
-        return self.render_to_response('event/event_list.html', {'name': sidebar_name})
-
-
-class EventDetailView(BaseTemplateView):
-    def get(self, request, id):
-        sidebar_name = sidebarUtil(request)
-        try:
-            event_id = int(id)
-            event = Topic.objects.get(id=event_id)
-            eval_keywords_list = eval(event.keywords) if event.keywords else []
-            keywords_list = [{"name": name, "number": number} for name, number in eval_keywords_list]
-        except Topic.DoesNotExist:
-            return self.render_to_response('event/event.html', {'event': '', 'weixin_list': [], 'weibo_list': [], 'name': sidebar_name})
-        user = self.request.myuser
-        try:
-            collection = user.collection
-        except Collection.DoesNotExist:
-            collection = Collection(user=user)
-            collection.save(using='master')
-        items = user.collection.events.all()
-        iscollected = any(filter(lambda x: x.id == event.id, items))
-        #weixin_list = [SetLogo(item) for item in event.weixin.all()][:10]
-        #weibo_list = [SetLogo(item) for item in event.weibo.all()][:10]
-        #for item in weibo_list:
-        #    SetLogo(item)
-        #    if len(item.content) < 144:
-        #        setattr(item, 'short', True)
-        #return self.render_to_response('event/event.html', {'event': event, 'weixin_list': weixin_list, 'weibo_list': weibo_list})
-        return self.render_to_response('event/event.html', {'event': event, 'keywords_list': keywords_list, 'isCollected': iscollected, 'name': sidebar_name})
-
-
-class WeixinView(BaseTemplateView):
-    def get(self, request):
-        sidebar_name = sidebarUtil(request)
-        hottest = [SetLogo(data) for data in Weixin.objects.order_by('-pubtime')[0:20]]
-        weixin = Weixin.objects.all()
-        latest = self.paging(weixin, 20, 1)
-        items = [SetLogo(data) for data in latest['items']]
-        html = self.set_css_to_weixin(items)
-        return self.render_to_response('weixin/weixin_list.html', {'weixin_latest_list': latest,
-                                                                   'weixin_hottest_list': hottest,
-                                                                   'html': html,
-                                                                   'total_page_number': latest['total_number'],
-                                                                   'name': sidebar_name})
-
-
-class WeixinDetailView(BaseTemplateView):
-    def get(self, request, id):
-        sidebar_name = sidebarUtil(request)
-        try:
-            weixin_id = int(id)
-            weixin = Weixin.objects.get(id=weixin_id)
-        except Weixin.DoesNotExist:
-            return render_to_response('weixin/weixin.html', {'article': '', 'relate': [], 'name': sidebar_name})
-        try:
-            r = RelatedData.objects.filter(uuid=weixin.uuid)[0]
-            relateddata = list(r.weixin.all()) + list(r.weibo.all()) + list(r.articles.all())
-        except IndexError:
-            relateddata = []
-        return self.render_to_response('weixin/weixin.html', {'article': SetLogo(weixin), 'relate': relateddata, 'name': sidebar_name})
-
-
-class WeiboView(BaseTemplateView):
-    def get(self, request):
-        sidebar_name = sidebarUtil(request)
-        latest = [SetLogo(data) for data in Weibo.objects.order_by('-pubtime')[0:20]]
-        for item in latest:
-            if len(item.content) < 144:
-                setattr(item, 'short', True)
-        hottest  = [eval(item) for item in RedisQueryApi().lrange('sort_weibohot', 0, -1)[:20]]
-        for data in hottest:
-            data['pubtime'] = datetime.fromtimestamp(data['pubtime'])
-            if data['photo'] == 'kong':
-                data['photo'] = u'http://tp2.sinaimg.cn/3557640017/180/40054587155/1'
-            if len(data['content']) < 144:
-                data['short'] = True
-        return self.render_to_response('weibo/weibo_list.html', {'weibo_latest_list': latest, 'weibo_hottest_list': hottest, 'name': sidebar_name})
-
-
 class CollectionView(BaseTemplateView):
     def get(self, request):
         sidebar_name = sidebarUtil(request)
@@ -369,56 +218,6 @@ class SettingsView(BaseTemplateView):
     def get(self, request):
         sidebar_name = sidebarUtil(request)
         return self.render_to_response('user/settings.html', {'name': sidebar_name})
-
-
-class CustomListView(BaseTemplateView):
-    custom_list_num = 5
-    def get(self, request):
-        user = self.request.myuser
-        newkeyword_list = CustomKeyword.objects.filter(group=user.group).exclude(custom__isnull=False)
-        searchkeyword_list = CustomKeyword.objects.filter(group=user.group).exclude(custom__isnull=True)
-        keyword_list = []
-        for keyword in searchkeyword_list:
-            setattr(keyword, 'name', keyword.newkeyword)
-            setattr(keyword, 'news_list', keyword.custom.articles.all()[:self.custom_list_num])
-            keyword_list.append(keyword)
-        return self.render_to_response('custom/custom_list.html', {'custom_list': keyword_list, 'keyword_list': newkeyword_list})
-
-    def get_news(self, keyword):
-        return Article.objects.raw(u"SELECT * FROM article WHERE MATCH (content, title) AGAINST ('%s') LIMIT %s" % (keyword, self.custom_list_num))
-
-
-class CustomView(BaseTemplateView):
-    def get(self, request, id):
-        user = request.myuser
-        try:
-            custom = CustomKeyword.objects.get(id=int(id), group=user.group)
-        except CustomKeyword.DoesNotExist:
-            return self.render_to_response('custom/custom.html', {'name': u''})
-        return self.render_to_response('custom/custom.html', {'name': custom.newkeyword})
-
-
-class ProductView(BaseTemplateView):
-    def get(self, reqeust, id):
-        if id:
-            try:
-                prokeyword = ProductKeyword.objects.get(id=id)
-                name = prokeyword.newkeyword
-            except:
-                name = u'全部'
-                if id != '0':
-                    return HttpResponseRedirect("/product/0/")
-        else:
-            return HttpResponseRedirect("/product/0/")
-        try:
-
-            group = Group.objects.filter(company=u'广东省质监局')
-            prokeywords = group[0].productkeyword_set.all()
-        except:
-            return self.render_to_response('product/product.html', {'product_list': [{'id': '', 'name': ''}],'product': {'name': u'全部'}})
-        prokey_len = len(prokeywords)
-        prokeyword_list = [{'id': '0', 'name': u'全部'}] + [{'id': prokeywords[i].id, 'name': prokeywords[i].newkeyword} for i in xrange(0, prokey_len)]
-        return self.render_to_response('product/product.html', {'product_list': prokeyword_list, 'product': {'name': name}})
 
 
 class UserView(BaseTemplateView):
@@ -443,6 +242,7 @@ class UserAdminView(BaseTemplateView):
             user.type = u'管理用户' if user.isAdmin else u'普通用户'
         return self.render_to_response('user/user.html', {'user_list': user_list, 'name': sidebar_name})
 
+
 def register_view(request):
     return render_to_response('user/register.html')
 
@@ -464,19 +264,9 @@ def login_view(request):
 
     return render_to_response('user/login.html', {'company': settings.COMPANY_NAME})
 
+
 def logout_view(request):
     response = HttpResponseRedirect('/')
     response.delete_cookie('pass_id')
     response.delete_cookie('name')
     return response
-
-
-class SearchView(BaseTemplateView):
-    def get(self, request, keyword):
-        return self.render_to_response('search/result.html')
-
-
-class InspectionView(BaseTemplateView):
-    def get(self, request):
-        sidebar_name = sidebarUtil(request)
-        return self.render_to_response('inspection/inspection_list.html', {'name': sidebar_name})
