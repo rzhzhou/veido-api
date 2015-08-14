@@ -23,58 +23,6 @@ def _load_config():
     global MEDIA_ROOT, STATIC_ROOT
     global NEWS_PAGE_LIMIT
 
-    cp = SafeConfigParser()
-    cp.read(os.path.join(BASE_DIR, "../config.cfg"))
-
-    SECTION = cp.get('deploy', 'environment')
-
-    # SECURITY WARNING: don't run with debug turned on in production!
-    DEBUG = cp.getboolean(SECTION, 'DEBUG')
-
-    TEMPLATE_DEBUG = DEBUG
-
-    ALLOWED_HOSTS = eval(cp.get(SECTION, 'ALLOWED_HOSTS'))
-
-    COMPANY_NAME = cp.get(SECTION, 'COMPANY_NAME')
-
-    # Internationalization
-    # https://docs.djangoproject.com/en/1.7/topics/i18n/
-
-    LANGUAGE_CODE = cp.get(SECTION, 'LANGUAGE_CODE')
-
-    TIME_ZONE = cp.get(SECTION, 'TIME_ZONE')
-
-    USE_I18N = cp.get(SECTION, 'USE_I18N')
-
-    USE_L10N = cp.get(SECTION, 'USE_L10N')
-
-    USE_TZ = cp.get(SECTION, 'USE_TZ')
-
-    MEDIA_ROOT = cp.get(SECTION, 'MEDIA_ROOT')
-
-    STATIC_ROOT = cp.get(SECTION, 'STATIC_ROOT')
-
-    NEWS_PAGE_LIMIT = cp.get('constant', 'NEWS_PAGE_LIMIT')
-
-    # MySQL
-    mysql_conn_str_default = cp.get(SECTION, 'mysql_conn_str_default')
-    mysql_conn_str_master = cp.get(SECTION, 'mysql_conn_str_master')
-    MYSQL_CONN_STR_DEFAULT = re.match(
-        r"mysql://(?P<username>.+):(?P<password>.+)@(?P<host>.+):(?P<port>\d+)/(?P<name>.+)",
-        mysql_conn_str_default).groupdict()
-    MYSQL_CONN_STR_MASTER = re.match(
-        r"mysql://(?P<username>.+):(?P<password>.+)@(?P<host>.+):(?P<port>\d+)/(?P<name>.+)",
-        mysql_conn_str_master).groupdict()
-
-    # MongoDB
-    MONGO_CONN_STR = cp.get(SECTION, 'mongo_conn_str')
-
-    # Redis
-    redis_conn_str = cp.get(SECTION, 'redis_conn_str')
-    REDIS_CONN_STR = re.match(
-        r"redis://(?P<host>.+):(?P<port>\d+)/(?P<db>.+)",
-        redis_conn_str).groupdict()
-
 _load_config()
 
 # Quick-start development settings - unsuitable for production
