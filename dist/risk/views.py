@@ -3,7 +3,7 @@ from django.shortcuts import render_to_response
 
 from base import sidebarUtil
 from base.views import BaseTemplateView
-from base.models import Topic
+from base.models import Risk
 
 
 class RisksView(BaseTemplateView):
