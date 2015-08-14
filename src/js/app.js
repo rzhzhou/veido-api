@@ -1,4 +1,4 @@
-/* global moment , echarts*/
+/* global moment , echarts */
 
 'use strict';
 
@@ -751,6 +751,7 @@ App.module.dataList = function (module, $dataList, api, start, end) {
     });
   });
 };
+
 
 //
 // Pages
