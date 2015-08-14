@@ -14,6 +14,7 @@ from weibo.views import WeiboView
 from custom.views import CustomView, CustomDetailView
 from product.views import ProductView
 from inspection.views import InspectionView
+from search.views import SearchView
 
 
 urlpatterns = patterns('',
@@ -32,7 +33,6 @@ urlpatterns += patterns('yqj.views',
     url(r'^user/$', UserAdminView.as_view()),
     url(r'^login/$', 'login_view'),
     url(r'^logout/$', 'logout_view'),
-    url(r'^search/(.+)/$', SearchView.as_view()),
 )
 
 urlpatterns += patterns('news.views',
@@ -65,4 +65,8 @@ urlpatterns += patterns('product.views',
 
 urlpatterns += patterns('inspection.views',
     url(r'^inspection/$', InspectionView.as_view()),
+)
+
+urlpatterns += patterns('search.views',
+    url(r'^search/(.+)/$', SearchView.as_view()),
 )

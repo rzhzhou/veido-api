@@ -224,8 +224,3 @@ def logout_view(request):
     response.delete_cookie('pass_id')
     response.delete_cookie('name')
     return response
-
-
-class SearchView(BaseTemplateView):
-    def get(self, request, keyword):
-        return self.render_to_response('search/result.html')
