@@ -132,7 +132,7 @@ def index_view(request):
             data['title'] = item.title
             data['source'] = item.source
             data['score'] = score
-            data['time'] =  datetime.now()
+            data['time'] =  item.pubtime
             data['id'] = item.id
             risk_list.append(data)
 
@@ -160,32 +160,6 @@ def index_view(request):
 
 def person_view(request, person_id):
     return HttpResponse('person')
-
-
-class RisksView(BaseTemplateView):
-    def get(self, request):
-        sidebar_name = sidebarUtil(request)
-        return self.render_to_response('risk/risk_list.html', {"name": sidebar_name})
-
-class RisksDetailView(BaseTemplateView):
-    def get(self, request, risk_id):
-        sidebar_name = sidebarUtil(request)
-        try:
-            risk_id = int(risk_id)
-            risk = Risk.objects.get(id=risk_id)
-            eval_keywords_list = eval(risk.keywords) if risk.keywords else []
-            keywords_list = [{"name": name, "number": number} for name, number in eval_keywords_list]
-        except Risk.DoesNotExist:
-            return self.render_to_response('risk/risk.html', {'risk': '', 'weixin_list': [], 'weibo_list': [], 'name': sidebar_name})
-        # user = self.request.myuser
-        # try:
-        #     collection = user.collection
-        # except Collection.DoesNotExist:
-        #     collection = Collection(user=user)
-        #     collection.save(using='master')
-        # items = user.collection.Risks.all()
-        # iscollected = any(filter(lambda x: x.id == risk_article.id, items))
-        return self.render_to_response('risk/risk.html',{'risk': risk, 'keywords_list': keywords_list, 'name': sidebar_name})
 
 
 class CollectionView(BaseTemplateView):

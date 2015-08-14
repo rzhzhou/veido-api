@@ -130,10 +130,11 @@ class RisksTableView(BaseAPIView):
             data['title'] = item.title
             data['source'] = item.source
             data['score'] = score
-            data['pubtime'] = datetime.now()
+            data['pubtime'] = item.pubtime
             data['id'] = item.id
             risk_list.append(data)
         return risk_list
+
         '''
         # This method is sorting in the memory
         score_list = LocaltionScore.objects.filter(group=group)
@@ -162,7 +163,6 @@ class RisksTableView(BaseAPIView):
         html_string = render_to_string('risk/risk_list_tmpl.html', {'risk_list':  datas['items']})
         return Response({"total": datas['total_number'], "html": html_string})
 
-        # return Response({'total': datas['total_number'], 'data': list(datas['items'])})
 
 class RisksDetailTableView(BaseAPIView):
 

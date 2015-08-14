@@ -158,6 +158,7 @@ class Risk(models.Model):
     area = models.ForeignKey(Area, verbose_name=u'地域')
     keywords = models.CharField(max_length=255, default=u'', verbose_name=u'关键词', blank=True)
     score = models.IntegerField(default=0, verbose_name=u'评分')
+    pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间', null=True, blank=True,)
 
     articles = models.ManyToManyField(Article, related_name='risks', related_query_name='risk', null=True, blank=True, verbose_name=u'文章')
     weibo = models.ManyToManyField(Weibo, related_name='risks', related_query_name='risk', null=True, blank=True, verbose_name=u'微博')
@@ -166,6 +167,7 @@ class Risk(models.Model):
     class Meta:
         db_table = 'risk'
         verbose_name_plural = u'风险快讯'
+        ordering = ['-pubtime']
 
     def __unicode__(self):
         return self.title
