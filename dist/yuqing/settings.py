@@ -1,4 +1,4 @@
-#coding=utf-8
+# -*- coding: utf-8 -*-
 """
 Django settings for yuqing project.
 
@@ -18,9 +18,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 def _load_config():
     global DEBUG, TEMPLATE_DEBUG, ALLOWED_HOSTS
-    global COMPANY_NAME, LANGUAGE_CODE, TIME_ZONE, USE_I18N, USE_L10N, USE_TZ
+    global COMPANY_NAME, LANGUAGE_CODE, TIME_ZONE, USE_I18N, USE_L10N, USE_TZ, NEWS_PAGE_LIMIT
     global MYSQL_CONN_STR_DEFAULT, MYSQL_CONN_STR_MASTER, MONGO_CONN_STR, REDIS_CONN_STR
     global MEDIA_ROOT, STATIC_ROOT
+    global NEWS_PAGE_LIMIT
 
     cp = SafeConfigParser()
     cp.read(os.path.join(BASE_DIR, "../config.cfg"))
@@ -52,6 +53,8 @@ def _load_config():
     MEDIA_ROOT = cp.get(SECTION, 'MEDIA_ROOT')
 
     STATIC_ROOT = cp.get(SECTION, 'STATIC_ROOT')
+
+    NEWS_PAGE_LIMIT = cp.get('constant', 'NEWS_PAGE_LIMIT')
 
     # MySQL
     mysql_conn_str_default = cp.get(SECTION, 'mysql_conn_str_default')
@@ -89,7 +92,9 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'base',
     'yqj',
+    'analytics',
     'rest_framework',
 )
 
@@ -104,7 +109,7 @@ MIDDLEWARE_CLASSES = (
     'yqj.middleware.UserAuthenticationMiddlerware',
 )
 
-ROOT_URLCONF = 'yuqing.urls'
+ROOT_URLCONF = 'base.urls'
 
 WSGI_APPLICATION = 'yuqing.wsgi.application'
 
@@ -147,5 +152,5 @@ TEMPLATE_DIRS = (
 
 if not MEDIA_ROOT:
     MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-    
+
 MEDIA_URL = '/media/'

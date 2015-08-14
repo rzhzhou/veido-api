@@ -1,19 +1,22 @@
-   #coding=utf-8
-
-from django.contrib import admin
-from django import forms
-from django.contrib import messages
-from yqj.mongoconnect import CrawlerTask
-from models import WeixinPublisher, WeiboPublisher,Weibo, ArticlePublisher,\
-                   Category, Group, User, Article, Topic, Custom,\
-                   CustomKeyword, Area,Weixin, Product, ProductKeyword, save_user,\
-                   GroupAuthUser, LocaltionScore, RiskScore, Risk, LRisk, TRisk
-# from django.contrib.auth.models import User
+# -*- coding: utf-8 -*-
 import jieba.analyse
+
+from django import forms
+from django.contrib import admin, messages
+
+from yqj.mongoconnect import CrawlerTask
+from base.models import (Area, Article, ArticlePublisher, Category, Custom,
+    CustomKeyword, Group, GroupAuthUser, LocaltionScore, Product, ProductKeyword,
+    Risk, LRisk, TRisk, RiskScore, Topic, User, Weibo, WeiboPublisher, Weixin,
+    WeixinPublisher, save_user)
+
 
 def show_pubtime(obj):
     return obj.pubtime.replace(tzinfo=None).strftime('%Y-%m-%d %H:%M')
+
+
 show_pubtime.short_description = u'发布时间'
+
 
 class WeiboAdmin(admin.ModelAdmin):
     list_display = ('title', 'source', 'website_type', 'area','pubtime')
@@ -25,6 +28,7 @@ class WeiboAdmin(admin.ModelAdmin):
         if db_field.name == "area":
             kwargs["queryset"] = Area.objects.filter(level__lt=3)
         return super(WeiboAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+
 
 class WeixinAdmin(admin.ModelAdmin):
     fields=('author','title','url','content','origin_source','source','website_type','pubtime','publisher','area','uuid','readnum','likenum')
@@ -60,8 +64,8 @@ class ArticleAdmin(admin.ModelAdmin):
         else:
             localscore.save()
 
-        
-        obj.save()  
+
+        obj.save()
 
 
 # class TarticleAdmin(admin.ModelAdmin):
@@ -100,7 +104,7 @@ class CustomKeywordAdmin(admin.ModelAdmin):
             # messages.error(request,
             #         "The Parking Location field cannot be changedaaaaaaaaaaa.")
             obj.save()
-        else:           
+        else:
             key_list = CustomKeyword.objects.filter(id=obj.id)
             if len(key_list) == 0:
                 return
@@ -119,8 +123,9 @@ class CustomKeywordAdmin(admin.ModelAdmin):
         del_index = key_list[0].review
         if not del_index:
             del_index = key_list[0].custom
-        CrawlerTask(del_index, "zjld", u"关键词").del_task()       
+        CrawlerTask(del_index, "zjld", u"关键词").del_task()
         obj.delete()
+
 
 class TopicAdmin(admin.ModelAdmin):
     fields = ('title', 'abstract', 'source', 'area', 'keywords')
@@ -183,7 +188,7 @@ class ProductKeywordAdmin(admin.ModelAdmin):
             # messages.error(request,
             #         "The Parking Location field cannot be changedaaaaaaaaaaa.")
             obj.save()
-        else:           
+        else:
             key_list = ProductKeyword.objects.filter(id=obj.id)
             if len(key_list) == 0:
                 return
@@ -202,7 +207,7 @@ class ProductKeywordAdmin(admin.ModelAdmin):
         del_index = key_list[0].review
         if not del_index:
             del_index = key_list[0].product
-        CrawlerTask(del_index, "zjld", u"关键词").del_task()       
+        CrawlerTask(del_index, "zjld", u"关键词").del_task()
         obj.delete()
 
 
@@ -249,7 +254,7 @@ class RiskAdmin(admin.ModelAdmin):
         if not change:
             CrawlerTask(obj.title, 'zjld', u"风险快讯").type_task()
             obj.save()
-        else:           
+        else:
             key_list = Risk.objects.filter(id=obj.id)
             if not key_list:
                 return
@@ -266,8 +271,8 @@ class RiskAdmin(admin.ModelAdmin):
         if not key_list:
             return
         del_index = key_list[0].title
-        CrawlerTask(del_index, "zjld", u"风险快讯").del_task()       
-        obj.delete()        
+        CrawlerTask(del_index, "zjld", u"风险快讯").del_task()
+        obj.delete()
 
 
 class LRiskAdmin(admin.ModelAdmin):
@@ -290,8 +295,8 @@ class LRiskAdmin(admin.ModelAdmin):
             localscore.save()
         else:
             localscore.save()
-   
-        obj.save()  
+
+        obj.save()
 
 
 class TRiskAdmin(admin.ModelAdmin):
@@ -314,7 +319,6 @@ class TRiskAdmin(admin.ModelAdmin):
         else:
             risk_score.save()
 
-# Register your models here.
 
 admin.site.register(WeixinPublisher)
 admin.site.register(WeiboPublisher)
@@ -336,4 +340,3 @@ admin.site.register(RiskScore, RiskScoreAdmin)
 admin.site.register(Risk, RiskAdmin)
 admin.site.register(LRisk, LRiskAdmin)
 admin.site.register(TRisk, TRiskAdmin)
-
