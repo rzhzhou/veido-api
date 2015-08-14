@@ -57,7 +57,7 @@ class BaseView(View):
             item['id'] = data.id
             item['source'] = data.source
             item['location'] = data.area.name
-            item['time'] = data.pubtime
+            item['time'] = data.pubtime.strftime('%Y-%m-%d')
             item['hot'] = data.articles.count() + data.weixin.count() + data.weibo.count()
             result.append(item)
 
