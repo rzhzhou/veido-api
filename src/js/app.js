@@ -49,26 +49,13 @@ var App = {
     var module  = this.module,
         page    = this.page,
         path    = location.pathname,
-        summary = /^\/(\w+)\/$/,
-        detail  = /^\/(\w+)\/(\d+)\/$/,
-        match   = null,
-        type,
-        id;
+        rule    = /^\/(?:(\w+)\/)?(?:(\d+)\/)?/,
+        match   = rule.exec(path).slice(1),
+        type    = match[0] === undefined ? 'dashboard' : match[0],
+        id      = match[1] === undefined ? undefined : +match[1];
 
-    switch (true) {
-    case path === '/':
-      type  = 'dashboard';
-      break;
-    case summary.test(path):
-      match = summary.exec(path);
-      type  = match[1];
-      break;
-    case detail.test(path):
-      match = detail.exec(path);
-      type  = match[1];
-      id    = +match[2];
-      break;
-    }
+    // console.log('type: ' + type);
+    // console.log('id: ' + id);
 
     if (type === 'login') {
       return page.login(module);
@@ -77,6 +64,10 @@ var App = {
     // common
     module.search();
     module.menu(path, type);
+
+    if (type === 'search') {
+      return page.search(module, path);
+    }
 
     if (id === undefined) {
       return page[type](module, path, type);
@@ -774,6 +765,10 @@ App.page.user = function (module) {
 };
 
 // util
+App.page.search = function (module, path) {
+  module.dataTable(path);
+};
+
 App.page.dashboard = function (module, path) {
   module.infoBox();
   module.line(path);
