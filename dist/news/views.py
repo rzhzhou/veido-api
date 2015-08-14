@@ -2,7 +2,7 @@
 from django.shortcuts import render_to_response
 
 from base.views import BaseTemplateView
-from base.models import Article
+from base.models import Area, Article, Category, RelatedData, Topic
 
 
 class NewsView(BaseTemplateView):
@@ -36,3 +36,30 @@ class NewsDetailView(BaseTemplateView):
         items = user.collection.articles.all()
         iscollected = any(filter(lambda x: x.id == news.id, items))
         return self.render_to_response('news/news.html', {'article': SetLogo(news), 'relate': relateddata, 'event': event, 'isCollected': iscollected})
+
+
+class CategoryView(BaseTemplateView):
+    def get(self, request, category_id):
+        try:
+            category = Category.objects.get(id=category_id)
+        except Category.DoesNotExist:
+            category = ''
+        return self.render_to_response('category/category.html', {'category': category})
+
+
+class LocationView(BaseTemplateView):
+    def get(self, request, location_id):
+        """
+        try:
+            location = Area.objects.get(id=int(location_id))
+        except Area.DoesNotExist:
+            location = ''
+        weixin = [set_logo(data) for data in Weixin.objects.filter(area=location)][:10]
+        weibo = [set_logo(data) for data in Weibo.objects.filter(area=location)][:10]
+        return self.render_to_response("location/location.html", {'location': location, 'weixin_list': weixin, 'weibo_list': weibo})
+        """
+        try:
+            location = Area.objects.get(id=int(location_id))
+        except Area.DoesNotExist:
+            location = ''
+        return self.render_to_response("location/location.html", {'location': location})

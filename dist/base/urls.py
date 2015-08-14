@@ -7,7 +7,7 @@ from django.contrib import admin
 from django.views.static import serve
 
 from yqj.views import *
-from news.views import NewsView, NewsDetailView
+from news.views import CategoryView, LocationView, NewsView, NewsDetailView
 from event.views import EventView, EventDetailView
 from weixin.views import WeixinView, WeixinDetailView
 from weibo.views import WeiboView
@@ -26,8 +26,6 @@ urlpatterns = patterns('',
 
 urlpatterns += patterns('yqj.views',
     url(r'^$', 'index_view'),
-    url(r'^location/(\d+)/$', LocationView.as_view()),
-    url(r'^category/(\d+)/$', CategoryView.as_view()),
     url(r'^collection/$', CollectionView.as_view()),
     url(r'^settings/$', SettingsView.as_view()),
     url(r'^user/$', UserAdminView.as_view()),
@@ -38,6 +36,8 @@ urlpatterns += patterns('yqj.views',
 urlpatterns += patterns('news.views',
     url(r'^news/$', NewsView.as_view()),
     url(r'^news/(\d+)/$', NewsDetailView.as_view()),
+    url(r'^category/(\d+)/$', CategoryView.as_view()),
+    url(r'^location/(\d+)/$', LocationView.as_view()),
 )
 
 urlpatterns += patterns('event.views',

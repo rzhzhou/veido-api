@@ -135,32 +135,6 @@ def index_view(request):
     else:
         return HttpResponse(status=401)
 
-class CategoryView(BaseTemplateView):
-    def get(self, request, category_id):
-        try:
-            category = Category.objects.get(id=category_id)
-        except Category.DoesNotExist:
-            category = ''
-        return self.render_to_response('category/category.html', {'category': category})
-
-
-class LocationView(BaseTemplateView):
-    def get(self, request, location_id):
-        """
-        try:
-            location = Area.objects.get(id=int(location_id))
-        except Area.DoesNotExist:
-            location = ''
-        weixin = [set_logo(data) for data in Weixin.objects.filter(area=location)][:10]
-        weibo = [set_logo(data) for data in Weibo.objects.filter(area=location)][:10]
-        return self.render_to_response("location/location.html", {'location': location, 'weixin_list': weixin, 'weibo_list': weibo})
-        """
-        try:
-            location = Area.objects.get(id=int(location_id))
-        except Area.DoesNotExist:
-            location = ''
-        return self.render_to_response("location/location.html", {'location': location})
-
 
 def person_view(request, person_id):
     return HttpResponse('person')
@@ -198,6 +172,7 @@ class UserAdminView(BaseTemplateView):
             user.type = u'管理用户' if user.isAdmin else u'普通用户'
         return self.render_to_response('user/user.html', {'user_list': user_list})
 
+
 def register_view(request):
     return render_to_response('user/register.html')
 
@@ -218,6 +193,7 @@ def login_view(request):
             return response
 
     return render_to_response('user/login.html', {'company': settings.COMPANY_NAME})
+
 
 def logout_view(request):
     response = HttpResponseRedirect('/')
