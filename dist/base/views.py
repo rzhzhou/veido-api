@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
+
 from django.core.paginator import EmptyPage, Paginator, PageNotAnInteger
 from django.db.models import Q
 from django.shortcuts import render_to_response
@@ -55,10 +57,7 @@ class BaseView(View):
             item['id'] = data.id
             item['source'] = data.source
             item['location'] = data.area.name
-            try:
-                item['time'] = data.articles.order_by('pubtime')[0].pubtime.replace(tzinfo=None).strftime('%Y-%m-%d')
-            except IndexError:
-                item['time'] = datetime.now().strftime('%Y-%m-%d')
+            item['time'] = data.pubtime
             item['hot'] = data.articles.count() + data.weixin.count() + data.weibo.count()
             result.append(item)
 
