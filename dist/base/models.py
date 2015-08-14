@@ -137,6 +137,7 @@ class Topic(models.Model):
     source = models.CharField(max_length=255, blank=True, verbose_name=u'首发媒体')
     area = models.ForeignKey(Area, verbose_name=u'地域')
     keywords = models.CharField(max_length=255, default=u'', verbose_name=u'关键词', blank=True)
+    pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间', null=True, blank=True)
     articles = models.ManyToManyField(Article, related_name='topics', related_query_name='topic', null=True, blank=True, verbose_name=u'文章')
     weibo = models.ManyToManyField(Weibo, related_name='topics', related_query_name='topic', null=True, blank=True, verbose_name=u'微博')
     weixin = models.ManyToManyField(Weixin, related_name='topics', related_query_name='topic', null=True, blank=True, verbose_name=u'微信')
@@ -144,6 +145,7 @@ class Topic(models.Model):
     class Meta:
         db_table = 'topic'
         verbose_name_plural = u'聚类事件'
+        ordering = ['-pubtime']
 
     def __unicode__(self):
         return self.title

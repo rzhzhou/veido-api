@@ -129,8 +129,8 @@ class CustomKeywordAdmin(admin.ModelAdmin):
 
 class TopicAdmin(admin.ModelAdmin):
     fields = ('title', 'abstract', 'source', 'area', 'keywords')
-    list_display = ('title', 'source', 'area')
-    list_editable = ('source', 'area',)
+    list_display = ('title', 'source', 'area',)
+    list_editable = ('source', 'area')
     list_filter = ('source',)
     search_fields = ('title', 'source')
     #
