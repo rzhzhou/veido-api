@@ -167,7 +167,7 @@ class Risk(models.Model):
     class Meta:
         db_table = 'risk'
         verbose_name_plural = u'风险快讯'
-
+        ordering = ['-pubtime']
     def __unicode__(self):
         return self.title
 
@@ -188,7 +188,7 @@ class LRisk(models.Model):
     class Meta:
         db_table = 'risk'
         verbose_name_plural = u'本地评分'
-
+        ordering = ['-pubtime']
     def __unicode__(self):
         return self.title
 
@@ -209,7 +209,7 @@ class TRisk(models.Model):
     class Meta:
         db_table = 'risk'
         verbose_name_plural = u'风险评分'
-
+        ordering = ['-pubtime']
     def __unicode__(self):
         return self.title
 

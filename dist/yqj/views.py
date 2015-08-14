@@ -158,7 +158,7 @@ def index_view(request):
             data['title'] = item.title
             data['source'] = item.source
             data['score'] = score
-            data['time'] =  datetime.now()
+            data['time'] =  item.pubtime
             data['id'] = item.id
             risk_list.append(data)
             
