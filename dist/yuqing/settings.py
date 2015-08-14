@@ -100,7 +100,7 @@ MIDDLEWARE_CLASSES = (
     'yqj.middleware.UserAuthenticationMiddlerware',
 )
 
-ROOT_URLCONF = 'yuqing.urls'
+ROOT_URLCONF = 'base.urls'
 
 WSGI_APPLICATION = 'yuqing.wsgi.application'
 
