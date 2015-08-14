@@ -244,9 +244,9 @@ class RiskScoreAdmin(admin.ModelAdmin):
 
 
 class RiskAdmin(admin.ModelAdmin):
-    fields = ('title', 'abstract', 'source', 'area', 'keywords', 'score', 'pubtime')
-    list_display = ('title', 'abstract', 'source', 'area', 'keywords', 'score', 'pubtime')
-    list_editable = ('title', 'abstract', 'source', 'area', 'keywords', 'score', 'pubtime')
+    fields = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
+    list_display = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
+    list_editable = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
     list_filter = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
     search_fields = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
 
@@ -276,9 +276,9 @@ class RiskAdmin(admin.ModelAdmin):
 
 
 class LRiskAdmin(admin.ModelAdmin):
-    fields = ('title', 'abstract', 'source', 'area', 'keywords', 'score', 'pubtime')
-    list_display = ('title', 'abstract', 'source', 'area', 'keywords', 'score', 'pubtime')
-    list_editable = ('title', 'abstract', 'source', 'area', 'keywords', 'score', 'pubtime')
+    fields = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
+    list_display = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
+    list_editable = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
     list_filter = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
     search_fields = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
 
@@ -300,9 +300,9 @@ class LRiskAdmin(admin.ModelAdmin):
 
 
 class TRiskAdmin(admin.ModelAdmin):
-    fields = ('title', 'abstract', 'source', 'area', 'keywords', 'score', 'pubtime')
-    list_display = ('title', 'abstract', 'source', 'area', 'keywords', 'score', 'pubtime')
-    list_editable = ('title', 'abstract', 'source', 'area', 'keywords', 'score', 'pubtime')
+    fields = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
+    list_display = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
+    list_editable = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
     list_filter = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
     search_fields = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
 
