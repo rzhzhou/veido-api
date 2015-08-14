@@ -12,6 +12,7 @@ from event.views import EventView, EventDetailView
 from weixin.views import WeixinView, WeixinDetailView
 from weibo.views import WeiboView
 from custom.views import CustomView, CustomDetailView
+from product.views import ProductView
 
 
 urlpatterns = patterns('',
@@ -25,8 +26,6 @@ urlpatterns += patterns('yqj.views',
     url(r'^$', 'index_view'),
     url(r'^location/(\d+)/$', LocationView.as_view()),
     url(r'^category/(\d+)/$', CategoryView.as_view()),
-    # url(r'^product/(\d*)/?$', ProductView.as_view()),
-    url(r'^product/(?P<id>\d*)/?$', ProductView.as_view()),
     url(r'^collection/$', CollectionView.as_view()),
     url(r'^settings/$', SettingsView.as_view()),
     url(r'^user/$', UserAdminView.as_view()),
@@ -34,7 +33,6 @@ urlpatterns += patterns('yqj.views',
     url(r'^login/$', 'login_view'),
     url(r'^logout/$', 'logout_view'),
     url(r'^search/(.+)/$', SearchView.as_view()),
-    # url(r'^search/(\s+)/$', SearchView.as_view()),
 )
 
 urlpatterns += patterns('news.views',
@@ -59,4 +57,8 @@ urlpatterns += patterns('weixin.views',
 urlpatterns += patterns('custom.views',
     url(r'^custom/$', CustomView.as_view()),
     url(r'^custom/(\d+)/$', CustomDetailView.as_view()),
+)
+
+urlpatterns += patterns('product.views',
+    url(r'^product/(?P<id>\d*)/?$', ProductView.as_view()),
 )

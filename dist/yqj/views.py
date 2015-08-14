@@ -12,11 +12,12 @@ from django.shortcuts import render, render_to_response
 from django.template.loader import render_to_string
 from django.utils import timezone
 
-from base import login_required, get_user_image
+from base import login_required, get_user_image, set_logo
 from base.views import BaseTemplateView
 from base.models import (Area, Article, ArticlePublisher, Category, Collection,
     Custom, CustomKeyword, Group, Inspection, Product, ProductKeyword,
     RelatedData, Topic, Weibo, Weixin)
+from yqj.redisconnect import RedisQueryApi
 
 
 @login_required
@@ -109,7 +110,7 @@ def index_view(request):
 
         weixin_data = Weixin.objects.all()[0:weixin_list_number]
         for data in weixin_data:
-            data = SetLogo(data)
+            data = set_logo(data)
 
         # inspection_list = Inspection.objects.filter(source=user.company).order_by('-pubtime')[:10]
         # for item in inspection_list:
@@ -150,8 +151,8 @@ class LocationView(BaseTemplateView):
             location = Area.objects.get(id=int(location_id))
         except Area.DoesNotExist:
             location = ''
-        weixin = [SetLogo(data) for data in Weixin.objects.filter(area=location)][:10]
-        weibo = [SetLogo(data) for data in Weibo.objects.filter(area=location)][:10]
+        weixin = [set_logo(data) for data in Weixin.objects.filter(area=location)][:10]
+        weibo = [set_logo(data) for data in Weibo.objects.filter(area=location)][:10]
         return self.render_to_response("location/location.html", {'location': location, 'weixin_list': weixin, 'weibo_list': weibo})
         """
         try:
@@ -174,32 +175,6 @@ class SettingsView(BaseTemplateView):
     def get(self, request):
 
         return self.render_to_response('user/settings.html')
-
-
-
-
-
-class ProductView(BaseTemplateView):
-    def get(self, reqeust, id):
-        if id:
-            try:
-                prokeyword = ProductKeyword.objects.get(id=id)
-                name = prokeyword.newkeyword
-            except:
-                name = u'全部'
-                if id != '0':
-                    return HttpResponseRedirect("/product/0/")
-        else:
-            return HttpResponseRedirect("/product/0/")
-        try:
-
-            group = Group.objects.filter(company=u'广东省质监局')
-            prokeywords = group[0].productkeyword_set.all()
-        except:
-            return self.render_to_response('product/product.html', {'product_list': [{'id': '', 'name': ''}],'product': {'name': u'全部'}})
-        prokey_len = len(prokeywords)
-        prokeyword_list = [{'id': '0', 'name': u'全部'}] + [{'id': prokeywords[i].id, 'name': prokeywords[i].newkeyword} for i in xrange(0, prokey_len)]
-        return self.render_to_response('product/product.html', {'product_list': prokeyword_list, 'product': {'name': name}})
 
 
 class UserView(BaseTemplateView):
