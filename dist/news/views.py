@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import render_to_response
 
+from base import set_logo
 from base.views import BaseTemplateView
 from base.models import Area, Article, Category, RelatedData, Topic
 
@@ -35,7 +36,7 @@ class NewsDetailView(BaseTemplateView):
             collection.save(using='master')
         items = user.collection.articles.all()
         iscollected = any(filter(lambda x: x.id == news.id, items))
-        return self.render_to_response('news/news.html', {'article': SetLogo(news), 'relate': relateddata, 'event': event, 'isCollected': iscollected})
+        return self.render_to_response('news/news.html', {'article': set_logo(news), 'relate': relateddata, 'event': event, 'isCollected': iscollected})
 
 
 class CategoryView(BaseTemplateView):
