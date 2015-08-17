@@ -45,49 +45,6 @@ class ArticleAdmin(admin.ModelAdmin):
     list_filter = ('pubtime', 'website_type')
     search_fields = ('title', 'source', 'content', 'website_type')
     raw_id_fields = ('area', 'publisher')
-    # def formfield_for_foreignkey(self, db_field, request, **kwargs):
-    #     if db_field.name == "area":
-    #         kwargs["queryset"] = Area.objects.filter(level__lt=3)
-    #     return super(ArticleAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
-
-    def save_model(self, request, obj, form, change):
-        groupauth = GroupAuthUser.objects.get(auth=request.user)
-        company = groupauth.group
-        article = obj
-        score = int(obj.website_type)
-        localscore = LocaltionScore(score=score, group=company, article=article)
-
-        loca = LocaltionScore.objects.filter(article=article, group=company)
-        if loca:
-            loca.delete()
-            localscore.save()
-        else:
-            localscore.save()
-
-
-        obj.save()
-
-
-# class TarticleAdmin(admin.ModelAdmin):
-#     # fields = ('title', 'source', 'area', 'feeling_factor', 'pubtime', 'localtion_score')
-#     list_display = ('title', 'source', 'area', 'feeling_factor', 'pubtime', 'website_type')
-#     list_editable = ('source', 'feeling_factor', 'pubtime', 'website_type')
-#     list_filter = ('pubtime', 'website_type')
-#     search_fields = ('title', 'source', 'content', 'website_type')
-#     raw_id_fields = ('area', 'publisher')
-#     def save_model(self, request, obj, form, change):
-#         score = int(obj.website_type)
-#         article = obj
-#         risk_score = RiskScore(score=score ,article=article)
-
-#         risk = RiskScore.objects.filter(article=article)
-
-#         if risk:
-#             risk.delete()
-#             risk_score.save()
-#         else:
-#             risk_score.save()
-
 
 
 class CustomKeywordAdmin(admin.ModelAdmin):
@@ -244,10 +201,10 @@ class RiskScoreAdmin(admin.ModelAdmin):
 
 
 class RiskAdmin(admin.ModelAdmin):
-    fields = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
-    list_display = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
-    list_editable = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
-    list_filter = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
+    fields = ('title', 'abstract', 'source', 'area', 'keywords', 'score', 'pubtime')
+    list_display = ('title', 'abstract', 'source', 'area', 'keywords', 'score', 'pubtime')
+    list_editable = ('title', 'abstract', 'source', 'area', 'keywords', 'score' , 'pubtime')
+    list_filter = ('title', )
     search_fields = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
 
     def save_model(self, request, obj, form, change):
@@ -276,10 +233,10 @@ class RiskAdmin(admin.ModelAdmin):
 
 
 class LRiskAdmin(admin.ModelAdmin):
-    fields = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
-    list_display = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
-    list_editable = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
-    list_filter = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
+    fields = ('title', 'abstract', 'source', 'area', 'keywords', 'score', 'pubtime')
+    list_display = ('title', 'abstract', 'source', 'area', 'keywords', 'score' , 'pubtime')
+    list_editable = ('title', 'abstract', 'source', 'area', 'keywords', 'score' ,'pubtime')
+    list_filter = ('title', )
     search_fields = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
 
     def save_model(self, request, obj, form, change):
@@ -300,10 +257,10 @@ class LRiskAdmin(admin.ModelAdmin):
 
 
 class TRiskAdmin(admin.ModelAdmin):
-    fields = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
-    list_display = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
-    list_editable = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
-    list_filter = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
+    fields = ('title', 'abstract', 'source', 'area', 'keywords', 'score', 'pubtime')
+    list_display = ('title', 'abstract', 'source', 'area', 'keywords', 'score' ,'pubtime')
+    list_editable = ('title', 'abstract', 'source', 'area', 'keywords', 'score', 'pubtime')
+    list_filter = ('title',)
     search_fields = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
 
     def save_model(self, request, obj, form, change):
