@@ -40,10 +40,10 @@ class WeixinAdmin(admin.ModelAdmin):
 
 class ArticleAdmin(admin.ModelAdmin):
     # fields = ('title', 'source', 'area', 'feeling_factor', 'pubtime', 'website_type')
-    list_display = ('title', 'source', 'area', 'feeling_factor', 'pubtime', 'website_type')
-    list_editable = ('source', 'feeling_factor', 'pubtime', 'website_type')
-    list_filter = ('pubtime', 'website_type')
-    search_fields = ('title', 'source', 'content', 'website_type')
+    list_display = ('title', 'source', 'area', 'feeling_factor', 'pubtime')
+    list_editable = ('source', 'feeling_factor', 'pubtime')
+    list_filter = ('pubtime',)
+    search_fields = ('title', 'source', 'content')
     raw_id_fields = ('area', 'publisher')
 
 
