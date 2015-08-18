@@ -2,7 +2,7 @@ import os
 import ConfigParser
 
 from django.conf import settings
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 
 from base.models import User, AnonymousUser, hash_password
 
@@ -44,6 +44,13 @@ def set_logo(obj):
     if not obj.publisher.photo:
         obj.publisher.photo = u'http://tp2.sinaimg.cn/3557640017/180/40054587155/1'
     return obj
+
+
+def xls_to_response(wb, fname):
+    response = HttpResponse(content_type="application/ms-excel")
+    response['Content-Disposition'] = 'attachment; filename=%s' % fname
+    wb.save(response)
+    return response
 
 
 def sidebarUtil(request):

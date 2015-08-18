@@ -1118,6 +1118,7 @@ App.page.analyticsDetail = function (module, path) {
               mark: {
                 show: false
               },
+
               dataView: {
                 show: true,
                 readOnly: false
@@ -1129,9 +1130,32 @@ App.page.analyticsDetail = function (module, path) {
               restore: {
                 show: false
               },
+              myTool: {
+                show: true,
+                title: '保存为excel',
+                icon: 'image://../../static/img/excel.png',
+                onclick: function () {
+                  var form = $('<form></form>');
+                  form.attr('action',api);
+                  form.attr('method','get');
+                  form.attr('target','_self');
+                  var myInput1 = $('<input type="text" name="type" />');
+                  myInput1.attr('value','chart-trend');
+                  var myInput2 = $('<input type="text" name="start" />');
+                  myInput2.attr('value',start);
+                  var myInput3 = $('<input type="text" name="end" />');
+                  myInput3.attr('value',end);
+                  var myInput4 = $('<input type="text" name="datatype" />');
+                  myInput4.attr('value','xls');
+                  form.append(myInput1).append(myInput2).append(myInput3).append(myInput4);
+                  form.submit();
+                  return false;
+                }
+              },
               saveAsImage: {
                 show: true
-              }
+              },
+    
             }
           },
           calculable: true,
