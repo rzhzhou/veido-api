@@ -29,7 +29,7 @@ class DispatchView(APIView, BaseTemplateView):
             datatype = parameter['datatype'] if parameter.has_key('datatype') else 'json'
             func = getattr(globals()['DispatchView'](), type)
 
-            if cache: # cache is flag,if cache=1 read redis, else read mysql
+            if datatype == 'json' and cache: # cache is flag,if cache=1 read redis, else read mysql
                 now = datetime.now()
                 today = date(now.year, now.month, now.day) + timedelta(days=1)
                 first_day_of_month = date(now.year, now.month, 1)
