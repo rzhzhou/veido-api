@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import pytz
 from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
@@ -23,8 +24,9 @@ class DispatchView(APIView, BaseTemplateView):
         parameter = request.GET
         try:
             type = parameter['type'].replace('-', '_')
-            start = parse_date(parameter['start'])
-            end = parse_date(parameter['end']) + timedelta(days=1)
+            tz = pytz.timezone(settings.TIME_ZONE)
+            start = tz.localize(datetime.strptime(parameter['start'], '%Y-%m-%d'))
+            end = tz.localize(datetime.strptime(parameter['end'], '%Y-%m-%d') + timedelta(days=1))
             cache = int(parameter['cache']) if parameter.has_key('cache') else 1
             func = getattr(globals()['DispatchView'](), type)
 
