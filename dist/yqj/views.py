@@ -83,6 +83,7 @@ def index_view(request):
         for item in risk_lists:
             data = {}
             try:
+                print item.id
                 relevance = LocaltionScore.objects.get(risk_id=item.id).score
             except LocaltionScore.DoesNotExist:
                 relevance = 0
