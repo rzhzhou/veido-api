@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
+import time
 import pytz
 from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
-import time
 
 from django.db.models import Q
 from django.template.loader import render_to_string
@@ -32,8 +32,8 @@ class DispatchView(APIView, BaseTemplateView):
             # cache is flag,if cache=1 read redis, else read mysql
             if cache:
                 now = datetime.now()
-                today = date(now.year, now.month, now.day) + timedelta(days=1)
-                first_day_of_month = date(now.year, now.month, 1)
+                today = tz.localize(datetime(now.year, now.month, now.day) + timedelta(days=1))
+                first_day_of_month = tz.localize(datetime(now.year, now.month, 1))
                 date_range = (end - start).days
 
                 data = None
