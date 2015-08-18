@@ -103,6 +103,7 @@ class DispatchView(APIView, BaseTemplateView):
 
     def chart_trend(self, start, end):
         days = (end - start).days
+        datel = [(start + timedelta(days=i)) for i in xrange(days)]
         start = start.astimezone(pytz.utc)
         start = time.strftime( '%Y-%m-%d %X', start.timetuple())
         start = datetime.strptime(start, '%Y-%m-%d %X')
@@ -121,8 +122,7 @@ class DispatchView(APIView, BaseTemplateView):
         weibo_data = [i for i in sum_result('weibo')[0]]
 
         total_data = map(lambda x: news_data[x] + weixin_data[x] + weibo_data[x] , xrange(days))
-
-        date = map(lambda x: x.strftime("%m-%d"), date)
+        date = map(lambda x: x.strftime("%m-%d"), datel)
 
         return Response({
             "date": date,
