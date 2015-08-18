@@ -181,10 +181,6 @@ class LRisk(models.Model):
     score = models.IntegerField(default=0, verbose_name=u'评分')
     pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间', null=True, blank=True,)
 
-    articles = models.ManyToManyField(Article, related_name='lrisks', related_query_name='lrisk', null=True, blank=True, verbose_name=u'文章')
-    weibo = models.ManyToManyField(Weibo, related_name='lrisks', related_query_name='lrisk', null=True, blank=True, verbose_name=u'微博')
-    weixin = models.ManyToManyField(Weixin, related_name='lrisks', related_query_name='lrisk', null=True, blank=True, verbose_name=u'微信')
-
     class Meta:
         db_table = 'risk'
         verbose_name_plural = u'本地评分'
@@ -201,10 +197,6 @@ class TRisk(models.Model):
     keywords = models.CharField(max_length=255, default=u'', verbose_name=u'关键词', blank=True)
     score = models.IntegerField(default=0, verbose_name=u'评分')
     pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间', null=True, blank=True,)
-
-    articles = models.ManyToManyField(Article, related_name='trisks', related_query_name='trisk', null=True, blank=True, verbose_name=u'文章')
-    weibo = models.ManyToManyField(Weibo, related_name='trisks', related_query_name='trisk', null=True, blank=True, verbose_name=u'微博')
-    weixin = models.ManyToManyField(Weixin, related_name='trisks', related_query_name='trisk', null=True, blank=True, verbose_name=u'微信')
 
     class Meta:
         db_table = 'risk'

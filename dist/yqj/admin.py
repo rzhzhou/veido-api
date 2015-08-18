@@ -102,9 +102,8 @@ class TopicAdmin(admin.ModelAdmin):
             if not key_list:
                 return
             old_keyword = key_list[0].title
-            if old_keyword == obj.title:
-                return
-            CrawlerTask(obj.title, "zjld", u"事件").update_task(old_keyword)
+            if old_keyword != obj.title:
+                CrawlerTask(obj.title, "zjld", u"事件").update_task(old_keyword)
         obj.save()
 
     def delete_model(self, request, obj,):
@@ -202,10 +201,10 @@ class RiskScoreAdmin(admin.ModelAdmin):
 
 class RiskAdmin(admin.ModelAdmin):
     fields = ('title', 'abstract', 'source', 'area', 'keywords', 'score', 'pubtime')
-    list_display = ('title', 'abstract', 'source', 'area', 'keywords', 'score', 'pubtime')
-    list_editable = ('title', 'abstract', 'source', 'area', 'keywords', 'score' , 'pubtime')
-    list_filter = ('title', )
-    search_fields = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
+    list_display = ('title',  'source', 'area', 'keywords' , 'pubtime')
+    list_editable = ('title', 'source', 'area', 'keywords' , 'pubtime')
+    list_filter = ('title', 'pubtime')
+    search_fields = ('title', 'pubtime')
 
     def save_model(self, request, obj, form, change):
         if not change:
@@ -218,9 +217,8 @@ class RiskAdmin(admin.ModelAdmin):
             old_keyword = key_list[0].title
             if not obj.title:
                 return
-            if old_keyword == obj.title:
-                return
-            CrawlerTask(obj.title, "zjld", u"风险快讯").update_task(old_keyword)
+            if old_keyword != obj.title:
+                CrawlerTask(obj.title, "zjld", u"风险快讯").update_task(old_keyword)
             obj.save()
 
     def delete_model(self, request, obj):
@@ -233,11 +231,11 @@ class RiskAdmin(admin.ModelAdmin):
 
 
 class LRiskAdmin(admin.ModelAdmin):
-    fields = ('title', 'abstract', 'source', 'area', 'keywords', 'score', 'pubtime')
-    list_display = ('title', 'abstract', 'source', 'area', 'keywords', 'score' , 'pubtime')
-    list_editable = ('title', 'abstract', 'source', 'area', 'keywords', 'score' ,'pubtime')
-    list_filter = ('title', )
-    search_fields = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
+    fields = ('title' ,'score', 'pubtime')
+    list_display = ('title' ,'score' , 'pubtime')
+    list_editable = ('title' ,'score' , 'pubtime')
+    list_filter = ('title', 'pubtime')
+    search_fields = ('title', 'pubtime')
 
     def save_model(self, request, obj, form, change):
         groupauth = GroupAuthUser.objects.get(auth=request.user)
@@ -257,11 +255,11 @@ class LRiskAdmin(admin.ModelAdmin):
 
 
 class TRiskAdmin(admin.ModelAdmin):
-    fields = ('title', 'abstract', 'source', 'area', 'keywords', 'score', 'pubtime')
-    list_display = ('title', 'abstract', 'source', 'area', 'keywords', 'score' ,'pubtime')
-    list_editable = ('title', 'abstract', 'source', 'area', 'keywords', 'score', 'pubtime')
-    list_filter = ('title',)
-    search_fields = ('title', 'abstract', 'source', 'area', 'keywords', 'score')
+    fields = ('title' ,'score', 'pubtime')
+    list_display = ('title' ,'score' , 'pubtime')
+    list_editable = ('title' ,'score' , 'pubtime')
+    list_filter = ('title', 'pubtime')
+    search_fields = ('title', 'pubtime')
 
     def save_model(self, request, obj, form, change):
         score = obj.score
