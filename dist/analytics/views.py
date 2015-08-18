@@ -2,6 +2,7 @@
 import pytz
 from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
+import time
 
 from django.http import HttpResponse
 from django.db.models import Q
@@ -64,27 +65,27 @@ class DispatchView(APIView, BaseTemplateView):
 
 
     def statistic(self, start, end):
-        total = Article.objects.filter(pubtime__range=(start, end)).count()
-        event_count = Category.objects.get(name=u'事件').articles.filter(pubtime__range=(start, end)).count()
-        hot_count = Category.objects.get(name=u'质监热点').articles.filter(pubtime__range=(start, end)).count()
-        inspection_count = Inspection.objects.filter(pubtime__range=(start, end)).count()
+        total = Article.objects.filter(pubtime__gte=start, pubtime__lt=end).count()
+        event_count = Category.objects.get(name=u'事件').articles.filter(pubtime__gte=start, pubtime__lt=end).count()
+        hot_count = Category.objects.get(name=u'质监热点').articles.filter(pubtime__gte=start, pubtime__lt=end).count()
+        inspection_count = Inspection.objects.filter(pubtime__gte=start, pubtime__lt=end).count()
 
         risk = event_count + hot_count + inspection_count
         return Response({'total': total, 'risk': risk})
 
     def chart_type(self, start, end):
-        article = Article.objects.filter(pubtime__range=(start,end)).count()
-        weixin = Weixin.objects.filter(pubtime__range=(start,end)).count()
-        weibo = Weibo.objects.filter(pubtime__range=(start,end)).count()
+        article = Article.objects.filter(pubtime__gte=start, pubtime__lt=end).count()
+        weixin = Weixin.objects.filter(pubtime__gte=start, pubtime__lt=end).count()
+        weibo = Weibo.objects.filter(pubtime__gte=start, pubtime__lt=end).count()
         return Response({'news': article, 'weixin': weixin, 'weibo': weibo})
 
     def chart_emotion(self, start, end):
-        positive = Article.objects.filter(pubtime__range=(start,end),
+        positive = Article.objects.filter(pubtime__gte=start, pubtime__lt=end,
                 feeling_factor__gte=0.9).count()
-        normal = Article.objects.filter(pubtime__range=(start,end),
+        normal = Article.objects.filter(pubtime__gte=start, pubtime__lt=end,
             feeling_factor__gte=0.1, feeling_factor__lt=0.9).count()
 
-        negative = Article.objects.filter(pubtime__range=(start,end), feeling_factor__lt=0.1).count()
+        negative = Article.objects.filter(pubtime__gte=start, pubtime__lt=end, feeling_factor__lt=0.1).count()
 
         return Response({'positive':positive, 'normal': normal, 'negative': negative})
 
@@ -95,7 +96,7 @@ class DispatchView(APIView, BaseTemplateView):
             citys = Area.objects.filter(parent_id=province.id)
             city_id = map(lambda c: c.id, citys)
             areas_id = Area.objects.filter(Q(parent_id__in=city_id)|Q(parent_id=province.id)|Q(id=province.id))
-            count = Weibo.objects.filter(area__in=areas_id, pubtime__range=(start,end)).count()
+            count = Weibo.objects.filter(area__in=areas_id, pubtime__gte=start, pubtime__lt=end).count()
             provice_count.append({'name': province.name, 'value': count})
         sort_result = sorted(provice_count, key=lambda x:x['value'])[-10:]
         name = map(lambda n: n['name'], sort_result)
@@ -104,11 +105,14 @@ class DispatchView(APIView, BaseTemplateView):
 
     def chart_trend(self, start, end):
         days = (end - start).days
+        start = start.astimezone(pytz.utc)
+        start = time.strftime( '%Y-%m-%d %X', start.timetuple())
+        start = datetime.strptime(start, '%Y-%m-%d %X')
         date = [(start + timedelta(days=x)) for x in xrange(days)]
 
         date_range = [(i, i + timedelta(days = 1)) for i in date]
         query_str = map(
-            lambda x: "sum(case when pubtime < '%s' and pubtime > '%s' then 1 else 0 end)"
+            lambda x: "sum(case when pubtime < '%s' and pubtime >= '%s' then 1 else 0 end)"
             % (x[1], x[0]),
             date_range
         )
