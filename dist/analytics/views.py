@@ -4,10 +4,8 @@ from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
 import time
 
-from django.http import HttpResponse
 from django.db.models import Q
 from django.template.loader import render_to_string
-from django.utils.dateparse import parse_date
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
