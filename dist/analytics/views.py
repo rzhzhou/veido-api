@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
+import xlwt
 from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
-from django.http import HttpResponse
 from django.db.models import Q
 from django.template.loader import render_to_string
 from django.utils.dateparse import parse_date
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from base import sidebarUtil
+from base import sidebarUtil, xls_to_response
 from base.views import BaseTemplateView
 from django.conf import settings
 from base.models import Article, Area, Category, Inspection, Weixin, Weibo
@@ -26,10 +26,10 @@ class DispatchView(APIView, BaseTemplateView):
             start = parse_date(parameter['start'])
             end = parse_date(parameter['end']) + timedelta(days=1)
             cache = int(parameter['cache']) if parameter.has_key('cache') else 1
+            datatype = parameter['datatype'] if parameter.has_key('datatype') else 'json'
             func = getattr(globals()['DispatchView'](), type)
 
-            # cache is flag,if cache=1 read redis, else read mysql
-            if cache:
+            if cache: # cache is flag,if cache=1 read redis, else read mysql
                 now = datetime.now()
                 today = date(now.year, now.month, now.day) + timedelta(days=1)
                 first_day_of_month = date(now.year, now.month, 1)
@@ -55,11 +55,13 @@ class DispatchView(APIView, BaseTemplateView):
                 if data:
                     return Response(eval(data))
 
-            return func(start, end)
+            if datatype == 'json':
+                return Response(func(start, end))
+            elif datatype == 'xls':
+                return self.generate_xls(func(start, end))
 
         except Exception, e:
             return Response({})
-
 
     def statistic(self, start, end):
         total = Article.objects.filter(pubtime__range=(start, end)).count()
@@ -68,13 +70,13 @@ class DispatchView(APIView, BaseTemplateView):
         inspection_count = Inspection.objects.filter(pubtime__range=(start, end)).count()
 
         risk = event_count + hot_count + inspection_count
-        return Response({'total': total, 'risk': risk})
+        return {'total': total, 'risk': risk}
 
     def chart_type(self, start, end):
         article = Article.objects.filter(pubtime__range=(start,end)).count()
         weixin = Weixin.objects.filter(pubtime__range=(start,end)).count()
         weibo = Weibo.objects.filter(pubtime__range=(start,end)).count()
-        return Response({'news': article, 'weixin': weixin, 'weibo': weibo})
+        return {'news': article, 'weixin': weixin, 'weibo': weibo}
 
     def chart_emotion(self, start, end):
         positive = Article.objects.filter(pubtime__range=(start,end),
@@ -84,7 +86,7 @@ class DispatchView(APIView, BaseTemplateView):
 
         negative = Article.objects.filter(pubtime__range=(start,end), feeling_factor__lt=0.1).count()
 
-        return Response({'positive':positive, 'normal': normal, 'negative': negative})
+        return {'positive':positive, 'normal': normal, 'negative': negative}
 
     def chart_weibo(self, start, end):
         provice_count = []
@@ -98,7 +100,7 @@ class DispatchView(APIView, BaseTemplateView):
         sort_result = sorted(provice_count, key=lambda x:x['value'])[-10:]
         name = map(lambda n: n['name'], sort_result)
         value = map(lambda v: v['value'], sort_result)
-        return Response({'province': provice_count, 'name': name, 'value': value})
+        return {'province': provice_count, 'name': name, 'value': value}
 
     def chart_trend(self, start, end):
         days = (end - start).days
@@ -120,18 +122,24 @@ class DispatchView(APIView, BaseTemplateView):
 
         date = map(lambda x: x.strftime("%m-%d"), date)
 
-        return Response({
+        return {
             "date": date,
             "news": news_data,
             "weixin": weixin_data,
             "weibo": weibo_data,
             "total": total_data
-        })
+        }
 
+    def generate_xls(self, data):
+        wb = xlwt.Workbook()
+        ws = wb.add_sheet('Sheet')
 
-# class AnalyticsParentsView(BaseTemplateView):
-#     def get(self, request):
-#         return self.render_to_response('analytics/analytics_all.html')
+        for k_index, k in enumerate(data.iterkeys()):
+            ws.write(0, k_index, k)
+            for v_index, v in enumerate(data[k]):
+                ws.write(v_index + 1, k_index, v)
+
+        return xls_to_response(wb, 'data.xls')
 
 
 class AnalyticsChildView(BaseTemplateView):
