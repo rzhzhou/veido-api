@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
+import time
 import pytz
 from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
-import time
 
 from django.db.models import Q
 from django.template.loader import render_to_string
@@ -32,8 +32,8 @@ class DispatchView(APIView, BaseTemplateView):
             # cache is flag,if cache=1 read redis, else read mysql
             if cache:
                 now = datetime.now()
-                today = date(now.year, now.month, now.day) + timedelta(days=1)
-                first_day_of_month = date(now.year, now.month, 1)
+                today = tz.localize(datetime(now.year, now.month, now.day) + timedelta(days=1))
+                first_day_of_month = tz.localize(datetime(now.year, now.month, 1))
                 date_range = (end - start).days
 
                 data = None
@@ -64,9 +64,12 @@ class DispatchView(APIView, BaseTemplateView):
 
     def statistic(self, start, end):
         total = Article.objects.filter(pubtime__gte=start, pubtime__lt=end).count()
-        event_count = Category.objects.get(name=u'事件').articles.filter(pubtime__gte=start, pubtime__lt=end).count()
-        hot_count = Category.objects.get(name=u'质监热点').articles.filter(pubtime__gte=start, pubtime__lt=end).count()
-        inspection_count = Inspection.objects.filter(pubtime__gte=start, pubtime__lt=end).count()
+        event_count = Category.objects.get(name=u'事件').articles.filter(
+            pubtime__gte=start, pubtime__lt=end).count()
+        hot_count = Category.objects.get(name=u'质监热点').articles.filter(
+            pubtime__gte=start, pubtime__lt=end).count()
+        inspection_count = Inspection.objects.filter(
+            pubtime__gte=start, pubtime__lt=end).count()
 
         risk = event_count + hot_count + inspection_count
         return Response({'total': total, 'risk': risk})
@@ -75,6 +78,7 @@ class DispatchView(APIView, BaseTemplateView):
         article = Article.objects.filter(pubtime__gte=start, pubtime__lt=end).count()
         weixin = Weixin.objects.filter(pubtime__gte=start, pubtime__lt=end).count()
         weibo = Weibo.objects.filter(pubtime__gte=start, pubtime__lt=end).count()
+
         return Response({'news': article, 'weixin': weixin, 'weibo': weibo})
 
     def chart_emotion(self, start, end):
@@ -82,8 +86,8 @@ class DispatchView(APIView, BaseTemplateView):
                 feeling_factor__gte=0.9).count()
         normal = Article.objects.filter(pubtime__gte=start, pubtime__lt=end,
             feeling_factor__gte=0.1, feeling_factor__lt=0.9).count()
-
-        negative = Article.objects.filter(pubtime__gte=start, pubtime__lt=end, feeling_factor__lt=0.1).count()
+        negative = Article.objects.filter(
+            pubtime__gte=start, pubtime__lt=end, feeling_factor__lt=0.1).count()
 
         return Response({'positive':positive, 'normal': normal, 'negative': negative})
 
