@@ -144,15 +144,15 @@ class DispatchView(APIView, BaseTemplateView):
             # data_keys = ['positive', 'normal', 'negative']
             # data_keys = list(data.iterkeys())
             for c_index, c in enumerate(data.iterkeys()):
-                ws.write(c_index+1, 0, c)
-                ws.write(c_index+1, 1, str(data[c]))
+                ws.write(c_index + 1, 0, c)
+                ws.write(c_index + 1, 1, str(data[c]))
 
         elif type == 'chart_weibo':
             ws.write(0, 0, u'地域')
             ws.write(0, 1, u'数量')
             for k_index, k in enumerate(data['province']):
-                ws.write(k_index+1, 0, k['name'])
-                ws.write(k_index+1, 1, str(k['value']))
+                ws.write(k_index + 1, 0, k['name'])
+                ws.write(k_index + 1, 1, str(k['value']))
         return xls_to_response(wb, 'data.xls')
 
 
