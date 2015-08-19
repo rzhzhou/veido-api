@@ -1602,14 +1602,27 @@ App.page.analyticsDetail = function (module, path) {
       $statistic = $('#statistic'),
       start = moment().subtract(6, 'days').format(),
       end = moment().format();
-
+      
   // init analytics
   module.dateRange($dateRange);
   $dateRange.trigger('show.dateRange', [start, end]);
 
   $chart.on('show.chart', function (event, start, end) {
     var chart = {},
-        name = $(this).find('.tab-pane.active')[0].id.slice(6);
+      name = $(this).find('.tab-pane.active')[0].id.slice(6),
+
+      excel = function (type) {
+        var myTool = {
+          show: true,
+          title: '保存为Excel',
+          icon: 'image://../../static/img/excel.png',
+
+          onclick: function() {
+            document.getElementById('save-as-excel').src = api + '?type='+type+'&start=' + start + '&end=' + end + '&datatype=xls';
+          }
+        };
+        return myTool;
+       };
 
     chart.trend = function (start, end) {
       $.getJSON(api, {
@@ -1643,10 +1656,9 @@ App.page.analyticsDetail = function (module, path) {
           toolbox: {
             show: true,
             feature: {
-              mark: {
+              /*mark: {
                 show: false
               },
-
               dataView: {
                 show: true,
                 readOnly: false
@@ -1657,33 +1669,11 @@ App.page.analyticsDetail = function (module, path) {
               },
               restore: {
                 show: false
-              },
-              myTool: {
-                show: true,
-                title: '保存为excel',
-                icon: 'image://../../static/img/excel.png',
-                onclick: function () {
-                  var form = $('<form></form>');
-                  form.attr('action',api);
-                  form.attr('method','get');
-                  form.attr('target','_self');
-                  var myInput1 = $('<input type="text" name="type" />');
-                  myInput1.attr('value','chart-trend');
-                  var myInput2 = $('<input type="text" name="start" />');
-                  myInput2.attr('value',start);
-                  var myInput3 = $('<input type="text" name="end" />');
-                  myInput3.attr('value',end);
-                  var myInput4 = $('<input type="text" name="datatype" />');
-                  myInput4.attr('value','xls');
-                  form.append(myInput1).append(myInput2).append(myInput3).append(myInput4);
-                  form.submit();
-                  return false;
-                }
-              },
+              },*/
+              myTool: excel('chart-trend') ,
               saveAsImage: {
                 show: true
-              },
-    
+              }
             }
           },
           calculable: true,
@@ -1737,10 +1727,11 @@ App.page.analyticsDetail = function (module, path) {
           toolbox: {
             show: true,
             feature: {
-              dataView: {
+              /*dataView: {
                 show: true,
                 readOnly: false
-              },
+              },*/
+              myTool: excel('chart-type'),
               saveAsImage: {
                 show: true,
               }
@@ -1791,10 +1782,11 @@ App.page.analyticsDetail = function (module, path) {
               mark: {
                 show: false
               },
-              dataView: {
+              /*dataView: {
                 show: true,
                 readOnly: false
-              },
+              },*/
+              myTool: excel('chart-emotion'),
               magicType: {
                 show: false,
                 type: ['pie'],
@@ -1857,25 +1849,20 @@ App.page.analyticsDetail = function (module, path) {
             max: data.value[9],
             x: 'left',
             y: 'bottom',
-            text: ['高', '低'], // 文本，默认为数值文本
+            text: ['高', '低'], 
             calculable: true
           },
           toolbox: {
-            show: false,
-            orient: 'vertical',
-            x: 'right',
-            y: 'center',
+            show: true,
+            orient: 'horizontal',
+            x: 'left',
+            y: 'top',
             feature: {
-              mark: {
-                show: true
-              },
-              dataView: {
+              /*dataView: {
                 show: true,
                 readOnly: false
-              },
-              restore: {
-                show: true
-              },
+              },*/
+              myTool: excel('chart-weibo'),
               saveAsImage: {
                 show: true
               }
@@ -1931,10 +1918,10 @@ App.page.analyticsDetail = function (module, path) {
               mark: {
                 show: true
               },
-              dataView: {
+              /*dataView: {
                 show: true,
                 readOnly: false
-              },
+              },*/
               magicType: {
                 show: true,
                 type: ['line', 'bar', 'stack', 'tiled']
