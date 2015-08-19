@@ -21,6 +21,7 @@ class DispatchView(APIView, BaseTemplateView):
 
     def get(self, request, id):
         parameter = request.GET
+
         try:
             type = parameter['type'].replace('-', '_')
             start = parse_date(parameter['start'])
@@ -59,6 +60,7 @@ class DispatchView(APIView, BaseTemplateView):
                 return Response(func(start, end))
             elif datatype == 'xls':
                 return self.generate_xls(func(start, end), type)
+
         except Exception, e:
             return Response({})
 
@@ -133,10 +135,13 @@ class DispatchView(APIView, BaseTemplateView):
         wb = xlwt.Workbook()
         ws = wb.add_sheet('Sheet')
         if type == 'chart_trend':
-            for k_index, k in enumerate(data.iterkeys()):
-                ws.write(0, k_index, k)
-                for v_index, v in enumerate(data[k]):
-                    ws.write(v_index + 1, k_index, v)
+            map_dict = [{'date': u'时间'}, {'news': u'新闻'}, {'weixin': u'微信'},
+                {'weibo': u'微博'}, {'total': u'总数'}]
+            for c, column in enumerate(map_dict):
+                ws.write(0, c, column.values()[0])
+                for r, row in enumerate(data[column.keys()[0]]):
+                    ws.write(r + 1, c, row)
+
         elif type == 'chart_type' or type == 'chart_emotion':
             ws.write(0, 0, u'类型')
             ws.write(0, 1, u'数量')
