@@ -43,7 +43,7 @@ def index_view(request):
 
         news_list_number = event_list_number = 10
         weixin_list_number = weibo_list_number = 5
-        news_list = Category.objects.get(name='质监热点').articles.filter(pubtime__gt= date.today())[:10]
+        news_list = Category.objects.get(name='质监热点').articles.all()[:10]
 
         for item in news_list:
             try:
