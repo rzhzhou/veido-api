@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import time
 import pytz
+import xlwt
 from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
@@ -9,7 +10,7 @@ from django.template.loader import render_to_string
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from base import sidebarUtil
+from base import sidebarUtil, xls_to_response
 from base.views import BaseTemplateView
 from django.conf import settings
 from base.models import Article, Area, Category, Inspection, Weixin, Weibo
@@ -21,16 +22,17 @@ class DispatchView(APIView, BaseTemplateView):
 
     def get(self, request, id):
         parameter = request.GET
+
         try:
             type = parameter['type'].replace('-', '_')
             tz = pytz.timezone(settings.TIME_ZONE)
             start = tz.localize(datetime.strptime(parameter['start'], '%Y-%m-%d'))
             end = tz.localize(datetime.strptime(parameter['end'], '%Y-%m-%d') + timedelta(days=1))
             cache = int(parameter['cache']) if parameter.has_key('cache') else 1
+            datatype = parameter['datatype'] if parameter.has_key('datatype') else 'json'
             func = getattr(globals()['DispatchView'](), type)
 
-            # cache is flag,if cache=1 read redis, else read mysql
-            if cache:
+            if datatype == 'json' and cache: # cache is flag,if cache=1 read redis, else read mysql
                 now = datetime.now()
                 today = tz.localize(datetime(now.year, now.month, now.day) + timedelta(days=1))
                 first_day_of_month = tz.localize(datetime(now.year, now.month, 1))
@@ -56,11 +58,13 @@ class DispatchView(APIView, BaseTemplateView):
                 if data:
                     return Response(eval(data))
 
-            return func(start, end)
+            if datatype == 'json':
+                return Response(func(start, end))
+            elif datatype == 'xls':
+                return self.generate_xls(func(start, end), type)
 
         except Exception, e:
             return Response({})
-
 
     def statistic(self, start, end):
         total = Article.objects.filter(pubtime__gte=start, pubtime__lt=end).count()
@@ -72,14 +76,14 @@ class DispatchView(APIView, BaseTemplateView):
             pubtime__gte=start, pubtime__lt=end).count()
 
         risk = event_count + hot_count + inspection_count
-        return Response({'total': total, 'risk': risk})
+        return {'total': total, 'risk': risk}
 
     def chart_type(self, start, end):
         article = Article.objects.filter(pubtime__gte=start, pubtime__lt=end).count()
         weixin = Weixin.objects.filter(pubtime__gte=start, pubtime__lt=end).count()
         weibo = Weibo.objects.filter(pubtime__gte=start, pubtime__lt=end).count()
 
-        return Response({'news': article, 'weixin': weixin, 'weibo': weibo})
+        return {'news': article, 'weixin': weixin, 'weibo': weibo}
 
     def chart_emotion(self, start, end):
         positive = Article.objects.filter(pubtime__gte=start, pubtime__lt=end,
@@ -89,7 +93,7 @@ class DispatchView(APIView, BaseTemplateView):
         negative = Article.objects.filter(
             pubtime__gte=start, pubtime__lt=end, feeling_factor__lt=0.1).count()
 
-        return Response({'positive':positive, 'normal': normal, 'negative': negative})
+        return {'positive': positive, 'normal': normal, 'negative': negative}
 
     def chart_weibo(self, start, end):
         provice_count = []
@@ -103,7 +107,7 @@ class DispatchView(APIView, BaseTemplateView):
         sort_result = sorted(provice_count, key=lambda x:x['value'])[-10:]
         name = map(lambda n: n['name'], sort_result)
         value = map(lambda v: v['value'], sort_result)
-        return Response({'province': provice_count, 'name': name, 'value': value})
+        return {'province': provice_count, 'name': name, 'value': value}
 
     def chart_trend(self, start, end):
         days = (end - start).days
@@ -128,18 +132,48 @@ class DispatchView(APIView, BaseTemplateView):
         total_data = map(lambda x: news_data[x] + weixin_data[x] + weibo_data[x] , xrange(days))
         date = map(lambda x: x.strftime("%m-%d"), datel)
 
-        return Response({
+        return {
             "date": date,
             "news": news_data,
             "weixin": weixin_data,
             "weibo": weibo_data,
             "total": total_data
-        })
+        }
 
+    def generate_xls(self, data, type):
+        wb = xlwt.Workbook()
+        ws = wb.add_sheet('Sheet')
+        if type == 'chart_trend':
+            map_dict = [{'date': u'时间'}, {'news': u'新闻'}, {'weixin': u'微信'},
+                {'weibo': u'微博'}, {'total': u'总数'}]
+            for c, column in enumerate(map_dict):
+                ws.write(0, c, column.values()[0])
+                for r, row in enumerate(data[column.keys()[0]]):
+                    ws.write(r + 1, c, row)
 
-# class AnalyticsParentsView(BaseTemplateView):
-#     def get(self, request):
-#         return self.render_to_response('analytics/analytics_all.html')
+        elif type == 'chart_type':
+            ws.write(0, 0, u'类型')
+            ws.write(0, 1, u'数量')
+            map_dict = [{'news': u'新闻'}, {'weixin': u'微信'}, {'weibo': u'微博'}]
+            for map_index, dct in enumerate(map_dict):
+                ws.write(map_index + 1, 0, dct.values()[0])
+                ws.write(map_index + 1, 1, str(data[dct.keys()[0]]))
+
+        elif type == 'chart_emotion':
+            ws.write(0, 0, u'类型')
+            ws.write(0, 1, u'数量')
+            map_dict = [{'positive': u'褒义'}, {'normal': u'中性'}, {'negative': u'贬义'}]
+            for map_index, dct in enumerate(map_dict):
+                ws.write(map_index + 1, 0, dct.values()[0])
+                ws.write(map_index + 1, 1, str(data[dct.keys()[0]]))
+
+        elif type == 'chart_weibo':
+            ws.write(0, 0, u'地域')
+            ws.write(0, 1, u'数量')
+            for k_index, dct in enumerate(data['province']):
+                ws.write(k_index + 1, 0, dct.values()[0])
+                ws.write(k_index + 1, 1, str(dct.values()[1]))
+        return xls_to_response(wb, 'data.xls')
 
 
 class AnalyticsChildView(BaseTemplateView):
