@@ -1610,9 +1610,19 @@ App.page.analyticsDetail = function (module, path) {
   $chart.on('show.chart', function (event, start, end) {
     var chart = {},
       name = $(this).find('.tab-pane.active')[0].id.slice(6),
+
       excel = function (type) {
-        document.getElementById('save-as-excel').src = api + '?type='+type+'&start=' + start + '&end=' + end + '&datatype=xls';
-      };
+        var myTool = {
+          show: true,
+          title: '保存为Excel',
+          icon: 'image://../../static/img/excel.png',
+
+          onclick: function() {
+            document.getElementById('save-as-excel').src = api + '?type='+type+'&start=' + start + '&end=' + end + '&datatype=xls';
+          }
+        };
+        return myTool;
+       };
 
     chart.trend = function (start, end) {
       $.getJSON(api, {
@@ -1646,10 +1656,9 @@ App.page.analyticsDetail = function (module, path) {
           toolbox: {
             show: true,
             feature: {
-              mark: {
+              /*mark: {
                 show: false
               },
-
               dataView: {
                 show: true,
                 readOnly: false
@@ -1660,19 +1669,11 @@ App.page.analyticsDetail = function (module, path) {
               },
               restore: {
                 show: false
-              },
-              myTool: {
-                show: true,
-                title: '保存为excel',
-                icon: 'image://../../static/img/excel.png',
-                onclick: function() {
-                  excel('chart-trend');
-                }
-              },
+              },*/
+              myTool: excel('chart-trend') ,
               saveAsImage: {
                 show: true
-              },
-    
+              }
             }
           },
           calculable: true,
@@ -1726,18 +1727,11 @@ App.page.analyticsDetail = function (module, path) {
           toolbox: {
             show: true,
             feature: {
-              dataView: {
+              /*dataView: {
                 show: true,
                 readOnly: false
-              },
-              myTool: {
-                show: true,
-                title: '保存为excel',
-                icon: 'image://../../static/img/excel.png',
-                onclick: function () {
-                  excel('chart-type');
-                }
-              },
+              },*/
+              myTool: excel('chart-type'),
               saveAsImage: {
                 show: true,
               }
@@ -1788,18 +1782,11 @@ App.page.analyticsDetail = function (module, path) {
               mark: {
                 show: false
               },
-              dataView: {
+              /*dataView: {
                 show: true,
                 readOnly: false
-              },
-              myTool: {
-                show: true,
-                title: '保存为excel',
-                icon: 'image://../../static/img/excel.png',
-                onclick: function () {
-                  excel('chart-emotion');
-                }
-              },
+              },*/
+              myTool: excel('chart-emotion'),
               magicType: {
                 show: false,
                 type: ['pie'],
@@ -1871,18 +1858,11 @@ App.page.analyticsDetail = function (module, path) {
             x: 'left',
             y: 'top',
             feature: {
-              dataView: {
+              /*dataView: {
                 show: true,
                 readOnly: false
-              },
-              myTool: {
-                show: true,
-                title: '保存为excel',
-                icon: 'image://../../static/img/excel.png',
-                onclick: function () {
-                  excel('chart-weibo');
-                }
-              },
+              },*/
+              myTool: excel('chart-weibo'),
               saveAsImage: {
                 show: true
               }
@@ -1938,10 +1918,10 @@ App.page.analyticsDetail = function (module, path) {
               mark: {
                 show: true
               },
-              dataView: {
+              /*dataView: {
                 show: true,
                 readOnly: false
-              },
+              },*/
               magicType: {
                 show: true,
                 type: ['line', 'bar', 'stack', 'tiled']

@@ -18,6 +18,8 @@ from base.models import (Area, Article, ArticlePublisher, Category, Collection,
     Custom, CustomKeyword, Group, Inspection, LocaltionScore, Product, ProductKeyword,
     RelatedData, Risk, RiskScore, Topic, Weibo, Weixin)
 from yqj.redisconnect import RedisQueryApi
+
+
 @login_required
 def index_view(request):
     user = request.myuser
@@ -83,7 +85,6 @@ def index_view(request):
         for item in risk_lists:
             data = {}
             try:
-                print item.id
                 relevance = LocaltionScore.objects.get(risk_id=item.id).score
             except LocaltionScore.DoesNotExist:
                 relevance = 0
