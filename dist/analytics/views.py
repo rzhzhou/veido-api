@@ -58,8 +58,7 @@ class DispatchView(APIView, BaseTemplateView):
             if datatype == 'json':
                 return Response(func(start, end))
             elif datatype == 'xls':
-                return self.generate_xls(func(start, end))
-
+                return self.generate_xls(func(start, end), type)
         except Exception, e:
             return Response({})
 
@@ -130,15 +129,30 @@ class DispatchView(APIView, BaseTemplateView):
             "total": total_data
         }
 
-    def generate_xls(self, data):
+    def generate_xls(self, data, type):
         wb = xlwt.Workbook()
         ws = wb.add_sheet('Sheet')
+        if type == 'chart_trend':
+            for k_index, k in enumerate(data.iterkeys()):
+                ws.write(0, k_index, k)
+                for v_index, v in enumerate(data[k]):
+                    ws.write(v_index + 1, k_index, v)
+        elif type == 'chart_type' or type == 'chart_emotion':
+            ws.write(0, 0, u'类型')
+            ws.write(0, 1, u'数量')
+            # emotion_list = [u'褒义', u'中性', u'贬义']
+            # data_keys = ['positive', 'normal', 'negative']
+            # data_keys = list(data.iterkeys())
+            for c_index, c in enumerate(data.iterkeys()):
+                ws.write(c_index+1, 0, c)
+                ws.write(c_index+1, 1, str(data[c]))
 
-        for k_index, k in enumerate(data.iterkeys()):
-            ws.write(0, k_index, k)
-            for v_index, v in enumerate(data[k]):
-                ws.write(v_index + 1, k_index, v)
-
+        elif type == 'chart_weibo':
+            ws.write(0, 0, u'地域')
+            ws.write(0, 1, u'数量')
+            for k_index, k in enumerate(data['province']):
+                ws.write(k_index+1, 0, k['name'])
+                ws.write(k_index+1, 1, str(k['value']))
         return xls_to_response(wb, 'data.xls')
 
 
