@@ -142,22 +142,28 @@ class DispatchView(APIView, BaseTemplateView):
                 for r, row in enumerate(data[column.keys()[0]]):
                     ws.write(r + 1, c, row)
 
-        elif type == 'chart_type' or type == 'chart_emotion':
+        elif type == 'chart_type':
             ws.write(0, 0, u'类型')
             ws.write(0, 1, u'数量')
-            # emotion_list = [u'褒义', u'中性', u'贬义']
-            # data_keys = ['positive', 'normal', 'negative']
-            # data_keys = list(data.iterkeys())
-            for c_index, c in enumerate(data.iterkeys()):
-                ws.write(c_index + 1, 0, c)
-                ws.write(c_index + 1, 1, str(data[c]))
+            map_dict = [{'news': u'新闻'}, {'weixin': u'微信'}, {'weibo': u'微博'}]
+            for map_index, dct in enumerate(map_dict):
+                ws.write(map_index + 1, 0, dct.values()[0])
+                ws.write(map_index + 1, 1, str(data[dct.keys()[0]]))
+
+        elif type == 'chart_emotion':
+            ws.write(0, 0, u'类型')
+            ws.write(0, 1, u'数量')
+            map_dict = [{'positive': u'褒义'}, {'normal': u'中性'}, {'negative': u'贬义'}]
+            for map_index, dct in enumerate(map_dict):
+                ws.write(map_index + 1, 0, dct.values()[0])
+                ws.write(map_index + 1, 1, str(data[dct.keys()[0]]))
 
         elif type == 'chart_weibo':
             ws.write(0, 0, u'地域')
             ws.write(0, 1, u'数量')
-            for k_index, k in enumerate(data['province']):
-                ws.write(k_index + 1, 0, k['name'])
-                ws.write(k_index + 1, 1, str(k['value']))
+            for k_index, dct in enumerate(data['province']):
+                ws.write(k_index + 1, 0, dct.values()[0])
+                ws.write(k_index + 1, 1, str(dct.values()[1]))
         return xls_to_response(wb, 'data.xls')
 
 
