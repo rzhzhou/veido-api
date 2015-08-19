@@ -3,7 +3,7 @@ from datetime import datetime
 
 from django.shortcuts import render_to_response
 
-from base import set_logo
+from base import set_logo, sidebarUtil
 from base.views import BaseTemplateView
 from base.models import Weibo
 from yqj.redisconnect import RedisQueryApi
@@ -11,6 +11,7 @@ from yqj.redisconnect import RedisQueryApi
 
 class WeiboView(BaseTemplateView):
     def get(self, request):
+        sidebar_name = sidebarUtil(request)
         latest = [set_logo(data) for data in Weibo.objects.order_by('-pubtime')[0:20]]
         for item in latest:
             if len(item.content) < 144:
@@ -22,4 +23,9 @@ class WeiboView(BaseTemplateView):
                 data['photo'] = u'http://tp2.sinaimg.cn/3557640017/180/40054587155/1'
             if len(data['content']) < 144:
                 data['short'] = True
-        return self.render_to_response('weibo/weibo_list.html', {'weibo_latest_list': latest, 'weibo_hottest_list': hottest})
+        return self.render_to_response('weibo/weibo_list.html',
+                {
+                    'weibo_latest_list': latest, 
+                    'weibo_hottest_list': hottest,
+                    'name': sidebar_name
+                })

@@ -9,6 +9,7 @@ from django.views.static import serve
 from yqj.views import *
 from news.views import CategoryView, LocationView, NewsView, NewsDetailView
 from event.views import EventView, EventDetailView
+from risk.views import RisksView, RisksDetailView
 from weixin.views import WeixinView, WeixinDetailView
 from weibo.views import WeiboView
 from custom.views import CustomView, CustomDetailView
@@ -45,6 +46,11 @@ urlpatterns += patterns('news.views',
 urlpatterns += patterns('event.views',
     url(r'^event/$', EventView.as_view()),
     url(r'^event/(\d+)/$', EventDetailView.as_view()),
+)
+
+urlpatterns += patterns('risk.views',
+    url(r'^risk/$', RisksView.as_view()),
+    url(r'^risk/(\d+)/$', RisksDetailView.as_view()),
 )
 
 urlpatterns += patterns('weibo.views',

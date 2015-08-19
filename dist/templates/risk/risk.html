@@ -1,13 +1,13 @@
 {% extends "base/layout.html" %}
 
-{% block title %}事件 - 质监舆情{% endblock %}
+{% block title %}风险快讯 - 质监舆情{% endblock %}
 
 {% block header %}
-  <h1>{{ name.event }}</h1>
+  <h1>风险快讯</h1>
   <ol class="breadcrumb">
     <li><a href="/"><i class="fa fa-dashboard"></i>首页</a></li>
-    <li><a href="/event/">{{ name.event }}</a></li>
-    <li class="active">{{ event.title }}</li>
+    <li><a href="/risk/">风险快讯</a></li>
+    <li class="active">{{ risk.title }}</li>
   </ol>
 {% endblock %}
 
@@ -25,10 +25,10 @@
               <span>添加收藏</span>
             {% endif %}
           </span>
-          <h3 class="box-title">{{ event.title }}</h3>
+          <h3 class="box-title">{{ risk.title }}</h3>
         </div>
         <div class="box-body">
-          {{ event.abstract }}
+          {{ risk.abstract }}
         </div>
       </div>
     </div>
