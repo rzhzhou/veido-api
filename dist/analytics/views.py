@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
-import time
 import pytz
+import time
 import xlwt
+
 from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
+from django.conf import settings
 from django.db.models import Q
 from django.template.loader import render_to_string
 from rest_framework.response import Response
@@ -12,7 +14,6 @@ from rest_framework.views import APIView
 
 from base import sidebarUtil, xls_to_response
 from base.views import BaseTemplateView
-from django.conf import settings
 from base.models import Article, Area, Category, Inspection, Weixin, Weibo
 from yqj.mysqlUtil import query
 from yqj.redisconnect import RedisQueryApi
