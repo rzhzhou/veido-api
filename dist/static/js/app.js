@@ -1218,16 +1218,20 @@ App.module.dateRange = function($dateRange) {
         });
 };
 
-App.module.statistic = function ($el, api) {
-  var $total = $el.find('.statistic-total > span'),
-      $risk = $el.find('.statistic-risk > span');
+App.module.statistic = function($el, api) {
+    var $total = $el.find('.statistic-total > span'),
+        $risk = $el.find('.statistic-risk > span');
 
-  $el.on('dateChange', function (event, start, end) {
-    $.getJSON(api, {type: 'statistic', start: start, end: end}, function (statistic) {
-      $total.text(statistic.total);
-      $risk.text(statistic.risk);
+    $el.on('show.statistic', function(event, start, end) {
+        $.getJSON(api, {
+            type: 'statistic',
+            start: start,
+            end: end
+        }, function(statistic) {
+            $total.text(statistic.total);
+            $risk.text(statistic.risk);
+        });
     });
-  });
 };
 
 App.module.dataList = function (module, $dataList, api, start, end) {
