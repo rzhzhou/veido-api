@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-import time
 import pytz
+import time
 import xlwt
+
 from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
 from django.conf import settings
-from django.http import HttpResponse
 from django.db.models import Q
 from django.template.loader import render_to_string
 from rest_framework.response import Response
