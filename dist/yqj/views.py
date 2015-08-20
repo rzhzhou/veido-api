@@ -45,7 +45,7 @@ def index_view(request):
 
         news_list_number = event_list_number = 10
         weixin_list_number = weibo_list_number = 5
-        news_list = Category.objects.get(name='质监热点').articles.filter(pubtime__gt= date.today())[:10]
+        news_list = Category.objects.get(name='质监热点').articles.all()[:10]
 
         for item in news_list:
             try:
@@ -85,12 +85,12 @@ def index_view(request):
         for item in risk_lists:
             data = {}
             try:
-                relevance = LocaltionScore.objects.get(risk_id=item.id).score
-            except LocaltionScore.DoesNotExist:
+                relevance = LocaltionScore.objects.get(risk_id=item.id, group_id=group).score
+            except:
                 relevance = 0
             try:
                 score = RiskScore.objects.get(risk=item.id).score
-            except RiskScore.DoesNotExist:
+            except :
                 score = 0
             data['relevance'] = relevance
             data['title'] = item.title

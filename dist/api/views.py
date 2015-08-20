@@ -119,12 +119,12 @@ class RisksTableView(BaseAPIView):
         for item in risk_lists:
             data = {}
             try:
-                relevance = LocaltionScore.objects.get(risk_id=item.id).score
-            except LocaltionScore.DoesNotExist:
+                relevance = LocaltionScore.objects.get(risk_id=item.id, group_id=group).score
+            except:
                 relevance = 0
             try:
                 score = RiskScore.objects.get(risk=item.id).score
-            except RiskScore.DoesNotExist:
+            except:
                 score = 0
             data['relevance'] = relevance
             data['title'] = item.title
