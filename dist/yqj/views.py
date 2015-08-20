@@ -18,6 +18,8 @@ from base.models import (Area, Article, ArticlePublisher, Category, Collection,
     Custom, CustomKeyword, Group, Inspection, LocaltionScore, Product, ProductKeyword,
     RelatedData, Risk, RiskScore, Topic, Weibo, Weixin)
 from yqj.redisconnect import RedisQueryApi
+
+
 @login_required
 def index_view(request):
     user = request.myuser
