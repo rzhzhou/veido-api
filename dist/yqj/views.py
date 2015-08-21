@@ -29,22 +29,22 @@ def index_view(request):
         locations = Area.objects.filter(level=user.area.level+1, parent=user.area)
         user.company = user.group.company
 
-        news_number = Article.objects.count()
-        weibo_number = Weibo.objects.count()
-        weixin_number = Weixin.objects.count()
-        total = news_number + weixin_number + weibo_number
+        news = Article.objects.count()
+        weibo = Weibo.objects.count()
+        weixin = Weixin.objects.count()
+        total = news + weixin + weibo
         event = Topic.objects.all().count()
-        event_news_number = Category.objects.get(name=u'事件').articles.count()
-        event_weixin_number = Weixin.objects.filter(website_type='topic').count()
-        event_weibo_number = Weibo.objects.filter(website_type='topic').count()
-        event_data_number = event_news_number + event_weixin_number + event_weibo_number
-        news_percent = news_number*100/total if news_number else 0
-        event_percent = event_data_number*100/total if event_data_number else 0
-        weixin_percent = weixin_number*100/total if weixin_number else 0
-        weibo_percent = weibo_number*100/total if weibo_number else 0
+        event_news = Category.objects.get(name=u'事件').articles.count()
+        event_weixin = Weixin.objects.filter(website_type='topic').count()
+        event_weibo = Weibo.objects.filter(website_type='topic').count()
+        event_data = event_news + event_weixin + event_weibo
+        news_percent = news*100/total if news else 0
+        event_percent = event_data*100/total if event_data else 0
+        weixin_percent = weixin*100/total if weixin else 0
+        weibo_percent = weibo*100/total if weibo else 0
 
-        news_list_number = event_list_number = 10
-        weixin_list_number = weibo_list_number = 5
+        news_list = event_list = 10
+        weixin_list = weibo_list = 5
         news_list = Category.objects.get(name='质监热点').articles.all()[:10]
 
         for item in news_list:
@@ -53,7 +53,7 @@ def index_view(request):
             except IndexError:
                 setattr(item, 'hot_index', 0)
 
-        event_list = Topic.objects.all()[:event_list_number]
+        event_list = Topic.objects.all()[:event_list]
         for iteml in event_list:
             try:
                 setattr(iteml, 'time', iteml.pubtime.replace(tzinfo=None).strftime('%Y-%m-%d'))
@@ -70,7 +70,7 @@ def index_view(request):
             if len(data['content']) < 200:
                 data['short'] = True
 
-        weixin_data = Weixin.objects.all()[0:weixin_list_number]
+        weixin_data = Weixin.objects.all()[0:weixin_list]
         for data in weixin_data:
             data = set_logo(data)
 
@@ -106,9 +106,9 @@ def index_view(request):
             'categories': categories,
             'locations': locations,
             'industries': [{'id': 0, 'name': u'综合'}],
-            'news': {'number': news_number, 'percent': news_percent},
-            'weibo': {'number': weibo_number, 'percent': weibo_percent},
-            'weixin': {'number': weixin_number, 'percent': weixin_percent},
+            'news': {'number': news, 'percent': news_percent},
+            'weibo': {'number': weibo, 'percent': weibo_percent},
+            'weixin': {'number': weixin, 'percent': weixin_percent},
             'event': {'number': event, 'percent': event_percent},
             'news_list': news_list,
             'event_list': event_list,
