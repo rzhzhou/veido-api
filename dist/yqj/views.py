@@ -38,10 +38,10 @@ def index_view(request):
         event_weixin = Weixin.objects.filter(website_type='topic').count()
         event_weibo = Weibo.objects.filter(website_type='topic').count()
         event_data = event_news + event_weixin + event_weibo
-        news_percent = news*100/total if news else 0
-        event_percent = event_data*100/total if event_data else 0
-        weixin_percent = weixin*100/total if weixin else 0
-        weibo_percent = weibo*100/total if weibo else 0
+        news_percent = news * 100 / total
+        event_percent = event_data * 100 / total
+        weixin_percent = weixin * 100 / total
+        weibo_percent = weibo * 100 / total
 
         news_list = event_list = 10
         weixin_list = weibo_list = 5
@@ -129,7 +129,7 @@ def person_view(request, person_id):
 class CollectionView(BaseTemplateView):
     def get(self, request):
         sidebar_name = sidebarUtil(request)
-        return self.render_to_response('user/collection.html',{'name': sidebar_name})
+        return self.render_to_response('user/collection.html', {'name': sidebar_name})
 
 
 class SettingsView(BaseTemplateView):
