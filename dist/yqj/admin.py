@@ -2,6 +2,7 @@
 import jieba.analyse
 
 from django import forms
+from django_extensions.admin import ForeignKeyAutocompleteAdmin
 from django.contrib import admin, messages
 
 from yqj.mongoconnect import CrawlerTask
@@ -18,7 +19,10 @@ def show_pubtime(obj):
 show_pubtime.short_description = u'发布时间'
 
 
-class WeiboAdmin(admin.ModelAdmin):
+class WeiboAdmin(ForeignKeyAutocompleteAdmin):
+    related_search_fields = {
+    'area': ('name',)
+    }
     list_display = ('title', 'source', 'website_type', 'area','pubtime')
     list_editable = ('source', 'pubtime',)
     list_filter = ('pubtime', )
@@ -30,7 +34,10 @@ class WeiboAdmin(admin.ModelAdmin):
         return super(WeiboAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
 
-class WeixinAdmin(admin.ModelAdmin):
+class WeixinAdmin(ForeignKeyAutocompleteAdmin):
+    related_search_fields = {
+    'area': ('name',)
+    }
     fields=('author','title','url','content','origin_source','source','website_type','pubtime','publisher','area','uuid','readnum','likenum')
     list_display=('author','title','origin_source','source','pubtime','publisher','area','readnum')
     list_editable=('title','pubtime','readnum',)
@@ -38,7 +45,10 @@ class WeixinAdmin(admin.ModelAdmin):
     search_fields=('title','source')
 
 
-class ArticleAdmin(admin.ModelAdmin):
+class ArticleAdmin(ForeignKeyAutocompleteAdmin):
+    related_search_fields = {
+    'area': ('name',)
+    }
     # fields = ('title', 'source', 'area', 'feeling_factor', 'pubtime', 'website_type')
     list_display = ('title', 'source', 'area', 'feeling_factor', 'pubtime')
     list_editable = ('source', 'feeling_factor', 'pubtime')
@@ -84,10 +94,13 @@ class CustomKeywordAdmin(admin.ModelAdmin):
         obj.delete()
 
 
-class TopicAdmin(admin.ModelAdmin):
+class TopicAdmin(ForeignKeyAutocompleteAdmin):
+    related_search_fields = {
+    'area': ('name',)
+    }
     fields = ('title', 'abstract', 'source', 'area', 'keywords', 'pubtime')
     list_display = ('title', 'source', 'area', 'pubtime',)
-    list_editable = ('source', 'area', 'pubtime')
+    list_editable = ('source', 'pubtime')
     list_filter = ('source', 'pubtime',)
     search_fields = ('title', 'source')
     #
@@ -199,10 +212,13 @@ class RiskScoreAdmin(admin.ModelAdmin):
     search_fields = ('score', 'risk')
 
 
-class RiskAdmin(admin.ModelAdmin):
+class RiskAdmin(ForeignKeyAutocompleteAdmin):
+    related_search_fields = {
+    'area': ('name',)
+    }
     fields = ('title', 'abstract', 'source', 'area', 'keywords', 'score', 'pubtime')
     list_display = ('title',  'source', 'area', 'keywords' , 'pubtime')
-    list_editable = ('title', 'source', 'area', 'keywords' , 'pubtime')
+    list_editable = ('title', 'source', 'keywords' , 'pubtime')
     list_filter = ('title', 'pubtime')
     search_fields = ('title', 'pubtime')
 
