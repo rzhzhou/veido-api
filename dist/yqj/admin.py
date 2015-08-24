@@ -207,6 +207,7 @@ class RiskAdmin(admin.ModelAdmin):
     search_fields = ('title', 'pubtime')
 
     def save_model(self, request, obj, form, change):
+        obj.keywords = jieba.analyse.extract_tags(obj.title, topK=3, withWeight=True, allowPOS=())
         if not change:
             CrawlerTask(obj.title, 'zjld', u"风险快讯").type_task()
             obj.save()
