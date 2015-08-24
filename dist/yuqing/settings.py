@@ -96,6 +96,7 @@ INSTALLED_APPS = (
     'yqj',
     'analytics',
     'rest_framework',
+    'django_extensions',
 )
 
 MIDDLEWARE_CLASSES = (
