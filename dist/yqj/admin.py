@@ -10,6 +10,7 @@ from base.models import (Area, Article, ArticlePublisher, Category, Custom,
     CustomKeyword, Group, GroupAuthUser, LocaltionScore, Product, ProductKeyword,
     Risk, LRisk, TRisk, RiskScore, Topic, User, Weibo, WeiboPublisher, Weixin,
     WeixinPublisher, save_user)
+from corpus.models import Event
 
 
 def show_pubtime(obj):
@@ -117,6 +118,8 @@ class TopicAdmin(ForeignKeyAutocompleteAdmin):
             old_keyword = key_list[0].title
             if old_keyword != obj.title:
                 CrawlerTask(obj.title, "zjld", u"事件").update_task(old_keyword)
+
+        Event(title=obj.title).save()
         obj.save()
 
     def delete_model(self, request, obj,):
