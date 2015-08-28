@@ -2,6 +2,7 @@
 import os
 import requests
 import json
+import cPickle
 from datetime import datetime, timedelta
 from collections import defaultdict
 from datetime import datetime, timedelta
@@ -30,6 +31,7 @@ from base.models import (Area, Article, Category, Collection, Custom,
 from yqj.redisconnect import RedisQueryApi
 from api.api_function import (GetFirstDaySeason, get_season, year_range,
     season_range, months_range, days_range, week_range, unstable)
+from yuqing.settings import BASE_DIR
 
 
 def login_view(request):
@@ -1009,28 +1011,7 @@ def chart_pie_risk_view(request, risk_id):
     return JsonResponse({u'name': name, u'value': value})
 
 def map_view(request):
-    # login_url = "http://192.168.0.215/auth"
-    # login_data = {
-    #     "u": "wuhanzhijian",
-    #     "p": "aebcb993a42143aa78b76a57666ec77d6bb55bec",
-    # }
-    # login_res = requests.post(login_url,data=login_data)
-    # login_json = json.loads(login_res.text)
-    # login_cookie = login_json["token"]
-    login_cookie = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhY2NvdW50X2l"\
-        "kIjoxLCJ1c2VyX2lkIjoxLCJhX25hbWUiOiJ3dWhhbnpoaWppYW4iLCJhX3JlYWx"\
-        "uYW1lIjoi566h55CG5ZGYIiwiYV9wd2QiOiI3YjNkNzgzMzFlNDQ0YzNmODBkO"\
-        "Dc1Njc4YjA1ODkyYmFiMmY1MTU3IiwiYV9waG9uZSI6bnVsbCwiYV9lbWFpbCI6"\
-        "Ind1aGFuemhpamlhbkBzaGVuZHUuaW5mbyIsImFfbG9nbyI6bnVsbCwic3Rh"\
-        "dHVzIjoxLCJzeXN0ZW1faWQiOjEsImlzcm9vdCI6MSwiU3lzQWNjb3VudFNhbHQiO"\
-        "nsic2FsdCI6ImZjMDhlNDFlZjkzZjIwYTYyYjhmY2I4ODc1ZThmNTJmZTJkZGExYTkifX0.x4IP"\
-        "k4Cnka7Z2izoZ2uTMjh7lzpsrJA3zs7hWTqnhFk"
-    url = "http://192.168.0.215/api/dashboard?ed=2015-07-23&edId=9335&sd=2015-06-23&sdId=9305"
-    headers = {
-        "Authorization" : "Bearer "+login_cookie,
-    }
-    res = requests.get(url, headers=headers)
-    data = json.loads(res.text)
+    data = cPickle.load(file(os.path.join(BASE_DIR, "yqj/jobs/minutely/date.data"), "r"))
     risk_data = data["regionData"]
     return JsonResponse({"regionData": risk_data })
 
