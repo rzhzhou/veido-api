@@ -1,12 +1,13 @@
 """
     keep alive with 'http://192.168.10.215' connection
 """
-
-from django_extensions.management.jobs import MinutelyJob
 import requests
+import os
+from django_extensions.management.jobs import MinutelyJob
 from datetime import datetime, timedelta
 from json import loads
 from cPickle import dump, load
+from yuqing.settings import BASE_DIR
 
 
 class Job(MinutelyJob):
@@ -34,7 +35,7 @@ class Job(MinutelyJob):
         if not data:
             print "error"
         else:
-            dump(data, file("map.json", "w")) 
+            dump(data, file(os.path.join(BASE_DIR, "yqj/jobs/minutely/map.json"), "w")) 
             print "success"   
 
     def get_data(self, start_day, start_id, end_day, end_id):
