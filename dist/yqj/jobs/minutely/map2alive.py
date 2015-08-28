@@ -34,7 +34,7 @@ class Job(MinutelyJob):
         if not data:
             print "error"
         else:
-            dump(data, file("date.data", "w")) 
+            dump(data, file("map.json", "w")) 
             print "success"   
 
     def get_data(self, start_day, start_id, end_day, end_id):
