@@ -25,12 +25,12 @@ class Job(MinutelyJob):
         ed = sd - timedelta(days=30)
         sd_str = sd.strftime("%Y-%m-%d")
         ed_str = ed.strftime("%Y-%m-%d")
-        dayId = self.get_dayId(sd_str, ed_str)
-        if not dayId:
-            dayId = self.get_dayId(sd_str, ed_str)
-        data = self.get_data(sd_str, dayId[0]["date_id"], ed_str, dayId[1]["date_id"])
+        day_id = self.get_day_id(sd_str, ed_str)
+        if not day_id:
+            day_id = self.get_day_id(sd_str, ed_str)
+        data = self.get_data(sd_str, day_id[0]["date_id"], ed_str, day_id[1]["date_id"])
         if not data:
-            data = self.get_data(sd_str, dayId[0]["date_id"], ed_str, dayId[1]["date_id"])
+            data = self.get_data(sd_str, day_id[0]["date_id"], ed_str, day_id[1]["date_id"])
         if not data:
             print "error"
         else:
@@ -47,16 +47,16 @@ class Job(MinutelyJob):
             return None
         return loads(res.text)
 
-    def get_dayId(self, start_day, end_day):
-        dayId = []
+    def get_day_id(self, start_day, end_day):
+        day_id = []
         url = "http://192.168.0.215/api/product/queryDateId?endDate=%s&startDate=%s" % (start_day, end_day)
         headers = {
             "Authorization" : "Bearer " + self.__login_cookie,
         }
         res = requests.get(url, headers=headers)
         if res.status_code == 200:
-            dayId = loads(res.text)["data"]     
-        return dayId
+            day_id = loads(res.text)["data"]     
+        return day_id
 
 
 if __name__ == '__main__':
