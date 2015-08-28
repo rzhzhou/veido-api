@@ -1011,7 +1011,7 @@ def chart_pie_risk_view(request, risk_id):
     return JsonResponse({u'name': name, u'value': value})
 
 def map_view(request):
-    data = cPickle.load(file(os.path.join(BASE_DIR, "yqj/jobs/minutely/date.data"), "r"))
+    data = cPickle.load(file(os.path.join(BASE_DIR, "yqj/jobs/minutely/map.json"), "r"))
     risk_data = data["regionData"]
     return JsonResponse({"regionData": risk_data })
 
