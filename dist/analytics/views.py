@@ -68,7 +68,10 @@ class DispatchView(APIView, BaseTemplateView):
             return Response({})
 
     def statistic(self, start, end):
-        total = Article.objects.filter(pubtime__gte=start, pubtime__lt=end).count()
+        article = Article.objects.filter(pubtime__gte=start, pubtime__lt=end).count()
+        weixin = Weixin.objects.filter(pubtime__gte=start, pubtime__lt=end).count()
+        weibo = Weibo.objects.filter(pubtime__gte=start, pubtime__lt=end).count()
+        total = article + weixin + weibo
         event_count = Category.objects.get(name=u'事件').articles.filter(
             pubtime__gte=start, pubtime__lt=end).count()
         hot_count = Category.objects.get(name=u'质监热点').articles.filter(
