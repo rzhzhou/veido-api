@@ -2,6 +2,10 @@
   "name": "app",
   "version": "1.0.0",
   "description": "舆情机客户端",
+  "scripts": {
+    "start": "gulp serve",
+    "build": "gulp build"
+  },
   "repository": {
     "type": "git",
     "url": "git@192.168.1.101:yqj/app.git"
