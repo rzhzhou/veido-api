@@ -130,6 +130,23 @@ class Article(models.Model):
         return self.title
 
 
+class News(models.Model):
+    author = models.CharField(max_length=255, verbose_name=u'作者')
+    title = models.CharField(max_length=255,blank=True, verbose_name=u'标题')
+    url = models.URLField(verbose_name=u'网站链接')
+    content = models.TextField(blank=True, verbose_name=u'正文')
+    source = models.CharField(max_length=255, blank=True, verbose_name=u'信息来源')
+    pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
+
+    area = models.ForeignKey(Area, verbose_name=u'地域')
+
+    class Meta:
+        db_table = 'article'
+        verbose_name_plural = u'质监热点'
+
+    def __unicode__(self):
+        return self.title
+
 class Topic(models.Model):
     title = models.CharField(max_length=255, blank=True, verbose_name=u'标题')
     abstract = models.TextField(blank=True, verbose_name=u'简介')
@@ -409,6 +426,31 @@ class Inspection(models.Model):
         return self.name
 
 
+class ZJInspection(models.Model):
+    url = models.CharField(max_length=255, verbose_name=u'网站链接')
+    name = models.CharField(max_length=255, verbose_name=u'标题')
+    manufacturer = models.CharField(max_length=255, null=True, blank=True, verbose_name=u'转载次数')
+    qualitied = models.FloatField(verbose_name=u'合格率')
+    pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
+    product = models.CharField(max_length=255, verbose_name=u'产品')
+    source = models.CharField(max_length=255, verbose_name=u'信息来源')
+    status = models.IntegerField(null=False, default=3, verbose_name=u'名称')
+    create_at = models.DateTimeField(auto_now=False, verbose_name=u'创建时间')
+    update_at = models.DateTimeField(auto_now=False, verbose_name=u'更新时间')
+    create_id = models.CharField(max_length=255, null=True, blank=True, verbose_name=u'创建人')
+    province = models.CharField(max_length=255, verbose_name=u'省')
+    city = models.CharField(max_length=255, null=True, blank=True, verbose_name=u'市')
+    district = models.CharField(max_length=255, null=True, blank=True, verbose_name=u'地区')
+    sync = models.IntegerField(null=True, blank=True, verbose_name=u'同步状态')
+
+    class Meta:
+        db_table = 'inspection'
+        verbose_name_plural = u'抽检'
+
+
+    def __unicode__(self):
+        return self.name
+
 class GroupAuthUser(models.Model):
     auth = models.CharField(max_length=255, verbose_name=u'用户名')
     group = models.ForeignKey(Group, verbose_name=u'分组')
@@ -444,3 +486,19 @@ class RiskScore(models.Model):
 
     def __unicode__(self):
         return str(self.score)
+
+
+class RelatedDataAtricle(models.Model):
+    article = models.ForeignKey(Article)
+    relateddata = models.ForeignKey(RelatedData)
+
+    class Meta:
+        db_table = 'relateddata_articles'
+
+
+class CategoryAtricle(models.Model):
+    article = models.ForeignKey(Article)
+    category = models.ForeignKey(Category)
+
+    class Meta:
+        db_table = 'category_articles'
