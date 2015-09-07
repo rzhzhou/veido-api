@@ -187,7 +187,7 @@ class RisksDetailWeixinView(BaseAPIView):
             return Response({'html': '', 'total': 0})
         items = risk.weixin.all()
         datas = self.paging(items, self.EVENT_WEIXIN_LIMIT, page)
-        items = [SetLogo(data) for data in datas['items']]
+        items = [set_logo(data) for data in datas['items']]
         html = self.set_css_to_weixin(items)
         return Response({'html': html, 'total': datas['total_number']})
 
@@ -201,7 +201,7 @@ class RisksDetailWeiboView(BaseAPIView):
             return Response({'html': '', 'total': 0})
         items = risk.weibo.all()
         datas = self.paging(items, self.EVENT_WEIBO_LIMIT, page)
-        items = [SetLogo(data) for data in datas['items']]
+        items = [set_logo(data) for data in datas['items']]
         html = self.set_css_to_weibo(items)
         return Response({'html': html, 'total': datas['total_number']})
 

@@ -6,10 +6,11 @@ from django_extensions.admin import ForeignKeyAutocompleteAdmin
 from django.contrib import admin, messages
 
 from yqj.mongoconnect import CrawlerTask
+from yqj_save import MySQLQuerApi
 from base.models import (Area, Article, ArticlePublisher, Category, Custom,
     CustomKeyword, Group, GroupAuthUser, LocaltionScore, Product, ProductKeyword,
     Risk, LRisk, TRisk, RiskScore, Topic, User, Weibo, WeiboPublisher, Weixin,
-    WeixinPublisher, save_user)
+    WeixinPublisher, save_user, ZJInspection, News)
 from corpus.models import Event
 
 
@@ -19,6 +20,15 @@ def show_pubtime(obj):
 
 show_pubtime.short_description = u'发布时间'
 
+class NewsAdmin(admin.ModelAdmin):
+    fields = ('url', 'title', 'content', 'author', 'pubtime', \
+        'source', 'area')
+    list_display = ('title', 'source', 'pubtime', 'area')
+    search_fields = ('url', 'title', 'content', 'author', 'area')
+    list_filter = ('pubtime',)
+
+    def save_model(self, request, obj, form, change):
+        MySQLQuerApi().insert(obj)
 
 class WeiboAdmin(ForeignKeyAutocompleteAdmin):
     related_search_fields = {
@@ -295,6 +305,11 @@ class TRiskAdmin(admin.ModelAdmin):
             risk_score.save()
 
 
+class InspectionAdmin(admin.ModelAdmin):
+    search_fields = ('url', 'name', 'source',)
+    list_filter = ('pubtime',)
+
+
 admin.site.register(WeixinPublisher)
 admin.site.register(WeiboPublisher)
 admin.site.register(Weibo,WeiboAdmin)
@@ -304,6 +319,7 @@ admin.site.register(Category)
 admin.site.register(User, UserAdmin)
 admin.site.register(Group)
 admin.site.register(Article, ArticleAdmin)
+admin.site.register(News, NewsAdmin)
 admin.site.register(Topic, TopicAdmin)
 admin.site.register(Custom)
 admin.site.register(CustomKeyword, CustomKeywordAdmin)
@@ -315,3 +331,4 @@ admin.site.register(RiskScore, RiskScoreAdmin)
 admin.site.register(Risk, RiskAdmin)
 admin.site.register(LRisk, LRiskAdmin)
 admin.site.register(TRisk, TRiskAdmin)
+admin.site.register(ZJInspection, InspectionAdmin)
