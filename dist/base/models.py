@@ -406,7 +406,7 @@ class AnonymousUser(User):
 
 
 class Inspection(models.Model):
-    url = models.CharField(max_length=255, verbose_name=u'网站链接')
+    url = models.URLField(max_length=255, verbose_name=u'网站链接')
     name = models.CharField(max_length=255, verbose_name=u'标题')
     manufacturer = models.CharField(max_length=255, null=True, blank=True,verbose_name=u'转载次数')
     qualitied = models.FloatField(verbose_name=u'关注度', null=True, blank=True)
@@ -427,7 +427,7 @@ class Inspection(models.Model):
 
 
 class ZJInspection(models.Model):
-    url = models.CharField(max_length=255, verbose_name=u'网站链接')
+    url = models.URLField(max_length=255, verbose_name=u'网站链接')
     name = models.CharField(max_length=255, verbose_name=u'标题')
     manufacturer = models.CharField(max_length=255, null=True, blank=True, verbose_name=u'转载次数')
     qualitied = models.FloatField(verbose_name=u'合格率')

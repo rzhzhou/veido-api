@@ -101,6 +101,7 @@ INSTALLED_APPS = (
     'analytics',
     'rest_framework',
     'django_extensions',
+    'import_export',
 )
 
 MIDDLEWARE_CLASSES = (

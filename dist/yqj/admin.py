@@ -12,6 +12,8 @@ from base.models import (Area, Article, ArticlePublisher, Category, Custom,
     Risk, LRisk, TRisk, RiskScore, Topic, User, Weibo, WeiboPublisher, Weixin,
     WeixinPublisher, save_user, ZJInspection, News)
 from corpus.models import Event
+from resource import InspectionResources
+from import_export.admin import ImportExportActionModelAdmin
 
 
 def show_pubtime(obj):
@@ -305,9 +307,11 @@ class TRiskAdmin(admin.ModelAdmin):
             risk_score.save()
 
 
-class InspectionAdmin(admin.ModelAdmin):
+class InspectionAdmin(ImportExportActionModelAdmin):
+    resource_class = InspectionResources
     search_fields = ('url', 'name', 'source',)
-    list_filter = ('pubtime',)
+    list_display = ('name', 'product', 'qualitied', 'source', 'pubtime')
+    list_filter = ('pubtime', 'province', 'city', 'district', 'product', 'source', )
 
 
 admin.site.register(WeixinPublisher)
