@@ -39,7 +39,7 @@ class BaseView(View):
             item['id'] = data.id
             item['source'] = data.publisher.publisher
             item['location'] = data.area.name
-            item['time'] = data.pubtime.replace(tzinfo=None).strftime('%Y-%m-%d')
+            item['time'] = data.pubtime.date().strftime('%Y-%m-%d')
             try:
                 item['hot'] = RelatedData.objects.filter(uuid=data.uuid)[0].articles.all().count()
             except IndexError:
@@ -55,7 +55,7 @@ class BaseView(View):
             item['id'] = data.id
             item['source'] = data.source
             item['location'] = data.area.name
-            item['time'] = data.pubtime.strftime('%Y-%m-%d')
+            item['time'] = data.pubtime.date().strftime('%Y-%m-%d')
             item['hot'] = data.articles.count() + data.weixin.count() + data.weibo.count()
             result.append(item)
 
@@ -79,7 +79,7 @@ class BaseView(View):
             html +=  u'<span>阅读 %s</span>' % count
             html +=  u'<span><i class="fa fa-thumbs-o-up"></i> %s</span>' % count
             html += """</div>"""
-            html +=  u'<div class="time pull-left">%s</div>' % item.pubtime.replace(tzinfo=None).strftime('%Y-%m-%d %H:%M')
+            html +=  u'<div class="time pull-left">%s</div>' % item.pubtime.strftime('%Y-%m-%d %H:%M')
             html += """</div></div></li>"""
         return html
 
@@ -103,7 +103,7 @@ class BaseView(View):
             html +=  u'<span>评论 %s</span>' % count
             html +=  u'<span><i class="fa fa-thumbs-o-up"></i> %s</span>' % count
             html += """</div>"""
-            html +=  u'<div class="time pull-left">%s</div>' % item.pubtime.replace(tzinfo=None).strftime('%Y-%m-%d %H:%M')
+            html +=  u'<div class="time pull-left">%s</div>' % item.pubtime.strftime('%Y-%m-%d %H:%M')
             html += """</div></div></li>"""
         return html
 

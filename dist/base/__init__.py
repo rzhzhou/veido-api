@@ -1,5 +1,5 @@
 import os
-import ConfigParser
+from ConfigParser import ConfigParser, RawConfigParser  
 
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseRedirect
@@ -56,9 +56,11 @@ def xls_to_response(wb, fname):
 def sidebarUtil(request):
     BASE_DIR = os.path.dirname(os.path.dirname(__file__))
     user = request.myuser
-    conf = ConfigParser.ConfigParser()
+    conf = ConfigParser()
     conf.read(os.path.join(BASE_DIR, "../sidebar.cfg"))
     username = user.username
+    if not conf.has_section(username):
+        username = 'test'
 
     sidebar_name = {
         "news": conf.get(username, "news"),
