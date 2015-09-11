@@ -3,6 +3,7 @@ import os
 import requests
 import json
 import cPickle
+import pytz
 from datetime import datetime, timedelta
 from collections import defaultdict
 from datetime import datetime, timedelta
@@ -10,6 +11,7 @@ from dateutil.relativedelta import relativedelta
 from serializers import ArticleSerializer
 
 from django.conf import settings
+from django.utils import timezone
 from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
@@ -405,7 +407,7 @@ class CollectView(APIView):
         if time:
             pubtime = time[0].pubtime
         else:
-            pubtime = datetime.now()
+            pubtime = timezone.now()
         one_record = [title, item.source, item.area.name, pubtime.date(), hot_index]
         #one_record = [view.collected_html(item), title, item.source, item.area.name, pubtime.date(), hot_index]
         return one_record
@@ -757,7 +759,6 @@ class WeiboTableView(BaseAPIView):
             html += """</div>"""
             html +=  u'<div class="time pull-left">%s</div>' % datetime.fromtimestamp(item['pubtime']).strftime('%Y-%m-%d %H:%M')
             html += """</div></div></li>"""
-
         return html
 
     def get(self, request, weibo_type, page):
@@ -890,13 +891,13 @@ def get_count_feeling(start_d, end_d, feeling_type):
         feeling_limit = 'feeling_factor <= 0.1 and feeling_factor >= 0'
     else:
         feeling_limit = 'feeling_factor > 0.1  and feeling_factor < 0.9 or feeling_factor = -1'
-
     with connection.cursor() as c:
         sql_str = "SELECT Date(pubtime), COUNT(*) FROM article where Date(pubtime) >= '{0}' and Date(pubtime) < '{1}' and {2} group by Date(pubtime)".format(start_d, end_d, feeling_limit)
         c.execute(sql_str)
         rows = c.fetchall()
 
         d =  dict(rows)
+        a = [i[0] for i in rows]
         result = []
         day = start_d
         while day < end_d:
@@ -907,7 +908,8 @@ def get_count_feeling(start_d, end_d, feeling_type):
 
 @login_required
 def chart_line_index_view(request):
-    today = datetime.today().date()
+    today = timezone.now()
+    today = today.astimezone(pytz.utc).date()
     start_d = today - timedelta(days=6)
     end_d = today + timedelta(days=1)
 
