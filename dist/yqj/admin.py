@@ -2,13 +2,18 @@
 import jieba.analyse
 
 from django import forms
+from django_extensions.admin import ForeignKeyAutocompleteAdmin
 from django.contrib import admin, messages
 
 from yqj.mongoconnect import CrawlerTask
+from yqj_save import MySQLQuerApi
 from base.models import (Area, Article, ArticlePublisher, Category, Custom,
     CustomKeyword, Group, GroupAuthUser, LocaltionScore, Product, ProductKeyword,
     Risk, LRisk, TRisk, RiskScore, Topic, User, Weibo, WeiboPublisher, Weixin,
-    WeixinPublisher, save_user)
+    WeixinPublisher, save_user, ZJInspection, News)
+from corpus.models import Event
+from resource import InspectionResources
+from import_export.admin import ImportExportActionModelAdmin
 
 
 def show_pubtime(obj):
@@ -17,8 +22,20 @@ def show_pubtime(obj):
 
 show_pubtime.short_description = u'发布时间'
 
+class NewsAdmin(admin.ModelAdmin):
+    fields = ('url', 'title', 'content', 'author', 'pubtime', \
+        'source', 'area')
+    list_display = ('title', 'source', 'pubtime', 'area')
+    search_fields = ('url', 'title', 'content', 'author', 'area')
+    list_filter = ('pubtime',)
 
-class WeiboAdmin(admin.ModelAdmin):
+    def save_model(self, request, obj, form, change):
+        MySQLQuerApi().insert(obj)
+
+class WeiboAdmin(ForeignKeyAutocompleteAdmin):
+    related_search_fields = {
+    'area': ('name',)
+    }
     list_display = ('title', 'source', 'website_type', 'area','pubtime')
     list_editable = ('source', 'pubtime',)
     list_filter = ('pubtime', )
@@ -30,7 +47,10 @@ class WeiboAdmin(admin.ModelAdmin):
         return super(WeiboAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
 
-class WeixinAdmin(admin.ModelAdmin):
+class WeixinAdmin(ForeignKeyAutocompleteAdmin):
+    related_search_fields = {
+    'area': ('name',)
+    }
     fields=('author','title','url','content','origin_source','source','website_type','pubtime','publisher','area','uuid','readnum','likenum')
     list_display=('author','title','origin_source','source','pubtime','publisher','area','readnum')
     list_editable=('title','pubtime','readnum',)
@@ -38,7 +58,10 @@ class WeixinAdmin(admin.ModelAdmin):
     search_fields=('title','source')
 
 
-class ArticleAdmin(admin.ModelAdmin):
+class ArticleAdmin(ForeignKeyAutocompleteAdmin):
+    related_search_fields = {
+    'area': ('name',)
+    }
     # fields = ('title', 'source', 'area', 'feeling_factor', 'pubtime', 'website_type')
     list_display = ('title', 'source', 'area', 'feeling_factor', 'pubtime')
     list_editable = ('source', 'feeling_factor', 'pubtime')
@@ -84,10 +107,13 @@ class CustomKeywordAdmin(admin.ModelAdmin):
         obj.delete()
 
 
-class TopicAdmin(admin.ModelAdmin):
+class TopicAdmin(ForeignKeyAutocompleteAdmin):
+    related_search_fields = {
+    'area': ('name',)
+    }
     fields = ('title', 'abstract', 'source', 'area', 'keywords', 'pubtime')
     list_display = ('title', 'source', 'area', 'pubtime',)
-    list_editable = ('source', 'area', 'pubtime')
+    list_editable = ('source', 'pubtime')
     list_filter = ('source', 'pubtime',)
     search_fields = ('title', 'source')
     #
@@ -104,6 +130,8 @@ class TopicAdmin(admin.ModelAdmin):
             old_keyword = key_list[0].title
             if old_keyword != obj.title:
                 CrawlerTask(obj.title, "zjld", u"事件").update_task(old_keyword)
+
+        Event(title=obj.title).save()
         obj.save()
 
     def delete_model(self, request, obj,):
@@ -199,14 +227,18 @@ class RiskScoreAdmin(admin.ModelAdmin):
     search_fields = ('score', 'risk')
 
 
-class RiskAdmin(admin.ModelAdmin):
+class RiskAdmin(ForeignKeyAutocompleteAdmin):
+    related_search_fields = {
+    'area': ('name',)
+    }
     fields = ('title', 'abstract', 'source', 'area', 'keywords', 'score', 'pubtime')
     list_display = ('title',  'source', 'area', 'keywords' , 'pubtime')
-    list_editable = ('title', 'source', 'area', 'keywords' , 'pubtime')
+    list_editable = ('title', 'source', 'keywords' , 'pubtime')
     list_filter = ('title', 'pubtime')
     search_fields = ('title', 'pubtime')
 
     def save_model(self, request, obj, form, change):
+        obj.keywords = jieba.analyse.extract_tags(obj.title, topK=3, withWeight=True, allowPOS=())
         if not change:
             CrawlerTask(obj.title, 'zjld', u"风险快讯").type_task()
             obj.save()
@@ -275,6 +307,13 @@ class TRiskAdmin(admin.ModelAdmin):
             risk_score.save()
 
 
+class InspectionAdmin(ImportExportActionModelAdmin):
+    resource_class = InspectionResources
+    search_fields = ('url', 'name', 'source',)
+    list_display = ('name', 'product', 'qualitied', 'source', 'pubtime')
+    list_filter = ('pubtime', 'province', 'city', 'district', 'product', 'source', )
+
+
 admin.site.register(WeixinPublisher)
 admin.site.register(WeiboPublisher)
 admin.site.register(Weibo,WeiboAdmin)
@@ -284,6 +323,7 @@ admin.site.register(Category)
 admin.site.register(User, UserAdmin)
 admin.site.register(Group)
 admin.site.register(Article, ArticleAdmin)
+admin.site.register(News, NewsAdmin)
 admin.site.register(Topic, TopicAdmin)
 admin.site.register(Custom)
 admin.site.register(CustomKeyword, CustomKeywordAdmin)
@@ -295,3 +335,4 @@ admin.site.register(RiskScore, RiskScoreAdmin)
 admin.site.register(Risk, RiskAdmin)
 admin.site.register(LRisk, LRiskAdmin)
 admin.site.register(TRisk, TRiskAdmin)
+admin.site.register(ZJInspection, InspectionAdmin)

@@ -2,6 +2,8 @@
 import os
 import requests
 import json
+import cPickle
+import pytz
 from datetime import datetime, timedelta
 from collections import defaultdict
 from datetime import datetime, timedelta
@@ -9,6 +11,7 @@ from dateutil.relativedelta import relativedelta
 from serializers import ArticleSerializer
 
 from django.conf import settings
+from django.utils import timezone
 from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
@@ -30,6 +33,7 @@ from base.models import (Area, Article, Category, Collection, Custom,
 from yqj.redisconnect import RedisQueryApi
 from api.api_function import (GetFirstDaySeason, get_season, year_range,
     season_range, months_range, days_range, week_range, unstable)
+from yuqing.settings import BASE_DIR
 
 
 def login_view(request):
@@ -185,7 +189,7 @@ class RisksDetailWeixinView(BaseAPIView):
             return Response({'html': '', 'total': 0})
         items = risk.weixin.all()
         datas = self.paging(items, self.EVENT_WEIXIN_LIMIT, page)
-        items = [SetLogo(data) for data in datas['items']]
+        items = [set_logo(data) for data in datas['items']]
         html = self.set_css_to_weixin(items)
         return Response({'html': html, 'total': datas['total_number']})
 
@@ -199,7 +203,7 @@ class RisksDetailWeiboView(BaseAPIView):
             return Response({'html': '', 'total': 0})
         items = risk.weibo.all()
         datas = self.paging(items, self.EVENT_WEIBO_LIMIT, page)
-        items = [SetLogo(data) for data in datas['items']]
+        items = [set_logo(data) for data in datas['items']]
         html = self.set_css_to_weibo(items)
         return Response({'html': html, 'total': datas['total_number']})
 
@@ -403,7 +407,7 @@ class CollectView(APIView):
         if time:
             pubtime = time[0].pubtime
         else:
-            pubtime = datetime.now()
+            pubtime = timezone.now()
         one_record = [title, item.source, item.area.name, pubtime.date(), hot_index]
         #one_record = [view.collected_html(item), title, item.source, item.area.name, pubtime.date(), hot_index]
         return one_record
@@ -755,7 +759,6 @@ class WeiboTableView(BaseAPIView):
             html += """</div>"""
             html +=  u'<div class="time pull-left">%s</div>' % datetime.fromtimestamp(item['pubtime']).strftime('%Y-%m-%d %H:%M')
             html += """</div></div></li>"""
-
         return html
 
     def get(self, request, weibo_type, page):
@@ -888,13 +891,13 @@ def get_count_feeling(start_d, end_d, feeling_type):
         feeling_limit = 'feeling_factor <= 0.1 and feeling_factor >= 0'
     else:
         feeling_limit = 'feeling_factor > 0.1  and feeling_factor < 0.9 or feeling_factor = -1'
-
     with connection.cursor() as c:
         sql_str = "SELECT Date(pubtime), COUNT(*) FROM article where Date(pubtime) >= '{0}' and Date(pubtime) < '{1}' and {2} group by Date(pubtime)".format(start_d, end_d, feeling_limit)
         c.execute(sql_str)
         rows = c.fetchall()
 
         d =  dict(rows)
+        a = [i[0] for i in rows]
         result = []
         day = start_d
         while day < end_d:
@@ -905,7 +908,8 @@ def get_count_feeling(start_d, end_d, feeling_type):
 
 @login_required
 def chart_line_index_view(request):
-    today = datetime.today().date()
+    today = timezone.now()
+    today = today.astimezone(pytz.utc).date()
     start_d = today - timedelta(days=6)
     end_d = today + timedelta(days=1)
 
@@ -1009,28 +1013,7 @@ def chart_pie_risk_view(request, risk_id):
     return JsonResponse({u'name': name, u'value': value})
 
 def map_view(request):
-    # login_url = "http://192.168.0.215/auth"
-    # login_data = {
-    #     "u": "wuhanzhijian",
-    #     "p": "aebcb993a42143aa78b76a57666ec77d6bb55bec",
-    # }
-    # login_res = requests.post(login_url,data=login_data)
-    # login_json = json.loads(login_res.text)
-    # login_cookie = login_json["token"]
-    login_cookie = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhY2NvdW50X2l"\
-        "kIjoxLCJ1c2VyX2lkIjoxLCJhX25hbWUiOiJ3dWhhbnpoaWppYW4iLCJhX3JlYWx"\
-        "uYW1lIjoi566h55CG5ZGYIiwiYV9wd2QiOiI3YjNkNzgzMzFlNDQ0YzNmODBkO"\
-        "Dc1Njc4YjA1ODkyYmFiMmY1MTU3IiwiYV9waG9uZSI6bnVsbCwiYV9lbWFpbCI6"\
-        "Ind1aGFuemhpamlhbkBzaGVuZHUuaW5mbyIsImFfbG9nbyI6bnVsbCwic3Rh"\
-        "dHVzIjoxLCJzeXN0ZW1faWQiOjEsImlzcm9vdCI6MSwiU3lzQWNjb3VudFNhbHQiO"\
-        "nsic2FsdCI6ImZjMDhlNDFlZjkzZjIwYTYyYjhmY2I4ODc1ZThmNTJmZTJkZGExYTkifX0.x4IP"\
-        "k4Cnka7Z2izoZ2uTMjh7lzpsrJA3zs7hWTqnhFk"
-    url = "http://192.168.0.215/api/dashboard?ed=2015-07-23&edId=9335&sd=2015-06-23&sdId=9305"
-    headers = {
-        "Authorization" : "Bearer "+login_cookie,
-    }
-    res = requests.get(url, headers=headers)
-    data = json.loads(res.text)
+    data = cPickle.load(file(os.path.join(BASE_DIR, "yqj/jobs/minutely/map.json"), "r"))
     risk_data = data["regionData"]
     return JsonResponse({"regionData": risk_data })
 
