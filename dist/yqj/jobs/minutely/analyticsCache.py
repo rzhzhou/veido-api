@@ -16,7 +16,7 @@ class Job(BaseJob):
     def Cache(self, datas):
         BASE_DIR = os.path.dirname(os.path.dirname(__file__))
         conf = ConfigParser.ConfigParser()
-        conf.read(os.path.join(BASE_DIR, "../../../dataCache.cfg"))
+        conf.read(os.path.join(BASE_DIR, "../../../analyticsCache.cfg"))
         url_cfg = conf.get("master", "url")
 
         if datas["hset_key"] == "date_range":
