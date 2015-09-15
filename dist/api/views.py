@@ -669,7 +669,7 @@ class InspectionLocalView(BaseAPIView):
     def get(self, request):
         user = request.myuser
         company = user.group.company
-        inspection_list = Inspection.objects.filter(source=company).order_by('-pubtime')[:10]
+        inspection_list = Inspection.objects.exclude(qualitied__isnull=True).filter(source=company).order_by('-pubtime')[:10]
         for item in inspection_list:
             item.qualitied = str(int(item.qualitied*100)) + '%'
 

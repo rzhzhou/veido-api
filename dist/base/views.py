@@ -5,7 +5,7 @@ from django.shortcuts import render_to_response
 from django.views.generic import View
 from rest_framework.views import APIView
 
-from base import login_required, get_user_image
+from base import login_required, get_user_image, sidebarUtil
 from base.models import Area, Category, RelatedData
 from yqj.redisconnect import RedisQueryApi
 
@@ -112,6 +112,9 @@ class BaseTemplateView(LoginRequiredMixin, BaseView):
     INCLUDE_SIDEBAR = True
     INCLUDE_USER = True
 
+    def __init__(self, request=None):
+        self.request = request
+
     def render_to_response(self, template_path, context={}):
         if self.INCLUDE_SIDEBAR:
             categories = self.get_article_categories()
@@ -130,8 +133,9 @@ class BaseTemplateView(LoginRequiredMixin, BaseView):
         return render_to_response(template_path, context)
 
     def get_article_categories(self):
-        return Category.objects.filter(~(Q(name='其他' )|Q(name='政府' )|Q(name='事件' )|Q(name='质监热点' )
-            |Q(name='指定监测' )))
+        business = sidebarUtil(self.request)['business']
+        categories = Category.objects.filter(name__in=business)
+        return categories
 
     def get_locations(self, area):
         #area = Area.objects.get(id=int(location_id))
