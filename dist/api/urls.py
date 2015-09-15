@@ -2,9 +2,9 @@ from django.conf.urls import patterns, include, url
 from api.views import ArticleTableView, NewsTableView, LocationTableView, CollectView, EventTableView,\
                       CollecModifyView, EventDetailTableView, SearchView, CustomTableView, InspectionNationalView,\
                       InspectionTableView, InspectionLocalView, WeixinTableView, WeiboTableView, LocationWeixinView, LocationWeiboView, EventDetailWeixinView,\
-                      EventDetailWeiboView, CustomWeixinView, CustomWeiboView, CustomModifyView,ProductTableView, RisksTableView, RisksDetailTableView, \
+                      EventDetailWeiboView, CustomWeixinView, CustomWeiboView, CustomModifyView, ProductTableView, RisksView, RisksTableView, RisksDetailTableView, \
                       RisksDetailWeixinView, RisksDetailWeiboView
-                      
+
 
 urlpatterns = patterns('',
     # Examples:
@@ -17,6 +17,7 @@ urlpatterns = patterns('',
     url(r'^location/(?P<location_id>\d+)/news/(?P<page>\d+)/$', LocationTableView.as_view()),
     url(r'^news/news/(?P<page>\d+)/$', NewsTableView.as_view()),
     url(r'^collection/(?P<table_type>\S+)/(?P<page>\d+)/$', CollectView.as_view()),
+    url(r'^risk/$', RisksView.as_view()),
     url(r'^risk/news/(?P<page>\d+)/$', RisksTableView.as_view()),
     url(r'^risk/(?P<id>\d+)/news/(?P<page>\d+)/$', RisksDetailTableView.as_view()),
     url(r'^risk/(?P<id>\d+)/weixin/new/(?P<page>\d+)/$', RisksDetailWeixinView.as_view()),
