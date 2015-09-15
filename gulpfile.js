@@ -2,6 +2,7 @@
 
 var browserSync = require('browser-sync').create(),
     del         = require('del'),
+    exec        = require('child_process').exec,
 
     gulp        = require('gulp'),
     sourcemaps  = require('gulp-sourcemaps'),
@@ -59,28 +60,14 @@ var dist = {
 
 
 // clean up vendor
-gulp.task('clean-vendor-css', function () {
-  del.sync([dist.css + 'vendor.css']);
+gulp.task('clean-vendor', function () {
+  del.sync([
+    dist.css + 'vendor.css',
+    dist.fonts + '*',
+    dist.js + 'vendor.js',
+    dist.js + 'echarts-all.js'
+  ]);
 });
-
-gulp.task('clean-vendor-fonts', function () {
-  del.sync([dist.fonts + '*']);
-});
-
-gulp.task('clean-vendor-js', function () {
-  del.sync([dist.js + 'vendor.js']);
-});
-
-gulp.task('clean-vendor-echarts', function () {
-  del.sync([dist.js + 'echarts-all.js']);
-});
-
-gulp.task('clean-vendor', [
-  'clean-vendor-css',
-  'clean-vendor-fonts',
-  'clean-vendor-js',
-  'clean-vendor-echarts'
-]);
 
 
 // clean up app
@@ -106,7 +93,7 @@ gulp.task('clean', [
 
 
 // vendor
-gulp.task('vendor-css', ['clean-vendor-css'], function () {
+gulp.task('vendor-css', ['clean-vendor'], function () {
   var files = [
     vendor.bootstrap.css,
     vendor.fontawesome.css,
@@ -120,7 +107,7 @@ gulp.task('vendor-css', ['clean-vendor-css'], function () {
     .pipe(gulp.dest(dist.css));
 });
 
-gulp.task('vendor-fonts', ['clean-vendor-fonts'], function () {
+gulp.task('vendor-fonts', ['clean-vendor'], function () {
   var files = [
     vendor.bootstrap.fonts,
     vendor.fontawesome.fonts
@@ -130,7 +117,7 @@ gulp.task('vendor-fonts', ['clean-vendor-fonts'], function () {
     .pipe(gulp.dest(dist.fonts));
 });
 
-gulp.task('vendor-js', ['clean-vendor-js'], function () {
+gulp.task('vendor-js', ['clean-vendor'], function () {
   var files = [
     vendor.jquery,
     vendor.bootstrap.js,
@@ -149,7 +136,7 @@ gulp.task('vendor-js', ['clean-vendor-js'], function () {
     .pipe(gulp.dest('dist/static/js'));
 });
 
-gulp.task('vendor-echarts', ['clean-vendor-echarts'], function () {
+gulp.task('vendor-echarts', ['clean-vendor'], function () {
   return  gulp.src(vendor.echarts)
     .pipe(gulp.dest(dist.js));
 });
@@ -198,7 +185,11 @@ gulp.task('serve-js', ['clean-app-js'], function () {
     .pipe(gulp.dest(dist.js));
 });
 
-gulp.task('serve', function () {
+gulp.task('django', function () {
+  exec('python dist/manage.py runserver');
+});
+
+gulp.task('serve', ['django'], function () {
   browserSync.init({
     notify: false,
     open: false,
@@ -218,4 +209,3 @@ gulp.task('serve', function () {
 
 // default task
 gulp.task('default', ['serve']);
-
