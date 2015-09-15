@@ -526,7 +526,7 @@ function _init() {
     });
   };
 }(jQuery));
-/* global moment , echarts*/
+/* global moment , echarts */
 
 'use strict';
 
@@ -1331,12 +1331,11 @@ App.page.user = function (module) {
 App.page.dashboard = function (module, path) {
   module.infoBox();
 
-  // gzRisk
   $.get('/api/risk/', {
     type: 'abstract'
-  }, function (htmlString) {
+  }, function (data) {
     $('<tbody/>')
-      .html(htmlString)
+      .html(data.html)
       .showRisk()
       .replaceAll($('#risk > tbody'));
   });
