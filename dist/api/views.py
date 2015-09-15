@@ -265,7 +265,8 @@ class NewsView(BaseAPIView):
         limit = settings.NEWS_PAGE_LIMIT if api_type == 'list' else 10
         items = self.get_custom_artice()
         datas = self.paging(items, limit, page)
-        html_string = render_to_string('news/%s_tpl.html' % api_type, {'news_list':  datas['items']})
+        result = self.news_to_json(datas['items'])
+        html_string = render_to_string('news/%s_tpl.html' % api_type, {'news_list':  result})
         return Response({'total': datas['total_number'], 'html': html_string})
 
 
@@ -329,34 +330,22 @@ class LocationWeiboView(BaseAPIView):
         return Response({'html': html, 'total': datas['total_number']})
 
 
-class EventTableView(BaseAPIView):
+class EventView(BaseAPIView):
     def collected_items(self):
         user = self.request.myuser
         return user.collection.events.all()
 
     def get(self, request, page):
-        """
-        result = []
-        event = Topic.objects.all()[:self.LIMIT_NUMBER]
-        for item in event:
-            collected_html = self.collected_html(item)
-            url = u'/event/%s' % item.id
-            title = self.title_html(url, item.title, item.id, 'topic')
-            hot_index = item.articles.all().count() + item.weixin.all().count() + item.weibo.all().count()
-            time = item.articles.all().order_by('-pubtime')
-            if time:
-                pubtime = time[0].pubtime
-            else:
-                pubtime = datetime.now()
-            one_record = [collected_html, title, item.source, item.area.name, pubtime.date(), hot_index]
-            result.append(one_record)
-        return Response({"event": result})
-        """
-        items = Topic.objects.all()
-        result = self.event_to_json(items)
-        datas = self.paging(result, self.EVENT_PAGE_LIMIT, page)
+        parameter = request.GET
 
-        return Response({'total': datas['total_number'], 'data': list(datas["items"])})
+        api_type = parameter['type']
+        page = parameter['page'] if parameter.has_key('page') else 1
+        limit = self.EVENT_PAGE_LIMIT if api_type == 'list' else 10
+        items = Topic.objects.all()
+        datas = self.paging(items, limit, page)
+        result = self.news_to_json(datas['items'])
+        html_string = render_to_string('event/%s_tpl.html' % api_type, {'events_list':  result})
+        return Response({'total': datas['total_number'], 'html': html_string})
 
 
 class EventDetailTableView(BaseAPIView):
