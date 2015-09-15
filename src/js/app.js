@@ -981,9 +981,39 @@ App.page.dashboard = function (module, path) {
   });
 };
 
-App.page.news = function (module, path) {
-  module.table(module, path);
+App.page.news = function (module) {
+  var $news = $('#news'),
+      $paginationContainer = $news.parent(),
+
+      toAPI = function (pageNumber) {
+        if (typeof pageNumber === 'undefined') {
+          pageNumber = 1;
+        }
+
+        return '/api/news/?type=list&page=' + pageNumber;
+      },
+
+      renderTable = function (pageContent) {
+        $news.children('tbody').html(pageContent);
+      };
+
+  $.get(toAPI(), function (data) {
+    renderTable(data.html);
+
+    $paginationContainer.twbsPagination({
+      totalPages: data.total,
+      visiblePages: 7,
+      onPageClick: function (event, pageNumber) {
+        module.returnTop($(this));
+        $.get(toAPI(pageNumber), function (data) {
+          renderTable(data.html);
+          $paginationContainer.twbsPagination({totalPages: data.total});
+        });
+      }
+    });
+  });
 };
+
 
 App.page.newsDetail = function (module, path, type, id) {
   module.collect(type, id);

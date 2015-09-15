@@ -1,0 +1,10 @@
+{% for news in news_list  %}
+<tr>
+  <td>
+    <a href="/news/{{ news.id }}/" title="{{ new.title }}" target="_blank">{{ news.title }}</a>
+  </td>
+  <td>{{ news.source }}</td>
+  <td>{{ news.pubtime | date:"Y-m-d" }}</td>
+  <td class="text-center">{{ news.hot }}</td>
+</tr>
+{% endfor %}
