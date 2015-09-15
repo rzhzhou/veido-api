@@ -959,7 +959,17 @@ App.page.search = function (module, path) {
 App.page.dashboard = function (module, path) {
   module.infoBox();
   module.map(path);
-  $('.table-risk').showRisk();
+
+  // whRisk
+  $.get('/api/risk/', {
+    type: 'abstract'
+  }, function (htmlString) {
+    $('<tbody/>')
+      .html(htmlString)
+      .showRisk()
+      .replaceAll($('#risk > tbody'));
+  });
+
   module.line(path);
   module.pie(path);
   module.inspection();
@@ -1074,7 +1084,7 @@ App.page.analyticsDetail = function (module, path) {
       $statistic = $('#statistic'),
       start = moment().subtract(6, 'days').format(),
       end = moment().format();
-      
+
   // init analytics
   module.dateRange($dateRange);
   $dateRange.trigger('show.dateRange', [start, end]);
@@ -1321,7 +1331,7 @@ App.page.analyticsDetail = function (module, path) {
             max: data.value[9],
             x: 'left',
             y: 'bottom',
-            text: ['高', '低'], 
+            text: ['高', '低'],
             calculable: true
           },
           toolbox: {
