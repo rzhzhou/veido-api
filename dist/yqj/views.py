@@ -75,31 +75,6 @@ def index_view(request):
             data = set_logo(data)
 
 
-        group = Group.objects.get(company=user.company).id
-        score_list = LocaltionScore.objects.filter(group=group)
-        risk_id = []
-        for item in score_list:
-            risk_id.append(item.risk_id)
-        risk_lists = Risk.objects.filter(id__in=risk_id)[:6]
-        risk_list = []
-        for item in risk_lists:
-            data = {}
-            try:
-                relevance = LocaltionScore.objects.get(risk_id=item.id, group_id=group).score
-            except:
-                relevance = 0
-            try:
-                score = RiskScore.objects.get(risk=item.id).score
-            except :
-                score = 0
-            data['relevance'] = relevance
-            data['title'] = item.title
-            data['source'] = item.source
-            data['score'] = score
-            data['time'] =  item.pubtime
-            data['id'] = item.id
-            risk_list.append(data)
-
         sidebar_name = sidebarUtil(request)
         return render_to_response("dashboard/dashboard.html",
             {   'user': user,
@@ -112,7 +87,6 @@ def index_view(request):
                 'event': {'number': event, 'percent': event_percent},
                 'news_list': news_list,
                 'event_list': event_list,
-                'risk_list': risk_list,
                 'weixin_hottest_list': weixin_data,
                 'weibo_hottest_list': weibo_data,
                 'user_image': get_user_image(user),
