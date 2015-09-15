@@ -252,36 +252,21 @@ class RisksDetailWeiboView(BaseAPIView):
         html = self.set_css_to_weibo(items)
         return Response({'html': html, 'total': datas['total_number']})
 
-class NewsTableView(BaseAPIView):
-    """
-    def get(self, request):
-        result = []
-        news = Article.objects.filter(website_type='topic')[:self.LIMIT_NUMBER]
-        serializer = ArticleSerializer(news, many=True)
-
-        for item in news:
-            collected_html = u'<i class="fa fa-star-o" data-toggle="tooltip", data-placement="right" title="添加收藏">'
-            #collected_html = self.collected_html(item)
-            url = u'/news/%s' % item.id
-            title = self.title_html(url, item.title,item.id, 'article')
-            try:
-                hot_index = RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count()
-            except IndexError:
-                hot_index = 0
-            one_record = [collected_html, title, item.publisher.publisher, item.area.name, item.pubtime.date(), hot_index]
-            result.append(one_record)
-
-        return Response({"news": result})
-    """
+class NewsView(BaseAPIView):
     def get_custom_artice(self):
         articles = Category.objects.get(name='质监热点').articles.all()
         return articles
 
-    def get(self, request, page):
+    def get(self, request):
+        parameter = request.GET
+
+        api_type = parameter['type']
+        page = parameter['page'] if parameter.has_key('page') else 1
+        limit = settings.NEWS_PAGE_LIMIT if api_type == 'list' else 10
         items = self.get_custom_artice()
         datas = self.paging(items, settings.NEWS_PAGE_LIMIT, page)
-        result = self.news_to_json(datas['items'])
-        return Response({'total': datas['total_number'], 'data': result})
+        html_string = render_to_string('risk/%s_tpl.html' % api_type, {'news_list':  datas['items']})
+        return Response({'total': datas['total_number'], 'html': html_string})
 
 
 class LocationTableView(BaseAPIView):
