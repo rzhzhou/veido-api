@@ -561,6 +561,35 @@ function _init() {
   moment.defaultFormat = 'YYYY-MM-DD';
 }());
 
+
+//
+// plugins
+//
+(function ($) {
+  $.fn.showRisk = function () {
+    var $riskScore      = this.find('td.risk-score'),
+        $localRelevance = this.find('td.local-relevance'),
+
+        replaceClass    = function (className) {
+          return function (index, element) {
+            var num     = $(element).data('num'),
+                $item   = $(element).find('i');
+
+            $item
+              .slice(0, num)
+              .removeClass(className + '-o')
+              .addClass(className);
+          };
+        };
+
+    $riskScore.each(replaceClass('fa-star'));
+    $localRelevance.each(replaceClass('fa-square'));
+
+    return this;
+  };
+}(jQuery));
+
+
 //
 // Application
 //
@@ -1301,6 +1330,17 @@ App.page.user = function (module) {
 // util
 App.page.dashboard = function (module, path) {
   module.infoBox();
+
+  // gzRisk
+  $.get('/api/risk/', {
+    type: 'abstract'
+  }, function (htmlString) {
+    $('<tbody/>')
+      .html(htmlString)
+      .showRisk()
+      .replaceAll($('#risk > tbody'));
+  });
+
   module.line(path);
   module.pie(path);
   module.inspection();
@@ -1362,6 +1402,50 @@ App.page.customDetail = function (module, path, type) {
 
 App.page.collection = function (module, path) {
   module.table(module, path);
+};
+
+App.page.risk = function (module) {
+  var $risk = $('#risk'),
+      $paginationContainer = $risk.parent(),
+
+      toAPI = function (pageNumber) {
+        if (typeof pageNumber === 'undefined') {
+          pageNumber = 1;
+        }
+
+        return '/api/risk/news/' + pageNumber + '/';
+      },
+
+      renderTable = function (pageContent) {
+        $('<tbody/>')
+          .html(pageContent)
+          .showRisk()
+          .replaceAll($risk.find('tbody'));
+      };
+
+  $.get(toAPI(), function (data) {
+    renderTable(data.html);
+
+    $paginationContainer.twbsPagination({
+      totalPages: data.total,
+      visiblePages: 7,
+      onPageClick: function(event, pageNumber) {
+        module.returnTop($(this));
+        $.get(toAPI(pageNumber), function(data) {
+          renderTable(data.html);
+          $paginationContainer.twbsPagination({totalPages: data.total});
+        });
+      }
+    });
+  });
+};
+
+App.page.riskDetail = function (module, path, type, id) {
+  module.collect(type, id);
+  module.line(path, type);
+  module.pie(path, type);
+  module.table(module, path);
+  module.sns(module, path, type);
 };
 
 App.page.analyticsDetail = function(module, path) {
