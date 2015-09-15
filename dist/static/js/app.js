@@ -1501,6 +1501,12 @@ App.page.dashboard = function (module, path) {
   module.line(path);
   module.pie(path);
   module.inspection();
+
+  $.get('/api/news/', {
+    type: 'abstract'
+  }, function (data) {
+    $('#news').html(data.html);
+  });
 };
 
 App.page.news = function (module, path) {
