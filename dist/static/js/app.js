@@ -1491,9 +1491,9 @@ App.page.dashboard = function (module, path) {
   // whRisk
   $.get('/api/risk/', {
     type: 'abstract'
-  }, function (htmlString) {
+  }, function (data) {
     $('<tbody/>')
-      .html(htmlString)
+      .html(data.html)
       .showRisk()
       .replaceAll($('#risk > tbody'));
   });
