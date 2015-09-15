@@ -67,6 +67,7 @@ def sidebarUtil(request):
         "event": conf.get(username, "event"),
         "location": conf.get(username, "location"),
         "custom": conf.get(username, "custom"),
-        "site": conf.get(username, "site")
+        "site": conf.get(username, "site"),
+        "business": eval(conf.get(username, "business"))
     }
     return sidebar_name

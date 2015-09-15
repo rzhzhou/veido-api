@@ -2,6 +2,7 @@
 
 var browserSync = require('browser-sync').create(),
     del         = require('del'),
+    exec        = require('child_process').exec,
 
     gulp        = require('gulp'),
     sourcemaps  = require('gulp-sourcemaps'),
@@ -198,7 +199,11 @@ gulp.task('serve-js', ['clean-app-js'], function () {
     .pipe(gulp.dest(dist.js));
 });
 
-gulp.task('serve', function () {
+gulp.task('django', function () {
+  exec('python dist/manage.py runserver');
+});
+
+gulp.task('serve', ['django'], function () {
   browserSync.init({
     notify: false,
     open: false,
@@ -218,4 +223,3 @@ gulp.task('serve', function () {
 
 // default task
 gulp.task('default', ['serve']);
-
