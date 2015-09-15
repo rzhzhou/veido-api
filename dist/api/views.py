@@ -149,7 +149,7 @@ class RisksView(BaseAPIView):
         limit = self.RISK_PAGE_LIMIT if api_type == 'list' else 6
         items = self.get_score_article(request)
         datas = self.paging(items, limit, page)
-        html_string = render_to_string('risk/abstract_tpl.html', {'risk_list':  datas['items']})
+        html_string = render_to_string('risk/%s_tpl.html' % api_type, {'risk_list':  datas['items']})
         return Response({'html': html_string})
 
 
