@@ -4,6 +4,7 @@ import requests
 import json
 import cPickle
 import pytz
+import time
 from datetime import datetime, timedelta
 from collections import defaultdict
 from datetime import datetime, timedelta
@@ -669,8 +670,12 @@ class InspectionLocalView(BaseAPIView):
     def get(self, request):
         user = request.myuser
         company = user.group.company
-        inspection_list = Inspection.objects.exclude(qualitied__isnull=True).filter(source=company).order_by('-pubtime')[:10]
+        inspection_list = Inspection.objects.exclude(qualitied__lt=0).filter(source=company).order_by('-pubtime')[:10]
+
+        tz  = pytz.timezone(settings.TIME_ZONE)
         for item in inspection_list:
+            timel = item.pubtime.astimezone(tz)
+            item.pubtime = timel
             item.qualitied = str(int(item.qualitied*100)) + '%'
 
         inspection = render_to_string('inspection/dashboard_inspection.html', {'inspection_list': inspection_list})
@@ -681,8 +686,12 @@ class InspectionNationalView(BaseAPIView):
     def get(self, request):
         user = request.myuser
         user.company = user.group.company
-        inspection_list = Inspection.objects.all().order_by('-pubtime')[:10]
+        inspection_list = Inspection.objects.exclude(qualitied__lt=0).all().order_by('-pubtime')[:10]
+
+        tz  = pytz.timezone(settings.TIME_ZONE)
         for item in inspection_list:
+            timel = item.pubtime.astimezone(tz)
+            item.pubtime = timel
             item.qualitied = str(int(item.qualitied*100)) + '%'
 
         inspection = render_to_string('inspection/dashboard_inspection.html', {'inspection_list': inspection_list})
@@ -692,14 +701,17 @@ class InspectionNationalView(BaseAPIView):
 class InspectionTableView(BaseAPIView):
     def get(self, request):
         result = []
-        news = Inspection.objects.order_by('-pubtime').all()
+        news = Inspection.objects.exclude(qualitied__lt=0).order_by('-pubtime').all()
 
         for item in news:
             #collected_html = u'<i class="fa fa-star-o" data-toggle="tooltip", data-placement="right" title="添加收藏">'
             title = self.title_html(item.url, item.name, item.id, 'inspection')
             quality = str(int(item.qualitied*100)) + '%'
             #one_record = [collected_html, item.product, title, quality, item.source, item.pubtime.strftime('%Y-%m-%d')]
-            one_record = [item.product, title, quality, item.source, item.pubtime.strftime('%Y-%m-%d')]
+            tz  = pytz.timezone(settings.TIME_ZONE)
+            timel = item.pubtime.astimezone(tz)
+            
+            one_record = [item.product, title, quality, item.source, timel.strftime('%Y-%m-%d')]
             result.append(one_record)
 
         return Response({"inspection": result})
