@@ -150,7 +150,7 @@ class RisksView(BaseAPIView):
         items = self.get_score_article(request)
         datas = self.paging(items, limit, page)
         html_string = render_to_string('risk/%s_tpl.html' % api_type, {'risk_list':  datas['items']})
-        return Response({'html': html_string})
+        return Response({'total': datas['total_number'], 'html': html_string})
 
 
 class RisksTableView(BaseAPIView):
