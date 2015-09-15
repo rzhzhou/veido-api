@@ -142,8 +142,13 @@ class RisksView(BaseAPIView):
         return risk_list
 
     def get(self, request):
+        parameter = request.GET
+
+        api_type = parameter['type']
+        page = parameter['page'] if parameter.has_key('page') else 1
+        limit = self.RISK_PAGE_LIMIT if api_type == 'list' else 6
         items = self.get_score_article(request)
-        datas = self.paging(items, 6, 1)
+        datas = self.paging(items, limit, page)
         html_string = render_to_string('risk/abstract_tpl.html', {'risk_list':  datas['items']})
         return Response({'html': html_string})
 
