@@ -3,7 +3,7 @@
   <td class="risk-item">
     <a href="/risk/{{ risk.id }}/" title="{{ risk.title }}" target="_blank">{{ risk.title }}</a>
     <p>
-      <span class="date">日期：{{ risk.time | date:"Y-m-d" }}</span>
+      <span class="date">日期：{{ risk.pubtime | date:"Y-m-d" }}</span>
       <span class="source">来源：{{ risk.source }}</span>
     </p>
   </td>

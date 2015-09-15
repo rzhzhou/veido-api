@@ -109,6 +109,45 @@ class ArticleTableView(BaseAPIView):
         result = self.news_to_json(datas['items'])
         return Response({'total': datas['total_number'], 'data': result})
 
+
+class RisksView(BaseAPIView):
+    def get_score_article(self, request):
+        user = request.myuser
+        company = user.group.company
+        group = Group.objects.get(company=company).id
+        score_list = LocaltionScore.objects.filter(group=group)
+        risk_id = []
+        for item in score_list:
+            risk_id.append(item.risk_id)
+
+        risk_lists = Risk.objects.filter(id__in=risk_id)
+        risk_list = []
+        for item in risk_lists:
+            data = {}
+            try:
+                relevance = LocaltionScore.objects.get(risk_id=item.id, group_id=group).score
+            except:
+                relevance = 0
+            try:
+                score = RiskScore.objects.get(risk=item.id).score
+            except:
+                score = 0
+            data['relevance'] = relevance
+            data['title'] = item.title
+            data['source'] = item.source
+            data['score'] = score
+            data['pubtime'] = item.pubtime
+            data['id'] = item.id
+            risk_list.append(data)
+        return risk_list
+
+    def get(self, request):
+        items = self.get_score_article(request)
+        datas = self.paging(items, 10, 1)
+        html_string = render_to_string('risk/abstract_tpl.html', {'risk_list':  datas['items']})
+        return Response({html_string})
+
+
 class RisksTableView(BaseAPIView):
     def get_score_article(self, request):
         user = request.myuser
@@ -710,7 +749,7 @@ class InspectionTableView(BaseAPIView):
             #one_record = [collected_html, item.product, title, quality, item.source, item.pubtime.strftime('%Y-%m-%d')]
             tz  = pytz.timezone(settings.TIME_ZONE)
             timel = item.pubtime.astimezone(tz)
-            
+
             one_record = [item.product, title, quality, item.source, timel.strftime('%Y-%m-%d')]
             result.append(one_record)
 
