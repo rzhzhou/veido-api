@@ -1570,7 +1570,7 @@ App.page.risk = function (module) {
           pageNumber = 1;
         }
 
-        return '/api/risk/news/' + pageNumber + '/';
+        return '/api/risk/?type=list&page=' + pageNumber;
       },
 
       renderTable = function (pageContent) {
@@ -1586,9 +1586,9 @@ App.page.risk = function (module) {
     $paginationContainer.twbsPagination({
       totalPages: data.total,
       visiblePages: 7,
-      onPageClick: function(event, pageNumber) {
+      onPageClick: function (event, pageNumber) {
         module.returnTop($(this));
-        $.get(toAPI(pageNumber), function(data) {
+        $.get(toAPI(pageNumber), function (data) {
           renderTable(data.html);
           $paginationContainer.twbsPagination({totalPages: data.total});
         });
