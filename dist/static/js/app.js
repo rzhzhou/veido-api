@@ -526,7 +526,7 @@ function _init() {
     });
   };
 }(jQuery));
-/* global echarts */
+/* global moment , echarts */
 
 'use strict';
 
@@ -551,6 +551,42 @@ function _init() {
 
   $.extend($.fn.twbsPagination.defaults, options);
 }());
+
+// moment
+(function () {
+  if (typeof moment !== 'function') {
+    throw new Error('moment required');
+  }
+
+  moment.defaultFormat = 'YYYY-MM-DD';
+}());
+
+//
+// plugins
+//
+(function ($) {
+  $.fn.showRisk = function () {
+    var $riskScore      = this.find('td.risk-score'),
+        $localRelevance = this.find('td.local-relevance'),
+
+        replaceClass    = function (className) {
+          return function (index, element) {
+            var num     = $(element).data('num'),
+                $item   = $(element).find('i');
+
+            $item
+              .slice(0, num)
+              .removeClass(className + '-o')
+              .addClass(className);
+          };
+        };
+
+    $riskScore.each(replaceClass('fa-star'));
+    $localRelevance.each(replaceClass('fa-square'));
+
+    return this;
+  };
+}(jQuery));
 
 
 //
@@ -817,6 +853,167 @@ App.module.pie = function (path) {
   });
 };
 
+App.module.map = function (path) {
+  $.getJSON('/api/map/' , function (result) {
+    var city = result.regionData,
+        data = [],
+        city2;
+
+    for (var c in city) {
+      data[c] = city[c].rank;
+      switch (data[c]) {
+      case 'A':
+        data[c] = 1;
+        break;
+      case 'B':
+        data[c] = 1;
+        break;
+      case 'C':
+        data[c] = 2;
+        break;
+      case 'D':
+        data[c] = 3;
+        break;
+      case 'E':
+        data[c] = 3;
+        break;
+      default:
+        data[c] = 3;
+        break;
+      }
+    }
+
+    echarts.util.mapData.params.params.wh = {
+      getGeoJson: function (callback) {
+      $.getJSON('/static/wh.json', callback);
+      }
+    };
+
+    echarts.init(document.getElementById('map-chart')).setOption({
+      title: {
+        subtext: ''
+      },
+      tooltip: {
+        trigger: 'item',
+        formatter: function(a) {
+          for (var i in city) {
+            if (a[1] == city[i].region_name) {
+              city2 = data[i];
+              switch (city2) {
+              case 1:
+                city2 = 'A';
+                break;
+              case 2:
+                city2 = 'B';
+                break;
+              case 3:
+                city2 = 'C';
+                break;
+              default:
+                city2 = 'erro';
+                break;
+              }
+            }
+          }
+          return a[1] + '<br>' + '风险等级  ' + city2;
+        }
+      },
+      legend: {
+        orient: 'vertical',
+        x: 'right',
+        data: ['']
+      },
+      dataRange: {
+        min: 0,
+        max: 3,
+        splitNumber: 3,
+        color: ['#fa9529', '#fff26e', '#cee19e', ],
+        formatter: function(v, v2) {
+          if (v2 == '1') {
+            return 'A' + '-低风险';
+          } else if (v2 == '2') {
+            return 'B' + '-中风险';
+          } else if (v2 == '3') {
+            return 'C' + '-高风险';
+          }
+        },
+        x: "right"
+      },
+      series: [{
+        name: '数据名称',
+        type: 'map',
+        mapType: 'wh',
+        selectedMode: 'single',
+        itemStyle: {
+          normal: {
+            label: {
+              show: false
+            }
+          },
+          //区域名称
+          emphasis: {
+            label: {
+              show: true
+            }
+          }
+        },
+        data: [{
+          name: '江岸区',
+          value: data[4]
+        },
+        {
+          name: '江汉区',
+          value: data[6]
+        },
+        {
+          name: '硚口区',
+          value: data[10]
+        },
+        {
+          name: '汉阳区',
+          value: data[11]
+        },
+        {
+          name: '武昌区',
+          value: data[0]
+        },
+        {
+          name: '洪山区',
+          value: data[1]
+        },
+        {
+          name: '青山区',
+          value: data[3]
+        },
+        {
+          name: '东西湖区',
+          value: data[9]
+        },
+        {
+          name: '蔡甸区',
+          value: data[12]
+        },
+        {
+          name: '江夏区',
+          value: data[2]
+        },
+        {
+          name: '黄陂区',
+          value: data[7]
+        },
+        {
+          name: '新洲区',
+          value: data[8]
+        },
+        {
+          name: '汉南区',
+          value: data[13]
+        }]
+      }]
+    });
+  });
+};
+
 // util
 App.module.search = function () {
   var form  = document.forms.search,
@@ -847,6 +1044,7 @@ App.module.menu = function (path, type) {
         // both 'category' and 'location' are parent treeview
         case type === 'category':
         case type === 'location':
+        case type === 'analytics':
           return href === path;
         default:
           return href.split('/')[1] === type;
@@ -1168,6 +1366,100 @@ App.module.custom = function () {
   }
 };
 
+App.module.dateRange = function ($dateRange) {
+  $dateRange
+    .on('show.dateRange', function (event, start, end) {
+      $(this).children('span').html(start + ' ~ ' + end);
+    })
+    .daterangepicker({
+      ranges: {
+        '过去7天': [moment().subtract(6, 'days'), moment()],
+        '过去30天': [moment().subtract(29, 'days'), moment()],
+        '这个月': [moment().startOf('month'), moment().endOf('month')],
+        '上个月': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+      },
+      'locale': {
+        'format': 'YYYY-MM-DD',
+        'separator': ' - ',
+        'applyLabel': '确定',
+        'cancelLabel': '取消',
+        'fromLabel': '从',
+        'toLabel': '到',
+        'customRangeLabel': '自定义'
+      },
+      'startDate': moment().subtract(6, 'days'),
+      'endDate': moment(),
+      'minDate': '2010-01-01',
+      'maxDate': moment(),
+      'opens': 'left',
+      'parentEl': '.content-header',
+      'applyClass': 'btn-success',
+      'cancelClass': 'btn-default'
+    });
+};
+
+App.module.statistic = function ($el, api) {
+  var $total = $el.find('.statistic-total > span'),
+      $risk = $el.find('.statistic-risk > span');
+
+  $el.on('show.statistic', function (event, start, end) {
+    $.getJSON(api, {
+      type: 'statistic',
+      start: start,
+      end: end
+    }, function (statistic) {
+      $total.text(statistic.total);
+      $risk.text(statistic.risk);
+    });
+  });
+};
+
+App.module.dataList = function (module, $dataList, api, start, end) {
+  $dataList.on('showDataList', function () {
+    var $paginationContainer = $dataList.parent(),
+
+        toParam = function (pageNumber) {
+          if (typeof pageNumber === 'undefined') {
+            pageNumber = 1;
+          }
+
+          return {
+            type: 'data-list',
+            start: start,
+            end: end,
+            page: pageNumber,
+          };
+        },
+
+        renderTable = function (pageContent) {
+          $('<tbody/>')
+            .html(pageContent)
+            .replaceAll($dataList.find('tbody'));
+        };
+
+    $.get(api, toParam(), function (data) {
+      renderTable(data.html);
+
+      $paginationContainer.twbsPagination({
+        totalPages: data.total,
+        visiblePages: 7,
+        first: '第一页',
+        prev: '上一页',
+        next: '下一页',
+        last: '最后一页',
+        paginationClass: 'pagination pagination-sm no-margin pull-right',
+        onPageClick: function(event, pageNumber) {
+          module.returnTop($(this));
+          $.get(api, toParam(pageNumber), function(data) {
+            renderTable(data.html);
+            $paginationContainer.twbsPagination({totalPages: data.total});
+          });
+        }
+      });
+    });
+  });
+};
+
 
 //
 // Pages
@@ -1194,6 +1486,8 @@ App.page.search = function (module, path) {
 
 App.page.dashboard = function (module, path) {
   module.infoBox();
+  module.map(path);
+  $('.table-risk').showRisk();
   module.line(path);
   module.pie(path);
   module.inspection();
@@ -1255,6 +1549,462 @@ App.page.customDetail = function (module, path, type) {
 
 App.page.collection = function (module, path) {
   module.table(module, path);
+};
+
+App.page.risk = function (module) {
+  var $risk = $('#risk'),
+      $paginationContainer = $risk.parent(),
+
+      toAPI = function (pageNumber) {
+        if (typeof pageNumber === 'undefined') {
+          pageNumber = 1;
+        }
+
+        return '/api/risk/news/' + pageNumber + '/';
+      },
+
+      renderTable = function (pageContent) {
+        $('<tbody/>')
+          .html(pageContent)
+          .showRisk()
+          .replaceAll($risk.find('tbody'));
+      };
+
+  $.get(toAPI(), function (data) {
+    renderTable(data.html);
+
+    $paginationContainer.twbsPagination({
+      totalPages: data.total,
+      visiblePages: 7,
+      onPageClick: function(event, pageNumber) {
+        module.returnTop($(this));
+        $.get(toAPI(pageNumber), function(data) {
+          renderTable(data.html);
+          $paginationContainer.twbsPagination({totalPages: data.total});
+        });
+      }
+    });
+  });
+};
+
+App.page.riskDetail = function (module, path, type, id) {
+  module.collect(type, id);
+  module.line(path, type);
+  module.pie(path, type);
+  module.table(module, path);
+  module.sns(module, path, type);
+};
+
+App.page.analyticsDetail = function (module, path) {
+  var api = '/api' + path,
+      $dateRange = $('.date-range-picker'),
+      $chart = $('#chart'),
+      $statistic = $('#statistic'),
+      start = moment().subtract(6, 'days').format(),
+      end = moment().format();
+      
+  // init analytics
+  module.dateRange($dateRange);
+  $dateRange.trigger('show.dateRange', [start, end]);
+
+  $chart.on('show.chart', function (event, start, end) {
+    var chart = {},
+      name = $(this).find('.tab-pane.active')[0].id.slice(6),
+
+      excel = function (type) {
+        var myTool = {
+          show: true,
+          title: '保存为Excel',
+          icon: 'image://../../static/img/excel.png',
+
+          onclick: function() {
+            document.getElementById('save-as-excel').src = api + '?type='+type+'&start=' + start + '&end=' + end + '&datatype=xls';
+          }
+        };
+        return myTool;
+       };
+
+    chart.trend = function (start, end) {
+      $.getJSON(api, {
+        type: 'chart-trend',
+        start: start,
+        end: end
+      }, function (data) {
+        echarts.init(document.getElementById('chart-trend'), 'macarons').setOption({
+          tooltip: {
+            backgroundColor: 'rgba(50,50,50,0.5)',
+            trigger: 'axis',
+            axisPointer: {
+              type: 'line',
+              lineStyle: {
+                color: '#008acd',
+              }
+            }
+          },
+          shadowStyle: {
+            color: 'rgba(200,200,200,0.2)'
+          },
+          legend: {
+            data: ['全部', '新闻', '微博', '微信']
+          },
+          grid: {
+            x: 50,
+            y: 30,
+            x2: 25,
+            y2: 65
+          },
+          toolbox: {
+            show: true,
+            feature: {
+              /*mark: {
+                show: false
+              },
+              dataView: {
+                show: true,
+                readOnly: false
+              },
+              magicType: {
+                show: false,
+                type: ['line']
+              },
+              restore: {
+                show: false
+              },*/
+              myTool: excel('chart-trend') ,
+              saveAsImage: {
+                show: true
+              }
+            }
+          },
+          calculable: true,
+          xAxis: [{
+            type: 'category',
+            boundaryGap: false,
+            data: data.date
+          }],
+          yAxis: [{
+            type: 'value'
+          }],
+          series: [{
+            name: '全部',
+            type: 'line',
+            data: data.total
+          }, {
+            name: '新闻',
+            type: 'line',
+            data: data.news
+          }, {
+            name: '微博',
+            type: 'line',
+            data: data.weibo
+          }, {
+            name: '微信',
+            type: 'line',
+            data: data.weixin
+          }, ]
+        });
+      });
+    };
+
+    chart.type = function (start, end) {
+      $.getJSON(api, {
+        type: 'chart-type',
+        start: start,
+        end: end
+      }, function (data) {
+        echarts.init(document.getElementById('chart-type'), 'macarons').setOption({
+          tooltip: {
+            backgroundColor: 'rgba(50,50,50,0.5)',
+            trigger: 'item',
+            formatter: '{a} <br/>{b} : {c} ({d}%)'
+          },
+          legend: {
+            orient: 'vertical',
+            x: 'left',
+            y: 'bottom',
+            data: ['新闻', '微博', '微信']
+          },
+          toolbox: {
+            show: true,
+            feature: {
+              /*dataView: {
+                show: true,
+                readOnly: false
+              },*/
+              myTool: excel('chart-type'),
+              saveAsImage: {
+                show: true,
+              }
+            }
+          },
+          calculable: true,
+          series: [{
+            name: '访问来源',
+            type: 'pie',
+            radius: '55%',
+            center: ['50%', '60%'],
+            data: [{
+              value: data.news,
+              name: '新闻'
+            }, {
+              value: data.weibo,
+              name: '微博'
+            }, {
+              value: data.weixin,
+              name: '微信'
+            }]
+          }]
+        });
+      });
+    };
+
+    chart.emotion = function (start, end) {
+      $.getJSON(api, {
+        type: 'chart-emotion',
+        start: start,
+        end: end
+      }, function (data) {
+        echarts.init(document.getElementById('chart-emotion'), 'macarons').setOption({
+          tooltip: {
+            backgroundColor: 'rgba(50,50,50,0.5)',
+            trigger: 'item',
+            formatter: '{a} <br/>{b} : {c} ({d}%)'
+          },
+          legend: {
+            orient: 'vertical',
+            x: 'left',
+            y: 'bottom',
+            data: ['正面', '中性', '负面']
+          },
+          toolbox: {
+            show: true,
+            feature: {
+              mark: {
+                show: false
+              },
+              /*dataView: {
+                show: true,
+                readOnly: false
+              },*/
+              myTool: excel('chart-emotion'),
+              magicType: {
+                show: false,
+                type: ['pie'],
+                option: {
+                  funnel: {
+                    x: '25%',
+                    width: '50%',
+                    funnelAlign: 'left',
+                    max: 2000
+                  }
+                }
+              },
+              restore: {
+                show: false
+              },
+              saveAsImage: {
+                show: true
+              }
+            }
+          },
+          calculable: true,
+          series: [{
+            name: '访问来源',
+            type: 'pie',
+            radius: '55%',
+            center: ['50%', '60%'],
+            data: [{
+              value: data.positive,
+              name: '正面'
+            }, {
+              value: data.normal,
+              name: '中性'
+            }, {
+              value: data.negative,
+              name: '负面'
+            }, ]
+          }]
+        });
+      });
+    };
+
+    chart.weibo = function (start, end) {
+      $.getJSON(api, {
+        type: 'chart-weibo',
+        start: start,
+        end: end
+      }, function (data) {
+        echarts.init(document.getElementById('chart-weibo-map'), 'macarons').setOption({
+          tooltip: {
+            trigger: 'item'
+          },
+          legend: {
+            show: false,
+            orient: 'vertical',
+            x: 'left',
+            data: ['微博文']
+          },
+          dataRange: {
+            min: 0,
+            max: data.value[9],
+            x: 'left',
+            y: 'bottom',
+            text: ['高', '低'], 
+            calculable: true
+          },
+          toolbox: {
+            show: true,
+            orient: 'horizontal',
+            x: 'left',
+            y: 'top',
+            feature: {
+              /*dataView: {
+                show: true,
+                readOnly: false
+              },*/
+              myTool: excel('chart-weibo'),
+              saveAsImage: {
+                show: true
+              }
+            }
+          },
+          roamController: {
+            show: true,
+            x: '85%',
+            mapTypeControl: {
+              'china': true
+            }
+          },
+          series: [{
+            name: '微博文',
+            type: 'map',
+            mapType: 'china',
+            roam: false,
+            itemStyle: {
+              normal: {
+                label: {
+                  show: true
+                }
+              },
+              emphasis: {
+                label: {
+                  show: true
+                }
+              }
+            },
+            data: data.province
+          }, ]
+        });
+
+        echarts.init(document.getElementById('chart-weibo-bar'), 'macarons').setOption({
+          title: {
+            text: '微博地域分析',
+            x: 45
+          },
+          tooltip: {
+            show: false,
+            trigger: 'axis',
+            axisPointer: { // 坐标轴指示器，坐标轴触发有效
+              type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
+            }
+          },
+          legend: {
+            show: false,
+            data: ['微博文']
+          },
+          toolbox: {
+            show: false,
+            feature: {
+              mark: {
+                show: true
+              },
+              /*dataView: {
+                show: true,
+                readOnly: false
+              },*/
+              magicType: {
+                show: true,
+                type: ['line', 'bar', 'stack', 'tiled']
+              },
+              restore: {
+                show: true
+              },
+              saveAsImage: {
+                show: true
+              }
+            }
+          },
+          calculable: false,
+          grid: {
+            borderWidth: 0
+          },
+          xAxis: [{
+            show: false,
+            type: 'value'
+          }],
+          yAxis: [{
+            show: true,
+            axisLine: false,
+            axisTick: false,
+            type: 'category',
+            splitLine: false,
+            splitArea: {
+              show: false
+            },
+            axisLabel: {
+              show: true,
+              textStyle: {
+                fontSize: 14,
+                fontWeight: 'bolder'
+              }
+            },
+            data: data.name
+          }],
+          series: [{
+            name: '微博文',
+            type: 'bar',
+            stack: '总量',
+            barWidth: 20,
+            itemStyle: {
+              normal: {
+                label: {
+                  show: true,
+                  textStyle: {
+                    color: '#000000',
+                    fontSize: 14,
+                    fontWeight: 'bolder'
+                  },
+                  position: 'right'
+                },
+                color: '#3C8DBC'
+              }
+            },
+            data: data.value
+          }]
+        });
+      });
+    };
+
+    chart[name](start, end);
+  });
+  $chart.trigger('show.chart', [start, end]);
+
+  module.statistic($statistic, api);
+  $statistic.trigger('show.statistic', [start, end]);
+
+  // listen for change
+  $chart.on('shown.bs.tab', function () {
+    $chart.trigger('show.chart', [start, end]);
+  });
+
+  $dateRange.on('apply.daterangepicker', function (event, picker) {
+    start = picker.startDate.format();
+    end = picker.endDate.format();
+
+    $dateRange.trigger('show.dateRange', [start, end]);
+    $chart.trigger('show.chart', [start, end]);
+    $statistic.trigger('show.statistic', [start, end]);
+  });
 };
 
 

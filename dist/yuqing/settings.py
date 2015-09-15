@@ -1,4 +1,4 @@
-#coding=utf-8
+# -*- coding: utf-8 -*-
 """
 Django settings for yuqing project.
 
@@ -18,8 +18,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 def _load_config():
     global DEBUG, TEMPLATE_DEBUG, ALLOWED_HOSTS
-    global COMPANY_NAME, LANGUAGE_CODE, TIME_ZONE, USE_I18N, USE_L10N, USE_TZ
-    global MYSQL_CONN_STR_DEFAULT, MYSQL_CONN_STR_MASTER, MONGO_CONN_STR, REDIS_CONN_STR
+    global COMPANY_NAME, LANGUAGE_CODE, TIME_ZONE, USE_I18N, USE_L10N, USE_TZ, NEWS_PAGE_LIMIT
+    global MYSQL_CONN_STR_DEFAULT, MYSQL_CONN_STR_MASTER, MYSQL_CONN_STR_CORPUS, MONGO_CONN_STR, REDIS_CONN_STR
+    global MEDIA_ROOT, STATIC_ROOT
+    global NEWS_PAGE_LIMIT
 
     cp = SafeConfigParser()
     cp.read(os.path.join(BASE_DIR, "../config.cfg"))
@@ -48,15 +50,25 @@ def _load_config():
 
     USE_TZ = cp.get(SECTION, 'USE_TZ')
 
+    MEDIA_ROOT = cp.get(SECTION, 'MEDIA_ROOT')
+
+    STATIC_ROOT = cp.get(SECTION, 'STATIC_ROOT')
+
+    NEWS_PAGE_LIMIT = cp.get('constant', 'NEWS_PAGE_LIMIT')
+
     # MySQL
     mysql_conn_str_default = cp.get(SECTION, 'mysql_conn_str_default')
     mysql_conn_str_master = cp.get(SECTION, 'mysql_conn_str_master')
+    mysql_conn_str_corpus = cp.get(SECTION, 'mysql_conn_str_corpus')
     MYSQL_CONN_STR_DEFAULT = re.match(
         r"mysql://(?P<username>.+):(?P<password>.+)@(?P<host>.+):(?P<port>\d+)/(?P<name>.+)",
         mysql_conn_str_default).groupdict()
     MYSQL_CONN_STR_MASTER = re.match(
         r"mysql://(?P<username>.+):(?P<password>.+)@(?P<host>.+):(?P<port>\d+)/(?P<name>.+)",
         mysql_conn_str_master).groupdict()
+    MYSQL_CONN_STR_CORPUS = re.match(
+        r"mysql://(?P<username>.+):(?P<password>.+)@(?P<host>.+):(?P<port>\d+)/(?P<name>.+)",
+        mysql_conn_str_corpus).groupdict()
 
     # MongoDB
     MONGO_CONN_STR = cp.get(SECTION, 'mongo_conn_str')
@@ -84,8 +96,12 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'base',
     'yqj',
+    'analytics',
     'rest_framework',
+    'django_extensions',
+    'import_export',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -99,7 +115,7 @@ MIDDLEWARE_CLASSES = (
     'yqj.middleware.UserAuthenticationMiddlerware',
 )
 
-ROOT_URLCONF = 'yuqing.urls'
+ROOT_URLCONF = 'base.urls'
 
 WSGI_APPLICATION = 'yuqing.wsgi.application'
 
@@ -122,8 +138,16 @@ DATABASES = {
         'USER': MYSQL_CONN_STR_MASTER['username'],
         'PASSWORD': MYSQL_CONN_STR_MASTER['password'],
     },
+    'corpus':{
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': MYSQL_CONN_STR_CORPUS['host'],
+        'NAME': MYSQL_CONN_STR_CORPUS['name'],
+        'USER': MYSQL_CONN_STR_CORPUS['username'],
+        'PASSWORD': MYSQL_CONN_STR_CORPUS['password'],
+    },
 }
 
+DATABASE_ROUTERS = ['corpus.router.MyDB2Router',]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
@@ -139,6 +163,8 @@ TEMPLATE_DIRS = (
     os.path.join(BASE_DIR, "templates"),
 )
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+if not MEDIA_ROOT:
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 MEDIA_URL = '/media/'

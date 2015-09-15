@@ -1,31 +1,40 @@
-#coding=utf-8
-
+# -*- coding: utf-8 -*-
 import os
-import datetime
+import requests
+import json
+import cPickle
+import pytz
+from datetime import datetime, timedelta
 from collections import defaultdict
+from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
-from django.views.generic import View
-from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
-from django.shortcuts import render_to_response
-from django.template.loader import render_to_string
-from django.db import models, connection, IntegrityError
-from django.conf import settings
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework.decorators import api_view
-from yqj.models import (Article, Area, Weixin, Weibo, Topic, RelatedData, Category,
-                        save_user, Collection, Topic, hash_password, User, Custom,
-                        Inspection, CustomKeyword,Product, ProductKeyword, Group)
-from yqj.views import SetLogo
 from serializers import ArticleSerializer
-from yqj import authenticate, login_required
-from django.db.models import Count
-from api_function import GetFirstDaySeason, get_season, year_range, season_range, months_range, days_range, week_range, unstable
+
+from django.conf import settings
+from django.utils import timezone
 from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
+from django.db import models, connection, IntegrityError
+from django.db.models import Count
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
+from django.shortcuts import render_to_response
+from django.template.loader import render_to_string
+from django.views.generic import View
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+
+from base import authenticate, login_required, set_logo
+from base.views import BaseAPIView
+from base.models import (Area, Article, Category, Collection, Custom,
+    CustomKeyword, Group, Inspection, LocaltionScore, Product, ProductKeyword,
+    RelatedData, Risk, RiskScore, Topic, User, Weibo, Weixin, save_user, hash_password)
 from yqj.redisconnect import RedisQueryApi
-from django.db import connection
+from api.api_function import (GetFirstDaySeason, get_season, year_range,
+    season_range, months_range, days_range, week_range, unstable)
+from yuqing.settings import BASE_DIR
+
 
 def login_view(request):
     try:
@@ -43,10 +52,9 @@ def login_view(request):
     else:
         return JsonResponse({'status': False})
 
+
 @api_view(['POST'])
 def registe_view(request):
-    print request.method
-
     try:
         username = request.POST['username']
         password = request.POST['password']
@@ -64,179 +72,12 @@ def registe_view(request):
     return JsonResponse ({'status': True})
 
 
-class LoginRequiredMixin(object):
-    @classmethod
-    def as_view(cls, **initkwargs):
-        view = super(LoginRequiredMixin, cls).as_view(**initkwargs)
-        return login_required(view)
-
-class TableAPIView(APIView):
-    COLLECTED_TEXT = u'<i class="fa fa-star" data-toggle="tooltip", data-placement="right" title="取消收藏">'
-    NO_COLLECTED_TEXT = u'<i class="fa fa-star-o" data-toggle="tooltip", data-placement="right" title="添加收藏">'
-
-    LIMIT_NUMBER = 300
-    NEWS_PAGE_LIMIT = 25
-    EVENT_PAGE_LIMIT = 25
-    def __init__(self, request=None):
-        self.request = request
-
-    def collected_html(self, item):
-        items = self.collected
-        return self.COLLECTED_TEXT if self.isIn(item, items) else self.NO_COLLECTED_TEXT
-
-    def isIn(self, item, items):
-        if isinstance(item, models.Model):
-            item_id = item.id
-        else:
-            item_id = item['id']
-
-        if item_id is None:
-            raise TypeError('item should has id atrribute or id key')
-
-        return any(filter(lambda x: x.id == item_id, items))
-
-    @property
-    def collected(self):
-        if getattr(self, '_collected', None) is None:
-            self._collected = self.collected_items()
-        return self._collected
-
-    def collected_items(self):
-        #return []
-        #try:
-        user = self.request.myuser
-        try:
-            self.collection = user.collection
-        except Collection.DoesNotExist:
-            self.collection = Collection(user=self.request.myuser)
-            self.collection.save(using='master')
-        return user.collection.articles.all()
-        #except:
-        #    return []
-
-    def title_html(self, *args):
-        title_format = u'<a href="{0}" title="{1}" target="_blank" data-id="{2}" data-type="{3}">{1}</a>'
-        return title_format.format(*args)
-
-    def set_css_to_weixin(self, items):
-        html = ""
-        count = u'0'
-        for item in items:
-            html += """<li class="media">"""
-            html += """<div class="media-left">"""
-            html +=  u'<img class="media-object" src="%s" alt="%s">' % (item.publisher.photo, item.publisher.publisher)
-            html += """</div>
-                       <div class="media-body"> """
-            html +=  u'<h4 class="media-heading">%s</h4>' % (item.publisher.publisher)
-            html +=  u'<p><a href="/weixin/%s/" target="_blank">%s</a></p>' % (item.id, item.title)
-            html += """<div class="media-meta">
-                       <div class="info pull-right">"""
-            html +=  u'<span>阅读 %s</span>' % count
-            html +=  u'<span><i class="fa fa-thumbs-o-up"></i> %s</span>' % count
-            html += """</div>"""
-            html +=  u'<div class="time pull-left">%s</div>' % item.pubtime.replace(tzinfo=None).strftime('%Y-%m-%d %H:%M')
-            html += """</div></div></li>"""
-        return html
-
-    def set_css_to_weibo(self, items):
-        html = ""
-        count = u'0'
-        for item in items:
-            html += """<li class="media">"""
-            html += """<div class="media-left">"""
-            html +=  u'<img class="media-object" src="%s" alt="%s">' % (item.publisher.photo, item.publisher.publisher)
-            html += """</div>
-                       <div class="media-body"> """
-            html +=  u'<h4 class="media-heading">%s</h4>' % (item.publisher.publisher)
-            if len(item.content) < 200:
-                 html +=  u'<p>%s</p>' % (item.content)
-            else:
-                 html +=  u'<p><a href="%s" target="_blank">%s</a></p>' % (item.url, item.title)
-            html += """<div class="media-meta">
-                       <div class="info pull-right">"""
-            html +=  u'<span>转载 %s</span>' % count
-            html +=  u'<span>评论 %s</span>' % count
-            html +=  u'<span><i class="fa fa-thumbs-o-up"></i> %s</span>' % count
-            html += """</div>"""
-            html +=  u'<div class="time pull-left">%s</div>' % item.pubtime.replace(tzinfo=None).strftime('%Y-%m-%d %H:%M')
-            html += """</div></div></li>"""
-        return html
-
-    def paging(self, items, limit, page):
-        #limit  每页显示的记录数 page 页码
-        #items = model.objects.all()
-        # 实例化一个分页对象
-        paginator = Paginator(items, limit)
-
-        try:
-            # 获取某页对应的记录
-            items = paginator.page(page)
-        except PageNotAnInteger:
-            # 如果页码不是个整数 取第一页的记录
-            items = paginator.page(1)
-        except EmptyPage:
-            # 如果页码太大，没有相应的记录 取最后一页的记录
-            items = paginator.page(paginator.num_pages)
-
-        return {'items': items, 'total_number': paginator.num_pages}
-
-    def pagingfromredis(self, model, limit, page):
-        items = [eval(item) for item in RedisQueryApi().lrange('sort_weibohot', 0, -1)]
-        # 实例化一个分页对象
-        paginator = Paginator(items, limit)
-	try:
-            # 获取某页对应的记录
-            items = paginator.page(page)
-        except PageNotAnInteger:
-            # 如果页码不是个整数 取第一页的记录
-            items = paginator.page(1)
-        except EmptyPage:
-            # 如果页码太大，没有相应的记录 取最后一页的记录
-            items = paginator.page(paginator.num_pages)
-
-        return {'items': items, 'total_number': paginator.num_pages}
-
-    def news_to_json(self, items):
-        result = []
-        for data in items:
-            item = {}
-            item['title'] = data.title
-            item['id'] = data.id
-            item['source'] = data.publisher.publisher
-            item['location'] = data.area.name
-            item['time'] = data.pubtime.replace(tzinfo=None).strftime('%Y-%m-%d')
-            try:
-                item['hot'] = RelatedData.objects.filter(uuid=data.uuid)[0].articles.all().count()
-            except IndexError:
-                item['hot'] = 0
-            result.append(item)
-        return result
-
-    def event_to_json(self, items):
-        result = []
-        for data in items:
-            item = {}
-            item['title'] = data.title
-            item['id'] = data.id
-            item['source'] = data.source
-            item['location'] = data.area.name
-            try:
-                item['time'] = data.articles.order_by('pubtime')[0].pubtime.replace(tzinfo=None).strftime('%Y-%m-%d')
-            except IndexError:
-                item['time'] = datetime.datetime.now().strftime('%Y-%m-%d')
-            item['hot'] = data.articles.count() + data.weixin.count() + data.weibo.count()
-            result.append(item)
-
-        results = sorted(result, key=lambda item: item['time'], reverse=True)
-
-        return results
-
-
 def get_date_from_iso(datetime_str):
-    #return datetime.datetime.strptime("2008-09-03T20:56:35.450686Z", "%Y-%m-%dT%H:%M:%S.%fZ")
-    return datetime.datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S.%fZ")
+    #return datetime.strptime("2008-09-03T20:56:35.450686Z", "%Y-%m-%dT%H:%M:%S.%fZ")
+    return datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S.%fZ")
 
-class ArticleTableView(TableAPIView):
+
+class ArticleTableView(BaseAPIView):
     def get(self, request, id, page):
         try:
             category = Category.objects.get(id=id)
@@ -263,12 +104,110 @@ class ArticleTableView(TableAPIView):
         return Response({'news': result})
         """
         items = category.articles.all()
+        datas = self.paging(items, settings.NEWS_PAGE_LIMIT, page)
+        result = self.news_to_json(datas['items'])
+        return Response({'total': datas['total_number'], 'data': result})
+
+class RisksTableView(BaseAPIView):
+    def get_score_article(self, request):
+        user = request.myuser
+        company = user.group.company
+        group = Group.objects.get(company=company).id
+        score_list = LocaltionScore.objects.filter(group=group)
+        risk_id = []
+        for item in score_list:
+            risk_id.append(item.risk_id)
+
+        risk_lists = Risk.objects.filter(id__in=risk_id)
+        risk_list = []
+        for item in risk_lists:
+            data = {}
+            try:
+                relevance = LocaltionScore.objects.get(risk_id=item.id, group_id=group).score
+            except:
+                relevance = 0
+            try:
+                score = RiskScore.objects.get(risk=item.id).score
+            except:
+                score = 0
+            data['relevance'] = relevance
+            data['title'] = item.title
+            data['source'] = item.source
+            data['score'] = score
+            data['pubtime'] = item.pubtime
+            data['id'] = item.id
+            risk_list.append(data)
+        return risk_list
+
+        '''
+        # This method is sorting in the memory
+        score_list = LocaltionScore.objects.filter(group=group)
+        risk_list = []
+        for item in score_list:
+            data = {}
+            data['relevance'] = item.score
+            article_list = Article.objects.filter(id=item.article.id).order_by('-pubtime')
+            for items in article_list:
+                try:
+                    score = RiskScore.objects.get(article=items.id).score
+                except RiskScore.DoesNotExist:
+                    score = 0
+                data['title'] = items.title
+                data['source'] = items.source
+                data['score'] = score
+                data['pubtime'] = items.pubtime
+                data['id'] = items.id
+                risk_list.append(data)
+        risk_list = sorted(risk_list, key=lambda x: x['pubtime'], reverse=True)
+        return risk_list
+        '''
+    def get(self, request, page):
+        items = self.get_score_article(request)
+        datas = self.paging(items, self.RISK_PAGE_LIMIT, page)
+        html_string = render_to_string('risk/risk_list_tmpl.html', {'risk_list':  datas['items']})
+        return Response({"total": datas['total_number'], "html": html_string})
+
+
+class RisksDetailTableView(BaseAPIView):
+
+    def get(self, request, id, page):
+        try:
+            risk = Risk.objects.get(id=int(id))
+        except Risk.DoesNotExist:
+            return Response({'risk': ''})
+        items = risk.articles.all()
         datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
         result = self.news_to_json(datas['items'])
         return Response({'total': datas['total_number'], 'data': result})
 
+class RisksDetailWeixinView(BaseAPIView):
+    EVENT_WEIXIN_LIMIT = 10
+    def get(self, request, id, page):
+        try:
+            risk = Risk.objects.get(id=int(id))
+        except Risk.DoesNotExist:
+            return Response({'html': '', 'total': 0})
+        items = risk.weixin.all()
+        datas = self.paging(items, self.EVENT_WEIXIN_LIMIT, page)
+        items = [set_logo(data) for data in datas['items']]
+        html = self.set_css_to_weixin(items)
+        return Response({'html': html, 'total': datas['total_number']})
 
-class NewsTableView(TableAPIView):
+
+class RisksDetailWeiboView(BaseAPIView):
+    EVENT_WEIBO_LIMIT = 10
+    def get(self, request, id, page):
+        try:
+            risk = Risk.objects.get(id=int(id))
+        except Risk.DoesNotExist:
+            return Response({'html': '', 'total': 0})
+        items = risk.weibo.all()
+        datas = self.paging(items, self.EVENT_WEIBO_LIMIT, page)
+        items = [set_logo(data) for data in datas['items']]
+        html = self.set_css_to_weibo(items)
+        return Response({'html': html, 'total': datas['total_number']})
+
+class NewsTableView(BaseAPIView):
     """
     def get(self, request):
         result = []
@@ -290,47 +229,17 @@ class NewsTableView(TableAPIView):
         return Response({"news": result})
     """
     def get_custom_artice(self):
-        custom_id_list = []
-        keywords = CustomKeyword.objects.filter(group_id=4)
-        for keyword in keywords:
-            custom_id = keyword.custom_id
-            if custom_id:
-                custom_id_list.append(custom_id)
-        try:
-            cursor = connection.cursor()
-            sql = 'select article_id from custom_articles where %s'\
-                %(
-                    reduce(
-                        lambda x, y: x + " or " + y,
-                        ["custom_id=%s" for x in custom_id_list]
-                        )
-                    )
-            cursor.execute(sql,custom_id_list)
-            row = cursor.fetchall()
-            article_id = []
-            for r in row:
-                article_id.append(r[0])
-        except:
-            article_id = []
-        news_list = Category.objects.get(name='质监热点').articles.all()
-
-        for n in news_list:
-            article_id.append(n.id)
-
-        articles = Article.objects.filter(id__in=article_id)
-
+        articles = Category.objects.get(name='质监热点').articles.all()
         return articles
 
     def get(self, request, page):
-        # news_list = Article.objects.filter(website_type='hot')
-        # news_list = ArticleCategory.objects.get(name='质监热点').articles.all()
         items = self.get_custom_artice()
-        datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
+        datas = self.paging(items, settings.NEWS_PAGE_LIMIT, page)
         result = self.news_to_json(datas['items'])
         return Response({'total': datas['total_number'], 'data': result})
 
 
-class LocationTableView(TableAPIView):
+class LocationTableView(BaseAPIView):
     def get(self, request, location_id, page):
         try:
             id = int(location_id)
@@ -355,12 +264,12 @@ class LocationTableView(TableAPIView):
         return Response({"news": result})
         """
         items = Article.objects.filter(area=area)
-        datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
+        datas = self.paging(items, settings.NEWS_PAGE_LIMIT, page)
         result = self.news_to_json(datas['items'])
         return Response({'total': datas['total_number'], 'data': result})
 
 
-class LocationWeixinView(TableAPIView):
+class LocationWeixinView(BaseAPIView):
     LOCATION_WEIXIN_LIMIT = 10
     def get(self, request, location_id, page):
         try:
@@ -370,12 +279,12 @@ class LocationWeixinView(TableAPIView):
             return Response({'html': '', 'total': 0})
         items = Weixin.objects.filter(area=area)
         datas = self.paging(items, self.LOCATION_WEIXIN_LIMIT, page)
-        items = [SetLogo(data) for data in datas['items']]
+        items = [set_logo(data) for data in datas['items']]
         html = self.set_css_to_weixin(items)
         return Response({'html': html, 'total': datas['total_number']})
 
 
-class LocationWeiboView(TableAPIView):
+class LocationWeiboView(BaseAPIView):
     LOCATION_WEIBO_LIMIT = 10
     def get(self, request, location_id, page):
         try:
@@ -385,12 +294,12 @@ class LocationWeiboView(TableAPIView):
             return Response({'html': '', 'total': 0})
         items = Weibo.objects.filter(area=area)
         datas = self.paging(items, self.LOCATION_WEIBO_LIMIT, page)
-        items = [SetLogo(data) for data in datas['items']]
+        items = [set_logo(data) for data in datas['items']]
         html = self.set_css_to_weibo(items)
         return Response({'html': html, 'total': datas['total_number']})
 
 
-class EventTableView(TableAPIView):
+class EventTableView(BaseAPIView):
     def collected_items(self):
         user = self.request.myuser
         return user.collection.events.all()
@@ -408,7 +317,7 @@ class EventTableView(TableAPIView):
             if time:
                 pubtime = time[0].pubtime
             else:
-                pubtime = datetime.datetime.now()
+                pubtime = datetime.now()
             one_record = [collected_html, title, item.source, item.area.name, pubtime.date(), hot_index]
             result.append(one_record)
         return Response({"event": result})
@@ -420,7 +329,7 @@ class EventTableView(TableAPIView):
         return Response({'total': datas['total_number'], 'data': list(datas["items"])})
 
 
-class EventDetailTableView(TableAPIView):
+class EventDetailTableView(BaseAPIView):
     def get(self, request, id, page):
         try:
             event = Topic.objects.get(id=int(id))
@@ -439,7 +348,7 @@ class EventDetailTableView(TableAPIView):
         return Response({'news': result})
         """
         items = event.articles.all()
-        datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
+        datas = self.paging(items, settings.NEWS_PAGE_LIMIT, page)
         result = self.news_to_json(datas['items'])
         return Response({'total': datas['total_number'], 'data': result})
 
@@ -448,7 +357,7 @@ class EventDetailTableView(TableAPIView):
         pass
 
 
-class EventDetailWeixinView(TableAPIView):
+class EventDetailWeixinView(BaseAPIView):
     EVENT_WEIXIN_LIMIT = 10
     def get(self, request, id, page):
         try:
@@ -457,12 +366,12 @@ class EventDetailWeixinView(TableAPIView):
             return Response({'html': '', 'total': 0})
         items = event.weixin.all()
         datas = self.paging(items, self.EVENT_WEIXIN_LIMIT, page)
-        items = [SetLogo(data) for data in datas['items']]
+        items = [set_logo(data) for data in datas['items']]
         html = self.set_css_to_weixin(items)
         return Response({'html': html, 'total': datas['total_number']})
 
 
-class EventDetailWeiboView(TableAPIView):
+class EventDetailWeiboView(BaseAPIView):
     EVENT_WEIBO_LIMIT = 10
     def get(self, request, id, page):
         try:
@@ -471,7 +380,7 @@ class EventDetailWeiboView(TableAPIView):
             return Response({'html': '', 'total': 0})
         items = event.weibo.all()
         datas = self.paging(items, self.EVENT_WEIBO_LIMIT, page)
-        items = [SetLogo(data) for data in datas['items']]
+        items = [set_logo(data) for data in datas['items']]
         html = self.set_css_to_weibo(items)
         return Response({'html': html, 'total': datas['total_number']})
 
@@ -481,7 +390,10 @@ class CollectView(APIView):
         url = u'/news/%s' % item.id
         view = ArticleTableView(self.request)
         title = view.title_html(url, item.title, item.id, 'article')
-        hot_index = RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count()
+        try:
+            hot_index = RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count()
+        except:
+            hot_index =0
         line = [title, item.publisher.publisher, item.area.name, item.pubtime.date(), hot_index]
         #line = [view.collected_html(item), title, item.publisher.publisher, item.area.name, item.pubtime.date(), hot_index]
         return line
@@ -495,7 +407,7 @@ class CollectView(APIView):
         if time:
             pubtime = time[0].pubtime
         else:
-            pubtime = datetime.datetime.now()
+            pubtime = timezone.now()
         one_record = [title, item.source, item.area.name, pubtime.date(), hot_index]
         #one_record = [view.collected_html(item), title, item.source, item.area.name, pubtime.date(), hot_index]
         return one_record
@@ -515,7 +427,7 @@ class CollectView(APIView):
         if table_type == 'news':
             view = ArticleTableView(self.request)
             items = self.collection.articles.all()
-            datas = view.paging(items, view.NEWS_PAGE_LIMIT, page)
+            datas = view.paging(items, settings.NEWS_PAGE_LIMIT, page)
             result = view.news_to_json(datas['items'])
         elif table_type == 'event':
             view = EventTableView(self.request)
@@ -557,7 +469,7 @@ class CollecModifyView(View):
         return self.data_type.lower()
 
     def get_related_model(self):
-        return models.get_model('yqj', self.data_type.capitalize() + 'Collection')
+        return models.get_model('base', self.data_type.capitalize() + 'Collection')
 
     def _create_collection(self):
         #add a collection to the user
@@ -573,10 +485,10 @@ class CollecModifyView(View):
         return self._create_collection()
 
     def get_model(self):
-        return models.get_model('yqj', self.data_type.capitalize())
+        return models.get_model('base', self.data_type.capitalize())
 
     def get_collection_model(self):
-        return models.get_model('yqj', self.data_type.capitalize() + 'Collection')
+        return models.get_model('base', self.data_type.capitalize() + 'Collection')
 
     def post(self, request, action, *args, **kwargs):
         try:
@@ -626,7 +538,7 @@ class SearchView(CollectView):
         return Topic.objects.raw(u"SELECT * FROM topic WHERE title like '%%{0}%%' LIMIT {1}".format(key, self.LIMIT))
 
 
-class CustomTableView(TableAPIView):
+class CustomTableView(BaseAPIView):
     def get_bak(self, request, custom_id):
         customname = [u'电梯',u'锅炉', u'两会']
         try:
@@ -662,12 +574,12 @@ class CustomTableView(TableAPIView):
         except CustomKeyword.DoesNotExist:
             return Response({'total': 0, 'data': []})
         items = keyword.custom.articles.all()
-        datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
+        datas = self.paging(items, settings.NEWS_PAGE_LIMIT, page)
         result = self.news_to_json(datas['items'])
         return Response({'total': datas['total_number'], 'data': result})
 
 
-class ProductTableView(TableAPIView):
+class ProductTableView(BaseAPIView):
     def get(self, request, id, page):
         if id:
             try:
@@ -680,22 +592,22 @@ class ProductTableView(TableAPIView):
             prokey = group[0].productkeyword_set.all()
 
         prokey_len = len(prokey)
-        product = [prokey[i].product for i in xrange(prokey_len)] 
+        product = [prokey[i].product for i in xrange(prokey_len)]
 
         data = [p.articles.all() for p in product]
         if data != []:
             item = reduce(lambda x, y: list(set(x).union(set(y))), data)
         else:
-            item =[] 
+            item =[]
         article_ids = [item[i].id for i in range(len(item))]
         item = Article.objects.filter(id__in=article_ids)
 
-        datas = self.paging(item, self.NEWS_PAGE_LIMIT, page)
+        datas = self.paging(item, settings.NEWS_PAGE_LIMIT, page)
         result = self.news_to_json(datas['items'])
         return Response({'total': datas['total_number'], 'data': result})
 
 
-class CustomWeixinView(TableAPIView):
+class CustomWeixinView(BaseAPIView):
     CUSTOM_WEIXIN_LIMIT = 10
     def get(self, request, custom_id, page):
         user = request.myuser
@@ -705,12 +617,12 @@ class CustomWeixinView(TableAPIView):
             return Response({'html': '', 'total': 0})
         items = keyword.custom.weixin.all()
         datas = self.paging(items, self.CUSTOM_WEIXIN_LIMIT, page)
-        items = [SetLogo(data) for data in datas['items']]
+        items = [set_logo(data) for data in datas['items']]
         html = self.set_css_to_weixin(items)
         return Response({'html': html, 'total': datas['total_number']})
 
 
-class CustomWeiboView(TableAPIView):
+class CustomWeiboView(BaseAPIView):
     CUSTOM_WEIBO_LIMIT = 10
     def get(self, request, custom_id, page):
         user = request.myuser
@@ -720,7 +632,7 @@ class CustomWeiboView(TableAPIView):
             return Response({'html': '', 'total': 0})
         items = keyword.custom.weibo.all()
         datas = self.paging(items, self.CUSTOM_WEIBO_LIMIT, page)
-        items = [SetLogo(data) for data in datas['items']]
+        items = [set_logo(data) for data in datas['items']]
         html = self.set_css_to_weibo(items)
         return Response({'html': html, 'total': datas['total_number']})
 
@@ -753,19 +665,19 @@ class CustomModifyView(View):
             status = self.delete(user)
         return JsonResponse({'status': status['status']})
 
-class InspectionLocalView(TableAPIView):
+class InspectionLocalView(BaseAPIView):
     def get(self, request):
         user = request.myuser
         company = user.group.company
-        inspection_list = Inspection.objects.filter(source=company).order_by('-pubtime')[:10]
+        inspection_list = Inspection.objects.exclude(qualitied__isnull=True).filter(source=company).order_by('-pubtime')[:10]
         for item in inspection_list:
             item.qualitied = str(int(item.qualitied*100)) + '%'
 
         inspection = render_to_string('inspection/dashboard_inspection.html', {'inspection_list': inspection_list})
         return HttpResponse(inspection)
 
-        
-class InspectionNationalView(TableAPIView):
+
+class InspectionNationalView(BaseAPIView):
     def get(self, request):
         user = request.myuser
         user.company = user.group.company
@@ -777,7 +689,7 @@ class InspectionNationalView(TableAPIView):
         return HttpResponse(inspection)
 
 
-class InspectionTableView(TableAPIView):
+class InspectionTableView(BaseAPIView):
     def get(self, request):
         result = []
         news = Inspection.objects.order_by('-pubtime').all()
@@ -793,7 +705,7 @@ class InspectionTableView(TableAPIView):
         return Response({"inspection": result})
 
         #items = Inspection.objects.order_by('-pubtime').all()
-        #datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
+        #datas = self.paging(items, settings.NEWS_PAGE_LIMIT, page)
         #result = self.inspection_to_json(datas['items'])
         #return Response({"total": datas['total_number'], "data": result})
 
@@ -811,22 +723,19 @@ class InspectionTableView(TableAPIView):
         return result
 
 
-
-
-
-class WeixinTableView(TableAPIView):
+class WeixinTableView(BaseAPIView):
     Weixin_table_limit = 20
     def get(self, request, weixin_type, page):
         if weixin_type == 'new':
             datas = self.paging(Weixin.objects.all(), self.Weixin_table_limit, page)
         elif weixin_type == 'hot':
             datas = self.paging(Weixin.objects.all(), self.Weixin_table_limit, page)
-        items = [SetLogo(data) for data in datas['items']]
+        items = [set_logo(data) for data in datas['items']]
         html = self.set_css_to_weixin(items)
         return Response({'html': html, 'total': datas['total_number']})
 
 
-class WeiboTableView(TableAPIView):
+class WeiboTableView(BaseAPIView):
     Weibo_table_limit = 20
     def set_css_to_hotweibo(self, items):
         html = ""
@@ -848,9 +757,8 @@ class WeiboTableView(TableAPIView):
             html +=  u'<span>评论 %s</span>' % item['comments_count']
             html +=  u'<span><i class="fa fa-thumbs-o-up"></i> %s</span>' % item['attitudes_count']
             html += """</div>"""
-            html +=  u'<div class="time pull-left">%s</div>' % datetime.datetime.fromtimestamp(item['pubtime']).strftime('%Y-%m-%d %H:%M')
+            html +=  u'<div class="time pull-left">%s</div>' % datetime.fromtimestamp(item['pubtime']).strftime('%Y-%m-%d %H:%M')
             html += """</div></div></li>"""
-
         return html
 
     def get(self, request, weibo_type, page):
@@ -863,7 +771,7 @@ class WeiboTableView(TableAPIView):
                     data['photo'] = u'http://tp2.sinaimg.cn/3557640017/180/40054587155/1'
             html = self.set_css_to_hotweibo(hot_datas['items'])
             return Response({'html': html, 'total': hot_datas['total_number']})
-        items = [SetLogo(data) for data in datas['items']]
+        items = [set_logo(data) for data in datas['items']]
         html = self.set_css_to_weibo(items)
         return Response({'html': html, 'total': datas['total_number']})
 
@@ -875,10 +783,18 @@ def upload_image(request):
     try:
         f = request.FILES['image']
     except KeyError:
-        return HttpResponse(status=400)
+        return HttpResponseRedirect('/settings/')
 
     media_path = settings.MEDIA_ROOT
     filename = str(user.id) + os.path.splitext(f.name)[1]
+    file_list = os.listdir(media_path)
+    name_list =  map(lambda x: x.split('.')[0], file_list)
+
+    count = 0
+    for i in name_list :
+        if i == str(user.id):
+            os.remove(media_path + '/' + file_list[count])
+        count += 1
 
     try:
         new_file = open(os.path.join(media_path, filename), 'w')
@@ -975,29 +891,30 @@ def get_count_feeling(start_d, end_d, feeling_type):
         feeling_limit = 'feeling_factor <= 0.1 and feeling_factor >= 0'
     else:
         feeling_limit = 'feeling_factor > 0.1  and feeling_factor < 0.9 or feeling_factor = -1'
-
     with connection.cursor() as c:
         sql_str = "SELECT Date(pubtime), COUNT(*) FROM article where Date(pubtime) >= '{0}' and Date(pubtime) < '{1}' and {2} group by Date(pubtime)".format(start_d, end_d, feeling_limit)
         c.execute(sql_str)
         rows = c.fetchall()
 
         d =  dict(rows)
+        a = [i[0] for i in rows]
         result = []
         day = start_d
         while day < end_d:
             num = d[day] if day in d else 0
             result.append(num)
-            day = day + datetime.timedelta(days=1)
+            day = day + timedelta(days=1)
         return result
 
 @login_required
 def chart_line_index_view(request):
-    today = datetime.datetime.today().date()
-    start_d = today - datetime.timedelta(days=6)
-    end_d = today + datetime.timedelta(days=1)
+    today = timezone.now()
+    today = today.astimezone(pytz.utc).date()
+    start_d = today - timedelta(days=6)
+    end_d = today + timedelta(days=1)
 
     data = {}
-    data['date'] = [(today - datetime.timedelta(days=x)).strftime("%m-%d") for x in reversed(range(7))]
+    data['date'] = [(today - timedelta(days=x)).strftime("%m-%d") for x in reversed(range(7))]
     data['positive'] = get_count_feeling(start_d, end_d, 'positive')
     data['neutral'] = get_count_feeling(start_d, end_d, 'netrual')
     data['negative'] = get_count_feeling(start_d, end_d, 'negative')
@@ -1027,6 +944,21 @@ def chart_line_event_view(request, topic_id):
     min_date = min(x.pubtime.date() for x in articles)
     max_date = max(x.pubtime.date() for x in articles)
     date_range = max_date - min_date
+    return chart_line(date_range, min_date, max_date, articles)
+
+def chart_line_risk_view(request, risk_id):
+    try:
+        articles = Risk.objects.get(id=risk_id).articles.all()
+    except Risk.DoesNotExist:
+        return HttpResponse(status=400)
+    if not articles:
+        return HttpResponse(status=400)
+    min_date = min(x.pubtime.date() for x in articles)
+    max_date = max(x.pubtime.date() for x in articles)
+    date_range = max_date - min_date
+    return chart_line(date_range, min_date, max_date, articles)
+
+def chart_line(date_range, min_date, max_date, articles):
     #data range by year   less one axis has data
     if date_range.days > 6 * 55:
         return year_range(min_date, max_date, date_range, articles)
@@ -1044,7 +976,6 @@ def chart_line_event_view(request, topic_id):
         return days_range(min_date, max_date, date_range, articles)
     else:
         return unstable()
-
 
 @api_view(['GET'])
 @login_required
@@ -1067,4 +998,22 @@ def chart_pie_event_view(request, topic_id):
              {u'name': u'自媒体', u'value': topic.weibo.count()+topic.weixin.count()}]
     value = [item for item in value if item['value']]
     return JsonResponse({u'name': name, u'value': value})
+
+
+def chart_pie_risk_view(request, risk_id):
+    try:
+        risk = Risk.objects.get(id=int(risk_id))
+    except (KeyError, ValueError, Risk.DoesNotExist):
+        return HttpResponse(status=400)
+    name = [u'新闻媒体', u'政府网站', u'自媒体']
+    value = [{u'name': u'新闻媒体', u'value': risk.articles.filter(publisher__searchmode=1).count()},
+             {u'name': u'政府网站', u'value': risk.articles.filter(publisher__searchmode=0).count()},
+             {u'name': u'自媒体', u'value': risk.weibo.count()+risk.weixin.count()}]
+    value = [item for item in value if item['value']]
+    return JsonResponse({u'name': name, u'value': value})
+
+def map_view(request):
+    data = cPickle.load(file(os.path.join(BASE_DIR, "yqj/jobs/minutely/map.json"), "r"))
+    risk_data = data["regionData"]
+    return JsonResponse({"regionData": risk_data })
 
