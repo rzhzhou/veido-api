@@ -264,8 +264,8 @@ class NewsView(BaseAPIView):
         page = parameter['page'] if parameter.has_key('page') else 1
         limit = settings.NEWS_PAGE_LIMIT if api_type == 'list' else 10
         items = self.get_custom_artice()
-        datas = self.paging(items, settings.NEWS_PAGE_LIMIT, page)
-        html_string = render_to_string('risk/%s_tpl.html' % api_type, {'news_list':  datas['items']})
+        datas = self.paging(items, limit, page)
+        html_string = render_to_string('news/%s_tpl.html' % api_type, {'news_list':  datas['items']})
         return Response({'total': datas['total_number'], 'html': html_string})
 
 
