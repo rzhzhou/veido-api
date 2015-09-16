@@ -1025,15 +1025,19 @@ App.page.dashboard = function (module, path) {
         .replaceAll($(container).children('tbody'));
     }
   });
-  
+
   module.line(path);
   module.pie(path);
   module.inspection();
 
-  $.get('/api/news/', {
-    type: 'abstract'
-  }, function (data) {
-    $('#news').html(data.html);
+  module.list(module, {
+    pagination: false,
+    container: '#news',
+    feature: 'news',
+    featureType: 'abstract',
+    render: function (container, content) {
+      $(container).html(content);
+    }
   });
 
   $.get('/api/event/', {
