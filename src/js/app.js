@@ -1047,7 +1047,14 @@ App.page.newsDetail = function (module, path, type, id) {
 };
 
 App.page.event = function (module, path) {
-  module.table(module, path);
+  module.list(module, {
+    container: '#event',
+    feature: 'event',
+    featureType: 'list',
+    render: function (container, content) {
+      $(container).children('tbody').html(content);
+    }
+  });
 };
 
 App.page.eventDetail = function (module, path, type, id) {
