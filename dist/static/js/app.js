@@ -1177,6 +1177,28 @@ App.module.table = function (module, path) {
   });
 };
 
+App.module.abstract = function (options) {
+  options = $.extend({
+    feature: '',
+    container: '',
+    render: function (container, content) {
+      $('<div/>')
+        .attr({id: this.feature, class: 'list-group no-margin'})
+        .html(content)
+        .find('[data-toggle="tooltip"]')
+          .tooltip()
+        .end()
+        .replaceAll($(container));
+    }
+  }, options);
+
+  $.get('/api/' + options.feature + '/', {
+    type: 'abstract'
+  }, function (data) {
+    options.render(options.container, data.html);
+  });
+};
+
 App.module.list = function (module, options) {
   options = $.extend({
     pagination: true,
@@ -1541,16 +1563,14 @@ App.page.dashboard = function (module, path) {
   module.infoBox();
   module.map(path);
 
-  module.list(module, {
-    pagination: false,
-    container: '#risk',
+  module.abstract({
     feature: 'risk',
-    featureType: 'abstract',
+    container: '#risk > tbody',
     render: function (container, content) {
       $('<tbody/>')
         .html(content)
         .showRisk()
-        .replaceAll($(container).children('tbody'));
+        .replaceAll($(container));
     }
   });
 
@@ -1558,24 +1578,14 @@ App.page.dashboard = function (module, path) {
   module.pie(path);
   module.inspection();
 
-  module.list(module, {
-    pagination: false,
-    container: '#news',
+  module.abstract({
     feature: 'news',
-    featureType: 'abstract',
-    render: function (container, content) {
-      $(container).html(content);
-    }
+    container: '#news'
   });
 
-  module.list(module, {
-    pagination: false,
-    container: '#event',
+  module.abstract({
     feature: 'event',
-    featureType: 'abstract',
-    render: function (container, content) {
-      $(container).html(content);
-    }
+    container: '#event'
   });
 };
 
