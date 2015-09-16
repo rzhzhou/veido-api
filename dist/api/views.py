@@ -759,7 +759,7 @@ class WeixinView(BaseAPIView):
         parameter = request.GET
 
         api_type = parameter['type']
-        sort = parameter['sort'] if parameter.has_key('page') else 'hot'
+        sort = parameter['sort'] if parameter.has_key('sort') else 'hot'
         page = parameter['page'] if parameter.has_key('page') else 1
         limit = self.Weixin_table_limit if api_type == 'list' else 6
 
@@ -779,7 +779,7 @@ class WeiboView(BaseAPIView):
         parameter = request.GET
 
         api_type = parameter['type']
-        sort = parameter['sort'] if parameter.has_key('page') else 'hot'
+        sort = parameter['sort'] if parameter.has_key('sort') else 'hot'
         page = parameter['page'] if parameter.has_key('page') else 1
         limit = self.Weibo_table_limit if api_type == 'list' else 6
 
