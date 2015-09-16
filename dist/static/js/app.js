@@ -1568,10 +1568,14 @@ App.page.dashboard = function (module, path) {
     }
   });
 
-  $.get('/api/event/', {
-    type: 'abstract'
-  }, function (data) {
-    $('#event').html(data.html);
+  module.list(module, {
+    pagination: false,
+    container: '#event',
+    feature: 'event',
+    featureType: 'abstract',
+    render: function (container, content) {
+      $(container).html(content);
+    }
   });
 };
 
