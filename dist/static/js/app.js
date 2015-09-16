@@ -1567,6 +1567,22 @@ App.page.dashboard = function (module, path) {
     feature: 'event',
     container: '#event'
   });
+
+  module.abstract({
+    feature: 'weixin',
+    container: '#weixin',
+    render: function (container, content) {
+      $(container).html(content);
+    }
+  });
+
+  module.abstract({
+    feature: 'weibo',
+    container: '#weibo',
+    render: function (container, content) {
+      $(container).html(content);
+    }
+  });
 };
 
 App.page.news = function (module) {
