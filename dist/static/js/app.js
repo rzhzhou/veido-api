@@ -1557,6 +1557,12 @@ App.page.dashboard = function (module, path) {
   }, function (data) {
     $('#news').html(data.html);
   });
+
+  $.get('/api/event/', {
+    type: 'abstract'
+  }, function (data) {
+    $('#event').html(data.html);
+  });
 };
 
 App.page.news = function (module) {
