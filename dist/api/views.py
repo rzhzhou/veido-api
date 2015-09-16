@@ -770,45 +770,23 @@ class WeixinView(BaseAPIView):
         return Response({'html': html_string, 'total': datas['total_number']})
 
 
-class WeiboTableView(BaseAPIView):
+class WeiboView(BaseAPIView):
     Weibo_table_limit = 20
-    def set_css_to_hotweibo(self, items):
-        html = ""
-        count = u'0'
-        for item in items:
-            html += """<li class="media">"""
-            html += """<div class="media-left">"""
-            html +=  u'<img class="media-object" src="%s" alt="%s">' % (item['photo'], item['publisher'])
-            html += """</div>
-                       <div class="media-body"> """
-            html +=  u'<h4 class="media-heading">%s</h4>' % (item['publisher'])
-            if len(item['content']) < 200:
-                 html +=  u'<p>%s</p>' % (item['content'])
-            else:
-                 html +=  u'<p><a href="%s" target="_blank">%s</a></p>' % (item['url'], item['title'])
-            html += """<div class="media-meta">
-                       <div class="info pull-right">"""
-            html +=  u'<span>转载 %s</span>' % item['reposts_count']
-            html +=  u'<span>评论 %s</span>' % item['comments_count']
-            html +=  u'<span><i class="fa fa-thumbs-o-up"></i> %s</span>' % item['attitudes_count']
-            html += """</div>"""
-            html +=  u'<div class="time pull-left">%s</div>' % datetime.fromtimestamp(item['pubtime']).strftime('%Y-%m-%d %H:%M')
-            html += """</div></div></li>"""
-        return html
 
-    def get(self, request, weibo_type, page):
-        if weibo_type == 'new':
+    def get(self, request):
+        parameter = request.GET
+
+        api_type = parameter['type']
+        sort = parameter['sort'] if parameter.has_key('page') else 'hot'
+        page = parameter['page'] if parameter.has_key('page') else 1
+
+        if sort == 'new':
             datas = self.paging(Weibo.objects.all(), self.Weibo_table_limit, page)
-        elif weibo_type == 'hot':
-            hot_datas = self.pagingfromredis(Weibo, self.Weibo_table_limit, page)
-            for data in hot_datas['items']:
-                if not data['photo']:
-                    data['photo'] = u'http://tp2.sinaimg.cn/3557640017/180/40054587155/1'
-            html = self.set_css_to_hotweibo(hot_datas['items'])
-            return Response({'html': html, 'total': hot_datas['total_number']})
+        else:
+            datas = self.pagingfromredis(Weibo, self.Weibo_table_limit, page)
         items = [set_logo(data) for data in datas['items']]
-        html = self.set_css_to_weibo(items)
-        return Response({'html': html, 'total': datas['total_number']})
+        html_string = render_to_string('weibo/%s_tpl.html' % api_type, {'weibo_list':  items})
+        return Response({'html': html_string, 'total': datas['total_number']})
 
 
 
