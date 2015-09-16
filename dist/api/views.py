@@ -335,7 +335,7 @@ class EventView(BaseAPIView):
         user = self.request.myuser
         return user.collection.events.all()
 
-    def get(self, request, page):
+    def get(self, request):
         parameter = request.GET
 
         api_type = parameter['type']
@@ -343,8 +343,8 @@ class EventView(BaseAPIView):
         limit = self.EVENT_PAGE_LIMIT if api_type == 'list' else 10
         items = Topic.objects.all()
         datas = self.paging(items, limit, page)
-        result = self.news_to_json(datas['items'])
-        html_string = render_to_string('event/%s_tpl.html' % api_type, {'events_list':  result})
+        result = self.event_to_json(datas['items'])
+        html_string = render_to_string('event/%s_tpl.html' % api_type, {'event_list':  result})
         return Response({'total': datas['total_number'], 'html': html_string})
 
 
