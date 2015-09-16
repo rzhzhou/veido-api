@@ -761,10 +761,12 @@ class WeixinView(BaseAPIView):
         api_type = parameter['type']
         sort = parameter['sort'] if parameter.has_key('page') else 'hot'
         page = parameter['page'] if parameter.has_key('page') else 1
+        limit = self.Weixin_table_limit if api_type == 'list' else 6
+
         if sort == 'new':
-            datas = self.paging(Weixin.objects.all(), self.Weixin_table_limit, page)
+            datas = self.paging(Weixin.objects.all(), limit, page)
         else: # hot
-            datas = self.paging(Weixin.objects.all(), self.Weixin_table_limit, page)
+            datas = self.paging(Weixin.objects.all(), limit, page)
         items = [set_logo(data) for data in datas['items']]
         html_string = render_to_string('weixin/%s_tpl.html' % api_type, {'weixin_list':  items})
         return Response({'html': html_string, 'total': datas['total_number']})
@@ -779,11 +781,12 @@ class WeiboView(BaseAPIView):
         api_type = parameter['type']
         sort = parameter['sort'] if parameter.has_key('page') else 'hot'
         page = parameter['page'] if parameter.has_key('page') else 1
+        limit = self.Weibo_table_limit if api_type == 'list' else 6
 
         if sort == 'new':
-            datas = self.paging(Weibo.objects.all(), self.Weibo_table_limit, page)
+            datas = self.paging(Weibo.objects.all(), limit, page)
         else:
-            datas = self.pagingfromredis(Weibo, self.Weibo_table_limit, page)
+            datas = self.pagingfromredis(Weibo, limit, page)
         items = [set_logo(data) for data in datas['items']]
         html_string = render_to_string('weibo/%s_tpl.html' % api_type, {'weibo_list':  items})
         return Response({'html': html_string, 'total': datas['total_number']})
