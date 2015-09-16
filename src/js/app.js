@@ -1097,38 +1097,16 @@ App.page.collection = function (module, path) {
 };
 
 App.page.risk = function (module) {
-  var $risk = $('#risk'),
-      $paginationContainer = $risk.parent(),
-
-      toAPI = function (pageNumber) {
-        if (typeof pageNumber === 'undefined') {
-          pageNumber = 1;
-        }
-
-        return '/api/risk/?type=list&page=' + pageNumber;
-      },
-
-      renderTable = function (pageContent) {
-        $('<tbody/>')
-          .html(pageContent)
-          .showRisk()
-          .replaceAll($risk.find('tbody'));
-      };
-
-  $.get(toAPI(), function (data) {
-    renderTable(data.html);
-
-    $paginationContainer.twbsPagination({
-      totalPages: data.total,
-      visiblePages: 7,
-      onPageClick: function (event, pageNumber) {
-        module.returnTop($(this));
-        $.get(toAPI(pageNumber), function (data) {
-          renderTable(data.html);
-          $paginationContainer.twbsPagination({totalPages: data.total});
-        });
-      }
-    });
+  module.list(module, {
+    container: '#risk',
+    feature: 'risk',
+    featureType: 'list',
+    render: function (container, content) {
+      $('<tbody/>')
+        .html(content)
+        .showRisk()
+        .replaceAll($(container).children('tbody'));
+    }
   });
 };
 
