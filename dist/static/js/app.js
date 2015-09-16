@@ -1541,16 +1541,19 @@ App.page.dashboard = function (module, path) {
   module.infoBox();
   module.map(path);
 
-  // whRisk
-  $.get('/api/risk/', {
-    type: 'abstract'
-  }, function (data) {
-    $('<tbody/>')
-      .html(data.html)
-      .showRisk()
-      .replaceAll($('#risk > tbody'));
+  module.list(module, {
+    pagination: false,
+    container: '#risk',
+    feature: 'risk',
+    featureType: 'abstract',
+    render: function (container, content) {
+      $('<tbody/>')
+        .html(content)
+        .showRisk()
+        .replaceAll($(container).children('tbody'));
+    }
   });
-
+  
   module.line(path);
   module.pie(path);
   module.inspection();
