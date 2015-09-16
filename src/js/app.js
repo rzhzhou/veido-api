@@ -1111,7 +1111,17 @@ App.page.weixinDetail = function () {
 };
 
 App.page.weibo = function (module, path, type) {
-  module.sns(module, path, type);
+  module.list({
+    feature: 'weibo',
+    sort: 'new',
+    container: '#weibo-new'
+  });
+
+  module.list({
+    feature: 'weibo',
+    sort: 'hot',
+    container: '#weibo-hot'
+  });
 };
 
 App.page.categoryDetail = function (module, path) {
