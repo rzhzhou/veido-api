@@ -1177,6 +1177,56 @@ App.module.table = function (module, path) {
   });
 };
 
+App.module.list = function (module, options) {
+  options = $.extend({
+    visiblePages: 7,
+    container: '',
+    feature: '',
+    featureType: '',
+    render: null
+  }, options);
+
+  $.extend($.fn.twbsPagination.defaults, {visiblePages: options.visiblePages});
+
+  function getAPI(feature) {
+    return '/api/' + feature + '/';
+  };
+
+  function getParam(featureType, pageNumber) {
+    pageNumber = typeof pageNumber === 'number' ? pageNumber : 1;
+    return {
+      type: featureType,
+      page: pageNumber
+    };
+  }
+
+  function paginate(container, totalPages, api, param, render) {
+    $(container).parent().twbsPagination({
+      totalPages: totalPages,
+      onPageClick: function (event, pageNumber) {
+        module.returnTop($(this));
+        $.get(api, param(pageNumber), function (data) {
+          render(container, data.html);
+        });
+      }
+    });
+  }
+
+  function init(container, api, param, render) {
+    $.get(api, param(), function (data) {
+      render(container, data.html);
+      paginate(container, data.total, api, param, render);
+    });
+  }
+
+  return init(
+    options.container,
+    getAPI(options.feature),
+    getParam.bind(null, options.featureType),
+    options.render
+  );
+};
+
 App.module.collect = function (type, id) {
   $('.collection').click(function () {
     var star = $(this).find('i'),
@@ -1510,38 +1560,15 @@ App.page.dashboard = function (module, path) {
 };
 
 App.page.news = function (module) {
-  var $news = $('#news'),
-      $paginationContainer = $news.parent(),
-
-      toAPI = function (pageNumber) {
-        if (typeof pageNumber === 'undefined') {
-          pageNumber = 1;
-        }
-
-        return '/api/news/?type=list&page=' + pageNumber;
-      },
-
-      renderTable = function (pageContent) {
-        $news.children('tbody').html(pageContent);
-      };
-
-  $.get(toAPI(), function (data) {
-    renderTable(data.html);
-
-    $paginationContainer.twbsPagination({
-      totalPages: data.total,
-      visiblePages: 7,
-      onPageClick: function (event, pageNumber) {
-        module.returnTop($(this));
-        $.get(toAPI(pageNumber), function (data) {
-          renderTable(data.html);
-          $paginationContainer.twbsPagination({totalPages: data.total});
-        });
-      }
-    });
+  module.list(module, {
+    container: '#news',
+    feature: 'news',
+    featureType: 'list',
+    render: function (container, content) {
+      $(container).children('tbody').html(content);
+    }
   });
 };
-
 
 App.page.newsDetail = function (module, path, type, id) {
   module.collect(type, id);
