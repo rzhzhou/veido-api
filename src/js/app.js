@@ -1093,13 +1093,13 @@ App.page.eventDetail = function (module, path, type, id) {
 };
 
 App.page.weixin = function (module, path, type) {
-  module.list({
+  module.list(module, {
     feature: 'weixin',
     sort: 'new',
     container: '#weixin-new'
   });
 
-  module.list({
+  module.list(module, {
     feature: 'weixin',
     sort: 'hot',
     container: '#weixin-hot'
