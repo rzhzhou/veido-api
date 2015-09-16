@@ -23,9 +23,9 @@ class WeiboView(BaseTemplateView):
                 data['photo'] = u'http://tp2.sinaimg.cn/3557640017/180/40054587155/1'
             if len(data['content']) < 144:
                 data['short'] = True
-        return self.render_to_response('weibo/weibo_list.html',
+        return self.render_to_response('weibo/list.html',
                 {
-                    'weibo_latest_list': latest, 
+                    'weibo_latest_list': latest,
                     'weibo_hottest_list': hottest,
                     'name': sidebar_name
                 })
