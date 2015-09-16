@@ -651,6 +651,7 @@ App.module.table = function (module, path) {
 
 App.module.list = function (module, options) {
   options = $.extend({
+    pagination: true,
     visiblePages: 7,
     container: '',
     feature: '',
@@ -687,7 +688,9 @@ App.module.list = function (module, options) {
   function init(container, api, param, render) {
     $.get(api, param(), function (data) {
       render(container, data.html);
-      paginate(container, data.total, api, param, render);
+      if (options.pagination) {
+        paginate(container, data.total, api, param, render);
+      }
     });
   }
 
