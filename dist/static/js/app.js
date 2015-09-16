@@ -1202,6 +1202,7 @@ App.module.abstract = function (options) {
 App.module.list = function (module, options) {
   options = $.extend({
     feature: '',
+    sort: '',
     container: '',
     render: function (container, content) {
       $(container).html(content);
@@ -1212,10 +1213,18 @@ App.module.list = function (module, options) {
 
   var api = '/api/' + options.feature + '/',
       param = function (pageNumber) {
-        return {
-          type: 'list',
-          page: pageNumber || 1
-        };
+        if (!options.sort) {
+          return {
+            type: 'list',
+            page: pageNumber || 1
+          };
+        } else {
+          return {
+            type: 'list',
+            page: pageNumber || 1,
+            sort: options.sort
+          };
+        }
       };
 
   $.get(api, param(), function (data) {
@@ -1612,7 +1621,17 @@ App.page.eventDetail = function (module, path, type, id) {
 };
 
 App.page.weixin = function (module, path, type) {
-  module.sns(module, path, type);
+  module.list({
+    feature: 'weixin',
+    sort: 'new',
+    container: '#weixin-new'
+  });
+
+  module.list({
+    feature: 'weixin',
+    sort: 'hot',
+    container: '#weixin-hot'
+  });
 };
 
 App.page.weixinDetail = function () {
