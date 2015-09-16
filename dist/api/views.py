@@ -753,16 +753,21 @@ class InspectionTableView(BaseAPIView):
         return result
 
 
-class WeixinTableView(BaseAPIView):
+class WeixinView(BaseAPIView):
     Weixin_table_limit = 20
-    def get(self, request, weixin_type, page):
-        if weixin_type == 'new':
+    def get(self, request):
+        parameter = request.GET
+
+        api_type = parameter['type']
+        sort = parameter['sort'] if parameter.has_key('page') else 'hot'
+        page = parameter['page'] if parameter.has_key('page') else 1
+        if sort == 'new':
             datas = self.paging(Weixin.objects.all(), self.Weixin_table_limit, page)
-        elif weixin_type == 'hot':
+        else: # hot
             datas = self.paging(Weixin.objects.all(), self.Weixin_table_limit, page)
         items = [set_logo(data) for data in datas['items']]
-        html = self.set_css_to_weixin(items)
-        return Response({'html': html, 'total': datas['total_number']})
+        html_string = render_to_string('weixin/%s_tpl.html' % api_type, {'weixin_list':  items})
+        return Response({'html': html_string, 'total': datas['total_number']})
 
 
 class WeiboTableView(BaseAPIView):
