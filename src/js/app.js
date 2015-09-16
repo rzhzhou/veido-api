@@ -673,52 +673,35 @@ App.module.abstract = function (options) {
 
 App.module.list = function (module, options) {
   options = $.extend({
-    visiblePages: 7,
-    container: '',
     feature: '',
-    featureType: '',
-    render: null
+    container: '',
+    render: function (container, content) {
+      $(container).html(content);
+    }
   }, options);
 
-  $.extend($.fn.twbsPagination.defaults, {visiblePages: options.visiblePages});
+  $.extend($.fn.twbsPagination.defaults, {visiblePages: 7});
 
-  function getAPI(feature) {
-    return '/api/' + feature + '/';
-  };
+  var api = '/api/' + options.feature + '/',
+      param = function (pageNumber) {
+        return {
+          type: 'list',
+          page: pageNumber || 1
+        };
+      };
 
-  function getParam(featureType, pageNumber) {
-    pageNumber = typeof pageNumber === 'number' ? pageNumber : 1;
-    return {
-      type: featureType,
-      page: pageNumber
-    };
-  }
-
-  function paginate(container, totalPages, api, param, render) {
-    $(container).parent().twbsPagination({
-      totalPages: totalPages,
+  $.get(api, param(), function (data) {
+    options.render(options.container, data.html);
+    $(options.container).closest('.box-body').twbsPagination({
+      totalPages: data.total,
       onPageClick: function (event, pageNumber) {
         module.returnTop($(this));
         $.get(api, param(pageNumber), function (data) {
-          render(container, data.html);
+          options.render(options.container, data.html);
         });
       }
     });
-  }
-
-  function init(container, api, param, render) {
-    $.get(api, param(), function (data) {
-      render(container, data.html);
-      paginate(container, data.total, api, param, render);
-    });
-  }
-
-  return init(
-    options.container,
-    getAPI(options.feature),
-    getParam.bind(null, options.featureType),
-    options.render
-  );
+  });
 };
 
 App.module.collect = function (type, id) {
@@ -1060,12 +1043,8 @@ App.page.dashboard = function (module, path) {
 
 App.page.news = function (module) {
   module.list(module, {
-    container: '#news',
     feature: 'news',
-    featureType: 'list',
-    render: function (container, content) {
-      $(container).children('tbody').html(content);
-    }
+    container: '#news > tbody'
   });
 };
 
@@ -1075,12 +1054,8 @@ App.page.newsDetail = function (module, path, type, id) {
 
 App.page.event = function (module, path) {
   module.list(module, {
-    container: '#event',
     feature: 'event',
-    featureType: 'list',
-    render: function (container, content) {
-      $(container).children('tbody').html(content);
-    }
+    container: '#event > tbody'
   });
 };
 
@@ -1132,14 +1107,13 @@ App.page.collection = function (module, path) {
 
 App.page.risk = function (module) {
   module.list(module, {
-    container: '#risk',
     feature: 'risk',
-    featureType: 'list',
+    container: '#risk > tbody',
     render: function (container, content) {
       $('<tbody/>')
         .html(content)
         .showRisk()
-        .replaceAll($(container).children('tbody'));
+        .replaceAll($(container));
     }
   });
 };
