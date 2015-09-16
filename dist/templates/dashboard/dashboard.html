@@ -133,39 +133,7 @@
   </div>
 
   <div class="row">
-    <div class="col-md-6">
-      <div class="box box-success">
-        <div class="box-header with-border">
-          <h3 class="box-title">微信</h3>
-        </div>
-        <div class="box-body no-padding">
-          <ul class="media-list">
-            {% for weixin in weixin_hottest_list %}
-              <li class="media">
-                <div class="media-left">
-                  <img class="media-object" src="{{ weixin.publisher.photo }}" alt="{{ weixin.publisher.publisher }}">
-                </div>
-                <div class="media-body">
-                  <h4 class="media-heading">{{ weixin.publisher.publisher }}</h4>
-                  <p><a href="/weixin/{{ weixin.id }}/" target="_blank">{{ weixin.title }}</a></p>
-
-                  <div class="media-meta">
-                    <div class="info pull-right">
-                      <span>阅读 {{ weixin.count }}</span>
-                      <span><i class="fa fa-thumbs-o-up"></i> {{ weixin.praise }}</span>
-                    </div>
-                    <div class="time pull-left">{{ weixin.pubtime | date:"Y-m-d h:m:s" }}</div>
-                  </div>
-                </div>
-              </li>
-            {% endfor %}
-          </ul>
-        </div>
-        <div class="box-footer text-center">
-          <a href="/weixin/">查看更多</a>
-        </div>
-      </div>
-    </div>
+    {% include "weixin/abstract.html" %}
 
     <div class="col-md-6">
       <div class="box box-warning">
