@@ -153,44 +153,61 @@ class RisksView(BaseAPIView):
         return Response({'total': datas['total_number'], 'html': html_string})
 
 
-class RisksDetailTableView(BaseAPIView):
+class RisksNewsView(BaseAPIView):
 
-    def get(self, request, id, page):
+    def get(self, request, id):
+        parameter = request.GET
+        page = parameter['page'] if parameter.has_key('page') else 1
+
         try:
             risk = Risk.objects.get(id=int(id))
         except Risk.DoesNotExist:
-            return Response({'risk': ''})
+            return HttpResponseRedirect('/risk/')
+
         items = risk.articles.all()
         datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
         result = self.news_to_json(datas['items'])
-        return Response({'total': datas['total_number'], 'data': result})
+        html_string = render_to_string('risk/list_tpl.html', {'risk_list':  datas['items']})
+        return Response({'total': datas['total_number'], 'html': html_string})
 
-class RisksDetailWeixinView(BaseAPIView):
+
+class RisksWeixinView(BaseAPIView):
     EVENT_WEIXIN_LIMIT = 10
-    def get(self, request, id, page):
+
+    def get(self, request, id):
+        parameter = request.GET
+        page = parameter['page'] if parameter.has_key('page') else 1
+
         try:
             risk = Risk.objects.get(id=int(id))
         except Risk.DoesNotExist:
-            return Response({'html': '', 'total': 0})
+            return HttpResponseRedirect('/risk/')
+
         items = risk.weixin.all()
         datas = self.paging(items, self.EVENT_WEIXIN_LIMIT, page)
         items = [set_logo(data) for data in datas['items']]
-        html = self.set_css_to_weixin(items)
-        return Response({'html': html, 'total': datas['total_number']})
+        html_string = render_to_string('weixin/list_tpl.html', {'weixin_list':  datas['items']})
+        return Response({'total': datas['total_number'], 'html': html_string})
 
 
-class RisksDetailWeiboView(BaseAPIView):
+class RisksWeiboView(BaseAPIView):
     EVENT_WEIBO_LIMIT = 10
-    def get(self, request, id, page):
+
+    def get(self, request, id):
+        parameter = request.GET
+        page = parameter['page'] if parameter.has_key('page') else 1
+
         try:
             risk = Risk.objects.get(id=int(id))
         except Risk.DoesNotExist:
-            return Response({'html': '', 'total': 0})
+            return HttpResponseRedirect('/risk/')
+
         items = risk.weibo.all()
         datas = self.paging(items, self.EVENT_WEIBO_LIMIT, page)
         items = [set_logo(data) for data in datas['items']]
-        html = self.set_css_to_weibo(items)
-        return Response({'html': html, 'total': datas['total_number']})
+        html_string = render_to_string('weibo/list_tpl.html', {'weibo_list':  datas['items']})
+        return Response({'total': datas['total_number'], 'html': html_string})
+
 
 class NewsView(BaseAPIView):
     def get_custom_artice(self):

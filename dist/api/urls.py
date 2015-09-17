@@ -4,8 +4,8 @@ from api.views import (ArticleTableView, CollectView, CollecModifyView,
     EventView, EventNewsView, EventWeixinView, EventWeiboView,
     InspectionTableView, InspectionLocalView, InspectionNationalView,
     LocationTableView, LocationWeixinView, LocationWeiboView, NewsView,
-    ProductTableView, RisksView, RisksDetailTableView,RisksDetailWeixinView,
-    RisksDetailWeiboView, SearchView, WeixinView, WeiboView)
+    ProductTableView, RisksView, RisksNewsView, RisksWeixinView, RisksWeiboView,
+    SearchView, WeixinView, WeiboView)
 
 
 urlpatterns = patterns('',
@@ -15,14 +15,17 @@ urlpatterns = patterns('',
     url(r'^location/(?P<location_id>\d+)/news/(?P<page>\d+)/$', LocationTableView.as_view()),
     url(r'^news/$', NewsView.as_view()),
     url(r'^collection/(?P<table_type>\S+)/(?P<page>\d+)/$', CollectView.as_view()),
+
     url(r'^risk/$', RisksView.as_view()),
-    url(r'^risk/(?P<id>\d+)/news/(?P<page>\d+)/$', RisksDetailTableView.as_view()),
-    url(r'^risk/(?P<id>\d+)/weixin/new/(?P<page>\d+)/$', RisksDetailWeixinView.as_view()),
-    url(r'^risk/(?P<id>\d+)/weibo/new/(?P<page>\d+)/$', RisksDetailWeiboView.as_view()),
+    url(r'^risk/(?P<id>\d+)/news/$', RisksNewsView.as_view()),
+    url(r'^risk/(?P<id>\d+)/weixin/$', RisksWeixinView.as_view()),
+    url(r'^risk/(?P<id>\d+)/weibo/$', RisksWeiboView.as_view()),
+
     url(r'^event/$', EventView.as_view()),
     url(r'^event/(?P<id>\d+)/news/$', EventNewsView.as_view()),
     url(r'^event/(?P<id>\d+)/weixin/$', EventWeixinView.as_view()),
     url(r'^event/(?P<id>\d+)/weibo/$', EventWeiboView.as_view()),
+
     url(r'^search/(.+)/$', SearchView.as_view()),
     url(r'^collection/(?P<action>\w+)/$', CollecModifyView.as_view()),
     #url(r'^collection/add/$', CollecModifyView.as_view()),
