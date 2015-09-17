@@ -1731,8 +1731,23 @@ App.page.custom = function (module) {
 };
 
 App.page.customDetail = function (module, path, type) {
-  module.table(module, path);
-  module.sns(module, path, type);
+  module.detail({
+    path: path,
+    feature: 'news',
+    container: '#news > tbody'
+  });
+
+  module.detail({
+    path: path,
+    feature: 'weixin',
+    container: '#weixin'
+  });
+
+  module.detail({
+    path: path,
+    feature: 'weibo',
+    container: '#weibo'
+  });
 };
 
 App.page.collection = function (module, path) {
@@ -1756,7 +1771,7 @@ App.page.riskDetail = function (module, path, type, id) {
   module.collect(type, id);
   module.line(path, type);
   module.pie(path, type);
-  
+
   module.detail({
     path: path,
     feature: 'news',
