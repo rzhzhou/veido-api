@@ -1194,8 +1194,23 @@ App.page.categoryDetail = function (module, path) {
 };
 
 App.page.locationDetail = function (module, path, type) {
-  module.table(module, path);
-  module.sns(module, path, type);
+  module.detail({
+    path: path,
+    feature: 'news',
+    container: '#news > tbody'
+  });
+
+  module.detail({
+    path: path,
+    feature: 'weixin',
+    container: '#weixin'
+  });
+
+  module.detail({
+    path: path,
+    feature: 'weibo',
+    container: '#weibo'
+  });
 };
 
 App.page.inspection = function (module, path) {
