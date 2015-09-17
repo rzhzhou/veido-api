@@ -1714,12 +1714,31 @@ App.page.weibo = function (module, path, type) {
 };
 
 App.page.categoryDetail = function (module, path) {
-  module.table(module, path);
+  module.detail({
+    path: path,
+    feature: 'news',
+    container: '#news > tbody'
+  });
 };
 
 App.page.locationDetail = function (module, path, type) {
-  module.table(module, path);
-  module.sns(module, path, type);
+  module.detail({
+    path: path,
+    feature: 'news',
+    container: '#news > tbody'
+  });
+
+  module.detail({
+    path: path,
+    feature: 'weixin',
+    container: '#weixin'
+  });
+
+  module.detail({
+    path: path,
+    feature: 'weibo',
+    container: '#weibo'
+  });
 };
 
 App.page.inspection = function (module, path) {
@@ -1751,7 +1770,17 @@ App.page.customDetail = function (module, path, type) {
 };
 
 App.page.collection = function (module, path) {
-  module.table(module, path);
+  module.detail({
+    path: path,
+    feature: 'news',
+    container: '#news > tbody'
+  });
+
+  module.detail({
+    path: path,
+    feature: 'event',
+    container: '#event > tbody'
+  });
 };
 
 App.page.risk = function (module) {
