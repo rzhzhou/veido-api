@@ -1,8 +1,8 @@
 from django.conf.urls import patterns, include, url
 from api.views import ArticleTableView, NewsView, LocationTableView, CollectView, EventView,\
-                      CollecModifyView, EventDetailTableView, SearchView, CustomTableView, InspectionNationalView,\
-                      InspectionTableView, InspectionLocalView, WeixinView, WeiboView, LocationWeixinView, LocationWeiboView, EventDetailWeixinView,\
-                      EventDetailWeiboView, CustomWeixinView, CustomWeiboView, CustomModifyView,ProductTableView, RisksView, RisksTableView, RisksDetailTableView, \
+                      CollecModifyView, EventNewsView, SearchView, CustomTableView, InspectionNationalView,\
+                      InspectionTableView, InspectionLocalView, WeixinView, WeiboView, LocationWeixinView, LocationWeiboView, EventWeixinView,\
+                      EventWeiboView, CustomWeixinView, CustomWeiboView, CustomModifyView,ProductTableView, RisksView, RisksTableView, RisksDetailTableView, \
                       RisksDetailWeixinView, RisksDetailWeiboView
 
 
@@ -23,9 +23,9 @@ urlpatterns = patterns('',
     url(r'^risk/(?P<id>\d+)/weixin/new/(?P<page>\d+)/$', RisksDetailWeixinView.as_view()),
     url(r'^risk/(?P<id>\d+)/weibo/new/(?P<page>\d+)/$', RisksDetailWeiboView.as_view()),
     url(r'^event/$', EventView.as_view()),
-    url(r'^event/(?P<id>\d+)/news/(?P<page>\d+)/$', EventDetailTableView.as_view()),
-    url(r'^event/(?P<id>\d+)/weixin/new/(?P<page>\d+)/$', EventDetailWeixinView.as_view()),
-    url(r'^event/(?P<id>\d+)/weibo/new/(?P<page>\d+)/$', EventDetailWeiboView.as_view()),
+    url(r'^event/(?P<id>\d+)/news/$', EventNewsView.as_view()),
+    url(r'^event/(?P<id>\d+)/weixin/$', EventWeixinView.as_view()),
+    url(r'^event/(?P<id>\d+)/weibo/$', EventWeiboView.as_view()),
     url(r'^search/(.+)/$', SearchView.as_view()),
     url(r'^collection/(?P<action>\w+)/$', CollecModifyView.as_view()),
     #url(r'^collection/add/$', CollecModifyView.as_view()),

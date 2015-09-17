@@ -348,60 +348,56 @@ class EventView(BaseAPIView):
         return Response({'total': datas['total_number'], 'html': html_string})
 
 
-class EventDetailTableView(BaseAPIView):
-    def get(self, request, id, page):
+class EventNewsView(BaseAPIView):
+
+    def get(self, request, id):
+        parameter = request.GET
+        page = parameter['page'] if parameter.has_key('page') else 1
+
         try:
             event = Topic.objects.get(id=int(id))
         except Topic.DoesNotExist:
-            return Response({'news': ''})
-        """
-        news = event.articles.all()
-        result = []
-        for item in news:
-            collected_html = self.collected_html(item)
-            url = u'/news/%s' % item.id
-            title = self.title_html(url, item.title, item.id, 'article')
-            hot_index = RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count()
-            one_record = [collected_html, title, item.publisher.publisher, item.area.name, item.pubtime.date(), hot_index]
-            result.append(one_record)
-        return Response({'news': result})
-        """
+            return HttpResponseRedirect('/event/')
         items = event.articles.all()
         datas = self.paging(items, settings.NEWS_PAGE_LIMIT, page)
         result = self.news_to_json(datas['items'])
         return Response({'total': datas['total_number'], 'data': result})
 
 
-    def get_collected_html(self, item):
-        pass
-
-
-class EventDetailWeixinView(BaseAPIView):
+class EventWeixinView(BaseAPIView):
     EVENT_WEIXIN_LIMIT = 10
-    def get(self, request, id, page):
+
+    def get(self, request, id):
+        parameter = request.GET
+        page = parameter['page'] if parameter.has_key('page') else 1
+
         try:
             event = Topic.objects.get(id=int(id))
         except Topic.DoesNotExist:
-            return Response({'html': '', 'total': 0})
+            return HttpResponseRedirect('/weixin/')
         items = event.weixin.all()
         datas = self.paging(items, self.EVENT_WEIXIN_LIMIT, page)
         items = [set_logo(data) for data in datas['items']]
-        html = self.set_css_to_weixin(items)
-        return Response({'html': html, 'total': datas['total_number']})
+        html_string = render_to_string('weixin/list_tpl.html', {'weixin_list':  items})
+        return Response({'html': html_string, 'total': datas['total_number']})
 
 
-class EventDetailWeiboView(BaseAPIView):
+class EventWeiboView(BaseAPIView):
     EVENT_WEIBO_LIMIT = 10
-    def get(self, request, id, page):
+
+    def get(self, request, id):
+        parameter = request.GET
+        page = parameter['page'] if parameter.has_key('page') else 1
+
         try:
             event = Topic.objects.get(id=int(id))
         except Topic.DoesNotExist:
-            return Response({'html': '', 'total': 0})
+            return HttpResponseRedirect('/weibo/')
         items = event.weibo.all()
         datas = self.paging(items, self.EVENT_WEIBO_LIMIT, page)
         items = [set_logo(data) for data in datas['items']]
-        html = self.set_css_to_weibo(items)
-        return Response({'html': html, 'total': datas['total_number']})
+        html_string = render_to_string('weibo/list_tpl.html', {'weibo_list':  items})
+        return Response({'html': html_string, 'total': datas['total_number']})
 
 
 class CollectView(APIView):
