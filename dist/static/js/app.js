@@ -1770,7 +1770,17 @@ App.page.customDetail = function (module, path, type) {
 };
 
 App.page.collection = function (module, path) {
-  module.table(module, path);
+  module.detail({
+    path: path,
+    feature: 'news',
+    container: '#news > tbody'
+  });
+
+  module.detail({
+    path: path,
+    feature: 'event',
+    container: '#event > tbody'
+  });
 };
 
 App.page.risk = function (module) {
