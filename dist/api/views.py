@@ -167,7 +167,7 @@ class RisksNewsView(BaseAPIView):
         items = risk.articles.all()
         datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
         result = self.news_to_json(datas['items'])
-        html_string = render_to_string('risk/list_tpl.html', {'risk_list':  datas['items']})
+        html_string = render_to_string('news/list_tpl.html', {'news_list':  result})
         return Response({'total': datas['total_number'], 'html': html_string})
 
 
