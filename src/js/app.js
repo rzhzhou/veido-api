@@ -649,6 +649,24 @@ App.module.table = function (module, path) {
   });
 };
 
+App.module.paginate = function (options) {
+  var returnTop = this.returnTop;
+
+  $.get(options.api, options.filter(), function (data) {
+    if (!data.html) { return false; }
+    options.render(options.container, data.html);
+    $(options.container).closest('.box-body').twbsPagination({
+      totalPages: data.total,
+      onPageClick: function (event, pageNumber) {
+        returnTop($(this));
+        $.get(options.api, options.filter(pageNumber), function (data) {
+          options.render(options.container, data.html);
+        });
+      }
+    });
+  });
+};
+
 App.module.abstract = function (options) {
   options = $.extend({
     feature: '',
@@ -693,20 +711,13 @@ App.module.list = function (options) {
         } else {
           return $.extend({}, options.filter, {page: pageNumber});
         }
-      },
-      returnTop = this.returnTop;
+      };
 
-  $.get(api, filter(), function (data) {
-    options.render(options.container, data.html);
-    $(options.container).closest('.box-body').twbsPagination({
-      totalPages: data.total,
-      onPageClick: function (event, pageNumber) {
-        returnTop($(this));
-        $.get(api, filter(pageNumber), function (data) {
-          options.render(options.container, data.html);
-        });
-      }
-    });
+  this.paginate.call(this, {
+    api: api,
+    filter: filter,
+    container: options.container,
+    render: options.render
   });
 };
 
@@ -729,20 +740,13 @@ App.module.detail = function (options) {
         } else {
           return {page: pageNumber};
         }
-      },
-      returnTop = this.returnTop;
+      };
 
-  $.get(api, filter(), function (data) {
-    options.render(options.container, data.html);
-    $(options.container).closest('.box-body').twbsPagination({
-      totalPages: data.total,
-      onPageClick: function (event, pageNumber) {
-        returnTop($(this));
-        $.get(api, filter(pageNumber), function (data) {
-          options.render(options.container, data.html);
-        });
-      }
-    });
+  this.paginate.call(this, {
+    api: api,
+    filter: filter,
+    container: options.container,
+    render: options.render
   });
 };
 
@@ -1224,8 +1228,24 @@ App.page.riskDetail = function (module, path, type, id) {
   module.collect(type, id);
   module.line(path, type);
   module.pie(path, type);
-  module.table(module, path);
-  module.sns(module, path, type);
+  
+  module.detail({
+    path: path,
+    feature: 'news',
+    container: '#news > tbody'
+  });
+
+  module.detail({
+    path: path,
+    feature: 'weixin',
+    container: '#weixin'
+  });
+
+  module.detail({
+    path: path,
+    feature: 'weibo',
+    container: '#weibo'
+  });
 };
 
 App.page.analyticsDetail = function (module, path) {
