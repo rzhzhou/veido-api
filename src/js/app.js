@@ -672,9 +672,12 @@ App.module.abstract = function (options) {
 };
 
 App.module.list = function (module, options) {
-  options = $.extend({
+  options = $.extend(true, {
     feature: '',
-    sort: '',
+    param: {
+      type: 'list',
+      page: 1
+    },
     container: '',
     render: function (container, content) {
       $(container).html(content);
@@ -685,17 +688,10 @@ App.module.list = function (module, options) {
 
   var api = '/api/' + options.feature + '/',
       param = function (pageNumber) {
-        if (!options.sort) {
-          return {
-            type: 'list',
-            page: pageNumber || 1
-          };
+        if (typeof pageNumber !== 'number') {
+          return options.param;
         } else {
-          return {
-            type: 'list',
-            page: pageNumber || 1,
-            sort: options.sort
-          };
+          return $.extend({}, options.param, {page: pageNumber});
         }
       };
 
