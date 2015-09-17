@@ -1238,6 +1238,42 @@ App.module.list = function (options) {
   });
 };
 
+App.module.detail = function (options) {
+  options = $.extend(true, {
+    path: '',
+    feature: '',
+    container: '',
+    render: function (container, content) {
+      $(container).html(content);
+    }
+  }, options);
+
+  $.extend($.fn.twbsPagination.defaults, {visiblePages: 7});
+
+  var api = '/api' + options.path + options.feature + '/',
+      filter = function (pageNumber) {
+        if (typeof pageNumber !== 'number') {
+          return {page: 1};
+        } else {
+          return {page: pageNumber};
+        }
+      },
+      returnTop = this.returnTop;
+
+  $.get(api, filter(), function (data) {
+    options.render(options.container, data.html);
+    $(options.container).closest('.box-body').twbsPagination({
+      totalPages: data.total,
+      onPageClick: function (event, pageNumber) {
+        returnTop($(this));
+        $.get(api, filter(pageNumber), function (data) {
+          options.render(options.container, data.html);
+        });
+      }
+    });
+  });
+};
+
 App.module.collect = function (type, id) {
   $('.collection').click(function () {
     var star = $(this).find('i'),
@@ -1613,8 +1649,24 @@ App.page.eventDetail = function (module, path, type, id) {
   module.collect(type, id);
   module.line(path, type);
   module.pie(path, type);
-  module.table(module, path);
-  module.sns(module, path, type);
+
+  module.detail({
+    path: path,
+    feature: 'news',
+    container: '#news > tbody'
+  });
+
+  module.detail({
+    path: path,
+    feature: 'weixin',
+    container: '#weixin'
+  });
+
+  module.detail({
+    path: path,
+    feature: 'weibo',
+    container: '#weibo'
+  });
 };
 
 App.page.weixin = function (module, path, type) {
