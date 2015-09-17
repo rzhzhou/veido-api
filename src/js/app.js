@@ -674,7 +674,7 @@ App.module.abstract = function (options) {
 App.module.list = function (module, options) {
   options = $.extend(true, {
     feature: '',
-    param: {
+    filter: {
       type: 'list',
       page: 1
     },
@@ -687,21 +687,21 @@ App.module.list = function (module, options) {
   $.extend($.fn.twbsPagination.defaults, {visiblePages: 7});
 
   var api = '/api/' + options.feature + '/',
-      param = function (pageNumber) {
+      filter = function (pageNumber) {
         if (typeof pageNumber !== 'number') {
-          return options.param;
+          return options.filter;
         } else {
-          return $.extend({}, options.param, {page: pageNumber});
+          return $.extend({}, options.filter, {page: pageNumber});
         }
       };
 
-  $.get(api, param(), function (data) {
+  $.get(api, filter(), function (data) {
     options.render(options.container, data.html);
     $(options.container).closest('.box-body').twbsPagination({
       totalPages: data.total,
       onPageClick: function (event, pageNumber) {
         module.returnTop($(this));
-        $.get(api, param(pageNumber), function (data) {
+        $.get(api, filter(pageNumber), function (data) {
           options.render(options.container, data.html);
         });
       }
