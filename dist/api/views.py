@@ -413,7 +413,6 @@ class CollectView(APIView):
         return Response({'total': datas['total_number'], 'data': result})
 
 
-
 class CollecModifyView(View):
     def save(self, item):
         data = {self.related_field: item, 'collection': self.collection}
@@ -487,6 +486,7 @@ class CollecModifyView(View):
             self.save(item)
         return JsonResponse({'status': True})
 
+
 class SearchView(CollectView):
     LIMIT = 200
     def get(self, request, keyword, *args, **kwargs):
@@ -511,7 +511,7 @@ class SearchView(CollectView):
         return Topic.objects.raw(u"SELECT * FROM topic WHERE title like '%%{0}%%' LIMIT {1}".format(key, self.LIMIT))
 
 
-class CustomTableView(BaseAPIView):
+class CustomNewsView(BaseAPIView):
     def get_bak(self, request, custom_id):
         customname = [u'电梯',u'锅炉', u'两会']
         try:
