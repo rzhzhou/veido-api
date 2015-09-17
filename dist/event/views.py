@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 
 from base import sidebarUtil
@@ -21,7 +22,7 @@ class EventDetailView(BaseTemplateView):
             eval_keywords_list = eval(event.keywords) if event.keywords else []
             keywords_list = [{"name": name, "number": number} for name, number in eval_keywords_list]
         except Topic.DoesNotExist:
-            return self.render_to_response('event/detail.html', {'event': '', 'weixin_list': [], 'weibo_list': []})
+            return HttpResponseRedirect('/event/')
         user = self.request.myuser
         try:
             collection = user.collection
