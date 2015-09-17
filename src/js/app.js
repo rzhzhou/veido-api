@@ -671,7 +671,7 @@ App.module.abstract = function (options) {
   });
 };
 
-App.module.list = function (module, options) {
+App.module.list = function (options) {
   options = $.extend(true, {
     feature: '',
     filter: {
@@ -693,14 +693,15 @@ App.module.list = function (module, options) {
         } else {
           return $.extend({}, options.filter, {page: pageNumber});
         }
-      };
+      },
+      returnTop = this.returnTop;
 
   $.get(api, filter(), function (data) {
     options.render(options.container, data.html);
     $(options.container).closest('.box-body').twbsPagination({
       totalPages: data.total,
       onPageClick: function (event, pageNumber) {
-        module.returnTop($(this));
+        returnTop($(this));
         $.get(api, filter(pageNumber), function (data) {
           options.render(options.container, data.html);
         });
@@ -1063,7 +1064,7 @@ App.page.dashboard = function (module, path) {
 };
 
 App.page.news = function (module) {
-  module.list(module, {
+  module.list({
     feature: 'news',
     container: '#news > tbody'
   });
@@ -1074,7 +1075,7 @@ App.page.newsDetail = function (module, path, type, id) {
 };
 
 App.page.event = function (module, path) {
-  module.list(module, {
+  module.list({
     feature: 'event',
     container: '#event > tbody'
   });
@@ -1089,7 +1090,7 @@ App.page.eventDetail = function (module, path, type, id) {
 };
 
 App.page.weixin = function (module, path, type) {
-  module.list(module, {
+  module.list({
     feature: 'weixin',
     filter: {
       sort: 'new'
@@ -1097,7 +1098,7 @@ App.page.weixin = function (module, path, type) {
     container: '#weixin-new'
   });
 
-  module.list(module, {
+  module.list({
     feature: 'weixin',
     filter: {
       sort: 'hot'
@@ -1111,7 +1112,7 @@ App.page.weixinDetail = function () {
 };
 
 App.page.weibo = function (module, path, type) {
-  module.list(module, {
+  module.list({
     feature: 'weibo',
     filter: {
       sort: 'new'
@@ -1119,7 +1120,7 @@ App.page.weibo = function (module, path, type) {
     container: '#weibo-new'
   });
 
-  module.list(module, {
+  module.list({
     feature: 'weibo',
     filter: {
       sort: 'hot'
@@ -1155,7 +1156,7 @@ App.page.collection = function (module, path) {
 };
 
 App.page.risk = function (module) {
-  module.list(module, {
+  module.list({
     feature: 'risk',
     container: '#risk > tbody',
     render: function (container, content) {
