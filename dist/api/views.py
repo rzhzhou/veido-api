@@ -361,7 +361,8 @@ class EventNewsView(BaseAPIView):
         items = event.articles.all()
         datas = self.paging(items, settings.NEWS_PAGE_LIMIT, page)
         result = self.news_to_json(datas['items'])
-        return Response({'total': datas['total_number'], 'data': result})
+        html_string = render_to_string('news/list_tpl.html', {'news_list':  result})
+        return Response({'html': html_string, 'total': datas['total_number']})
 
 
 class EventWeixinView(BaseAPIView):
