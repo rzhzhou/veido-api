@@ -4,16 +4,16 @@
     <img class="media-object" src="http://tp2.sinaimg.cn/3557640017/180/40054587155/1" alt="占豪">
   </div>
   <div class="media-body">
-    <h4 class="media-heading">占豪</h4>
+    <h4 class="media-heading">{{ weixin.publisher.publisher }}</h4>
     <p>
-      <a href="/weixin/24243/" target="_blank">原创丨美国在中东要遇大麻烦！</a>
+      <a href="/weixin/24243/" target="_blank">{{ weixin.title }}</a>
     </p>
     <div class="media-meta">
       <div class="info pull-right">
-        <span>阅读 0</span>
-        <span><i class="fa fa-thumbs-o-up"></i> 0</span>
+        <span>阅读 {{ weixin.count }}</span>
+        <span><i class="fa fa-thumbs-o-up"></i> {{ weixin.praise }}</span>
       </div>
-      <div class="time pull-left">2015-09-15 16:00</div>
+      <div class="time pull-left">{{ weixin.pubtime | date:"Y-m-d h:m:s" }}</div>
     </div>
   </div>
 </li>
