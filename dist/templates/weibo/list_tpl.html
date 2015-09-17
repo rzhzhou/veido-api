@@ -1,19 +1,25 @@
 {% for weibo in weibo_list %}
-<li class="media">
-  <div class="media-left">
-    <img class="media-object" src="http://tp2.sinaimg.cn/3557640017/180/40054587155/1" alt="无锡市质监局">
-  </div>
-  <div class="media-body">
-    <h4 class="media-heading">无锡市质监局</h4>
-    <p>#质量月# 质量提升，标准引领 @无锡发布</p>
-    <div class="media-meta">
-      <div class="info pull-right">
-        <span>转载 0</span>
-        <span>评论 0</span>
-        <span><i class="fa fa-thumbs-o-up"></i> 0</span>
-      </div>
-      <div class="time pull-left">2015-09-17 06:48</div>
+  <li class="media">
+    <div class="media-left">
+      <img class="media-object" src="http://tp2.sinaimg.cn/3557640017/180/40054587155/1" alt="无锡市质监局">
     </div>
-  </div>
-</li>
+    <div class="media-body">
+      <h4 class="media-heading">{{ weibo.author }}</h4>
+      <p>
+        {% if weibo.short %}
+          {{ weibo.content }}
+        {% else %}
+          <a href="{{ weibo.url }}" target="_blank">{{ weibo.title }}</a>
+        {% endif %}
+      </p>
+      <div class="media-meta">
+        <div class="info pull-right">
+          <span>转载 {{ weibo.reposts_count }}</span>
+          <span>评论 {{ weibo.comments_count }}</span>
+          <span><i class="fa fa-thumbs-o-up"></i> {{ weibo.attitudes_count }}</span>
+        </div>
+        <div class="time pull-left">{{ weibo.pubtime | date:"Y-m-d h:m:s" }}</div>
+      </div>
+    </div>
+  </li>
 {% endfor %}
