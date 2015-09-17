@@ -605,50 +605,6 @@ App.module.returnTop = function (el) {
   $('body').animate({scrollTop: scrollTop});
 };
 
-App.module.table = function (module, path) {
-  $('.table-custom').each(function () {
-    var $this       = $(this),
-        $pagination = $this.parent(),
-        content     = this.tBodies[0],
-        type        = this.id,
-
-        renderTable = function(data) {
-          var items = data.data,
-
-              table = $.map(items, function(item) {
-                var url       = '/' + type + '/' + item.id + '/',
-                    title     = '<td><a href="' + url + '" title="' + item.title + '" target="_blank">' + item.title + '</a></td>',
-                    source    = '<td>' + item.source   + '</td>',
-                    location  = '<td>' + item.location + '</td>',
-                    time      = '<td>' + item.time     + '</td>',
-                    hot       = '<td class="text-center">' + item.hot + '</td>',
-                    row       = '<tr>' + title + source + location + time + hot + '</tr>';
-
-                return row;
-              });
-
-          $(content).html(table);
-        };
-
-    $.getJSON('/api' + path + type + '/1/', function(data) {
-      renderTable(data);
-
-      $pagination.twbsPagination({
-        totalPages: data.total,
-        visiblePages: 7,
-        onPageClick: function(event, page) {
-          module.returnTop($this);
-
-          $.getJSON('/api' + path + type + '/' + page + '/', function(data) {
-            renderTable(data);
-            $pagination.twbsPagination({totalPages: data.total});
-          });
-        }
-      });
-    });
-  });
-};
-
 App.module.paginate = function (options) {
   var returnTop = this.returnTop;
 
