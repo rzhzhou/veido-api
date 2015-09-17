@@ -512,102 +512,61 @@ class SearchView(CollectView):
 
 
 class CustomNewsView(BaseAPIView):
-    def get_bak(self, request, custom_id):
-        customname = [u'电梯',u'锅炉', u'两会']
-        try:
-            #custom = Custom.objects.get(id=int(custom_id))
-            custom = customname[int(custom_id)]
-        except Custom.DoesNotExist:
-            return Response({'news': ''})
-        result = []
-        #news = custom.articles.all()[:self.LIMIT_NUMBER]
-        news = self.get_news(custom)
-        serializer = ArticleSerializer(news, many=True)
 
-        for item in news:
-            collected_html = self.collected_html(item)
-            url = u'/news/%s' % item.id
-            title = self.title_html(url, item.title,item.id, 'article')
-            try:
-                hot_index = RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count()
-            except IndexError:
-                hot_index = 0
-            one_record = [collected_html, title, item.publisher.publisher, item.area.name, item.pubtime.date(), hot_index]
-            result.append(one_record)
-
-        return Response({"news": result})
-
-    def get_news(self, keyword):
-        return Article.objects.raw(u"SELECT * FROM article WHERE MATCH (content, title) AGAINST ('%s')" % (keyword))
-
-    def get(self, request, custom_id, page):
+    def get(self, request, custom_id):
         user = request.myuser
+        parameter = request.GET
+        page = parameter['page'] if parameter.has_key('page') else 1
+
         try:
             keyword = CustomKeyword.objects.get(id=int(custom_id), group=user.group)
         except CustomKeyword.DoesNotExist:
-            return Response({'total': 0, 'data': []})
+            return HttpResponseRedirect('/custom/')
+
         items = keyword.custom.articles.all()
         datas = self.paging(items, settings.NEWS_PAGE_LIMIT, page)
         result = self.news_to_json(datas['items'])
-        return Response({'total': datas['total_number'], 'data': result})
-
-
-class ProductTableView(BaseAPIView):
-    def get(self, request, id, page):
-        if id:
-            try:
-                prokey = [ProductKeyword.objects.get(id=id)]
-            except ProductKeyword.DoesNotExist:
-                group = Group.objects.filter(company=u'广东省质监局')
-                prokey = group[0].productkeyword_set.all()
-        else:
-            group = Group.objects.filter(company=u'广东省质监局')
-            prokey = group[0].productkeyword_set.all()
-
-        prokey_len = len(prokey)
-        product = [prokey[i].product for i in xrange(prokey_len)]
-
-        data = [p.articles.all() for p in product]
-        if data != []:
-            item = reduce(lambda x, y: list(set(x).union(set(y))), data)
-        else:
-            item =[]
-        article_ids = [item[i].id for i in range(len(item))]
-        item = Article.objects.filter(id__in=article_ids)
-
-        datas = self.paging(item, settings.NEWS_PAGE_LIMIT, page)
-        result = self.news_to_json(datas['items'])
-        return Response({'total': datas['total_number'], 'data': result})
+        html_string = render_to_string('news/list_tpl.html', {'news_list':  result})
+        return Response({'html': html_string, 'total': datas['total_number']})
 
 
 class CustomWeixinView(BaseAPIView):
     CUSTOM_WEIXIN_LIMIT = 10
-    def get(self, request, custom_id, page):
+
+    def get(self, request, custom_id):
         user = request.myuser
+        parameter = request.GET
+        page = parameter['page'] if parameter.has_key('page') else 1
+
         try:
             keyword = CustomKeyword.objects.get(id=int(custom_id), group=user.group)
         except CustomKeyword.DoesNotExist:
-            return Response({'html': '', 'total': 0})
+            return HttpResponseRedirect('/weixin/')
         items = keyword.custom.weixin.all()
         datas = self.paging(items, self.CUSTOM_WEIXIN_LIMIT, page)
         items = [set_logo(data) for data in datas['items']]
-        html = self.set_css_to_weixin(items)
-        return Response({'html': html, 'total': datas['total_number']})
+        html_string = render_to_string('weixin/list_tpl.html', {'weixin_list':  items})
+        return Response({'html': html_string, 'total': datas['total_number']})
 
 
 class CustomWeiboView(BaseAPIView):
     CUSTOM_WEIBO_LIMIT = 10
-    def get(self, request, custom_id, page):
+
+    def get(self, request, custom_id):
         user = request.myuser
+        parameter = request.GET
+        page = parameter['page'] if parameter.has_key('page') else 1
+
         try:
             keyword = CustomKeyword.objects.get(id=int(custom_id), group=user.group)
         except CustomKeyword.DoesNotExist:
-            return Response({'html': '', 'total': 0})
+            return HttpResponseRedirect('/weibo/')
+
         items = keyword.custom.weibo.all()
         datas = self.paging(items, self.CUSTOM_WEIBO_LIMIT, page)
         items = [set_logo(data) for data in datas['items']]
-        html = self.set_css_to_weibo(items)
-        return Response({'html': html, 'total': datas['total_number']})
+        html_string = render_to_string('weibo/list_tpl.html', {'weibo_list':  items})
+        return Response({'html': html_string, 'total': datas['total_number']})
 
 
 class CustomModifyView(View):
@@ -637,6 +596,35 @@ class CustomModifyView(View):
         if action == 'remove':
             status = self.delete(user)
         return JsonResponse({'status': status['status']})
+
+
+class ProductTableView(BaseAPIView):
+    def get(self, request, id, page):
+        if id:
+            try:
+                prokey = [ProductKeyword.objects.get(id=id)]
+            except ProductKeyword.DoesNotExist:
+                group = Group.objects.filter(company=u'广东省质监局')
+                prokey = group[0].productkeyword_set.all()
+        else:
+            group = Group.objects.filter(company=u'广东省质监局')
+            prokey = group[0].productkeyword_set.all()
+
+        prokey_len = len(prokey)
+        product = [prokey[i].product for i in xrange(prokey_len)]
+
+        data = [p.articles.all() for p in product]
+        if data != []:
+            item = reduce(lambda x, y: list(set(x).union(set(y))), data)
+        else:
+            item =[]
+        article_ids = [item[i].id for i in range(len(item))]
+        item = Article.objects.filter(id__in=article_ids)
+
+        datas = self.paging(item, settings.NEWS_PAGE_LIMIT, page)
+        result = self.news_to_json(datas['items'])
+        return Response({'total': datas['total_number'], 'data': result})
+
 
 class InspectionLocalView(BaseAPIView):
     def get(self, request):
