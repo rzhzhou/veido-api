@@ -1639,15 +1639,19 @@ App.page.weixinDetail = function () {
 };
 
 App.page.weibo = function (module, path, type) {
-  module.list({
+  module.list(module, {
     feature: 'weibo',
-    sort: 'new',
+    filter: {
+      sort: 'new'
+    },
     container: '#weibo-new'
   });
 
-  module.list({
+  module.list(module, {
     feature: 'weibo',
-    sort: 'hot',
+    filter: {
+      sort: 'hot'
+    },
     container: '#weibo-hot'
   });
 };
