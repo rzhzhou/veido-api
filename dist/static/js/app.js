@@ -1619,13 +1619,17 @@ App.page.eventDetail = function (module, path, type, id) {
 App.page.weixin = function (module, path, type) {
   module.list(module, {
     feature: 'weixin',
-    sort: 'new',
+    filter: {
+      sort: 'new'
+    },
     container: '#weixin-new'
   });
 
   module.list(module, {
     feature: 'weixin',
-    sort: 'hot',
+    filter: {
+      sort: 'hot'
+    },
     container: '#weixin-hot'
   });
 };
