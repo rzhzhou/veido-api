@@ -1186,7 +1186,11 @@ App.page.weibo = function (module, path, type) {
 };
 
 App.page.categoryDetail = function (module, path) {
-  module.table(module, path);
+  module.detail({
+    path: path,
+    feature: 'news',
+    container: '#news > tbody'
+  });
 };
 
 App.page.locationDetail = function (module, path, type) {
