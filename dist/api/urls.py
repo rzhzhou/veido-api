@@ -1,18 +1,14 @@
 from django.conf.urls import patterns, include, url
-from api.views import (ArticleTableView, NewsView, LocationTableView,
-    CollectView, EventView, CollecModifyView, EventNewsView,
-    SearchView, CustomTableView, InspectionNationalView, InspectionTableView,
-    InspectionLocalView, WeixinView, WeiboView, LocationWeixinView,
-    LocationWeiboView, EventWeixinView, EventWeiboView,
-    CustomWeixinView, CustomWeiboView, CustomModifyView,ProductTableView,
-    RisksView, RisksDetailTableView,RisksDetailWeixinView, RisksDetailWeiboView)
+from api.views import (ArticleTableView, CollectView, CollecModifyView,
+    CustomTableView, CustomWeixinView, CustomWeiboView, CustomModifyView,
+    EventView, EventNewsView, EventWeixinView, EventWeiboView,
+    InspectionTableView, InspectionLocalView, InspectionNationalView,
+    LocationTableView, LocationWeixinView, LocationWeiboView, NewsView,
+    ProductTableView, RisksView, RisksDetailTableView,RisksDetailWeixinView,
+    RisksDetailWeiboView, SearchView, WeixinView, WeiboView)
 
 
 urlpatterns = patterns('',
-    # Examples:
-    # url(r'^$', 'yuqing.views.home', name='home'),
-    # url(r'^blog/', include('blog.urls')),
-
     url(r'^category/(?P<id>\d+)/news/(?P<page>\d+)/$', ArticleTableView.as_view()),
     url(r'^location/(?P<location_id>\d+)/weixin/new/(?P<page>\d+)/$', LocationWeixinView.as_view()),
     url(r'^location/(?P<location_id>\d+)/weibo/new/(?P<page>\d+)/$', LocationWeiboView.as_view()),
