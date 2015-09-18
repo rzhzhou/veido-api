@@ -1,6 +1,6 @@
 {% extends "base/_layout.html" %}
 
-{% block title %}注册 - 质监舆情{% endblock %}
+{% block title %}注册 - {{ name.site }}{% endblock %}
 
 {% block class %}register-page{% endblock %}
 
@@ -18,7 +18,7 @@
         </div>
         <div id="password" class="form-group has-feedback">
           <input type="password" class="form-control" placeholder="密码">
-          <span class="glyphicon glyphicon-lock form-control-feedback"></span>          
+          <span class="glyphicon glyphicon-lock form-control-feedback"></span>
         </div>
         <div id="retype-password" class="form-group has-feedback">
           <input type="password" class="form-control" placeholder="确认密码">
