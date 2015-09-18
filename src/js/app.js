@@ -409,7 +409,7 @@ App.module.map = function () {
             return 'C' + '-高风险';
           }
         },
-        x: 'right''
+        x: 'right'
       },
       series: [{
         name: '数据名称',
