@@ -47,7 +47,7 @@ var vendor = {
 var app = {
   less: 'src/less/app.less',
   js: [
-    'src/js/adminlte/app.js',
+    'src/js/adminlte.js',
     'src/js/app.js'
   ]
 };
