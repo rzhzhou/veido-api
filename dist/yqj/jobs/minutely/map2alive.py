@@ -35,8 +35,11 @@ class Job(MinutelyJob):
         if not data:
             print "error"
         else:
+            for i in data['regionData']:
+                i['regionName'] = i['region_name']
+                del i['region_name']
             dump(data, file(os.path.join(BASE_DIR, "yqj/jobs/minutely/map.json"), "w")) 
-            print "success"   
+            print "success"
 
     def get_data(self, start_day, start_id, end_day, end_id):
         url = "http://192.168.0.215/api/dashboard?sd=%s&sdId=%s&ed=%s&edId=%s" % (start_day, start_id, end_day, end_id)
