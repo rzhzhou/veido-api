@@ -655,10 +655,11 @@ App.module.list = function (options) {
     container: '',
     render: function (container, content) {
       $(container).html(content);
-    }
+    },
+    visiblePages: 7
   }, options);
 
-  $.extend($.fn.twbsPagination.defaults, {visiblePages: 7});
+  $.extend($.fn.twbsPagination.defaults, {visiblePages: options.visiblePages});
 
   var api = '/api/' + options.feature + '/',
       filter = function (pageNumber) {
@@ -731,38 +732,6 @@ App.module.collect = function (type, id) {
     } else {
       collect('/api/collection/add/', '取消收藏');
     }
-  });
-};
-
-App.module.sns = function (module, path, type) {
-  var $sns = $('.sns');
-
-  $sns.each(function(index, element) {
-    var $content    = $(element),
-        $pagination = $content.parent().next(),
-
-        snsType = function() {
-          if (type === 'weixin' || type === 'weibo') {
-            return $pagination.data('type');
-          } else {
-            return $pagination.data('type').replace('-', '/');
-          }
-        };
-
-    $.getJSON('/api' + path + snsType() + '/1/', function(data) {
-      $content.html(data.html);
-
-      $pagination.twbsPagination({
-        totalPages: data.total,
-        onPageClick: function (event, page) {
-          module.returnTop($sns);
-          $.getJSON('/api' + path + snsType() + '/' + page + '/', function(data) {
-            $content.html(data.html);
-            $pagination.twbsPagination({totalPages: data.total});
-          });
-        }
-      });
-    });
   });
 };
 
@@ -943,52 +912,6 @@ App.module.statistic = function ($el, api) {
   });
 };
 
-App.module.dataList = function (module, $dataList, api, start, end) {
-  $dataList.on('showDataList', function () {
-    var $paginationContainer = $dataList.parent(),
-
-        toParam = function (pageNumber) {
-          if (typeof pageNumber === 'undefined') {
-            pageNumber = 1;
-          }
-
-          return {
-            type: 'data-list',
-            start: start,
-            end: end,
-            page: pageNumber,
-          };
-        },
-
-        renderTable = function (pageContent) {
-          $('<tbody/>')
-            .html(pageContent)
-            .replaceAll($dataList.find('tbody'));
-        };
-
-    $.get(api, toParam(), function (data) {
-      renderTable(data.html);
-
-      $paginationContainer.twbsPagination({
-        totalPages: data.total,
-        visiblePages: 7,
-        first: '第一页',
-        prev: '上一页',
-        next: '下一页',
-        last: '最后一页',
-        paginationClass: 'pagination pagination-sm no-margin pull-right',
-        onPageClick: function(event, pageNumber) {
-          module.returnTop($(this));
-          $.get(api, toParam(pageNumber), function(data) {
-            renderTable(data.html);
-            $paginationContainer.twbsPagination({totalPages: data.total});
-          });
-        }
-      });
-    });
-  });
-};
-
 
 //
 // Pages
@@ -1107,7 +1030,8 @@ App.page.weixin = function (module) {
     filter: {
       sort: 'new'
     },
-    container: '#weixin-new'
+    container: '#weixin-new',
+    visiblePages: 3
   });
 
   module.list({
@@ -1115,7 +1039,8 @@ App.page.weixin = function (module) {
     filter: {
       sort: 'hot'
     },
-    container: '#weixin-hot'
+    container: '#weixin-hot',
+    visiblePages: 3
   });
 };
 
@@ -1129,7 +1054,8 @@ App.page.weibo = function (module) {
     filter: {
       sort: 'new'
     },
-    container: '#weibo-new'
+    container: '#weibo-new',
+    visiblePages: 3
   });
 
   module.list({
@@ -1137,7 +1063,8 @@ App.page.weibo = function (module) {
     filter: {
       sort: 'hot'
     },
-    container: '#weibo-hot'
+    container: '#weibo-hot',
+    visiblePages: 3
   });
 };
 

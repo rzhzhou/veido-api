@@ -1,3 +1,6 @@
+/* jshint camelcase: false, unused: false, latedef: false */
+/* globals FastClick */
+
 /*! AdminLTE app.js
  * ================
  * Main JS application file for AdminLTE v2. This file
@@ -14,8 +17,8 @@
 'use strict';
 
 //Make sure jQuery has been loaded before app.js
-if (typeof jQuery === "undefined") {
-  throw new Error("AdminLTE requires jQuery");
+if (typeof jQuery === 'undefined') {
+  throw new Error('AdminLTE requires jQuery');
 }
 
 /* AdminLTE
@@ -38,28 +41,28 @@ $.AdminLTE.options = {
   //Add slimscroll to navbar menus
   //This requires you to load the slimscroll plugin
   //in every page before app.js
-  navbarMenuSlimscroll: true,
-  navbarMenuSlimscrollWidth: "3px", //The width of the scroll bar
-  navbarMenuHeight: "200px", //The height of the inner menu
+  navbarMenuSlimscroll: false,
+  navbarMenuSlimscrollWidth: '3px', //The width of the scroll bar
+  navbarMenuHeight: '200px', //The height of the inner menu
   //Sidebar push menu toggle button selector
-  sidebarToggleSelector: "[data-toggle='offcanvas']",
+  sidebarToggleSelector: '[data-toggle="offcanvas"]',
   //Activate sidebar push menu
   sidebarPushMenu: true,
   //Activate sidebar slimscroll if the fixed layout is set (requires SlimScroll Plugin)
-  sidebarSlimScroll: true,
+  sidebarSlimScroll: false,
   //BoxRefresh Plugin
-  enableBoxRefresh: true,
+  enableBoxRefresh: false,
   //Bootstrap.js tooltip
   enableBSToppltip: true,
-  BSTooltipSelector: "[data-toggle='tooltip']",
+  BSTooltipSelector: '[data-toggle="tooltip"]',
   //Enable Fast Click. Fastclick.js creates a more
   //native touch experience with touch devices. If you
   //choose to enable the plugin, make sure you load the script
   //before AdminLTE's app.js
-  enableFastclick: true,
+  enableFastclick: false,
   //Box Widget Plugin. Enable this plugin
   //to allow boxes to be collapsed and/or removed
-  enableBoxWidget: true,
+  enableBoxWidget: false,
   //Box Widget plugin options
   boxWidgetOptions: {
     boxWidgetIcons: {
@@ -80,28 +83,28 @@ $.AdminLTE.options = {
   //Direct Chat plugin options
   directChat: {
     //Enable direct chat by default
-    enable: true,
+    enable: false,
     //The button to open and close the chat contacts pane
     contactToggleSelector: '[data-widget="chat-pane-toggle"]'
   },
   //Define the set of colors to use globally around the website
   colors: {
-    lightBlue: "#3c8dbc",
-    red: "#f56954",
-    green: "#00a65a",
-    aqua: "#00c0ef",
-    yellow: "#f39c12",
-    blue: "#0073b7",
-    navy: "#001F3F",
-    teal: "#39CCCC",
-    olive: "#3D9970",
-    lime: "#01FF70",
-    orange: "#FF851B",
-    fuchsia: "#F012BE",
-    purple: "#8E24AA",
-    maroon: "#D81B60",
-    black: "#222222",
-    gray: "#d2d6de"
+    lightBlue: '#3c8dbc',
+    red: '#f56954',
+    green: '#00a65a',
+    aqua: '#00c0ef',
+    yellow: '#f39c12',
+    blue: '#0073b7',
+    navy: '#001F3F',
+    teal: '#39CCCC',
+    olive: '#3D9970',
+    lime: '#01FF70',
+    orange: '#FF851B',
+    fuchsia: '#F012BE',
+    purple: '#8E24AA',
+    maroon: '#D81B60',
+    black: '#222222',
+    gray: '#d2d6de'
   },
   //The standard screen sizes that bootstrap uses.
   //If you change these in the variables.less file, change
@@ -135,12 +138,12 @@ $(function () {
   $.AdminLTE.tree('.sidebar');
 
   //Add slimscroll to navbar dropdown
-  if (o.navbarMenuSlimscroll && typeof $.fn.slimscroll != 'undefined') {
-    $(".navbar .menu").slimscroll({
-      height: "200px",
+  if (o.navbarMenuSlimscroll && typeof $.fn.slimscroll !== 'undefined') {
+    $('.navbar .menu').slimscroll({
+      height: '200px',
       alwaysVisible: false,
-      size: "3px"
-    }).css("width", "100%");
+      size: '3px'
+    }).css('width', '100%');
   }
 
   //Activate sidebar push menu
@@ -159,7 +162,7 @@ $(function () {
   }
 
   //Activate fast click
-  if (o.enableFastclick && typeof FastClick != 'undefined') {
+  if (o.enableFastclick && typeof FastClick !== 'undefined') {
     FastClick.attach(document.body);
   }
 
@@ -177,9 +180,9 @@ $(function () {
    */
   $('.btn-group[data-toggle="btn-toggle"]').each(function () {
     var group = $(this);
-    $(this).find(".btn").click(function (e) {
-      group.find(".btn.active").removeClass("active");
-      $(this).addClass("active");
+    $(this).find('.btn').click(function (e) {
+      group.find('.btn.active').removeClass('active');
+      $(this).addClass('active');
       e.preventDefault();
     });
 
@@ -207,7 +210,7 @@ function _init() {
       var _this = this;
       _this.fix();
       _this.fixSidebar();
-      $(window, ".wrapper").resize(function () {
+      $(window, '.wrapper').resize(function () {
         _this.fix();
         _this.fixSidebar();
       });
@@ -216,39 +219,39 @@ function _init() {
       //Get window height and the wrapper height
       var neg = $('.main-header').outerHeight() + $('.main-footer').outerHeight();
       var window_height = $(window).height();
-      var sidebar_height = $(".sidebar").height();
+      var sidebar_height = $('.sidebar').height();
       //Set the min-height of the content and sidebar based on the
       //the height of the document.
-      if ($("body").hasClass("fixed")) {
-        $(".content-wrapper, .right-side").css('min-height', window_height - $('.main-footer').outerHeight());
+      if ($('body').hasClass('fixed')) {
+        $('.content-wrapper, .right-side').css('min-height', window_height - $('.main-footer').outerHeight());
       } else {
         if (window_height >= sidebar_height) {
-          $(".content-wrapper, .right-side").css('min-height', window_height - neg);
+          $('.content-wrapper, .right-side').css('min-height', window_height - neg);
         } else {
-          $(".content-wrapper, .right-side").css('min-height', sidebar_height);
+          $('.content-wrapper, .right-side').css('min-height', sidebar_height);
         }
       }
     },
     fixSidebar: function () {
       //Make sure the body tag has the .fixed class
-      if (!$("body").hasClass("fixed")) {
-        if (typeof $.fn.slimScroll != 'undefined') {
-          $(".sidebar").slimScroll({destroy: true}).height("auto");
+      if (!$('body').hasClass('fixed')) {
+        if (typeof $.fn.slimScroll !== 'undefined') {
+          $('.sidebar').slimScroll({destroy: true}).height('auto');
         }
         return;
-      } else if (typeof $.fn.slimScroll == 'undefined' && console) {
-        console.error("Error: the fixed layout requires the slimscroll plugin!");
+      } else if (typeof $.fn.slimScroll === 'undefined' && console) {
+        console.error('Error: the fixed layout requires the slimscroll plugin!');
       }
       //Enable slimscroll for fixed layout
       if ($.AdminLTE.options.sidebarSlimScroll) {
-        if (typeof $.fn.slimScroll != 'undefined') {
+        if (typeof $.fn.slimScroll !== 'undefined') {
           //Distroy if it exists
-          $(".sidebar").slimScroll({destroy: true}).height("auto");
+          $('.sidebar').slimScroll({destroy: true}).height('auto');
           //Add slimscroll
-          $(".sidebar").slimscroll({
-            height: ($(window).height() - $(".main-header").height()) + "px",
-            color: "rgba(0,0,0,0.2)",
-            size: "3px"
+          $('.sidebar').slimscroll({
+            height: ($(window).height() - $('.main-header').height()) + 'px',
+            color: 'rgba(0,0,0,0.2)',
+            size: '3px'
           });
         }
       }
@@ -260,7 +263,7 @@ function _init() {
    * Adds the push menu functionality to the sidebar.
    *
    * @type Function
-   * @usage: $.AdminLTE.pushMenu("[data-toggle='offcanvas']")
+   * @usage: $.AdminLTE.pushMenu('[data-toggle='offcanvas']')
    */
   $.AdminLTE.pushMenu = function (toggleBtn) {
     //Get the screen sizes
@@ -272,23 +275,23 @@ function _init() {
 
       //Enable sidebar push menu
       if ($(window).width() > (screenSizes.sm - 1)) {
-        $("body").toggleClass('sidebar-collapse');
+        $('body').toggleClass('sidebar-collapse');
       }
       //Handle sidebar push menu for small screens
       else {
-        if ($("body").hasClass('sidebar-open')) {
-          $("body").removeClass('sidebar-open');
-          $("body").removeClass('sidebar-collapse')
+        if ($('body').hasClass('sidebar-open')) {
+          $('body').removeClass('sidebar-open');
+          $('body').removeClass('sidebar-collapse');
         } else {
-          $("body").addClass('sidebar-open');
+          $('body').addClass('sidebar-open');
         }
       }
     });
 
-    $(".content-wrapper").click(function () {
+    $('.content-wrapper').click(function () {
       //Enable hide menu when clicking on the content-wrapper on small screens
-      if ($(window).width() <= (screenSizes.sm - 1) && $("body").hasClass("sidebar-open")) {
-        $("body").removeClass('sidebar-open');
+      if ($(window).width() <= (screenSizes.sm - 1) && $('body').hasClass('sidebar-open')) {
+        $('body').removeClass('sidebar-open');
       }
     });
 
@@ -305,7 +308,7 @@ function _init() {
   $.AdminLTE.tree = function (menu) {
     var _this = this;
 
-    $("li a", $(menu)).click(function (e) {
+    $('li a', $(menu)).click(function (e) {
       //Get the clicked link and the next element
       var $this = $(this);
       var checkElement = $this.next();
@@ -318,7 +321,7 @@ function _init() {
           //Fix the layout in case the sidebar stretches over the height of the window
           //_this.layout.fix();
         });
-        checkElement.parent("li").removeClass("active");
+        checkElement.parent('li').removeClass('active');
       }
       //If the menu is not visible
       else if ((checkElement.is('.treeview-menu')) && (!checkElement.is(':visible'))) {
@@ -329,7 +332,7 @@ function _init() {
         //Remove the menu-open class from the parent
         ul.removeClass('menu-open');
         //Get the parent li
-        var parent_li = $this.parent("li");
+        var parent_li = $this.parent('li');
 
         //Open the target menu and add the menu-open class
         checkElement.slideDown('normal', function () {
@@ -375,26 +378,26 @@ function _init() {
     },
     collapse: function (element) {
       //Find the box parent
-      var box = element.parents(".box").first();
+      var box = element.parents('.box').first();
       //Find the body and the footer
-      var bf = box.find(".box-body, .box-footer");
-      if (!box.hasClass("collapsed-box")) {
+      var bf = box.find('.box-body, .box-footer');
+      if (!box.hasClass('collapsed-box')) {
         //Convert minus into plus
-        element.children(".fa-minus").removeClass("fa-minus").addClass("fa-plus");
+        element.children('.fa-minus').removeClass('fa-minus').addClass('fa-plus');
         bf.slideUp(300, function () {
-          box.addClass("collapsed-box");
+          box.addClass('collapsed-box');
         });
       } else {
         //Convert plus into minus
-        element.children(".fa-plus").removeClass("fa-plus").addClass("fa-minus");
+        element.children('.fa-plus').removeClass('fa-plus').addClass('fa-minus');
         bf.slideDown(300, function () {
-          box.removeClass("collapsed-box");
+          box.removeClass('collapsed-box');
         });
       }
     },
     remove: function (element) {
       //Find the box parent
-      var box = element.parents(".box").first();
+      var box = element.parents('.box').first();
       box.slideUp();
     },
     options: $.AdminLTE.options.boxWidgetOptions
@@ -414,7 +417,7 @@ function _init() {
  * a refresh button to the box. It converts the box's state to a loading state.
  *
  * @type plugin
- * @usage $("#box-widget").boxRefresh( options );
+ * @usage $('#box-widget').boxRefresh( options );
  */
 (function ($) {
 
@@ -423,9 +426,9 @@ function _init() {
     // Render options
     var settings = $.extend({
       //Refressh button selector
-      trigger: ".refresh-btn",
+      trigger: '.refresh-btn',
       //File source to be loaded (e.g: ajax/src.php)
-      source: "",
+      source: '',
       //Callbacks
       onLoadStart: function (box) {
       }, //Right after the button has been clicked
@@ -439,9 +442,9 @@ function _init() {
 
     return this.each(function () {
       //if a source is specified
-      if (settings.source === "") {
+      if (settings.source === '') {
         if (console) {
-          console.log("Please specify a source first - boxRefresh()");
+          console.log('Please specify a source first - boxRefresh()');
         }
         return;
       }
@@ -457,7 +460,7 @@ function _init() {
         start(box);
 
         //Perform ajax call
-        box.find(".box-body").load(settings.source, function () {
+        box.find('.box-body').load(settings.source, function () {
           done(box);
         });
       });
@@ -487,7 +490,7 @@ function _init() {
  * This plugin depends on iCheck plugin for checkbox and radio inputs
  *
  * @type plugin
- * @usage $("#todo-widget").todolist( options );
+ * @usage $('#todo-widget').todolist( options );
  */
 (function ($) {
 
@@ -504,28 +507,29 @@ function _init() {
 
     return this.each(function () {
 
-      if (typeof $.fn.iCheck != 'undefined') {
+      if (typeof $.fn.iCheck !== 'undefined') {
         $('input', this).on('ifChecked', function (event) {
-          var ele = $(this).parents("li").first();
-          ele.toggleClass("done");
+          var ele = $(this).parents('li').first();
+          ele.toggleClass('done');
           settings.onCheck.call(ele);
         });
 
         $('input', this).on('ifUnchecked', function (event) {
-          var ele = $(this).parents("li").first();
-          ele.toggleClass("done");
+          var ele = $(this).parents('li').first();
+          ele.toggleClass('done');
           settings.onUncheck.call(ele);
         });
       } else {
         $('input', this).on('change', function (event) {
-          var ele = $(this).parents("li").first();
-          ele.toggleClass("done");
+          var ele = $(this).parents('li').first();
+          ele.toggleClass('done');
           settings.onCheck.call(ele);
         });
       }
     });
   };
 }(jQuery));
+
 /* global moment , echarts */
 
 'use strict';
@@ -1183,10 +1187,11 @@ App.module.list = function (options) {
     container: '',
     render: function (container, content) {
       $(container).html(content);
-    }
+    },
+    visiblePages: 7
   }, options);
 
-  $.extend($.fn.twbsPagination.defaults, {visiblePages: 7});
+  $.extend($.fn.twbsPagination.defaults, {visiblePages: options.visiblePages});
 
   var api = '/api/' + options.feature + '/',
       filter = function (pageNumber) {
@@ -1259,38 +1264,6 @@ App.module.collect = function (type, id) {
     } else {
       collect('/api/collection/add/', '取消收藏');
     }
-  });
-};
-
-App.module.sns = function (module, path, type) {
-  var $sns = $('.sns');
-
-  $sns.each(function(index, element) {
-    var $content    = $(element),
-        $pagination = $content.parent().next(),
-
-        snsType = function() {
-          if (type === 'weixin' || type === 'weibo') {
-            return $pagination.data('type');
-          } else {
-            return $pagination.data('type').replace('-', '/');
-          }
-        };
-
-    $.getJSON('/api' + path + snsType() + '/1/', function(data) {
-      $content.html(data.html);
-
-      $pagination.twbsPagination({
-        totalPages: data.total,
-        onPageClick: function (event, page) {
-          module.returnTop($sns);
-          $.getJSON('/api' + path + snsType() + '/' + page + '/', function(data) {
-            $content.html(data.html);
-            $pagination.twbsPagination({totalPages: data.total});
-          });
-        }
-      });
-    });
   });
 };
 
@@ -1471,52 +1444,6 @@ App.module.statistic = function ($el, api) {
   });
 };
 
-App.module.dataList = function (module, $dataList, api, start, end) {
-  $dataList.on('showDataList', function () {
-    var $paginationContainer = $dataList.parent(),
-
-        toParam = function (pageNumber) {
-          if (typeof pageNumber === 'undefined') {
-            pageNumber = 1;
-          }
-
-          return {
-            type: 'data-list',
-            start: start,
-            end: end,
-            page: pageNumber,
-          };
-        },
-
-        renderTable = function (pageContent) {
-          $('<tbody/>')
-            .html(pageContent)
-            .replaceAll($dataList.find('tbody'));
-        };
-
-    $.get(api, toParam(), function (data) {
-      renderTable(data.html);
-
-      $paginationContainer.twbsPagination({
-        totalPages: data.total,
-        visiblePages: 7,
-        first: '第一页',
-        prev: '上一页',
-        next: '下一页',
-        last: '最后一页',
-        paginationClass: 'pagination pagination-sm no-margin pull-right',
-        onPageClick: function(event, pageNumber) {
-          module.returnTop($(this));
-          $.get(api, toParam(pageNumber), function(data) {
-            renderTable(data.html);
-            $paginationContainer.twbsPagination({totalPages: data.total});
-          });
-        }
-      });
-    });
-  });
-};
-
 
 //
 // Pages
@@ -1635,7 +1562,8 @@ App.page.weixin = function (module) {
     filter: {
       sort: 'new'
     },
-    container: '#weixin-new'
+    container: '#weixin-new',
+    visiblePages: 3
   });
 
   module.list({
@@ -1643,7 +1571,8 @@ App.page.weixin = function (module) {
     filter: {
       sort: 'hot'
     },
-    container: '#weixin-hot'
+    container: '#weixin-hot',
+    visiblePages: 3
   });
 };
 
@@ -1657,7 +1586,8 @@ App.page.weibo = function (module) {
     filter: {
       sort: 'new'
     },
-    container: '#weibo-new'
+    container: '#weibo-new',
+    visiblePages: 3
   });
 
   module.list({
@@ -1665,7 +1595,8 @@ App.page.weibo = function (module) {
     filter: {
       sort: 'hot'
     },
-    container: '#weibo-hot'
+    container: '#weibo-hot',
+    visiblePages: 3
   });
 };
 

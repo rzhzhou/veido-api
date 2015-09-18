@@ -1,6 +1,6 @@
 {% extends "base/layout.html" %}
 
-{% block title %}指定监测 - 质监舆情{% endblock %}
+{% block title %}指定监测 - {{ name.site }}{% endblock %}
 
 {% block header %}
   <h1>指定监测</h1>
@@ -15,7 +15,7 @@
     <div class="col-md-12">
       <div class="box box-info">
         <div class="box-header with-border">
-          <h3 class="box-title">{{ name }}</h3>
+          <h3 class="box-title">{{ customkeyword }}</h3>
         </div>
         <div class="box-body clearfix">
           <table id="news" class="table table-bordered table-hover table-custom">
@@ -50,7 +50,7 @@
         <div class="box-header with-border">
           <h3 class="box-title">微信</h3>
         </div>
-        <div class="box-body">
+        <div class="box-body clearfix">
           <ul id="weixin" class="media-list"></ul>
         </div>
       </div>
@@ -61,7 +61,7 @@
         <div class="box-header with-border">
           <h3 class="box-title">微博</h3>
         </div>
-        <div class="box-body">
+        <div class="box-body clearfix">
           <ul id="weibo" class="media-list"></ul>
         </div>
       </div>
