@@ -142,30 +142,25 @@ class RisksView(BaseAPIView):
         return risk_list
 
     def get(self, request):
-        parameter = request.GET
-
-        api_type = parameter['type']
-        page = parameter['page'] if parameter.has_key('page') else 1
-        limit = self.RISK_PAGE_LIMIT if api_type == 'list' else 6
+        container = self.requestContainer(page=1,limit=6, limit_list=self.RISK_PAGE_LIMIT)
         items = self.get_score_article(request)
-        datas = self.paging(items, limit, page)
-        html_string = render_to_string('risk/%s_tpl.html' % api_type, {'risk_list':  datas['items']})
+        datas = self.paging(items, container['limit'], container['page'])
+        html_string = render_to_string('risk/%s_tpl.html' % container['type'], 
+            {'risk_list':  datas['items']})
         return Response({'total': datas['total_number'], 'html': html_string})
 
 
 class RisksNewsView(BaseAPIView):
 
     def get(self, request, id):
-        parameter = request.GET
-        page = parameter['page'] if parameter.has_key('page') else 1
-
+        container = self.requestContainer()
         try:
             risk = Risk.objects.get(id=int(id))
         except Risk.DoesNotExist:
             return HttpResponseRedirect('/risk/')
 
         items = risk.articles.all()
-        datas = self.paging(items, self.NEWS_PAGE_LIMIT, page)
+        datas = self.paging(items, self.NEWS_PAGE_LIMIT, container['page'])
         result = self.news_to_json(datas['items'])
         html_string = render_to_string('news/list_tpl.html', {'news_list':  result})
         return Response({'total': datas['total_number'], 'html': html_string})
@@ -175,16 +170,14 @@ class RisksWeixinView(BaseAPIView):
     EVENT_WEIXIN_LIMIT = 10
 
     def get(self, request, id):
-        parameter = request.GET
-        page = parameter['page'] if parameter.has_key('page') else 1
-
+        container = self.requestContainer()
         try:
             risk = Risk.objects.get(id=int(id))
         except Risk.DoesNotExist:
             return HttpResponseRedirect('/risk/')
 
         items = risk.weixin.all()
-        datas = self.paging(items, self.EVENT_WEIXIN_LIMIT, page)
+        datas = self.paging(items, self.EVENT_WEIXIN_LIMIT, container['page'])
         items = [set_logo(data) for data in datas['items']]
         html_string = render_to_string('weixin/list_tpl.html', {'weixin_list':  datas['items']})
         return Response({'total': datas['total_number'], 'html': html_string})
@@ -194,16 +187,14 @@ class RisksWeiboView(BaseAPIView):
     EVENT_WEIBO_LIMIT = 10
 
     def get(self, request, id):
-        parameter = request.GET
-        page = parameter['page'] if parameter.has_key('page') else 1
-
+        container = self.requestContainer()
         try:
             risk = Risk.objects.get(id=int(id))
         except Risk.DoesNotExist:
             return HttpResponseRedirect('/risk/')
 
         items = risk.weibo.all()
-        datas = self.paging(items, self.EVENT_WEIBO_LIMIT, page)
+        datas = self.paging(items, self.EVENT_WEIBO_LIMIT, container['page'])
         items = [set_logo(data) for data in datas['items']]
         html_string = render_to_string('weibo/list_tpl.html', {'weibo_list':  datas['items']})
         return Response({'total': datas['total_number'], 'html': html_string})
@@ -215,15 +206,12 @@ class NewsView(BaseAPIView):
         return articles
 
     def get(self, request):
-        parameter = request.GET
-
-        api_type = parameter['type']
-        page = parameter['page'] if parameter.has_key('page') else 1
-        limit = settings.NEWS_PAGE_LIMIT if api_type == 'list' else 10
+        container = self.requestContainer(limit=10, limit_list=settings.NEWS_PAGE_LIMIT)
         items = self.get_custom_artice()
-        datas = self.paging(items, limit, page)
+        datas = self.paging(items, container['limit'], container['page'])
         result = self.news_to_json(datas['items'])
-        html_string = render_to_string('news/%s_tpl.html' % api_type, {'news_list':  result})
+        html_string = render_to_string('news/%s_tpl.html' % container['type'], 
+            {'news_list':  result})
         return Response({'total': datas['total_number'], 'html': html_string})
 
 
@@ -293,30 +281,24 @@ class EventView(BaseAPIView):
         return user.collection.events.all()
 
     def get(self, request):
-        parameter = request.GET
-
-        api_type = parameter['type']
-        page = parameter['page'] if parameter.has_key('page') else 1
-        limit = self.EVENT_PAGE_LIMIT if api_type == 'list' else 10
+        container = self.requestContainer(limit=10, limit_list=self.EVENT_PAGE_LIMIT)
         items = Topic.objects.all()
-        datas = self.paging(items, limit, page)
+        datas = self.paging(items, container['limit'], container['page'])
         result = self.event_to_json(datas['items'])
-        html_string = render_to_string('event/%s_tpl.html' % api_type, {'event_list':  result})
+        html_string = render_to_string('event/%s_tpl.html' % container['type'], {'event_list':  result})
         return Response({'total': datas['total_number'], 'html': html_string})
 
 
 class EventNewsView(BaseAPIView):
 
     def get(self, request, id):
-        parameter = request.GET
-        page = parameter['page'] if parameter.has_key('page') else 1
-
+        container = self.requestContainer()
         try:
             event = Topic.objects.get(id=int(id))
         except Topic.DoesNotExist:
             return HttpResponseRedirect('/event/')
         items = event.articles.all()
-        datas = self.paging(items, settings.NEWS_PAGE_LIMIT, page)
+        datas = self.paging(items, settings.NEWS_PAGE_LIMIT, container['page'])
         result = self.news_to_json(datas['items'])
         html_string = render_to_string('news/list_tpl.html', {'news_list':  result})
         return Response({'html': html_string, 'total': datas['total_number']})
@@ -326,15 +308,13 @@ class EventWeixinView(BaseAPIView):
     EVENT_WEIXIN_LIMIT = 10
 
     def get(self, request, id):
-        parameter = request.GET
-        page = parameter['page'] if parameter.has_key('page') else 1
-
+        container = self.requestContainer()
         try:
             event = Topic.objects.get(id=int(id))
         except Topic.DoesNotExist:
             return HttpResponseRedirect('/weixin/')
         items = event.weixin.all()
-        datas = self.paging(items, self.EVENT_WEIXIN_LIMIT, page)
+        datas = self.paging(items, self.EVENT_WEIXIN_LIMIT, container['page'])
         items = [set_logo(data) for data in datas['items']]
         html_string = render_to_string('weixin/list_tpl.html', {'weixin_list':  items})
         return Response({'html': html_string, 'total': datas['total_number']})
@@ -344,15 +324,13 @@ class EventWeiboView(BaseAPIView):
     EVENT_WEIBO_LIMIT = 10
 
     def get(self, request, id):
-        parameter = request.GET
-        page = parameter['page'] if parameter.has_key('page') else 1
-
+        container = self.requestContainer()
         try:
             event = Topic.objects.get(id=int(id))
         except Topic.DoesNotExist:
             return HttpResponseRedirect('/weibo/')
         items = event.weibo.all()
-        datas = self.paging(items, self.EVENT_WEIBO_LIMIT, page)
+        datas = self.paging(items, self.EVENT_WEIBO_LIMIT, container['page'])
         items = [set_logo(data) for data in datas['items']]
         html_string = render_to_string('weibo/list_tpl.html', {'weibo_list':  items})
         return Response({'html': html_string, 'total': datas['total_number']})
@@ -514,17 +492,14 @@ class SearchView(CollectView):
 class CustomNewsView(BaseAPIView):
 
     def get(self, request, custom_id):
-        user = request.myuser
-        parameter = request.GET
-        page = parameter['page'] if parameter.has_key('page') else 1
-
+        container = self.requestContainer()
         try:
             keyword = CustomKeyword.objects.get(id=int(custom_id), group=user.group)
         except CustomKeyword.DoesNotExist:
             return HttpResponseRedirect('/custom/')
 
         items = keyword.custom.articles.all()
-        datas = self.paging(items, settings.NEWS_PAGE_LIMIT, page)
+        datas = self.paging(items, settings.NEWS_PAGE_LIMIT, container['page'])
         result = self.news_to_json(datas['items'])
         html_string = render_to_string('news/list_tpl.html', {'news_list':  result})
         return Response({'html': html_string, 'total': datas['total_number']})
@@ -534,16 +509,13 @@ class CustomWeixinView(BaseAPIView):
     CUSTOM_WEIXIN_LIMIT = 10
 
     def get(self, request, custom_id):
-        user = request.myuser
-        parameter = request.GET
-        page = parameter['page'] if parameter.has_key('page') else 1
-
+        container = self.requestContainer()
         try:
             keyword = CustomKeyword.objects.get(id=int(custom_id), group=user.group)
         except CustomKeyword.DoesNotExist:
             return HttpResponseRedirect('/weixin/')
         items = keyword.custom.weixin.all()
-        datas = self.paging(items, self.CUSTOM_WEIXIN_LIMIT, page)
+        datas = self.paging(items, self.CUSTOM_WEIXIN_LIMIT, container['page'])
         items = [set_logo(data) for data in datas['items']]
         html_string = render_to_string('weixin/list_tpl.html', {'weixin_list':  items})
         return Response({'html': html_string, 'total': datas['total_number']})
@@ -553,17 +525,14 @@ class CustomWeiboView(BaseAPIView):
     CUSTOM_WEIBO_LIMIT = 10
 
     def get(self, request, custom_id):
-        user = request.myuser
-        parameter = request.GET
-        page = parameter['page'] if parameter.has_key('page') else 1
-
+        container = self.requestContainer()
         try:
             keyword = CustomKeyword.objects.get(id=int(custom_id), group=user.group)
         except CustomKeyword.DoesNotExist:
             return HttpResponseRedirect('/weibo/')
 
         items = keyword.custom.weibo.all()
-        datas = self.paging(items, self.CUSTOM_WEIBO_LIMIT, page)
+        datas = self.paging(items, self.CUSTOM_WEIBO_LIMIT, container['page'])
         items = [set_logo(data) for data in datas['items']]
         html_string = render_to_string('weibo/list_tpl.html', {'weibo_list':  items})
         return Response({'html': html_string, 'total': datas['total_number']})
@@ -698,19 +667,13 @@ class InspectionTableView(BaseAPIView):
 class WeixinView(BaseAPIView):
     Weixin_table_limit = 20
     def get(self, request):
-        parameter = request.GET
-
-        api_type = parameter['type']
-        sort = parameter['sort'] if parameter.has_key('sort') else 'hot'
-        page = parameter['page'] if parameter.has_key('page') else 1
-        limit = self.Weixin_table_limit if api_type == 'list' else 6
-
+        container = self.requestContainer(sort='hot', limit_list=self.Weixin_table_limit, limit=6)
         if sort == 'new':
-            datas = self.paging(Weixin.objects.all(), limit, page)
+            datas = self.paging(Weixin.objects.all(), container['limit'], container['page'])
         else: # hot
-            datas = self.paging(Weixin.objects.all(), limit, page)
+            datas = self.paging(Weixin.objects.all(), container['limit'], container['page'])
         items = [set_logo(data) for data in datas['items']]
-        html_string = render_to_string('weixin/%s_tpl.html' % api_type, {'weixin_list':  items})
+        html_string = render_to_string('weixin/%s_tpl.html' % container['type'], {'weixin_list':  items})
         return Response({'html': html_string, 'total': datas['total_number']})
 
 
@@ -718,19 +681,13 @@ class WeiboView(BaseAPIView):
     Weibo_table_limit = 20
 
     def get(self, request):
-        parameter = request.GET
-
-        api_type = parameter['type']
-        sort = parameter['sort'] if parameter.has_key('sort') else 'hot'
-        page = parameter['page'] if parameter.has_key('page') else 1
-        limit = self.Weibo_table_limit if api_type == 'list' else 6
-
+        container = self.requestContainer(sort='hot', limit_list=self.Weixin_table_limit, limit=6)
         if sort == 'new':
-            datas = self.paging(Weibo.objects.all(), limit, page)
+            datas = self.paging(Weibo.objects.all(), container['limit'], container['page'])
         else:
-            datas = self.pagingfromredis(Weibo, limit, page)
+            datas = self.pagingfromredis(Weibo, container['limit'], container['page'])
         items = [set_logo(data) for data in datas['items']]
-        html_string = render_to_string('weibo/%s_tpl.html' % api_type, {'weibo_list':  items})
+        html_string = render_to_string('weibo/%s_tpl.html' % container['type'], {'weibo_list':  items})
         return Response({'html': html_string, 'total': datas['total_number']})
 
 
