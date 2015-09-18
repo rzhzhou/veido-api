@@ -1187,10 +1187,11 @@ App.module.list = function (options) {
     container: '',
     render: function (container, content) {
       $(container).html(content);
-    }
+    },
+    visiblePages: 7
   }, options);
 
-  $.extend($.fn.twbsPagination.defaults, {visiblePages: 7});
+  $.extend($.fn.twbsPagination.defaults, {visiblePages: options.visiblePages});
 
   var api = '/api/' + options.feature + '/',
       filter = function (pageNumber) {
@@ -1561,7 +1562,8 @@ App.page.weixin = function (module) {
     filter: {
       sort: 'new'
     },
-    container: '#weixin-new'
+    container: '#weixin-new',
+    visiblePages: 3
   });
 
   module.list({
@@ -1569,7 +1571,8 @@ App.page.weixin = function (module) {
     filter: {
       sort: 'hot'
     },
-    container: '#weixin-hot'
+    container: '#weixin-hot',
+    visiblePages: 3
   });
 };
 
@@ -1583,7 +1586,8 @@ App.page.weibo = function (module) {
     filter: {
       sort: 'new'
     },
-    container: '#weibo-new'
+    container: '#weibo-new',
+    visiblePages: 3
   });
 
   module.list({
@@ -1591,7 +1595,8 @@ App.page.weibo = function (module) {
     filter: {
       sort: 'hot'
     },
-    container: '#weibo-hot'
+    container: '#weibo-hot',
+    visiblePages: 3
   });
 };
 
