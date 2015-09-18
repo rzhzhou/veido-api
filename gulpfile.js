@@ -186,7 +186,7 @@ gulp.task('serve-js', ['clean-app-js'], function () {
 });
 
 gulp.task('django', function () {
-  exec('python dist/manage.py runserver');
+  exec('python dist/manage.py runserver 0.0.0.0:8000');
 });
 
 gulp.task('serve', ['django'], function () {
