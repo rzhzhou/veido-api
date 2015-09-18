@@ -369,7 +369,7 @@ App.module.map = function () {
         trigger: 'item',
         formatter: function(a) {
           for (var i in city) {
-            if (a[1] == city[i].region_name) {
+            if (a[1] === city[i].regionName) {
               city2 = data[i];
               switch (city2) {
               case 1:
@@ -401,15 +401,15 @@ App.module.map = function () {
         splitNumber: 3,
         color: ['#fa9529', '#fff26e', '#cee19e', ],
         formatter: function(v, v2) {
-          if (v2 == '1') {
+          if (v2 === '1') {
             return 'A' + '-低风险';
-          } else if (v2 == '2') {
+          } else if (v2 === '2') {
             return 'B' + '-中风险';
-          } else if (v2 == '3') {
+          } else if (v2 === '3') {
             return 'C' + '-高风险';
           }
         },
-        x: "right"
+        x: 'right'
       },
       series: [{
         name: '数据名称',
