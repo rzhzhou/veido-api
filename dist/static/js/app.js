@@ -1262,38 +1262,6 @@ App.module.collect = function (type, id) {
   });
 };
 
-App.module.sns = function (module, path, type) {
-  var $sns = $('.sns');
-
-  $sns.each(function(index, element) {
-    var $content    = $(element),
-        $pagination = $content.parent().next(),
-
-        snsType = function() {
-          if (type === 'weixin' || type === 'weibo') {
-            return $pagination.data('type');
-          } else {
-            return $pagination.data('type').replace('-', '/');
-          }
-        };
-
-    $.getJSON('/api' + path + snsType() + '/1/', function(data) {
-      $content.html(data.html);
-
-      $pagination.twbsPagination({
-        totalPages: data.total,
-        onPageClick: function (event, page) {
-          module.returnTop($sns);
-          $.getJSON('/api' + path + snsType() + '/' + page + '/', function(data) {
-            $content.html(data.html);
-            $pagination.twbsPagination({totalPages: data.total});
-          });
-        }
-      });
-    });
-  });
-};
-
 App.module.dataTable = function (path) {
   $.fn.dataTable.ext.errMode = 'throw';
 
