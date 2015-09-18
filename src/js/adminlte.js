@@ -49,7 +49,7 @@ $.AdminLTE.options = {
   //Activate sidebar push menu
   sidebarPushMenu: true,
   //Activate sidebar slimscroll if the fixed layout is set (requires SlimScroll Plugin)
-  sidebarSlimScroll: true,
+  sidebarSlimScroll: false,
   //BoxRefresh Plugin
   enableBoxRefresh: true,
   //Bootstrap.js tooltip
