@@ -51,7 +51,7 @@ $.AdminLTE.options = {
   //Activate sidebar slimscroll if the fixed layout is set (requires SlimScroll Plugin)
   sidebarSlimScroll: false,
   //BoxRefresh Plugin
-  enableBoxRefresh: true,
+  enableBoxRefresh: false,
   //Bootstrap.js tooltip
   enableBSToppltip: true,
   BSTooltipSelector: '[data-toggle="tooltip"]',
@@ -62,7 +62,7 @@ $.AdminLTE.options = {
   enableFastclick: true,
   //Box Widget Plugin. Enable this plugin
   //to allow boxes to be collapsed and/or removed
-  enableBoxWidget: true,
+  enableBoxWidget: false,
   //Box Widget plugin options
   boxWidgetOptions: {
     boxWidgetIcons: {
