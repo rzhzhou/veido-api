@@ -193,7 +193,7 @@ gulp.task('serve', ['django'], function () {
   browserSync.init({
     notify: false,
     open: false,
-    proxy: '127.0.0.1:8000'
+    proxy: '0.0.0.0:8000'
   });
 
   gulp.watch('src/less/*.less', ['serve-less']);
