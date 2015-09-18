@@ -911,52 +911,6 @@ App.module.statistic = function ($el, api) {
   });
 };
 
-App.module.dataList = function (module, $dataList, api, start, end) {
-  $dataList.on('showDataList', function () {
-    var $paginationContainer = $dataList.parent(),
-
-        toParam = function (pageNumber) {
-          if (typeof pageNumber === 'undefined') {
-            pageNumber = 1;
-          }
-
-          return {
-            type: 'data-list',
-            start: start,
-            end: end,
-            page: pageNumber,
-          };
-        },
-
-        renderTable = function (pageContent) {
-          $('<tbody/>')
-            .html(pageContent)
-            .replaceAll($dataList.find('tbody'));
-        };
-
-    $.get(api, toParam(), function (data) {
-      renderTable(data.html);
-
-      $paginationContainer.twbsPagination({
-        totalPages: data.total,
-        visiblePages: 7,
-        first: '第一页',
-        prev: '上一页',
-        next: '下一页',
-        last: '最后一页',
-        paginationClass: 'pagination pagination-sm no-margin pull-right',
-        onPageClick: function(event, pageNumber) {
-          module.returnTop($(this));
-          $.get(api, toParam(pageNumber), function(data) {
-            renderTable(data.html);
-            $paginationContainer.twbsPagination({totalPages: data.total});
-          });
-        }
-      });
-    });
-  });
-};
-
 
 //
 // Pages
