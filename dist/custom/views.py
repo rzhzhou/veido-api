@@ -33,4 +33,4 @@ class CustomDetailView(BaseTemplateView):
             custom = CustomKeyword.objects.get(id=int(id), group=user.group)
         except CustomKeyword.DoesNotExist:
             return self.render_to_response('custom/detail.html', {'newkeyword': u'', 'name': sidebar_name})
-        return self.render_to_response('custom/detail.html', {'newkeyword': custom.newkeyword, 'name': sidebar_name})
+        return self.render_to_response('custom/detail.html', {'customkeyword': custom.newkeyword, 'name': sidebar_name})
