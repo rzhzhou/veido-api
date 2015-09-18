@@ -126,7 +126,7 @@ gulp.task('vendor-js', ['clean-vendor'], function () {
     vendor.moment[0],
     vendor.moment[1],
     vendor.daterangepicker.js,
-    vendor.slimscroll,
+    // vendor.slimscroll,
     vendor.twbsPagination
   ];
 
