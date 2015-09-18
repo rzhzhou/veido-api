@@ -606,7 +606,7 @@ App.module.returnTop = function (el) {
 };
 
 App.module.paginate = function (options) {
-  var returnTop = this.returnTop;
+  var returnTop = this.returnTop.bind(this);
 
   $.get(options.api, options.filter(), function (data) {
     if (!data.html) { return false; }
@@ -669,7 +669,7 @@ App.module.list = function (options) {
         }
       };
 
-  this.paginate.call(this, {
+  this.paginate({
     api: api,
     filter: filter,
     container: options.container,
@@ -698,7 +698,7 @@ App.module.detail = function (options) {
         }
       };
 
-  this.paginate.call(this, {
+  this.paginate({
     api: api,
     filter: filter,
     container: options.container,
