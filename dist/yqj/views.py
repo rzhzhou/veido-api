@@ -154,7 +154,7 @@ def login_view(request):
             response.set_cookie('name', user.name)
             return response
 
-    return render_to_response('user/login.html', {'company': settings.COMPANY_NAME})
+    return render_to_response('user/login.html', {'company': settings.COMPANY_NAME, 'site': settings.COMPANY_NAME})
 
 
 def logout_view(request):
