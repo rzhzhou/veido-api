@@ -853,7 +853,7 @@ App.module.pie = function (path) {
   });
 };
 
-App.module.map = function (path) {
+App.module.map = function () {
   $.getJSON('/api/map/' , function (result) {
     var city = result.regionData,
         data = [],
@@ -1598,7 +1598,7 @@ App.page.newsDetail = function (module, path, type, id) {
   module.collect(type, id);
 };
 
-App.page.event = function (module, path) {
+App.page.event = function (module) {
   module.list({
     feature: 'event',
     container: '#event > tbody'
@@ -1629,7 +1629,7 @@ App.page.eventDetail = function (module, path, type, id) {
   });
 };
 
-App.page.weixin = function (module, path, type) {
+App.page.weixin = function (module) {
   module.list({
     feature: 'weixin',
     filter: {
@@ -1651,7 +1651,7 @@ App.page.weixinDetail = function () {
   // placeholder for future usage
 };
 
-App.page.weibo = function (module, path, type) {
+App.page.weibo = function (module) {
   module.list({
     feature: 'weibo',
     filter: {
@@ -1677,7 +1677,7 @@ App.page.categoryDetail = function (module, path) {
   });
 };
 
-App.page.locationDetail = function (module, path, type) {
+App.page.locationDetail = function (module, path) {
   module.detail({
     path: path,
     feature: 'news',
@@ -1705,7 +1705,7 @@ App.page.custom = function (module) {
   module.custom();
 };
 
-App.page.customDetail = function (module, path, type) {
+App.page.customDetail = function (module, path) {
   module.detail({
     path: path,
     feature: 'news',
