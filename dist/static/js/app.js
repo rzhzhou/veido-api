@@ -652,14 +652,14 @@ App.module.login = function () {
       submit   = elements[2],
       $msg     = $(form).find('p'),
 
-      enableSubmit = function() {
+      enableSubmit = function () {
         submit.disabled = !(username.value && password.value);
       },
 
-      processLogin = function(event) {
+      processLogin = function (event) {
         event.preventDefault();
 
-        $.post(action, $(form).serialize(), function(response) {
+        $.post(action, $(form).serialize(), function (response) {
           if (response.status) {
             location.href = location.search ? location.search.substr(1).split('=')[1] : '/';
           } else {
@@ -683,14 +683,14 @@ App.module.register = function () {
       submit   = elements[3],
       $msg     = $(form).find('p'),
 
-      enableSubmit = function() {
+      enableSubmit = function () {
         submit.disabled = !(username.value && password.value && retype.value);
       },
 
-      processAdd   = function(event) {
+      processAdd   = function (event) {
         event.preventDefault();
 
-        var processResponse = function(response) {
+        var processResponse = function (response) {
           if (response.status) {
             location.reload();
           } else {
@@ -719,16 +719,16 @@ App.module.admin = function () {
       $remove = $button.eq(1),
       id      = [],
 
-      action = function(obj, api) {
-        obj.click(function() {
+      action = function (obj, api) {
+        obj.click(function () {
           id.length = 0;
 
-          $input.filter(':checked').each(function(index, element) {
+          $input.filter(':checked').each(function (index, element) {
             id.push( $(element).parent().next().data('id') );
           });
 
           if (id.length) {
-            $.post(api, {id: id.toString()}, function(response) {
+            $.post(api, {id: id.toString()}, function (response) {
               if (response.status) {
                 location.reload();
               }
@@ -753,14 +753,14 @@ App.module.settings = function () {
       $msg        = $(form).find('p'),
 
 
-      enableSubmit = function() {
+      enableSubmit = function () {
         submit.disabled = !(username.value && oldPassword.value && newPassword.value && retype.value);
       },
 
-      processChange = function(event) {
+      processChange = function (event) {
         event.preventDefault();
 
-        var processResponse = function(response) {
+        var processResponse = function (response) {
           if (response.status) {
             $msg.text('更新成功！').show();
             location.href = '/login/';
@@ -899,7 +899,7 @@ App.module.map = function () {
       },
       tooltip: {
         trigger: 'item',
-        formatter: function(a) {
+        formatter: function (a) {
           for (var i in city) {
             if (a[1] === city[i].regionName) {
               city2 = data[i];
@@ -932,7 +932,7 @@ App.module.map = function () {
         max: 3,
         splitNumber: 3,
         color: ['#fa9529', '#fff26e', '#cee19e', ],
-        formatter: function(v, v2) {
+        formatter: function (v, v2) {
           if (v2 === '1') {
             return 'A' + '-低风险';
           } else if (v2 === '2') {
@@ -1023,7 +1023,7 @@ App.module.search = function () {
   var form  = document.forms.search,
       input = form.elements.keywords;
 
-  $(form).submit(function(event) {
+  $(form).submit(function (event) {
     event.preventDefault();
 
     var keywords = $.trim(input.value);
@@ -1086,7 +1086,7 @@ App.module.infoBox = function () {
 
         intervalID,
 
-        countTo = function() {
+        countTo = function () {
           numberValue += numberIncrement;
           percentValue += percentIncrement;
 
@@ -1244,13 +1244,13 @@ App.module.collect = function (type, id) {
     var star = $(this).find('i'),
         text = $(this).find('span'),
 
-        collect = function(api, nextAction) {
+        collect = function (api, nextAction) {
           var data = {
                 type: type === 'news' ? 'article' : 'topic',
                 id: id
               };
 
-          $.post(api, data, function(response) {
+          $.post(api, data, function (response) {
             if (response.status) {
               star.toggleClass('fa-star-o');
               star.toggleClass('fa-star');
@@ -1607,14 +1607,14 @@ App.page.custom = function () {
       $msg     = $(form).prev(),
       $list    = $(form).parent().prev().find('li'),
 
-      enableSubmit = function() {
+      enableSubmit = function () {
         button.disabled = !(keyword.value);
       },
 
-      processAdd = function(event) {
+      processAdd = function (event) {
         event.preventDefault();
 
-        $.post(action, $(form).serialize(), function(response) {
+        $.post(action, $(form).serialize(), function (response) {
           if (response.status) {
             $msg.text('关键词添加成功！').show();
             location.reload();
@@ -1725,7 +1725,7 @@ App.page.analyticsDetail = function (module, path) {
           title: '保存为Excel',
           icon: 'image://../../static/img/excel.png',
 
-          onclick: function() {
+          onclick: function () {
             document.getElementById('save-as-excel').src = api + '?type='+type+'&start=' + start + '&end=' + end + '&datatype=xls';
           }
         };
