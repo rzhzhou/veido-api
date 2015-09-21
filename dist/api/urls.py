@@ -9,10 +9,10 @@ from api.views import (ArticleTableView, CollectView, CollecModifyView,
 
 
 urlpatterns = patterns('',
-    url(r'^category/(?P<id>\d+)/news/(?P<page>\d+)/$', ArticleTableView.as_view()),
-    url(r'^location/(?P<location_id>\d+)/weixin/new/(?P<page>\d+)/$', LocationWeixinView.as_view()),
-    url(r'^location/(?P<location_id>\d+)/weibo/new/(?P<page>\d+)/$', LocationWeiboView.as_view()),
-    url(r'^location/(?P<location_id>\d+)/news/(?P<page>\d+)/$', LocationTableView.as_view()),
+    url(r'^category/(?P<id>\d+)/news/$', ArticleTableView.as_view()),
+    url(r'^location/(?P<id>\d+)/weixin/$', LocationWeixinView.as_view()),
+    url(r'^location/(?P<id>\d+)/weibo/$', LocationWeiboView.as_view()),
+    url(r'^location/(?P<id>\d+)/news/$', LocationTableView.as_view()),
     url(r'^news/$', NewsView.as_view()),
     url(r'^collection/(?P<table_type>\S+)/(?P<page>\d+)/$', CollectView.as_view()),
 

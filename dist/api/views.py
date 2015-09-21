@@ -79,16 +79,18 @@ def get_date_from_iso(datetime_str):
 
 
 class ArticleTableView(BaseAPIView):
-    def get(self, request, id, page):
+    def get(self, request, id):
+        container = self.requestContainer()
         try:
             category = Category.objects.get(id=id)
         except Category.DoesNotExist:
             return Response({'total': 0, 'data': []})
 
         items = category.articles.all()
-        datas = self.paging(items, settings.NEWS_PAGE_LIMIT, page)
+        datas = self.paging(items, settings.NEWS_PAGE_LIMIT, container['page'])
         result = self.news_to_json(datas['items'])
-        return Response({'total': datas['total_number'], 'data': result})
+        news_html = render_to_string('news/list_tpl.html', {'news_list': result})
+        return Response({'total': datas['total_number'], 'html': news_html})
 
 
 class RisksView(BaseAPIView):
@@ -201,47 +203,49 @@ class NewsView(BaseAPIView):
 
 
 class LocationTableView(BaseAPIView):
-    def get(self, request, location_id, page):
+    def get(self, request, id):
+        container = self.requestContainer()
         try:
-            id = int(location_id)
+            id = int(id)
             area = Area.objects.get(id=id)
         except Area.DoesNotExist:
             return Response({'total': 0, 'data': []})
 
         items = Article.objects.filter(area=area)
-        datas = self.paging(items, settings.NEWS_PAGE_LIMIT, page)
+        datas = self.paging(items, settings.NEWS_PAGE_LIMIT, container['page'])
         result = self.news_to_json(datas['items'])
-        return Response({'total': datas['total_number'], 'data': result})
+        html_string = render_to_string('news/list_tpl.html', {'news_list': result})
+        return Response({'total': datas['total_number'], 'html': html_string})
 
 
 class LocationWeixinView(BaseAPIView):
-    LOCATION_WEIXIN_LIMIT = 10
-    def get(self, request, location_id, page):
+    def get(self, request, id):
+        container = self.requestContainer()
         try:
-            id = int(location_id)
+            id = int(id)
             area = Area.objects.get(id=id)
         except Area.DoesNotExist:
             return Response({'html': '', 'total': 0})
-        items = Weixin.objects.filter(area=area)
-        datas = self.paging(items, self.LOCATION_WEIXIN_LIMIT, page)
+        items = Weixin.objects.all()
+        datas = self.paging(items, settings.LOCATION_WEIXIN_LIMIT, container['page'])
         items = [set_logo(data) for data in datas['items']]
-        html = self.set_css_to_weixin(items)
-        return Response({'html': html, 'total': datas['total_number']})
+        html_string = render_to_string('weixin/list_tpl.html', {'weixin_list': items})
+        return Response({'html': html_string, 'total': datas['total_number']})
 
 
 class LocationWeiboView(BaseAPIView):
-    LOCATION_WEIBO_LIMIT = 10
-    def get(self, request, location_id, page):
+    def get(self, request, id):
+        container = self.requestContainer()
         try:
-            id = int(location_id)
+            id = int(id)
             area = Area.objects.get(id=id)
         except Area.DoesNotExist:
             return Response({'html': '', 'total': 0})
-        items = Weibo.objects.filter(area=area)
-        datas = self.paging(items, self.LOCATION_WEIBO_LIMIT, page)
+        items = Weibo.objects.all()
+        datas = self.paging(items, settings.LOCATION_WEIBO_LIMIT, container['page'])
         items = [set_logo(data) for data in datas['items']]
-        html = self.set_css_to_weibo(items)
-        return Response({'html': html, 'total': datas['total_number']})
+        html_string = render_to_string('weibo/list_tpl.html', {'weibo_list': items})
+        return Response({'html': html_string, 'total': datas['total_number']})
 
 
 class EventView(BaseAPIView):
