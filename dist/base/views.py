@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+import pytz
+from django.conf import settings
+from datetime import datetime
 from django.core.paginator import EmptyPage, Paginator, PageNotAnInteger
 from django.db.models import Q
 from django.shortcuts import render_to_response
@@ -39,7 +42,11 @@ class BaseView(View):
             item['id'] = data.id
             item['source'] = data.publisher.publisher
             item['location'] = data.area.name
-            item['time'] = data.pubtime.date().strftime('%Y-%m-%d')
+            pubtime = data.pubtime
+            if pubtime.tzinfo == pytz.utc:
+                item['time'] = pubtime.astimezone(pytz.timezone(settings.TIME_ZONE)).strftime('%Y-%m-%d')
+            else:
+                item['time'] = data.pubtime.strftime('%Y-%m-%d')
             try:
                 item['hot'] = RelatedData.objects.filter(uuid=data.uuid)[0].articles.all().count()
             except IndexError:
