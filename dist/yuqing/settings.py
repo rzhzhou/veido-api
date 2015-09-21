@@ -18,7 +18,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 def _load_config():
     global DEBUG, TEMPLATE_DEBUG, ALLOWED_HOSTS
-    global COMPANY_NAME, LANGUAGE_CODE, TIME_ZONE, USE_I18N, USE_L10N, USE_TZ, NEWS_PAGE_LIMIT
+    global COMPANY_NAME, LANGUAGE_CODE, TIME_ZONE, USE_I18N, USE_L10N, USE_TZ, NEWS_PAGE_LIMIT,\
+                 RISK_PAGE_LIMIT, EVENT_PAGE_LIMIT, WEIXIN_TABLE_LIMIT, WEIBO_TABLE_LIMIT
     global MYSQL_CONN_STR_DEFAULT, MYSQL_CONN_STR_MASTER, MYSQL_CONN_STR_CORPUS, MONGO_CONN_STR, REDIS_CONN_STR
     global MEDIA_ROOT, STATIC_ROOT
     global NEWS_PAGE_LIMIT
@@ -55,6 +56,14 @@ def _load_config():
     STATIC_ROOT = cp.get(SECTION, 'STATIC_ROOT')
 
     NEWS_PAGE_LIMIT = cp.get('constant', 'NEWS_PAGE_LIMIT')
+
+    EVENT_PAGE_LIMIT = cp.get('constant', 'EVENT_PAGE_LIMIT')
+
+    RISK_PAGE_LIMIT = cp.get('constant', 'RISK_PAGE_LIMIT')
+
+    WEIXIN_TABLE_LIMIT = cp.get('constant', 'WEIXIN_TABLE_LIMIT')
+
+    WEIBO_TABLE_LIMIT = cp.get('constant', 'WEIBO_TABLE_LIMIT')
 
     # MySQL
     mysql_conn_str_default = cp.get(SECTION, 'mysql_conn_str_default')

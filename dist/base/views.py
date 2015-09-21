@@ -148,11 +148,6 @@ class BaseAPIView(BaseView, APIView):
     COLLECTED_TEXT = u'<i class="fa fa-star" data-toggle="tooltip", data-placement="right" title="取消收藏">'
     NO_COLLECTED_TEXT = u'<i class="fa fa-star-o" data-toggle="tooltip", data-placement="right" title="添加收藏">'
 
-    LIMIT_NUMBER = 300
-    NEWS_PAGE_LIMIT = 25
-    EVENT_PAGE_LIMIT = 25
-    RISK_PAGE_LIMIT = 25
-
     def __init__(self, request=None):
         self.request = request
 
