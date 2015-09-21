@@ -226,7 +226,7 @@ class LocationWeixinView(BaseAPIView):
             area = Area.objects.get(id=id)
         except Area.DoesNotExist:
             return Response({'html': '', 'total': 0})
-        items = Weixin.objects.all()
+        items = Weixin.objects.filter(area=area)
         datas = self.paging(items, settings.LOCATION_WEIXIN_LIMIT, container['page'])
         items = [set_logo(data) for data in datas['items']]
         html_string = render_to_string('weixin/list_tpl.html', {'weixin_list': items})
@@ -241,7 +241,7 @@ class LocationWeiboView(BaseAPIView):
             area = Area.objects.get(id=id)
         except Area.DoesNotExist:
             return Response({'html': '', 'total': 0})
-        items = Weibo.objects.all()
+        items = Weibo.objects.filter(area=area)
         datas = self.paging(items, settings.LOCATION_WEIBO_LIMIT, container['page'])
         items = [set_logo(data) for data in datas['items']]
         html_string = render_to_string('weibo/list_tpl.html', {'weibo_list': items})
