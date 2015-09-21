@@ -84,26 +84,7 @@ class ArticleTableView(BaseAPIView):
             category = Category.objects.get(id=id)
         except Category.DoesNotExist:
             return Response({'total': 0, 'data': []})
-        """
-            return Response({'news': []})
-        result = []
-        articles = category.articles.all()[:self.LIMIT_NUMBER]
-        serializer = ArticleSerializer(articles, many=True)
 
-        for item in articles:
-            collected_html = self.collected_html(item)
-            #pubtime = get_date_from_iso(item.pubtime)
-            url = u'/news/%s' % item.id
-            title = self.title_html(url, item.title,item.id, 'article')
-            try:
-                hot_index = RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count()
-            except IndexError:
-                hot_index = 0
-            one_record = [collected_html, title, item.publisher.publisher, item.area.name, item.pubtime.date(), hot_index]
-            result.append(one_record)
-
-        return Response({'news': result})
-        """
         items = category.articles.all()
         datas = self.paging(items, settings.NEWS_PAGE_LIMIT, page)
         result = self.news_to_json(datas['items'])
@@ -111,6 +92,7 @@ class ArticleTableView(BaseAPIView):
 
 
 class RisksView(BaseAPIView):
+    RISK_PAGE_LIMIT = 6
     def get_score_article(self, request):
         user = request.myuser
         company = user.group.company
@@ -142,7 +124,8 @@ class RisksView(BaseAPIView):
         return risk_list
 
     def get(self, request):
-        container = self.requestContainer(page=1,limit=6, limit_list=self.RISK_PAGE_LIMIT)
+        container = self.requestContainer(page=1,limit=self.RISK_PAGE_LIMIT, 
+            limit_list=settings.RISK_PAGE_LIMIT)
         items = self.get_score_article(request)
         datas = self.paging(items, container['limit'], container['page'])
         html_string = render_to_string('risk/%s_tpl.html' % container['type'], 
@@ -160,7 +143,7 @@ class RisksNewsView(BaseAPIView):
             return HttpResponseRedirect('/risk/')
 
         items = risk.articles.all()
-        datas = self.paging(items, self.NEWS_PAGE_LIMIT, container['page'])
+        datas = self.paging(items, settings.NEWS_PAGE_LIMIT, container['page'])
         result = self.news_to_json(datas['items'])
         html_string = render_to_string('news/list_tpl.html', {'news_list':  result})
         return Response({'total': datas['total_number'], 'html': html_string})
@@ -201,12 +184,14 @@ class RisksWeiboView(BaseAPIView):
 
 
 class NewsView(BaseAPIView):
+    NEWS_PAGE_LIMIT = 10
     def get_custom_artice(self):
         articles = Category.objects.get(name='质监热点').articles.all()
         return articles
 
     def get(self, request):
-        container = self.requestContainer(limit=10, limit_list=settings.NEWS_PAGE_LIMIT)
+        container = self.requestContainer(limit=self.NEWS_PAGE_LIMIT, 
+            limit_list=settings.NEWS_PAGE_LIMIT)
         items = self.get_custom_artice()
         datas = self.paging(items, container['limit'], container['page'])
         result = self.news_to_json(datas['items'])
@@ -222,23 +207,7 @@ class LocationTableView(BaseAPIView):
             area = Area.objects.get(id=id)
         except Area.DoesNotExist:
             return Response({'total': 0, 'data': []})
-        """
-            return Response({'news': []})
-        result = []
-        news = Article.objects.filter(area=area)[:self.LIMIT_NUMBER]
-        serializer = ArticleSerializer(news, many=True)
 
-        for item in news:
-            collected_html = self.collected_html(item)
-            #pubtime = get_date_from_iso(item.item)
-            url = u'/news/%s' % item.id
-            title = self.title_html(url, item.title,item.id, 'article')
-            hot_index = RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count()
-            one_record = [collected_html, title, item.publisher.publisher, item.area.name, item.pubtime.date(), hot_index]
-            result.append(one_record)
-
-        return Response({"news": result})
-        """
         items = Article.objects.filter(area=area)
         datas = self.paging(items, settings.NEWS_PAGE_LIMIT, page)
         result = self.news_to_json(datas['items'])
@@ -276,12 +245,14 @@ class LocationWeiboView(BaseAPIView):
 
 
 class EventView(BaseAPIView):
+    EVENT_PAGE_LIMIT = 10
     def collected_items(self):
         user = self.request.myuser
         return user.collection.events.all()
 
     def get(self, request):
-        container = self.requestContainer(limit=10, limit_list=self.EVENT_PAGE_LIMIT)
+        container = self.requestContainer(limit=self.EVENT_PAGE_LIMIT, 
+            limit_list=settings.EVENT_PAGE_LIMIT)
         items = Topic.objects.all()
         datas = self.paging(items, container['limit'], container['page'])
         result = self.event_to_json(datas['items'])
@@ -369,12 +340,7 @@ class CollectView(APIView):
         except Collection.DoesNotExist:
             self.collection = Collection(user=self.request.myuser)
             self.collection.save(using='master')
-        """
-        news = [self.article_html(item) for item in self.collection.articles.all()]
-        topic = [self.topic_html(item) for item in self.collection.events.all()]
 
-        return Response({'news': news, 'event': topic})
-        """
         if table_type == 'news':
             view = ArticleTableView(self.request)
             items = self.collection.articles.all()
@@ -383,7 +349,7 @@ class CollectView(APIView):
         elif table_type == 'event':
             view = EventTableView(self.request)
             items = self.collection.events.all()
-            datas = view.paging(items, view.EVENT_PAGE_LIMIT, page)
+            datas = view.paging(items, settings.EVENT_PAGE_LIMIT, page)
             result = view.event_to_json(datas['items'])
         else:
             result = []
@@ -645,10 +611,6 @@ class InspectionTableView(BaseAPIView):
 
         return Response({"inspection": result})
 
-        #items = Inspection.objects.order_by('-pubtime').all()
-        #datas = self.paging(items, settings.NEWS_PAGE_LIMIT, page)
-        #result = self.inspection_to_json(datas['items'])
-        #return Response({"total": datas['total_number'], "data": result})
 
     def inspection_to_json(self, items):
         result = []
@@ -665,10 +627,11 @@ class InspectionTableView(BaseAPIView):
 
 
 class WeixinView(BaseAPIView):
-    Weixin_table_limit = 20
+    WEIXIN_LIMIT = 6
     def get(self, request):
-        container = self.requestContainer(sort='hot', limit_list=self.Weixin_table_limit, limit=6)
-        if sort == 'new':
+        container = self.requestContainer(sort='hot', limit_list=settings.WEIXIN_TABLE_LIMIT, 
+            limit=self.WEIXIN_LIMIT)
+        if container['sort'] == 'new':
             datas = self.paging(Weixin.objects.all(), container['limit'], container['page'])
         else: # hot
             datas = self.paging(Weixin.objects.all(), container['limit'], container['page'])
@@ -678,11 +641,12 @@ class WeixinView(BaseAPIView):
 
 
 class WeiboView(BaseAPIView):
-    Weibo_table_limit = 20
+    WEIBO_LIMIT = 6
 
     def get(self, request):
-        container = self.requestContainer(sort='hot', limit_list=self.Weixin_table_limit, limit=6)
-        if sort == 'new':
+        container = self.requestContainer(sort='hot', limit_list=settings.WEIBO_TABLE_LIMIT, 
+            limit=self.WEIBO_LIMIT)
+        if container['sort'] == 'new':
             datas = self.paging(Weibo.objects.all(), container['limit'], container['page'])
         else:
             datas = self.pagingfromredis(Weibo, container['limit'], container['page'])
