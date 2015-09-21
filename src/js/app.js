@@ -829,41 +829,6 @@ App.module.dataTable = function (path) {
   // });
 };
 
-App.module.custom = function () {
-  var form     = document.forms.addKeyword,
-      action   = form.action,
-      elements = form.elements,
-      fieldset = elements[0],
-      keyword  = elements[1],
-      button   = elements[2],
-      $msg     = $(form).prev(),
-      $list    = $(form).parent().prev().find('li'),
-
-      enableSubmit = function() {
-        button.disabled = !(keyword.value);
-      },
-
-      processAdd = function(event) {
-        event.preventDefault();
-
-        $.post(action, $(form).serialize(), function(response) {
-          if (response.status) {
-            $msg.text('关键词添加成功！').show();
-            location.reload();
-          } else {
-            $msg.text('关键词添加失败！').show();
-            keyword.value = '';
-          }
-        });
-      };
-
-  if ($list.length >= 5) {
-    fieldset.disabled = true;
-  } else {
-    $(form).keyup(enableSubmit).submit(processAdd);
-  }
-};
-
 App.module.dateRange = function ($dateRange) {
   $dateRange
     .on('show.dateRange', function (event, start, end) {
@@ -1100,8 +1065,39 @@ App.page.inspection = function (module, path) {
   module.dataTable(path);
 };
 
-App.page.custom = function (module) {
-  module.custom();
+App.page.custom = function () {
+  var form     = document.forms.addKeyword,
+      action   = form.action,
+      elements = form.elements,
+      fieldset = elements[0],
+      keyword  = elements[1],
+      button   = elements[2],
+      $msg     = $(form).prev(),
+      $list    = $(form).parent().prev().find('li'),
+
+      enableSubmit = function() {
+        button.disabled = !(keyword.value);
+      },
+
+      processAdd = function(event) {
+        event.preventDefault();
+
+        $.post(action, $(form).serialize(), function(response) {
+          if (response.status) {
+            $msg.text('关键词添加成功！').show();
+            location.reload();
+          } else {
+            $msg.text('关键词添加失败！').show();
+            keyword.value = '';
+          }
+        });
+      };
+
+  if ($list.length >= 5) {
+    fieldset.disabled = true;
+  } else {
+    $(form).keyup(enableSubmit).submit(processAdd);
+  }
 };
 
 App.page.customDetail = function (module, path) {
