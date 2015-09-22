@@ -63,6 +63,50 @@ class BaseView(View):
 
         return results
 
+    def set_css_to_weixin(self, items):
+        html = ""
+        count = u'0'
+        for item in items:
+            html += """<li class="media">"""
+            html += """<div class="media-left">"""
+            html +=  u'<img class="media-object" src="%s" alt="%s">' % (item.publisher.photo, item.publisher.publisher)
+            html += """</div>
+                       <div class="media-body"> """
+            html +=  u'<h4 class="media-heading">%s</h4>' % (item.publisher.publisher)
+            html +=  u'<p><a href="/weixin/%s/" target="_blank">%s</a></p>' % (item.id, item.title)
+            html += """<div class="media-meta">
+                       <div class="info pull-right">"""
+            html +=  u'<span>阅读 %s</span>' % count
+            html +=  u'<span><i class="fa fa-thumbs-o-up"></i> %s</span>' % count
+            html += """</div>"""
+            html +=  u'<div class="time pull-left">%s</div>' % item.pubtime.strftime('%Y-%m-%d %H:%M')
+            html += """</div></div></li>"""
+        return html
+
+    def set_css_to_weibo(self, items):
+        html = ""
+        count = u'0'
+        for item in items:
+            html += """<li class="media">"""
+            html += """<div class="media-left">"""
+            html +=  u'<img class="media-object" src="%s" alt="%s">' % (item.publisher.photo, item.publisher.publisher)
+            html += """</div>
+                       <div class="media-body"> """
+            html +=  u'<h4 class="media-heading">%s</h4>' % (item.publisher.publisher)
+            if len(item.content) < 200:
+                 html +=  u'<p>%s</p>' % (item.content)
+            else:
+                 html +=  u'<p><a href="%s" target="_blank">%s</a></p>' % (item.url, item.title)
+            html += """<div class="media-meta">
+                       <div class="info pull-right">"""
+            html +=  u'<span>转载 %s</span>' % count
+            html +=  u'<span>评论 %s</span>' % count
+            html +=  u'<span><i class="fa fa-thumbs-o-up"></i> %s</span>' % count
+            html += """</div>"""
+            html +=  u'<div class="time pull-left">%s</div>' % item.pubtime.strftime('%Y-%m-%d %H:%M')
+            html += """</div></div></li>"""
+        return html
+
 
 class BaseTemplateView(LoginRequiredMixin, BaseView):
     INCLUDE_SIDEBAR = True
@@ -94,7 +138,6 @@ class BaseTemplateView(LoginRequiredMixin, BaseView):
         return categories
 
     def get_locations(self, area):
-        #area = Area.objects.get(id=int(location_id))
         if area.id == 4:
             return []
         return Area.objects.filter(parent=area, level=area.level+1)
@@ -129,8 +172,6 @@ class BaseAPIView(BaseView, APIView):
         return self._collected
 
     def collected_items(self):
-        #return []
-        #try:
         user = self.request.myuser
         try:
             self.collection = user.collection
@@ -138,8 +179,6 @@ class BaseAPIView(BaseView, APIView):
             self.collection = Collection(user=self.request.myuser)
             self.collection.save(using='master')
         return user.collection.articles.all()
-        #except:
-        #    return []
 
     def title_html(self, *args):
         title_format = u'<a href="{0}" title="{1}" target="_blank" data-id="{2}" data-type="{3}">{1}</a>'
