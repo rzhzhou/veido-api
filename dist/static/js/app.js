@@ -1078,32 +1078,34 @@ App.module.infoBox = function () {
 
         numberValue = 0,
         numberFinal = $(element).data('number'),
-        numberIncrement = Math.floor(numberFinal / loop),
+        numberIncrement = numberFinal / loop,
 
         percentValue = 0,
         percentFinal = $(element).data('percent'),
-        percentIncrement = Math.floor(percentFinal / loop),
+        percentIncrement = percentFinal / loop,
 
-        intervalID,
+        render = function (numberValue, percentValue) {
+          infoBoxNumber.text(numberValue);
+          progressBar.width(percentValue + '%');
+          progressDescription.text('占总数据 ' + percentValue + '%');
+        },
 
-        countTo = function () {
-          numberValue += numberIncrement;
-          percentValue += percentIncrement;
+        increaseTo = function () {
+          if (loopCount < loop) {
+            numberValue += numberIncrement;
+            percentValue += percentIncrement;
+            render(numberValue.toFixed(), percentValue.toFixed());
 
-          loopCount++;
-
-          if (loopCount >= loop) {
-            clearInterval(intervalID);
+            loopCount++;
+            setTimeout(increaseTo, refreshInterval);
+          } else {
             numberValue = numberFinal;
             percentValue = percentFinal;
+            render(numberValue, percentValue);
           }
-
-          infoBoxNumber.text( numberValue.toFixed() );
-          progressBar.width( percentValue + '%' );
-          progressDescription.text( '占总数据 ' + percentValue.toFixed() + '%' );
         };
 
-    intervalID = setInterval(countTo, refreshInterval);
+    setTimeout(increaseTo, refreshInterval);
   };
 
   $('.info-box-content').each(animate);
