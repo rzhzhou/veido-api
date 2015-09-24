@@ -533,52 +533,6 @@ App.module.menu = function (path, type) {
   menu.appendTo(parent);
 };
 
-App.module.infoBox = function () {
-  var animate = function (index, element) {
-    var infoBoxNumber = $(element).find('.info-box-number'),
-        progressBar = $(element).find('.progress-bar'),
-        progressDescription = $(element).find('.progress-description'),
-
-        duration = 2000,
-        refreshInterval = 100,
-        loop = Math.floor(duration / refreshInterval),
-        loopCount = 0,
-
-        numberValue = 0,
-        numberFinal = $(element).data('number'),
-        numberIncrement = numberFinal / loop,
-
-        percentValue = 0,
-        percentFinal = $(element).data('percent'),
-        percentIncrement = percentFinal / loop,
-
-        render = function (numberValue, percentValue) {
-          infoBoxNumber.text(numberValue);
-          progressBar.width(percentValue + '%');
-          progressDescription.text('占总数据 ' + percentValue + '%');
-        },
-
-        increaseTo = function () {
-          if (loopCount < loop) {
-            numberValue += numberIncrement;
-            percentValue += percentIncrement;
-            render(numberValue.toFixed(), percentValue.toFixed());
-
-            loopCount++;
-            setTimeout(increaseTo, refreshInterval);
-          } else {
-            numberValue = numberFinal;
-            percentValue = percentFinal;
-            render(numberValue, percentValue);
-          }
-        };
-
-    setTimeout(increaseTo, refreshInterval);
-  };
-
-  $('.info-box-content').each(animate);
-};
-
 App.module.inspection = function () {
   var $inspection = $('#inspection'),
       $content    = $inspection.children('.box-body').find('tbody');
@@ -904,7 +858,48 @@ App.page.search = function (module, path) {
 };
 
 App.page.dashboard = function (module, path) {
-  module.infoBox();
+  $('.info-box-content').each(function (index, element) {
+    var infoBoxNumber = $(element).find('.info-box-number'),
+        progressBar = $(element).find('.progress-bar'),
+        progressDescription = $(element).find('.progress-description'),
+
+        duration = 2000,
+        refreshInterval = 100,
+        loop = Math.floor(duration / refreshInterval),
+        loopCount = 0,
+
+        numberValue = 0,
+        numberFinal = $(element).data('number'),
+        numberIncrement = numberFinal / loop,
+
+        percentValue = 0,
+        percentFinal = $(element).data('percent'),
+        percentIncrement = percentFinal / loop,
+
+        render = function (numberValue, percentValue) {
+          infoBoxNumber.text(numberValue);
+          progressBar.width(percentValue + '%');
+          progressDescription.text('占总数据 ' + percentValue + '%');
+        },
+
+        increaseTo = function () {
+          if (loopCount < loop) {
+            numberValue += numberIncrement;
+            percentValue += percentIncrement;
+            render(numberValue.toFixed(), percentValue.toFixed());
+
+            loopCount++;
+            setTimeout(increaseTo, refreshInterval);
+          } else {
+            numberValue = numberFinal;
+            percentValue = percentFinal;
+            render(numberValue, percentValue);
+          }
+        };
+
+    setTimeout(increaseTo, refreshInterval);
+  });
+
   module.map(path);
 
   module.abstract({
