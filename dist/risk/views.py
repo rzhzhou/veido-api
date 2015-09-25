@@ -18,7 +18,7 @@ class RisksDetailView(BaseTemplateView):
             risk_id = int(risk_id)
             risk = Risk.objects.get(id=risk_id)
             eval_keywords_list = eval(risk.keywords) if risk.keywords else []
-            keywords_list = [{"name": name, "number": number} for name, number in eval_keywords_list]
+            keywords_list = [{"name": name, "number": "%.2f"%number} for name, number in eval_keywords_list]
         except Risk.DoesNotExist:
             return self.render_to_response('risk/detail.html', {'risk': '', 'weixin_list': [], 'weibo_list': [], 'name': sidebar_name})
         return self.render_to_response('risk/detail.html',{'risk': risk, 'keywords_list': keywords_list, 'name': sidebar_name})
