@@ -19,7 +19,7 @@ class EventDetailView(BaseTemplateView):
             event_id = int(id)
             event = Topic.objects.get(id=event_id)
             eval_keywords_list = eval(event.keywords) if event.keywords else []
-            keywords_list = [{"name": name, "number": number} for name, number in eval_keywords_list]
+            keywords_list = [{"name": name, "number": round(number, 2)} for name, number in eval_keywords_list]
         except Topic.DoesNotExist:
             return self.render_to_response('event/event.html', {'event': '', 'weixin_list': [], 'weibo_list': []})
         user = self.request.myuser
