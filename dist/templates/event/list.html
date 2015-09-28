@@ -1,12 +1,12 @@
 {% extends "base/layout.html" %}
 
-{% block title %}事件 - {{ name.site }}{% endblock %}
+{% block title %}{{ name.event }} - {{ name.site }}{% endblock %}
 
 {% block header %}
-  <h1>事件</h1>
+  <h1>{{ name.event }}</h1>
   <ol class="breadcrumb">
     <li><a href="/"><i class="fa fa-dashboard"></i>首页</a></li>
-    <li class="active">事件</li>
+    <li class="active">{{ name.event }}</li>
   </ol>
 {% endblock %}
 
