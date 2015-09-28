@@ -1,12 +1,10 @@
-{% for risk in risk_list %}
+{% for risk in risk_list  %}
 <tr>
-  <td class="risk-item">
-    <a href="/risk/{{ risk.id }}/" title="{{ risk.title }}" target="_blank">{{ risk.title }}</a>
-    <p>
-      <span class="date">日期：{{ risk.pubtime | date:"Y-m-d" }}</span>
-      <span class="source">来源：{{ risk.source }}</span>
-    </p>
+  <td>
+    <a href="/risk/{{ risk.id }}/" target="_blank">{{ risk.title }}</a>
   </td>
+  <td>{{ risk.source }}</td>
+  <td>{{ risk.pubtime | date:"Y-m-d" }}</td>
   <td class="risk-score" data-num={{ risk.score }}>
     <i class="fa fa-star-o"></i>
     <i class="fa fa-star-o"></i>
