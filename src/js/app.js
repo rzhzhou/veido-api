@@ -917,8 +917,6 @@ App.page.dashboard = function (module, path) {
     }
   });
 
-  module.line(path);
-  module.pie(path);
   module.inspection();
 
   module.abstract({
@@ -946,6 +944,9 @@ App.page.dashboard = function (module, path) {
       $(container).html(content);
     }
   });
+
+  module.line(path);
+  module.pie(path);
 };
 
 App.page.news = function (module) {
