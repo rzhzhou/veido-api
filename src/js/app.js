@@ -906,8 +906,6 @@ App.page.dashboard = function (module, path) {
     setTimeout(increaseTo, refreshInterval);
   });
 
-  module.map(path);
-
   module.abstract({
     feature: 'risk',
     container: '#risk > tbody',
