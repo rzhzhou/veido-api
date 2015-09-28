@@ -18,7 +18,7 @@
           <i class="fa fa-newspaper-o"></i>
         </span>
         <div class="info-box-content" data-number="{{ news.number }}" data-percent="{{ news.percent }}">
-          <span class="info-box-text">{{ name.news }}</span>
+          <span class="info-box-text">新闻</span>
           <span class="info-box-number"></span>
           <div class="progress">
             <div class="progress-bar"></div>
@@ -34,7 +34,7 @@
           <i class="fa fa-exclamation"></i>
         </span>
         <div class="info-box-content" data-number="{{ event.number }}" data-percent="{{ event.percent }}">
-          <span class="info-box-text">{{ name.event }}</span>
+          <span class="info-box-text">事件</span>
           <span class="info-box-number"></span>
           <div class="progress">
             <div class="progress-bar"></div>
@@ -81,10 +81,20 @@
     <div class="col-md-6">
       <div class="box box-info">
         <div class="box-header with-border">
-          <h3 class="box-title">区域风险状况</h3>
+          <h3 class="box-title">新闻</h3>
         </div>
         <div class="box-body no-padding">
-          <div id="map-chart" style="height: 467px"></div>
+          <div class="list-group no-margin">
+            {% for news in news_list %}
+              <a href="/news/{{ news.id }}/" class="list-group-item no-border" target="_blank">
+                <span class="badge" data-toggle="tooltip" data-placement="left" title="热度 {{ news.hot_index }}">{{ news.hot_index }}</span>
+                {{ news.title }}
+              </a>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="box-footer text-center">
+          <a href="/news/">查看更多</a>
         </div>
       </div>
     </div>
@@ -151,10 +161,46 @@
     <div class="col-md-6">
       <div class="box box-default">
         <div class="box-header with-border">
-          <h3 class="box-title">{{ name.location }}</h3>
+          <h3 class="box-title">区域状况</h3>
         </div>
         <div class="box-body">
           <div id="pie-chart" style="height: 320px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div id="inspection" class="box box-default">
+        <div class="box-header with-border">
+          <h3 class="box-title">抽检信息</h3>
+          <div class="box-tools pull-right">
+            <div class="btn-group">
+              <button type="button" id="local-inspection" class="btn btn-default btn-xs active">本地</button>
+              <button type="button" id="national-inspection" class="btn btn-default btn-xs">全国</button>
+            </div>
+          </div>
+        </div>
+        <div class="box-body no-padding">
+          <table class="table table-hover table-custom">
+            <thead>
+              <tr>
+                <th class="col-category">产品种类</th>
+                <th class="col-name">事件</th>
+                <th class="col-quality">合格率</th>
+                <th class="col-source">来源</th>
+                <th class="col-time">抽检日期</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {% include "inspection/dashboard_inspection.html" %}
+            </tbody>
+          </table>
+        </div>
+        <div class="box-footer text-center">
+          <a href="/inspection/">查看更多</a>
         </div>
       </div>
     </div>

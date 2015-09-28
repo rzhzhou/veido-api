@@ -33,6 +33,7 @@
   moment.defaultFormat = 'YYYY-MM-DD';
 }());
 
+
 //
 // plugins
 //
@@ -77,13 +78,26 @@ var App = {
     var module  = this.module,
         page    = this.page,
         path    = location.pathname,
-        rule    = /^\/(?:(\w+)\/)?(?:(\d+)\/)?/,
-        match   = rule.exec(path).slice(1),
-        type    = match[0] === undefined ? 'dashboard' : match[0],
-        id      = match[1] === undefined ? undefined : +match[1];
+        summary = /^\/(\w+)\/$/,
+        detail  = /^\/(\w+)\/(\d+)\/$/,
+        match   = null,
+        type,
+        id;
 
-    // console.log('type: ' + type);
-    // console.log('id: ' + id);
+    switch (true) {
+    case path === '/':
+      type  = 'dashboard';
+      break;
+    case summary.test(path):
+      match = summary.exec(path);
+      type  = match[1];
+      break;
+    case detail.test(path):
+      match = detail.exec(path);
+      type  = match[1];
+      id    = +match[2];
+      break;
+    }
 
     if (type === 'login') {
       return page.login(module);
@@ -92,10 +106,6 @@ var App = {
     // common
     module.search();
     module.menu(path, type);
-
-    if (type === 'search') {
-      return page.search(module, path);
-    }
 
     if (id === undefined) {
       return page[type](module, path, type);
@@ -817,20 +827,20 @@ App.module.dateRange = function ($dateRange) {
     });
 };
 
-App.module.statistic = function ($el, api) {
-  var $total = $el.find('.statistic-total > span'),
-      $risk = $el.find('.statistic-risk > span');
+App.module.statistic = function($el, api) {
+    var $total = $el.find('.statistic-total > span'),
+        $risk = $el.find('.statistic-risk > span');
 
-  $el.on('show.statistic', function (event, start, end) {
-    $.getJSON(api, {
-      type: 'statistic',
-      start: start,
-      end: end
-    }, function (statistic) {
-      $total.text(statistic.total);
-      $risk.text(statistic.risk);
+    $el.on('show.statistic', function(event, start, end) {
+        $.getJSON(api, {
+            type: 'statistic',
+            start: start,
+            end: end
+        }, function(statistic) {
+            $total.text(statistic.total);
+            $risk.text(statistic.risk);
+        });
     });
-  });
 };
 
 
@@ -853,10 +863,6 @@ App.page.user = function (module) {
 };
 
 // util
-App.page.search = function (module, path) {
-  module.dataTable(path);
-};
-
 App.page.dashboard = function (module, path) {
   $('.info-box-content').each(function (index, element) {
     var infoBoxNumber = $(element).find('.info-box-number'),
@@ -1528,26 +1534,27 @@ App.page.analyticsDetail = function (module, path) {
       });
     };
 
-    chart[name](start, end);
-  });
-  $chart.trigger('show.chart', [start, end]);
 
-  module.statistic($statistic, api);
-  $statistic.trigger('show.statistic', [start, end]);
-
-  // listen for change
-  $chart.on('shown.bs.tab', function () {
+        chart[name](start, end);
+    });
     $chart.trigger('show.chart', [start, end]);
-  });
 
-  $dateRange.on('apply.daterangepicker', function (event, picker) {
-    start = picker.startDate.format();
-    end = picker.endDate.format();
-
-    $dateRange.trigger('show.dateRange', [start, end]);
-    $chart.trigger('show.chart', [start, end]);
+    module.statistic($statistic, api);
     $statistic.trigger('show.statistic', [start, end]);
-  });
+
+    // listen for change
+    $chart.on('shown.bs.tab', function() {
+        $chart.trigger('show.chart', [start, end]);
+    });
+
+    $dateRange.on('apply.daterangepicker', function(event, picker) {
+        start = picker.startDate.format();
+        end = picker.endDate.format();
+
+        $dateRange.trigger('show.dateRange', [start, end]);
+        $chart.trigger('show.chart', [start, end]);
+        $statistic.trigger('show.statistic', [start, end]);
+    });
 };
 
 
