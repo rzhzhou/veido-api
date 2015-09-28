@@ -18,14 +18,10 @@ class RisksDetailView(BaseTemplateView):
         sidebar_name = sidebarUtil(request)
 
         try:
-<<<<<<< HEAD
             risk_id = int(risk_id)
             risk = Risk.objects.get(id=risk_id)
             eval_keywords_list = eval(risk.keywords) if risk.keywords else []
             keywords_list = [{"name": name, "number": "%.2f"%number} for name, number in eval_keywords_list]
-=======
-            risk = Risk.objects.get(id=int(risk_id))
->>>>>>> api
         except Risk.DoesNotExist:
             return HttpResponseRedirect('/risk/')
 
