@@ -3,7 +3,7 @@ from import_export.widgets import DateWidget
 from datetime import datetime
 from import_export import resources, fields
 from django.conf import settings
-import pytz
+import pytz, xlrd
 
 
 class InspectionResources(resources.ModelResource):
@@ -23,9 +23,20 @@ class InspectionResources(resources.ModelResource):
         export_order = ('id', 'name', 'url', 'source', 'pubtime', 'province', 'city', 'qualitied', 'product')
 
     def dehydrate_pubtime(self, zjinspection):
-        if isinstance(zjinspection.pubtime, basestring):
-            return datetime.strptime(zjinspection.pubtime, '%Y-%m-%d %H:%M:%S')
-        elif isinstance(zjinspection.pubtime, float):
-            raise TypeError(u"日期必须为文本类型")
+        if isinstance(zjinspection.pubtime, datetime):
+            if zjinspection.pubtime.tzinfo is None:
+                return zjinspection.pubtime.strftime('%Y-%m-%d %H:%M:%S')
+            elif zjinspection.pubtime.tzinfo == pytz.utc:
+                return zjinspection.pubtime.astimezone(
+                    pytz.timezone(settings.TIME_ZONE)).strftime('%Y-%m-%d %H:%M:%S')
         else:
-            return zjinspection.pubtime.astimezone(pytz.timezone(settings.TIME_ZONE)).strftime('%Y-%m-%d %H:%M:%S')
+            return ""
+
+    def before_save_instance(self, instance, dry_run):
+        if instance.create_at is None:
+            instance.create_at = datetime.now()
+        instance.update_at = datetime.now()
+        if isinstance(instance.pubtime, basestring):
+            instance.pubtime = datetime.strptime(instance.pubtime, '%Y-%m-%d %H:%M:%S')
+        elif isinstance(instance.pubtime, float):
+            instance.pubtime = xlrd.xldate.xldate_as_datetime(instance.pubtime, 0)

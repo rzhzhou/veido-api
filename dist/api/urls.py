@@ -1,9 +1,11 @@
 from django.conf.urls import patterns, include, url
-from api.views import ArticleTableView, NewsTableView, LocationTableView, CollectView, EventTableView,\
-                      CollecModifyView, EventDetailTableView, SearchView, CustomTableView, InspectionNationalView,\
-                      InspectionTableView, InspectionLocalView, WeixinTableView, WeiboTableView, LocationWeixinView, LocationWeiboView, EventDetailWeixinView,\
-                      EventDetailWeiboView, CustomWeixinView, CustomWeiboView, CustomModifyView, ProductTableView, RisksView, RisksTableView, RisksDetailTableView, \
-                      RisksDetailWeixinView, RisksDetailWeiboView
+from api.views import (ArticleTableView, NewsTableView, LocationTableView,
+    CollectView, EventTableView, CollecModifyView, EventDetailTableView,
+    SearchView, CustomTableView, InspectionNationalView, InspectionTableView,
+    InspectionLocalView, WeixinTableView, WeiboTableView, LocationWeixinView,
+    LocationWeiboView, EventDetailWeixinView, EventDetailWeiboView,
+    CustomWeixinView, CustomWeiboView, CustomModifyView,ProductTableView,
+    RisksView, RisksDetailTableView,RisksDetailWeixinView, RisksDetailWeiboView)
 
 
 urlpatterns = patterns('',
@@ -18,7 +20,6 @@ urlpatterns = patterns('',
     url(r'^news/news/(?P<page>\d+)/$', NewsTableView.as_view()),
     url(r'^collection/(?P<table_type>\S+)/(?P<page>\d+)/$', CollectView.as_view()),
     url(r'^risk/$', RisksView.as_view()),
-    url(r'^risk/news/(?P<page>\d+)/$', RisksTableView.as_view()),
     url(r'^risk/(?P<id>\d+)/news/(?P<page>\d+)/$', RisksDetailTableView.as_view()),
     url(r'^risk/(?P<id>\d+)/weixin/new/(?P<page>\d+)/$', RisksDetailWeixinView.as_view()),
     url(r'^risk/(?P<id>\d+)/weibo/new/(?P<page>\d+)/$', RisksDetailWeiboView.as_view()),

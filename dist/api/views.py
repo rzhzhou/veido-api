@@ -142,70 +142,15 @@ class RisksView(BaseAPIView):
         return risk_list
 
     def get(self, request):
+        parameter = request.GET
+
+        api_type = parameter['type']
+        page = parameter['page'] if parameter.has_key('page') else 1
+        limit = self.RISK_PAGE_LIMIT if api_type == 'list' else 6
         items = self.get_score_article(request)
-        datas = self.paging(items, 10, 1)
-        html_string = render_to_string('risk/risk_list_tmpl.html', {'risk_list':  datas['items']})
-        return Response({html_string})
-
-
-class RisksTableView(BaseAPIView):
-    def get_score_article(self, request):
-        user = request.myuser
-        company = user.group.company
-        group = Group.objects.get(company=company).id
-        score_list = LocaltionScore.objects.filter(group=group)
-        risk_id = []
-        for item in score_list:
-            risk_id.append(item.risk_id)
-
-        risk_lists = Risk.objects.filter(id__in=risk_id)
-        risk_list = []
-        for item in risk_lists:
-            data = {}
-            try:
-                relevance = LocaltionScore.objects.get(risk_id=item.id, group_id=group).score
-            except:
-                relevance = 0
-            try:
-                score = RiskScore.objects.get(risk=item.id).score
-            except:
-                score = 0
-            data['relevance'] = relevance
-            data['title'] = item.title
-            data['source'] = item.source
-            data['score'] = score
-            data['pubtime'] = item.pubtime
-            data['id'] = item.id
-            risk_list.append(data)
-        return risk_list
-
-        '''
-        # This method is sorting in the memory
-        score_list = LocaltionScore.objects.filter(group=group)
-        risk_list = []
-        for item in score_list:
-            data = {}
-            data['relevance'] = item.score
-            article_list = Article.objects.filter(id=item.article.id).order_by('-pubtime')
-            for items in article_list:
-                try:
-                    score = RiskScore.objects.get(article=items.id).score
-                except RiskScore.DoesNotExist:
-                    score = 0
-                data['title'] = items.title
-                data['source'] = items.source
-                data['score'] = score
-                data['pubtime'] = items.pubtime
-                data['id'] = items.id
-                risk_list.append(data)
-        risk_list = sorted(risk_list, key=lambda x: x['pubtime'], reverse=True)
-        return risk_list
-        '''
-    def get(self, request, page):
-        items = self.get_score_article(request)
-        datas = self.paging(items, self.RISK_PAGE_LIMIT, page)
-        html_string = render_to_string('risk/risk_list_tmpl.html', {'risk_list':  datas['items']})
-        return Response({"total": datas['total_number'], "html": html_string})
+        datas = self.paging(items, limit, page)
+        html_string = render_to_string('risk/%s_tpl.html' % api_type, {'risk_list':  datas['items']})
+        return Response({'total': datas['total_number'], 'html': html_string})
 
 
 class RisksDetailTableView(BaseAPIView):
@@ -749,7 +694,7 @@ class InspectionTableView(BaseAPIView):
             #one_record = [collected_html, item.product, title, quality, item.source, item.pubtime.strftime('%Y-%m-%d')]
             tz  = pytz.timezone(settings.TIME_ZONE)
             timel = item.pubtime.astimezone(tz)
-            
+
             one_record = [item.product, title, quality, item.source, timel.strftime('%Y-%m-%d')]
             result.append(one_record)
 

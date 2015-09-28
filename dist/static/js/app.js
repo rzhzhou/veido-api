@@ -1330,7 +1330,13 @@ App.page.user = function (module) {
 // util
 App.page.dashboard = function (module, path) {
   module.infoBox();
+<<<<<<< HEAD
 
+=======
+  module.map(path);
+
+  // whRisk
+>>>>>>> master
   $.get('/api/risk/', {
     type: 'abstract'
   }, function (data) {
@@ -1412,7 +1418,7 @@ App.page.risk = function (module) {
           pageNumber = 1;
         }
 
-        return '/api/risk/news/' + pageNumber + '/';
+        return '/api/risk/?type=list&page=' + pageNumber;
       },
 
       renderTable = function (pageContent) {
@@ -1428,9 +1434,9 @@ App.page.risk = function (module) {
     $paginationContainer.twbsPagination({
       totalPages: data.total,
       visiblePages: 7,
-      onPageClick: function(event, pageNumber) {
+      onPageClick: function (event, pageNumber) {
         module.returnTop($(this));
-        $.get(toAPI(pageNumber), function(data) {
+        $.get(toAPI(pageNumber), function (data) {
           renderTable(data.html);
           $paginationContainer.twbsPagination({totalPages: data.total});
         });
@@ -1447,6 +1453,7 @@ App.page.riskDetail = function (module, path, type, id) {
   module.sns(module, path, type);
 };
 
+<<<<<<< HEAD
 App.page.analyticsDetail = function(module, path) {
     var api = '/api' + path,
         $dateRange = $('.date-range-picker'),
@@ -1509,6 +1516,70 @@ App.page.analyticsDetail = function(module, path) {
                         show: true,
                         feature: {
                             /*mark: {
+=======
+App.page.analyticsDetail = function (module, path) {
+  var api = '/api' + path,
+      $dateRange = $('.date-range-picker'),
+      $chart = $('#chart'),
+      $statistic = $('#statistic'),
+      start = moment().subtract(6, 'days').format(),
+      end = moment().format();
+
+  // init analytics
+  module.dateRange($dateRange);
+  $dateRange.trigger('show.dateRange', [start, end]);
+
+  $chart.on('show.chart', function (event, start, end) {
+    var chart = {},
+      name = $(this).find('.tab-pane.active')[0].id.slice(6),
+
+      excel = function (type) {
+        var myTool = {
+          show: true,
+          title: '保存为Excel',
+          icon: 'image://../../static/img/excel.png',
+
+          onclick: function() {
+            document.getElementById('save-as-excel').src = api + '?type='+type+'&start=' + start + '&end=' + end + '&datatype=xls';
+          }
+        };
+        return myTool;
+       };
+
+    chart.trend = function (start, end) {
+      $.getJSON(api, {
+        type: 'chart-trend',
+        start: start,
+        end: end
+      }, function (data) {
+        echarts.init(document.getElementById('chart-trend'), 'macarons').setOption({
+          tooltip: {
+            backgroundColor: 'rgba(50,50,50,0.5)',
+            trigger: 'axis',
+            axisPointer: {
+              type: 'line',
+              lineStyle: {
+                color: '#008acd',
+              }
+            }
+          },
+          shadowStyle: {
+            color: 'rgba(200,200,200,0.2)'
+          },
+          legend: {
+            data: ['全部', '新闻', '微博', '微信']
+          },
+          grid: {
+            x: 50,
+            y: 30,
+            x2: 25,
+            y2: 65
+          },
+          toolbox: {
+            show: true,
+            feature: {
+              /*mark: {
+>>>>>>> master
                 show: false
               },
               dataView: {
@@ -1638,6 +1709,7 @@ App.page.analyticsDetail = function(module, path) {
                 show: true,
                 readOnly: false
               },*/
+<<<<<<< HEAD
                             myTool: excel('chart-emotion'),
                             magicType: {
                                 show: false,
@@ -1711,6 +1783,81 @@ App.page.analyticsDetail = function(module, path) {
                         y: 'top',
                         feature: {
                             /*dataView: {
+=======
+              myTool: excel('chart-emotion'),
+              magicType: {
+                show: false,
+                type: ['pie'],
+                option: {
+                  funnel: {
+                    x: '25%',
+                    width: '50%',
+                    funnelAlign: 'left',
+                    max: 2000
+                  }
+                }
+              },
+              restore: {
+                show: false
+              },
+              saveAsImage: {
+                show: true
+              }
+            }
+          },
+          calculable: true,
+          series: [{
+            name: '访问来源',
+            type: 'pie',
+            radius: '55%',
+            center: ['50%', '60%'],
+            data: [{
+              value: data.positive,
+              name: '正面'
+            }, {
+              value: data.normal,
+              name: '中性'
+            }, {
+              value: data.negative,
+              name: '负面'
+            }, ]
+          }]
+        });
+      });
+    };
+
+    chart.weibo = function (start, end) {
+      $.getJSON(api, {
+        type: 'chart-weibo',
+        start: start,
+        end: end
+      }, function (data) {
+        echarts.init(document.getElementById('chart-weibo-map'), 'macarons').setOption({
+          tooltip: {
+            trigger: 'item'
+          },
+          legend: {
+            show: false,
+            orient: 'vertical',
+            x: 'left',
+            data: ['微博文']
+          },
+          dataRange: {
+            min: 0,
+            max: data.value[9],
+            x: 'left',
+            y: 'bottom',
+            text: ['高', '低'],
+            calculable: true
+          },
+          toolbox: {
+            show: true,
+            orient: 'horizontal',
+            x: 'left',
+            y: 'top',
+            feature: {
+              /*dataView: {
+>>>>>>> master
                 show: true,
                 readOnly: false
               },*/

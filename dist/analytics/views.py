@@ -23,7 +23,6 @@ class DispatchView(APIView, BaseTemplateView):
 
     def get(self, request, id):
         parameter = request.GET
-
         try:
             type = parameter['type'].replace('-', '_')
             tz = pytz.timezone(settings.TIME_ZONE)
