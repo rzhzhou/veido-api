@@ -191,6 +191,26 @@ def unstable():
     return JsonResponse(data)
 
 
+def chart_line(date_range, min_date, max_date, articles):
+    #data range by year   less one axis has data
+    if date_range.days > 6 * 55:
+        return year_range(min_date, max_date, date_range, articles)
+    #data range by season   less two axis has data
+    elif date_range.days > 6 * 30:
+        return season_range(min_date, max_date, date_range, articles)
+    #data range by month    less two axis has data
+    elif  date_range.days >= 3 * 10:
+        return months_range(min_date, max_date, date_range, articles)
+    #data range by weeks    less one axis has data
+    elif date_range.days > 7:
+        return week_range(min_date, max_date, date_range, articles)
+    #data range by days     less one axis has data
+    elif date_range.days >= 0:
+        return days_range(min_date, max_date, date_range, articles)
+    else:
+        return unstable()
+
+
 if __name__ == '__main__':
     print date.today()
     print GetFirstDaySeason(date.today())
