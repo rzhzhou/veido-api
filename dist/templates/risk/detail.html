@@ -1,6 +1,6 @@
 {% extends "base/layout.html" %}
 
-{% block title %}风险快讯 - 质监舆情{% endblock %}
+{% block title %}风险快讯 - {{ name.site }}{% endblock %}
 
 {% block header %}
   <h1>风险快讯</h1>
@@ -103,10 +103,9 @@
         <div class="box-header with-border">
           <h3 class="box-title">微信</h3>
         </div>
-        <div class="box-body">
-          <ul class="media-list sns"></ul>
+        <div class="box-body clearfix">
+          <ul id="weibo" class="media-list"></ul>
         </div>
-        <div class="box-footer clearfix" data-total="{{ total_page_number }}" data-type="weixin-new"></div>
       </div>
     </div>
 
@@ -115,10 +114,9 @@
         <div class="box-header with-border">
           <h3 class="box-title">微博</h3>
         </div>
-        <div class="box-body">
-          <ul class="media-list sns"></ul>
+        <div class="box-body clearfix">
+          <ul id="weixin" class="media-list"></ul>
         </div>
-        <div class="box-footer clearfix" data-total="{{ total_page_number }}" data-type="weibo-new"></div>
       </div>
     </div>
   </div>

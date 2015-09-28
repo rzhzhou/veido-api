@@ -47,7 +47,7 @@ var vendor = {
 var app = {
   less: 'src/less/app.less',
   js: [
-    'src/js/adminlte/app.js',
+    'src/js/adminlte.js',
     'src/js/app.js'
   ]
 };
@@ -126,7 +126,7 @@ gulp.task('vendor-js', ['clean-vendor'], function () {
     vendor.moment[0],
     vendor.moment[1],
     vendor.daterangepicker.js,
-    vendor.slimscroll,
+    // vendor.slimscroll,
     vendor.twbsPagination
   ];
 
@@ -186,14 +186,14 @@ gulp.task('serve-js', ['clean-app-js'], function () {
 });
 
 gulp.task('django', function () {
-  exec('python dist/manage.py runserver');
+  exec('python dist/manage.py runserver 0.0.0.0:8000');
 });
 
 gulp.task('serve', ['django'], function () {
   browserSync.init({
     notify: false,
     open: false,
-    proxy: '127.0.0.1:8000'
+    proxy: '0.0.0.0:8000'
   });
 
   gulp.watch('src/less/*.less', ['serve-less']);

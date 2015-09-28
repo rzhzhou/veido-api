@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 
 from base import sidebarUtil
@@ -12,13 +13,24 @@ class RisksView(BaseTemplateView):
         return self.render_to_response('risk/list.html', {"name": sidebar_name})
 
 class RisksDetailView(BaseTemplateView):
+
     def get(self, request, risk_id):
         sidebar_name = sidebarUtil(request)
+
         try:
+<<<<<<< HEAD
             risk_id = int(risk_id)
             risk = Risk.objects.get(id=risk_id)
             eval_keywords_list = eval(risk.keywords) if risk.keywords else []
             keywords_list = [{"name": name, "number": "%.2f"%number} for name, number in eval_keywords_list]
+=======
+            risk = Risk.objects.get(id=int(risk_id))
+>>>>>>> api
         except Risk.DoesNotExist:
-            return self.render_to_response('risk/detail.html', {'risk': '', 'weixin_list': [], 'weibo_list': [], 'name': sidebar_name})
-        return self.render_to_response('risk/detail.html',{'risk': risk, 'keywords_list': keywords_list, 'name': sidebar_name})
+            return HttpResponseRedirect('/risk/')
+
+        eval_keywords_list = eval(risk.keywords) if risk.keywords else []
+        keywords_list = [{"name": name, "number": number} for name, number in eval_keywords_list]
+
+        return self.render_to_response('risk/detail.html',
+            {'risk': risk, 'keywords_list': keywords_list, 'name': sidebar_name})

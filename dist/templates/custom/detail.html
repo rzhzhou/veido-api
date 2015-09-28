@@ -1,13 +1,12 @@
 {% extends "base/layout.html" %}
 
-{% block title %}{{ location.name }} - {{ name.site }}{% endblock %}
+{% block title %}指定监测 - {{ name.site }}{% endblock %}
 
 {% block header %}
-  <h1>{{ location.name }}</h1>
+  <h1>指定监测</h1>
   <ol class="breadcrumb">
     <li><a href="/"><i class="fa fa-dashboard"></i>首页</a></li>
-    <li class="active">区域状况</li>
-    <li class="active">{{ location.name }}</li>
+    <li class="active"><a href="/custom/">指定监测</a></li>
   </ol>
 {% endblock %}
 
@@ -16,7 +15,7 @@
     <div class="col-md-12">
       <div class="box box-info">
         <div class="box-header with-border">
-          <h3 class="box-title">新闻</h3>
+          <h3 class="box-title">{{ customkeyword }}</h3>
         </div>
         <div class="box-body clearfix">
           <table id="news" class="table table-bordered table-hover table-custom">
@@ -51,7 +50,7 @@
         <div class="box-header with-border">
           <h3 class="box-title">微信</h3>
         </div>
-        <div class="box-body">
+        <div class="box-body clearfix">
           <ul id="weixin" class="media-list"></ul>
         </div>
       </div>
@@ -62,7 +61,7 @@
         <div class="box-header with-border">
           <h3 class="box-title">微博</h3>
         </div>
-        <div class="box-body">
+        <div class="box-body clearfix">
           <ul id="weibo" class="media-list"></ul>
         </div>
       </div>

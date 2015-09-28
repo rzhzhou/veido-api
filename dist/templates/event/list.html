@@ -1,28 +1,28 @@
 {% extends "base/layout.html" %}
 
-{% block title %}新闻 - 质监舆情{% endblock %}
+{% block title %}事件 - {{ name.site }}{% endblock %}
 
 {% block header %}
-  <h1>{{ name.news }}</h1>
+  <h1>{{ name.event }}</h1>
   <ol class="breadcrumb">
     <li><a href="/"><i class="fa fa-dashboard"></i>首页</a></li>
-    <li class="active">{{ name.news }}</li>
+    <li class="active">{{ name.event }}</li>
   </ol>
 {% endblock %}
 
 {% block content %}
   <div class="row">
     <div class="col-md-12">
-      <div class="box box-info">
+      <div class="box box-danger">
         <div class="box-header with-border">
-          <h3 class="box-title">文章列表</h3>
+          <h3 class="box-title">事件列表</h3>
         </div>
         <div class="box-body clearfix">
-          <table id="news" class="table table-bordered table-hover table-custom">
+          <table id="event" class="table table-bordered table-hover table-custom">
             <thead>
               <tr>
                 <th class="col-title">标题</th>
-                <th class="col-source">来源</th>
+                <th class="col-source">首发媒体</th>
                 <th class="col-location">地点</th>
                 <th class="col-time">时间</th>
                 <th class="col-index">热度</th>
@@ -32,7 +32,7 @@
             <tfoot>
               <tr>
                 <th>标题</th>
-                <th>来源</th>
+                <th>首发媒体</th>
                 <th>地点</th>
                 <th>时间</th>
                 <th>热度</th>

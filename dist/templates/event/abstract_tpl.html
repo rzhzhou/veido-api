@@ -1,0 +1,6 @@
+{% for event in event_list %}
+  <a href="/event/{{ event.id }}/" class="list-group-item no-border" target="_blank">
+    <span class="badge" data-toggle="tooltip" data-placement="left" title="热度 {{ event.hot }}">{{ event.hot }}</span>
+    {{ event.title }}
+  </a>
+{% endfor %}

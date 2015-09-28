@@ -9,7 +9,7 @@ from base.models import Area, Article, Category, RelatedData, Topic
 class NewsView(BaseTemplateView):
     def get(self, request):
         sidebar_name = sidebarUtil(request)
-        return self.render_to_response('news/news_list.html', {'name': sidebar_name})
+        return self.render_to_response('news/list.html', {'name': sidebar_name})
 
 
 class NewsDetailView(BaseTemplateView):
@@ -19,7 +19,7 @@ class NewsDetailView(BaseTemplateView):
             news_id = int(news_id)
             news = Article.objects.get(id=news_id)
         except Article.DoesNotExist:
-            return self.render_to_response('news/news.html', {'article': '', 'relate': [], 'name': sidebar_name})
+            return self.render_to_response('news/detail.html', {'article': '', 'relate': [], 'name': sidebar_name})
 
         try:
             r = RelatedData.objects.filter(uuid=news.uuid)[0]
@@ -38,9 +38,9 @@ class NewsDetailView(BaseTemplateView):
             collection.save(using='master')
         items = user.collection.articles.all()
         iscollected = any(filter(lambda x: x.id == news.id, items))
-        return self.render_to_response('news/news.html', 
+        return self.render_to_response('news/detail.html',
             {
-            'article': set_logo(news), 
+            'article': set_logo(news),
             'relate': relateddata,
             'event': event,
             'isCollected': iscollected,

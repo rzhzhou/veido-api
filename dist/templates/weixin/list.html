@@ -1,38 +1,36 @@
 {% extends "base/layout.html" %}
 
-{% block title %}微博 - 质监舆情{% endblock %}
+{% block title %}微信 - {{ name.site }}{% endblock %}
 
 {% block header %}
-  <h1>微博</h1>
+  <h1>微信</h1>
   <ol class="breadcrumb">
     <li><a href="/"><i class="fa fa-dashboard"></i>首页</a></li>
-    <li class="active"><a href="/weibo/">微博</a></li>
+    <li class="active">微信</li>
   </ol>
 {% endblock %}
 
 {% block content %}
   <div class="row">
     <div class="col-md-6">
-      <div class="box box-warning">
+      <div class="box box-success">
         <div class="box-header with-border">
           <h3 class="box-title">最新</h3>
         </div>
-        <div class="box-body no-padding">
-          <ul class="media-list sns"></ul>
+        <div class="box-body clearfix">
+          <ul id="weixin-new" class="media-list sns"></ul>
         </div>
-        <div class="box-footer clearfix" data-total="{{ total_page_number }}" data-type="new"></div>
       </div>
     </div>
 
     <div class="col-md-6">
-      <div class="box box-warning">
+      <div class="box box-success">
         <div class="box-header with-border">
           <h3 class="box-title">热门</h3>
         </div>
-        <div class="box-body no-padding">
-          <ul class="media-list sns"></ul>
+        <div class="box-body clearfix">
+          <ul id="weixin-hot" class="media-list sns"></ul>
         </div>
-        <div class="box-footer clearfix" data-total="{{ total_page_number }}" data-type="hot"></div>
       </div>
     </div>
   </div>

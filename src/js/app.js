@@ -120,14 +120,14 @@ App.module.login = function () {
       submit   = elements[2],
       $msg     = $(form).find('p'),
 
-      enableSubmit = function() {
+      enableSubmit = function () {
         submit.disabled = !(username.value && password.value);
       },
 
-      processLogin = function(event) {
+      processLogin = function (event) {
         event.preventDefault();
 
-        $.post(action, $(form).serialize(), function(response) {
+        $.post(action, $(form).serialize(), function (response) {
           if (response.status) {
             location.href = location.search ? location.search.substr(1).split('=')[1] : '/';
           } else {
@@ -151,14 +151,14 @@ App.module.register = function () {
       submit   = elements[3],
       $msg     = $(form).find('p'),
 
-      enableSubmit = function() {
+      enableSubmit = function () {
         submit.disabled = !(username.value && password.value && retype.value);
       },
 
-      processAdd   = function(event) {
+      processAdd   = function (event) {
         event.preventDefault();
 
-        var processResponse = function(response) {
+        var processResponse = function (response) {
           if (response.status) {
             location.reload();
           } else {
@@ -187,16 +187,16 @@ App.module.admin = function () {
       $remove = $button.eq(1),
       id      = [],
 
-      action = function(obj, api) {
-        obj.click(function() {
+      action = function (obj, api) {
+        obj.click(function () {
           id.length = 0;
 
-          $input.filter(':checked').each(function(index, element) {
+          $input.filter(':checked').each(function (index, element) {
             id.push( $(element).parent().next().data('id') );
           });
 
           if (id.length) {
-            $.post(api, {id: id.toString()}, function(response) {
+            $.post(api, {id: id.toString()}, function (response) {
               if (response.status) {
                 location.reload();
               }
@@ -221,14 +221,14 @@ App.module.settings = function () {
       $msg        = $(form).find('p'),
 
 
-      enableSubmit = function() {
+      enableSubmit = function () {
         submit.disabled = !(username.value && oldPassword.value && newPassword.value && retype.value);
       },
 
-      processChange = function(event) {
+      processChange = function (event) {
         event.preventDefault();
 
-        var processResponse = function(response) {
+        var processResponse = function (response) {
           if (response.status) {
             $msg.text('更新成功！').show();
             location.href = '/login/';
@@ -325,7 +325,7 @@ App.module.pie = function (path) {
   });
 };
 
-App.module.map = function (path) {
+App.module.map = function () {
   $.getJSON('/api/map/' , function (result) {
     var city = result.regionData,
         data = [],
@@ -367,7 +367,7 @@ App.module.map = function (path) {
       },
       tooltip: {
         trigger: 'item',
-        formatter: function(a) {
+        formatter: function (a) {
           for (var i in city) {
             if (a[1] === city[i].regionName) {
               city2 = data[i];
@@ -400,7 +400,7 @@ App.module.map = function (path) {
         max: 3,
         splitNumber: 3,
         color: ['#fa9529', '#fff26e', '#cee19e', ],
-        formatter: function(v, v2) {
+        formatter: function (v, v2) {
           if (v2 === '1') {
             return 'A' + '-低风险';
           } else if (v2 === '2') {
@@ -409,7 +409,7 @@ App.module.map = function (path) {
             return 'C' + '-高风险';
           }
         },
-        x: 'right''
+        x: 'right'
       },
       series: [{
         name: '数据名称',
@@ -491,7 +491,7 @@ App.module.search = function () {
   var form  = document.forms.search,
       input = form.elements.keywords;
 
-  $(form).submit(function(event) {
+  $(form).submit(function (event) {
     event.preventDefault();
 
     var keywords = $.trim(input.value);
@@ -533,50 +533,6 @@ App.module.menu = function (path, type) {
   menu.appendTo(parent);
 };
 
-App.module.infoBox = function () {
-  var animate = function (index, element) {
-    var infoBoxNumber = $(element).find('.info-box-number'),
-        progressBar = $(element).find('.progress-bar'),
-        progressDescription = $(element).find('.progress-description'),
-
-        duration = 2000,
-        refreshInterval = 100,
-        loop = Math.floor(duration / refreshInterval),
-        loopCount = 0,
-
-        numberValue = 0,
-        numberFinal = $(element).data('number'),
-        numberIncrement = Math.floor(numberFinal / loop),
-
-        percentValue = 0,
-        percentFinal = $(element).data('percent'),
-        percentIncrement = Math.floor(percentFinal / loop),
-
-        intervalID,
-
-        countTo = function() {
-          numberValue += numberIncrement;
-          percentValue += percentIncrement;
-
-          loopCount++;
-
-          if (loopCount >= loop) {
-            clearInterval(intervalID);
-            numberValue = numberFinal;
-            percentValue = percentFinal;
-          }
-
-          infoBoxNumber.text( numberValue.toFixed() );
-          progressBar.width( percentValue + '%' );
-          progressDescription.text( '占总数据 ' + percentValue.toFixed() + '%' );
-        };
-
-    intervalID = setInterval(countTo, refreshInterval);
-  };
-
-  $('.info-box-content').each(animate);
-};
-
 App.module.inspection = function () {
   var $inspection = $('#inspection'),
       $content    = $inspection.children('.box-body').find('tbody');
@@ -605,47 +561,105 @@ App.module.returnTop = function (el) {
   $('body').animate({scrollTop: scrollTop});
 };
 
-App.module.table = function (module, path) {
-  $('.table-custom').each(function () {
-    var $this       = $(this),
-        $pagination = $this.parent(),
-        content     = this.tBodies[0],
-        type        = this.id,
+App.module.paginate = function (options) {
+  var returnTop = this.returnTop.bind(this);
 
-        renderTable = function(data) {
-          var items = data.data,
-
-              table = $.map(items, function(item) {
-                var url       = '/' + type + '/' + item.id + '/',
-                    title     = '<td><a href="' + url + '" title="' + item.title + '" target="_blank">' + item.title + '</a></td>',
-                    source    = '<td>' + item.source   + '</td>',
-                    location  = '<td>' + item.location + '</td>',
-                    time      = '<td>' + item.time     + '</td>',
-                    hot       = '<td class="text-center">' + item.hot + '</td>',
-                    row       = '<tr>' + title + source + location + time + hot + '</tr>';
-
-                return row;
-              });
-
-          $(content).html(table);
-        };
-
-    $.getJSON('/api' + path + type + '/1/', function(data) {
-      renderTable(data);
-
-      $pagination.twbsPagination({
-        totalPages: data.total,
-        visiblePages: 7,
-        onPageClick: function(event, page) {
-          module.returnTop($this);
-
-          $.getJSON('/api' + path + type + '/' + page + '/', function(data) {
-            renderTable(data);
-            $pagination.twbsPagination({totalPages: data.total});
-          });
-        }
-      });
+  $.get(options.api, options.filter(), function (data) {
+    if (!data.html) { return false; }
+    options.render(options.container, data.html);
+    $(options.container).closest('.box-body').twbsPagination({
+      totalPages: data.total,
+      onPageClick: function (event, pageNumber) {
+        returnTop($(this));
+        $.get(options.api, options.filter(pageNumber), function (data) {
+          options.render(options.container, data.html);
+        });
+      }
     });
+  });
+};
+
+App.module.abstract = function (options) {
+  options = $.extend({
+    feature: '',
+    container: '',
+    render: function (container, content) {
+      $('<div/>')
+        .attr({id: this.feature, class: 'list-group no-margin'})
+        .html(content)
+        .find('[data-toggle="tooltip"]')
+          .tooltip()
+        .end()
+        .replaceAll($(container));
+    }
+  }, options);
+
+  $.get('/api/' + options.feature + '/', {
+    type: 'abstract'
+  }, function (data) {
+    options.render(options.container, data.html);
+  });
+};
+
+App.module.list = function (options) {
+  options = $.extend(true, {
+    feature: '',
+    filter: {
+      type: 'list',
+      page: 1
+    },
+    container: '',
+    render: function (container, content) {
+      $(container).html(content);
+    },
+    visiblePages: 7
+  }, options);
+
+  $.extend($.fn.twbsPagination.defaults, {visiblePages: options.visiblePages});
+
+  var api = '/api/' + options.feature + '/',
+      filter = function (pageNumber) {
+        if (typeof pageNumber !== 'number') {
+          return options.filter;
+        } else {
+          return $.extend({}, options.filter, {page: pageNumber});
+        }
+      };
+
+  this.paginate({
+    api: api,
+    filter: filter,
+    container: options.container,
+    render: options.render
+  });
+};
+
+App.module.detail = function (options) {
+  options = $.extend(true, {
+    path: '',
+    feature: '',
+    container: '',
+    render: function (container, content) {
+      $(container).html(content);
+    }
+  }, options);
+
+  $.extend($.fn.twbsPagination.defaults, {visiblePages: 7});
+
+  var api = '/api' + options.path + options.feature + '/',
+      filter = function (pageNumber) {
+        if (typeof pageNumber !== 'number') {
+          return {page: 1};
+        } else {
+          return {page: pageNumber};
+        }
+      };
+
+  this.paginate({
+    api: api,
+    filter: filter,
+    container: options.container,
+    render: options.render
   });
 };
 
@@ -654,13 +668,13 @@ App.module.collect = function (type, id) {
     var star = $(this).find('i'),
         text = $(this).find('span'),
 
-        collect = function(api, nextAction) {
+        collect = function (api, nextAction) {
           var data = {
                 type: type === 'news' ? 'article' : 'topic',
                 id: id
               };
 
-          $.post(api, data, function(response) {
+          $.post(api, data, function (response) {
             if (response.status) {
               star.toggleClass('fa-star-o');
               star.toggleClass('fa-star');
@@ -674,38 +688,6 @@ App.module.collect = function (type, id) {
     } else {
       collect('/api/collection/add/', '取消收藏');
     }
-  });
-};
-
-App.module.sns = function (module, path, type) {
-  var $sns = $('.sns');
-
-  $sns.each(function(index, element) {
-    var $content    = $(element),
-        $pagination = $content.parent().next(),
-
-        snsType = function() {
-          if (type === 'weixin' || type === 'weibo') {
-            return $pagination.data('type');
-          } else {
-            return $pagination.data('type').replace('-', '/');
-          }
-        };
-
-    $.getJSON('/api' + path + snsType() + '/1/', function(data) {
-      $content.html(data.html);
-
-      $pagination.twbsPagination({
-        totalPages: data.total,
-        onPageClick: function (event, page) {
-          module.returnTop($sns);
-          $.getJSON('/api' + path + snsType() + '/' + page + '/', function(data) {
-            $content.html(data.html);
-            $pagination.twbsPagination({totalPages: data.total});
-          });
-        }
-      });
-    });
   });
 };
 
@@ -803,41 +785,6 @@ App.module.dataTable = function (path) {
   // });
 };
 
-App.module.custom = function () {
-  var form     = document.forms.addKeyword,
-      action   = form.action,
-      elements = form.elements,
-      fieldset = elements[0],
-      keyword  = elements[1],
-      button   = elements[2],
-      $msg     = $(form).prev(),
-      $list    = $(form).parent().prev().find('li'),
-
-      enableSubmit = function() {
-        button.disabled = !(keyword.value);
-      },
-
-      processAdd = function(event) {
-        event.preventDefault();
-
-        $.post(action, $(form).serialize(), function(response) {
-          if (response.status) {
-            $msg.text('关键词添加成功！').show();
-            location.reload();
-          } else {
-            $msg.text('关键词添加失败！').show();
-            keyword.value = '';
-          }
-        });
-      };
-
-  if ($list.length >= 5) {
-    fieldset.disabled = true;
-  } else {
-    $(form).keyup(enableSubmit).submit(processAdd);
-  }
-};
-
 App.module.dateRange = function ($dateRange) {
   $dateRange
     .on('show.dateRange', function (event, start, end) {
@@ -886,52 +833,6 @@ App.module.statistic = function ($el, api) {
   });
 };
 
-App.module.dataList = function (module, $dataList, api, start, end) {
-  $dataList.on('showDataList', function () {
-    var $paginationContainer = $dataList.parent(),
-
-        toParam = function (pageNumber) {
-          if (typeof pageNumber === 'undefined') {
-            pageNumber = 1;
-          }
-
-          return {
-            type: 'data-list',
-            start: start,
-            end: end,
-            page: pageNumber,
-          };
-        },
-
-        renderTable = function (pageContent) {
-          $('<tbody/>')
-            .html(pageContent)
-            .replaceAll($dataList.find('tbody'));
-        };
-
-    $.get(api, toParam(), function (data) {
-      renderTable(data.html);
-
-      $paginationContainer.twbsPagination({
-        totalPages: data.total,
-        visiblePages: 7,
-        first: '第一页',
-        prev: '上一页',
-        next: '下一页',
-        last: '最后一页',
-        paginationClass: 'pagination pagination-sm no-margin pull-right',
-        onPageClick: function(event, pageNumber) {
-          module.returnTop($(this));
-          $.get(api, toParam(pageNumber), function(data) {
-            renderTable(data.html);
-            $paginationContainer.twbsPagination({totalPages: data.total});
-          });
-        }
-      });
-    });
-  });
-};
-
 
 //
 // Pages
@@ -957,115 +858,289 @@ App.page.search = function (module, path) {
 };
 
 App.page.dashboard = function (module, path) {
-  module.infoBox();
+  $('.info-box-content').each(function (index, element) {
+    var infoBoxNumber = $(element).find('.info-box-number'),
+        progressBar = $(element).find('.progress-bar'),
+        progressDescription = $(element).find('.progress-description'),
+
+        duration = 2000,
+        refreshInterval = 100,
+        loop = Math.floor(duration / refreshInterval),
+        loopCount = 0,
+
+        numberValue = 0,
+        numberFinal = $(element).data('number'),
+        numberIncrement = numberFinal / loop,
+
+        percentValue = 0,
+        percentFinal = $(element).data('percent'),
+        percentIncrement = percentFinal / loop,
+
+        render = function (numberValue, percentValue) {
+          infoBoxNumber.text(numberValue);
+          progressBar.width(percentValue + '%');
+          progressDescription.text('占总数据 ' + percentValue + '%');
+        },
+
+        increaseTo = function () {
+          if (loopCount < loop) {
+            numberValue += numberIncrement;
+            percentValue += percentIncrement;
+            render(numberValue.toFixed(), percentValue.toFixed());
+
+            loopCount++;
+            setTimeout(increaseTo, refreshInterval);
+          } else {
+            numberValue = numberFinal;
+            percentValue = percentFinal;
+            render(numberValue, percentValue);
+          }
+        };
+
+    setTimeout(increaseTo, refreshInterval);
+  });
+
   module.map(path);
 
-  // whRisk
-  $.get('/api/risk/', {
-    type: 'abstract'
-  }, function (data) {
-    $('<tbody/>')
-      .html(data.html)
-      .showRisk()
-      .replaceAll($('#risk > tbody'));
+  module.abstract({
+    feature: 'risk',
+    container: '#risk > tbody',
+    render: function (container, content) {
+      $('<tbody/>')
+        .html(content)
+        .showRisk()
+        .replaceAll($(container));
+    }
   });
 
   module.line(path);
   module.pie(path);
   module.inspection();
+
+  module.abstract({
+    feature: 'news',
+    container: '#news'
+  });
+
+  module.abstract({
+    feature: 'event',
+    container: '#event'
+  });
+
+  module.abstract({
+    feature: 'weixin',
+    container: '#weixin',
+    render: function (container, content) {
+      $(container).html(content);
+    }
+  });
+
+  module.abstract({
+    feature: 'weibo',
+    container: '#weibo',
+    render: function (container, content) {
+      $(container).html(content);
+    }
+  });
 };
 
-App.page.news = function (module, path) {
-  module.table(module, path);
+App.page.news = function (module) {
+  module.list({
+    feature: 'news',
+    container: '#news > tbody'
+  });
 };
 
 App.page.newsDetail = function (module, path, type, id) {
   module.collect(type, id);
 };
 
-App.page.event = function (module, path) {
-  module.table(module, path);
+App.page.event = function (module) {
+  module.list({
+    feature: 'event',
+    container: '#event > tbody'
+  });
 };
 
 App.page.eventDetail = function (module, path, type, id) {
   module.collect(type, id);
   module.line(path, type);
   module.pie(path, type);
-  module.table(module, path);
-  module.sns(module, path, type);
+
+  module.detail({
+    path: path,
+    feature: 'news',
+    container: '#news > tbody'
+  });
+
+  module.detail({
+    path: path,
+    feature: 'weixin',
+    container: '#weixin'
+  });
+
+  module.detail({
+    path: path,
+    feature: 'weibo',
+    container: '#weibo'
+  });
 };
 
-App.page.weixin = function (module, path, type) {
-  module.sns(module, path, type);
+App.page.weixin = function (module) {
+  module.list({
+    feature: 'weixin',
+    filter: {
+      sort: 'new'
+    },
+    container: '#weixin-new',
+    visiblePages: 3
+  });
+
+  module.list({
+    feature: 'weixin',
+    filter: {
+      sort: 'hot'
+    },
+    container: '#weixin-hot',
+    visiblePages: 3
+  });
 };
 
 App.page.weixinDetail = function () {
   // placeholder for future usage
 };
 
-App.page.weibo = function (module, path, type) {
-  module.sns(module, path, type);
+App.page.weibo = function (module) {
+  module.list({
+    feature: 'weibo',
+    filter: {
+      sort: 'new'
+    },
+    container: '#weibo-new',
+    visiblePages: 3
+  });
+
+  module.list({
+    feature: 'weibo',
+    filter: {
+      sort: 'hot'
+    },
+    container: '#weibo-hot',
+    visiblePages: 3
+  });
 };
 
 App.page.categoryDetail = function (module, path) {
-  module.table(module, path);
+  module.detail({
+    path: path,
+    feature: 'news',
+    container: '#news > tbody'
+  });
 };
 
-App.page.locationDetail = function (module, path, type) {
-  module.table(module, path);
-  module.sns(module, path, type);
+App.page.locationDetail = function (module, path) {
+  module.detail({
+    path: path,
+    feature: 'news',
+    container: '#news > tbody'
+  });
+
+  module.detail({
+    path: path,
+    feature: 'weixin',
+    container: '#weixin'
+  });
+
+  module.detail({
+    path: path,
+    feature: 'weibo',
+    container: '#weibo'
+  });
 };
 
 App.page.inspection = function (module, path) {
   module.dataTable(path);
 };
 
-App.page.custom = function (module) {
-  module.custom();
+App.page.custom = function () {
+  var form     = document.forms.addKeyword,
+      action   = form.action,
+      elements = form.elements,
+      fieldset = elements[0],
+      keyword  = elements[1],
+      button   = elements[2],
+      $msg     = $(form).prev(),
+      $list    = $(form).parent().prev().find('li'),
+
+      enableSubmit = function () {
+        button.disabled = !(keyword.value);
+      },
+
+      processAdd = function (event) {
+        event.preventDefault();
+
+        $.post(action, $(form).serialize(), function (response) {
+          if (response.status) {
+            $msg.text('关键词添加成功！').show();
+            location.reload();
+          } else {
+            $msg.text('关键词添加失败！').show();
+            keyword.value = '';
+          }
+        });
+      };
+
+  if ($list.length >= 5) {
+    fieldset.disabled = true;
+  } else {
+    $(form).keyup(enableSubmit).submit(processAdd);
+  }
 };
 
-App.page.customDetail = function (module, path, type) {
-  module.table(module, path);
-  module.sns(module, path, type);
+App.page.customDetail = function (module, path) {
+  module.detail({
+    path: path,
+    feature: 'news',
+    container: '#news > tbody'
+  });
+
+  module.detail({
+    path: path,
+    feature: 'weixin',
+    container: '#weixin'
+  });
+
+  module.detail({
+    path: path,
+    feature: 'weibo',
+    container: '#weibo'
+  });
 };
 
 App.page.collection = function (module, path) {
-  module.table(module, path);
+  module.detail({
+    path: path,
+    feature: 'news',
+    container: '#news > tbody'
+  });
+
+  module.detail({
+    path: path,
+    feature: 'event',
+    container: '#event > tbody'
+  });
 };
 
 App.page.risk = function (module) {
-  var $risk = $('#risk'),
-      $paginationContainer = $risk.parent(),
-
-      toAPI = function (pageNumber) {
-        if (typeof pageNumber === 'undefined') {
-          pageNumber = 1;
-        }
-
-        return '/api/risk/?type=list&page=' + pageNumber;
-      },
-
-      renderTable = function (pageContent) {
-        $('<tbody/>')
-          .html(pageContent)
-          .showRisk()
-          .replaceAll($risk.find('tbody'));
-      };
-
-  $.get(toAPI(), function (data) {
-    renderTable(data.html);
-
-    $paginationContainer.twbsPagination({
-      totalPages: data.total,
-      visiblePages: 7,
-      onPageClick: function (event, pageNumber) {
-        module.returnTop($(this));
-        $.get(toAPI(pageNumber), function (data) {
-          renderTable(data.html);
-          $paginationContainer.twbsPagination({totalPages: data.total});
-        });
-      }
-    });
+  module.list({
+    feature: 'risk',
+    container: '#risk > tbody',
+    render: function (container, content) {
+      $('<tbody/>')
+        .html(content)
+        .showRisk()
+        .replaceAll($(container));
+    }
   });
 };
 
@@ -1073,8 +1148,24 @@ App.page.riskDetail = function (module, path, type, id) {
   module.collect(type, id);
   module.line(path, type);
   module.pie(path, type);
-  module.table(module, path);
-  module.sns(module, path, type);
+
+  module.detail({
+    path: path,
+    feature: 'news',
+    container: '#news > tbody'
+  });
+
+  module.detail({
+    path: path,
+    feature: 'weixin',
+    container: '#weixin'
+  });
+
+  module.detail({
+    path: path,
+    feature: 'weibo',
+    container: '#weibo'
+  });
 };
 
 App.page.analyticsDetail = function (module, path) {
@@ -1099,7 +1190,7 @@ App.page.analyticsDetail = function (module, path) {
           title: '保存为Excel',
           icon: 'image://../../static/img/excel.png',
 
-          onclick: function() {
+          onclick: function () {
             document.getElementById('save-as-excel').src = api + '?type='+type+'&start=' + start + '&end=' + end + '&datatype=xls';
           }
         };
@@ -1138,20 +1229,6 @@ App.page.analyticsDetail = function (module, path) {
           toolbox: {
             show: true,
             feature: {
-              /*mark: {
-                show: false
-              },
-              dataView: {
-                show: true,
-                readOnly: false
-              },
-              magicType: {
-                show: false,
-                type: ['line']
-              },
-              restore: {
-                show: false
-              },*/
               myTool: excel('chart-trend') ,
               saveAsImage: {
                 show: true
@@ -1209,10 +1286,6 @@ App.page.analyticsDetail = function (module, path) {
           toolbox: {
             show: true,
             feature: {
-              /*dataView: {
-                show: true,
-                readOnly: false
-              },*/
               myTool: excel('chart-type'),
               saveAsImage: {
                 show: true,
@@ -1264,10 +1337,6 @@ App.page.analyticsDetail = function (module, path) {
               mark: {
                 show: false
               },
-              /*dataView: {
-                show: true,
-                readOnly: false
-              },*/
               myTool: excel('chart-emotion'),
               magicType: {
                 show: false,
@@ -1304,7 +1373,7 @@ App.page.analyticsDetail = function (module, path) {
             }, {
               value: data.negative,
               name: '负面'
-            }, ]
+            }]
           }]
         });
       });
@@ -1340,10 +1409,6 @@ App.page.analyticsDetail = function (module, path) {
             x: 'left',
             y: 'top',
             feature: {
-              /*dataView: {
-                show: true,
-                readOnly: false
-              },*/
               myTool: excel('chart-weibo'),
               saveAsImage: {
                 show: true
@@ -1386,8 +1451,8 @@ App.page.analyticsDetail = function (module, path) {
           tooltip: {
             show: false,
             trigger: 'axis',
-            axisPointer: { // 坐标轴指示器，坐标轴触发有效
-              type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
+            axisPointer: {
+              type: 'shadow'
             }
           },
           legend: {
@@ -1400,10 +1465,6 @@ App.page.analyticsDetail = function (module, path) {
               mark: {
                 show: true
               },
-              /*dataView: {
-                show: true,
-                readOnly: false
-              },*/
               magicType: {
                 show: true,
                 type: ['line', 'bar', 'stack', 'tiled']

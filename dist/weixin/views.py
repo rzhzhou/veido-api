@@ -14,7 +14,7 @@ class WeixinView(BaseTemplateView):
         latest = self.paging(weixin, 20, 1)
         items = [set_logo(data) for data in latest['items']]
         html = self.set_css_to_weixin(items)
-        return self.render_to_response('weixin/weixin_list.html', {'weixin_latest_list': latest,
+        return self.render_to_response('weixin/list.html', {'weixin_latest_list': latest,
                                                                    'weixin_hottest_list': hottest,
                                                                    'html': html,
                                                                    'total_page_number': latest['total_number'],
@@ -29,13 +29,13 @@ class WeixinDetailView(BaseTemplateView):
             weixin_id = int(id)
             weixin = Weixin.objects.get(id=weixin_id)
         except Weixin.DoesNotExist:
-            return render_to_response('weixin/weixin.html', {'article': '', 'relate': []})
+            return render_to_response('weixin/detail.html', {'article': '', 'relate': []})
         try:
             r = RelatedData.objects.filter(uuid=weixin.uuid)[0]
             relateddata = list(r.weixin.all()) + list(r.weibo.all()) + list(r.articles.all())
         except IndexError:
             relateddata = []
-        return self.render_to_response('weixin/weixin.html', {'article': set_logo(weixin), 
+        return self.render_to_response('weixin/detail.html', {'article': set_logo(weixin),
                                                                 'relate': relateddata,
                                                                 'name': sidebar_name
                                                                 })
