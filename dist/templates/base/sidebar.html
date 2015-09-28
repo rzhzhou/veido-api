@@ -105,21 +105,10 @@
       </li>
 
       <li class="treeview">
-        <a href="#">
+        <a href="/analytics/0/">
           <i class="fa fa-line-chart"></i>
           <span>数据统计</span>
-          <i class="fa fa-angle-left pull-right"></i>
         </a>
-        <ul class="treeview-menu analytics-all">
-          {% for industry in industries %}
-            <li>
-              <a href="/analytics/{{ industry.id }}/">
-                <i class="fa fa-circle-o"></i>
-                <span>{{ industry.name }}</span>
-              </a>
-            </li>
-          {% endfor %}
-        </ul>
       </li>
 
       {% comment 'temporary disable' %}
