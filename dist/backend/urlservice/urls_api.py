@@ -79,8 +79,8 @@ urlpatterns += patterns('analytics.views',
 )
 
 urlpatterns += patterns('collection,views_api',
-    url(r'^collection/(?P<action>\w+)/$', CollecModifyView.as_view()),
-    url(r'^collection/(?P<table_type>\S+)/(?P<page>\d+)/$', CollectView.as_view()),
+    url(r'^collection/$', CollecModifyView.as_view()),
+    url(r'^collection/(?P<table_type>\S+)/$', CollectView.as_view()),
 )
 
 urlpatterns += patterns('yqj.views_api',

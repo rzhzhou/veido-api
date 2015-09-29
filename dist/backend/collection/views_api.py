@@ -1,9 +1,17 @@
 # -*- coding: utf-8 -*-
-from base.models import Article, Category, RelatedData
+from django.views.generic import View
+from rest_framework.decorators import api_view
+from django.db import models, connection, IntegrityError
+from rest_framework.response import Response
+from django.conf import settings
+from django.template.loader import render_to_string
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
+
+from base.models import Article, Category, RelatedData, ArticleCollection,\
+    Collection
 from news.views_api import ArticleTableView
 from event.views_api import EventTableView
 from base.views import BaseAPIView
-from django.views.generic import View
 
 
 class CollecModifyView(View):
@@ -21,8 +29,7 @@ class CollecModifyView(View):
         except IntegrityError:
              pass
 
-
-    def delete(self, item):
+    def _delete(self, item):
         try:
             collectitem = self.get_collection_model().objects.get(**{self.related_field: item, 'collection': self.collection})
             collectitem.delete(using='master')
@@ -55,28 +62,28 @@ class CollecModifyView(View):
     def get_collection_model(self):
         return models.get_model('base', self.data_type.capitalize() + 'Collection')
 
-    def post(self, request, action, *args, **kwargs):
+    def prepare(self,request):
+        data = request.read()
+        data_type = data.split('&')[0].split('=')[1]
+        id = data.split('&')[1].split('=')[1]
         try:
-            self.data_type = request.POST['type']
-            pk = request.POST['id']
+            self.data_type = data_type
+            pk = id
         except KeyError:
             return HttpResponse(status=404)
 
         related_fields = ['article', 'topic']
         if self.data_type not in related_fields:
             return HttpResponse(status=400)
-
-        #find the model and get instance
         try:
             model = self.get_model()
             item = model.objects.get(id=pk)
         except model.DoesNotExist:
             return HttpResponse(status=404)
+        return item
 
-        if action == 'remove':
-            self.delete(item)
-        elif action == 'add':
-            self.save(item)
+    def put(self, request):
+        self.save(self.prepare(request))
         return JsonResponse({'status': True})
 
     def delete(self, request):
@@ -110,7 +117,8 @@ class CollectView(BaseAPIView):
         one_record = [title, item.source, item.area.name, pubtime.date(), hot_index]
         return one_record
 
-    def get(self, request, table_type, page):
+    def get(self, request, table_type):
+        page = int(request.GET['page'])
         try:
             self.collection = request.myuser.collection
         except Collection.DoesNotExist:
@@ -122,12 +130,14 @@ class CollectView(BaseAPIView):
             items = self.collection.articles.all()
             datas = self.paging(items, settings.NEWS_PAGE_LIMIT, page)
             result = self.news_to_json(datas['items'])
+            html_string = render_to_string('news/list_tpl.html', {'news_list':  result})
         elif table_type == 'event':
             view = EventTableView(self.request)
             items = self.collection.events.all()
             datas = self.paging(items, settings.EVENT_PAGE_LIMIT, page)
             result = self.event_to_json(datas['items'])
+            html_string = render_to_string('event/list_tpl.html', {'event_list':  result})
         else:
             result = []
             datas = {'taotal_number': 0}
-        return Response({'total': datas['total_number'], 'data': result})
+        return Response({'total': datas['total_number'], 'html': html_string})
