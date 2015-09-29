@@ -17,3 +17,4 @@ tablib == 0.10.0
 urllib3 >= 1.7.1
 wheel == 0.24.0
 xlwt == 1.0.0
+xlrd == 0.9.4
