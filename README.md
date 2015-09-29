@@ -10,7 +10,7 @@ python manage.py runserver 0.0.0.0:8000
 
 ### Project Structure
 
-<pre>
+```
 observer/                  - Main Project Folder
   apps/                    - Contains all django apps
   settings/                - Contains production and development settings files
@@ -24,4 +24,4 @@ createapp.py               - Run 'python createapp.py [APP_NAME]' to create an a
 manage.py                  - Standard django management file
 runserver.py               - Run 'python runserver.py' to run a local test server. Does relevant checks and updates db first.
 requirements.txt           - Contains all pip requirements
-</pre>
+```
