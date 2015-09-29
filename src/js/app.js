@@ -598,7 +598,10 @@ App.module.paginate = function (options) {
       loading.appendTo(box);
     },
     success: function (data) {
-      if (!data.html) { return false; }
+      if (!data.html) {
+        loading.detach();
+        return false;
+      }
       options.render(options.container, data.html);
       boxBody.twbsPagination({
         totalPages: data.total,
@@ -611,7 +614,7 @@ App.module.paginate = function (options) {
 
 App.module.abstract = function (options) {
   var loading = $('<div class="overlay"><i class="fa fa-refresh fa-spin"></i></div>');
-  
+
   options = $.extend({
     feature: '',
     container: '',
