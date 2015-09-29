@@ -10,7 +10,7 @@ from base import authenticate, login_required, set_logo
 from base.api_function import chart_line
 
 class RisksView(BaseAPIView):
-    HOME_PAGE_LIMIT = 6
+    HOME_PAGE_LIMIT = 10
     def get_score_article(self, request):
         user = request.myuser
         company = user.group.company
