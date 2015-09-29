@@ -1144,6 +1144,8 @@ App.module.paginate = function (options) {
 };
 
 App.module.abstract = function (options) {
+  var loading = $('<div class="overlay"><i class="fa fa-refresh fa-spin"></i></div>');
+  
   options = $.extend({
     feature: '',
     container: '',
@@ -1164,15 +1166,11 @@ App.module.abstract = function (options) {
       type: 'abstract'
     },
     beforeSend: function () {
-      $(options.container)
-        .closest('.box')
-        .append($('<div class="overlay"><i class="fa fa-refresh fa-spin"></i></div>'));
+      $(options.container).closest('.box').append(loading);
     },
     success: function (data) {
       options.render(options.container, data.html);
-      $(options.container)
-        .closest('.box')
-        .find('.overlay').remove();
+      loading.remove();
     }
   });
 };
