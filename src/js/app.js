@@ -676,27 +676,30 @@ App.module.detail = function (options) {
 App.module.collect = function (type, id) {
   $('.collection').click(function () {
     var star = $(this).find('i'),
-        text = $(this).find('span'),
+        text = $(this).find('span');
 
-        collect = function (api, nextAction) {
-          var data = {
-                type: type === 'news' ? 'article' : 'topic',
-                id: id
-              };
+    function collect(method) {
+      $.ajax({
+        type: method,
+        url: '/api/collection/',
+        data: {
+          type: type === 'news' ? 'article' : 'topic',
+          id: id
+        },
+        success: function (data) {
+          if (data.status) {
+            star.toggleClass('fa-star-o');
+            star.toggleClass('fa-star');
+            text.text(method === 'PUT' ? '取消收藏' : '添加收藏');
+          }
+        }
+      });
+    }
 
-          $.post(api, data, function (response) {
-            if (response.status) {
-              star.toggleClass('fa-star-o');
-              star.toggleClass('fa-star');
-              text.text(nextAction);
-            }
-          });
-        };
-
-    if ( star.hasClass('fa-star') ) {
-      collect('/api/collection/remove/', '添加收藏');
+    if (star.hasClass('fa-star')) {
+      collect('DELETE');
     } else {
-      collect('/api/collection/add/', '取消收藏');
+      collect('PUT');
     }
   });
 };
