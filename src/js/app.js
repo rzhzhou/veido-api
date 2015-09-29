@@ -572,20 +572,40 @@ App.module.returnTop = function (el) {
 };
 
 App.module.paginate = function (options) {
-  var returnTop = this.returnTop.bind(this);
-
-  $.get(options.api, options.filter(), function (data) {
-    if (!data.html) { return false; }
-    options.render(options.container, data.html);
-    $(options.container).closest('.box-body').twbsPagination({
-      totalPages: data.total,
-      onPageClick: function (event, pageNumber) {
-        returnTop($(this));
-        $.get(options.api, options.filter(pageNumber), function (data) {
-          options.render(options.container, data.html);
+  var returnTop = this.returnTop.bind(this),
+      box = $(options.container).closest('.box'),
+      boxBody = $(options.container).closest('.box-body'),
+      loading = $('<div class="overlay"><i class="fa fa-refresh fa-spin"></i></div>'),
+      pageClick = function (event, pageNumber) {
+        $.ajax({
+          url: options.api,
+          data: options.filter(pageNumber),
+          beforeSend: function () {
+            loading.appendTo(box);
+          },
+          success: function (data) {
+            options.render(options.container, data.html);
+            loading.detach();
+            returnTop(boxBody);
+          }
         });
-      }
-    });
+      };
+
+  $.ajax({
+    url: options.api,
+    data: options.filter(),
+    beforeSend: function () {
+      loading.appendTo(box);
+    },
+    success: function (data) {
+      if (!data.html) { return false; }
+      options.render(options.container, data.html);
+      boxBody.twbsPagination({
+        totalPages: data.total,
+        onPageClick: pageClick
+      });
+      loading.detach();
+    }
   });
 };
 
