@@ -17,6 +17,7 @@ observer/                  - Main Project Folder
   prefixed_storage.py      - For storages plugin, if need be
   ...
 static/                    - Contains all static files
+  build/                   - Contains all static build files
 templates/                 - Contains all the dynamic template files
 tests/                     - Contains all the testing files
 tmp/                       - Contains local development environment files (e.g. database files, log files, etc.)
