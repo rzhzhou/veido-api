@@ -604,10 +604,22 @@ App.module.abstract = function (options) {
     }
   }, options);
 
-  $.get('/api/' + options.feature + '/', {
-    type: 'abstract'
-  }, function (data) {
-    options.render(options.container, data.html);
+  $.ajax({
+    url: '/api/' + options.feature + '/',
+    data: {
+      type: 'abstract'
+    },
+    beforeSend: function () {
+      $(options.container)
+        .closest('.box')
+        .append($('<div class="overlay"><i class="fa fa-refresh fa-spin"></i></div>'));
+    },
+    success: function (data) {
+      options.render(options.container, data.html);
+      $(options.container)
+        .closest('.box')
+        .find('.overlay').remove();
+    }
   });
 };
 
