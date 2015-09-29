@@ -79,6 +79,10 @@ class CollecModifyView(View):
             self.save(item)
         return JsonResponse({'status': True})
 
+    def delete(self, request):
+        self._delete(self.prepare(request))
+        return JsonResponse({'status': True})
+
 
 class CollectView(BaseAPIView):
     def article_html(self, item):
