@@ -1,7 +1,6 @@
 {
   "browser": true,
   "node": true,
-  "esnext": true,
   "bitwise": true,
   "camelcase": true,
   "curly": true,
@@ -15,5 +14,6 @@
   "undef": true,
   "unused": true,
   "strict": true,
-  "jquery": true
+  "jquery": true,
+  "browserify": true
 }
