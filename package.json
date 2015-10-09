@@ -9,10 +9,10 @@
   "dependencies": {
     "admin-lte": "^2.3.0",
     "bootstrap": "^3.3.5",
-    "bootstrap-daterangepicker": "dangrossman/bootstrap-daterangepicker#2.1.12",
+    "bootstrap-daterangepicker": "dangrossman/bootstrap-daterangepicker",
     "font-awesome": "^4.4.0",
     "jquery": "^2.1.4",
-    "twbs-pagination": "esimakin/twbs-pagination#1.2.5"
+    "twbs-pagination": "esimakin/twbs-pagination"
   },
   "devDependencies": {
     "browser-sync": "^2.7.9",
