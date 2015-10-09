@@ -1,6 +1,8 @@
-### Get Started
+## Get Started
 
-#### All developers
+### All developers
+
+To start development:
 
 ```shell
 mkdir observer && cd $_
@@ -9,15 +11,13 @@ pip install -r requirements.txt
 python manage.py runserver 0.0.0.0:8000
 ```
 
-
-
-#### Front-end developers only
+### Front-end developers only
 
 To start development:
 
 ```shell
 npm i -g gulp
-npm i
+npm i -d
 gulp serve
 ```
 
@@ -27,7 +27,7 @@ To start build:
 gulp build
 ```
 
-### Project Structure
+## Project Structure
 
 ```
 observer/                  - Main Project Folder
