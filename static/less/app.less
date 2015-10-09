@@ -1,8 +1,8 @@
 //Bootstrap Variables & Mixins
 //The core bootstrap code have not been modified. These files
-//are included only for refrence.
-@import "bootstrap-less/mixins.less";
-@import "bootstrap-less/variables.less";
+//are included only for reference.
+@import (reference) "bootstrap/mixins.less";
+@import (reference) "bootstrap/variables.less";
 
 //MISC
 //----
@@ -14,13 +14,15 @@
 //-----------
 @import "adminlte/header.less";
 @import "adminlte/sidebar.less";
+@import "adminlte/sidebar-mini.less";
+@import "adminlte/control-sidebar.less";
 @import "adminlte/dropdown.less";
 @import "adminlte/forms.less";
 @import "adminlte/progress-bars.less";
 @import "adminlte/small-box.less";
 @import "adminlte/boxes.less";
 @import "adminlte/info-box.less";
-// @import "adminlte/timeline.less";
+@import "adminlte/timeline.less";
 @import "adminlte/buttons.less";
 @import "adminlte/callout.less";
 @import "adminlte/alerts.less";
@@ -28,10 +30,11 @@
 @import "adminlte/products.less";
 @import "adminlte/table.less";
 @import "adminlte/labels.less";
-// @import "adminlte/direct-chat.less";
+@import "adminlte/direct-chat.less";
 @import "adminlte/users-list.less";
-// @import "adminlte/carousel.less";
+@import "adminlte/carousel.less";
 @import "adminlte/modal.less";
+@import "adminlte/social-widgets.less";
 @import "info-box.less";
 @import "media.less";
 @import "dataTables.less";
@@ -39,11 +42,12 @@
 
 //PAGES
 //------
-// @import "adminlte/mailbox.less";
-// @import "adminlte/lockscreen.less";
+@import "adminlte/mailbox.less";
+@import "adminlte/lockscreen.less";
 @import "adminlte/login_and_register.less";
 @import "adminlte/404_500_errors.less";
-// @import "adminlte/invoice.less";
+@import "adminlte/invoice.less";
+@import "adminlte/profile";
 @import "product.less";
 @import "settings.less";
 @import "user.less";
@@ -53,16 +57,15 @@
 
 //Plugins
 //--------
-// @import "adminlte/bootstrap-social.less";
-// @import "adminlte/fullcalendar.less";
-
+@import "adminlte/bootstrap-social.less";
+@import "adminlte/fullcalendar.less";
+@import "adminlte/select2.less";
 
 //Miscellaneous
 //-------------
 @import "adminlte/miscellaneous.less";
-// @import "adminlte/print.less";
-
+@import "adminlte/print.less";
 
 //Skin blue
 //---------
-@import "adminlte/skins/skin-blue.less";
+@import "adminlte/skins/skin-blue-light.less";
