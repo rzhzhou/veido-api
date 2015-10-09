@@ -1,14 +1,10 @@
 {
-  "name": "app",
-  "version": "1.0.0",
-  "description": "舆情机客户端",
-  "scripts": {
-    "start": "gulp serve",
-    "build": "gulp build"
-  },
+  "name": "Observer",
+  "version": "3.0.0",
+  "description": "质监舆情",
   "repository": {
     "type": "git",
-    "url": "git@192.168.1.101:yqj/app.git"
+    "url": "git@192.168.1.101:observer/app.git"
   },
   "dependencies": {
     "admin-lte": "^2.3.0",
