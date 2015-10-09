@@ -1,5 +1,7 @@
 ### Get Started
 
+#### All developers
+
 ```shell
 mkdir observer && cd $_
 git clone git@192.168.1.101:observer/app.git
@@ -7,6 +9,23 @@ pip install -r requirements.txt
 python manage.py runserver 0.0.0.0:8000
 ```
 
+
+
+#### Front-end developers only
+
+To start development:
+
+```shell
+npm i -g gulp
+npm i
+gulp serve
+```
+
+To start build:
+
+```shell
+gulp build
+```
 
 ### Project Structure
 
