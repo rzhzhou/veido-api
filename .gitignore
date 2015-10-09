@@ -1,5 +1,2 @@
 .DS_Store
-**/**/**/*.pyc
-node_modules/*
-bower_components/*
-etc/*
+node_modules
