@@ -148,7 +148,7 @@ gulp.task('serve', ['django'], function () {
     proxy: '0.0.0.0:8000'
   });
 
-  gulp.watch('static/less/*.less', ['serve-less']);
+  gulp.watch('static/less/**/*.less', ['serve-less']);
   gulp.watch('static/js/*.js', ['serve-js']);
 
   gulp.watch([
