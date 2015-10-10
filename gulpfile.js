@@ -15,47 +15,43 @@ var browserSync = require('browser-sync').create(),
 // paths
 var vendor = {
   bootstrap: {
-    css: 'bower_components/bootstrap/dist/css/bootstrap.css',
-    fonts: 'bower_components/bootstrap/dist/fonts/*',
-    js: 'bower_components/bootstrap/dist/js/bootstrap.js'
+    css: 'node_modules/bootstrap/dist/css/bootstrap.css',
+    fonts: 'node_modules/bootstrap/dist/fonts/*',
+    js: 'node_modules/bootstrap/dist/js/bootstrap.js'
   },
   daterangepicker: {
-    css: 'bower_components/bootstrap-daterangepicker/daterangepicker.css',
-    js: 'bower_components/bootstrap-daterangepicker/daterangepicker.js'
+    css: 'node_modules/bootstrap-daterangepicker/daterangepicker.css',
+    js: 'node_modules/bootstrap-daterangepicker/daterangepicker.js'
   },
-  dataTables: {
-    css: 'bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.css',
-    js: [
-      'bower_components/DataTables/media/js/jquery.dataTables.js',
-      'bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.js'
-    ]
-  },
-  echarts: 'bower_components/echarts/build/dist/echarts-all.js',
+  adminlte: 'static/js/adminlte.js',
+  echarts: 'static/js/echarts.js',
   fontawesome: {
-    css: 'bower_components/fontawesome/css/font-awesome.css',
-    fonts: 'bower_components/fontawesome/fonts/*'
+    css: 'node_modules/fontawesome/css/font-awesome.css',
+    fonts: 'node_modules/fontawesome/fonts/*'
   },
-  jquery: 'bower_components/jquery/dist/jquery.js',
+  jquery: 'node_modules/jquery/dist/jquery.js',
   moment: [
-    'bower_components/moment/moment.js',
-    'bower_components/moment/locale/zh-cn.js'
+    'node_modules/moment/moment.js',
+    'node_modules/moment/locale/zh-cn.js'
   ],
-  slimscroll: 'bower_components/jquery.slimscroll/jquery.slimscroll.js',
-  twbsPagination: 'bower_components/twbs-pagination/jquery.twbsPagination.js'
+  twbsPagination: 'node_modules/twbs-pagination/jquery.twbsPagination.js'
 };
 
 var app = {
-  less: 'src/less/app.less',
+  less: 'static/less/app.less',
   js: [
-    'src/js/adminlte.js',
-    'src/js/app.js'
+    'static/js/config.js',
+    'static/js/plugin.js',
+    'static/js/module.js',
+    'static/js/page.js',
+    'static/js/route.js'
   ]
 };
 
 var dist = {
-  css: 'dist/static/css/',
-  fonts: 'dist/static/fonts/',
-  js: 'dist/static/js/'
+  css: 'static/build/css/',
+  fonts: 'static/build/fonts/',
+  js: 'static/build/js/'
 };
 
 
@@ -64,8 +60,7 @@ gulp.task('clean-vendor', function () {
   del.sync([
     dist.css + 'vendor.css',
     dist.fonts + '*',
-    dist.js + 'vendor.js',
-    dist.js + 'echarts-all.js'
+    dist.js + 'vendor.js'
   ]);
 });
 
@@ -97,8 +92,7 @@ gulp.task('vendor-css', ['clean-vendor'], function () {
   var files = [
     vendor.bootstrap.css,
     vendor.fontawesome.css,
-    vendor.daterangepicker.css,
-    vendor.dataTables.css
+    vendor.daterangepicker.css
   ];
 
   return gulp.src(files)
@@ -121,31 +115,24 @@ gulp.task('vendor-js', ['clean-vendor'], function () {
   var files = [
     vendor.jquery,
     vendor.bootstrap.js,
-    vendor.dataTables.js[0],
-    vendor.dataTables.js[1],
     vendor.moment[0],
     vendor.moment[1],
     vendor.daterangepicker.js,
-    // vendor.slimscroll,
-    vendor.twbsPagination
+    vendor.twbsPagination,
+    vendor.adminlte,
+    vendor.echarts
   ];
 
   return gulp.src(files)
     .pipe(concat('vendor.js'))
     .pipe(uglify())
-    .pipe(gulp.dest('dist/static/js'));
-});
-
-gulp.task('vendor-echarts', ['clean-vendor'], function () {
-  return  gulp.src(vendor.echarts)
     .pipe(gulp.dest(dist.js));
 });
 
 gulp.task('vendor', [
   'vendor-css',
   'vendor-fonts',
-  'vendor-js',
-  'vendor-echarts'
+  'vendor-js'
 ]);
 
 
@@ -160,7 +147,7 @@ gulp.task('build-less', ['clean-app-css'], function () {
 gulp.task('build-js', ['clean-app-js'], function () {
   return gulp.src(app.js)
     .pipe(concat('app.js'))
-    .pipe(uglify())
+    // .pipe(uglify())
     .pipe(gulp.dest(dist.js));
 });
 
@@ -196,8 +183,8 @@ gulp.task('serve', ['django'], function () {
     proxy: '0.0.0.0:8000'
   });
 
-  gulp.watch('src/less/*.less', ['serve-less']);
-  gulp.watch('src/js/*.js', ['serve-js']);
+  gulp.watch('static/less/*.less', ['serve-less']);
+  gulp.watch('static/js/*.js', ['serve-js']);
 
   gulp.watch([
     'dist/templates/**/*.html',

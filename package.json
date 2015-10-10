@@ -12,6 +12,7 @@
     "bootstrap-daterangepicker": "dangrossman/bootstrap-daterangepicker",
     "font-awesome": "^4.4.0",
     "jquery": "^2.1.4",
+    "moment": "^2.9.0",
     "twbs-pagination": "esimakin/twbs-pagination"
   },
   "devDependencies": {
