@@ -21,8 +21,8 @@
   "adminlte": "static/js/adminlte.js",
   "echarts": "static/js/echarts.js",
   "fontawesome": {
-    "css": "node_modules/fontawesome/css/font-awesome.css",
-    "fonts": "node_modules/fontawesome/fonts/*"
+    "css": "node_modules/font-awesome/css/font-awesome.css",
+    "fonts": "node_modules/font-awesome/fonts/*"
   },
   "jquery": "node_modules/jquery/dist/jquery.js",
   "moment": [
