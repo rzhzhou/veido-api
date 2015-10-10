@@ -47,5 +47,5 @@ static/                    - Contains all static files
   less/                    - Contains all less source files
 templates/                 - Contains all the dynamic template files
 manage.py                  - Standard django management file
-requirements.txt           - Contains all pip requirements
+requirement.txt           - Contains all pip requirements
 ```
