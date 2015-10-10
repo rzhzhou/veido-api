@@ -1,7 +1,5 @@
 'use strict';
 
-var App = App || {};
-
 // user
 App.page.login = function (module) {
   module.login();

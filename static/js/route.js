@@ -1,7 +1,5 @@
 'use strict';
 
-var App = App || {};
-
 App.route = function () {
   var module  = this.module,
       page    = this.page,
