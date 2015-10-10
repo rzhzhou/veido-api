@@ -1,6 +1,9 @@
 'use strict';
 
-var App = {};
+var App = {
+  module: {},
+  page: {}
+};
 
 // user
 App.module.login = function () {
