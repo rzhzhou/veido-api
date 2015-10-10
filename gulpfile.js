@@ -9,44 +9,9 @@ var browserSync = require('browser-sync').create(),
     less        = require('gulp-less'),
     minify      = require('gulp-minify-css'),
     concat      = require('gulp-concat'),
-    uglify      = require('gulp-uglify');
+    uglify      = require('gulp-uglify'),
 
-
-// paths
-var vendor = {
-  bootstrap: {
-    css: 'node_modules/bootstrap/dist/css/bootstrap.css',
-    fonts: 'node_modules/bootstrap/dist/fonts/*',
-    js: 'node_modules/bootstrap/dist/js/bootstrap.js'
-  },
-  daterangepicker: {
-    css: 'node_modules/bootstrap-daterangepicker/daterangepicker.css',
-    js: 'node_modules/bootstrap-daterangepicker/daterangepicker.js'
-  },
-  adminlte: 'static/js/adminlte.js',
-  echarts: 'static/js/echarts.js',
-  fontawesome: {
-    css: 'node_modules/fontawesome/css/font-awesome.css',
-    fonts: 'node_modules/fontawesome/fonts/*'
-  },
-  jquery: 'node_modules/jquery/dist/jquery.js',
-  moment: [
-    'node_modules/moment/moment.js',
-    'node_modules/moment/locale/zh-cn.js'
-  ],
-  twbsPagination: 'node_modules/twbs-pagination/jquery.twbsPagination.js'
-};
-
-var app = {
-  less: 'static/less/app.less',
-  js: [
-    'static/js/config.js',
-    'static/js/plugin.js',
-    'static/js/module.js',
-    'static/js/page.js',
-    'static/js/route.js'
-  ]
-};
+    map         = require('map.json');
 
 var dist = {
   css: 'static/build/css/',
@@ -90,9 +55,9 @@ gulp.task('clean', [
 // vendor
 gulp.task('vendor-css', ['clean-vendor'], function () {
   var files = [
-    vendor.bootstrap.css,
-    vendor.fontawesome.css,
-    vendor.daterangepicker.css
+    map.bootstrap.css,
+    map.fontawesome.css,
+    map.daterangepicker.css
   ];
 
   return gulp.src(files)
@@ -103,8 +68,8 @@ gulp.task('vendor-css', ['clean-vendor'], function () {
 
 gulp.task('vendor-fonts', ['clean-vendor'], function () {
   var files = [
-    vendor.bootstrap.fonts,
-    vendor.fontawesome.fonts
+    map.bootstrap.fonts,
+    map.fontawesome.fonts
   ];
 
   return gulp.src(files)
@@ -113,14 +78,14 @@ gulp.task('vendor-fonts', ['clean-vendor'], function () {
 
 gulp.task('vendor-js', ['clean-vendor'], function () {
   var files = [
-    vendor.jquery,
-    vendor.bootstrap.js,
-    vendor.moment[0],
-    vendor.moment[1],
-    vendor.daterangepicker.js,
-    vendor.twbsPagination,
-    vendor.adminlte,
-    vendor.echarts
+    map.jquery,
+    map.bootstrap.js,
+    map.moment[0],
+    map.moment[1],
+    map.daterangepicker.js,
+    map.twbsPagination,
+    map.adminlte,
+    map.echarts
   ];
 
   return gulp.src(files)
@@ -138,14 +103,14 @@ gulp.task('vendor', [
 
 // build
 gulp.task('build-less', ['clean-app-css'], function () {
-  return gulp.src(app.less)
+  return gulp.src(map.app.less)
     .pipe(less())
     .pipe(minify())
     .pipe(gulp.dest(dist.css));
 });
 
 gulp.task('build-js', ['clean-app-js'], function () {
-  return gulp.src(app.js)
+  return gulp.src(map.app.js)
     .pipe(concat('app.js'))
     .pipe(uglify())
     .pipe(gulp.dest(dist.js));
@@ -159,7 +124,7 @@ gulp.task('build', [
 
 // serve
 gulp.task('serve-less', ['clean-app-css'], function () {
-  return gulp.src(app.less)
+  return gulp.src(map.app.less)
     .pipe(sourcemaps.init())
       .pipe(less())
     .pipe(sourcemaps.write())
@@ -167,7 +132,7 @@ gulp.task('serve-less', ['clean-app-css'], function () {
 });
 
 gulp.task('serve-js', ['clean-app-js'], function () {
-  return gulp.src(app.js)
+  return gulp.src(map.app.js)
     .pipe(concat('app.js'))
     .pipe(gulp.dest(dist.js));
 });

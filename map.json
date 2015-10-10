@@ -1,0 +1,33 @@
+{
+  "app": {
+    "less": "static/less/app.less",
+    "js": [
+      "static/js/config.js",
+      "static/js/plugin.js",
+      "static/js/module.js",
+      "static/js/page.js",
+      "static/js/route.js"
+    ]
+  },
+  "bootstrap": {
+    "css": "node_modules/bootstrap/dist/css/bootstrap.css",
+    "fonts": "node_modules/bootstrap/dist/fonts/*",
+    "js": "node_modules/bootstrap/dist/js/bootstrap.js"
+  },
+  "daterangepicker": {
+    "css": "node_modules/bootstrap-daterangepicker/daterangepicker.css",
+    "js": "node_modules/bootstrap-daterangepicker/daterangepicker.js"
+  },
+  "adminlte": "static/js/adminlte.js",
+  "echarts": "static/js/echarts.js",
+  "fontawesome": {
+    "css": "node_modules/fontawesome/css/font-awesome.css",
+    "fonts": "node_modules/fontawesome/fonts/*"
+  },
+  "jquery": "node_modules/jquery/dist/jquery.js",
+  "moment": [
+    "node_modules/moment/moment.js",
+    "node_modules/moment/locale/zh-cn.js"
+  ],
+  "twbsPagination": "node_modules/twbs-pagination/jquery.twbsPagination.js"
+}
