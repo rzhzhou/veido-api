@@ -11,7 +11,7 @@ var browserSync = require('browser-sync').create(),
     concat      = require('gulp-concat'),
     uglify      = require('gulp-uglify'),
 
-    map         = require('map.json');
+    map         = require('./map.json');
 
 var dist = {
   css: 'static/build/css/',
