@@ -8,6 +8,13 @@ To start development:
 mkdir observer && cd $_
 git clone git@192.168.1.101:observer/app.git
 pip install -r requirements.txt
+```
+
+### Backend developers only
+
+To start development:
+
+```shell
 python manage.py runserver 0.0.0.0:8000
 ```
 
