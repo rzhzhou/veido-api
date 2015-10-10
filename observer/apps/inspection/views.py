@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import render_to_response
 
-from backend.base import sidebarUtil
-from backend.base.views import BaseTemplateView
+from observer.apps.base import sidebarUtil
+from observer.apps.base.views import BaseTemplateView
 
 
 class InspectionView(BaseTemplateView):

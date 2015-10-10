@@ -1,4 +1,4 @@
-from backend.base.models import AnonymousUser, User
+from observer.apps.base.models import AnonymousUser, User
 
 class UserAuthenticationMiddlerware(object):
     def process_request(self, request):

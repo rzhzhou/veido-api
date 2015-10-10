@@ -10,8 +10,8 @@ from django.utils import timezone
 from django.db import models, connection, IntegrityError
 from django.db.models import Count
 
-from backend.base import authenticate, login_required, set_logo
-from backend.base.models import save_user, hash_password, User, Area
+from observer.apps.base import authenticate, login_required, set_logo
+from observer.apps.base.models import save_user, hash_password, User, Area
 from django.conf import settings
 
 def login_view(request):

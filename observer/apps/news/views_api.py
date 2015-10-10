@@ -2,12 +2,12 @@
 
 from django.conf import settings
 
-from backend.base.views import BaseAPIView
+from observer.apps.base.views import BaseAPIView
 from rest_framework.response import Response
 from django.template.loader import render_to_string
 
-from backend.base.models import Category
-from backend.base.models import Area, Article, Category
+from observer.apps.base.models import Category
+from observer.apps.base.models import Area, Article, Category
 
 class ArticleTableView(BaseAPIView):
     def get(self, request, id):

@@ -5,9 +5,9 @@ from rest_framework.response import Response
 from django.db.models import Count
 from django.views.generic import View
 
-from backend.base import authenticate, login_required, set_logo
-from backend.base.views import BaseAPIView
-from backend.base.models import CustomKeyword
+from observer.apps.base import authenticate, login_required, set_logo
+from observer.apps.base.views import BaseAPIView
+from observer.apps.base.models import CustomKeyword
 
 
 class CustomNewsView(BaseAPIView):

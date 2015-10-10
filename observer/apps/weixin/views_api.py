@@ -3,9 +3,9 @@ from django.template.loader import render_to_string
 from rest_framework.response import Response
 from django.conf import settings
 
-from backend.base.views import BaseAPIView
-from backend.base.models import Weixin, Area
-from backend.base import authenticate, login_required, set_logo
+from observer.apps.base.views import BaseAPIView
+from observer.apps.base.models import Weixin, Area
+from observer.apps.base import authenticate, login_required, set_logo
 
 class WeixinView(BaseAPIView):
     HOME_PAGE_LIMIT = 6

@@ -2,8 +2,8 @@
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.conf import settings
 
-from backend.collection.views_api import CollectView
-from backend.base.models import Collection, Article, Topic
+from observer.apps.collection.views_api import CollectView
+from observer.apps.base.models import Collection, Article, Topic
 
 
 class SearchView(CollectView):

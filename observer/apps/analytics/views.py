@@ -12,11 +12,11 @@ from django.template.loader import render_to_string
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from backend.base import sidebarUtil, xls_to_response
-from backend.base.views import BaseTemplateView
-from backend.base.models import Article, Area, Category, Inspection, Weixin, Weibo
-from backend.yqj.mysqlUtil import query
-from backend.yqj.redisconnect import RedisQueryApi
+from observer.apps.base import sidebarUtil, xls_to_response
+from observer.apps.base.views import BaseTemplateView
+from observer.apps.base.models import Article, Area, Category, Inspection, Weixin, Weibo
+from observer.apps.yqj.mysqlUtil import query
+from observer.apps.yqj.redisconnect import RedisQueryApi
 
 
 class DispatchView(APIView, BaseTemplateView):

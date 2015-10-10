@@ -1,5 +1,5 @@
 """
-WSGI config for yuqing project.
+WSGI config for observer project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -8,7 +8,7 @@ https://docs.djangoproject.com/en/1.7/howto/deployment/wsgi/
 """
 
 import os
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "yuqing.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "observer.settings.development")
 
 from django.core.wsgi import get_wsgi_application
 application = get_wsgi_application()

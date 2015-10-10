@@ -5,10 +5,10 @@ from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from rest_framework.decorators import api_view
 from django.conf import settings
 
-from backend.base.views import BaseAPIView
-from backend.base.models import Topic
-from backend.base import authenticate, login_required, set_logo
-from backend.base.api_function import chart_line
+from observer.apps.base.views import BaseAPIView
+from observer.apps.base.models import Topic
+from observer.apps.base import authenticate, login_required, set_logo
+from observer.apps.base.api_function import chart_line
 
 class EventView(BaseAPIView):
     HOME_PAGE_LIMIT = 10

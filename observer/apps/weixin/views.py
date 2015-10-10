@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import render_to_response
 
-from backend.base import set_logo, sidebarUtil
-from backend.base.views import BaseTemplateView
-from backend.base.models import Weixin, RelatedData
+from observer.apps.base import set_logo, sidebarUtil
+from observer.apps.base.views import BaseTemplateView
+from observer.apps.base.models import Weixin, RelatedData
 
 
 class WeixinView(BaseTemplateView):

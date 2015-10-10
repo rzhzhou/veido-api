@@ -128,10 +128,10 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'backend.base',
-    'backend.yqj',
-    'backend.analytics',
-    'backend.collection',
+    'observer.apps.base',
+    'observer.apps.yqj',
+    'observer.apps.analytics',
+    'observer.apps.collection',
     'rest_framework',
     'django_extensions',
     'import_export',
@@ -145,12 +145,12 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'backend.yqj.middleware.UserAuthenticationMiddlerware',
+    'observer.apps.yqj.middleware.UserAuthenticationMiddlerware',
 )
 
-ROOT_URLCONF = 'backend.base.urls'
+ROOT_URLCONF = 'observer.apps.base.urls'
 
-WSGI_APPLICATION = 'backend.wsgi.application'
+WSGI_APPLICATION = 'observer.wsgi.application'
 
 
 # Database

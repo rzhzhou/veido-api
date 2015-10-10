@@ -7,8 +7,8 @@ from rest_framework.response import Response
 from django.template.loader import render_to_string
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 
-from backend.base.views import BaseAPIView
-from backend.base.models import Inspection
+from observer.apps.base.views import BaseAPIView
+from observer.apps.base.models import Inspection
 
 
 class InspectionTableView(BaseAPIView):

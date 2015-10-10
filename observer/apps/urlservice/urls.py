@@ -6,19 +6,19 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.static import serve
 
-from backend.yqj.views import *
-from backend.news.views import CategoryView, LocationView, NewsView, NewsDetailView
-from backend.event.views import EventView, EventDetailView
-from backend.risk.views import RisksView, RisksDetailView
-from backend.weixin.views import WeixinView, WeixinDetailView
-from backend.weibo.views import WeiboView
-from backend.custom.views import CustomView, CustomDetailView
-from backend.product.views import ProductView
-from backend.inspection.views import InspectionView
-from backend.search.views import SearchView
-from backend.analytics.views import AnalyticsChildView
+from observer.apps.yqj.views import *
+from observer.apps.news.views import CategoryView, LocationView, NewsView, NewsDetailView
+from observer.apps.event.views import EventView, EventDetailView
+from observer.apps.risk.views import RisksView, RisksDetailView
+from observer.apps.weixin.views import WeixinView, WeixinDetailView
+from observer.apps.weibo.views import WeiboView
+from observer.apps.custom.views import CustomView, CustomDetailView
+from observer.apps.product.views import ProductView
+from observer.apps.inspection.views import InspectionView
+from observer.apps.search.views import SearchView
+from observer.apps.analytics.views import AnalyticsChildView
 
-urlpatterns = patterns('backend.yqj.views',
+urlpatterns = patterns('observer.apps.yqj.views',
     url(r'^$', 'index_view'),
     url(r'^collection/$', CollectionView.as_view()),
     url(r'^settings/$', SettingsView.as_view()),
