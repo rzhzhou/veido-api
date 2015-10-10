@@ -8,9 +8,9 @@ from django.shortcuts import render_to_response
 from django.views.generic import View
 from rest_framework.views import APIView
 
-from base import login_required, get_user_image, sidebarUtil
-from base.models import Area, Category, RelatedData
-from yqj.redisconnect import RedisQueryApi
+from backend.base import login_required, get_user_image, sidebarUtil
+from backend.base.models import Area, Category, RelatedData
+from backend.yqj.redisconnect import RedisQueryApi
 
 
 class LoginRequiredMixin(object):

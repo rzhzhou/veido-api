@@ -12,12 +12,12 @@ from django.shortcuts import render, render_to_response
 from django.template.loader import render_to_string
 from django.utils import timezone
 
-from base import login_required, get_user_image, set_logo, sidebarUtil
-from base.views import BaseTemplateView
-from base.models import (Area, Article, ArticlePublisher, Category, Collection,
+from backend.base import login_required, get_user_image, set_logo, sidebarUtil
+from backend.base.views import BaseTemplateView
+from backend.base.models import (Area, Article, ArticlePublisher, Category, Collection,
     Custom, CustomKeyword, Group, Inspection, LocaltionScore, Product, ProductKeyword,
     RelatedData, Risk, RiskScore, Topic, Weibo, Weixin)
-from yqj.redisconnect import RedisQueryApi
+from backend.yqj.redisconnect import RedisQueryApi
 
 
 @login_required

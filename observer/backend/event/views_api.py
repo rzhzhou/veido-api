@@ -5,10 +5,10 @@ from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from rest_framework.decorators import api_view
 from django.conf import settings
 
-from base.views import BaseAPIView
-from base.models import Topic
-from base import authenticate, login_required, set_logo
-from base.api_function import chart_line
+from backend.base.views import BaseAPIView
+from backend.base.models import Topic
+from backend.base import authenticate, login_required, set_logo
+from backend.base.api_function import chart_line
 
 class EventView(BaseAPIView):
     HOME_PAGE_LIMIT = 10
@@ -17,7 +17,7 @@ class EventView(BaseAPIView):
         return user.collection.events.all()
 
     def get(self, request):
-        container = self.requestContainer(limit=self.HOME_PAGE_LIMIT, 
+        container = self.requestContainer(limit=self.HOME_PAGE_LIMIT,
             limit_list=settings.EVENT_PAGE_LIMIT)
         items = Topic.objects.all()
         datas = self.paging(items, container['limit'], container['page'])

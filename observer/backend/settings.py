@@ -27,7 +27,7 @@ def _load_config():
     global NEWS_PAGE_LIMIT
 
     cp = SafeConfigParser()
-    cp.read(os.path.join(BASE_DIR, "../../config.cfg"))
+    cp.read(os.path.join(BASE_DIR, "config/config.cfg"))
 
     SECTION = cp.get('deploy', 'environment')
 
@@ -128,13 +128,13 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'base',
-    'yqj',
-    'analytics',
+    'backend.base',
+    'backend.yqj',
+    'backend.analytics',
+    'backend.collection',
     'rest_framework',
     'django_extensions',
     'import_export',
-    'collection',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -145,12 +145,12 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'yqj.middleware.UserAuthenticationMiddlerware',
+    'backend.yqj.middleware.UserAuthenticationMiddlerware',
 )
 
-ROOT_URLCONF = 'base.urls'
+ROOT_URLCONF = 'backend.base.urls'
 
-WSGI_APPLICATION = 'yuqing.wsgi.application'
+WSGI_APPLICATION = 'backend.wsgi.application'
 
 
 # Database
@@ -198,6 +198,6 @@ TEMPLATE_DIRS = (
 
 
 if not MEDIA_ROOT:
-    MEDIA_ROOT = os.path.join(BASE_DIR, '../media')
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 MEDIA_URL = '/media/'

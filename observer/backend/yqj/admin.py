@@ -5,13 +5,13 @@ from django import forms
 from django_extensions.admin import ForeignKeyAutocompleteAdmin
 from django.contrib import admin, messages
 
-from yqj.mongoconnect import CrawlerTask
+from backend.yqj.mongoconnect import CrawlerTask
 from yqj_save import MySQLQuerApi
-from base.models import (Area, Article, ArticlePublisher, Category, Custom,
+from backend.base.models import (Area, Article, ArticlePublisher, Category, Custom,
     CustomKeyword, Group, GroupAuthUser, LocaltionScore, Product, ProductKeyword,
     Risk, LRisk, TRisk, RiskScore, Topic, User, Weibo, WeiboPublisher, Weixin,
     WeixinPublisher, save_user, ZJInspection, News)
-from corpus.models import Event
+from backend.corpus.models import Event
 from resource import InspectionResources
 from import_export.admin import ImportExportActionModelAdmin
 

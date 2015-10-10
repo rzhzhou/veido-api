@@ -2,12 +2,12 @@
 
 from django.conf import settings
 
-from base.views import BaseAPIView
+from backend.base.views import BaseAPIView
 from rest_framework.response import Response
 from django.template.loader import render_to_string
 
-from base.models import Category
-from base.models import Area, Article, Category
+from backend.base.models import Category
+from backend.base.models import Area, Article, Category
 
 class ArticleTableView(BaseAPIView):
     def get(self, request, id):
@@ -47,11 +47,11 @@ class NewsView(BaseAPIView):
         return articles
 
     def get(self, request):
-        container = self.requestContainer(limit=self.HOME_PAGE_LIMIT, 
+        container = self.requestContainer(limit=self.HOME_PAGE_LIMIT,
             limit_list=settings.NEWS_PAGE_LIMIT)
         items = self.get_custom_artice()
         datas = self.paging(items, container['limit'], container['page'])
         result = self.news_to_json(datas['items'])
-        html_string = render_to_string('news/%s_tpl.html' % container['type'], 
+        html_string = render_to_string('news/%s_tpl.html' % container['type'],
             {'news_list':  result})
         return Response({'total': datas['total_number'], 'html': html_string})

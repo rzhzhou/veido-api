@@ -3,14 +3,14 @@ from django.template.loader import render_to_string
 from rest_framework.response import Response
 from django.conf import settings
 
-from base.views import BaseAPIView
-from base.models import Weixin, Area
-from base import authenticate, login_required, set_logo
+from backend.base.views import BaseAPIView
+from backend.base.models import Weixin, Area
+from backend.base import authenticate, login_required, set_logo
 
 class WeixinView(BaseAPIView):
     HOME_PAGE_LIMIT = 6
     def get(self, request):
-        container = self.requestContainer(sort='hot', limit_list=settings.WEIXIN_TABLE_LIMIT, 
+        container = self.requestContainer(sort='hot', limit_list=settings.WEIXIN_TABLE_LIMIT,
             limit=self.HOME_PAGE_LIMIT)
         if container['sort'] == 'new':
             datas = self.paging(Weixin.objects.all(), container['limit'], container['page'])

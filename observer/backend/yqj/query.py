@@ -5,7 +5,7 @@ root_mod = '/home/lxwu/Documents/shendu/cluster'
 sys.path.append(root_mod)
 
 from datetime import timedelta
-from base.models import Area, ArticlePublisher, Article ,\
+from backend.base.models import Area, ArticlePublisher, Article ,\
                         RelatedData, Category
 
 def save_article_publisher(data):

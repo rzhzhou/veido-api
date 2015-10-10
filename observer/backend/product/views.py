@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import render_to_response
 
-from base.views import BaseTemplateView
-from base.models import Group, ProductKeyword
+from backend.base.views import BaseTemplateView
+from backend.base.models import Group, ProductKeyword
 
 
 class ProductView(BaseTemplateView):

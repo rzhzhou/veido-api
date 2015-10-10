@@ -5,7 +5,7 @@ import math
 from datetime import timedelta
 import datetime
 import time
-from base.models import Article
+from backend.base.models import Article
 
 
 class sim_article():

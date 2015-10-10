@@ -1,7 +1,7 @@
 #coding: utf-8
 from django.conf import settings
 from django.db import IntegrityError, transaction
-from base.models import Article, Area, RelatedData, \
+from backend.base.models import Article, Area, RelatedData, \
      ArticlePublisher, RelatedDataAtricle, Category, CategoryAtricle
 from django.http import HttpResponse
 from simArticle import  _cal_values

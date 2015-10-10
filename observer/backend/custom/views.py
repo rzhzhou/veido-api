@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import render_to_response
 
-from base import sidebarUtil
-from base.views import BaseTemplateView
-from base.models import Article, CustomKeyword
+from backend.base import sidebarUtil
+from backend.base.views import BaseTemplateView
+from backend.base.models import Article, CustomKeyword
 
 class CustomView(BaseTemplateView):
     custom_list_num = 5

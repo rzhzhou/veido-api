@@ -5,7 +5,7 @@ from django.conf import settings
 from django.db import models
 from django.http import HttpResponse, HttpResponseRedirect
 
-from base.models import User, AnonymousUser, hash_password
+from backend.base.models import User, AnonymousUser, hash_password
 
 
 def authenticate(username, raw_password):

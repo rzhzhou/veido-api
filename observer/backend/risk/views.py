@@ -2,9 +2,9 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 
-from base import sidebarUtil
-from base.views import BaseTemplateView
-from base.models import Risk
+from backend.base import sidebarUtil
+from backend.base.views import BaseTemplateView
+from backend.base.models import Risk
 
 
 class RisksView(BaseTemplateView):

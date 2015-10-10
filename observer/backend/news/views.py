@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import render_to_response
 
-from base import set_logo, sidebarUtil
-from base.views import BaseTemplateView
-from base.models import Area, Article, Category, RelatedData, Topic
+from backend.base import set_logo, sidebarUtil
+from backend.base.views import BaseTemplateView
+from backend.base.models import Area, Article, Category, RelatedData, Topic
 
 
 class NewsView(BaseTemplateView):

@@ -4,10 +4,10 @@ from django.template.loader import render_to_string
 from rest_framework.response import Response
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 
-from base.views import BaseAPIView
-from base.models import Group, LocaltionScore, Risk, RiskScore
-from base import authenticate, login_required, set_logo
-from base.api_function import chart_line
+from backend.base.views import BaseAPIView
+from backend.base.models import Group, LocaltionScore, Risk, RiskScore
+from backend.base import authenticate, login_required, set_logo
+from backend.base.api_function import chart_line
 
 class RisksView(BaseAPIView):
     HOME_PAGE_LIMIT = 10
@@ -41,11 +41,11 @@ class RisksView(BaseAPIView):
             risk_list.append(data)
         return risk_list
     def get(self, request):
-        container = self.requestContainer(page=1,limit=self.HOME_PAGE_LIMIT, 
+        container = self.requestContainer(page=1,limit=self.HOME_PAGE_LIMIT,
             limit_list=settings.RISK_PAGE_LIMIT)
         items = self.get_score_article(request)
         datas = self.paging(items, container['limit'], container['page'])
-        html_string = render_to_string('risk/%s_tpl.html' % container['type'], 
+        html_string = render_to_string('risk/%s_tpl.html' % container['type'],
             {'risk_list':  datas['items']})
         return Response({'total': datas['total_number'], 'html': html_string})
 
@@ -120,4 +120,3 @@ def chart_pie_risk_view(request, risk_id):
              {u'name': u'自媒体', u'value': risk.weibo.count()+risk.weixin.count()}]
     value = [item for item in value if item['value']]
     return JsonResponse({u'name': name, u'value': value})
-    

@@ -7,11 +7,11 @@ from django.conf import settings
 from django.template.loader import render_to_string
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 
-from base.models import Article, Category, RelatedData, ArticleCollection,\
+from backend.base.models import Article, Category, RelatedData, ArticleCollection,\
     Collection
-from news.views_api import ArticleTableView
-from event.views_api import EventTableView
-from base.views import BaseAPIView
+from backend.news.views_api import ArticleTableView
+from backend.event.views_api import EventTableView
+from backend.base.views import BaseAPIView
 
 
 class CollecModifyView(View):

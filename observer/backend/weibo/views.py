@@ -3,10 +3,10 @@ from datetime import datetime
 
 from django.shortcuts import render_to_response
 
-from base import set_logo, sidebarUtil
-from base.views import BaseTemplateView
-from base.models import Weibo
-from yqj.redisconnect import RedisQueryApi
+from backend.base import set_logo, sidebarUtil
+from backend.base.views import BaseTemplateView
+from backend.base.models import Weibo
+from backend.yqj.redisconnect import RedisQueryApi
 
 
 class WeiboView(BaseTemplateView):

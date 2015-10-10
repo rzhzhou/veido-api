@@ -1,21 +1,21 @@
 from django.conf.urls import patterns, include, url
 
-from collection.views_api import CollectView, CollecModifyView
-from custom.views_api import CustomWeixinView, CustomWeiboView, \
+from backend.collection.views_api import CollectView, CollecModifyView
+from backend.custom.views_api import CustomWeixinView, CustomWeiboView, \
     CustomModifyView, CustomNewsView
-from event.views_api import EventView, EventNewsView, \
+from backend.event.views_api import EventView, EventNewsView, \
     EventWeixinView, EventWeiboView
-from inspection.views_api import InspectionTableView, InspectionLocalView, \
+from backend.inspection.views_api import InspectionTableView, InspectionLocalView, \
     InspectionNationalView
-from news.views_api import LocationTableView, NewsView, ArticleTableView
-from risk.views_api import RisksView, RisksNewsView,\
+from backend.news.views_api import LocationTableView, NewsView, ArticleTableView
+from backend.risk.views_api import RisksView, RisksNewsView,\
     RisksWeixinView, RisksWeiboView
-from product.views_api import ProductTableView
-from search.views_api import SearchView
-from weixin.views_api import WeixinView, LocationWeixinView
-from weibo.views_api import WeiboView, LocationWeiboView
-from analytics.views import DispatchView
-from yqj.views_api import login_view, registe_view, upload_image, change_passwd,\
+from backend.product.views_api import ProductTableView
+from backend.search.views_api import SearchView
+from backend.weixin.views_api import WeixinView, LocationWeixinView
+from backend.weibo.views_api import WeiboView, LocationWeiboView
+from backend.analytics.views import DispatchView
+from backend.yqj.views_api import login_view, registe_view, upload_image, change_passwd,\
     reset_passwd, delete_user_view, add_user_view, chart_line_index_view,\
     chart_pie_index_view, map_view
 

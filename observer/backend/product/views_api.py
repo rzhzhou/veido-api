@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from rest_framework.response import Response
 
-from base.views import BaseAPIView
-from base.models import ProductKeyword, Group, Article
+from backend.base.views import BaseAPIView
+from backend.base.models import ProductKeyword, Group, Article
 
 
 class ProductTableView(BaseAPIView):
