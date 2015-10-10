@@ -147,7 +147,7 @@ gulp.task('build-less', ['clean-app-css'], function () {
 gulp.task('build-js', ['clean-app-js'], function () {
   return gulp.src(app.js)
     .pipe(concat('app.js'))
-    // .pipe(uglify())
+    .pipe(uglify())
     .pipe(gulp.dest(dist.js));
 });
 
@@ -173,7 +173,7 @@ gulp.task('serve-js', ['clean-app-js'], function () {
 });
 
 gulp.task('django', function () {
-  exec('python dist/manage.py runserver 0.0.0.0:8000');
+  exec('python manage.py runserver 0.0.0.0:8000');
 });
 
 gulp.task('serve', ['django'], function () {
