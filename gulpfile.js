@@ -152,9 +152,9 @@ gulp.task('serve', ['django'], function () {
   gulp.watch('static/js/*.js', ['serve-js']);
 
   gulp.watch([
-    'dist/templates/**/*.html',
-    'dist/static/css/*.css',
-    'dist/static/js/*.js'
+    'templates/**/*.html',
+    'static/css/*.css',
+    'static/js/*.js'
   ]).on('change', browserSync.reload);
 });
 
