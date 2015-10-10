@@ -15,5 +15,8 @@
   "unused": true,
   "strict": true,
   "jquery": true,
-  "browserify": true
+  "browserify": true,
+  "globals": {
+    "moment": true
+  }
 }
