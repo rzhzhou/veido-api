@@ -83,7 +83,7 @@ urlpatterns += patterns('collection,views_api',
     url(r'^collection/(?P<table_type>\S+)/$', CollectView.as_view()),
 )
 
-urlpatterns += patterns('yqj.views_api',
+urlpatterns += patterns('observer.apps.yqj.views_api',
     url(r'^login/$', 'login_view'),
     url(r'^register/$', 'registe_view'),
     url(r'^settings/upload/$', 'upload_image'),

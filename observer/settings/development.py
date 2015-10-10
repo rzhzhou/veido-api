@@ -180,7 +180,7 @@ DATABASES = {
     },
 }
 
-DATABASE_ROUTERS = ['corpus.router.MyDB2Router',]
+DATABASE_ROUTERS = ['observer.apps.corpus.router.MyDB2Router',]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
@@ -188,7 +188,7 @@ DATABASE_ROUTERS = ['corpus.router.MyDB2Router',]
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, "../static"),
+    os.path.join(BASE_DIR, "../static/build/"),
 )
 
 

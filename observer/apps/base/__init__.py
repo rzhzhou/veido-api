@@ -60,7 +60,7 @@ def sidebarUtil(request):
     BASE_DIR = os.path.dirname(os.path.dirname(__file__))
     user = request.myuser
     conf = ConfigParser()
-    conf.read(os.path.join(BASE_DIR, "../../sidebar.cfg"))
+    conf.read(os.path.join(BASE_DIR, "../settings/sidebar.cfg"))
     username = user.username
     if not conf.has_section(username):
         username = 'test'
