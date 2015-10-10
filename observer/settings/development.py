@@ -27,7 +27,7 @@ def _load_config():
     global NEWS_PAGE_LIMIT
 
     cp = SafeConfigParser()
-    cp.read(os.path.join(BASE_DIR, "config/config.cfg"))
+    cp.read(os.path.join(BASE_DIR, "settings/config.cfg"))
 
     SECTION = cp.get('deploy', 'environment')
 
