@@ -90,7 +90,7 @@ gulp.task('vendor-js', ['clean-vendor'], function () {
 
   return gulp.src(files)
     .pipe(concat('vendor.js'))
-    .pipe(uglify())
+    // .pipe(uglify())
     .pipe(gulp.dest(dist.js));
 });
 
