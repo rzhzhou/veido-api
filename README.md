@@ -7,7 +7,7 @@ To start development:
 ```shell
 mkdir observer && cd $_
 git clone git@192.168.1.101:observer/app.git
-pip install -r requirements.txt
+pip install -r requirement.txt
 ```
 
 ### Backend developers only
