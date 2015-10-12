@@ -66,24 +66,6 @@
       </li>
 
       <li class="treeview">
-        <a href="#">
-          <i class="fa fa-globe"></i>
-          <span>区域状况</span>
-          <i class="fa fa-angle-left pull-right"></i>
-        </a>
-        <ul class="treeview-menu">
-          {% for location in locations %}
-            <li>
-              <a href="/location/{{location.id}}/">
-                <i class="fa fa-circle-o"></i>
-                <span>{{ location.name }}</span>
-              </a>
-            </li>
-          {% endfor %}
-        </ul>
-      </li>
-
-      <li class="treeview">
         <a href="/custom/">
           <i class="fa fa-eye"></i>
           <span>指定监测</span>
@@ -96,7 +78,7 @@
           <span>数据统计</span>
         </a>
       </li>
-      
+
       <li class="header">用户</li>
 
       <li class="treeview">
