@@ -25,6 +25,9 @@ def _load_config():
     global MYSQL_CONN_STR_DEFAULT, MYSQL_CONN_STR_MASTER, MYSQL_CONN_STR_CORPUS, MONGO_CONN_STR, REDIS_CONN_STR
     global MEDIA_ROOT, STATIC_ROOT
     global NEWS_PAGE_LIMIT
+    global DIR
+
+    DIR = str(os.path.join(BASE_DIR, "settings/sidebar.cfg"))
 
     cp = SafeConfigParser()
     cp.read(os.path.join(BASE_DIR, "settings/config.cfg"))

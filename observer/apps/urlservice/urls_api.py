@@ -1,32 +1,32 @@
 from django.conf.urls import patterns, include, url
 
-from observer.apps.collection.views_api import CollectView, CollecModifyView
-from observer.apps.custom.views_api import CustomWeixinView, CustomWeiboView, \
+from observer.apps.collection.api import CollectView, CollecModifyView
+from observer.apps.custom.api import CustomWeixinView, CustomWeiboView, \
     CustomModifyView, CustomNewsView
-from observer.apps.event.views_api import EventView, EventNewsView, \
+from observer.apps.event.api import EventView, EventNewsView, \
     EventWeixinView, EventWeiboView
-from observer.apps.inspection.views_api import InspectionTableView, InspectionLocalView, \
+from observer.apps.inspection.api import InspectionTableView, InspectionLocalView, \
     InspectionNationalView
-from observer.apps.news.views_api import LocationTableView, NewsView, ArticleTableView
-from observer.apps.risk.views_api import RisksView, RisksNewsView,\
+from observer.apps.news.api import LocationTableView, NewsView, ArticleTableView
+from observer.apps.risk.api import RisksView, RisksNewsView,\
     RisksWeixinView, RisksWeiboView
-from observer.apps.product.views_api import ProductTableView
-from observer.apps.search.views_api import SearchView
-from observer.apps.weixin.views_api import WeixinView, LocationWeixinView
-from observer.apps.weibo.views_api import WeiboView, LocationWeiboView
+from observer.apps.product.api import ProductTableView
+from observer.apps.search.api import SearchView
+from observer.apps.weixin.api import WeixinView, LocationWeixinView
+from observer.apps.weibo.api import WeiboView, LocationWeiboView
 from observer.apps.analytics.views import DispatchView
-from observer.apps.yqj.views_api import login_view, registe_view, upload_image, change_passwd,\
+from observer.apps.yqj.api import login_view, registe_view, upload_image, change_passwd,\
     reset_passwd, delete_user_view, add_user_view, chart_line_index_view,\
     chart_pie_index_view, map_view
 
 
-urlpatterns = patterns('news.views_api',
+urlpatterns = patterns('news.api',
     url(r'^category/(?P<id>\d+)/news/$', ArticleTableView.as_view()),
     url(r'^location/(?P<id>\d+)/news/$', LocationTableView.as_view()),
     url(r'^news/$', NewsView.as_view()),
 )
 
-urlpatterns += patterns('event.views_api',
+urlpatterns += patterns('event.api',
     url(r'^event/$', EventView.as_view()),
     url(r'^event/(?P<id>\d+)/news/$', EventNewsView.as_view()),
     url(r'^event/(?P<id>\d+)/weixin/$', EventWeixinView.as_view()),
@@ -35,7 +35,7 @@ urlpatterns += patterns('event.views_api',
     url(r'^pie/event/(\d+)/$', 'chart_pie_event_view'),
 )
 
-urlpatterns += patterns('risk.views_api',
+urlpatterns += patterns('risk.api',
     url(r'^risk/$', RisksView.as_view()),
     url(r'^risk/(?P<id>\d+)/news/$', RisksNewsView.as_view()),
     url(r'^risk/(?P<id>\d+)/weixin/$', RisksWeixinView.as_view()),
@@ -44,33 +44,33 @@ urlpatterns += patterns('risk.views_api',
     url(r'^pie/risk/(\d+)/$', 'chart_pie_risk_view'),
 )
 
-urlpatterns += patterns('weibo.views_api',
+urlpatterns += patterns('weibo.api',
     url(r'^weibo/$', WeiboView.as_view()),
     url(r'^location/(?P<id>\d+)/weibo/$', LocationWeiboView.as_view()),
 )
-urlpatterns += patterns('weixin.views_api',
+urlpatterns += patterns('weixin.api',
     url(r'^weixin/$', WeixinView.as_view()),
     url(r'^location/(?P<id>\d+)/weixin/$', LocationWeixinView.as_view()),
 )
 
-urlpatterns += patterns('custom.views_api',
+urlpatterns += patterns('custom.api',
     url(r'^custom/(?P<custom_id>\d+)/news/$', CustomNewsView.as_view()),
     url(r'^custom/(?P<custom_id>\d+)/weixin/$', CustomWeixinView.as_view()),
     url(r'^custom/(?P<custom_id>\d+)/weibo/$', CustomWeiboView.as_view()),
     url(r'^custom/(?P<action>\w+)/$', CustomModifyView.as_view()),
 )
 
-urlpatterns += patterns('product.views_api',
+urlpatterns += patterns('product.api',
     url(r'^product/(?P<id>\d*)/?news/(?P<page>\d+)/$', ProductTableView.as_view()),
 )
 
-urlpatterns += patterns('inspection.views_api',
+urlpatterns += patterns('inspection.api',
     url(r'^inspection/$', InspectionTableView.as_view()),
     url(r'^dashboard/local-inspection/$', InspectionLocalView.as_view()),
     url(r'^dashboard/national-inspection/$', InspectionNationalView.as_view()),
 )
 
-urlpatterns += patterns('search.views_api',
+urlpatterns += patterns('search.api',
     url(r'^search/(.+)/$', SearchView.as_view()),
 )
 
@@ -78,12 +78,12 @@ urlpatterns += patterns('analytics.views',
     url(r'^analytics/(?P<id>\d+)/$', DispatchView.as_view()),
 )
 
-urlpatterns += patterns('collection,views_api',
+urlpatterns += patterns('collection,api',
     url(r'^collection/$', CollecModifyView.as_view()),
     url(r'^collection/(?P<table_type>\S+)/$', CollectView.as_view()),
 )
 
-urlpatterns += patterns('observer.apps.yqj.views_api',
+urlpatterns += patterns('observer.apps.yqj.api',
     url(r'^login/$', 'login_view'),
     url(r'^register/$', 'registe_view'),
     url(r'^settings/upload/$', 'upload_image'),
