@@ -6,7 +6,7 @@ To start development:
 
 ```shell
 mkdir observer && cd $_
-git clone git@192.168.1.101:observer/app.git
+git clone git@code.dev:observer/app.git
 pip install -r requirement.txt
 ```
 
