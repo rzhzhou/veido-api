@@ -10,6 +10,7 @@ var browserSync = require('browser-sync').create(),
     minify      = require('gulp-minify-css'),
     concat      = require('gulp-concat'),
     uglify      = require('gulp-uglify'),
+    jshint      = require('gulp-jshint'),
 
     map         = require('./map.json');
 
@@ -100,6 +101,12 @@ gulp.task('vendor', [
   'vendor-js'
 ]);
 
+// lint
+gulp.task('lint', function () {
+  return gulp.src(map.app.js)
+    .pipe(jshint('.jshintrc'))
+    .pipe(jshint.reporter('jshint-stylish'));
+});
 
 // build
 gulp.task('build-less', ['clean-app-css'], function () {
@@ -131,7 +138,7 @@ gulp.task('serve-less', ['clean-app-css'], function () {
     .pipe(gulp.dest(dist.css));
 });
 
-gulp.task('serve-js', ['clean-app-js'], function () {
+gulp.task('serve-js', ['clean-app-js', 'lint'], function () {
   return gulp.src(map.app.js)
     .pipe(concat('app.js'))
     .pipe(gulp.dest(dist.js));
