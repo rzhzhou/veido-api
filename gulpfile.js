@@ -14,6 +14,8 @@ var browserSync = require('browser-sync').create(),
 
     map         = require('./map.json');
 
+var port = +(Math.random() * 1000).toFixed() + 8000;
+
 var dist = {
   css: 'static/build/css/',
   fonts: 'static/build/fonts/',
@@ -145,14 +147,15 @@ gulp.task('serve-js', ['clean-app-js', 'lint'], function () {
 });
 
 gulp.task('django', function () {
-  exec('python manage.py runserver 0.0.0.0:8000');
+  exec('python manage.py runserver 0.0.0.0:' + port);
 });
 
 gulp.task('serve', ['django'], function () {
   browserSync.init({
     notify: false,
     open: false,
-    proxy: '0.0.0.0:8000'
+    proxy: '0.0.0.0:' + port,
+    port: port + 1
   });
 
   gulp.watch('static/less/**/*.less', ['serve-less']);
