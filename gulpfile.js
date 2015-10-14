@@ -11,7 +11,7 @@ var browserSync = require('browser-sync').create(),
     config      = require('./package.json'),
     dist        = config.dist,
     map         = config.map,
-    port        = config[username];
+    port        = config.port[username];
 
 
 // clean up vendor
