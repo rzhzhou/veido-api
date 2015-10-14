@@ -1,10 +1,10 @@
 {% for inspection in inspection_list  %}
 <tr>
-  <td>
-    <a href="/inspection/{{ inspection.id }}/" title="{{ inspection.title }}" target="_blank">{{ inspection.title }}</a>
-  </td>
+
   <td>{{ inspection.category }}</td>
-  <td>{{ inspection.event }}</td>
+  <td>
+    <a href="/inspection/{{ inspection.id }}/" title="{{ inspection.event }}" target="_blank">{{ inspection.event }}</a>
+  </td>
   <td>{{ inspection.quality }}</td>
   <td>{{ inspection.source }}</td>
   <td>{{ inspection.time }}</td>
