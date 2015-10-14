@@ -3,18 +3,14 @@
 var browserSync = require('browser-sync').create(),
     del         = require('del'),
     exec        = require('child_process').exec,
+    username    = require('username').sync(),
 
     gulp        = require('gulp'),
-    sourcemaps  = require('gulp-sourcemaps'),
-    less        = require('gulp-less'),
-    minify      = require('gulp-minify-css'),
-    concat      = require('gulp-concat'),
-    uglify      = require('gulp-uglify'),
-    jshint      = require('gulp-jshint'),
+    $           = require('gulp-load-plugins')(),
 
+    port        = require('./port.json')[username],
     map         = require('./map.json');
 
-var port = +(Math.random() * 1000).toFixed() + 8000;
 
 var dist = {
   css: 'static/build/css/',
@@ -64,8 +60,8 @@ gulp.task('vendor-css', ['clean-vendor'], function () {
   ];
 
   return gulp.src(files)
-    .pipe(concat('vendor.css'))
-    .pipe(minify())
+    .pipe($.concat('vendor.css'))
+    .pipe($.minifyCss())
     .pipe(gulp.dest(dist.css));
 });
 
@@ -92,8 +88,8 @@ gulp.task('vendor-js', ['clean-vendor'], function () {
   ];
 
   return gulp.src(files)
-    .pipe(concat('vendor.js'))
-    // .pipe(uglify())
+    .pipe($.concat('vendor.js'))
+    .pipe($.uglify())
     .pipe(gulp.dest(dist.js));
 });
 
@@ -106,22 +102,22 @@ gulp.task('vendor', [
 // lint
 gulp.task('lint', function () {
   return gulp.src(map.app.js)
-    .pipe(jshint('.jshintrc'))
-    .pipe(jshint.reporter('jshint-stylish'));
+    .pipe($.jshint('.jshintrc'))
+    .pipe($.jshint.reporter('jshint-stylish'));
 });
 
 // build
 gulp.task('build-less', ['clean-app-css'], function () {
   return gulp.src(map.app.less)
-    .pipe(less())
-    .pipe(minify())
+    .pipe($.less())
+    .pipe($.minifyCss())
     .pipe(gulp.dest(dist.css));
 });
 
 gulp.task('build-js', ['clean-app-js'], function () {
   return gulp.src(map.app.js)
-    .pipe(concat('app.js'))
-    .pipe(uglify())
+    .pipe($.concat('app.js'))
+    .pipe($.uglify())
     .pipe(gulp.dest(dist.js));
 });
 
@@ -134,28 +130,28 @@ gulp.task('build', [
 // serve
 gulp.task('serve-less', ['clean-app-css'], function () {
   return gulp.src(map.app.less)
-    .pipe(sourcemaps.init())
-      .pipe(less())
-    .pipe(sourcemaps.write())
+    .pipe($.sourcemaps.init())
+      .pipe($.less())
+    .pipe($.sourcemaps.write())
     .pipe(gulp.dest(dist.css));
 });
 
 gulp.task('serve-js', ['clean-app-js', 'lint'], function () {
   return gulp.src(map.app.js)
-    .pipe(concat('app.js'))
+    .pipe($.concat('app.js'))
     .pipe(gulp.dest(dist.js));
 });
 
 gulp.task('django', function () {
-  exec('python manage.py runserver 0.0.0.0:' + port);
+  exec('python manage.py runserver 0.0.0.0:' + (port * 3));
 });
 
 gulp.task('serve', ['django'], function () {
   browserSync.init({
     notify: false,
     open: false,
-    proxy: '0.0.0.0:' + port,
-    port: port + 1
+    proxy: '0.0.0.0:' + (port * 3),
+    port: port
   });
 
   gulp.watch('static/less/**/*.less', ['serve-less']);

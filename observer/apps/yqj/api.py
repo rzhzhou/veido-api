@@ -26,10 +26,8 @@ def login_view(request):
         response = JsonResponse({'status': True})
         response.set_cookie('pass_id', user.id)
         response.set_cookie('name', user.username)
-        print response
         return response
     else:
-        print '###'
         return JsonResponse({'status': False})
 
 @api_view(['POST'])

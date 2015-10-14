@@ -57,10 +57,8 @@ def xls_to_response(wb, fname):
 
 
 def sidebarUtil(request):
-    BASE_DIR = os.path.dirname(os.path.dirname(__file__))
     user = request.myuser
-    conf = ConfigParser()
-    conf.read(os.path.join(BASE_DIR, "../settings/sidebar.cfg"))
+    conf = settings.CONF
     username = user.username
     if not conf.has_section(username):
         username = 'test'

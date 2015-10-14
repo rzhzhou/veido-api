@@ -23,15 +23,14 @@ python manage.py runserver 0.0.0.0:8000
 To start development:
 
 ```shell
-npm i -g gulp
 npm i -d
-gulp serve
+npm start
 ```
 
 To start build:
 
 ```shell
-gulp build
+npm run build
 ```
 
 ## Project Structure
