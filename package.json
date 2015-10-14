@@ -56,7 +56,7 @@
       "css": "node_modules/bootstrap-daterangepicker/daterangepicker.css",
       "js": "node_modules/bootstrap-daterangepicker/daterangepicker.js"
     },
-    "echarts": "static/js/echarts.js",
+    "echarts": "static/js/echarts.min.js",
     "fontawesome": {
       "css": "node_modules/font-awesome/css/font-awesome.css",
       "fonts": "node_modules/font-awesome/fonts/*"
