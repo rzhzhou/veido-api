@@ -58,8 +58,7 @@ def xls_to_response(wb, fname):
 
 def sidebarUtil(request):
     user = request.myuser
-    conf = ConfigParser()
-    conf.read(settings.DIR)
+    conf = settings.CONF
     username = user.username
     if not conf.has_section(username):
         username = 'test'
