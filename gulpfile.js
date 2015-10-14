@@ -83,8 +83,8 @@ gulp.task('vendor-js', ['clean-vendor'], function () {
   ];
 
   return gulp.src(files)
+    .pipe($.if(/^[a-z_\/\-]+\.js$/, $.uglify()))
     .pipe($.concat('vendor.js'))
-    .pipe($.uglify())
     .pipe(gulp.dest(dist.js));
 });
 
