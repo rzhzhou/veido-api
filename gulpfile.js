@@ -12,9 +12,11 @@ var browserSync = require('browser-sync').create(),
     uglify      = require('gulp-uglify'),
     jshint      = require('gulp-jshint'),
 
+    username    = require('username').sync(),
+    port        = require('./port.json')[username],
+
     map         = require('./map.json');
 
-var port = +(Math.random() * 1000).toFixed() + 8000;
 
 var dist = {
   css: 'static/build/css/',
@@ -147,15 +149,15 @@ gulp.task('serve-js', ['clean-app-js', 'lint'], function () {
 });
 
 gulp.task('django', function () {
-  exec('python manage.py runserver 0.0.0.0:' + port);
+  exec('python manage.py runserver 0.0.0.0:' + (port * 3));
 });
 
 gulp.task('serve', ['django'], function () {
   browserSync.init({
     notify: false,
     open: false,
-    proxy: '0.0.0.0:' + port,
-    port: port + 1
+    proxy: '0.0.0.0:' + (port * 3),
+    port: port
   });
 
   gulp.watch('static/less/**/*.less', ['serve-less']);
