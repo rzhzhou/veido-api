@@ -9,8 +9,8 @@ from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 
 from observer.apps.base.models import Article, Category, RelatedData, ArticleCollection,\
     Collection
-from observer.apps.news.views_api import ArticleTableView
-from observer.apps.event.views_api import EventTableView
+from observer.apps.news.api import ArticleTableView
+from observer.apps.event.api import EventTableView
 from observer.apps.base.views import BaseAPIView
 
 

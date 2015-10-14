@@ -2,7 +2,7 @@
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.conf import settings
 
-from observer.apps.collection.views_api import CollectView
+from observer.apps.collection.api import CollectView
 from observer.apps.base.models import Collection, Article, Topic
 
 
