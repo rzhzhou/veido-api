@@ -215,8 +215,11 @@ App.page.locationDetail = function (module, path) {
   });
 };
 
-App.page.inspection = function (module, path) {
-  module.dataTable(path);
+App.page.inspection = function (module) {
+  module.list({
+    feature: 'inspection',
+    container: '#inspection > tbody'
+  });
 };
 
 App.page.custom = function () {

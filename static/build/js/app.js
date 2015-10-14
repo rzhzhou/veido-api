@@ -482,24 +482,24 @@ App.module.menu = function (path, type) {
 };
 
 App.module.inspection = function () {
-  var $inspection = $('#inspection'),
-      $content    = $inspection.children('.box-body').find('tbody');
-
-  $content.load('/api/dashboard/local-inspection/');
-
-  $inspection.on('click', 'button', function (event) {
-    event.preventDefault();
-
-    if ( $(this).hasClass('active') ) {
-      return false;
-    }
-
-    $(this)
-      .addClass('active')
-      .siblings().removeClass('active');
-
-    $content.load('/api/dashboard/' + this.id + '/');
-  });
+  // var $inspection = $('#inspection'),
+  //     $content    = $inspection.children('.box-body').find('tbody');
+  //
+  // $content.load('/api/dashboard/local-inspection/');
+  //
+  // $inspection.on('click', 'button', function (event) {
+  //   event.preventDefault();
+  //
+  //   if ( $(this).hasClass('active') ) {
+  //     return false;
+  //   }
+  //
+  //   $(this)
+  //     .addClass('active')
+  //     .siblings().removeClass('active');
+  //
+  //   $content.load('/api/dashboard/' + this.id + '/');
+  // });
 };
 
 App.module.returnTop = function (el) {
@@ -816,6 +816,7 @@ App.module.statistic = function($el, api) {
         });
     });
 };
+
 'use strict';
 
 // user
@@ -1033,8 +1034,11 @@ App.page.locationDetail = function (module, path) {
   });
 };
 
-App.page.inspection = function (module, path) {
-  module.dataTable(path);
+App.page.inspection = function (module) {
+  module.list({
+    feature: 'inspection',
+    container: '#inspection > tbody'
+  });
 };
 
 App.page.custom = function () {
@@ -1525,6 +1529,7 @@ App.page.analyticsDetail = function (module, path) {
         $statistic.trigger('show.statistic', [start, end]);
     });
 };
+
 'use strict';
 
 App.route = function () {
