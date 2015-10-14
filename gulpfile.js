@@ -55,8 +55,8 @@ gulp.task('vendor-css', ['clean-vendor'], function () {
   ];
 
   return gulp.src(files)
+    .pipe($.if(/^[a-z_\/\-]+\.css$/, $.minifyCss()))
     .pipe($.concat('vendor.css'))
-    .pipe($.minifyCss())
     .pipe(gulp.dest(dist.css));
 });
 

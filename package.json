@@ -50,7 +50,7 @@
       "less": "static/less/app.less"
     },
     "bootstrap": {
-      "css": "node_modules/bootstrap/dist/css/bootstrap.css",
+      "css": "node_modules/bootstrap/dist/css/bootstrap.min.css",
       "fonts": "node_modules/bootstrap/dist/fonts/*",
       "js": "node_modules/bootstrap/dist/js/bootstrap.min.js"
     },
@@ -60,7 +60,7 @@
     },
     "echarts": "static/js/echarts.min.js",
     "fontawesome": {
-      "css": "node_modules/font-awesome/css/font-awesome.css",
+      "css": "node_modules/font-awesome/css/font-awesome.min.css",
       "fonts": "node_modules/font-awesome/fonts/*"
     },
     "jquery": "node_modules/jquery/dist/jquery.min.js",
