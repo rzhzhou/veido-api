@@ -12,7 +12,7 @@
   "bootstrap": {
     "css": "node_modules/bootstrap/dist/css/bootstrap.css",
     "fonts": "node_modules/bootstrap/dist/fonts/*",
-    "js": "node_modules/bootstrap/dist/js/bootstrap.js"
+    "js": "node_modules/bootstrap/dist/js/bootstrap.min.js"
   },
   "daterangepicker": {
     "css": "node_modules/bootstrap-daterangepicker/daterangepicker.css",
@@ -24,10 +24,10 @@
     "css": "node_modules/font-awesome/css/font-awesome.css",
     "fonts": "node_modules/font-awesome/fonts/*"
   },
-  "jquery": "node_modules/jquery/dist/jquery.js",
+  "jquery": "node_modules/jquery/dist/jquery.min.js",
   "moment": [
-    "node_modules/moment/moment.js",
+    "node_modules/moment/moment.min.js",
     "node_modules/moment/locale/zh-cn.js"
   ],
-  "twbsPagination": "node_modules/twbs-pagination/jquery.twbsPagination.js"
+  "twbsPagination": "node_modules/twbs-pagination/jquery.twbsPagination.min.js"
 }
