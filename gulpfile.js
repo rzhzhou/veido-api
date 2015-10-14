@@ -8,15 +8,10 @@ var browserSync = require('browser-sync').create(),
     gulp        = require('gulp'),
     $           = require('gulp-load-plugins')(),
 
-    port        = require('./port.json')[username],
-    map         = require('./map.json');
-
-
-var dist = {
-  css: 'static/build/css/',
-  fonts: 'static/build/fonts/',
-  js: 'static/build/js/'
-};
+    config      = require('./package.json'),
+    dist        = config.dist,
+    map         = config.map,
+    port        = config[username];
 
 
 // clean up vendor

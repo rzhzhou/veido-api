@@ -3,8 +3,8 @@
   "version": "3.0.0",
   "description": "质监舆情",
   "scripts": {
-    "start": "gulp serve",
-    "build": "gulp build"
+    "build": "gulp build",
+    "start": "gulp serve"
   },
   "dependencies": {
     "admin-lte": "^2.3.0",
@@ -29,5 +29,49 @@
     "gulp-sourcemaps": "^1.5.0",
     "gulp-uglify": "^1.1.0",
     "jshint-stylish": "^2.0.1"
+  },
+  "dist": {
+    "css": "static/build/css/",
+    "fonts": "static/build/fonts/",
+    "js": "static/build/js/"
+  },
+  "map": {
+    "adminlte": "static/js/adminlte.js",
+    "app": {
+      "js": [
+        "static/js/config.js",
+        "static/js/plugin.js",
+        "static/js/module.js",
+        "static/js/page.js",
+        "static/js/route.js"
+      ],
+      "less": "static/less/app.less"
+    },
+    "bootstrap": {
+      "css": "node_modules/bootstrap/dist/css/bootstrap.css",
+      "fonts": "node_modules/bootstrap/dist/fonts/*",
+      "js": "node_modules/bootstrap/dist/js/bootstrap.min.js"
+    },
+    "daterangepicker": {
+      "css": "node_modules/bootstrap-daterangepicker/daterangepicker.css",
+      "js": "node_modules/bootstrap-daterangepicker/daterangepicker.js"
+    },
+    "echarts": "static/js/echarts.js",
+    "fontawesome": {
+      "css": "node_modules/font-awesome/css/font-awesome.css",
+      "fonts": "node_modules/font-awesome/fonts/*"
+    },
+    "jquery": "node_modules/jquery/dist/jquery.min.js",
+    "moment": [
+      "node_modules/moment/moment.min.js",
+      "node_modules/moment/locale/zh-cn.js"
+    ],
+    "twbsPagination": "node_modules/twbs-pagination/jquery.twbsPagination.min.js"
+  },
+  "port": {
+    "fei": 3000,
+    "vagrant": 3000,
+    "xxy": 3002,
+    "zjdeng": 3001
   }
 }
