@@ -13,6 +13,72 @@
 {% block content %}
   <div class="row">
     <div class="col-md-12">
+      <div id="chart" class="nav-tabs-custom">
+        <iframe id="save-as-excel" style="display: none;"></iframe>
+        <ul class="nav nav-tabs">
+          <li class="active">
+            <a href="#chart-trend" data-toggle="tab">报道总趋势分析</a>
+          </li>
+          <li>
+            <a href="#chart-type" data-toggle="tab">信息类型分析</a>
+          </li>
+          <li>
+            <a href="#chart-emotion" data-toggle="tab">情感分析</a>
+          </li>
+          <li>
+            <a href="#chart-weibo" data-toggle="tab">微博地域分析</a>
+          </li>
+          <li class="data-range">
+            <button class="date-range-picker btn btn-default">
+              <i class="fa fa-calendar"></i>
+              <span></span>
+              <b class="caret"></b>
+            </button>
+          </li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane active" id="chart-trend" style="height: 400px"></div>
+          <div class="tab-pane" id="chart-type" style="height: 400px"></div>
+          <div class="tab-pane" id="chart-emotion" style="height: 400px"></div>
+          <div class="tab-pane" id="chart-weibo" style="height: 400px" >
+            <div class="row">
+              <div class="col-md-8">
+                <div id = "chart-weibo-map" style = "height: 400px"></div>
+              </div>
+              <div class="col-md-4">
+                <div id = "chart-weibo-bar" style = "height: 400px"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <div id="statistic" class="box box-solid">
+              <div class="box-body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="statistic-total text-center">
+                      <span></span>
+                      <p>监测数据</p>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="statistic-risk text-center">
+                      <span></span>
+                      <p>风险数据</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
       <div class="box box-info">
         <div class="box-header with-border">
           <h3 class="box-title">新闻列表</h3>
