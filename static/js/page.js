@@ -215,8 +215,8 @@ App.page.locationDetail = function (module, path) {
   });
 };
 
-App.page.inspection = function (module, path) {
-  module.dataTable(path);
+App.page.inspection = function () {
+  // pending
 };
 
 App.page.custom = function () {
