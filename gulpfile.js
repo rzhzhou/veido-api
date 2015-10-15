@@ -55,7 +55,7 @@ gulp.task('vendor-css', ['clean-vendor'], function () {
   ];
 
   return gulp.src(files)
-    .pipe($.if(/^[a-z_\/\-]+\.css$/, $.minifyCss()))
+    .pipe($.if('!*.min.css', $.minifyCss()))
     .pipe($.concat('vendor.css'))
     .pipe(gulp.dest(dist.css));
 });
@@ -83,7 +83,7 @@ gulp.task('vendor-js', ['clean-vendor'], function () {
   ];
 
   return gulp.src(files)
-    .pipe($.if(/^[a-z_\/\-]+\.js$/, $.uglify()))
+    .pipe($.if('!*.min.js', $.uglify()))
     .pipe($.concat('vendor.js'))
     .pipe(gulp.dest(dist.js));
 });
