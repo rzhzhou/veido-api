@@ -65,7 +65,7 @@
     },
     "jquery": "node_modules/jquery/dist/jquery.min.js",
     "moment": [
-      "node_modules/moment/moment.min.js",
+      "node_modules/moment/min/moment.min.js",
       "node_modules/moment/locale/zh-cn.js"
     ],
     "twbsPagination": "node_modules/twbs-pagination/jquery.twbsPagination.min.js"
