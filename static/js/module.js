@@ -429,24 +429,24 @@ App.module.menu = function (path, type) {
 };
 
 App.module.inspection = function () {
-  // var $inspection = $('#inspection'),
-  //     $content    = $inspection.children('.box-body').find('tbody');
-  //
-  // $content.load('/api/dashboard/local-inspection/');
-  //
-  // $inspection.on('click', 'button', function (event) {
-  //   event.preventDefault();
-  //
-  //   if ( $(this).hasClass('active') ) {
-  //     return false;
-  //   }
-  //
-  //   $(this)
-  //     .addClass('active')
-  //     .siblings().removeClass('active');
-  //
-  //   $content.load('/api/dashboard/' + this.id + '/');
-  // });
+  var $inspection = $('#inspection'),
+      $content    = $inspection.children('.box-body').find('tbody');
+
+  $content.load('/api/dashboard/local-inspection/');
+
+  $inspection.on('click', 'button', function (event) {
+    event.preventDefault();
+
+    if ( $(this).hasClass('active') ) {
+      return false;
+    }
+
+    $(this)
+      .addClass('active')
+      .siblings().removeClass('active');
+
+    $content.load('/api/dashboard/' + this.id + '/');
+  });
 };
 
 App.module.returnTop = function (el) {
