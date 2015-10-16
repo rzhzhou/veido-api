@@ -1,12 +1,14 @@
-#coding: utf-8
+# coding: utf-8
+import uuid
+
 from django.conf import settings
 from django.db import IntegrityError, transaction
 from observer.apps.base.models import Article, Area, RelatedData, \
-     ArticlePublisher, RelatedDataAtricle, Category, CategoryAtricle
+    ArticlePublisher, RelatedDataAtricle, Category, CategoryAtricle
 from django.http import HttpResponse
-from simArticle import  _cal_values
+
+from simArticle import _cal_values
 from query import *
-import uuid
 
 
 class MySQLQuerApi(object):
@@ -20,21 +22,19 @@ class MySQLQuerApi(object):
             'source': obj.source,
             'pubtime': obj.pubtime,
             'uuid': uid,
-            'area': Area.objects.get(name=obj.area.name , level=obj.area.level),
-            'publisher': get_article_publisher(obj.source) if article_publisher_count(obj.source) \
-                else save_article_publisher(data={"publisher": obj.source}),
-        }
+            'area': Area.objects.get(name=obj.area.name, level=obj.area.level),
+            'publisher': get_article_publisher(obj.source) if article_publisher_count(obj.source)
+            else save_article_publisher(data={"publisher": obj.source})}
         return dct
 
     def insert_to_categoryarticle(self, article):
         hot_id = get_category('质监热点')
         CategoryAtricle(article=article, category=hot_id).save()
 
-
     def insert_to_relateddata(self, article, article_title, article_pubtime, uid):
         relateddata = RelatedData(uuid=uid)
         relateddata.save()
-        result = _cal_values("article",article_title, article_pubtime)
+        result = _cal_values("article", article_title, article_pubtime)
         for r in result:
             if not RelatedData.objects.filter(uuid=r.uuid):
                 self.insert_to_relateddata(r, r.title, r.pubtime, r.uuid)
@@ -42,7 +42,6 @@ class MySQLQuerApi(object):
             re_id = RelatedData.objects.get(uuid=r.uuid)
             if re_id:
                 RelatedDataAtricle(article=article, relateddata=re_id).save()
-
 
     @transaction.atomic()
     def insert(self, obj):

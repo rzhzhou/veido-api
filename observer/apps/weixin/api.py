@@ -1,23 +1,28 @@
 # -*- coding: utf-8 -*-
+from django.conf import settings
 from django.template.loader import render_to_string
 from rest_framework.response import Response
-from django.conf import settings
 
+from observer.apps.base import authenticate, login_required, set_logo
 from observer.apps.base.views import BaseAPIView
 from observer.apps.base.models import Weixin, Area
-from observer.apps.base import authenticate, login_required, set_logo
+
 
 class WeixinView(BaseAPIView):
     HOME_PAGE_LIMIT = 6
+
     def get(self, request):
-        container = self.requestContainer(sort='hot', limit_list=settings.WEIXIN_TABLE_LIMIT,
+        container = self.requestContainer(
+            sort='hot',
+            limit_list=settings.WEIXIN_TABLE_LIMIT,
             limit=self.HOME_PAGE_LIMIT)
         if container['sort'] == 'new':
             datas = self.paging(Weixin.objects.all(), container['limit'], container['page'])
-        else: # hot
+        else:  # hot
             datas = self.paging(Weixin.objects.all(), container['limit'], container['page'])
         items = [set_logo(data) for data in datas['items']]
-        html_string = render_to_string('weixin/%s_tpl.html' % container['type'], {'weixin_list':  items})
+        html_string = render_to_string('weixin/%s_tpl.html' % container['type'], {
+            'weixin_list': items})
         return Response({'html': html_string, 'total': datas['total_number']})
 
 

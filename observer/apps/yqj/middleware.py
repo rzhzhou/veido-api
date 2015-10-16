@@ -1,5 +1,6 @@
 from observer.apps.base.models import AnonymousUser, User
 
+
 class UserAuthenticationMiddlerware(object):
     def process_request(self, request):
         try:

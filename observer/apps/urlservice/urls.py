@@ -18,7 +18,8 @@ from observer.apps.inspection.views import InspectionView
 from observer.apps.search.views import SearchView
 from observer.apps.analytics.views import AnalyticsChildView
 
-urlpatterns = patterns('observer.apps.yqj.views',
+urlpatterns = patterns(
+    'observer.apps.yqj.views',
     url(r'^$', 'index_view'),
     url(r'^collection/$', CollectionView.as_view()),
     url(r'^settings/$', SettingsView.as_view()),
@@ -27,48 +28,58 @@ urlpatterns = patterns('observer.apps.yqj.views',
     url(r'^logout/$', 'logout_view'),
 )
 
-urlpatterns += patterns('news.views',
+urlpatterns += patterns(
+    'news.views',
     url(r'^news/$', NewsView.as_view()),
     url(r'^news/(\d+)/$', NewsDetailView.as_view()),
     url(r'^category/(\d+)/$', CategoryView.as_view()),
     url(r'^location/(\d+)/$', LocationView.as_view()),
 )
 
-urlpatterns += patterns('event.views',
+urlpatterns += patterns(
+    'event.views',
     url(r'^event/$', EventView.as_view()),
     url(r'^event/(\d+)/$', EventDetailView.as_view()),
 )
 
-urlpatterns += patterns('risk.views',
+urlpatterns += patterns(
+    'risk.views',
     url(r'^risk/$', RisksView.as_view()),
     url(r'^risk/(\d+)/$', RisksDetailView.as_view()),
 )
 
-urlpatterns += patterns('weibo.views',
+urlpatterns += patterns(
+    'weibo.views',
     url(r'^weibo/$', WeiboView.as_view()),
 )
-urlpatterns += patterns('weixin.views',
+urlpatterns += patterns(
+    'weixin.views',
     url(r'^weixin/$', WeixinView.as_view()),
     url(r'^weixin/(\d+)/$', WeixinDetailView.as_view()),
 )
 
-urlpatterns += patterns('custom.views',
+urlpatterns += patterns(
+    'custom.views',
     url(r'^custom/$', CustomView.as_view()),
     url(r'^custom/(\d+)/$', CustomDetailView.as_view()),
 )
 
-urlpatterns += patterns('product.views',
+urlpatterns += patterns(
+    'product.views',
     url(r'^product/(?P<id>\d*)/?$', ProductView.as_view()),
 )
 
-urlpatterns += patterns('inspection.views',
+urlpatterns += patterns(
+    'inspection.views',
     url(r'^inspection/$', InspectionView.as_view()),
 )
 
-urlpatterns += patterns('search.views',
+urlpatterns += patterns(
+    'search.views',
     url(r'^search/(.+)/$', SearchView.as_view()),
 )
 
-urlpatterns += patterns('analytics.views',
+urlpatterns += patterns(
+    'analytics.views',
     url(r'^analytics/(?P<id>\d+)/$', AnalyticsChildView.as_view()),
 )

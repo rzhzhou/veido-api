@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
+from django.conf import settings
+from django.db import models, connection, IntegrityError
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
+from django.template.loader import render_to_string
 from django.views.generic import View
 from rest_framework.decorators import api_view
-from django.db import models, connection, IntegrityError
 from rest_framework.response import Response
-from django.conf import settings
-from django.template.loader import render_to_string
-from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 
 from observer.apps.base.models import Article, Category, RelatedData, ArticleCollection,\
     Collection
@@ -22,12 +22,12 @@ class CollecModifyView(View):
                 category = item.categorys.all()[0]
             except IndexError:
                 category = Category.objects.get(name='其他')
-            data['category'] =  category.name
+            data['category'] = category.name
         try:
             collection_item = self.get_related_model().objects.create(**data)
             collection_item.save(using='master')
         except IntegrityError:
-             pass
+            pass
 
     def _delete(self, item):
         try:
@@ -44,7 +44,7 @@ class CollecModifyView(View):
         return models.get_model('base', self.data_type.capitalize() + 'Collection')
 
     def _create_collection(self):
-        #add a collection to the user
+        # add a collection to the user
         try:
             _collection = self.request.myuser.collection
         except ObjectDoesNotExist:
@@ -62,7 +62,7 @@ class CollecModifyView(View):
     def get_collection_model(self):
         return models.get_model('base', self.data_type.capitalize() + 'Collection')
 
-    def prepare(self,request):
+    def prepare(self, request):
         data = request.read()
         data_type = data.split('&')[0].split('=')[1]
         id = data.split('&')[1].split('=')[1]
@@ -99,9 +99,9 @@ class CollectView(BaseAPIView):
         try:
             hot_index = RelatedData.objects.filter(uuid=item.uuid)[0].articles.all().count()
         except:
-            hot_index =0
+            hot_index = 0
         line = [title, item.publisher.publisher, item.area.name, item.pubtime.date(), hot_index]
-        #line = [view.collected_html(item), title, item.publisher.publisher, item.area.name, item.pubtime.date(), hot_index]
+        # line = [view.collected_html(item), title, item.publisher.publisher, item.area.name, item.pubtime.date(), hot_index]
         return line
 
     def topic_html(self, item):
@@ -130,13 +130,13 @@ class CollectView(BaseAPIView):
             items = self.collection.articles.all()
             datas = self.paging(items, settings.NEWS_PAGE_LIMIT, page)
             result = self.news_to_json(datas['items'])
-            html_string = render_to_string('news/list_tpl.html', {'news_list':  result})
+            html_string = render_to_string('news/list_tpl.html', {'news_list': result})
         elif table_type == 'event':
             view = EventTableView(self.request)
             items = self.collection.events.all()
             datas = self.paging(items, settings.EVENT_PAGE_LIMIT, page)
             result = self.event_to_json(datas['items'])
-            html_string = render_to_string('event/list_tpl.html', {'event_list':  result})
+            html_string = render_to_string('event/list_tpl.html', {'event_list': result})
         else:
             result = []
             datas = {'taotal_number': 0}

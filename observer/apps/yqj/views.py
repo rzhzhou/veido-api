@@ -14,9 +14,10 @@ from django.utils import timezone
 
 from observer.apps.base import login_required, get_user_image, set_logo, sidebarUtil
 from observer.apps.base.views import BaseTemplateView
-from observer.apps.base.models import (Area, Article, ArticlePublisher, Category, Collection,
-    Custom, CustomKeyword, Group, Inspection, LocaltionScore, Product, ProductKeyword,
-    RelatedData, Risk, RiskScore, Topic, Weibo, Weixin)
+from observer.apps.base.models import (
+    Area, Article, ArticlePublisher, Category, Collection, Custom, CustomKeyword,
+    Group, Inspection, LocaltionScore, Product, ProductKeyword, RelatedData,
+    Risk, RiskScore, Topic, Weibo, Weixin)
 from observer.apps.yqj.redisconnect import RedisQueryApi
 
 
@@ -26,7 +27,7 @@ def index_view(request):
     if user.is_authenticated():
         business = sidebarUtil(request)['business']
         categories = Category.objects.filter(name__in=business)
-        locations = Area.objects.filter(level=user.area.level+1, parent=user.area)
+        locations = Area.objects.filter(level=user.area.level + 1, parent=user.area)
         user.company = user.group.company
 
         news = Article.objects.count()
@@ -60,7 +61,7 @@ def index_view(request):
             except:
                 setattr(iteml, 'time', datetime.now().strftime('%Y-%m-%d'))
         for item in event_list:
-            setattr(item, 'hot_index', item.articles.all().count()+item.weixin.all().count()+item.weibo.all().count())
+            setattr(item, 'hot_index', item.articles.all().count() + item.weixin.all().count() + item.weibo.all().count())
 
         weibo_data = [eval(item) for item in RedisQueryApi().lrange('sort_weibohot', 0, -1)[:5]]
         for data in weibo_data:
@@ -74,24 +75,22 @@ def index_view(request):
         for data in weixin_data:
             data = set_logo(data)
 
-
         sidebar_name = sidebarUtil(request)
-        return render_to_response("dashboard/dashboard.html",
-            {   'user': user,
-                'categories': categories,
-                'locations': locations,
-                'industries': [{'id': 0, 'name': u'综合'}],
-                'news': {'number': news, 'percent': news_percent},
-                'weibo': {'number': weibo, 'percent': weibo_percent},
-                'weixin': {'number': weixin, 'percent': weixin_percent},
-                'event': {'number': event, 'percent': event_percent},
-                'news_list': news_list,
-                'event_list': event_list,
-                'weixin_hottest_list': weixin_data,
-                'weibo_hottest_list': weibo_data,
-                'user_image': get_user_image(user),
-                'name': sidebar_name,
-            })
+        return render_to_response("dashboard/dashboard.html", {
+            'user': user,
+            'categories': categories,
+            'locations': locations,
+            'industries': [{'id': 0, 'name': u'综合'}],
+            'news': {'number': news, 'percent': news_percent},
+            'weibo': {'number': weibo, 'percent': weibo_percent},
+            'weixin': {'number': weixin, 'percent': weixin_percent},
+            'event': {'number': event, 'percent': event_percent},
+            'news_list': news_list,
+            'event_list': event_list,
+            'weixin_hottest_list': weixin_data,
+            'weibo_hottest_list': weibo_data,
+            'user_image': get_user_image(user),
+            'name': sidebar_name})
     else:
         return HttpResponse(status=401)
 

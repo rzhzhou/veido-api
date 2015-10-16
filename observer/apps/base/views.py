@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import pytz
-from django.conf import settings
 from datetime import datetime
+
+from django.conf import settings
 from django.core.paginator import EmptyPage, Paginator, PageNotAnInteger
 from django.db.models import Q
 from django.shortcuts import render_to_response
@@ -21,16 +22,17 @@ class LoginRequiredMixin(object):
         view = super(LoginRequiredMixin, cls).as_view(**initkwargs)
         return login_required(view)
 
+
 class BaseView(View):
 
     def paging(self, items, limit, page):
         paginator = Paginator(items, limit)
         try:
-            items = paginator.page(page) # 获取某页对应的记录
+            items = paginator.page(page)  # 获取某页对应的记录
         except PageNotAnInteger:
-            items = paginator.page(1) # 如果页码不是个整数 取第一页的记录
+            items = paginator.page(1)  # 如果页码不是个整数 取第一页的记录
         except EmptyPage:
-            items = paginator.page(paginator.num_pages) # 如果页码太大，没有相应的记录 取最后一页的记录
+            items = paginator.page(paginator.num_pages)  # 如果页码太大，没有相应的记录 取最后一页的记录
 
         return {'items': items, 'total_number': paginator.num_pages}
 
@@ -76,17 +78,17 @@ class BaseView(View):
         for item in items:
             html += """<li class="media">"""
             html += """<div class="media-left">"""
-            html +=  u'<img class="media-object" src="%s" alt="%s">' % (item.publisher.photo, item.publisher.publisher)
+            html += u'<img class="media-object" src="%s" alt="%s">' % (item.publisher.photo, item.publisher.publisher)
             html += """</div>
                        <div class="media-body"> """
-            html +=  u'<h4 class="media-heading">%s</h4>' % (item.publisher.publisher)
-            html +=  u'<p><a href="/weixin/%s/" target="_blank">%s</a></p>' % (item.id, item.title)
+            html += u'<h4 class="media-heading">%s</h4>' % (item.publisher.publisher)
+            html += u'<p><a href="/weixin/%s/" target="_blank">%s</a></p>' % (item.id, item.title)
             html += """<div class="media-meta">
                        <div class="info pull-right">"""
-            html +=  u'<span>阅读 %s</span>' % count
-            html +=  u'<span><i class="fa fa-thumbs-o-up"></i> %s</span>' % count
+            html += u'<span>阅读 %s</span>' % count
+            html += u'<span><i class="fa fa-thumbs-o-up"></i> %s</span>' % count
             html += """</div>"""
-            html +=  u'<div class="time pull-left">%s</div>' % item.pubtime.strftime('%Y-%m-%d %H:%M')
+            html += u'<div class="time pull-left">%s</div>' % item.pubtime.strftime('%Y-%m-%d %H:%M')
             html += """</div></div></li>"""
         return html
 
@@ -96,21 +98,21 @@ class BaseView(View):
         for item in items:
             html += """<li class="media">"""
             html += """<div class="media-left">"""
-            html +=  u'<img class="media-object" src="%s" alt="%s">' % (item.publisher.photo, item.publisher.publisher)
+            html += u'<img class="media-object" src="%s" alt="%s">' % (item.publisher.photo, item.publisher.publisher)
             html += """</div>
                        <div class="media-body"> """
-            html +=  u'<h4 class="media-heading">%s</h4>' % (item.publisher.publisher)
+            html += u'<h4 class="media-heading">%s</h4>' % (item.publisher.publisher)
             if len(item.content) < 200:
-                 html +=  u'<p>%s</p>' % (item.content)
+                html += u'<p>%s</p>' % (item.content)
             else:
-                 html +=  u'<p><a href="%s" target="_blank">%s</a></p>' % (item.url, item.title)
+                html += u'<p><a href="%s" target="_blank">%s</a></p>' % (item.url, item.title)
             html += """<div class="media-meta">
                        <div class="info pull-right">"""
-            html +=  u'<span>转载 %s</span>' % count
-            html +=  u'<span>评论 %s</span>' % count
-            html +=  u'<span><i class="fa fa-thumbs-o-up"></i> %s</span>' % count
+            html += u'<span>转载 %s</span>' % count
+            html += u'<span>评论 %s</span>' % count
+            html += u'<span><i class="fa fa-thumbs-o-up"></i> %s</span>' % count
             html += """</div>"""
-            html +=  u'<div class="time pull-left">%s</div>' % item.pubtime.strftime('%Y-%m-%d %H:%M')
+            html += u'<div class="time pull-left">%s</div>' % item.pubtime.strftime('%Y-%m-%d %H:%M')
             html += """</div></div></li>"""
         return html
 
@@ -125,7 +127,7 @@ class BaseTemplateView(LoginRequiredMixin, BaseView):
     def render_to_response(self, template_path, context={}):
         if self.INCLUDE_SIDEBAR:
             categories = self.get_article_categories()
-            #for ctg in categories:
+            # for ctg in categories:
             #    ctg.id = encrypt(ctg.id)
             context['categories'] = categories
             context['industries'] = [{'id': 0, 'name': u'综合'}]
@@ -147,7 +149,7 @@ class BaseTemplateView(LoginRequiredMixin, BaseView):
     def get_locations(self, area):
         if area.id == 4:
             return []
-        return Area.objects.filter(parent=area, level=area.level+1)
+        return Area.objects.filter(parent=area, level=area.level + 1)
 
 
 class BaseAPIView(BaseView, APIView):

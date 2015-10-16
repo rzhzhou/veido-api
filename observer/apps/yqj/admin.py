@@ -7,7 +7,8 @@ from django.contrib import admin, messages
 
 from observer.apps.yqj.mongoconnect import CrawlerTask
 from yqj_save import MySQLQuerApi
-from observer.apps.base.models import (Area, Article, ArticlePublisher, Category, Custom,
+from observer.apps.base.models import (
+    Area, Article, ArticlePublisher, Category, Custom,
     CustomKeyword, Group, GroupAuthUser, LocaltionScore, Product, ProductKeyword,
     Risk, LRisk, TRisk, RiskScore, Topic, User, Weibo, WeiboPublisher, Weixin,
     WeixinPublisher, save_user, ZJInspection, News)
@@ -22,9 +23,9 @@ def show_pubtime(obj):
 
 show_pubtime.short_description = u'发布时间'
 
+
 class NewsAdmin(admin.ModelAdmin):
-    fields = ('url', 'title', 'content', 'author', 'pubtime', \
-        'source', 'area')
+    fields = ('url', 'title', 'content', 'author', 'pubtime', 'source', 'area')
     list_display = ('title', 'source', 'pubtime', 'area')
     search_fields = ('url', 'title', 'content', 'author', 'area')
     list_filter = ('pubtime',)
@@ -32,11 +33,10 @@ class NewsAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         MySQLQuerApi().insert(obj)
 
+
 class WeiboAdmin(ForeignKeyAutocompleteAdmin):
-    related_search_fields = {
-    'area': ('name',)
-    }
-    list_display = ('title', 'source', 'website_type', 'area','pubtime')
+    related_search_fields = {'area': ('name',)}
+    list_display = ('title', 'source', 'website_type', 'area', 'pubtime')
     list_editable = ('source', 'pubtime',)
     list_filter = ('pubtime', )
     search_fields = ('title', 'source', 'content')
@@ -48,20 +48,19 @@ class WeiboAdmin(ForeignKeyAutocompleteAdmin):
 
 
 class WeixinAdmin(ForeignKeyAutocompleteAdmin):
-    related_search_fields = {
-    'area': ('name',)
-    }
-    fields=('author','title','url','content','origin_source','source','website_type','pubtime','publisher','area','uuid','readnum','likenum')
-    list_display=('author','title','origin_source','source','pubtime','publisher','area','readnum')
-    list_editable=('title','pubtime','readnum',)
-    list_filter=('source','origin_source','pubtime',)
-    search_fields=('title','source')
+    related_search_fields = {'area': ('name',)}
+    fields = (
+        'author', 'title', 'url', 'content', 'origin_source', 'source',
+        'website_type', 'pubtime', 'publisher', 'area', 'uuid', 'readnum', 'likenum')
+    list_display = (
+        'author', 'title', 'origin_source', 'source', 'pubtime', 'publisher', 'area', 'readnum')
+    list_editable = ('title', 'pubtime', 'readnum',)
+    list_filter = ('source', 'origin_source', 'pubtime',)
+    search_fields = ('title', 'source')
 
 
 class ArticleAdmin(ForeignKeyAutocompleteAdmin):
-    related_search_fields = {
-    'area': ('name',)
-    }
+    related_search_fields = {'area': ('name',)}
     # fields = ('title', 'source', 'area', 'feeling_factor', 'pubtime', 'website_type')
     list_display = ('title', 'source', 'area', 'feeling_factor', 'pubtime')
     list_editable = ('source', 'feeling_factor', 'pubtime')
@@ -72,9 +71,10 @@ class ArticleAdmin(ForeignKeyAutocompleteAdmin):
 
 class CustomKeywordAdmin(admin.ModelAdmin):
     list_display = ('newkeyword', 'review', 'group', 'custom')
-    #list_editable = ('source', 'feeling_factor', 'pubtime',)
+    # list_editable = ('source', 'feeling_factor', 'pubtime',)
     list_filter = ('group', )
     search_fields = ('newkeyword', 'review')
+
     def save_model(self, request, obj, form, change):
         if not change:
             if obj.custom:
@@ -108,19 +108,16 @@ class CustomKeywordAdmin(admin.ModelAdmin):
 
 
 class TopicAdmin(ForeignKeyAutocompleteAdmin):
-    related_search_fields = {
-    'area': ('name',)
-    }
+    related_search_fields = {'area': ('name',)}
     fields = ('title', 'abstract', 'source', 'area', 'keywords', 'pubtime')
     list_display = ('title', 'source', 'area', 'pubtime',)
     list_editable = ('source', 'pubtime')
     list_filter = ('source', 'pubtime',)
     search_fields = ('title', 'source')
-    #
+
     def save_model(self, request, obj, form, change):
         obj.keywords = jieba.analyse.extract_tags(obj.title, topK=3, withWeight=True, allowPOS=())
-         # return <type 'list'> contain tuple
-
+        # return <type 'list'> contain tuple
         if not change:
             CrawlerTask(obj.title, 'zjld', u"事件").type_task()
         else:
@@ -199,8 +196,8 @@ class UserAdmin(admin.ModelAdmin):
     fields = ('username', 'password', 'area', 'isAdmin', 'group')
     list_display = ('username', 'password', 'area', 'isAdmin', 'group',)
     list_editable = ('username', 'password', 'area', 'isAdmin', 'group')
-    # def save_model(   self, request, obj, form, change):
-    def save_model(self,request, obj, form, change):
+
+    def save_model(self, request, obj, form, change):
         save_user(obj.username, obj.password, obj.area, obj.group, obj.isAdmin)
 
 
@@ -228,12 +225,10 @@ class RiskScoreAdmin(admin.ModelAdmin):
 
 
 class RiskAdmin(ForeignKeyAutocompleteAdmin):
-    related_search_fields = {
-    'area': ('name',)
-    }
+    related_search_fields = {'area': ('name',)}
     fields = ('title', 'abstract', 'source', 'area', 'keywords', 'score', 'pubtime')
-    list_display = ('title',  'source', 'area', 'keywords' , 'pubtime')
-    list_editable = ('title', 'source', 'keywords' , 'pubtime')
+    list_display = ('title', 'source', 'area', 'keywords', 'pubtime')
+    list_editable = ('title', 'source', 'keywords', 'pubtime')
     list_filter = ('title', 'pubtime')
     search_fields = ('title', 'pubtime')
 
@@ -263,9 +258,9 @@ class RiskAdmin(ForeignKeyAutocompleteAdmin):
 
 
 class LRiskAdmin(admin.ModelAdmin):
-    fields = ('title' ,'score', 'pubtime')
-    list_display = ('title' ,'score' , 'pubtime')
-    list_editable = ('title' ,'score' , 'pubtime')
+    fields = ('title', 'score', 'pubtime')
+    list_display = ('title', 'score', 'pubtime')
+    list_editable = ('title', 'score', 'pubtime')
     list_filter = ('title', 'pubtime')
     search_fields = ('title', 'pubtime')
 
@@ -287,19 +282,18 @@ class LRiskAdmin(admin.ModelAdmin):
 
 
 class TRiskAdmin(admin.ModelAdmin):
-    fields = ('title' ,'score', 'pubtime')
-    list_display = ('title' ,'score' , 'pubtime')
-    list_editable = ('title' ,'score' , 'pubtime')
+    fields = ('title', 'score', 'pubtime')
+    list_display = ('title', 'score', 'pubtime')
+    list_editable = ('title', 'score', 'pubtime')
     list_filter = ('title', 'pubtime')
     search_fields = ('title', 'pubtime')
 
     def save_model(self, request, obj, form, change):
         score = obj.score
         risk_id = obj.id
-        risk_score = RiskScore(score=score ,risk_id=risk_id)
+        risk_score = RiskScore(score=score, risk_id=risk_id)
 
         risk = RiskScore.objects.filter(risk_id=risk_id)
-
         if risk:
             risk.delete()
             risk_score.save()
@@ -316,8 +310,8 @@ class InspectionAdmin(ImportExportActionModelAdmin):
 
 admin.site.register(WeixinPublisher)
 admin.site.register(WeiboPublisher)
-admin.site.register(Weibo,WeiboAdmin)
-admin.site.register(Weixin,WeixinAdmin)
+admin.site.register(Weibo, WeiboAdmin)
+admin.site.register(Weixin, WeixinAdmin)
 admin.site.register(ArticlePublisher)
 admin.site.register(Category)
 admin.site.register(User, UserAdmin)
