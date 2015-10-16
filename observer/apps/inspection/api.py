@@ -35,7 +35,7 @@ class InspectionLocalView(BaseAPIView):
             item.pubtime = timel
             item.qualitied = str(int(item.qualitied*100)) + '%'
 
-        inspection = render_to_string('inspection/dashboard_inspection.html', {'inspection_list': inspection_list})
+        inspection = render_to_string('inspection/abstract.html', {'inspection_list': inspection_list})
         return HttpResponse(inspection)
 
 
@@ -53,5 +53,5 @@ class InspectionNationalView(BaseAPIView):
             item.pubtime = timel
             item.qualitied = str(int(item.qualitied*100)) + '%'
 
-        inspection = render_to_string('inspection/dashboard_inspection.html', {'inspection_list': inspection_list})
+        inspection = render_to_string('inspection/abstract.html', {'inspection_list': inspection_list})
         return HttpResponse(inspection)

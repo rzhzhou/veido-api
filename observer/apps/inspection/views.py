@@ -8,4 +8,4 @@ from observer.apps.base.views import BaseTemplateView
 class InspectionView(BaseTemplateView):
     def get(self, request):
     	sidebar_name = sidebarUtil(request)
-        return self.render_to_response('inspection/inspection_list.html', {'name': sidebar_name})
+        return self.render_to_response('inspection/list.html', {'name': sidebar_name})
