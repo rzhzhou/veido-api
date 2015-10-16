@@ -32,7 +32,7 @@ class DispatchView(APIView, BaseTemplateView):
             datatype = parameter['datatype'] if parameter.has_key('datatype') else 'json'
             func = getattr(globals()['DispatchView'](), type)
 
-            if datatype == 'json' and cache: # cache is flag,if cache=1 read redis, else read mysql
+            if datatype == 'json' and cache:  # cache is flag,if cache=1 read redis, else read mysql
                 now = datetime.now()
                 today = tz.localize(datetime(now.year, now.month, now.day) + timedelta(days=1))
                 first_day_of_month = tz.localize(datetime(now.year, now.month, 1))
@@ -89,10 +89,11 @@ class DispatchView(APIView, BaseTemplateView):
         return {'news': article, 'weixin': weixin, 'weibo': weibo}
 
     def chart_emotion(self, start, end):
-        positive = Article.objects.filter(pubtime__gte=start, pubtime__lt=end,
-                feeling_factor__gte=0.9).count()
-        normal = Article.objects.filter(pubtime__gte=start, pubtime__lt=end,
-            feeling_factor__gte=0.1, feeling_factor__lt=0.9).count()
+        positive = Article.objects.filter(
+            pubtime__gte=start, pubtime__lt=end, feeling_factor__gte=0.9).count()
+        normal = Article.objects.filter(
+            pubtime__gte=start, pubtime__lt=end, feeling_factor__gte=0.1,
+            feeling_factor__lt=0.9).count()
         negative = Article.objects.filter(
             pubtime__gte=start, pubtime__lt=end, feeling_factor__lt=0.1).count()
 
@@ -104,10 +105,12 @@ class DispatchView(APIView, BaseTemplateView):
         for province in provinces:
             citys = Area.objects.filter(parent_id=province.id)
             city_id = map(lambda c: c.id, citys)
-            areas_id = Area.objects.filter(Q(parent_id__in=city_id)|Q(parent_id=province.id)|Q(id=province.id))
-            count = Weibo.objects.filter(area__in=areas_id, pubtime__gte=start, pubtime__lt=end).count()
+            areas_id = Area.objects.filter(
+                Q(parent_id__in=city_id) | Q(parent_id=province.id) | Q(id=province.id))
+            count = Weibo.objects.filter(
+                area__in=areas_id, pubtime__gte=start, pubtime__lt=end).count()
             provice_count.append({'name': province.name, 'value': count})
-        sort_result = sorted(provice_count, key=lambda x:x['value'])[-10:]
+        sort_result = sorted(provice_count, key=lambda x: x['value'])[-10:]
         name = map(lambda n: n['name'], sort_result)
         value = map(lambda v: v['value'], sort_result)
         return {'province': provice_count, 'name': name, 'value': value}
@@ -116,23 +119,23 @@ class DispatchView(APIView, BaseTemplateView):
         days = (end - start).days
         datel = [(start + timedelta(days=i)) for i in xrange(days)]
         start = start.astimezone(pytz.utc)
-        start = time.strftime( '%Y-%m-%d %X', start.timetuple())
+        start = time.strftime('%Y-%m-%d %X', start.timetuple())
         start = datetime.strptime(start, '%Y-%m-%d %X')
         date = [(start + timedelta(days=x)) for x in xrange(days)]
 
-        date_range = [(i, i + timedelta(days = 1)) for i in date]
+        date_range = [(i, i + timedelta(days=1)) for i in date]
         query_str = map(
             lambda x: "sum(case when pubtime < '%s' and pubtime >= '%s' then 1 else 0 end)"
             % (x[1], x[0]),
             date_range
         )
 
-        sum_result =lambda x: query('select %s from %s' % (','.join(query_str), x))
+        sum_result = lambda x: query('select %s from %s' % (','.join(query_str), x))
         news_data = [i for i in sum_result('article')[0]]
         weixin_data = [i for i in sum_result('weixin')[0]]
         weibo_data = [i for i in sum_result('weibo')[0]]
 
-        total_data = map(lambda x: news_data[x] + weixin_data[x] + weibo_data[x] , xrange(days))
+        total_data = map(lambda x: news_data[x] + weixin_data[x] + weibo_data[x], xrange(days))
         date = map(lambda x: x.strftime("%m-%d"), datel)
 
         return {
@@ -147,8 +150,12 @@ class DispatchView(APIView, BaseTemplateView):
         wb = xlwt.Workbook()
         ws = wb.add_sheet('Sheet')
         if type == 'chart_trend':
-            map_dict = [{'date': u'时间'}, {'news': u'新闻'}, {'weixin': u'微信'},
-                {'weibo': u'微博'}, {'total': u'总数'}]
+            map_dict = [
+                {'date': u'时间'},
+                {'news': u'新闻'},
+                {'weixin': u'微信'},
+                {'weibo': u'微博'},
+                {'total': u'总数'}]
             for c, column in enumerate(map_dict):
                 ws.write(0, c, column.values()[0])
                 for r, row in enumerate(data[column.keys()[0]]):
@@ -182,4 +189,6 @@ class DispatchView(APIView, BaseTemplateView):
 class AnalyticsChildView(BaseTemplateView):
     def get(self, request, id):
         sidebar_name = sidebarUtil(request)
-        return self.render_to_response('analytics/analytics.html', {'industry': {'name': u'综合'}, 'name': sidebar_name})
+        return self.render_to_response('analytics/analytics.html', {
+            'industry': {'name': u'综合'},
+            'name': sidebar_name})

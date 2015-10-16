@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from rest_framework.response import Response
 
-from observer.apps.base.views import BaseAPIView
 from observer.apps.base.models import ProductKeyword, Group, Article
+from observer.apps.base.views import BaseAPIView
 
 
 class ProductTableView(BaseAPIView):
@@ -24,7 +24,7 @@ class ProductTableView(BaseAPIView):
         if data != []:
             item = reduce(lambda x, y: list(set(x).union(set(y))), data)
         else:
-            item =[]
+            item = []
         article_ids = [item[i].id for i in range(len(item))]
         item = Article.objects.filter(id__in=article_ids)
 

@@ -35,7 +35,7 @@ class WeixinPublisher(models.Model):
 
 class Weixin(models.Model):
     author = models.CharField(max_length=255, verbose_name=u'作者')
-    title = models.CharField(max_length=255,blank=True, verbose_name=u'标题')
+    title = models.CharField(max_length=255, blank=True, verbose_name=u'标题')
     url = models.URLField(verbose_name=u'网站链接')
     content = models.TextField(blank=True, verbose_name=u'正文')
     origin_source = models.CharField(max_length=255, blank=True, verbose_name=u'信息转载来源')
@@ -72,7 +72,7 @@ class WeiboPublisher(models.Model):
 
 class Weibo(models.Model):
     author = models.CharField(max_length=255, verbose_name=u'作者')
-    title = models.CharField(max_length=255,blank=True, verbose_name=u'标题')
+    title = models.CharField(max_length=255, blank=True, verbose_name=u'标题')
     url = models.URLField(verbose_name=u'网站链接')
     content = models.TextField(blank=True, verbose_name=u'正文')
     origin_source = models.CharField(max_length=255, blank=True, verbose_name=u'信息转载来源')
@@ -81,9 +81,9 @@ class Weibo(models.Model):
     pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
     publisher = models.ForeignKey(WeiboPublisher, verbose_name=u'微博发布者')
     area = models.ForeignKey(Area, verbose_name=u'地域')
-    attitudes_count = models.IntegerField(blank=True, verbose_name=u'点赞数' ,default=0)
-    comments_count = models.IntegerField(blank=True, verbose_name=u'评论量' ,default=0)
-    reposts_count = models.IntegerField(blank=True, verbose_name=u'转发量' ,default=0)
+    attitudes_count = models.IntegerField(blank=True, verbose_name=u'点赞数', default=0)
+    comments_count = models.IntegerField(blank=True, verbose_name=u'评论量', default=0)
+    reposts_count = models.IntegerField(blank=True, verbose_name=u'转发量', default=0)
     uuid = models.CharField(max_length=36)
 
     class Meta:
@@ -111,7 +111,7 @@ class ArticlePublisher(models.Model):
 
 class Article(models.Model):
     author = models.CharField(max_length=255, verbose_name=u'作者')
-    title = models.CharField(max_length=255,blank=True, verbose_name=u'标题')
+    title = models.CharField(max_length=255, blank=True, verbose_name=u'标题')
     url = models.URLField(verbose_name=u'网站链接')
     content = models.TextField(blank=True, verbose_name=u'正文')
     source = models.CharField(max_length=255, blank=True, verbose_name=u'信息来源')
@@ -132,7 +132,7 @@ class Article(models.Model):
 
 class News(models.Model):
     author = models.CharField(max_length=255, verbose_name=u'作者')
-    title = models.CharField(max_length=255,blank=True, verbose_name=u'标题')
+    title = models.CharField(max_length=255, blank=True, verbose_name=u'标题')
     url = models.URLField(verbose_name=u'网站链接')
     content = models.TextField(blank=True, verbose_name=u'正文')
     source = models.CharField(max_length=255, blank=True, verbose_name=u'信息来源')
@@ -146,6 +146,7 @@ class News(models.Model):
 
     def __unicode__(self):
         return self.title
+
 
 class Topic(models.Model):
     title = models.CharField(max_length=255, blank=True, verbose_name=u'标题')
@@ -248,11 +249,12 @@ class Category(models.Model):
         verbose_name_plural = u'文章分类'
 
 
-def make_random_string(length=10,
-                         allowed_chars='abcdefghjkmnpqrstuvwxyz'
-                                       'ABCDEFGHJKLMNPQRSTUVWXYZ'
-                                       '23456789'):
-   return get_random_string(length, allowed_chars)
+def make_random_string(
+        length=10,
+        allowed_chars='abcdefghjkmnpqrstuvwxyz'
+        'ABCDEFGHJKLMNPQRSTUVWXYZ'
+        '23456789'):
+    return get_random_string(length, allowed_chars)
 
 
 def hash_password(raw_password, salt):
@@ -304,7 +306,7 @@ class User(models.Model):
 
 class Custom(models.Model):
     searchkeyword = models.CharField(max_length=255, verbose_name=u'关键词')
-    #group = models.ManyToManyField(Group, related_name='custom', related_query_name='customs', null=True, blank=True, verbose_name=u'所属组')
+    # group = models.ManyToManyField(Group, related_name='custom', related_query_name='customs', null=True, blank=True, verbose_name=u'所属组')
     articles = models.ManyToManyField(Article, related_name='customs', related_query_name='custom', null=True, blank=True, verbose_name=u'文章')
     weibo = models.ManyToManyField(Weibo, related_name='customs', related_query_name='custom', null=True, blank=True, verbose_name=u'微博')
     weixin = models.ManyToManyField(Weixin, related_name='customs', related_query_name='custom', null=True, blank=True, verbose_name=u'微信')
@@ -320,7 +322,7 @@ class Custom(models.Model):
 class CustomKeyword(models.Model):
     newkeyword = models.CharField(max_length=255, verbose_name=u'关键词')
     review = models.CharField(max_length=255, default=u'', verbose_name=u'审核')
-    #synced = models.CharField(max_length=255, default=u'', verbose_name=u'同步')
+    # synced = models.CharField(max_length=255, default=u'', verbose_name=u'同步')
     group = models.ForeignKey(Group)
     custom = models.ForeignKey(Custom, null=True, blank=True, default=u'')
 
@@ -348,7 +350,7 @@ class Product(models.Model):
 class ProductKeyword(models.Model):
     newkeyword = models.CharField(max_length=255, verbose_name=u'关键词')
     review = models.CharField(max_length=255, default=u'', verbose_name=u'审核')
-    #synced = models.CharField(max_length=255, default=u'', verbose_name=u'同步')
+    # synced = models.CharField(max_length=255, default=u'', verbose_name=u'同步')
     group = models.ForeignKey(Group)
     product = models.ForeignKey(Product, null=True, blank=True, default=u'')
 
@@ -362,8 +364,14 @@ class ProductKeyword(models.Model):
 
 class Collection(models.Model):
     user = models.OneToOneField(User, primary_key=True, verbose_name=u'用户')
-    articles = models.ManyToManyField(Article, null=True, blank=True, related_name='collections', related_query_name='collection', through='ArticleCollection', verbose_name=u'文章')
-    events = models.ManyToManyField(Topic, null=True,blank=True, related_name='collections', related_query_name='collection', through='TopicCollection', verbose_name=u'质量事件')
+    articles = models.ManyToManyField(
+        Article, null=True, blank=True, related_name='collections',
+        related_query_name='collection', through='ArticleCollection',
+        verbose_name=u'文章')
+    events = models.ManyToManyField(
+        Topic, null=True, blank=True, related_name='collections',
+        related_query_name='collection', through='TopicCollection',
+        verbose_name=u'质量事件')
 
     class Meta:
         db_table = 'collection'
@@ -384,6 +392,7 @@ class ArticleCollection(models.Model):
         db_table = 'article_collection'
         verbose_name_plural = u'文章收藏'
         unique_together = (("article", "collection"),)
+
     def __unicode__(self):
         return self.category
 
@@ -408,7 +417,7 @@ class AnonymousUser(User):
 class Inspection(models.Model):
     url = models.URLField(max_length=255, verbose_name=u'网站链接')
     name = models.CharField(max_length=255, verbose_name=u'标题')
-    manufacturer = models.CharField(max_length=255, null=True, blank=True,verbose_name=u'转载次数')
+    manufacturer = models.CharField(max_length=255, null=True, blank=True, verbose_name=u'转载次数')
     qualitied = models.FloatField(verbose_name=u'关注度', null=True, blank=True)
     pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
     product = models.CharField(max_length=255, verbose_name=u'名称')
@@ -447,9 +456,9 @@ class ZJInspection(models.Model):
         db_table = 'inspection'
         verbose_name_plural = u'抽检'
 
-
     def __unicode__(self):
         return self.name
+
 
 class GroupAuthUser(models.Model):
     auth = models.CharField(max_length=255, verbose_name=u'用户名')
@@ -460,7 +469,7 @@ class GroupAuthUser(models.Model):
         verbose_name_plural = u'用户绑定'
 
     def __unicode__(self):
-        return  self.auth
+        return self.auth
 
 
 class LocaltionScore(models.Model):

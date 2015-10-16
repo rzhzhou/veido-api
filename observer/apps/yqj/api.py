@@ -4,15 +4,16 @@ import os
 import pytz
 from datetime import datetime, timedelta
 
-from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
-from rest_framework.decorators import api_view
-from django.utils import timezone
 from django.db import models, connection, IntegrityError
 from django.db.models import Count
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
+from django.utils import timezone
+from rest_framework.decorators import api_view
 
 from observer.apps.base import authenticate, login_required, set_logo
 from observer.apps.base.models import save_user, hash_password, User, Area
 from django.conf import settings
+
 
 def login_view(request):
     try:
@@ -30,6 +31,7 @@ def login_view(request):
     else:
         return JsonResponse({'status': False})
 
+
 @api_view(['POST'])
 def registe_view(request):
     try:
@@ -43,10 +45,11 @@ def registe_view(request):
     try:
         area = Area.objects.get(name=u'武汉')
         save_user(username, password, area)
-    except :
+    except:
         return JsonResponse({'status': False})
 
-    return JsonResponse ({'status': True})
+    return JsonResponse({'status': True})
+
 
 @login_required
 def upload_image(request):
@@ -59,10 +62,10 @@ def upload_image(request):
     media_path = settings.MEDIA_ROOT
     filename = str(user.id) + os.path.splitext(f.name)[1]
     file_list = os.listdir(media_path)
-    name_list =  map(lambda x: x.split('.')[0], file_list)
+    name_list = map(lambda x: x.split('.')[0], file_list)
 
     count = 0
-    for i in name_list :
+    for i in name_list:
         if i == str(user.id):
             os.remove(media_path + '/' + file_list[count])
         count += 1
@@ -78,6 +81,7 @@ def upload_image(request):
 
     return HttpResponseRedirect('/settings/')
 
+
 @login_required
 def change_passwd(request):
     user = request.myuser
@@ -91,13 +95,14 @@ def change_passwd(request):
         return JsonResponse({'status': False})
 
     coded = hash_password(old_passwd, user.salt)
-    #authencate success
+    # authencate success
     if user.password == coded:
         user.password = hash_password(new_passwd, user.salt)
         user.save(using='master')
         return JsonResponse({'status': True})
     else:
         return JsonResponse({'status': False})
+
 
 @login_required
 def reset_passwd(request):
@@ -118,6 +123,7 @@ def reset_passwd(request):
             user.save(using='master')
     return JsonResponse({'status': True})
 
+
 @login_required
 def delete_user_view(request):
     try:
@@ -135,6 +141,7 @@ def delete_user_view(request):
             delete_user = User.objects.get(id=user_id)
             delete_user.delete(using='master')
     return JsonResponse({'status': True})
+
 
 @login_required
 def add_user_view(request):
@@ -154,6 +161,7 @@ def add_user_view(request):
         save_user(username, password, myuser.area, myuser.group)
         return JsonResponse({'status': True})
 
+
 def get_count_feeling(start_d, end_d, feeling_type):
     feeling_limit = ''
     if feeling_type == 'positive':
@@ -167,7 +175,7 @@ def get_count_feeling(start_d, end_d, feeling_type):
         c.execute(sql_str)
         rows = c.fetchall()
 
-        d =  dict(rows)
+        d = dict(rows)
         a = [i[0] for i in rows]
         result = []
         day = start_d
@@ -176,6 +184,7 @@ def get_count_feeling(start_d, end_d, feeling_type):
             result.append(num)
             day = day + timedelta(days=1)
         return result
+
 
 @login_required
 def chart_line_index_view(request):
@@ -192,6 +201,7 @@ def chart_line_index_view(request):
 
     return JsonResponse(data)
 
+
 @login_required
 def chart_pie_index_view(request):
     area = request.myuser.area
@@ -200,11 +210,12 @@ def chart_pie_index_view(request):
     values = []
     for item in locations:
         values.append({'name': item.name, 'value': item.article_set.all().count()})
-        #values.append({'name': item.name, 'value': 80})
+        # values.append({'name': item.name, 'value': 80})
     values = [item for item in values if item['value']]
     return JsonResponse({'name': name, "value": values})
+
 
 def map_view(request):
     data = cPickle.load(file(os.path.join(settings.BASE_DIR, "yqj/jobs/minutely/map.json"), "r"))
     risk_data = data["regionData"]
-    return JsonResponse({"regionData": risk_data })
+    return JsonResponse({"regionData": risk_data})

@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
-from import_export.widgets import DateWidget
-from datetime import datetime
-from import_export import resources, fields
-from django.conf import settings
 import pytz, xlrd
+from datetime import datetime
+
+from django.conf import settings
+
+from import_export.widgets import DateWidget
+from import_export import resources, fields
 
 
 class InspectionResources(resources.ModelResource):
@@ -17,7 +19,7 @@ class InspectionResources(resources.ModelResource):
     city = fields.Field(attribute='city', column_name=u'市')
 
     class Meta:
-    	from admin import ZJInspection
+        from admin import ZJInspection
         model = ZJInspection
         fields = ('id', 'name', 'url', 'source', 'product', 'pubtime', 'province', 'city', 'qualitied')
         export_order = ('id', 'name', 'url', 'source', 'pubtime', 'province', 'city', 'qualitied', 'product')

@@ -5,6 +5,7 @@ from observer.apps.base import sidebarUtil
 from observer.apps.base.views import BaseTemplateView
 from observer.apps.base.models import Article, CustomKeyword
 
+
 class CustomView(BaseTemplateView):
     custom_list_num = 5
 
