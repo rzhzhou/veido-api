@@ -28,7 +28,7 @@ urlpatterns = patterns(
 )
 
 urlpatterns += patterns(
-    'event.api',
+    'observer.apps.event.api',
     url(r'^event/$', EventView.as_view()),
     url(r'^event/(?P<id>\d+)/news/$', EventNewsView.as_view()),
     url(r'^event/(?P<id>\d+)/weixin/$', EventWeixinView.as_view()),
@@ -38,7 +38,7 @@ urlpatterns += patterns(
 )
 
 urlpatterns += patterns(
-    'risk.api',
+    'observer.apps.risk.api',
     url(r'^risk/$', RisksView.as_view()),
     url(r'^risk/(?P<id>\d+)/news/$', RisksNewsView.as_view()),
     url(r'^risk/(?P<id>\d+)/weixin/$', RisksWeixinView.as_view()),

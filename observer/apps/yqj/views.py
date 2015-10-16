@@ -95,7 +95,7 @@ def index_view(request):
         return HttpResponse(status=401)
 
 
-def person_view(request, person_id):
+def person_view(request):
     return HttpResponse('person')
 
 

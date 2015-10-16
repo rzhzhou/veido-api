@@ -21,6 +21,7 @@ from observer.apps.analytics.views import AnalyticsChildView
 urlpatterns = patterns(
     'observer.apps.yqj.views',
     url(r'^$', 'index_view'),
+    url(r'^person/$', 'person_view'),
     url(r'^collection/$', CollectionView.as_view()),
     url(r'^settings/$', SettingsView.as_view()),
     url(r'^user/$', UserAdminView.as_view()),
