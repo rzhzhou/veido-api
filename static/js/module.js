@@ -670,7 +670,7 @@ App.module.statistic = function($el, api) {
     });
 };
 
-App.module.analytics = function (module,path) {
+App.module.analytics = function (module) {
   var api = '/api/analytics/0',
       $dateRange = $('.date-range-picker'),
       $chart = $('#chart'),
@@ -1051,4 +1051,4 @@ App.module.analytics = function (module,path) {
         $chart.trigger('show.chart', [start, end]);
         $statistic.trigger('show.statistic', [start, end]);
     });
-}
+};
