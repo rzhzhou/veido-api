@@ -101,7 +101,8 @@ App.page.dashboard = function (module, path) {
   module.pie(path);
 };
 
-App.page.news = function (module) {
+App.page.news = function (module,path) {
+  module.analytics(module,path);
   module.list({
     feature: 'news',
     container: '#news > tbody'
@@ -112,7 +113,8 @@ App.page.newsDetail = function (module, path, type, id) {
   module.collect(type, id);
 };
 
-App.page.event = function (module) {
+App.page.event = function (module,path) {
+  module.analytics(module,path);
   module.list({
     feature: 'event',
     container: '#event > tbody'
@@ -188,6 +190,7 @@ App.page.weibo = function (module) {
 };
 
 App.page.categoryDetail = function (module, path) {
+  module.analytics(module,path);
   module.detail({
     path: path,
     feature: 'news',
@@ -215,8 +218,11 @@ App.page.locationDetail = function (module, path) {
   });
 };
 
-App.page.inspection = function () {
-  // pending
+App.page.inspection = function (module) {
+  module.list({
+    feature: 'inspection',
+    container: '#inspection > tbody'
+  });
 };
 
 App.page.custom = function () {

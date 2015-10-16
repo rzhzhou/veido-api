@@ -4,11 +4,6 @@
 
 {% block header %}
   <h1>{{ industry.name }}</h1>
-  <button class="date-range-picker btn btn-default">
-    <i class="fa fa-calendar"></i>
-    <span></span>
-    <b class="caret"></b>
-  </button>
 {% endblock %}
 
 {% block content %}
@@ -29,6 +24,13 @@
           <li>
             <a href="#chart-weibo" data-toggle="tab">微博地域分析</a>
           </li>
+          <li class="data-range">
+            <button class="date-range-picker btn btn-default">
+              <i class="fa fa-calendar"></i>
+              <span></span>
+              <b class="caret"></b>
+            </button>
+          </li>
         </ul>
         <div class="tab-content">
           <div class="tab-pane active" id="chart-trend" style="height: 400px"></div>
@@ -45,25 +47,24 @@
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="col-md-12">
-      <div id="statistic" class="box box-solid">
-        <div class="box-body">
-          <div class="row">
-            <div class="col-md-6">
-              <div class="statistic-total text-center">
-                <span></span>
-                <p>监测数据</p>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="statistic-risk text-center">
-                <span></span>
-                <p>风险数据</p>
+        <div class="row">
+          <div class="col-md-12">
+            <div id="statistic" class="box box-solid">
+              <div class="box-body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="statistic-total text-center">
+                      <span></span>
+                      <p>监测数据</p>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="statistic-risk text-center">
+                      <span></span>
+                      <p>风险数据</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

@@ -56,6 +56,23 @@ class BaseView(View):
             result.append(item)
         return result
 
+    def inspection_to_json(self, items):
+        result = []
+        for data in items:
+            item = {}
+            item['url'] = data.url
+            item['event'] = data.name
+            item['source'] = data.source
+            item['category'] = data.product
+            item['quality'] = str(int(data.qualitied * 100)) + "%"
+            pubtime = data.pubtime
+            if pubtime.tzinfo == pytz.utc:
+                item['time'] = pubtime.astimezone(pytz.timezone(settings.TIME_ZONE)).strftime('%Y-%m-%d')
+            else:
+                item['time'] = data.pubtime.strftime('%Y-%m-%d')
+            result.append(item)
+        return result
+
     def event_to_json(self, items):
         result = []
         for data in items:
