@@ -21,7 +21,11 @@ class ProductView(BaseTemplateView):
             group = Group.objects.filter(company=u'广东省质监局')
             prokeywords = group[0].productkeyword_set.all()
         except:
-            return self.render_to_response('product/product.html', {'product_list': [{'id': '', 'name': ''}],'product': {'name': u'全部'}})
+            return self.render_to_response('product/product.html', {
+                'product_list': [{'id': '', 'name': ''}],
+                'product': {'name': u'全部'}})
         prokey_len = len(prokeywords)
         prokeyword_list = [{'id': '0', 'name': u'全部'}] + [{'id': prokeywords[i].id, 'name': prokeywords[i].newkeyword} for i in xrange(0, prokey_len)]
-        return self.render_to_response('product/product.html', {'product_list': prokeyword_list, 'product': {'name': name}})
+        return self.render_to_response('product/product.html', {
+            'product_list': prokeyword_list,
+            'product': {'name': name}})

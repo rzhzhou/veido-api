@@ -223,7 +223,6 @@ App.page.inspection = function (module) {
     feature: 'inspection',
     container: '#inspection > tbody'
   });
-};
 
 App.page.custom = function () {
   var form     = document.forms.addKeyword,

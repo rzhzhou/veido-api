@@ -134,6 +134,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'observer.apps.base',
     'observer.apps.yqj',
+    'observer.apps.event',
     'observer.apps.analytics',
     'observer.apps.collection',
     'rest_framework',

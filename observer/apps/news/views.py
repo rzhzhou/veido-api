@@ -38,14 +38,12 @@ class NewsDetailView(BaseTemplateView):
             collection.save(using='master')
         items = user.collection.articles.all()
         iscollected = any(filter(lambda x: x.id == news.id, items))
-        return self.render_to_response('news/detail.html',
-            {
+        return self.render_to_response('news/detail.html', {
             'article': set_logo(news),
             'relate': relateddata,
             'event': event,
             'isCollected': iscollected,
-            'name': sidebar_name
-            })
+            'name': sidebar_name})
 
 
 class CategoryView(BaseTemplateView):

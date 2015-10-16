@@ -14,12 +14,12 @@ class WeixinView(BaseTemplateView):
         latest = self.paging(weixin, 20, 1)
         items = [set_logo(data) for data in latest['items']]
         html = self.set_css_to_weixin(items)
-        return self.render_to_response('weixin/list.html', {'weixin_latest_list': latest,
-                                                                   'weixin_hottest_list': hottest,
-                                                                   'html': html,
-                                                                   'total_page_number': latest['total_number'],
-                                                                   'name': sidebar_name
-                                                                   })
+        return self.render_to_response('weixin/list.html', {
+            'weixin_latest_list': latest,
+            'weixin_hottest_list': hottest,
+            'html': html,
+            'total_page_number': latest['total_number'],
+            'name': sidebar_name})
 
 
 class WeixinDetailView(BaseTemplateView):
@@ -35,8 +35,7 @@ class WeixinDetailView(BaseTemplateView):
             relateddata = list(r.weixin.all()) + list(r.weibo.all()) + list(r.articles.all())
         except IndexError:
             relateddata = []
-        return self.render_to_response('weixin/detail.html', {'article': set_logo(weixin),
-                                                                'relate': relateddata,
-                                                                'name': sidebar_name
-                                                                })
-
+        return self.render_to_response('weixin/detail.html', {
+            'article': set_logo(weixin),
+            'relate': relateddata,
+            'name': sidebar_name})

@@ -1,10 +1,11 @@
-#coding:utf-8
+# coding:utf-8
 # chjsun
 import jieba
 import math
 from datetime import timedelta
 import datetime
 import time
+
 from observer.apps.base.models import Article
 
 
@@ -16,7 +17,7 @@ class sim_article():
         self.pubtime = pubtime
 
     def article_result(self):
-        result = _cal_values(self.article,self.title,self.pubtime)
+        result = _cal_values(self.article, self.title, self.pubtime)
         return result
 
 

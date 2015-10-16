@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
-
 from django.conf import settings
-
-from observer.apps.base.views import BaseAPIView
-from rest_framework.response import Response
 from django.template.loader import render_to_string
+from rest_framework.response import Response
 
-from observer.apps.base.models import Category
 from observer.apps.base.models import Area, Article, Category
+from observer.apps.base.views import BaseAPIView
+
 
 class ArticleTableView(BaseAPIView):
     def get(self, request, id):
@@ -42,16 +40,17 @@ class LocationTableView(BaseAPIView):
 
 class NewsView(BaseAPIView):
     HOME_PAGE_LIMIT = 10
+
     def get_custom_artice(self):
         articles = Category.objects.get(name='质监热点').articles.all()
         return articles
 
     def get(self, request):
-        container = self.requestContainer(limit=self.HOME_PAGE_LIMIT,
-            limit_list=settings.NEWS_PAGE_LIMIT)
+        container = self.requestContainer(
+            limit=self.HOME_PAGE_LIMIT, limit_list=settings.NEWS_PAGE_LIMIT)
         items = self.get_custom_artice()
         datas = self.paging(items, container['limit'], container['page'])
         result = self.news_to_json(datas['items'])
-        html_string = render_to_string('news/%s_tpl.html' % container['type'],
-            {'news_list':  result})
+        html_string = render_to_string('news/%s_tpl.html' % container['type'], {
+            'news_list': result})
         return Response({'total': datas['total_number'], 'html': html_string})

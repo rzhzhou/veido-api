@@ -12,13 +12,15 @@ class RedisClient(object):
         self.conf = settings.REDIS_CONN_STR
 
     def connect(self):
-        pool = redis.ConnectionPool(host=self.conf['host'],
+        pool = redis.ConnectionPool(
+            host=self.conf['host'],
             port=self.conf['port'], db=self.conf['db'])
         return redis.Redis(connection_pool=pool)
 
 
 def get_instance():
     return RedisClient().connect()
+
 
 class RedisQueryApi(object):
     """Redis Query Api"""
