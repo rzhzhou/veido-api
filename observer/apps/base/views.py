@@ -226,7 +226,7 @@ class BaseAPIView(BaseView, APIView):
 
         return {'items': items, 'total_number': paginator.num_pages}
 
-    def requestContainer(self, limit=6, limit_list=20, sort='', page=1):
+    def requesthead(self, limit=6, limit_list=20, sort='', page=1):
         parameter = self.request.GET.dict()
         api_type = parameter.pop('type')  if parameter.has_key('type') else ''
         sort = parameter.pop('sort') if parameter.has_key('sort') else sort
