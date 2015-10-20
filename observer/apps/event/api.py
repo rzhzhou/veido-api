@@ -23,7 +23,7 @@ class EventView(BaseAPIView):
         return user.collection.events.all()
 
     def get(self, request):
-        container = self.requestContainer(
+        container = self.requesthead(
             limit=self.HOME_PAGE_LIMIT, limit_list=settings.EVENT_PAGE_LIMIT)
         items = Topic.objects.all()
         datas = self.paging(items, container['limit'], container['page'])
@@ -49,7 +49,7 @@ class EventTableView(BaseAPIView):
 class EventNewsView(BaseAPIView):
 
     def get(self, request, id):
-        container = self.requestContainer()
+        container = self.requesthead()
         try:
             event = Topic.objects.get(id=int(id))
         except Topic.DoesNotExist:
@@ -63,7 +63,7 @@ class EventNewsView(BaseAPIView):
 
 class EventWeixinView(BaseAPIView):
     def get(self, request, id):
-        container = self.requestContainer()
+        container = self.requesthead()
         try:
             event = Topic.objects.get(id=int(id))
         except Topic.DoesNotExist:
@@ -78,7 +78,7 @@ class EventWeixinView(BaseAPIView):
 class EventWeiboView(BaseAPIView):
 
     def get(self, request, id):
-        container = self.requestContainer()
+        container = self.requesthead()
         try:
             event = Topic.objects.get(id=int(id))
         except Topic.DoesNotExist:

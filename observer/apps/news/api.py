@@ -9,7 +9,7 @@ from observer.apps.base.views import BaseAPIView
 
 class ArticleTableView(BaseAPIView):
     def get(self, request, id):
-        container = self.requestContainer()
+        container = self.requesthead()
         try:
             category = Category.objects.get(id=id)
         except Category.DoesNotExist:
@@ -24,7 +24,7 @@ class ArticleTableView(BaseAPIView):
 
 class LocationTableView(BaseAPIView):
     def get(self, request, id):
-        container = self.requestContainer()
+        container = self.requesthead()
         try:
             id = int(id)
             area = Area.objects.get(id=id)
@@ -46,7 +46,7 @@ class NewsView(BaseAPIView):
         return articles
 
     def get(self, request):
-        container = self.requestContainer(
+        container = self.requesthead(
             limit=self.HOME_PAGE_LIMIT, limit_list=settings.NEWS_PAGE_LIMIT)
         items = self.get_custom_artice()
         datas = self.paging(items, container['limit'], container['page'])

@@ -13,7 +13,7 @@ from observer.apps.base.models import Inspection
 
 class InspectionTableView(BaseAPIView):
     def get(self, request):
-        container = self.requestContainer(limit_list=settings.EVENT_PAGE_LIMIT)
+        container = self.requesthead(limit_list=settings.EVENT_PAGE_LIMIT)
         items = Inspection.objects.exclude(qualitied__lt=0).order_by('-pubtime')
         datas = self.paging(items, container['limit'], container['page'])
         result = self.inspection_to_json(datas['items'])
