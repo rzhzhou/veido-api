@@ -14,7 +14,9 @@ import os
 import re
 from ConfigParser import SafeConfigParser
 
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+PROJECT_ROOT = os.path.abspath(os.path.dirname(BASE_DIR))
 
 def _load_config():
     global DEBUG, TEMPLATE_DEBUG, ALLOWED_HOSTS
@@ -193,12 +195,12 @@ DATABASE_ROUTERS = ['observer.apps.corpus.router.MyDB2Router',]
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, "../static/build/"),
+    os.path.join(PROJECT_ROOT, "static/build/"),
 )
 
 
 TEMPLATE_DIRS = (
-    os.path.join(BASE_DIR, "../templates"),
+    os.path.join(PROJECT_ROOT, "templates"),
 )
 
 
