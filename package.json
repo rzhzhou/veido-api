@@ -14,8 +14,7 @@
     "font-awesome": "^4.4.0",
     "jquery": "^2.1.4",
     "moment": "^2.9.0",
-    "twbs-pagination": "esimakin/twbs-pagination",
-    "username": "^1.0.1"
+    "twbs-pagination": "esimakin/twbs-pagination"
   },
   "devDependencies": {
     "browser-sync": "^2.7.9",
@@ -32,7 +31,8 @@
     "gulp-uglify": "^1.1.0",
     "jshint-stylish": "^2.0.1",
     "lazypipe": "^1.0.1",
-    "minimist": "^1.2.0"
+    "minimist": "^1.2.0",
+    "username": "^1.0.1"
   },
   "dist": {
     "css": "static/build/css/",

@@ -12,7 +12,7 @@ from observer.apps.base.models import CustomKeyword
 
 class CustomNewsView(BaseAPIView):
     def get(self, request, custom_id):
-        container = self.requestContainer()
+        container = self.requesthead()
         try:
             keyword = CustomKeyword.objects.get(id=int(custom_id), group=user.group)
         except CustomKeyword.DoesNotExist:
@@ -27,7 +27,7 @@ class CustomNewsView(BaseAPIView):
 
 class CustomWeixinView(BaseAPIView):
     def get(self, request, custom_id):
-        container = self.requestContainer()
+        container = self.requesthead()
         try:
             keyword = CustomKeyword.objects.get(id=int(custom_id), group=user.group)
         except CustomKeyword.DoesNotExist:
@@ -41,7 +41,7 @@ class CustomWeixinView(BaseAPIView):
 
 class CustomWeiboView(BaseAPIView):
     def get(self, request, custom_id):
-        container = self.requestContainer()
+        container = self.requesthead()
         try:
             keyword = CustomKeyword.objects.get(id=int(custom_id), group=user.group)
         except CustomKeyword.DoesNotExist:

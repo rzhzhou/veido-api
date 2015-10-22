@@ -12,7 +12,7 @@ class WeixinView(BaseAPIView):
     HOME_PAGE_LIMIT = 6
 
     def get(self, request):
-        container = self.requestContainer(
+        container = self.requesthead(
             sort='hot',
             limit_list=settings.WEIXIN_TABLE_LIMIT,
             limit=self.HOME_PAGE_LIMIT)
@@ -28,7 +28,7 @@ class WeixinView(BaseAPIView):
 
 class LocationWeixinView(BaseAPIView):
     def get(self, request, id):
-        container = self.requestContainer()
+        container = self.requesthead()
         try:
             id = int(id)
             area = Area.objects.get(id=id)
