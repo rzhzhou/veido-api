@@ -28,10 +28,10 @@ def _load_config():
     global CONF
 
     CONF = SafeConfigParser()
-    CONF.read(os.path.join(BASE_DIR, "settings/sidebar.cfg"))
+    CONF.read(os.path.join(BASE_DIR, "settings/cfg/sidebar.cfg"))
 
     cp = SafeConfigParser()
-    cp.read(os.path.join(BASE_DIR, "settings/config.cfg"))
+    cp.read(os.path.join(BASE_DIR, "settings/cfg/config.cfg"))
 
     SECTION = cp.get('deploy', 'environment')
 
