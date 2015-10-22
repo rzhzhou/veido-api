@@ -5,7 +5,7 @@ from rest_framework.response import Response
 
 from observer.apps.base.models import Area, Article, Category
 from observer.apps.base.views import BaseAPIView
-
+from observer.apps.yqj.redisconnect import RedisQueryApi
 
 class ArticleTableView(BaseAPIView):
     def get(self, request, id):
@@ -48,9 +48,18 @@ class NewsView(BaseAPIView):
     def get(self, request):
         container = self.requestContainer(
             limit=self.HOME_PAGE_LIMIT, limit_list=settings.NEWS_PAGE_LIMIT)
-        items = self.get_custom_artice()
-        datas = self.paging(items, container['limit'], container['page'])
-        result = self.news_to_json(datas['items'])
-        html_string = render_to_string('news/%s_tpl.html' % container['type'], {
-            'news_list': result})
-        return Response({'total': datas['total_number'], 'html': html_string})
+        try:
+            catch = container['catch']
+            data = None
+            if catch and container['type'] == 'abstract':
+                data = RedisQueryApi().hget('news', 'abstract')
+                if data:
+                    return Response(eval(data))
+            items = self.get_custom_artice()
+            datas = self.paging(items, container['limit'], container['page'])
+            result = self.news_to_json(datas['items'])
+            html_string = render_to_string('news/%s_tpl.html' % container['type'], {
+                'news_list': result})
+            return Response({'total': datas['total_number'], 'html': html_string})
+        except:
+            return Response({})

@@ -6,7 +6,7 @@ from django.db import models
 from django.http import HttpResponse, HttpResponseRedirect
 
 from observer.apps.base.models import User, AnonymousUser, hash_password
-
+from observer.apps.yqj.redisconnect import RedisQueryApi
 
 def authenticate(username, raw_password):
     try:
@@ -72,3 +72,24 @@ def sidebarUtil(request):
         "business": eval(conf.get(username, "business"))
     }
     return sidebar_name
+
+def read_redis(name):
+    data = None
+    data = RedisQueryApi().hget(name, 'abstract')
+    if data:
+        return data
+
+def read(name, types):
+    def decorator(view_func):
+        def wrapper(request, *args, **kwargs):
+            if types == 'abstract':
+                data = None
+                data = RedisQueryApi().hget(name, types)
+                if data:
+                    return Response(eval(data))
+            return view_func(request, *args, **kwargs)
+        return wrapper
+    return decorator
+
+
+

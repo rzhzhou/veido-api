@@ -8,7 +8,7 @@ from observer.apps.base import authenticate, login_required, set_logo
 from observer.apps.base.api_function import chart_line
 from observer.apps.base.models import Group, LocaltionScore, Risk, RiskScore
 from observer.apps.base.views import BaseAPIView
-
+from observer.apps.yqj.redisconnect import RedisQueryApi
 
 class RisksView(BaseAPIView):
     HOME_PAGE_LIMIT = 10
@@ -47,10 +47,19 @@ class RisksView(BaseAPIView):
         container = self.requestContainer(
             page=1, limit=self.HOME_PAGE_LIMIT, limit_list=settings.RISK_PAGE_LIMIT)
         items = self.get_score_article(request)
-        datas = self.paging(items, container['limit'], container['page'])
-        html_string = render_to_string('risk/%s_tpl.html' % container['type'], {
-            'risk_list': datas['items']})
-        return Response({'total': datas['total_number'], 'html': html_string})
+        try:
+            catch = container['catch']
+            data = None
+            if catch and container['type'] == 'abstract':
+                data = RedisQueryApi().hget('risk', 'abstract')
+                if data:
+                    return Response(eval(data))
+            datas = self.paging(items, container['limit'], container['page'])
+            html_string = render_to_string('risk/%s_tpl.html' % container['type'], {
+                'risk_list': datas['items']})
+            return Response({'total': datas['total_number'], 'html': html_string})
+        except:
+            return Response({})
 
 
 class RisksNewsView(BaseAPIView):

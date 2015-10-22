@@ -4,20 +4,21 @@ import requests
 import ConfigParser
 from datetime import datetime, timedelta, date
 
+from django.conf import settings
 from django_extensions.management.jobs import BaseJob
 
 from observer.apps.yqj.redisconnect import RedisQueryApi
-
 reload(sys)
 sys.setdefaultencoding( "utf-8" )
 
 class Job(BaseJob):
 
     def Cache(self, datas):
-        BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-        conf = ConfigParser.ConfigParser()
-        conf.read(os.path.join(BASE_DIR, "../../../analyticsCache.cfg"))
-        url_cfg = conf.get("master", "url")
+        # BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+        # conf = ConfigParser.ConfigParser()
+        # conf.read(os.path.join(BASE_DIR, "../../../analyticsCache.cfg"))
+        # url_cfg = conf.get("master", "url")
+        url_cfg = settings.CACHE
 
         if datas["hset_key"] == "date_range":
             RedisQueryApi().hset(datas["hset_name"], datas["hset_key"], {"start": datas["start"], "end": datas["end"]})

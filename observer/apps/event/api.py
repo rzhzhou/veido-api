@@ -1,19 +1,15 @@
 # -*- coding: utf-8 -*-
-import sys
-root_mod = '/home/feng/Project/observer/app'
-sys.path.append(root_mod)
-print sys.path
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.template.loader import render_to_string
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from observer.apps.base import authenticate, login_required, set_logo
+from observer.apps.base import authenticate, login_required, set_logo, read_redis
 from observer.apps.base.views import BaseAPIView
 from observer.apps.base.models import Topic
 from observer.apps.base.api_function import chart_line
-
+from observer.apps.yqj.redisconnect import RedisQueryApi
 
 class EventView(BaseAPIView):
     HOME_PAGE_LIMIT = 10
@@ -25,12 +21,21 @@ class EventView(BaseAPIView):
     def get(self, request):
         container = self.requestContainer(
             limit=self.HOME_PAGE_LIMIT, limit_list=settings.EVENT_PAGE_LIMIT)
-        items = Topic.objects.all()
-        datas = self.paging(items, container['limit'], container['page'])
-        result = self.event_to_json(datas['items'])
-        html_string = render_to_string('event/%s_tpl.html' % container['type'], {
-            'event_list': result})
-        return Response({'total': datas['total_number'], 'html': html_string})
+        catch = container['catch']
+        try:
+            data = None
+            if catch and container['type'] == 'abstract':
+                data = RedisQueryApi().hget('event', 'abstract')
+                if data:
+                    return Response(eval(data))
+            items = Topic.objects.all()
+            datas = self.paging(items, container['limit'], container['page'])
+            result = self.event_to_json(datas['items'])
+            html_string = render_to_string('event/%s_tpl.html' % container['type'], {
+                'event_list': result})
+            return Response({'total': datas['total_number'], 'html': html_string})
+        except:
+            return Response({})
 
 
 class EventTableView(BaseAPIView):
