@@ -14,7 +14,7 @@ from observer.apps.product.api import ProductTableView
 from observer.apps.search.api import SearchView
 from observer.apps.weixin.api import WeixinView, LocationWeixinView
 from observer.apps.weibo.api import WeiboView, LocationWeiboView
-from observer.apps.analytics.views import DispatchView
+from observer.apps.analytics.api import DispatchView
 from observer.apps.yqj.api import login_view, registe_view, upload_image, change_passwd,\
     reset_passwd, delete_user_view, add_user_view, chart_line_index_view,\
     chart_pie_index_view, map_view
@@ -84,7 +84,7 @@ urlpatterns += patterns(
 )
 
 urlpatterns += patterns(
-    'analytics.views',
+    'analytics.api',
     url(r'^analytics/(?P<id>\d+)/$', DispatchView.as_view()),
 )
 

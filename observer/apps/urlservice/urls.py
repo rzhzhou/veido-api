@@ -16,7 +16,7 @@ from observer.apps.custom.views import CustomView, CustomDetailView
 from observer.apps.product.views import ProductView
 from observer.apps.inspection.views import InspectionView
 from observer.apps.search.views import SearchView
-from observer.apps.analytics.views import AnalyticsChildView
+from observer.apps.analytics.api import AnalyticsChildView
 
 urlpatterns = patterns(
     'observer.apps.yqj.views',
@@ -81,6 +81,6 @@ urlpatterns += patterns(
 )
 
 urlpatterns += patterns(
-    'analytics.views',
+    'analytics.api',
     url(r'^analytics/(?P<id>\d+)/$', AnalyticsChildView.as_view()),
 )
