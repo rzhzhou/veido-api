@@ -19,9 +19,7 @@ class WeiboView(BaseAPIView):
         else:
             datas = self.pagingfromredis(Weibo, container['limit'], container['page'])
         items = [set_logo(data) for data in datas['items']]
-        html_string = render_to_string('weibo/%s_tpl.html' % container['type'], {
-            'weibo_list': items})
-        return Response({'html': html_string, 'total': datas['total_number']})
+        return Response({'data': items, 'total': datas['total_number']})
 
 
 class LocationWeiboView(BaseAPIView):
@@ -35,5 +33,4 @@ class LocationWeiboView(BaseAPIView):
         items = Weibo.objects.filter(area=area)
         datas = self.paging(items, settings.LOCATION_WEIBO_LIMIT, container['page'])
         items = [set_logo(data) for data in datas['items']]
-        html_string = render_to_string('weibo/list_tpl.html', {'weibo_list': items})
-        return Response({'html': html_string, 'total': datas['total_number']})
+        return Response({'data': items, 'total': datas['total_number']})

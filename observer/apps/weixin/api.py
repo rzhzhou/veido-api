@@ -21,9 +21,7 @@ class WeixinView(BaseAPIView):
         else:  # hot
             datas = self.paging(Weixin.objects.all(), container['limit'], container['page'])
         items = [set_logo(data) for data in datas['items']]
-        html_string = render_to_string('weixin/%s_tpl.html' % container['type'], {
-            'weixin_list': items})
-        return Response({'html': html_string, 'total': datas['total_number']})
+        return Response({'data': items, 'total': datas['total_number']})
 
 
 class LocationWeixinView(BaseAPIView):
@@ -37,5 +35,4 @@ class LocationWeixinView(BaseAPIView):
         items = Weixin.objects.filter(area=area)
         datas = self.paging(items, settings.LOCATION_WEIXIN_LIMIT, container['page'])
         items = [set_logo(data) for data in datas['items']]
-        html_string = render_to_string('weixin/list_tpl.html', {'weixin_list': items})
-        return Response({'html': html_string, 'total': datas['total_number']})
+        return Response({'data': items, 'total': datas['total_number']})
