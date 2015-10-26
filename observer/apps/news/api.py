@@ -18,8 +18,7 @@ class ArticleTableView(BaseAPIView):
         items = category.articles.all()
         datas = self.paging(items, settings.NEWS_PAGE_LIMIT, container['page'])
         result = self.news_to_json(datas['items'])
-        news_html = render_to_string('news/list_tpl.html', {'news_list': result})
-        return Response({'total': datas['total_number'], 'html': news_html})
+        return Response({'total': datas['total_number'], 'data': result})
 
 
 class LocationTableView(BaseAPIView):
@@ -34,8 +33,7 @@ class LocationTableView(BaseAPIView):
         items = Article.objects.filter(area=area)
         datas = self.paging(items, settings.NEWS_PAGE_LIMIT, container['page'])
         result = self.news_to_json(datas['items'])
-        html_string = render_to_string('news/list_tpl.html', {'news_list': result})
-        return Response({'total': datas['total_number'], 'html': html_string})
+        return Response({'total': datas['total_number'], 'data': result})
 
 
 class NewsView(BaseAPIView):
@@ -51,6 +49,4 @@ class NewsView(BaseAPIView):
         items = self.get_custom_artice()
         datas = self.paging(items, container['limit'], container['page'])
         result = self.news_to_json(datas['items'])
-        html_string = render_to_string('news/%s_tpl.html' % container['type'], {
-            'news_list': result})
-        return Response({'total': datas['total_number'], 'html': html_string})
+        return Response({'total': datas['total_number'], 'data': result})
