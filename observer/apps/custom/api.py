@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.db.models import Count
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
-from django.template.loader import render_to_string
 from django.views.generic import View
 from rest_framework.response import Response
 
@@ -21,8 +20,7 @@ class CustomNewsView(BaseAPIView):
         items = keyword.custom.articles.all()
         datas = self.paging(items, settings.CUSTOM_NEWS_LIMIT, container['page'])
         result = self.news_to_json(datas['items'])
-        html_string = render_to_string('news/list_tpl.html', {'news_list': result})
-        return Response({'html': html_string, 'total': datas['total_number']})
+        return Response({'data': result, 'total': datas['total_number']})
 
 
 class CustomWeixinView(BaseAPIView):
@@ -34,9 +32,8 @@ class CustomWeixinView(BaseAPIView):
             return HttpResponseRedirect('/weixin/')
         items = keyword.custom.weixin.all()
         datas = self.paging(items, settings.CUSTOM_WEIXIN_LIMIT, container['page'])
-        items = [set_logo(data) for data in datas['items']]
-        html_string = render_to_string('weixin/list_tpl.html', {'weixin_list': items})
-        return Response({'html': html_string, 'total': datas['total_number']})
+        result = [set_logo(data) for data in datas['items']]
+        return Response({'data': result, 'total': datas['total_number']})
 
 
 class CustomWeiboView(BaseAPIView):
@@ -49,9 +46,8 @@ class CustomWeiboView(BaseAPIView):
 
         items = keyword.custom.weibo.all()
         datas = self.paging(items, settings.CUSTOM_WEIBO_LIMIT, container['page'])
-        items = [set_logo(data) for data in datas['items']]
-        html_string = render_to_string('weibo/list_tpl.html', {'weibo_list': items})
-        return Response({'html': html_string, 'total': datas['total_number']})
+        result = [set_logo(data) for data in datas['items']]
+        return Response({'data': result, 'total': datas['total_number']})
 
 
 class CustomModifyView(View):
