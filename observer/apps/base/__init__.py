@@ -4,6 +4,7 @@ from ConfigParser import ConfigParser, RawConfigParser
 from django.conf import settings
 from django.db import models
 from django.http import HttpResponse, HttpResponseRedirect
+from rest_framework.response import Response
 
 from observer.apps.base.models import User, AnonymousUser, hash_password
 from observer.apps.yqj.redisconnect import RedisQueryApi
@@ -79,12 +80,11 @@ def read_redis(name):
     if data:
         return data
 
-def read(name, types):
+def read(name):
     def decorator(view_func):
         def wrapper(request, *args, **kwargs):
-            if types == 'abstract':
-                data = None
-                data = RedisQueryApi().hget(name, types)
+            if request.GET['type'] == 'abstract':
+                data = RedisQueryApi().hget(name, 'abstract')
                 if data:
                     return Response(eval(data))
             return view_func(request, *args, **kwargs)

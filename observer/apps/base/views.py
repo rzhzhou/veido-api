@@ -226,19 +226,18 @@ class BaseAPIView(BaseView, APIView):
 
         return {'items': items, 'total_number': paginator.num_pages}
 
-    def requestContainer(self, limit=6, limit_list=20, sort='', page=1, catch=1):
-        parameter = self.request.GET
-        api_type = parameter['type'] if parameter.has_key('type') else ''
-        sort = parameter['sort'] if parameter.has_key('sort') else sort
-        page = parameter['page'] if parameter.has_key('page') else page
-        catch = int(parameter['catch']) if parameter.has_key('catch') else catch
+    def requesthead(self, limit=6, limit_list=20, sort='', page=1):
+        parameter = self.request.GET.dict()
+        api_type = parameter.pop('type')  if parameter.has_key('type') else ''
+        sort = parameter.pop('sort') if parameter.has_key('sort') else sort
+        page = parameter.pop('page') if parameter.has_key('page') else page
         limit = limit_list if api_type == 'list' else limit
+        parameter = {'name':'abc'}
 
-        container = {
+        container = dict(parameter, **{
             'type': api_type,
             'page': page,
             'sort': sort,
             'limit': limit,
-            'catch': catch
-        }
+        })
         return container

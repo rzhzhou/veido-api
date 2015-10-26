@@ -511,3 +511,5 @@ class CategoryAtricle(models.Model):
 
     class Meta:
         db_table = 'category_articles'
+
+

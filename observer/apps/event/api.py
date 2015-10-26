@@ -5,7 +5,7 @@ from django.template.loader import render_to_string
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from observer.apps.base import authenticate, login_required, set_logo, read_redis
+from observer.apps.base import authenticate, login_required, set_logo, read
 from observer.apps.base.views import BaseAPIView
 from observer.apps.base.models import Topic
 from observer.apps.base.api_function import chart_line
@@ -18,25 +18,16 @@ class EventView(BaseAPIView):
         user = self.request.myuser
         return user.collection.events.all()
 
+    # @read('event')
     def get(self, request):
-        container = self.requestContainer(
+        container = self.requesthead(
             limit=self.HOME_PAGE_LIMIT, limit_list=settings.EVENT_PAGE_LIMIT)
-        catch = container['catch']
-        try:
-            data = None
-            if catch and container['type'] == 'abstract':
-                data = RedisQueryApi().hget('event', 'abstract')
-                if data:
-                    return Response(eval(data))
-            items = Topic.objects.all()
-            datas = self.paging(items, container['limit'], container['page'])
-            result = self.event_to_json(datas['items'])
-            html_string = render_to_string('event/%s_tpl.html' % container['type'], {
-                'event_list': result})
-            return Response({'total': datas['total_number'], 'html': html_string})
-        except:
-            return Response({})
-
+        items = Topic.objects.all()
+        datas = self.paging(items, container['limit'], container['page'])
+        result = self.event_to_json(datas['items'])
+        html_string = render_to_string('event/%s_tpl.html' % container['type'], {
+            'event_list': result})
+        return Response({'total': datas['total_number'], 'html': html_string})
 
 class EventTableView(BaseAPIView):
     def collected_items(self):
@@ -54,7 +45,7 @@ class EventTableView(BaseAPIView):
 class EventNewsView(BaseAPIView):
 
     def get(self, request, id):
-        container = self.requestContainer()
+        container = self.requesthead()
         try:
             event = Topic.objects.get(id=int(id))
         except Topic.DoesNotExist:
@@ -68,7 +59,7 @@ class EventNewsView(BaseAPIView):
 
 class EventWeixinView(BaseAPIView):
     def get(self, request, id):
-        container = self.requestContainer()
+        container = self.requesthead()
         try:
             event = Topic.objects.get(id=int(id))
         except Topic.DoesNotExist:
@@ -83,7 +74,7 @@ class EventWeixinView(BaseAPIView):
 class EventWeiboView(BaseAPIView):
 
     def get(self, request, id):
-        container = self.requestContainer()
+        container = self.requesthead()
         try:
             event = Topic.objects.get(id=int(id))
         except Topic.DoesNotExist:

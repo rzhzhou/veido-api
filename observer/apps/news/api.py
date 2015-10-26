@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
 from django.template.loader import render_to_string
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from observer.apps.base import read
 from observer.apps.base.models import Area, Article, Category
-from observer.apps.base.views import BaseAPIView
-from observer.apps.yqj.redisconnect import RedisQueryApi
+from observer.apps.base.views import BaseAPIView, BaseView
 
 class ArticleTableView(BaseAPIView):
     def get(self, request, id):
-        container = self.requestContainer()
+        container = self.requesthead()
         try:
             category = Category.objects.get(id=id)
         except Category.DoesNotExist:
@@ -24,7 +25,7 @@ class ArticleTableView(BaseAPIView):
 
 class LocationTableView(BaseAPIView):
     def get(self, request, id):
-        container = self.requestContainer()
+        container = self.requesthead()
         try:
             id = int(id)
             area = Area.objects.get(id=id)
@@ -37,29 +38,19 @@ class LocationTableView(BaseAPIView):
         html_string = render_to_string('news/list_tpl.html', {'news_list': result})
         return Response({'total': datas['total_number'], 'html': html_string})
 
-
-class NewsView(BaseAPIView):
+@api_view(['GET'])
+@read('news')
+def news_view(request):
     HOME_PAGE_LIMIT = 10
+    container = request.GET
+    page = int(container['page']) if container.has_key('spage') else 1
+    limit = 10
+    if container['type'] == 'list':
+        limit = settings.NEWS_PAGE_LIMIT
 
-    def get_custom_artice(self):
-        articles = Category.objects.get(name='质监热点').articles.all()
-        return articles
-
-    def get(self, request):
-        container = self.requestContainer(
-            limit=self.HOME_PAGE_LIMIT, limit_list=settings.NEWS_PAGE_LIMIT)
-        try:
-            catch = container['catch']
-            data = None
-            if catch and container['type'] == 'abstract':
-                data = RedisQueryApi().hget('news', 'abstract')
-                if data:
-                    return Response(eval(data))
-            items = self.get_custom_artice()
-            datas = self.paging(items, container['limit'], container['page'])
-            result = self.news_to_json(datas['items'])
-            html_string = render_to_string('news/%s_tpl.html' % container['type'], {
-                'news_list': result})
-            return Response({'total': datas['total_number'], 'html': html_string})
-        except:
-            return Response({})
+    items = Category.objects.get(name='质监热点').articles.all()
+    datas = BaseView().paging(items, limit, page)
+    result = BaseView().news_to_json(datas['items'])
+    html_string = render_to_string('news/%s_tpl.html' % container['type'], {
+        'news_list': result})
+    return Response({'total': datas['total_number'], 'html': html_string})

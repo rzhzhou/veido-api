@@ -28,13 +28,13 @@ def _load_config():
     global CONF, CACHE
 
     CONF = SafeConfigParser()
-    CONF.read(os.path.join(BASE_DIR, "settings/sidebar.cfg"))
+    CONF.read(os.path.join(BASE_DIR, "settings/cfg/sidebar.cfg"))
 
     cp = SafeConfigParser()
-    cp.read(os.path.join(BASE_DIR, "settings/config.cfg"))
+    cp.read(os.path.join(BASE_DIR, "settings/cfg/config.cfg"))
 
     CON = SafeConfigParser()
-    CON.read(os.path.join(BASE_DIR, "settings/analyticsCache.cfg"))
+    CON.read(os.path.join(BASE_DIR, "settings/cfg/analyticsCache.cfg"))
     CACHE = CON.get('test', 'url')
 
     SECTION = cp.get('deploy', 'environment')

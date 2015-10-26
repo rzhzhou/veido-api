@@ -12,7 +12,7 @@ class WeiboView(BaseAPIView):
     HOME_PAGE_LIMIT = 6
 
     def get(self, request):
-        container = self.requestContainer(
+        container = self.requesthead(
             sort='hot', limit_list=settings.WEIBO_TABLE_LIMIT, limit=self.HOME_PAGE_LIMIT)
         if container['sort'] == 'new':
             datas = self.paging(Weibo.objects.all(), container['limit'], container['page'])
@@ -26,7 +26,7 @@ class WeiboView(BaseAPIView):
 
 class LocationWeiboView(BaseAPIView):
     def get(self, request, id):
-        container = self.requestContainer()
+        container = self.requesthead()
         try:
             id = int(id)
             area = Area.objects.get(id=id)

@@ -44,7 +44,7 @@ class RisksView(BaseAPIView):
         return risk_list
 
     def get(self, request):
-        container = self.requestContainer(
+        container = self.requesthead(
             page=1, limit=self.HOME_PAGE_LIMIT, limit_list=settings.RISK_PAGE_LIMIT)
         items = self.get_score_article(request)
         try:
@@ -65,7 +65,7 @@ class RisksView(BaseAPIView):
 class RisksNewsView(BaseAPIView):
 
     def get(self, request, id):
-        container = self.requestContainer()
+        container = self.requesthead()
         try:
             risk = Risk.objects.get(id=int(id))
         except Risk.DoesNotExist:
@@ -80,7 +80,7 @@ class RisksNewsView(BaseAPIView):
 
 class RisksWeixinView(BaseAPIView):
     def get(self, request, id):
-        container = self.requestContainer()
+        container = self.requesthead()
         try:
             risk = Risk.objects.get(id=int(id))
         except Risk.DoesNotExist:
@@ -96,7 +96,7 @@ class RisksWeixinView(BaseAPIView):
 
 class RisksWeiboView(BaseAPIView):
     def get(self, request, id):
-        container = self.requestContainer()
+        container = self.requesthead()
         try:
             risk = Risk.objects.get(id=int(id))
         except Risk.DoesNotExist:
