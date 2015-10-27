@@ -173,7 +173,7 @@ class BaseView(View):
         return html
 
 
-class BaseTemplateView(LoginRequiredMixin, BaseView):
+class BaseTemplateView(BaseView):
     INCLUDE_SIDEBAR = True
     INCLUDE_USER = True
 
