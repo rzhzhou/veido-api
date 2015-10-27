@@ -89,6 +89,45 @@ class BaseView(View):
 
         return results
 
+    def weixin_to_json(self, items):
+        result = []
+        for data in items:
+            item = {}
+            item['id'] = data.id
+            item['url'] = data.url
+            item['publisher'] = data.publisher.publisher
+            item['title'] = data.title
+            item['photo'] = data.publisher.photo
+            item['readnum'] = data.readnum
+            item['likenum'] = data.likenum
+            pubtime = data.pubtime
+            if pubtime.tzinfo == pytz.utc:
+                item['time'] = pubtime.astimezone(pytz.timezone(settings.TIME_ZONE)).strftime('%Y-%m-%d %H-%M-%S')
+            else:
+                item['time'] = data.pubtime.strftime('%Y-%m-%d %H-%M-%S')
+            result.append(item)
+        return result
+
+    def weibo_to_json(self, items):
+        result = []
+        for data in items:
+            item = {}
+            item['id'] = data.id
+            item['url'] = data.url
+            item['publisher'] = data.publisher.publisher
+            item['title'] = data.title
+            item['photo'] = data.publisher.photo
+            item['attitudes'] = data.attitudes_count
+            item['comments'] = data.comments_count
+            item['reposts'] = data.reposts_count
+            pubtime = data.pubtime
+            if pubtime.tzinfo == pytz.utc:
+                item['time'] = pubtime.astimezone(pytz.timezone(settings.TIME_ZONE)).strftime('%Y-%m-%d %H-%M-%S')
+            else:
+                item['time'] = data.pubtime.strftime('%Y-%m-%d %H-%M-%S')
+            result.append(item)
+        return result
+
     def set_css_to_weixin(self, items):
         html = ""
         count = u'0'

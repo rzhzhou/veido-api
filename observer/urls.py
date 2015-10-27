@@ -6,7 +6,6 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.static import serve
 
-from observer.apps.urlservice import urls, urls_api
 
 urlpatterns = patterns(
     '',

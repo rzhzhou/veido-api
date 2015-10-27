@@ -48,7 +48,7 @@ class RisksView(BaseAPIView):
             page=1, limit=self.HOME_PAGE_LIMIT, limit_list=settings.RISK_PAGE_LIMIT)
         items = self.get_score_article(request)
         datas = self.paging(items, container['limit'], container['page'])
-        return Response({'total': datas['total_number'], 'data': datas['items']})
+        return Response({'total': datas['total_number'], 'data': list(datas['items'])})
 
 
 class RisksNewsView(BaseAPIView):
@@ -77,7 +77,8 @@ class RisksWeixinView(BaseAPIView):
         items = risk.weixin.all()
         datas = self.paging(items, settings.RISK_WEIXIN_LIMIT, container['page'])
         items = [set_logo(data) for data in datas['items']]
-        return Response({'total': datas['total_number'], 'data': datas['items']})
+        result = self.weixin_to_json(items)
+        return Response({'total': datas['total_number'], 'data': result})
 
 
 class RisksWeiboView(BaseAPIView):
@@ -91,7 +92,8 @@ class RisksWeiboView(BaseAPIView):
         items = risk.weibo.all()
         datas = self.paging(items, settings.RISK_WEIBO_LIMIT, container['page'])
         items = [set_logo(data) for data in datas['items']]
-        return Response({'total': datas['total_number'], 'data': datas['items']})
+        result = self.weibo_to_json(items)
+        return Response({'total': datas['total_number'], 'data': result})
 
 
 def chart_line_risk_view(request, risk_id):
