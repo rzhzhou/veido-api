@@ -513,3 +513,31 @@ class CategoryAtricle(models.Model):
         db_table = 'category_articles'
 
 
+class CacheType(models.Model):
+    name = models.CharField(max_length=255, verbose_name=u'项目名')
+
+    class Meta:
+        db_table = 'cachetype'
+        verbose_name_plural = u'缓存类型'
+
+    def __unicode__(self):
+        return self.name
+
+
+class CacheConf(models.Model):
+    name = models.CharField(max_length=255, verbose_name=u'项目名')
+    time = models.IntegerField(null=True, blank=True, verbose_name=u'*/min')
+    url = models.CharField(max_length=255, verbose_name=u'url')
+    typename = models.ForeignKey(CacheType, null=True, blank=True, verbose_name=u'类型')
+    task = models.CharField(max_length=255, null=True, blank=True, verbose_name=u'任务')
+
+    class Meta:
+        db_table = 'cacheconf'
+        verbose_name_plural = u'缓存管理'
+
+    def __unicode__(self):
+        return self.name
+
+
+
+

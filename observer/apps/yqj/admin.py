@@ -4,6 +4,7 @@ import jieba.analyse
 from django import forms
 from django_extensions.admin import ForeignKeyAutocompleteAdmin
 from django.contrib import admin, messages
+from import_export.admin import ImportExportActionModelAdmin
 
 from observer.apps.yqj.mongoconnect import CrawlerTask
 from yqj_save import MySQLQuerApi
@@ -11,10 +12,10 @@ from observer.apps.base.models import (
     Area, Article, ArticlePublisher, Category, Custom,
     CustomKeyword, Group, GroupAuthUser, LocaltionScore, Product, ProductKeyword,
     Risk, LRisk, TRisk, RiskScore, Topic, User, Weibo, WeiboPublisher, Weixin,
-    WeixinPublisher, save_user, ZJInspection, News)
+    WeixinPublisher, save_user, ZJInspection, News, CacheType, CacheConf)
 from observer.apps.corpus.models import Event
 from resource import InspectionResources
-from import_export.admin import ImportExportActionModelAdmin
+from altercron import execute
 
 
 def show_pubtime(obj):
@@ -308,6 +309,21 @@ class InspectionAdmin(ImportExportActionModelAdmin):
     list_filter = ('pubtime', 'province', 'city', 'district', 'product', 'source', )
 
 
+class CacheTypeAdmin(admin.ModelAdmin):
+    fields = ('name', )
+    list_display = ('name', )
+    list_editable = ('name', )
+
+
+class CacheConfAdmin(admin.ModelAdmin):
+    fields = ('name', 'time', 'url', 'typename', 'task')
+    list_display = ('name', 'time', 'url', 'typename', 'task')
+    list_editable = ('name', 'time', 'url', 'typename', 'task')
+
+    def save_model(self, request, obj, form, change):
+        execute(obj.time, obj.name)
+        obj.save()
+
 admin.site.register(WeixinPublisher)
 admin.site.register(WeiboPublisher)
 admin.site.register(Weibo, WeiboAdmin)
@@ -330,3 +346,5 @@ admin.site.register(Risk, RiskAdmin)
 admin.site.register(LRisk, LRiskAdmin)
 admin.site.register(TRisk, TRiskAdmin)
 admin.site.register(ZJInspection, InspectionAdmin)
+admin.site.register(CacheType, CacheTypeAdmin)
+admin.site.register(CacheConf, CacheConfAdmin)
