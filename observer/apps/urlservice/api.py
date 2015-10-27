@@ -14,7 +14,7 @@ from observer.apps.product.api import ProductTableView
 from observer.apps.search.api import SearchView
 from observer.apps.weixin.api import WeixinView, LocationWeixinView
 from observer.apps.weibo.api import WeiboView, LocationWeiboView
-from observer.apps.analytics.views import DispatchView
+from observer.apps.analytics.api import DispatchView
 from observer.apps.yqj.api import login_view, registe_view, upload_image, change_passwd,\
     reset_passwd, delete_user_view, add_user_view, chart_line_index_view,\
     chart_pie_index_view, map_view
@@ -48,18 +48,18 @@ urlpatterns += patterns(
 )
 
 urlpatterns += patterns(
-    'weibo.api',
+    'observer.apps.weibo.api',
     url(r'^weibo/$', WeiboView.as_view()),
     url(r'^location/(?P<id>\d+)/weibo/$', LocationWeiboView.as_view()),
 )
 urlpatterns += patterns(
-    'weixin.api',
+    'observer.apps.weixin.api',
     url(r'^weixin/$', WeixinView.as_view()),
     url(r'^location/(?P<id>\d+)/weixin/$', LocationWeixinView.as_view()),
 )
 
 urlpatterns += patterns(
-    'custom.api',
+    'observer.apps.custom.api',
     url(r'^custom/(?P<custom_id>\d+)/news/$', CustomNewsView.as_view()),
     url(r'^custom/(?P<custom_id>\d+)/weixin/$', CustomWeixinView.as_view()),
     url(r'^custom/(?P<custom_id>\d+)/weibo/$', CustomWeiboView.as_view()),
@@ -67,29 +67,29 @@ urlpatterns += patterns(
 )
 
 urlpatterns += patterns(
-    'product.api',
+    'observer.apps.product.api',
     url(r'^product/(?P<id>\d*)/?news/(?P<page>\d+)/$', ProductTableView.as_view()),
 )
 
 urlpatterns += patterns(
-    'inspection.api',
+    'observer.apps.inspection.api',
     url(r'^inspection/$', InspectionTableView.as_view()),
     url(r'^dashboard/local-inspection/$', InspectionLocalView.as_view()),
     url(r'^dashboard/national-inspection/$', InspectionNationalView.as_view()),
 )
 
 urlpatterns += patterns(
-    'search.api',
+    'observer.apps.search.api',
     url(r'^search/(.+)/$', SearchView.as_view()),
 )
 
 urlpatterns += patterns(
-    'analytics.views',
+    'observer.apps.analytics.api',
     url(r'^analytics/(?P<id>\d+)/$', DispatchView.as_view()),
 )
 
 urlpatterns += patterns(
-    'collection,api',
+    'observer.apps.collection,api',
     url(r'^collection/$', CollecModifyView.as_view()),
     url(r'^collection/(?P<table_type>\S+)/$', CollectView.as_view()),
 )

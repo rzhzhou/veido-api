@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
-from django.template.loader import render_to_string
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
@@ -25,9 +24,7 @@ class EventView(BaseAPIView):
         items = Topic.objects.all()
         datas = self.paging(items, container['limit'], container['page'])
         result = self.event_to_json(datas['items'])
-        html_string = render_to_string('event/%s_tpl.html' % container['type'], {
-            'event_list': result})
-        return Response({'total': datas['total_number'], 'html': html_string})
+        return Response({'total': datas['total_number'], 'data': result})
 
 class EventTableView(BaseAPIView):
     def collected_items(self):
@@ -38,7 +35,6 @@ class EventTableView(BaseAPIView):
         items = Topic.objects.all()
         result = self.event_to_json(items)
         datas = self.paging(result, self.EVENT_PAGE_LIMIT, page)
-
         return Response({'total': datas['total_number'], 'data': list(datas["items"])})
 
 
@@ -53,8 +49,7 @@ class EventNewsView(BaseAPIView):
         items = event.articles.all()
         datas = self.paging(items, settings.NEWS_PAGE_LIMIT, container['page'])
         result = self.news_to_json(datas['items'])
-        html_string = render_to_string('news/list_tpl.html', {'news_list': result})
-        return Response({'html': html_string, 'total': datas['total_number']})
+        return Response({'data': result, 'total': datas['total_number']})
 
 
 class EventWeixinView(BaseAPIView):
@@ -66,9 +61,8 @@ class EventWeixinView(BaseAPIView):
             return HttpResponseRedirect('/weixin/')
         items = event.weixin.all()
         datas = self.paging(items, settings.EVENT_WEIXIN_LIMIT, container['page'])
-        items = [set_logo(data) for data in datas['items']]
-        html_string = render_to_string('weixin/list_tpl.html', {'weixin_list': items})
-        return Response({'html': html_string, 'total': datas['total_number']})
+        result = [set_logo(data) for data in datas['items']]
+        return Response({'data': result, 'total': datas['total_number']})
 
 
 class EventWeiboView(BaseAPIView):
@@ -81,9 +75,8 @@ class EventWeiboView(BaseAPIView):
             return HttpResponseRedirect('/weibo/')
         items = event.weibo.all()
         datas = self.paging(items, settings.EVENT_WEIBO_LIMIT, container['page'])
-        items = [set_logo(data) for data in datas['items']]
-        html_string = render_to_string('weibo/list_tpl.html', {'weibo_list': items})
-        return Response({'html': html_string, 'total': datas['total_number']})
+        result = [set_logo(data) for data in datas['items']]
+        return Response({'data': result, 'total': datas['total_number']})
 
 
 @login_required

@@ -47,19 +47,8 @@ class RisksView(BaseAPIView):
         container = self.requesthead(
             page=1, limit=self.HOME_PAGE_LIMIT, limit_list=settings.RISK_PAGE_LIMIT)
         items = self.get_score_article(request)
-        try:
-            catch = container['catch']
-            data = None
-            if catch and container['type'] == 'abstract':
-                data = RedisQueryApi().hget('risk', 'abstract')
-                if data:
-                    return Response(eval(data))
-            datas = self.paging(items, container['limit'], container['page'])
-            html_string = render_to_string('risk/%s_tpl.html' % container['type'], {
-                'risk_list': datas['items']})
-            return Response({'total': datas['total_number'], 'html': html_string})
-        except:
-            return Response({})
+        datas = self.paging(items, container['limit'], container['page'])
+        return Response({'total': datas['total_number'], 'data': datas['items']})
 
 
 class RisksNewsView(BaseAPIView):
@@ -74,8 +63,7 @@ class RisksNewsView(BaseAPIView):
         items = risk.articles.all()
         datas = self.paging(items, settings.NEWS_PAGE_LIMIT, container['page'])
         result = self.news_to_json(datas['items'])
-        html_string = render_to_string('news/list_tpl.html', {'news_list': result})
-        return Response({'total': datas['total_number'], 'html': html_string})
+        return Response({'total': datas['total_number'], 'data': result})
 
 
 class RisksWeixinView(BaseAPIView):
@@ -89,9 +77,7 @@ class RisksWeixinView(BaseAPIView):
         items = risk.weixin.all()
         datas = self.paging(items, settings.RISK_WEIXIN_LIMIT, container['page'])
         items = [set_logo(data) for data in datas['items']]
-        html_string = render_to_string('weixin/list_tpl.html', {
-            'weixin_list': datas['items']})
-        return Response({'total': datas['total_number'], 'html': html_string})
+        return Response({'total': datas['total_number'], 'data': datas['items']})
 
 
 class RisksWeiboView(BaseAPIView):
@@ -105,8 +91,7 @@ class RisksWeiboView(BaseAPIView):
         items = risk.weibo.all()
         datas = self.paging(items, settings.RISK_WEIBO_LIMIT, container['page'])
         items = [set_logo(data) for data in datas['items']]
-        html_string = render_to_string('weibo/list_tpl.html', {'weibo_list': datas['items']})
-        return Response({'total': datas['total_number'], 'html': html_string})
+        return Response({'total': datas['total_number'], 'data': datas['items']})
 
 
 def chart_line_risk_view(request, risk_id):

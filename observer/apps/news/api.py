@@ -19,8 +19,7 @@ class ArticleTableView(BaseAPIView):
         items = category.articles.all()
         datas = self.paging(items, settings.NEWS_PAGE_LIMIT, container['page'])
         result = self.news_to_json(datas['items'])
-        news_html = render_to_string('news/list_tpl.html', {'news_list': result})
-        return Response({'total': datas['total_number'], 'html': news_html})
+        return Response({'total': datas['total_number'], 'data': result})
 
 
 class LocationTableView(BaseAPIView):
@@ -35,22 +34,21 @@ class LocationTableView(BaseAPIView):
         items = Article.objects.filter(area=area)
         datas = self.paging(items, settings.NEWS_PAGE_LIMIT, container['page'])
         result = self.news_to_json(datas['items'])
-        html_string = render_to_string('news/list_tpl.html', {'news_list': result})
-        return Response({'total': datas['total_number'], 'html': html_string})
+        return Response({'total': datas['total_number'], 'data': result})
 
 @api_view(['GET'])
 @read('news')
 def news_view(request):
     HOME_PAGE_LIMIT = 10
-    container = request.GET
-    page = int(container['page']) if container.has_key('spage') else 1
-    limit = 10
-    if container['type'] == 'list':
-        limit = settings.NEWS_PAGE_LIMIT
 
-    items = Category.objects.get(name='质监热点').articles.all()
-    datas = BaseView().paging(items, limit, page)
-    result = BaseView().news_to_json(datas['items'])
-    html_string = render_to_string('news/%s_tpl.html' % container['type'], {
-        'news_list': result})
-    return Response({'total': datas['total_number'], 'html': html_string})
+    def get_custom_artice(self):
+        articles = Category.objects.get(name='质监热点').articles.all()
+        return articles
+
+    def get(self, request):
+        container = self.requesthead(
+            limit=self.HOME_PAGE_LIMIT, limit_list=settings.NEWS_PAGE_LIMIT)
+        items = self.get_custom_artice()
+        datas = self.paging(items, container['limit'], container['page'])
+        result = self.news_to_json(datas['items'])
+        return Response({'total': datas['total_number'], 'data': result})
