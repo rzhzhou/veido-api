@@ -155,7 +155,7 @@ MIDDLEWARE_CLASSES = (
     'observer.apps.yqj.middleware.UserAuthenticationMiddlerware',
 )
 
-ROOT_URLCONF = 'observer.apps.base.urls'
+ROOT_URLCONF = 'observer.urls'
 
 WSGI_APPLICATION = 'observer.wsgi.application'
 
