@@ -18,7 +18,7 @@ from observer.apps.base.models import (
     Area, Article, ArticlePublisher, Category, Collection, Custom, CustomKeyword,
     Group, Inspection, LocaltionScore, Product, ProductKeyword, RelatedData,
     Risk, RiskScore, Topic, Weibo, Weixin)
-from observer.apps.yqj.redisconnect import RedisQueryApi
+from observer.utils.connector.redis import RedisQueryApi
 
 
 @login_required

@@ -11,7 +11,7 @@ from rest_framework.views import APIView
 
 from observer.apps.base import login_required, get_user_image, sidebarUtil
 from observer.apps.base.models import Area, Category, RelatedData
-from observer.apps.yqj.redisconnect import RedisQueryApi
+from observer.utils.connector.redis import RedisQueryApi
 
 
 class LoginRequiredMixin(object):

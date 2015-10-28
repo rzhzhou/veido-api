@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, date
 
 from django_extensions.management.jobs import BaseJob
 
-from observer.apps.yqj.redisconnect import RedisQueryApi
+from observer.utils.connector.redis import RedisQueryApi
 
 reload(sys)
 sys.setdefaultencoding( "utf-8" )
