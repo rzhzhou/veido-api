@@ -5,7 +5,7 @@ from django import forms
 from django_extensions.admin import ForeignKeyAutocompleteAdmin
 from django.contrib import admin, messages
 
-from observer.apps.yqj.mongoconnect import CrawlerTask
+from observer.utils.connector.mongo import CrawlerTask
 from yqj_save import MySQLQuerApi
 from observer.apps.base.models import (
     Area, Article, ArticlePublisher, Category, Custom,
