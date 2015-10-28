@@ -7,7 +7,7 @@ from observer.apps.event.api import EventView, EventNewsView, \
     EventWeixinView, EventWeiboView
 from observer.apps.inspection.api import InspectionTableView, InspectionLocalView, \
     InspectionNationalView
-from observer.apps.news.api import LocationTableView, ArticleTableView
+from observer.apps.news.api import LocationTableView, ArticleTableView, NewsView
 from observer.apps.risk.api import RisksView, RisksNewsView,\
     RisksWeixinView, RisksWeiboView
 from observer.apps.product.api import ProductTableView
@@ -24,12 +24,12 @@ urlpatterns = patterns(
     'observer.apps.news.api',
     url(r'^category/(?P<id>\d+)/news/$', ArticleTableView.as_view()),
     url(r'^location/(?P<id>\d+)/news/$', LocationTableView.as_view()),
-    url(r'^news/$', 'news_view'),
+    url(r'^news/$', NewsView.as_view()),
 )
 
 urlpatterns += patterns(
     'observer.apps.event.api',
-    url(r'^event/$', 'event_view'),
+    url(r'^event/$', EventView.as_view()),
     url(r'^event/(?P<id>\d+)/news/$', EventNewsView.as_view()),
     url(r'^event/(?P<id>\d+)/weixin/$', EventWeixinView.as_view()),
     url(r'^event/(?P<id>\d+)/weibo/$', EventWeiboView.as_view()),

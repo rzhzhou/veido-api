@@ -4,9 +4,10 @@ from django.template.loader import render_to_string
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from observer.apps.base import read
 from observer.apps.base.models import Area, Article, Category
 from observer.apps.base.views import BaseAPIView, BaseView
+from observer.utils.decorators.cache import read_cache
+
 
 class ArticleTableView(BaseAPIView):
     def get(self, request, id):
@@ -36,15 +37,15 @@ class LocationTableView(BaseAPIView):
         result = self.news_to_json(datas['items'])
         return Response({'total': datas['total_number'], 'data': result})
 
-@api_view(['GET'])
-@read('news')
-def news_view(request):
+
+class NewsView(BaseAPIView):
     HOME_PAGE_LIMIT = 10
 
     def get_custom_artice(self):
         articles = Category.objects.get(name='质监热点').articles.all()
         return articles
 
+    @read_cache
     def get(self, request):
         container = self.requesthead(
             limit=self.HOME_PAGE_LIMIT, limit_list=settings.NEWS_PAGE_LIMIT)
