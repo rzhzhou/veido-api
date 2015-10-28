@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from observer.apps.yqj.redisconnect import RedisQueryApi
 
+
 class ReadCache(object):
 
     def __init__(self):
