@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import sys
 import os
 root_mod = '/home/feng/Project/observer/api'
@@ -9,23 +10,20 @@ from django.conf import settings
 from django_extensions.management.jobs import BaseJob
 
 from observer.apps.yqj.redisconnect import RedisQueryApi
-reload(sys)
-sys.setdefaultencoding("utf-8")
 
 class BaseCatch(BaseJob):
 
-    def Cache(self, datas):
-        url_cfg = settings.CACHE
-        url_cache = '%s/api/%s/?type=abstract&catch=0' % (url_cfg, datas['hset_name'])
+    def cache(self, datas):
+        url_cfg = (settings.CACHE).decode()
+        url_cache = datas['url'] %(url_cfg)
         result = requests.get(url=url_cache)
-        RedisQueryApi().hset(datas['hset_name'], datas['hset_key'], str(result.text))
+        RedisQueryApi().hset(datas['hset_name'], datas['hset_key'], result.text)
 
-    def get(self, name):
-            datas = {
-                    'hset_name' : name,
-                    'hset_key' : 'abstract'
-                }
-            self.Cache(datas)
+    def get(self, name, url):
+        datas = {'url': url,
+                'hset_name' : name,
+                'hset_key' : u'abstract'}
+        self.cache(datas)
 
 if __name__ == '__main__':
-    BaseCatch().get(name='event')
+    BaseCatch().get(name=u'event', url=u'%s/api/event/?type=abstract&cache=0')
