@@ -29,7 +29,7 @@ urlpatterns = patterns(
 
 urlpatterns += patterns(
     'observer.apps.event.api',
-    url(r'^event/$', EventView.as_view()),
+    url(r'^event/$', 'event_view'),
     url(r'^event/(?P<id>\d+)/news/$', EventNewsView.as_view()),
     url(r'^event/(?P<id>\d+)/weixin/$', EventWeixinView.as_view()),
     url(r'^event/(?P<id>\d+)/weibo/$', EventWeiboView.as_view()),

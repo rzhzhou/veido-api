@@ -9,6 +9,7 @@ from observer.apps.base.views import BaseAPIView
 from observer.apps.base.models import Topic
 from observer.apps.base.api_function import chart_line
 from observer.apps.yqj.redisconnect import RedisQueryApi
+from observer.utils.decorators.cache import read_cache
 
 class EventView(BaseAPIView):
     HOME_PAGE_LIMIT = 10
@@ -25,6 +26,19 @@ class EventView(BaseAPIView):
         datas = self.paging(items, container['limit'], container['page'])
         result = self.event_to_json(datas['items'])
         return Response({'total': datas['total_number'], 'data': result})
+
+
+@api_view(['GET'])
+@read_cache
+def event_view(request):
+    container = BaseAPIView(request).requesthead(
+        limit=10, limit_list=settings.EVENT_PAGE_LIMIT)
+    items = Topic.objects.all()
+    datas = BaseAPIView(request).paging(items, container['limit'], container['page'])
+    result = BaseAPIView(request).event_to_json(datas['items'])
+    return Response({'total': datas['total_number'], 'data': result})
+
+
 
 class EventTableView(BaseAPIView):
     def collected_items(self):
