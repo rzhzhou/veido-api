@@ -11,10 +11,11 @@ from observer.apps.base.models import (
     Area, Article, ArticlePublisher, Category, Custom,
     CustomKeyword, Group, GroupAuthUser, LocaltionScore, Product, ProductKeyword,
     Risk, LRisk, TRisk, RiskScore, Topic, User, Weibo, WeiboPublisher, Weixin,
-    WeixinPublisher, save_user, ZJInspection, News)
+    WeixinPublisher, save_user, ZJInspection, News, SettingsType, Settings)
 from observer.apps.corpus.models import Event
 from resource import InspectionResources
 from import_export.admin import ImportExportActionModelAdmin
+from django.conf import settings
 
 
 def show_pubtime(obj):
@@ -193,7 +194,8 @@ class ProductKeywordAdmin(admin.ModelAdmin):
 
 
 class UserAdmin(admin.ModelAdmin):
-    fields = ('username', 'password', 'area', 'isAdmin', 'group')
+    # fields = ('username', 'password', 'area', 'isAdmin', 'group')
+    # filter_horizontal = ('settings', )
     list_display = ('username', 'password', 'area', 'isAdmin', 'group',)
     list_editable = ('username', 'password', 'area', 'isAdmin', 'group')
 
@@ -308,6 +310,22 @@ class InspectionAdmin(ImportExportActionModelAdmin):
     list_filter = ('pubtime', 'province', 'city', 'district', 'product', 'source', )
 
 
+class SettingsTypeAdmin(admin.ModelAdmin):
+    fields = ('name', )
+    list_display = ('name', )
+    list_editable = ('name', )
+    list_filter = ('name', )
+    search_fields = ('name', )
+
+
+class SettingsAdmin(admin.ModelAdmin):
+    # fields = ('name', 'value', 'type', 'username')
+    list_display = ('name', 'value', 'type', 'user')
+    list_editable = ('name', 'value', 'type', 'user')
+    list_filter = ('name', 'value', 'type', 'user')
+    search_fields = ('name', 'value', 'type', 'user')
+
+
 admin.site.register(WeixinPublisher)
 admin.site.register(WeiboPublisher)
 admin.site.register(Weibo, WeiboAdmin)
@@ -330,3 +348,5 @@ admin.site.register(Risk, RiskAdmin)
 admin.site.register(LRisk, LRiskAdmin)
 admin.site.register(TRisk, TRiskAdmin)
 admin.site.register(ZJInspection, InspectionAdmin)
+admin.site.register(SettingsType, SettingsTypeAdmin)
+admin.site.register(Settings, SettingsAdmin)
