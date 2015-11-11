@@ -142,6 +142,7 @@ INSTALLED_APPS = (
     'rest_framework',
     'django_extensions',
     'import_export',
+    'observer.apps.riskmonitor',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -160,6 +161,10 @@ ROOT_URLCONF = 'observer.urls'
 WSGI_APPLICATION = 'observer.wsgi.application'
 
 
+GRAPH_MODELS = {
+  'all_applications': True,
+  'group_models': True,
+}
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 
