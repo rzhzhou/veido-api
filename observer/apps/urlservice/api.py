@@ -21,6 +21,13 @@ from observer.apps.yqj.api import login_view, registe_view, upload_image, change
 
 
 urlpatterns = patterns(
+    '',
+    url(r'^token-auth/', 'rest_framework_jwt.views.obtain_jwt_token'),
+    url(r'^token-refresh/', 'rest_framework_jwt.views.refresh_jwt_token'),
+    url(r'^token-verify/', 'rest_framework_jwt.views.verify_jwt_token'),
+)
+
+urlpatterns += patterns(
     'observer.apps.news.api',
     url(r'^category/(?P<id>\d+)/news/$', ArticleTableView.as_view()),
     url(r'^location/(?P<id>\d+)/news/$', LocationTableView.as_view()),
