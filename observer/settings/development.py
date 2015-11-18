@@ -138,6 +138,7 @@ INSTALLED_APPS = (
     'observer.apps.event',
     'observer.apps.analytics',
     'observer.apps.collection',
+    'observer.apps.config',
     'rest_framework',
     'django_extensions',
     'import_export',

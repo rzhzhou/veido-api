@@ -11,7 +11,9 @@ from observer.apps.base.models import (
     Area, Article, ArticlePublisher, Category, Custom,
     CustomKeyword, Group, GroupAuthUser, LocaltionScore, Product, ProductKeyword,
     Risk, LRisk, TRisk, RiskScore, Topic, User, Weibo, WeiboPublisher, Weixin,
-    WeixinPublisher, save_user, ZJInspection, News, SettingsType, Settings)
+    WeixinPublisher, save_user, ZJInspection, News)
+from observer.apps.config.models import(
+    SettingsType, Settings, CacheType, CacheConf)
 from observer.apps.corpus.models import Event
 from resource import InspectionResources
 from import_export.admin import ImportExportActionModelAdmin
@@ -326,6 +328,20 @@ class SettingsAdmin(admin.ModelAdmin):
     search_fields = ('name', 'value', 'type', 'user')
 
 
+class CacheTypeAdmin(admin.ModelAdmin):
+    list_display = ('name', )
+    list_editable = ('name', )
+    list_filter = ('name', )
+    search_fields = ('name', )
+
+
+class CacheConfAdmin(admin.ModelAdmin):
+    list_display = ('name', 'time', 'url', 'typename', 'task')
+    list_editable = ('name', 'time', 'url', 'typename', 'task')
+    list_filter = ('name', 'time', 'url', 'typename', 'task')
+    search_fields = ('name', 'time', 'url', 'typename', 'task')
+
+
 admin.site.register(WeixinPublisher)
 admin.site.register(WeiboPublisher)
 admin.site.register(Weibo, WeiboAdmin)
@@ -350,3 +366,5 @@ admin.site.register(TRisk, TRiskAdmin)
 admin.site.register(ZJInspection, InspectionAdmin)
 admin.site.register(SettingsType, SettingsTypeAdmin)
 admin.site.register(Settings, SettingsAdmin)
+admin.site.register(CacheType, CacheTypeAdmin)
+admin.site.register(CacheConf, CacheConfAdmin)
