@@ -1,11 +1,11 @@
 import os
-from ConfigParser import ConfigParser, RawConfigParser
 
 from django.conf import settings
 from django.db import models
 from django.http import HttpResponse, HttpResponseRedirect
 
 from observer.apps.base.models import User, AnonymousUser, hash_password
+from observer.utils.connector.mysql import query_one
 
 
 def authenticate(username, raw_password):
@@ -58,17 +58,14 @@ def xls_to_response(wb, fname):
 
 def sidebarUtil(request):
     user = request.myuser
-    conf = settings.CONF
     username = user.username
-    if not conf.has_section(username):
-        username = 'test'
 
     sidebar_name = {
-        "news": conf.get(username, "news"),
-        "event": conf.get(username, "event"),
-        "location": conf.get(username, "location"),
-        "custom": conf.get(username, "custom"),
-        "site": conf.get(username, "site"),
-        "business": eval(conf.get(username, "business"))
+        "news": query_one(user=login_user, confname='news'),
+        "event": query_one(user=login_user, confname='event'),
+        "location": query_one(user=login_user, confname='location'),
+        "custom": query_one(user=login_user, confname='custom'),
+        "site": query_one(user=login_user, confname='site'),
+        "business": eval(query_one(user=login_user, confname='business'))
     }
     return sidebar_name

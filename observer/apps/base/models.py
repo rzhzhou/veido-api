@@ -300,6 +300,9 @@ class User(models.Model):
         db_table = 'yqj_user'
         verbose_name_plural = u'舆情机用户'
 
+    def __unicode__(self):
+        return self.username
+
     def is_authenticated(self):
         return True
 
