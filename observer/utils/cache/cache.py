@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
-import sys
 import os
-root_mod = '/home/feng/Project/observer/api'
-sys.path.append(root_mod)
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "observer.settings.development")
 import requests
 

@@ -4,11 +4,12 @@ from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from observer.apps.base import authenticate, login_required, set_logo, read
+from observer.apps.base import authenticate, login_required, set_logo
 from observer.apps.base.views import BaseAPIView
 from observer.apps.base.models import Topic
 from observer.apps.base.api_function import chart_line
 from observer.apps.yqj.redisconnect import RedisQueryApi
+from observer.utils.decorators.cache import read_cache
 
 class EventView(BaseAPIView):
     HOME_PAGE_LIMIT = 10
@@ -17,7 +18,7 @@ class EventView(BaseAPIView):
         user = self.request.myuser
         return user.collection.events.all()
 
-    # @read('event')
+    @read_cache
     def get(self, request):
         container = self.requesthead(
             limit=self.HOME_PAGE_LIMIT, limit_list=settings.EVENT_PAGE_LIMIT)
@@ -25,6 +26,7 @@ class EventView(BaseAPIView):
         datas = self.paging(items, container['limit'], container['page'])
         result = self.event_to_json(datas['items'])
         return Response({'total': datas['total_number'], 'data': result})
+
 
 class EventTableView(BaseAPIView):
     def collected_items(self):

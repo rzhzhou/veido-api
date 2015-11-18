@@ -73,23 +73,3 @@ def sidebarUtil(request):
         "business": eval(conf.get(username, "business"))
     }
     return sidebar_name
-
-def read_redis(name):
-    data = None
-    data = RedisQueryApi().hget(name, 'abstract')
-    if data:
-        return data
-
-def read(name):
-    def decorator(view_func):
-        def wrapper(request, *args, **kwargs):
-            if request.GET['type'] == 'abstract':
-                data = RedisQueryApi().hget(name, 'abstract')
-                if data:
-                    return Response(eval(data))
-            return view_func(request, *args, **kwargs)
-        return wrapper
-    return decorator
-
-
-
