@@ -2,6 +2,7 @@
 from django.db import models
 
 from observer.apps.base.models import Area
+from django.contrib.auth.models import User 
 
 
 class Score(models.Model):
@@ -30,6 +31,20 @@ class Industry(models.Model):
         return self.name
 
 
+class UserIndustry(models.Model):
+    name = models.CharField(max_length=255, verbose_name=u'名称')
+
+    user = models.ForeignKey(User, verbose_name=u'用户')
+    industry = models.ForeignKey(Industry, verbose_name=u'行业')
+
+    class Meta:
+        db_table = 'user_industry'
+        verbose_name_plural = u'支柱行业'
+
+    def __unicode__(self):
+        return self.name
+
+
 class Enterprise(models.Model):
     name = models.CharField(max_length=255, verbose_name=u'企业名')
     locate_x = models.FloatField(verbose_name=u'纬度', null=True, blank=True)
@@ -46,6 +61,20 @@ class Enterprise(models.Model):
 
     def __unicode__(self):
         return self.name
+
+
+
+class UserEnterprise(models.Model):
+    user = models.ForeignKey(User, verbose_name=u'用户')
+    enterprise = models.ForeignKey(Enterprise, verbose_name=u'企业')
+
+    class Meta:
+        db_table = 'user_enterprise'
+        verbose_name_plural = u'监测企业'
+
+    def __unicode__(self):
+        return self.enterprise.name
+
 
 
 class Product(models.Model):
