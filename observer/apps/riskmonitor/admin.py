@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from observer.apps.riskmonitor.models import(
     Score, Industry, Enterprise, Product, EnterpriseProduct,
-    Metrics, MetricsProduct)
+    Metrics, MetricsProduct, UserIndustry, UserEnterprise)
 
 # Register your models here.
 class ScoreAdmin(admin.ModelAdmin):
@@ -54,6 +54,20 @@ class MetricsProductAdmin(admin.ModelAdmin):
     list_filter = ('weight', 'metrics', 'product')
 
 
+class UserIndustryAdmin(admin.ModelAdmin):
+    fields = ('name', 'user', 'industry')
+    list_display = ('name', 'user', 'industry')
+    search_fields = ('name', 'user', 'industry')
+    list_filter = ('name', 'user', 'industry')
+
+
+class UserEnterpriseAdmin(admin.ModelAdmin):
+    fields = ('user', 'enterprise')
+    list_display = ('user', 'enterprise')
+    search_fields = ('user', 'enterprise')
+    list_filter = ('user', 'enterprise')
+
+
 admin.site.register(Score, ScoreAdmin)
 admin.site.register(Industry, IndustryAdmin)
 admin.site.register(Enterprise, EnterpriseAdmin)
@@ -61,3 +75,5 @@ admin.site.register(Product, ProductAdmin)
 admin.site.register(EnterpriseProduct, EnterpriseProductAdmin)
 admin.site.register(Metrics, MetricsAdmin)
 admin.site.register(MetricsProduct, MetricsProductAdmin)
+admin.site.register(UserIndustry, UserIndustryAdmin)
+admin.site.register(UserEnterprise, UserEnterpriseAdmin)
