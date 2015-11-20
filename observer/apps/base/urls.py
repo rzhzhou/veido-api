@@ -17,14 +17,14 @@ from observer.apps.weibo.api import WeiboView, LocationWeiboView
 from observer.apps.analytics.api import DispatchView
 from observer.apps.yqj.api import login_view, registe_view, upload_image, change_passwd,\
     reset_passwd, delete_user_view, add_user_view, chart_line_index_view,\
-    chart_pie_index_view, map_view
+    chart_pie_index_view, map_view, HomeView, Dashboard
 
 
 urlpatterns = patterns(
     '',
-    url(r'^token-auth/', 'rest_framework_jwt.views.obtain_jwt_token'),
-    url(r'^token-refresh/', 'rest_framework_jwt.views.refresh_jwt_token'),
-    url(r'^token-verify/', 'rest_framework_jwt.views.verify_jwt_token'),
+    url(r'^token-auth$', 'rest_framework_jwt.views.obtain_jwt_token'),
+    url(r'^token-refresh$', 'rest_framework_jwt.views.refresh_jwt_token'),
+    url(r'^token-verify$', 'rest_framework_jwt.views.verify_jwt_token'),
 )
 
 urlpatterns += patterns(
@@ -104,6 +104,7 @@ urlpatterns += patterns(
 urlpatterns += patterns(
     'observer.apps.yqj.api',
     url(r'^login/$', 'login_view'),
+    url(r'^token-revork$', 'logout_view'),
     url(r'^register/$', 'registe_view'),
     url(r'^settings/upload/$', 'upload_image'),
     url(r'^settings/change/$', 'change_passwd'),
@@ -114,4 +115,6 @@ urlpatterns += patterns(
     url(r'^line/$', 'chart_line_index_view'),
     url(r'^pie/$', 'chart_pie_index_view'),
     url(r'^map/$', 'map_view'),
+    url(r'^app$', HomeView.as_view()),
+    url(r'^dashboard$', Dashboard.as_view()),
 )

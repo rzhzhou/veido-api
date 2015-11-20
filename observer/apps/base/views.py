@@ -11,7 +11,7 @@ from rest_framework.views import APIView
 
 from observer.apps.base import login_required, get_user_image, sidebarUtil
 from observer.apps.base.models import Area, Category, RelatedData
-from observer.utils.connector.redis import RedisQueryApi
+from observer.utils.connector.redisconnector import RedisQueryApi
 
 
 class LoginRequiredMixin(object):
@@ -24,6 +24,16 @@ class LoginRequiredMixin(object):
 
 
 class BaseView(View):
+    def get_info(self, title='', color=None, types=None, name=None, items=None, link=None):
+        data = {
+        'title': title,
+        'color': color,
+        'type': types,
+        'name': name,
+        'items': items,
+        'link': link
+        }
+        return data
 
     def paging(self, items, limit, page):
         paginator = Paginator(items, limit)
@@ -173,7 +183,7 @@ class BaseView(View):
         return html
 
 
-class BaseTemplateView(LoginRequiredMixin, BaseView):
+class BaseTemplateView(BaseView):
     INCLUDE_SIDEBAR = True
     INCLUDE_USER = True
 
