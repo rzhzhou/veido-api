@@ -24,6 +24,7 @@ class WeiboView(BaseAPIView):
 
 
 class WeiboApi(BaseView):
+    
     def get(self):
         items = [eval(item) for item in RedisQueryApi().lrange('sort_weibohot', 0, -1)]
         result = self.weibo_to_json(items)

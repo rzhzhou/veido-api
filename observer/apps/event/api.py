@@ -28,11 +28,13 @@ class EventView(BaseAPIView):
 
 
 class EventApi(BaseView):
+
     def get(self):
         items = Topic.objects.all()[:10]
         result = self.event_to_json(items)
         event_data = self.get_info(title=u'质监事件', color='danger', types='event', name='eventDetail', items=result)
         return event_data
+
 
 class EventTableView(BaseAPIView):
     def collected_items(self):
