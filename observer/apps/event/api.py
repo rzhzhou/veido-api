@@ -6,7 +6,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from observer.apps.base import authenticate, login_required, set_logo
-from observer.apps.base.views import BaseAPIView
+from observer.apps.base.views import BaseAPIView, BaseView
 from observer.apps.base.models import Topic
 from observer.apps.base.api_function import chart_line
 
@@ -26,6 +26,13 @@ class EventView(BaseAPIView):
         result = self.event_to_json(datas['items'])
         return Response({'total': datas['total_number'], 'data': result})
 
+
+class EventApi(BaseView):
+    def get(self):
+        items = Topic.objects.all()[:10]
+        result = self.event_to_json(items)
+        event_data = self.get_info(title=u'质监事件', color='danger', types='event', name='eventDetail', items=result)
+        return event_data
 
 class EventTableView(BaseAPIView):
     def collected_items(self):
