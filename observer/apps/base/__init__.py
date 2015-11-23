@@ -57,13 +57,14 @@ def xls_to_response(wb, fname):
 
 
 def sidebarUtil(request):
-    user = request.myuser
+    user = request.user
     conf = settings.CONF
     username = user.username
     if not conf.has_section(username):
         username = 'test'
 
     sidebar_name = {
+        "user": user,
         "news": conf.get(username, "news"),
         "event": conf.get(username, "event"),
         "location": conf.get(username, "location"),

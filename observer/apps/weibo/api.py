@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from observer.apps.base import authenticate, login_required, set_logo
 from observer.apps.base.views import BaseAPIView, BaseView
 from observer.apps.base.models import Weibo, Area
-from observer.utils.connector.redis import RedisQueryApi
+from observer.utils.connector.redisconnector import RedisQueryApi
 
 class WeiboView(BaseAPIView):
     HOME_PAGE_LIMIT = 6
