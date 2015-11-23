@@ -1,11 +1,11 @@
 import os
-from ConfigParser import ConfigParser, RawConfigParser
 
 from django.conf import settings
 from django.db import models
 from django.http import HttpResponse, HttpResponseRedirect
 
 from observer.apps.base.models import User, AnonymousUser, hash_password
+from observer.utils.connector.mysql import query_one
 
 
 def authenticate(username, raw_password):
@@ -60,8 +60,6 @@ def sidebarUtil(request):
     user = request.user
     conf = settings.CONF
     username = user.username
-    if not conf.has_section(username):
-        username = 'test'
 
     sidebar_name = {
         "user": user,
