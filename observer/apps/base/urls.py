@@ -17,7 +17,7 @@ from observer.apps.weibo.api import WeiboView, LocationWeiboView
 from observer.apps.analytics.api import DispatchView
 from observer.apps.yqj.api import login_view, registe_view, upload_image, change_passwd,\
     reset_passwd, delete_user_view, add_user_view, chart_line_index_view,\
-    chart_pie_index_view, map_view, HomeView, Dashboard
+    chart_pie_index_view, map_view, Sidebar, Dashboard
 
 
 urlpatterns = patterns(
@@ -115,6 +115,6 @@ urlpatterns += patterns(
     url(r'^line/$', 'chart_line_index_view'),
     url(r'^pie/$', 'chart_pie_index_view'),
     url(r'^map/$', 'map_view'),
-    url(r'^app$', HomeView.as_view()),
+    url(r'^app$', Sidebar.as_view()),
     url(r'^dashboard$', Dashboard.as_view()),
 )

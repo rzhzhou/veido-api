@@ -283,7 +283,7 @@ class Dashboard(BaseAPIView):
           })
 
 
-class HomeView(APIView):
+class Sidebar(APIView):
 
   def get(self, request):
       sidebar = sidebarUtil(request)
