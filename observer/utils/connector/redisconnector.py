@@ -4,7 +4,6 @@ from django.conf import settings
 
 
 class RedisClient(object):
-
     conf = None
 
     """docstring for RedisClient"""

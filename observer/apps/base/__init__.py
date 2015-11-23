@@ -57,15 +57,17 @@ def xls_to_response(wb, fname):
 
 
 def sidebarUtil(request):
-    user = request.myuser
+    user = request.user
+    conf = settings.CONF
     username = user.username
 
     sidebar_name = {
-        "news": query_one(user=login_user, confname='news'),
-        "event": query_one(user=login_user, confname='event'),
-        "location": query_one(user=login_user, confname='location'),
-        "custom": query_one(user=login_user, confname='custom'),
-        "site": query_one(user=login_user, confname='site'),
-        "business": eval(query_one(user=login_user, confname='business'))
+        "user": user,
+        "news": conf.get(username, "news"),
+        "event": conf.get(username, "event"),
+        "location": conf.get(username, "location"),
+        "custom": conf.get(username, "custom"),
+        "site": conf.get(username, "site"),
+        "business": eval(conf.get(username, "business"))
     }
     return sidebar_name

@@ -4,7 +4,7 @@ from django.template.loader import render_to_string
 from rest_framework.response import Response
 
 from observer.apps.base.models import Area, Article, Category
-from observer.apps.base.views import BaseAPIView
+from observer.apps.base.views import BaseAPIView, BaseView
 
 
 class ArticleTableView(BaseAPIView):
@@ -50,3 +50,12 @@ class NewsView(BaseAPIView):
         datas = self.paging(items, container['limit'], container['page'])
         result = self.news_to_json(datas['items'])
         return Response({'total': datas['total_number'], 'data': result})
+
+class NewsApi(BaseView):
+    
+    def get(self):
+        items = Category.objects.get(name='质监热点').articles.all()[:10]
+        result = self.news_to_json(items)
+        new_data = self.get_info(title=u'质监热点', color='info', types='news', name='newsDetail', items=result)
+        
+        return new_data

@@ -4,7 +4,7 @@ from django.template.loader import render_to_string
 from rest_framework.response import Response
 
 from observer.apps.base import authenticate, login_required, set_logo
-from observer.apps.base.views import BaseAPIView
+from observer.apps.base.views import BaseAPIView, BaseView
 from observer.apps.base.models import Weixin, Area
 
 
@@ -23,6 +23,16 @@ class WeixinView(BaseAPIView):
         items = [set_logo(data) for data in datas['items']]
         result = self.weixin_to_json(items)
         return Response({'data': result, 'total': datas['total_number']})
+
+
+class WeixinApi(BaseView):
+    
+    def get(self):
+        datas = Weixin.objects.all()[:7]
+        items = [set_logo(data) for data in datas]
+        result = self.weixin_to_json(items)
+        weixin_data = self.get_info(color='success', types='weixin', name=u'微信', link='/weixin', items=result)
+        return weixin_data
 
 
 class LocationWeixinView(BaseAPIView):

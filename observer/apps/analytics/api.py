@@ -16,7 +16,7 @@ from observer.apps.base import sidebarUtil, xls_to_response
 from observer.apps.base.views import BaseTemplateView
 from observer.apps.base.models import Article, Area, Category, Inspection, Weixin, Weibo
 from observer.utils.connector.mysql import query
-from observer.utils.connector.redis import RedisQueryApi
+from observer.utils.connector.redisconnector import RedisQueryApi
 
 
 class DispatchView(APIView, BaseTemplateView):
