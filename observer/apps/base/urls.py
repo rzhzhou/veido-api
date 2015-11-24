@@ -80,7 +80,7 @@ urlpatterns += patterns(
 
 urlpatterns += patterns(
     'observer.apps.inspection.api',
-    url(r'^inspection/$', InspectionTableView.as_view()),
+    url(r'^inspection$', InspectionTableView.as_view()),
     url(r'^dashboard/local-inspection/$', InspectionLocalView.as_view()),
     url(r'^dashboard/national-inspection/$', InspectionNationalView.as_view()),
 )
