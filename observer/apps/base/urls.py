@@ -3,8 +3,7 @@ from django.conf.urls import patterns, include, url
 from observer.apps.collection.api import CollectView, CollecModifyView
 from observer.apps.custom.api import CustomWeixinView, CustomWeiboView, \
     CustomModifyView, CustomNewsView
-from observer.apps.event.api import EventView, EventNewsView, \
-    EventWeixinView, EventWeiboView
+from observer.apps.event.api import EventDetailsView, EventTableView
 from observer.apps.inspection.api import InspectionTableView, InspectionLocalView, \
     InspectionNationalView
 from observer.apps.news.api import LocationTableView, NewsView, ArticleTableView
@@ -36,12 +35,8 @@ urlpatterns += patterns(
 
 urlpatterns += patterns(
     'observer.apps.event.api',
-    url(r'^event/$', EventView.as_view()),
-    url(r'^event/(?P<id>\d+)/news/$', EventNewsView.as_view()),
-    url(r'^event/(?P<id>\d+)/weixin/$', EventWeixinView.as_view()),
-    url(r'^event/(?P<id>\d+)/weibo/$', EventWeiboView.as_view()),
-    url(r'^line/event/(\d+)/$', 'chart_line_event_view'),
-    url(r'^pie/event/(\d+)/$', 'chart_pie_event_view'),
+    url(r'^event/(?P<id>\d+)$', EventDetailsView.as_view()),
+    url(r'^event$', EventTableView.as_view()),
 )
 
 urlpatterns += patterns(
