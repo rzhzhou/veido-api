@@ -37,7 +37,7 @@ class EventDetailsView(BaseAPIView):
         items = event.articles.all()
         datas = self.paging(items, settings.NEWS_PAGE_LIMIT, container['page'])
         result = self.news_to_json(datas['items'])
-        return {'data': result, 'pages': datas['total_number']}
+        return {'items': result, 'pages': datas['total_number']}
 
     def event_weixin(self, event, container):
         items = event.weixin.all()
