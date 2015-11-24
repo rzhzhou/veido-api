@@ -70,6 +70,7 @@ class BaseView(View):
         result = []
         for data in items:
             item = {}
+            item['id'] = data.id
             item['url'] = data.url
             item['event'] = data.name
             item['source'] = data.source
