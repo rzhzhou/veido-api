@@ -5,6 +5,7 @@ from django.db import models
 from django.http import HttpResponse, HttpResponseRedirect
 
 from observer.apps.base.models import User, AnonymousUser, hash_password
+from observer.apps.config.models import Settings, SettingsType
 from observer.utils.connector.mysql import query_one
 
 
@@ -58,16 +59,23 @@ def xls_to_response(wb, fname):
 
 def sidebarUtil(request):
     user = request.user
-    conf = settings.CONF
-    username = user.username
-
-    sidebar_name = {
-        "user": user,
-        "news": conf.get(username, "news"),
-        "event": conf.get(username, "event"),
-        "location": conf.get(username, "location"),
-        "custom": conf.get(username, "custom"),
-        "site": conf.get(username, "site"),
-        "business": eval(conf.get(username, "business"))
-    }
-    return sidebar_name
+    try:
+        user = User.objects.get(username=user.username)
+        sidebar = Settings.objects.filter(user=user, type_id=1)
+        result = {}
+        for i in sidebar:
+            items = {}
+            items[i.name] = i.value
+            result.update(items)
+        result.update({'user': user.username})
+        return result
+    except:
+        return {
+        'user': user.username,
+        'news': '',
+        'event': '',
+        'location': '',
+        'custom': '',
+        'site': '',
+        'business': []
+        }

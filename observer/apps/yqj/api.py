@@ -288,86 +288,86 @@ class Sidebar(APIView):
   def get(self, request):
       sidebar = sidebarUtil(request)
       return Response({
-          "user": {
-          "name": sidebar["user"].username,
-          "company": sidebar["site"].decode('utf-8'),
-          "icon": "/dist/img/avatar.jpg"
+          'user': {
+          'name': sidebar['user'],
+          'company': sidebar['site'],
+          'icon': '/dist/img/avatar.jpg'
           },
-          "map": [
+          'map': [
             {
-              "id": "dashboard",
-              "name": u"整体概览",
-              "icon": "dashboard"
+              'id': 'dashboard',
+              'name': u'整体概览',
+              'icon': 'dashboard'
             },
             {
-              "id": "website",
-              "name": u"网站",
-              "icon": "globe"
+              'id': 'website',
+              'name': u'网站',
+              'icon': 'globe'
             },
             {
-              "id": "keyword",
-              "name": u"关键词",
-              "icon": "comment-o"
+              'id': 'keyword',
+              'name': u'关键词',
+              'icon': 'comment-o'
             },
             {
-              "id": "event",
-              "name": sidebar["event"].decode('utf-8'),
-              "icon": "warning"
+              'id': 'event',
+              'name': sidebar['event'],
+              'icon': 'warning'
             },
             {
-              "id": "eventDetail",
-              "name": u"事件详情",
-              "icon": "warning"
+              'id': 'eventDetail',
+              'name': u'事件详情',
+              'icon': 'warning'
             },
             {
-              "id": "person",
-              "name": u"人物",
-              "icon": "user"
+              'id': 'person',
+              'name': u'人物',
+              'icon': 'user'
             },
             {
-              "id": "news",
-              "name": sidebar["news"].decode('utf-8'),
-              "icon": "newspaper-o"
+              'id': 'news',
+              'name': sidebar['news'],
+              'icon': 'newspaper-o'
             },
             {
-              "id": "newsDetail",
-              "name": u"热点详情",
-              "icon": "newspaper-o"
+              'id': 'newsDetail',
+              'name': u'热点详情',
+              'icon': 'newspaper-o'
             },
             {
-              "id": "industry",
-              "name": u"行业监测",
-              "icon": "industry"
+              'id': 'industry',
+              'name': u'行业监测',
+              'icon': 'industry'
             },
             {
-              "id": "inspection",
-              "name": u"抽检信息",
-              "icon": "cubes"
+              'id': 'inspection',
+              'name': u'抽检信息',
+              'icon': 'cubes'
             },
             {
-              "id": "department",
-              "name":u"业务信息",
-              "icon": "tasks"
+              'id': 'department',
+              'name':u'业务信息',
+              'icon': 'tasks'
             },
             {
-              "id": "collection",
-              "name": u"我的收藏",
-              "icon": "star"
+              'id': 'collection',
+              'name': u'我的收藏',
+              'icon': 'star'
             },
             {
-              "id": "settings",
-              "name": u"我的设置",
-              "icon": "gear"
+              'id': 'settings',
+              'name': u'我的设置',
+              'icon': 'gear'
             },
             {
-              "id": "user",
-              "name": u"账户管理",
-              "icon": "user"
+              'id': 'user',
+              'name': u'账户管理',
+              'icon': 'user'
             },
             {
-              "id": "weixinDetail",
-              "name": u"微信",
-              "icon": ""
+              'id': 'weixinDetail',
+              'name': u'微信',
+              'icon': ''
             }
           ]
         })
