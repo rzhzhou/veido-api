@@ -50,9 +50,13 @@ class BaseView(View):
         result = []
         for data in items:
             item = {}
-            item['title'] = data.title
             item['id'] = data.id
-            item['source'] = data.publisher.publisher
+            item['url'] = data.url
+            item['title'] = data.title
+            item['author'] = data.author
+            item['source'] = data.source
+            item['publisher'] = data.publisher.publisher
+            item['content'] = data.content
             item['location'] = data.area.name
             pubtime = data.pubtime
             if pubtime.tzinfo == pytz.utc:
@@ -275,18 +279,33 @@ class BaseAPIView(BaseView, APIView):
 
         return {'items': items, 'total_number': paginator.num_pages}
 
+    # def requesthead(self, limit=6, limit_list=20, sort='', page=1):
+    #     parameter = self.request.GET.dict()
+    #     api_type = parameter.pop('type')  if parameter.has_key('type') else ''
+    #     sort = parameter.pop('sort') if parameter.has_key('sort') else sort
+    #     page = parameter.pop('page') if parameter.has_key('page') else page
+    #     limit = limit_list if api_type == 'list' else limit
+    #     parameter = {'name':'abc'}
+
+    #     container = dict(parameter, **{
+    #         'type': api_type,
+    #         'page': page,
+    #         'sort': sort,
+    #         'limit': limit
+    #     })
+    #     return container
+
     def requesthead(self, limit=6, limit_list=20, sort='', page=1):
         parameter = self.request.GET.dict()
         api_type = parameter.pop('type')  if parameter.has_key('type') else ''
         sort = parameter.pop('sort') if parameter.has_key('sort') else sort
         page = parameter.pop('page') if parameter.has_key('page') else page
-        limit = limit_list if api_type == 'list' else limit
         parameter = {'name':'abc'}
 
         container = dict(parameter, **{
             'type': api_type,
             'page': page,
             'sort': sort,
-            'limit': limit
+            'limit': limit_list,
         })
         return container
