@@ -13,18 +13,9 @@ from observer.apps.base.views import BaseAPIView
 class RisksView(BaseAPIView):
     HOME_PAGE_LIMIT = 10
 
-    def get_score_article(self, request):
-        user = request.myuser
-        company = user.group.company
-        group = Group.objects.get(company=company).id
-        score_list = LocaltionScore.objects.filter(group=group)
-        risk_id = []
-        for item in score_list:
-            risk_id.append(item.risk_id)
-
-        risk_lists = Risk.objects.filter(id__in=risk_id)
-        risk_list = []
-        for item in risk_lists:
+    def risk_json(self, risks):
+        risk_lists = []
+        for item in risks:
             data = {}
             try:
                 relevance = LocaltionScore.objects.get(risk_id=item.id, group_id=group).score
@@ -40,15 +31,31 @@ class RisksView(BaseAPIView):
             data['score'] = score
             data['pubtime'] = item.pubtime
             data['id'] = item.id
-            risk_list.append(data)
-        return risk_list
+            risk_lists.append(data)
+        return risk_lists
+
+    def get_score_article(self, request):
+        user = request.myuser
+        company = user.group.company
+        group = Group.objects.get(company=company).id
+        score_list = LocaltionScore.objects.filter(group=group)
+        risk_id = []
+        for item in score_list:
+            risk_id.append(item.risk_id)
+        risk_before = Risk.objects.filter(id__in=risk_id)
+        risk_lists = self.risk_json(risk_before)
+        risk_after = Risk.objects.exclude(id__in=risk_id)
+        risk_lists = risk_lists + self.risk_json(risk_after)
+        return risk_lists
 
     def get(self, request):
-        container = self.requesthead(
-            page=1, limit=self.HOME_PAGE_LIMIT, limit_list=settings.RISK_PAGE_LIMIT)
+        container = self.requestContainer(page=1,limit=self.HOME_PAGE_LIMIT, 
+            limit_list=settings.RISK_PAGE_LIMIT)
         items = self.get_score_article(request)
         datas = self.paging(items, container['limit'], container['page'])
-        return Response({'total': datas['total_number'], 'data': list(datas['items'])})
+        html_string = render_to_string('risk/%s_tpl.html' % container['type'], 
+            {'risk_list':  datas['items']})
+        return Response({'total': datas['total_number'], 'html': html_string})
 
 
 class RisksNewsView(BaseAPIView):
