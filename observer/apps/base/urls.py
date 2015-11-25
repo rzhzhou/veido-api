@@ -93,7 +93,7 @@ urlpatterns += patterns(
 
 urlpatterns += patterns(
     'observer.apps.collection,api',
-    url(r'^collection/$', CollecModifyView.as_view()),
+    url(r'^collection$', CollecModifyView.as_view()),
     url(r'^collection/(?P<table_type>\S+)/$', CollectView.as_view()),
 )
 

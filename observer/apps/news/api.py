@@ -91,7 +91,6 @@ class NewsView(BaseAPIView):
             limit=self.HOME_PAGE_LIMIT, limit_list=settings.NEWS_PAGE_LIMIT)
         items = self.get_custom_artice()
         datas = self.paging(items, container['limit'], container['page'])
-        print container['limit'], container['page']
         result = self.news_to_json(datas['items'])
         return Response({'list':{'pages': datas['total_number'], 'items': result}})
 
