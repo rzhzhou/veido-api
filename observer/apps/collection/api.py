@@ -8,13 +8,13 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from observer.apps.base.models import Article, Category, RelatedData, ArticleCollection,\
-    Collection
+    Collection, User
 from observer.apps.news.api import ArticleTableView
 from observer.apps.event.api import EventTableView
 from observer.apps.base.views import BaseAPIView
 
 
-class CollecModifyView(View):
+class CollecModifyView(BaseAPIView):
     def save(self, item):
         data = {self.related_field: item, 'collection': self.collection}
         if isinstance(item, Article):
@@ -33,7 +33,7 @@ class CollecModifyView(View):
         try:
             collectitem = self.get_collection_model().objects.get(**{self.related_field: item, 'collection': self.collection})
             collectitem.delete(using='master')
-        except self.get_collection_model.DoesNotExist:
+        except self.get_collection_model().DoesNotExist:
             pass
 
     @property
@@ -46,7 +46,9 @@ class CollecModifyView(View):
     def _create_collection(self):
         # add a collection to the user
         try:
-            _collection = self.request.myuser.collection
+            name = self.request.user.username
+            user = User.objects.get(username=name)
+            _collection = user.collection
         except ObjectDoesNotExist:
             _collection = Collection(user=user)
             _collection.save(using='master')
@@ -63,9 +65,14 @@ class CollecModifyView(View):
         return models.get_model('base', self.data_type.capitalize() + 'Collection')
 
     def prepare(self, request):
-        data = request.read()
-        data_type = data.split('&')[0].split('=')[1]
-        id = data.split('&')[1].split('=')[1]
+        data = eval(request.read())
+        data_type = data['type']
+        id = data['id']
+
+        if data_type == 'news':
+            data_type = 'article'
+        elif data_type == 'event':
+            data_type = 'topic'
         try:
             self.data_type = data_type
             pk = id
