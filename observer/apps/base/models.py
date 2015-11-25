@@ -3,6 +3,7 @@ import hmac
 import hashlib
 
 from django.conf import settings
+from tinymce.models import HTMLField
 from django.db import models
 from django.utils.crypto import get_random_string
 
@@ -150,7 +151,7 @@ class News(models.Model):
 
 class Topic(models.Model):
     title = models.CharField(max_length=255, blank=True, verbose_name=u'标题')
-    abstract = models.TextField(blank=True, verbose_name=u'简介')
+    abstract = HTMLField()
     source = models.CharField(max_length=255, blank=True, verbose_name=u'首发媒体')
     area = models.ForeignKey(Area, verbose_name=u'地域')
     keywords = models.CharField(max_length=255, default=u'', verbose_name=u'关键词', blank=True)
