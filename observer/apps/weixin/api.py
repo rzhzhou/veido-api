@@ -5,7 +5,7 @@ from rest_framework.response import Response
 
 from observer.apps.base import authenticate, login_required, set_logo
 from observer.apps.base.views import BaseAPIView, BaseView
-from observer.apps.base.models import Weixin, Area
+from observer.apps.base.models import Weixin, Area, RelatedData
 
 
 class WeixinView(BaseAPIView):
@@ -48,3 +48,23 @@ class LocationWeixinView(BaseAPIView):
         items = [set_logo(data) for data in datas['items']]
         result = self.weixin_to_json(items)
         return Response({'data': result, 'total': datas['total_number']})
+
+
+class WeixinDetailView(BaseAPIView):
+
+    def get(self, request, id):
+        try:
+            weixin_id = int(id)
+            weixin = Weixin.objects.filter(id=weixin_id)
+            result = self.weixin_to_json(weixin)[0]
+        except:
+            return Response({'data': {}, 'relate': []})
+        try:
+            r = RelatedData.objects.filter(uuid=weixin[0].uuid)[0]
+            weinxin_list = self.weixin_to_json(r.weixin.all())
+            weibo_list = self.weibo_to_json(r.weibo.all())
+            article_list = self.news_to_json(r.articles.all())
+            relateddata = weinxin_list + weibo_list + article_list
+        except IndexError:
+            relateddata = []
+        return Response( {'article': result, 'relate': relateddata})

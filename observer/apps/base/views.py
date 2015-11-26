@@ -110,12 +110,13 @@ class BaseView(View):
             item = {}
             item['id'] = data.id
             item['url'] = data.url
-            item['publisher'] = data.publisher.publisher
+            item['author'] = data.publisher.publisher
             item['source'] = data.source
             item['title'] = data.title
             item['photo'] = data.publisher.photo
             item['count'] = data.readnum
             item['likes'] = data.likenum
+            item['content'] = data.content
             pubtime = data.pubtime
             if pubtime.tzinfo == pytz.utc:
                 item['time'] = pubtime.astimezone(pytz.timezone(settings.TIME_ZONE)).strftime('%Y-%m-%d %H-%M-%S')
