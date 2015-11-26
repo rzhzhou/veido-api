@@ -11,7 +11,7 @@ from observer.apps.risk.api import RisksView, RisksNewsView,\
     RisksWeixinView, RisksWeiboView
 from observer.apps.product.api import ProductTableView
 from observer.apps.search.api import SearchView
-from observer.apps.weixin.api import WeixinView, LocationWeixinView
+from observer.apps.weixin.api import WeixinView, LocationWeixinView, WeixinDetailView
 from observer.apps.weibo.api import WeiboView, LocationWeiboView
 from observer.apps.analytics.api import DispatchView
 from observer.apps.yqj.api import login_view, registe_view, upload_image, change_passwd,\
@@ -58,6 +58,7 @@ urlpatterns += patterns(
 urlpatterns += patterns(
     'observer.apps.weixin.api',
     url(r'^weixin/$', WeixinView.as_view()),
+    url(r'^weixin/(?P<id>\d+)$', WeixinDetailView.as_view()),
     url(r'^location/(?P<id>\d+)/weixin/$', LocationWeixinView.as_view()),
 )
 
