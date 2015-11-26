@@ -7,6 +7,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 from observer.apps.base.models import User, AnonymousUser, hash_password
 from observer.apps.config.models import Settings, SettingsType
 from observer.utils.connector.mysql import query_one
+from observer.utils.connector.redisconnector import RedisQueryApi
+from rest_framework.response import Response
 
 
 def authenticate(username, raw_password):
@@ -79,3 +81,17 @@ def sidebarUtil(request):
         'site': '',
         'business': []
         }
+
+
+def token(view_func):
+
+    def wrapper(view_class, *args, **kwargs):
+        jwt = (view_class.request).META['HTTP_AUTHORIZATION']
+        data = RedisQueryApi().keys('token*')
+        for item in data:
+            value = RedisQueryApi().get(item)
+            if jwt == value:
+                return HttpResponse(status=403)
+            else:
+                return view_func(view_class, *args, **kwargs)
+    return wrapper

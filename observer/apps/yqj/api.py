@@ -2,6 +2,7 @@
 import cPickle
 import os
 import pytz
+import uuid
 from datetime import datetime, timedelta
 
 from django.db import models, connection, IntegrityError
@@ -12,7 +13,7 @@ from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from observer.apps.base import authenticate, login_required, set_logo
+from observer.apps.base import authenticate, login_required, set_logo, token
 from observer.apps.base.models import save_user, hash_password, User, Area, Category
 from django.conf import settings
 from observer.apps.base import sidebarUtil
@@ -26,6 +27,7 @@ from observer.apps.base.models import (
     Group, Inspection, LocaltionScore, Product, ProductKeyword, RelatedData,
     Risk, RiskScore, Topic, Weibo, Weixin)
 from observer.utils.connector.redisconnector import RedisQueryApi
+
 
 def login_view(request):
     try:
@@ -183,7 +185,8 @@ def get_count_feeling(start_d, end_d, feeling_type):
     else:
         feeling_limit = 'feeling_factor > 0.1  and feeling_factor < 0.9 or feeling_factor = -1'
     with connection.cursor() as c:
-        sql_str = "SELECT Date(pubtime), COUNT(*) FROM article where Date(pubtime) >= '{0}' and Date(pubtime) < '{1}' and {2} group by Date(pubtime)".format(start_d, end_d, feeling_limit)
+        sql_str = "SELECT Date(pubtime), COUNT(*) FROM article where Date(pubtime) >= '{0}' and Date(pubtime) < '{1}' and {2} group by Date(pubtime)".format(
+            start_d, end_d, feeling_limit)
         c.execute(sql_str)
         rows = c.fetchall()
 
@@ -206,7 +209,8 @@ def chart_line_index_view(request):
     end_d = today + timedelta(days=1)
 
     data = {}
-    data['date'] = [(today - timedelta(days=x)).strftime("%m-%d") for x in reversed(range(7))]
+    data['date'] = [(today - timedelta(days=x)).strftime("%m-%d")
+                    for x in reversed(range(7))]
     data['positive'] = get_count_feeling(start_d, end_d, 'positive')
     data['neutral'] = get_count_feeling(start_d, end_d, 'netrual')
     data['negative'] = get_count_feeling(start_d, end_d, 'negative')
@@ -221,14 +225,16 @@ def chart_pie_index_view(request):
     name = [item.name for item in locations]
     values = []
     for item in locations:
-        values.append({'name': item.name, 'value': item.article_set.all().count()})
+        values.append(
+            {'name': item.name, 'value': item.article_set.all().count()})
         # values.append({'name': item.name, 'value': 80})
     values = [item for item in values if item['value']]
     return JsonResponse({'name': name, "value": values})
 
 
 def map_view(request):
-    data = cPickle.load(file(os.path.join(settings.BASE_DIR, "yqj/jobs/minutely/map.json"), "r"))
+    data = cPickle.load(
+        file(os.path.join(settings.BASE_DIR, "yqj/jobs/minutely/map.json"), "r"))
     risk_data = data["regionData"]
     return JsonResponse({"regionData": risk_data})
 
@@ -245,133 +251,141 @@ class Dashboard(BaseAPIView):
         weibo_list = WeiboApi().get()
         return Response({
             "boxes": [{
-              "id": 0,
-              "name": u"质监热点",
-              "number": news,
-              "link": "news",
-              "color": "aqua",
-              "icon": "newspaper-o"
+                "id": 0,
+                "name": u"质监热点",
+                "number": news,
+                "link": "news",
+                "color": "aqua",
+                "icon": "newspaper-o"
             },
-            {
-              "id": 1,
-              "name": u"事件",
-              "number": event,
-              "link": "event",
-              "color": "red",
-              "icon": "exclamation"
+                {
+                "id": 1,
+                "name": u"事件",
+                "number": event,
+                "link": "event",
+                "color": "red",
+                "icon": "exclamation"
             },
-            {
-              "id": 2,
-              "name": u"行业监测",
-              "number": "2890",
-              "link": "industry",
-              "color": "green",
-              "icon": "industry"
+                {
+                "id": 2,
+                "name": u"行业监测",
+                "number": "2890",
+                "link": "industry",
+                "color": "green",
+                "icon": "industry"
             },
-            {
-              "id": 3,
-              "name": u"抽检信息",
-              "number": inspection,
-              "link": "inspection",
-              "color": "yellow",
-              "icon": "cubes"
+                {
+                "id": 3,
+                "name": u"抽检信息",
+                "number": inspection,
+                "link": "inspection",
+                "color": "yellow",
+                "icon": "cubes"
             }],
             "weixin": weixin_list,
             "weibo": weibo_list,
-            "news": news_list, 
+            "news": news_list,
             'event': event_list
-          })
+        })
 
 
 class Sidebar(APIView):
 
-  def get(self, request):
-      sidebar = sidebarUtil(request)
-      return Response({
-          'user': {
-          'name': sidebar['user'],
-          'company': sidebar['site'],
-          'icon': '/dist/img/avatar.jpg'
-          },
-          'map': [
-            {
-              'id': 'dashboard',
-              'name': u'整体概览',
-              'icon': 'dashboard'
+    def get(self, request):
+        sidebar = sidebarUtil(request)
+        return Response({
+            'user': {
+                'name': sidebar['user'],
+                'company': sidebar['site'],
+                'icon': '/dist/img/avatar.jpg'
             },
-            {
-              'id': 'website',
-              'name': u'网站',
-              'icon': 'globe'
-            },
-            {
-              'id': 'keyword',
-              'name': u'关键词',
-              'icon': 'comment-o'
-            },
-            {
-              'id': 'event',
-              'name': sidebar['event'],
-              'icon': 'warning'
-            },
-            {
-              'id': 'eventDetail',
-              'name': u'事件详情',
-              'icon': 'warning'
-            },
-            {
-              'id': 'person',
-              'name': u'人物',
-              'icon': 'user'
-            },
-            {
-              'id': 'news',
-              'name': sidebar['news'],
-              'icon': 'newspaper-o'
-            },
-            {
-              'id': 'newsDetail',
-              'name': u'热点详情',
-              'icon': 'newspaper-o'
-            },
-            {
-              'id': 'industry',
-              'name': u'行业监测',
-              'icon': 'industry'
-            },
-            {
-              'id': 'inspection',
-              'name': u'抽检信息',
-              'icon': 'cubes'
-            },
-            {
-              'id': 'department',
-              'name':u'业务信息',
-              'icon': 'tasks'
-            },
-            {
-              'id': 'collection',
-              'name': u'我的收藏',
-              'icon': 'star'
-            },
-            {
-              'id': 'settings',
-              'name': u'我的设置',
-              'icon': 'gear'
-            },
-            {
-              'id': 'user',
-              'name': u'账户管理',
-              'icon': 'user'
-            },
-            {
-              'id': 'weixinDetail',
-              'name': u'微信',
-              'icon': ''
-            }
-          ]
+            'map': [
+                {
+                    'id': 'dashboard',
+                    'name': u'整体概览',
+                    'icon': 'dashboard'
+                },
+                {
+                    'id': 'website',
+                    'name': u'网站',
+                    'icon': 'globe'
+                },
+                {
+                    'id': 'keyword',
+                    'name': u'关键词',
+                    'icon': 'comment-o'
+                },
+                {
+                    'id': 'event',
+                    'name': sidebar['event'],
+                    'icon': 'warning'
+                },
+                {
+                    'id': 'eventDetail',
+                    'name': u'事件详情',
+                    'icon': 'warning'
+                },
+                {
+                    'id': 'person',
+                    'name': u'人物',
+                    'icon': 'user'
+                },
+                {
+                    'id': 'news',
+                    'name': sidebar['news'],
+                    'icon': 'newspaper-o'
+                },
+                {
+                    'id': 'newsDetail',
+                    'name': u'热点详情',
+                    'icon': 'newspaper-o'
+                },
+                {
+                    'id': 'industry',
+                    'name': u'行业监测',
+                    'icon': 'industry'
+                },
+                {
+                    'id': 'inspection',
+                    'name': u'抽检信息',
+                    'icon': 'cubes'
+                },
+                {
+                    'id': 'department',
+                    'name': u'业务信息',
+                    'icon': 'tasks'
+                },
+                {
+                    'id': 'collection',
+                    'name': u'我的收藏',
+                    'icon': 'star'
+                },
+                {
+                    'id': 'settings',
+                    'name': u'我的设置',
+                    'icon': 'gear'
+                },
+                {
+                    'id': 'user',
+                    'name': u'账户管理',
+                    'icon': 'user'
+                },
+                {
+                    'id': 'weixinDetail',
+                    'name': u'微信',
+                    'icon': ''
+                }
+            ]
         })
 
 
-def logout_view(request):
-  return JsonResponse({})
+class LogoutView(BaseAPIView):
+
+    @token
+    def get(self, request):
+        time = settings.JWT_AUTH['JWT_EXPIRATION_DELTA']
+        name = 'token'+str(uuid.uuid1())
+        jwt = request.META['HTTP_AUTHORIZATION']
+        RedisQueryApi().set(name, jwt)
+        RedisQueryApi().expire(name, time)
+        return Response({'status': 'true'})
