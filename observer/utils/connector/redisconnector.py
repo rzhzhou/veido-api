@@ -63,3 +63,15 @@ class RedisQueryApi(object):
 
     def sort(self, name, start=None, num=None, by=None, get=None, desc=False, alpha=False, store=None):
         return self.instance.sort(name, start, num, by, get, desc, alpha, store)
+    
+    def set(self, key, value):
+        return self.instance.set(key, value)
+
+    def get(self, key):
+        return self.instance.get(key)
+
+    def expire(self, key, value):
+        return self.instance.expire(key, value)
+
+    def keys(self, key):
+        return self.instance.keys(key)
