@@ -86,12 +86,16 @@ def sidebarUtil(request):
 def token(view_func):
 
     def wrapper(view_class, *args, **kwargs):
-        jwt = (view_class.request).META['HTTP_AUTHORIZATION']
-        data = RedisQueryApi().keys('token*')
-        for item in data:
-            value = RedisQueryApi().get(item)
-            if jwt == value:
-                return HttpResponse(status=403)
-            else:
-                return view_func(view_class, *args, **kwargs)
+        parameter = view_class.request
+        username = parameter.user.username
+        jwt = parameter.META['HTTP_AUTHORIZATION']
+        data = RedisQueryApi().keys(username+'*')
+        if data:
+            for item in data:
+                value = RedisQueryApi().get(item)
+                if jwt == value:
+                    return HttpResponse(status=403)
+        else:
+            return view_func(view_class, *args, **kwargs)
+        return view_func(view_class, *args, **kwargs)
     return wrapper

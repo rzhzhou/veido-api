@@ -3,6 +3,7 @@ import cPickle
 import os
 import pytz
 import uuid
+import jwt
 from datetime import datetime, timedelta
 
 from django.db import models, connection, IntegrityError
@@ -383,9 +384,12 @@ class LogoutView(BaseAPIView):
 
     @token
     def get(self, request):
-        time = settings.JWT_AUTH['JWT_EXPIRATION_DELTA']
-        name = 'token'+str(uuid.uuid1())
-        jwt = request.META['HTTP_AUTHORIZATION']
-        RedisQueryApi().set(name, jwt)
-        RedisQueryApi().expire(name, time)
+        auth = settings.JWT_AUTH
+        secret_key = auth['JWT_SECRET_KEY']
+        algorithm = auth['JWT_ALGORITHM']
+        token = request.META['HTTP_AUTHORIZATION']
+        result = jwt.decode(token.split()[1], secret_key, algorithm)
+        name = result['username'] + str(uuid.uuid1())
+        RedisQueryApi().set(name, token)
+        RedisQueryApi().expire(name, result['exp'])
         return Response({'status': 'true'})
