@@ -9,7 +9,7 @@ from rest_framework.response import Response
 
 from observer.apps.base.views import BaseAPIView
 from observer.apps.base.models import Inspection
-from observer.apps.yqj.redisconnect import RedisQueryApi
+
 
 class InspectionTableView(BaseAPIView):
     def get(self, request):
@@ -17,8 +17,7 @@ class InspectionTableView(BaseAPIView):
         items = Inspection.objects.exclude(qualitied__lt=0).order_by('-pubtime')
         datas = self.paging(items, container['limit'], container['page'])
         result = self.inspection_to_json(datas['items'])
-        html_string = render_to_string('inspection/list_tpl.html', {'inspection_list':  result})
-        return Response({'total': datas['total_number'], 'html': html_string})
+        return Response({'list':{'pages': datas['total_number'], 'items': result}})
 
 
 class InspectionLocalView(BaseAPIView):

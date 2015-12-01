@@ -4,9 +4,9 @@ from django.template.loader import render_to_string
 from rest_framework.response import Response
 
 from observer.apps.base import authenticate, login_required, set_logo
-from observer.apps.base.views import BaseAPIView
+from observer.apps.base.views import BaseAPIView, BaseView
 from observer.apps.base.models import Weibo, Area
-
+from observer.utils.connector.redisconnector import RedisQueryApi
 
 class WeiboView(BaseAPIView):
     HOME_PAGE_LIMIT = 6
@@ -14,6 +14,7 @@ class WeiboView(BaseAPIView):
     def get(self, request):
         container = self.requesthead(
             sort='hot', limit_list=settings.WEIBO_TABLE_LIMIT, limit=self.HOME_PAGE_LIMIT)
+
         if container['sort'] == 'new':
             datas = self.paging(Weibo.objects.all(), container['limit'], container['page'])
         else:
@@ -21,6 +22,16 @@ class WeiboView(BaseAPIView):
         items = [set_logo(data) for data in datas['items']]
         result = self.weibo_to_json(items)
         return Response({'data': result, 'total': datas['total_number']})
+
+
+class WeiboApi(BaseView):
+
+    def get(self):
+        uuids = RedisQueryApi().lrange('hotuuid', 0, -1)
+        items = Weibo.objects.filter(uuid__in=uuids)
+        result = self.weibo_to_json(items)[:6]
+        weibo_data = self.get_info(color='warning', types='weibo', name=u'微博', link='/weibo', items=result)
+        return weibo_data
 
 
 class LocationWeiboView(BaseAPIView):

@@ -3,6 +3,7 @@ import hmac
 import hashlib
 
 from django.conf import settings
+from tinymce.models import HTMLField
 from django.db import models
 from django.utils.crypto import get_random_string
 
@@ -134,7 +135,7 @@ class News(models.Model):
     author = models.CharField(max_length=255, verbose_name=u'作者')
     title = models.CharField(max_length=255, blank=True, verbose_name=u'标题')
     url = models.URLField(verbose_name=u'网站链接')
-    content = models.TextField(blank=True, verbose_name=u'正文')
+    content = HTMLField(blank=True, verbose_name=u'正文')
     source = models.CharField(max_length=255, blank=True, verbose_name=u'信息来源')
     pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
 
@@ -150,7 +151,7 @@ class News(models.Model):
 
 class Topic(models.Model):
     title = models.CharField(max_length=255, blank=True, verbose_name=u'标题')
-    abstract = models.TextField(blank=True, verbose_name=u'简介')
+    abstract = models.CharField(max_length=255, blank=True, verbose_name=u'正文')
     source = models.CharField(max_length=255, blank=True, verbose_name=u'首发媒体')
     area = models.ForeignKey(Area, verbose_name=u'地域')
     keywords = models.CharField(max_length=255, default=u'', verbose_name=u'关键词', blank=True)
@@ -299,6 +300,9 @@ class User(models.Model):
     class Meta:
         db_table = 'yqj_user'
         verbose_name_plural = u'舆情机用户'
+
+    def __unicode__(self):
+        return self.username
 
     def is_authenticated(self):
         return True

@@ -10,8 +10,8 @@ from django.views.generic import View
 from rest_framework.views import APIView
 
 from observer.apps.base import login_required, get_user_image, sidebarUtil
-from observer.apps.base.models import Area, Category, RelatedData
-from observer.apps.yqj.redisconnect import RedisQueryApi
+from observer.apps.base.models import Area, Category, RelatedData, Weibo
+from observer.utils.connector.redisconnector import RedisQueryApi
 
 
 class LoginRequiredMixin(object):
@@ -24,6 +24,16 @@ class LoginRequiredMixin(object):
 
 
 class BaseView(View):
+    def get_info(self, title='', color=None, types=None, name=None, items=None, link=None):
+        data = {
+        'title': title,
+        'color': color,
+        'type': types,
+        'name': name,
+        'items': items,
+        'link': link
+        }
+        return data
 
     def paging(self, items, limit, page):
         paginator = Paginator(items, limit)
@@ -40,9 +50,13 @@ class BaseView(View):
         result = []
         for data in items:
             item = {}
-            item['title'] = data.title
             item['id'] = data.id
-            item['source'] = data.publisher.publisher
+            item['url'] = data.url
+            item['title'] = data.title
+            item['author'] = data.author
+            item['source'] = data.source
+            item['publisher'] = data.publisher.publisher
+            item['content'] = data.content
             item['location'] = data.area.name
             pubtime = data.pubtime
             if pubtime.tzinfo == pytz.utc:
@@ -60,6 +74,7 @@ class BaseView(View):
         result = []
         for data in items:
             item = {}
+            item['id'] = data.id
             item['url'] = data.url
             item['event'] = data.name
             item['source'] = data.source
@@ -95,11 +110,13 @@ class BaseView(View):
             item = {}
             item['id'] = data.id
             item['url'] = data.url
-            item['publisher'] = data.publisher.publisher
+            item['author'] = data.publisher.publisher
+            item['source'] = data.source
             item['title'] = data.title
             item['photo'] = data.publisher.photo
-            item['readnum'] = data.readnum
-            item['likenum'] = data.likenum
+            item['count'] = data.readnum
+            item['likes'] = data.likenum
+            item['content'] = data.content
             pubtime = data.pubtime
             if pubtime.tzinfo == pytz.utc:
                 item['time'] = pubtime.astimezone(pytz.timezone(settings.TIME_ZONE)).strftime('%Y-%m-%d %H-%M-%S')
@@ -114,12 +131,12 @@ class BaseView(View):
             item = {}
             item['id'] = data.id
             item['url'] = data.url
-            item['publisher'] = data.publisher.publisher
+            item['author'] = data.publisher.publisher
             item['title'] = data.title
             item['photo'] = data.publisher.photo
-            item['attitudes'] = data.attitudes_count
+            item['likes'] = data.attitudes_count
             item['comments'] = data.comments_count
-            item['reposts'] = data.reposts_count
+            item['reprints'] = data.reposts_count
             pubtime = data.pubtime
             if pubtime.tzinfo == pytz.utc:
                 item['time'] = pubtime.astimezone(pytz.timezone(settings.TIME_ZONE)).strftime('%Y-%m-%d %H-%M-%S')
@@ -250,7 +267,8 @@ class BaseAPIView(BaseView, APIView):
         return title_format.format(*args)
 
     def pagingfromredis(self, model, limit, page):
-        items = [eval(item) for item in RedisQueryApi().lrange('sort_weibohot', 0, -1)]
+        uuids = RedisQueryApi().lrange('hotuuid', 0, -1)
+        items = Weibo.objects.filter(uuid__in=uuids)
         # 实例化一个分页对象
         paginator = Paginator(items, limit)
         try:
@@ -265,18 +283,33 @@ class BaseAPIView(BaseView, APIView):
 
         return {'items': items, 'total_number': paginator.num_pages}
 
+    # def requesthead(self, limit=6, limit_list=20, sort='', page=1):
+    #     parameter = self.request.GET.dict()
+    #     api_type = parameter.pop('type')  if parameter.has_key('type') else ''
+    #     sort = parameter.pop('sort') if parameter.has_key('sort') else sort
+    #     page = parameter.pop('page') if parameter.has_key('page') else page
+    #     limit = limit_list if api_type == 'list' else limit
+    #     parameter = {'name':'abc'}
+
+    #     container = dict(parameter, **{
+    #         'type': api_type,
+    #         'page': page,
+    #         'sort': sort,
+    #         'limit': limit
+    #     })
+    #     return container
+
     def requesthead(self, limit=6, limit_list=20, sort='', page=1):
         parameter = self.request.GET.dict()
         api_type = parameter.pop('type')  if parameter.has_key('type') else ''
         sort = parameter.pop('sort') if parameter.has_key('sort') else sort
         page = parameter.pop('page') if parameter.has_key('page') else page
-        limit = limit_list if api_type == 'list' else limit
         parameter = {'name':'abc'}
 
         container = dict(parameter, **{
             'type': api_type,
             'page': page,
             'sort': sort,
-            'limit': limit,
+            'limit': limit_list,
         })
         return container

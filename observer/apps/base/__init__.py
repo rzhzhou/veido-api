@@ -1,5 +1,4 @@
 import os
-from ConfigParser import ConfigParser, RawConfigParser
 
 from django.conf import settings
 from django.db import models
@@ -7,7 +6,11 @@ from django.http import HttpResponse, HttpResponseRedirect
 from rest_framework.response import Response
 
 from observer.apps.base.models import User, AnonymousUser, hash_password
-from observer.apps.yqj.redisconnect import RedisQueryApi
+from observer.apps.config.models import Settings, SettingsType
+from observer.utils.connector.mysql import query_one
+from observer.utils.connector.redisconnector import RedisQueryApi
+from rest_framework.response import Response
+
 
 def authenticate(username, raw_password):
     try:
@@ -58,18 +61,42 @@ def xls_to_response(wb, fname):
 
 
 def sidebarUtil(request):
-    user = request.myuser
-    conf = settings.CONF
-    username = user.username
-    if not conf.has_section(username):
-        username = 'test'
+    user = request.user
+    try:
+        user = User.objects.get(username=user.username)
+        sidebar = Settings.objects.filter(user=user, type_id=1)
+        result = {}
+        for i in sidebar:
+            items = {}
+            items[i.name] = i.value
+            result.update(items)
+        result.update({'user': user.username})
+        return result
+    except:
+        return {
+        'user': user.username,
+        'news': '',
+        'event': '',
+        'location': '',
+        'custom': '',
+        'site': '',
+        'business': []
+        }
 
-    sidebar_name = {
-        "news": conf.get(username, "news"),
-        "event": conf.get(username, "event"),
-        "location": conf.get(username, "location"),
-        "custom": conf.get(username, "custom"),
-        "site": conf.get(username, "site"),
-        "business": eval(conf.get(username, "business"))
-    }
-    return sidebar_name
+
+def token(view_func):
+
+    def wrapper(view_class, *args, **kwargs):
+        parameter = view_class.request
+        username = parameter.user.username
+        jwt = parameter.META['HTTP_AUTHORIZATION']
+        data = RedisQueryApi().keys(username+'*')
+        if data:
+            for item in data:
+                value = RedisQueryApi().get(item)
+                if jwt == value:
+                    return HttpResponse(status=403)
+        else:
+            return view_func(view_class, *args, **kwargs)
+        return view_func(view_class, *args, **kwargs)
+    return wrapper

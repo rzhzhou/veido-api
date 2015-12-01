@@ -5,80 +5,104 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from observer.apps.base import authenticate, login_required, set_logo
-from observer.apps.base.views import BaseAPIView
+from observer.apps.base.views import BaseAPIView, BaseView
 from observer.apps.base.models import Topic
 from observer.apps.base.api_function import chart_line
-from observer.apps.yqj.redisconnect import RedisQueryApi
+from observer.utils.connector.redisconnector import RedisQueryApi
 from observer.utils.decorators.cache import read_cache
 
-class EventView(BaseAPIView):
+class EventDetailsView(BaseAPIView):
     HOME_PAGE_LIMIT = 10
 
-    def collected_items(self):
-        user = self.request.myuser
-        return user.collection.events.all()
+    def collected_items(self, id):
+        # user = self.request.myuser
+        # collection = user.collection.events.filter(id=id)
+        # flag = True if collection else False
+        collected = True
+        return collected
 
-    @read_cache
-    def get(self, request):
-        container = self.requesthead(
-            limit=self.HOME_PAGE_LIMIT, limit_list=settings.EVENT_PAGE_LIMIT)
-        items = Topic.objects.all()
-        datas = self.paging(items, container['limit'], container['page'])
-        result = self.event_to_json(datas['items'])
-        return Response({'total': datas['total_number'], 'data': result})
+    def abstract(self, event):
+        abstract = {}
+        abstract['title'] = event.title
+        abstract['content'] = event.abstract
+        return abstract
 
+    def keywords(self, event):
+        eval_keywords_list = eval(event.keywords) if event.keywords else []
+        keywords_list = [{"name": name, "number": "%.2f"%number}
+         for name, number in eval_keywords_list]
+        return keywords_list
 
-class EventTableView(BaseAPIView):
-    def collected_items(self):
-        user = self.request.myuser
-        return user.collection.events.all()
-
-    def get(self, request, page):
-        items = Topic.objects.all()
-        result = self.event_to_json(items)
-        datas = self.paging(result, self.EVENT_PAGE_LIMIT, page)
-        return Response({'total': datas['total_number'], 'data': list(datas["items"])})
-
-
-class EventNewsView(BaseAPIView):
-
-    def get(self, request, id):
-        container = self.requesthead()
-        try:
-            event = Topic.objects.get(id=int(id))
-        except Topic.DoesNotExist:
-            return HttpResponseRedirect('/event/')
+    def event_news(self, event, container):
         items = event.articles.all()
         datas = self.paging(items, settings.NEWS_PAGE_LIMIT, container['page'])
         result = self.news_to_json(datas['items'])
-        return Response({'data': result, 'total': datas['total_number']})
+        return {'items': result, 'pages': datas['total_number']}
 
-
-class EventWeixinView(BaseAPIView):
-    def get(self, request, id):
-        container = self.requesthead()
-        try:
-            event = Topic.objects.get(id=int(id))
-        except Topic.DoesNotExist:
-            return HttpResponseRedirect('/weixin/')
+    def event_weixin(self, event, container):
         items = event.weixin.all()
         datas = self.paging(items, settings.EVENT_WEIXIN_LIMIT, container['page'])
-        result = [set_logo(data) for data in datas['items']]
-        return Response({'data': result, 'total': datas['total_number']})
-
-
-class EventWeiboView(BaseAPIView):
-
-    def get(self, request, id):
-        container = self.requesthead()
-        try:
-            event = Topic.objects.get(id=int(id))
-        except Topic.DoesNotExist:
-            return HttpResponseRedirect('/weibo/')
+        result = self.weixin_to_json(datas['items'])
+        return {
+            'items': result,
+            'name': u'微信',
+            'type': 'weixin',
+            'color': 'success',
+            'link': '/weixin'
+            }
+    def event_weibo(self, event, container):
         items = event.weibo.all()
         datas = self.paging(items, settings.EVENT_WEIBO_LIMIT, container['page'])
-        result = [set_logo(data) for data in datas['items']]
-        return Response({'data': result, 'total': datas['total_number']})
+        result = self.weibo_to_json(datas['items'])
+        return {
+            'items': result,
+            'type': 'weibo',
+            'name': u'微博',
+            'color': 'warning',
+            'link': '/weibo',
+            }
+
+    def get(self, request, id):
+        collected = self.collected_items(id)
+        container = self.requesthead(
+            limit=self.HOME_PAGE_LIMIT, limit_list=settings.EVENT_PAGE_LIMIT)
+        try:
+            event = Topic.objects.get(id=id)
+            abstract = self.abstract(event)
+            keywords = self.keywords(event)
+            news = self.event_news(event, container)
+            weixins = self.event_weixin(event, container)
+            weibos = self.event_weibo(event, container)
+        except Topic.DoesNotExist:
+            return HttpResponseRedirect('/event/')
+        return Response({
+            'abstract': abstract,
+            'collected':collected,
+            'keywords': keywords,
+            'news': news,
+            'weixin': weixins,
+            'weibo': weibos,
+            })
+
+
+class EventApi(BaseView):
+
+    def get(self):
+        items = Topic.objects.all()[:10]
+        result = self.event_to_json(items)
+        event_data = self.get_info(title=u'质监事件', color='danger', types='event', name='eventDetail', items=result)
+        return event_data
+
+
+class EventTableView(BaseAPIView):
+    def get(self, request):
+        container = self.requesthead(
+            limit_list=settings.EVENT_PAGE_LIMIT)
+        items = Topic.objects.all()
+        result = self.event_to_json(items)
+        datas = self.paging(result, settings.EVENT_PAGE_LIMIT, container['page'])
+        return Response({'list':{'pages': datas['total_number'],
+            'items': list(datas["items"])}})
 
 
 @login_required

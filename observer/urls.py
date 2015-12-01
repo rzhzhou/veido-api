@@ -10,7 +10,7 @@ from django.views.static import serve
 urlpatterns = patterns(
     '',
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^', include('observer.apps.urlservice.urls')),
-    url(r'^api/', include('observer.apps.urlservice.api')),
+    (r'^tinymce/', include('tinymce.urls')),
+    url(r'^api/', include('observer.apps.base.urls')),
     url(r'^vendor/(?P<path>.*)$', serve, {'document_root': os.path.join(settings.BASE_DIR, 'vendor')}),
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

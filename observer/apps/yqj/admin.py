@@ -6,16 +6,20 @@ from django_extensions.admin import ForeignKeyAutocompleteAdmin
 from django.contrib import admin, messages
 from import_export.admin import ImportExportActionModelAdmin
 
-from observer.apps.yqj.mongoconnect import CrawlerTask
+from observer.utils.connector.mongo import CrawlerTask
 from yqj_save import MySQLQuerApi
 from observer.apps.base.models import (
     Area, Article, ArticlePublisher, Category, Custom,
     CustomKeyword, Group, GroupAuthUser, LocaltionScore, Product, ProductKeyword,
     Risk, LRisk, TRisk, RiskScore, Topic, User, Weibo, WeiboPublisher, Weixin,
-    WeixinPublisher, save_user, ZJInspection, News, CacheType, CacheConf)
+    WeixinPublisher, save_user, ZJInspection, News)
+from observer.apps.config.models import(
+    SettingsType, Settings, CacheType, CacheConf)
 from observer.apps.corpus.models import Event
 from resource import InspectionResources
+from import_export.admin import ImportExportActionModelAdmin
 from altercron import execute
+from django.conf import settings
 
 
 def show_pubtime(obj):
@@ -194,7 +198,8 @@ class ProductKeywordAdmin(admin.ModelAdmin):
 
 
 class UserAdmin(admin.ModelAdmin):
-    fields = ('username', 'password', 'area', 'isAdmin', 'group')
+    # fields = ('username', 'password', 'area', 'isAdmin', 'group')
+    # filter_horizontal = ('settings', )
     list_display = ('username', 'password', 'area', 'isAdmin', 'group',)
     list_editable = ('username', 'password', 'area', 'isAdmin', 'group')
 
@@ -324,6 +329,35 @@ class CacheConfAdmin(admin.ModelAdmin):
         execute(obj.time, obj.name)
         obj.save()
 
+class SettingsTypeAdmin(admin.ModelAdmin):
+    fields = ('name', )
+    list_display = ('name', )
+    list_editable = ('name', )
+    list_filter = ('name', )
+    search_fields = ('name', )
+
+
+class SettingsAdmin(admin.ModelAdmin):
+    # fields = ('name', 'value', 'type', 'username')
+    list_display = ('name', 'value', 'type', 'user')
+    list_editable = ('name', 'value', 'type', 'user')
+    list_filter = ('name', 'value', 'type', 'user')
+    search_fields = ('name', 'value', 'type', 'user')
+
+
+class CacheTypeAdmin(admin.ModelAdmin):
+    list_display = ('name', )
+    list_editable = ('name', )
+    list_filter = ('name', )
+    search_fields = ('name', )
+
+
+class CacheConfAdmin(admin.ModelAdmin):
+    list_display = ('name', 'time', 'url', 'typename', 'task')
+    list_editable = ('name', 'time', 'url', 'typename', 'task')
+    list_filter = ('name', 'time', 'url', 'typename', 'task')
+    search_fields = ('name', 'time', 'url', 'typename', 'task')
+
 admin.site.register(WeixinPublisher)
 admin.site.register(WeiboPublisher)
 admin.site.register(Weibo, WeiboAdmin)
@@ -346,5 +380,7 @@ admin.site.register(Risk, RiskAdmin)
 admin.site.register(LRisk, LRiskAdmin)
 admin.site.register(TRisk, TRiskAdmin)
 admin.site.register(ZJInspection, InspectionAdmin)
+admin.site.register(SettingsType, SettingsTypeAdmin)
+admin.site.register(Settings, SettingsAdmin)
 admin.site.register(CacheType, CacheTypeAdmin)
 admin.site.register(CacheConf, CacheConfAdmin)
