@@ -26,9 +26,9 @@ class WeixinView(BaseAPIView):
 
 
 class WeixinApi(BaseView):
-    
+
     def get(self):
-        datas = Weixin.objects.all()[:7]
+        datas = Weixin.objects.all()[:6]
         items = [set_logo(data) for data in datas]
         result = self.weixin_to_json(items)
         weixin_data = self.get_info(color='success', types='weixin', name=u'微信', link='/weixin', items=result)

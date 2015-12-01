@@ -10,7 +10,7 @@ from django.views.generic import View
 from rest_framework.views import APIView
 
 from observer.apps.base import login_required, get_user_image, sidebarUtil
-from observer.apps.base.models import Area, Category, RelatedData
+from observer.apps.base.models import Area, Category, RelatedData, Weibo
 from observer.utils.connector.redisconnector import RedisQueryApi
 
 
@@ -267,7 +267,8 @@ class BaseAPIView(BaseView, APIView):
         return title_format.format(*args)
 
     def pagingfromredis(self, model, limit, page):
-        items = [eval(item) for item in RedisQueryApi().lrange('sort_weibohot', 0, -1)]
+        uuids = RedisQueryApi().lrange('hotuuid', 0, -1)
+        items = Weibo.objects.filter(uuid__in=uuids)
         # 实例化一个分页对象
         paginator = Paginator(items, limit)
         try:

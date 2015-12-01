@@ -14,6 +14,7 @@ class WeiboView(BaseAPIView):
     def get(self, request):
         container = self.requesthead(
             sort='hot', limit_list=settings.WEIBO_TABLE_LIMIT, limit=self.HOME_PAGE_LIMIT)
+
         if container['sort'] == 'new':
             datas = self.paging(Weibo.objects.all(), container['limit'], container['page'])
         else:
@@ -24,10 +25,11 @@ class WeiboView(BaseAPIView):
 
 
 class WeiboApi(BaseView):
-    
+
     def get(self):
-        items = [eval(item) for item in RedisQueryApi().lrange('sort_weibohot', 0, -1)]
-        result = self.weibo_to_json(items)
+        uuids = RedisQueryApi().lrange('hotuuid', 0, -1)
+        items = Weibo.objects.filter(uuid__in=uuids)
+        result = self.weibo_to_json(items)[:6]
         weibo_data = self.get_info(color='warning', types='weibo', name=u'微博', link='/weibo', items=result)
         return weibo_data
 
