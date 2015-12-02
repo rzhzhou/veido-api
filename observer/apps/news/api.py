@@ -88,7 +88,6 @@ class NewsView(BaseAPIView):
         articles = Category.objects.get(name='质监热点').articles.all()
         return articles
 
-    @read_cache
     def get(self, request):
         container = self.requesthead(
             limit=self.HOME_PAGE_LIMIT, limit_list=settings.NEWS_PAGE_LIMIT)

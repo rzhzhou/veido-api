@@ -28,6 +28,7 @@ from observer.apps.base.models import (
     Group, Inspection, LocaltionScore, Product, ProductKeyword, RelatedData,
     Risk, RiskScore, Topic, Weibo, Weixin)
 from observer.utils.connector.redisconnector import RedisQueryApi
+from observer.utils.decorators.cache import read_cache
 
 
 def login_view(request):
@@ -242,6 +243,7 @@ def map_view(request):
 
 class Dashboard(BaseAPIView):
 
+    @read_cache
     def get(self, request):
         news = Category.objects.get(name=u'质监热点').articles.all().count()
         event = Topic.objects.count()
