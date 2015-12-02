@@ -299,17 +299,19 @@ class BaseAPIView(BaseView, APIView):
     #     })
     #     return container
 
-    def requesthead(self, limit=6, limit_list=20, sort='', page=1):
+    def requesthead(self, limit=6, limit_list=20, sort='', page=1, cache=1):
         parameter = self.request.GET.dict()
         api_type = parameter.pop('type')  if parameter.has_key('type') else ''
         sort = parameter.pop('sort') if parameter.has_key('sort') else sort
         page = parameter.pop('page') if parameter.has_key('page') else page
+        cache = parameter.pop('cache') if parameter.has_key('cache') else 1
         parameter = {'name':'abc'}
 
         container = dict(parameter, **{
             'type': api_type,
             'page': page,
             'sort': sort,
+            'cache': cache,
             'limit': limit_list,
         })
         return container

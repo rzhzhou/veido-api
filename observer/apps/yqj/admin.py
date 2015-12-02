@@ -4,6 +4,7 @@ import jieba.analyse
 from django import forms
 from django_extensions.admin import ForeignKeyAutocompleteAdmin
 from django.contrib import admin, messages
+from import_export.admin import ImportExportActionModelAdmin
 
 from observer.utils.connector.mongo import CrawlerTask
 from yqj_save import MySQLQuerApi
@@ -17,6 +18,7 @@ from observer.apps.config.models import(
 from observer.apps.corpus.models import Event
 from resource import InspectionResources
 from import_export.admin import ImportExportActionModelAdmin
+from altercron import execute
 from django.conf import settings
 
 
@@ -312,6 +314,21 @@ class InspectionAdmin(ImportExportActionModelAdmin):
     list_filter = ('pubtime', 'province', 'city', 'district', 'product', 'source', )
 
 
+class CacheTypeAdmin(admin.ModelAdmin):
+    fields = ('name', )
+    list_display = ('name', )
+    list_editable = ('name', )
+
+
+class CacheConfAdmin(admin.ModelAdmin):
+    fields = ('name', 'time', 'url', 'typename', 'task')
+    list_display = ('name', 'time', 'url', 'typename', 'task')
+    list_editable = ('name', 'time', 'url', 'typename', 'task')
+
+    def save_model(self, request, obj, form, change):
+        execute(obj.time, obj.name)
+        obj.save()
+
 class SettingsTypeAdmin(admin.ModelAdmin):
     fields = ('name', )
     list_display = ('name', )
@@ -340,7 +357,6 @@ class CacheConfAdmin(admin.ModelAdmin):
     list_editable = ('name', 'time', 'url', 'typename', 'task')
     list_filter = ('name', 'time', 'url', 'typename', 'task')
     search_fields = ('name', 'time', 'url', 'typename', 'task')
-
 
 admin.site.register(WeixinPublisher)
 admin.site.register(WeiboPublisher)

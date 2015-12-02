@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
 from django.template.loader import render_to_string
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from observer.utils.decorators.cache import read_cache
 from observer.apps.base.models import (
     Area, Article, Category, RelatedData, Topic, Collection, User)
 from observer.apps.base.views import BaseAPIView, BaseView
@@ -33,7 +35,7 @@ class NewsDetailView(BaseAPIView):
             event = self.event_to_json(item)
         except IndexError:
             event = []
-        user = request.user   
+        user = request.user
         try:
             yqj_user = User.objects.get(username=user.username)
             collection = yqj_user.collection
@@ -96,11 +98,11 @@ class NewsView(BaseAPIView):
 
 
 class NewsApi(BaseView):
-    
+
     def get(self):
         items = Category.objects.get(name='质监热点').articles.all()[:10]
         result = self.news_to_json(items)
         new_data = self.get_info(title=u'质监热点', color='info', types='news', name='newsDetail', items=result)
-        
+
         return new_data
 

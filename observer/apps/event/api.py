@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import sys
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from rest_framework.decorators import api_view
@@ -9,7 +8,8 @@ from observer.apps.base import authenticate, login_required, set_logo
 from observer.apps.base.views import BaseAPIView, BaseView
 from observer.apps.base.models import Topic
 from observer.apps.base.api_function import chart_line
-
+from observer.utils.connector.redisconnector import RedisQueryApi
+from observer.utils.decorators.cache import read_cache
 
 class EventDetailsView(BaseAPIView):
     HOME_PAGE_LIMIT = 10
@@ -44,9 +44,9 @@ class EventDetailsView(BaseAPIView):
         datas = self.paging(items, settings.EVENT_WEIXIN_LIMIT, container['page'])
         result = self.weixin_to_json(datas['items'])
         return {
-            'items': result, 
+            'items': result,
             'name': u'微信',
-            'type': 'weixin', 
+            'type': 'weixin',
             'color': 'success',
             'link': '/weixin'
             }
@@ -76,7 +76,7 @@ class EventDetailsView(BaseAPIView):
         except Topic.DoesNotExist:
             return HttpResponseRedirect('/event/')
         return Response({
-            'abstract': abstract, 
+            'abstract': abstract,
             'collected':collected,
             'keywords': keywords,
             'news': news,
@@ -101,7 +101,7 @@ class EventTableView(BaseAPIView):
         items = Topic.objects.all()
         result = self.event_to_json(items)
         datas = self.paging(result, settings.EVENT_PAGE_LIMIT, container['page'])
-        return Response({'list':{'pages': datas['total_number'], 
+        return Response({'list':{'pages': datas['total_number'],
             'items': list(datas["items"])}})
 
 

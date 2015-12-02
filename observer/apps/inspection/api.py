@@ -18,7 +18,7 @@ class InspectionTableView(BaseAPIView):
         datas = self.paging(items, container['limit'], container['page'])
         result = self.inspection_to_json(datas['items'])
         return Response({'list':{'pages': datas['total_number'], 'items': result}})
-                            
+
 
 class InspectionLocalView(BaseAPIView):
     HOME_PAGE_LIMIT = 10

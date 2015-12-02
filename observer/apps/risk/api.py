@@ -49,11 +49,11 @@ class RisksView(BaseAPIView):
         return risk_lists
 
     def get(self, request):
-        container = self.requestContainer(page=1,limit=self.HOME_PAGE_LIMIT, 
+        container = self.requestContainer(page=1,limit=self.HOME_PAGE_LIMIT,
             limit_list=settings.RISK_PAGE_LIMIT)
         items = self.get_score_article(request)
         datas = self.paging(items, container['limit'], container['page'])
-        html_string = render_to_string('risk/%s_tpl.html' % container['type'], 
+        html_string = render_to_string('risk/%s_tpl.html' % container['type'],
             {'risk_list':  datas['items']})
         return Response({'total': datas['total_number'], 'html': html_string})
 

@@ -3,6 +3,7 @@ import os
 from django.conf import settings
 from django.db import models
 from django.http import HttpResponse, HttpResponseRedirect
+from rest_framework.response import Response
 
 from observer.apps.base.models import User, AnonymousUser, hash_password
 from observer.apps.config.models import Settings, SettingsType
