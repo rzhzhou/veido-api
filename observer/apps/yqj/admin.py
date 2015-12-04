@@ -359,13 +359,6 @@ class CacheConfAdmin(admin.ModelAdmin):
     search_fields = ('name', 'time', 'url', 'typename', 'task')
 
 
-class CorpusAdmin(admin.ModelAdmin):
-    list_display = ('industry', 'riskword')
-    list_editable = ('industry', 'riskword')
-    list_filter = ('industry', 'riskword')
-    search_fields = ('industry', 'riskword')
-
-
 admin.site.register(WeixinPublisher)
 admin.site.register(WeiboPublisher)
 admin.site.register(Weibo, WeiboAdmin)
@@ -392,5 +385,4 @@ admin.site.register(SettingsType, SettingsTypeAdmin)
 admin.site.register(Settings, SettingsAdmin)
 admin.site.register(CacheType, CacheTypeAdmin)
 admin.site.register(CacheConf, CacheConfAdmin)
-admin.site.register(Corpus, CorpusAdmin)
 admin.site.register(RiskWord)
