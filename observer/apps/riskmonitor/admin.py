@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from observer.apps.riskmonitor.models import(
     Brand, Enterprise, Product, Industry,Metrics, 
-    MetricsProduct, RiskData, ScoreIndustry, 
+    ProductMetrics, RiskData, ScoreIndustry, 
     ScoreEnterprise, ScoreProduct, UserIndustry, 
     UserEnterprise)
 
@@ -35,7 +35,7 @@ class MetricsAdmin(admin.ModelAdmin):
     list_filter = ('name', 'level', 'parent')
 
 
-class MetricsProductAdmin(admin.ModelAdmin):
+class ProductMetricsAdmin(admin.ModelAdmin):
     fields = ('weight', 'metrics', 'product')
     list_display = ('weight', 'metrics', 'product')
     search_fields = ('weight', 'metrics', 'product')
@@ -88,7 +88,7 @@ admin.site.register(Industry, IndustryAdmin)
 admin.site.register(Enterprise, EnterpriseAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Metrics, MetricsAdmin)
-admin.site.register(MetricsProduct, MetricsProductAdmin)
+admin.site.register(ProductMetrics, ProductMetricsAdmin)
 admin.site.register(UserIndustry, UserIndustryAdmin)
 admin.site.register(UserEnterprise, UserEnterpriseAdmin)
 admin.site.register(ScoreIndustry, ScoreIndustryAdmin)
