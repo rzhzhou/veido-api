@@ -15,7 +15,7 @@ from observer.apps.base.models import (
     WeixinPublisher, save_user, ZJInspection, News)
 from observer.apps.config.models import(
     SettingsType, Settings, CacheType, CacheConf)
-from observer.apps.corpus.models import Event
+from observer.apps.corpus.models import Corpus
 from resource import InspectionResources
 from import_export.admin import ImportExportActionModelAdmin
 from altercron import execute
@@ -358,6 +358,13 @@ class CacheConfAdmin(admin.ModelAdmin):
     list_filter = ('name', 'time', 'url', 'typename', 'task')
     search_fields = ('name', 'time', 'url', 'typename', 'task')
 
+
+class CorpusAdmin(admin.ModelAdmin):
+    list_display = ('name', 'industry', 'enterprise', 'product', 'metrics')
+    list_editable = ('name', 'industry', 'enterprise', 'product', 'metrics')
+    list_filter = ('name', 'industry', 'enterprise', 'product', 'metrics')
+    search_fields = ('name', 'industry', 'enterprise', 'product', 'metrics')
+
 admin.site.register(WeixinPublisher)
 admin.site.register(WeiboPublisher)
 admin.site.register(Weibo, WeiboAdmin)
@@ -384,3 +391,4 @@ admin.site.register(SettingsType, SettingsTypeAdmin)
 admin.site.register(Settings, SettingsAdmin)
 admin.site.register(CacheType, CacheTypeAdmin)
 admin.site.register(CacheConf, CacheConfAdmin)
+admin.site.register(Corpus, CorpusAdmin)

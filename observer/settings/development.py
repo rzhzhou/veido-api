@@ -22,7 +22,7 @@ sys.path.append(BASE_DIR)
 from observer.utils.connector.mysql import query_one
 
 
-login_user = 'wuhan'
+login_user = 'test'
 
 
 def _load_config():
@@ -140,6 +140,7 @@ INSTALLED_APPS = (
     'observer.apps.analytics',
     'observer.apps.collection',
     'observer.apps.config',
+    'observer.apps.corpus',
     'rest_framework',
     'django_extensions',
     'import_export',
@@ -237,7 +238,7 @@ DATABASES = {
     },
 }
 
-DATABASE_ROUTERS = ['observer.apps.corpus.router.MyDB2Router',]
+# DATABASE_ROUTERS = ['observer.apps.corpus.router.MyDB2Router',]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
