@@ -1,36 +1,22 @@
 # -*- coding: utf-8 -*-
+from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 
 from observer.apps.base.models import Area
-from django.contrib.auth.models import User 
 
 
-class Industry(models.Model):
-    name = models.CharField(max_length=255, verbose_name=u'名称')
-    level = models.BigIntegerField(null=False, verbose_name=u'行业层级')
-    parent = models.ForeignKey('self', null=True, blank=True, verbose_name=u'上一级')
-
-    class Meta:
-        db_table = 'industry'
-        verbose_name_plural = u'行业'
-
-    def __unicode__(self):
-        return self.name
-
-
-class UserIndustry(models.Model):
-    name = models.CharField(max_length=255, verbose_name=u'名称')
-
-    user = models.ForeignKey(User, verbose_name=u'用户')
-    industry = models.ForeignKey(Industry, verbose_name=u'行业')
+class Brand(models.Model):
+    zh_name = models.CharField(max_length=255, verbose_name=u'中文名称')
+    en_name = models.CharField(max_length=255, verbose_name=u'英文名称')
+    logo = models.URLField(verbose_name=u'图标')
 
     class Meta:
-        db_table = 'user_industry'
-        verbose_name_plural = u'支柱行业'
+        db_table = 'brand'
+        verbose_name_plural = u'品牌'
 
     def __unicode__(self):
-        return self.name
+        return self.en_name+self.zh_name
 
 
 class Enterprise(models.Model):
@@ -50,18 +36,31 @@ class Enterprise(models.Model):
         return self.name
 
 
-
-class UserEnterprise(models.Model):
-    user = models.ForeignKey(User, verbose_name=u'用户')
-    enterprise = models.ForeignKey(Enterprise, verbose_name=u'企业')
+class Industry(models.Model):
+    name = models.CharField(max_length=255, verbose_name=u'名称')
+    level = models.BigIntegerField(null=False, verbose_name=u'行业层级')
+    parent = models.ForeignKey('self', null=True, blank=True, verbose_name=u'上一级')
 
     class Meta:
-        db_table = 'user_enterprise'
-        verbose_name_plural = u'监测企业'
+        db_table = 'industry'
+        verbose_name_plural = u'行业'
 
     def __unicode__(self):
-        return self.enterprise.name
+        return self.name
 
+
+class Metrics(models.Model):
+    name = models.CharField(max_length=255, verbose_name=u'指标')
+    level = models.BigIntegerField(null=False, verbose_name=u'等级')
+
+    parent = models.ForeignKey('self', null=True, blank=True, verbose_name=u'上一级')
+
+    class Meta:
+        db_table = 'metrics'
+        verbose_name_plural = u'指标'
+
+    def __unicode__(self):
+        return self.name
 
 
 class Product(models.Model):
@@ -76,6 +75,45 @@ class Product(models.Model):
 
     def __unicode__(self):
         return self.name
+
+
+class ProductMetrics(models.Model):
+    weight = models.CharField(max_length=255, verbose_name=u'权重')
+
+    metrics = models.ForeignKey(Metrics, verbose_name=u'指标')
+    product = models.ForeignKey(Product, verbose_name=u'产品')
+
+    class Meta:
+        db_table = 'metrics_product'
+        verbose_name_plural = u'产品指标'
+
+    def __unicode__(self):
+        return self.weight
+
+
+class RiskData(models.Model):
+    user_id = models.CharField(max_length=255, verbose_name=u'作者链接地址')
+    user_name = models.CharField(max_length=255, verbose_name=u'作者名')
+    content = models.TextField(blank=True, verbose_name=u'正文')
+    pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
+    comment = models.CharField(max_length=255, verbose_name=u'是否自营')
+    comment_id = models.CharField(max_length=255, verbose_name=u'评论地址')
+    source = models.CharField(max_length=255, blank=True, verbose_name=u'信息来源')
+    show_pic = models.TextField(blank=True, verbose_name=u'图片评论图')
+    score = models.IntegerField(null=False, verbose_name=u'评分')
+    url = models.URLField(verbose_name=u'网站链接')
+    uuid = models.CharField(max_length=36)
+    
+    area = models.ForeignKey(Area, verbose_name=u'地域')
+    brand = models.ForeignKey(Brand, verbose_name=u'品牌')
+    industry = models.ForeignKey(Industry, verbose_name=u'行业')
+
+    class Meta:
+        db_table = 'risk_data'
+        verbose_name_plural = u'电商风险评论'
+
+    def __unicode__(self):
+        return self.title
 
 
 class ScoreIndustry(models.Model):
@@ -120,67 +158,27 @@ class ScoreProduct(models.Model):
         return self.score
 
 
-class Metrics(models.Model):
-    name = models.CharField(max_length=255, verbose_name=u'指标')
-    level = models.BigIntegerField(null=False, verbose_name=u'等级')
-
-    parent = models.ForeignKey('self', null=True, blank=True, verbose_name=u'上一级')
+class UserEnterprise(models.Model):
+    user = models.ForeignKey(User, verbose_name=u'用户')
+    enterprise = models.ForeignKey(Enterprise, verbose_name=u'企业')
 
     class Meta:
-        db_table = 'metrics'
-        verbose_name_plural = u'指标'
+        db_table = 'user_enterprise'
+        verbose_name_plural = u'监测企业'
 
     def __unicode__(self):
-        return self.name
+        return self.enterprise.name
 
 
-class MetricsProduct(models.Model):
-    weight = models.CharField(max_length=255, verbose_name=u'权重')
+class UserIndustry(models.Model):
+    name = models.CharField(max_length=255, verbose_name=u'名称')
 
-    metrics = models.ForeignKey(Metrics, verbose_name=u'指标')
-    product = models.ForeignKey(Product, verbose_name=u'产品')
-
-    class Meta:
-        db_table = 'metrics_product'
-        verbose_name_plural = u'产品指标'
-
-    def __unicode__(self):
-        return self.weight
-
-
-class Brand(models.Model):
-    zh_name = models.CharField(max_length=255, verbose_name=u'中文名称')
-    en_name = models.CharField(max_length=255, verbose_name=u'英文名称')
-    logo = models.URLField(verbose_name=u'图标')
-
-    class Meta:
-        db_table = 'brand'
-        verbose_name_plural = u'品牌'
-
-    def __unicode__(self):
-        return self.en_name+self.zh_name
-
-
-class RiskData(models.Model):
-    user_id = models.CharField(max_length=255, verbose_name=u'作者链接地址')
-    user_name = models.CharField(max_length=255, verbose_name=u'作者名')
-    content = models.TextField(blank=True, verbose_name=u'正文')
-    pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
-    comment = models.CharField(max_length=255, verbose_name=u'是否自营')
-    comment_id = models.CharField(max_length=255, verbose_name=u'评论地址')
-    source = models.CharField(max_length=255, blank=True, verbose_name=u'信息来源')
-    show_pic = models.TextField(blank=True, verbose_name=u'图片评论图')
-    score = models.IntegerField(null=False, verbose_name=u'评分')
-    url = models.URLField(verbose_name=u'网站链接')
-    uuid = models.CharField(max_length=36)
-    
-    area = models.ForeignKey(Area, verbose_name=u'地域')
-    brand = models.ForeignKey(Brand, verbose_name=u'品牌')
+    user = models.ForeignKey(User, verbose_name=u'用户')
     industry = models.ForeignKey(Industry, verbose_name=u'行业')
 
     class Meta:
-        db_table = 'risk_data'
-        verbose_name_plural = u'电商风险评论'
+        db_table = 'user_industry'
+        verbose_name_plural = u'支柱行业'
 
     def __unicode__(self):
-        return self.title
+        return self.name
