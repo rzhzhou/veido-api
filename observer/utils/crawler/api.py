@@ -53,12 +53,13 @@ class CrawlerTask(object):
 
     def update(self, uuid):
         cond = {
-            '_id': self.uuid
+            'id': self.uuid
         }
-        MongodbQuerApi(self.collection).update(cond)
+        MongodbQuerApi(self.collection).delete(cond)
+        self.build()
 
-    def remove(self):
+    def remove(self, uuid):
         cond = {
-            '_id': self.uuid
+            'id': self.uuid
         }
         MongodbQuerApi(self.collection).delete(cond)

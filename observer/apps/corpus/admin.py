@@ -14,11 +14,17 @@ class CorpusAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         if not change:
             CrawlerTask(obj.uuid, obj.industry.name, 
-            	obj.riskword.name, 'riskmonitor', u'关键词').build()
+                obj.riskword.name, 'riskmonitor', u'关键词').build()
         else:
             CrawlerTask(obj.uuid, obj.industry.name, 
-            	obj.riskword.name, 'riskmonitor', u'关键词').update(obj.uuid)
+                obj.riskword.name, 'riskmonitor', u'关键词').update(obj.uuid)
 
         obj.save()
+
+    def delete_model(self, request, obj):
+        CrawlerTask(obj.uuid, obj.industry.name, 
+                obj.riskword.name, 'riskmonitor', u'关键词').remove(obj.uuid)
+        obj.delete()
+
 
 admin.site.register(Corpus, CorpusAdmin)
