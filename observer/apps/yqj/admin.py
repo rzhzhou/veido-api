@@ -360,10 +360,10 @@ class CacheConfAdmin(admin.ModelAdmin):
 
 
 class CorpusAdmin(admin.ModelAdmin):
-    list_display = ('industry', 'riskword')
-    list_editable = ('industry', 'riskword')
-    list_filter = ('industry', 'riskword')
-    search_fields = ('industry', 'riskword')
+    list_display = ('industry', 'riskword', 'uuid')
+    list_editable = ('industry', 'riskword', 'uuid')
+    list_filter = ('industry', 'riskword', 'uuid')
+    search_fields = ('industry', 'riskword', 'uuid')
 
 
 admin.site.register(WeixinPublisher)
