@@ -4,7 +4,7 @@ from datetime import datetime
 
 from django.conf import settings
 from django.core.paginator import EmptyPage, Paginator, PageNotAnInteger
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.shortcuts import render_to_response
 from django.views.generic import View
 from rest_framework.views import APIView
@@ -48,6 +48,10 @@ class BaseView(View):
 
     def news_to_json(self, items):
         result = []
+        relateddata_count = RelatedData.objects.filter(
+            uuid__in=[obj.uuid for obj in items]).annotate(Count('articles', distinct=True))
+        hots = {r.uuid: r.articles__count for r in relateddata_count}
+
         for data in items:
             item = {}
             item['id'] = data.id
@@ -56,7 +60,6 @@ class BaseView(View):
             item['author'] = data.author
             item['source'] = data.source
             item['publisher'] = data.publisher.publisher
-            item['content'] = data.content
             item['location'] = data.area.name
             pubtime = data.pubtime
             if pubtime.tzinfo == pytz.utc:
@@ -64,7 +67,7 @@ class BaseView(View):
             else:
                 item['time'] = data.pubtime.strftime('%Y-%m-%d')
             try:
-                item['hot'] = RelatedData.objects.filter(uuid=data.uuid)[0].articles.all().count()
+                item['hot'] = hots[data.uuid]
             except IndexError:
                 item['hot'] = 0
             result.append(item)
