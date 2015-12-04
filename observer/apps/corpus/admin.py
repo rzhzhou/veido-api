@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
+
 from observer.apps.corpus.models import Corpus
+from observer.utils.crawler.api import CrawlerTask
 
 
 class CorpusAdmin(admin.ModelAdmin):
@@ -11,11 +13,11 @@ class CorpusAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         if not change:
-            CrawlerTask(obj.uuid, obj.riskword.name, 
-            	obj.corpus.name, 'riskmonitor', u'关键词').build()
+            CrawlerTask(obj.uuid, obj.industry.name, 
+            	obj.riskword.name, 'riskmonitor', u'关键词').build()
         else:
-            CrawlerTask(obj.uuid, obj.riskword.name, 
-            	obj.corpus.name, 'riskmonitor', u'关键词').update(obj.uuid)
+            CrawlerTask(obj.uuid, obj.industry.name, 
+            	obj.riskword.name, 'riskmonitor', u'关键词').update(obj.uuid)
 
         obj.save()
 

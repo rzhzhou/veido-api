@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime, timedelta
+
+from observer.utils.connector.mongo import MongodbQuerApi
 
 
 class CrawlerTask(object):
 
-    def __init__(self, uuid, industry, corpus, collection, stype):
+    def __init__(self, uuid, industry, riskword, collection, stype):
         self.uuid = uuid
         self.industry = industry
-        self.corpus = corpus
+        self.riskword = riskword
         self.collection = collection
         self.stype = stype
         self.source = {
@@ -19,17 +22,17 @@ class CrawlerTask(object):
     def build(self):
         for source, sdata in self.source.items():
             data = {
-                'key': sdata[0] % (self.industry, self.corpus),
+                'key': sdata[0] % (self.industry, self.riskword),
                 'interval': sdata[1],
                 'type': sdata[2],
                 'source': source,
             }
             
-            self.insert_task(data)
+            self.insert(data)
 
     def insert(self, data):
         conf = {
-            "_id": self.uuid
+            "id": self.uuid,
             "type": data.get('type', ''),
             "status": data.get('status', 0),
             "priority": data.get('priority', 3),
