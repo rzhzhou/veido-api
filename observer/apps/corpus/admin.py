@@ -12,6 +12,7 @@ class CorpusAdmin(admin.ModelAdmin):
     list_editable = ('industry', 'riskword')
     list_filter = ('industry', 'riskword')
     search_fields = ('industry', 'riskword')
+    actions = ['delete_selected']
 
     def __init__(self, *args, **kwargs):
         super(CorpusAdmin, self).__init__(*args, **kwargs)
@@ -31,6 +32,12 @@ class CorpusAdmin(admin.ModelAdmin):
         CrawlerTask(obj.uuid, obj.industry.name, 
                 obj.riskword.name, 'riskmonitor', self.stype).remove(obj.uuid)
         obj.delete()
+
+    def delete_selected(self, request, objs):
+        for obj in objs:
+            CrawlerTask(obj.uuid, obj.industry.name, 
+                    obj.riskword.name, 'riskmonitor', self.stype).remove(obj.uuid)
+            obj.delete()
 
 
 admin.site.register(Corpus, CorpusAdmin)
