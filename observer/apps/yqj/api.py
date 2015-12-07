@@ -382,16 +382,15 @@ class Sidebar(APIView):
         })
 
 
-class LogoutView(BaseAPIView):
-
-    @token
-    def get(self, request):
-        auth = settings.JWT_AUTH
-        secret_key = auth['JWT_SECRET_KEY']
-        algorithm = auth['JWT_ALGORITHM']
-        token = request.META['HTTP_AUTHORIZATION']
-        result = jwt.decode(token.split()[1], secret_key, algorithm)
-        name = result['username'] + str(uuid.uuid1())
-        RedisQueryApi().set(name, token)
-        RedisQueryApi().expire(name, result['exp'])
-        return Response({'status': 'true'})
+@api_view(['POST'])
+@token
+def logout_view(request):
+    auth = settings.JWT_AUTH
+    secret_key = auth['JWT_SECRET_KEY']
+    algorithm = auth['JWT_ALGORITHM']
+    token = request.META['HTTP_AUTHORIZATION']
+    result = jwt.decode(token.split()[1], secret_key, algorithm)
+    name = result['username'] + str(uuid.uuid1())
+    RedisQueryApi().set(name, token)
+    RedisQueryApi().expire(name, result['exp'])
+    return Response({'status': 'true'})
