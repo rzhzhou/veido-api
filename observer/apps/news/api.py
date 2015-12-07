@@ -31,8 +31,8 @@ class NewsDetailView(BaseAPIView):
         except IndexError:
             relateddata = []
         try:
-            item = Topic.objects.filter(articles__id=news_id)[0]
-            event = self.event_to_json(item)
+            item = Topic.objects.filter(articles__id=news_id)
+            event = self.event_to_json(item)[0]
         except IndexError:
             event = []
         user = request.user
