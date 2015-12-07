@@ -6,7 +6,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from rest_framework.response import Response
 
 from observer.apps.base.models import User, AnonymousUser, hash_password
-from observer.apps.config.models import Settings, SettingsType
+from observer.apps.config.models import SettingsOne
 from observer.utils.connector.mysql import query_one
 from observer.utils.connector.redisconnector import RedisQueryApi
 from rest_framework.response import Response
@@ -64,7 +64,7 @@ def sidebarUtil(request):
     user = request.user
     try:
         user = User.objects.get(username=user.username)
-        sidebar = Settings.objects.filter(user=user, type_id=1)
+        sidebar = SettingsOne.objects.filter(user=user)
         result = {}
         for i in sidebar:
             items = {}

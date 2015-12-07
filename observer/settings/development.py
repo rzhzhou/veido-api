@@ -22,7 +22,7 @@ sys.path.append(BASE_DIR)
 from observer.utils.connector.mysql import query_one
 
 
-login_user = 'wuhan'
+login_user = 'test'
 
 
 def _load_config():
@@ -38,67 +38,69 @@ def _load_config():
 
 
 ################数据库配置########################
-    ALLOWED_HOSTS = query_one(user=login_user, confname='ALLOWED_HOSTS')
+    confdb = query_one(user=login_user)
 
-    DEBUG = query_one(user=login_user, confname='DEBUG')
+    ALLOWED_HOSTS = confdb['allowed_hosts']
+
+    DEBUG = confdb['debug']
 
     TEMPLATE_DEBUG = DEBUG
 
-    COMPANY_NAME = query_one(user=login_user, confname='COMPANY_NAME')
+    COMPANY_NAME = confdb['company_name']
 
     # Internationalization
     # https://docs.djangoproject.com/en/1.7/topics/i18n/
 
-    LANGUAGE_CODE = query_one(user=login_user, confname='LANGUAGE_CODE')
+    LANGUAGE_CODE = confdb['language_code']
 
-    TIME_ZONE = query_one(user=login_user, confname='TIME_ZONE')
+    TIME_ZONE = confdb['time_zone']
 
-    USE_I18N = query_one(user=login_user, confname='USE_I18N')
+    USE_I18N = confdb['use_i18n']
 
-    USE_L10N = query_one(user=login_user, confname='USE_L10N')
+    USE_L10N = confdb['use_l10n']
 
-    USE_TZ = query_one(user=login_user, confname='USE_TZ')
+    USE_TZ = confdb['use_tz']
 
-    MEDIA_ROOT = query_one(user=login_user, confname='MEDIA_ROOT')
+    MEDIA_ROOT = confdb['media_root']
 
-    STATIC_ROOT = query_one(user=login_user, confname='STATIC_ROOT')
+    STATIC_ROOT = confdb['static_root']
 
-    NEWS_PAGE_LIMIT = query_one(user=login_user, confname='NEWS_PAGE_LIMIT')
+    NEWS_PAGE_LIMIT = confdb['news_page_limit']
 
-    EVENT_PAGE_LIMIT = query_one(user=login_user, confname='EVENT_PAGE_LIMIT')
+    EVENT_PAGE_LIMIT = confdb['event_page_limit']
 
-    RISK_PAGE_LIMIT = query_one(user=login_user, confname='RISK_PAGE_LIMIT')
+    RISK_PAGE_LIMIT = confdb['risk_page_limit']
 
-    WEIXIN_TABLE_LIMIT = query_one(user=login_user, confname='WEIXIN_TABLE_LIMIT')
+    WEIXIN_TABLE_LIMIT = confdb['weixin_table_limit']
 
-    WEIBO_TABLE_LIMIT = query_one(user=login_user, confname='WEIBO_TABLE_LIMIT')
+    WEIBO_TABLE_LIMIT = confdb['weibo_table_limit']
 
-    LOCATION_WEIXIN_LIMIT = query_one(user=login_user, confname='LOCATION_WEIXIN_LIMIT')
+    LOCATION_WEIXIN_LIMIT = confdb['location_weixin_limit']
 
-    LOCATION_WEIBO_LIMIT = query_one(user=login_user, confname='LOCATION_WEIBO_LIMIT')
+    LOCATION_WEIBO_LIMIT = confdb['location_weibo_limit']
 
-    EVENT_WEIXIN_LIMIT = query_one(user=login_user, confname='EVENT_WEIXIN_LIMIT')
+    EVENT_WEIXIN_LIMIT = confdb['event_weixin_limit']
 
-    EVENT_WEIBO_LIMIT = query_one(user=login_user, confname='EVENT_WEIBO_LIMIT')
+    EVENT_WEIBO_LIMIT = confdb['event_weibo_limit']
 
-    RISK_WEIXIN_LIMIT = query_one(user=login_user, confname='RISK_WEIXIN_LIMIT')
+    RISK_WEIXIN_LIMIT = confdb['risk_weixin_limit']
 
-    RISK_WEIBO_LIMIT = query_one(user=login_user, confname='RISK_WEIBO_LIMIT')
+    RISK_WEIBO_LIMIT = confdb['risk_weibo_limit']
 
-    CUSTOM_NEWS_LIMIT = query_one(user=login_user, confname='CUSTOM_NEWS_LIMIT')
+    CUSTOM_NEWS_LIMIT = confdb['custom_news_limit']
 
-    CUSTOM_WEIXIN_LIMIT = query_one(user=login_user, confname='CUSTOM_WEIXIN_LIMIT')
+    CUSTOM_WEIXIN_LIMIT = confdb['custom_weixin_limit']
 
-    CUSTOM_WEIBO_LIMIT = query_one(user=login_user, confname='CUSTOM_WEIBO_LIMIT')
+    CUSTOM_WEIBO_LIMIT = confdb['custom_weibo_limit']
 
-    PRODUCT_LIMIT = query_one(user=login_user, confname='PRODUCT_LIMIT')
+    PRODUCT_LIMIT = confdb['product_limit']
 
-    SEARCH_LIMIT = query_one(user=login_user, confname='SEARCH_LIMIT')
+    SEARCH_LIMIT = confdb['search_limit']
 
     # MySQL
-    mysql_conn_str_default = query_one(user=login_user, confname='mysql_default')
-    mysql_conn_str_master = query_one(user=login_user, confname='mysql_master')
-    mysql_conn_str_corpus = query_one(user=login_user, confname='mysql_corpus')
+    mysql_conn_str_default = confdb['mysql_default']
+    mysql_conn_str_master = confdb['mysql_master']
+    mysql_conn_str_corpus = confdb['mysql_corpus']
     MYSQL_CONN_STR_DEFAULT = re.match(
         r"mysql://(?P<username>.+):(?P<password>.+)@(?P<host>.+):(?P<port>\d+)/(?P<name>.+)",
         mysql_conn_str_default).groupdict()
@@ -110,10 +112,10 @@ def _load_config():
         mysql_conn_str_corpus).groupdict()
 
     # MongoDB
-    MONGO_CONN_STR = query_one(user=login_user, confname='mongo_conn')
+    MONGO_CONN_STR = confdb['mongo_conn']
 
     # Redis
-    redis_conn_str = query_one(user=login_user, confname='redis_conn')
+    redis_conn_str = confdb['redis_conn']
     REDIS_CONN_STR = re.match(
         r"redis://(?P<host>.+):(?P<port>\d+)/(?P<db>.+)",
         redis_conn_str).groupdict()
