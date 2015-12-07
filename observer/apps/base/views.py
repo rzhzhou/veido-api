@@ -59,6 +59,7 @@ class BaseView(View):
             item['title'] = data.title
             item['author'] = data.author
             item['source'] = data.source
+            item['content'] = data.content
             item['publisher'] = data.publisher.publisher
             item['location'] = data.area.name
             pubtime = data.pubtime

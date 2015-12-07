@@ -22,7 +22,7 @@ sys.path.append(BASE_DIR)
 from observer.utils.connector.mysql import query_one
 
 
-login_user = 'test'
+login_user = 'wuhan'
 
 
 def _load_config():
