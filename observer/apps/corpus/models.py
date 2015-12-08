@@ -18,8 +18,7 @@ class RiskWord(models.Model):
         return self.name
 
 class Corpus(models.Model):
-    uuid = models.CharField(max_length=255, default=uuid.uuid4().hex, verbose_name=u'uuid')
-
+    uuid = models.CharField(max_length=255, default=uuid.uuid4, verbose_name=u'uuid')
     riskword = models.ForeignKey(RiskWord, null=True, blank=True, verbose_name=u'风险语料词')
     industry = models.ForeignKey(Industry, null=True, blank=True, verbose_name=u'行业')
 

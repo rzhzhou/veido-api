@@ -15,7 +15,6 @@ from observer.apps.base.models import (
     WeixinPublisher, save_user, ZJInspection, News)
 from observer.apps.config.models import(
     CacheType, CacheConf)
-from observer.apps.corpus.models import Corpus, RiskWord
 from resource import InspectionResources
 from import_export.admin import ImportExportActionModelAdmin
 from altercron import execute
@@ -368,4 +367,3 @@ admin.site.register(TRisk, TRiskAdmin)
 admin.site.register(ZJInspection, InspectionAdmin)
 admin.site.register(CacheType, CacheTypeAdmin)
 admin.site.register(CacheConf, CacheConfAdmin)
-admin.site.register(RiskWord)

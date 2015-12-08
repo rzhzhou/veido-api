@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import uuid
+
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
@@ -7,8 +9,8 @@ from observer.apps.base.models import Area
 
 
 class Brand(models.Model):
-    zh_name = models.CharField(max_length=255, verbose_name=u'中文名称')
-    en_name = models.CharField(max_length=255, verbose_name=u'英文名称')
+    zh_name = models.CharField(max_length=255, null=True, blank=True, verbose_name=u'中文名称')
+    en_name = models.CharField(max_length=255, null=True, blank=True, verbose_name=u'英文名称')
     logo = models.URLField(verbose_name=u'图标')
 
     class Meta:
@@ -23,7 +25,7 @@ class Enterprise(models.Model):
     name = models.CharField(max_length=255, verbose_name=u'企业名')
     locate_x = models.FloatField(verbose_name=u'纬度', null=True, blank=True)
     locate_y = models.FloatField(verbose_name=u'经度', null=True, blank=True)
-    scale = models.CharField(max_length=255, verbose_name=u'规模')
+    scale = models.CharField(max_length=255, null=True, blank=True, verbose_name=u'规模')
     ccc = models.BooleanField(default=False, verbose_name=u'ccc认证')
 
     area = models.ForeignKey(Area, verbose_name=u'地域')
@@ -92,17 +94,17 @@ class ProductMetrics(models.Model):
 
 
 class RiskData(models.Model):
-    user_id = models.CharField(max_length=255, verbose_name=u'作者链接地址')
-    user_name = models.CharField(max_length=255, verbose_name=u'作者名')
+    user_id = models.CharField(max_length=255, null=True, blank=True, verbose_name=u'作者链接地址')
+    user_name = models.CharField(max_length=255, null=True, blank=True, verbose_name=u'作者名')
     content = models.TextField(blank=True, verbose_name=u'正文')
-    pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
+    pubtime = models.DateTimeField(auto_now=False, null=True, blank=True, verbose_name=u'发布时间')
     comment = models.CharField(max_length=255, verbose_name=u'是否自营')
-    comment_id = models.CharField(max_length=255, verbose_name=u'评论地址')
+    comment_id = models.CharField(max_length=255, null=True, blank=True, verbose_name=u'评论地址')
     source = models.CharField(max_length=255, blank=True, verbose_name=u'信息来源')
-    show_pic = models.TextField(blank=True, verbose_name=u'图片评论图')
-    score = models.IntegerField(null=False, verbose_name=u'评分')
-    url = models.URLField(verbose_name=u'网站链接')
-    uuid = models.CharField(max_length=36)
+    show_pic = models.TextField( null=True, blank=True, verbose_name=u'图片评论图')
+    score = models.IntegerField(null=True, blank=True, verbose_name=u'评分')
+    url = models.URLField( null=True, blank=True, verbose_name=u'网站链接')
+    uuid = models.CharField(max_length=255, default=uuid.uuid4, verbose_name=u'uuid')
     
     area = models.ForeignKey(Area, verbose_name=u'地域')
     brand = models.ForeignKey(Brand, verbose_name=u'品牌')
@@ -113,7 +115,7 @@ class RiskData(models.Model):
         verbose_name_plural = u'电商风险评论'
 
     def __unicode__(self):
-        return self.title
+        return self.source
 
 
 class ScoreIndustry(models.Model):

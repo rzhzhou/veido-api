@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django_extensions.admin import ForeignKeyAutocompleteAdmin
 
 from observer.apps.riskmonitor.models import(
     Brand, Enterprise, Product, Industry,Metrics, 
@@ -14,7 +15,8 @@ class IndustryAdmin(admin.ModelAdmin):
     list_filter = ('name', 'level', 'parent')
 
 
-class EnterpriseAdmin(admin.ModelAdmin):
+class EnterpriseAdmin(ForeignKeyAutocompleteAdmin):
+    related_search_fields = {'area': ('name',)}
     fields = ('name', 'locate_x', 'locate_y', 'scale', 'ccc', 'area')
     list_display = ('name', 'locate_x', 'locate_y', 'scale', 'ccc', 'area')
     search_fields = ('name', 'locate_x', 'locate_y', 'scale', 'ccc', 'area')
@@ -84,6 +86,13 @@ class BrandAdmin(admin.ModelAdmin):
     list_filter = ('zh_name', 'en_name', 'logo')
 
 
+class RiskDataAdmin(ForeignKeyAutocompleteAdmin):
+    related_search_fields = {'area': ('name',)}
+    list_display = ('user_name', 'content', 'comment', 'url', 'area', 'brand', 'industry')
+    search_fields = ('user_name', 'content', 'comment', 'url', 'area', 'brand', 'industry')
+    list_filter = ('user_name', 'content', 'comment', 'url', 'area', 'brand', 'industry')
+
+
 admin.site.register(Industry, IndustryAdmin)
 admin.site.register(Enterprise, EnterpriseAdmin)
 admin.site.register(Product, ProductAdmin)
@@ -95,4 +104,4 @@ admin.site.register(ScoreIndustry, ScoreIndustryAdmin)
 admin.site.register(ScoreEnterprise, ScoreEnterpriseAdmin)
 admin.site.register(ScoreProduct, ScoreProductAdmin)
 admin.site.register(Brand, BrandAdmin)
-admin.site.register(RiskData)
+admin.site.register(RiskData, RiskDataAdmin)
