@@ -17,6 +17,7 @@ class NewsDetailView(BaseAPIView):
             news_id = int(news_id)
             news = Article.objects.filter(id=news_id)
             result = self.news_to_json(news)[0]
+            result.update({'content': news[0].content})
         except IndexError:
             return Response({
             'article': {},
