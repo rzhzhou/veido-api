@@ -14,7 +14,7 @@ from observer.apps.base.models import (
     Risk, LRisk, TRisk, RiskScore, Topic, User, Weibo, WeiboPublisher, Weixin,
     WeixinPublisher, save_user, ZJInspection, News)
 from observer.apps.config.models import(
-    SettingsType, Settings, CacheType, CacheConf)
+    CacheType, CacheConf)
 from observer.apps.corpus.models import Corpus, RiskWord
 from resource import InspectionResources
 from import_export.admin import ImportExportActionModelAdmin
@@ -329,21 +329,6 @@ class CacheConfAdmin(admin.ModelAdmin):
         execute(obj.time, obj.name)
         obj.save()
 
-class SettingsTypeAdmin(admin.ModelAdmin):
-    fields = ('name', )
-    list_display = ('name', )
-    list_editable = ('name', )
-    list_filter = ('name', )
-    search_fields = ('name', )
-
-
-class SettingsAdmin(admin.ModelAdmin):
-    # fields = ('name', 'value', 'type', 'username')
-    list_display = ('name', 'value', 'type', 'user')
-    list_editable = ('name', 'value', 'type', 'user')
-    list_filter = ('name', 'value', 'type', 'user')
-    search_fields = ('name', 'value', 'type', 'user')
-
 
 class CacheTypeAdmin(admin.ModelAdmin):
     list_display = ('name', )
@@ -381,8 +366,6 @@ admin.site.register(Risk, RiskAdmin)
 admin.site.register(LRisk, LRiskAdmin)
 admin.site.register(TRisk, TRiskAdmin)
 admin.site.register(ZJInspection, InspectionAdmin)
-admin.site.register(SettingsType, SettingsTypeAdmin)
-admin.site.register(Settings, SettingsAdmin)
 admin.site.register(CacheType, CacheTypeAdmin)
 admin.site.register(CacheConf, CacheConfAdmin)
 admin.site.register(RiskWord)

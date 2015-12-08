@@ -6,7 +6,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from rest_framework.response import Response
 
 from observer.apps.base.models import User, AnonymousUser, hash_password
-from observer.apps.config.models import Settings, SettingsType
+from observer.apps.config.models import SettingsOne
 from observer.utils.connector.mysql import query_one
 from observer.utils.connector.redisconnector import RedisQueryApi
 from rest_framework.response import Response
@@ -64,15 +64,19 @@ def sidebarUtil(request):
     user = request.user
     try:
         user = User.objects.get(username=user.username)
-        sidebar = Settings.objects.filter(user=user, type_id=1)
+        sidebar = SettingsOne.objects.filter(user=user)[0]
+        business = sidebar.business
         result = {}
-        for i in sidebar:
-            items = {}
-            items[i.name] = i.value
-            result.update(items)
-        result.update({'user': user.username})
+        result['news'] = sidebar.news
+        result['event'] = sidebar.event
+        result['location'] = sidebar.location
+        result['custom'] = sidebar.custom
+        result['site'] = sidebar.site
+        result['business'] = eval(business) if business else []
+        result['user'] = user.username
         return result
-    except:
+
+    except User.DoesNotExist:
         return {
         'user': user.username,
         'news': '',
@@ -86,10 +90,9 @@ def sidebarUtil(request):
 
 def token(view_func):
 
-    def wrapper(view_class, *args, **kwargs):
-        parameter = view_class.request
-        username = parameter.user.username
-        jwt = parameter.META['HTTP_AUTHORIZATION']
+    def wrapper(request, *args, **kwargs):
+        username = request.user.username
+        jwt = request.META['HTTP_AUTHORIZATION']
         data = RedisQueryApi().keys(username+'*')
         if data:
             for item in data:
@@ -97,6 +100,6 @@ def token(view_func):
                 if jwt == value:
                     return HttpResponse(status=403)
         else:
-            return view_func(view_class, *args, **kwargs)
-        return view_func(view_class, *args, **kwargs)
+            return view_func(request, *args, **kwargs)
+        return view_func(request, *args, **kwargs)
     return wrapper

@@ -1,10 +1,14 @@
+# -*- coding: utf-8 -*-
 import MySQLdb
+import MySQLdb.cursors 
+
 from django.conf import settings
 
 
 class mysql():
-    def __init__(self, type=''):
+    def __init__(self, type='', cursorclass=MySQLdb.cursors.DictCursor):
         self.type = type
+        self.cursorclass=cursorclass
 
     def open(self):
         if not self.type:
@@ -14,14 +18,15 @@ class mysql():
                 mysql_conn['username'],
                 mysql_conn['password'],
                 mysql_conn['name'],
-                charset='utf8')
+                charset='utf8') 
         else:
             return MySQLdb.connect(
                     '192.168.1.101',
                     'root',
                     '123456',
                     'yqj2',
-                    charset='utf8')
+                    charset='utf8',
+                    cursorclass=self.cursorclass)
 
 
 def query(sql, llist=[]):
@@ -36,22 +41,27 @@ def query(sql, llist=[]):
 
 
 # return []
-def query_one(sql='', llist=[], user='', confname=''):
+def query_one(sql='', llist=[], user=''):
     if not user:
         db = mysql().open()
         cursor = db.cursor()
         cursor.execute(sql, llist)
+        result = cursor.fetchone()[0]
+
+        db.commit()
+        db.clone()
+        return result
     else:
         db = mysql('conf').open()
         cursor = db.cursor()
-        sql = """SELECT VALUE FROM settings WHERE user_id=(SELECT id FROM yqj_user WHERE 
-            username=%s) AND NAME=%s"""
-        cursor.execute(sql, [user, confname])
-    result = cursor.fetchone()[0]
+        sql = u"""SELECT * FROM settings_one WHERE user_id=(SELECT id FROM yqj_user WHERE 
+            username=%s)"""
+        cursor.execute(sql, [user])
+        result = cursor.fetchone()
 
-    db.commit()
-    db.close()
-    return result
+        db.commit()
+        db.close()
+        return result
 
 
 # return row (int)number
