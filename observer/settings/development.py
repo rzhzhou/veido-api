@@ -35,6 +35,7 @@ def _load_config():
     global MEDIA_ROOT, STATIC_ROOT
     global NEWS_PAGE_LIMIT
     global CONF, CACHE
+    global NEWS, EVENT, LOCATION, CUSTOM, SITE, BUSINESS
 
 
 ################数据库配置########################
@@ -96,6 +97,19 @@ def _load_config():
     PRODUCT_LIMIT = confdb['product_limit']
 
     SEARCH_LIMIT = confdb['search_limit']
+
+    #sidebar
+    NEWS = confdb['news']
+
+    EVENT = confdb['event']
+
+    LOCATION = confdb['location']
+
+    CUSTOM = confdb['custom']
+
+    SITE = confdb['site']
+
+    BUSINESS = confdb['business']
 
     # MySQL
     mysql_conn_str_default = confdb['mysql_default']
