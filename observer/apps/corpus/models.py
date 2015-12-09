@@ -23,8 +23,8 @@ class Corpus(models.Model):
     industry = models.ForeignKey(Industry, null=True, blank=True, verbose_name=u'行业')
 
     class Meta:
-            db_table = 'corpus'
-            verbose_name_plural = u'语料库'
+        db_table = 'corpus'
+        verbose_name_plural = u'语料库'
 
     def __unicode__(self):
         return self.riskword
