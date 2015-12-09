@@ -184,3 +184,39 @@ class UserIndustry(models.Model):
 
     def __unicode__(self):
         return self.name
+
+
+class RiskNewsPublisher(models.Model):
+    photo = models.URLField(verbose_name=u'用户头像')
+    publisher = models.CharField(max_length=255, verbose_name=u'发布者')
+    brief = models.CharField(max_length=255, verbose_name=u'简介')
+    searchmode = models.IntegerField(default=0, verbose_name=u'搜索方式')
+
+    class Meta:
+        db_table = 'risknewspublisher'
+        verbose_name_plural = u'风险新闻发布者'
+
+    def __unicode__(self):
+        return self.publisher
+
+
+class RiskNews(models.Model):
+    author = models.CharField(max_length=255, verbose_name=u'作者')
+    title = models.CharField(max_length=255, blank=True, verbose_name=u'标题')
+    url = models.URLField(verbose_name=u'网站链接')
+    content = models.TextField(blank=True, verbose_name=u'正文')
+    source = models.CharField(max_length=255, blank=True, verbose_name=u'信息来源')
+    pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
+    publisher = models.ForeignKey(RiskNewsPublisher, verbose_name=u'文章发布者')
+    area = models.ForeignKey(Area, verbose_name=u'地域')
+    uuid = models.CharField(max_length=36)
+    feeling_factor = models.FloatField(default=-1, verbose_name=u'正负面')
+    reshipment = models.IntegerField(verbose_name=u'转载数')
+
+    class Meta:
+        db_table = 'risk_news'
+        verbose_name_plural = u'风险新闻'
+        ordering = ['-pubtime']
+
+    def __unicode__(self):
+        return self.title
