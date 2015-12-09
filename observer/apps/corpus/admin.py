@@ -9,7 +9,6 @@ from observer.utils.crawler.api import CrawlerTask
 
 class CorpusAdmin(admin.ModelAdmin):
     list_display = ('industry', 'riskword')
-    list_editable = ('industry', 'riskword')
     list_filter = ('industry', 'riskword')
     search_fields = ('industry', 'riskword')
     actions = ['delete_selected']
@@ -19,24 +18,25 @@ class CorpusAdmin(admin.ModelAdmin):
         self.stype = os.path.basename(os.path.dirname(__file__))
 
     def save_model(self, request, obj, form, change):
+        riskwords = list(set(obj.riskword.split()))
         if not change:
             CrawlerTask(obj.uuid, obj.industry.name, 
-                obj.riskword.name, 'riskmonitor', self.stype).build()
+                riskwords, 'riskmonitor', self.stype).build()
         else:
             CrawlerTask(obj.uuid, obj.industry.name, 
-                obj.riskword.name, 'riskmonitor', self.stype).update(obj.uuid)
-
+                riskwords, 'riskmonitor', self.stype).update(obj.uuid)
+        obj.riskword = " ".join(riskwords)
         obj.save()
 
     def delete_model(self, request, obj):
         CrawlerTask(obj.uuid, obj.industry.name, 
-                obj.riskword.name, 'riskmonitor', self.stype).remove(obj.uuid)
+                list(set(obj.riskword.split())), 'riskmonitor', self.stype).remove(obj.uuid)
         obj.delete()
 
     def delete_selected(self, request, objs):
         for obj in objs:
             CrawlerTask(obj.uuid, obj.industry.name, 
-                    obj.riskword.name, 'riskmonitor', self.stype).remove(obj.uuid)
+                    list(set(obj.riskword.split())), 'riskmonitor', self.stype).remove(obj.uuid)
             obj.delete()
 
 

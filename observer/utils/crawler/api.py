@@ -6,10 +6,10 @@ from observer.utils.connector.mongo import MongodbQuerApi
 
 class CrawlerTask(object):
 
-    def __init__(self, uuid, industry, riskword, collection, stype):
+    def __init__(self, uuid, industry, riskwords, collection, stype):
         self.uuid = uuid
         self.industry = industry
-        self.riskword = riskword
+        self.riskwords = riskwords
         self.collection = collection
         self.stype = stype
         self.source = {
@@ -21,14 +21,15 @@ class CrawlerTask(object):
 
     def build(self):
         for source, sdata in self.source.items():
-            data = {
-                'key': sdata[0] % (self.industry, self.riskword),
-                'interval': sdata[1],
-                'type': sdata[2],
-                'source': source,
-            }
-            
-            self.insert(data)
+            for riskword in self.riskwords:
+                data = {
+                    'key': sdata[0] % (self.industry, riskword),
+                    'interval': sdata[1],
+                    'type': sdata[2],
+                    'source': source,
+                }
+                
+                self.insert(data)
 
     def insert(self, data):
         conf = {
