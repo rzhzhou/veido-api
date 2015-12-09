@@ -211,7 +211,7 @@ class RiskNews(models.Model):
     area = models.ForeignKey(Area, verbose_name=u'地域')
     uuid = models.CharField(max_length=36)
     feeling_factor = models.FloatField(default=-1, verbose_name=u'正负面')
-    reshipment = models.IntegerField(verbose_name=u'转载数')
+    reprinted = models.IntegerField(verbose_name=u'转载数')
     
     industry = models.ManyToManyField(Industry, related_name='industrys', 
         related_query_name='industry', null=True, blank=True, verbose_name=u'行业')
