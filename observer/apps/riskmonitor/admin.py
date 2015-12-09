@@ -5,7 +5,7 @@ from observer.apps.riskmonitor.models import(
     Brand, Enterprise, Product, Industry,Metrics, 
     ProductMetrics, RiskData, ScoreIndustry, 
     ScoreEnterprise, ScoreProduct, UserIndustry, 
-    UserEnterprise)
+    UserEnterprise, RiskNews)
 
 
 class IndustryAdmin(admin.ModelAdmin):
@@ -105,3 +105,4 @@ admin.site.register(ScoreEnterprise, ScoreEnterpriseAdmin)
 admin.site.register(ScoreProduct, ScoreProductAdmin)
 admin.site.register(Brand, BrandAdmin)
 admin.site.register(RiskData, RiskDataAdmin)
+admin.site.register(RiskNews)

@@ -212,6 +212,11 @@ class RiskNews(models.Model):
     uuid = models.CharField(max_length=36)
     feeling_factor = models.FloatField(default=-1, verbose_name=u'正负面')
     reshipment = models.IntegerField(verbose_name=u'转载数')
+    
+    industry = models.ManyToManyField(Industry, related_name='industrys', 
+        related_query_name='industry', null=True, blank=True, verbose_name=u'行业')
+    enterprise = models.ManyToManyField(Enterprise, related_name='enterprises', 
+        related_query_name='enterprise', null=True, blank=True, verbose_name=u'企业')
 
     class Meta:
         db_table = 'risk_news'
