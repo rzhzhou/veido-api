@@ -3,7 +3,7 @@ import os
 
 from django.contrib import admin
 
-from observer.apps.corpus.models import Corpus, RiskWord
+from observer.apps.corpus.models import Corpus
 from observer.utils.crawler.api import CrawlerTask
 
 
@@ -41,4 +41,3 @@ class CorpusAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Corpus, CorpusAdmin)
-admin.site.register(RiskWord)
