@@ -14,10 +14,10 @@ class CrawlerTask(object):
         self.collection = collection
         self.stype = stype
         self.source = {
-            'baidu': ('"%s" +%s -(%s)', 21600, 'zjld.baidu.newstitle',),
+            'baidu': ('"%s" +%s -(%s)', 21600, 'riskmonitor.baidu.newstitle',),
             # 'weibo': ('%s %s', 21600, 'zjld.weibo.newstitle',),
             # 'sogou': ('+%s+%s', 21600, 'zjld.sogou.keywords',),
-            # 'sogou_news': ('+%s+%s', 21600, 'zjld.sogou.newstitle',)
+            'sogou_news': ('"%s" +%s -(%s)', 21600, 'riskmonitor.sogou.newstitle',)
         }
 
     def build(self):
