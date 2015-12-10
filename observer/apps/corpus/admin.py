@@ -11,6 +11,7 @@ class CorpusAdmin(admin.ModelAdmin):
     list_display = ('industry', 'riskword', 'invalidword')
     list_filter = ('industry', 'riskword', 'invalidword')
     search_fields = ('industry', 'riskword', 'invalidword')
+    readonly_fields = ['uuid']
     actions = ['delete_selected']
 
     def __init__(self, *args, **kwargs):
