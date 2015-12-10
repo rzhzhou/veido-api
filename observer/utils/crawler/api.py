@@ -46,6 +46,7 @@ class CrawlerTask(object):
             "timeout": 3600,
             "key": data.get('key'),
             "data": {
+                "industry": self.industry,
                 "source_type": self.stype,
                 "source": data.get('source', '')
             }
