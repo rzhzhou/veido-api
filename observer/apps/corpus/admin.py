@@ -8,9 +8,9 @@ from observer.utils.crawler.api import CrawlerTask
 
 
 class CorpusAdmin(admin.ModelAdmin):
-    list_display = ('industry', 'riskword')
-    list_filter = ('industry', 'riskword')
-    search_fields = ('industry', 'riskword')
+    list_display = ('industry', 'riskword', 'invalidword')
+    list_filter = ('industry', 'riskword', 'invalidword')
+    search_fields = ('industry', 'riskword', 'invalidword')
     actions = ['delete_selected']
 
     def __init__(self, *args, **kwargs):
@@ -19,24 +19,26 @@ class CorpusAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         riskwords = list(set(obj.riskword.split()))
+        invalidwords = list(set(obj.invalidword.split()))
         if not change:
-            CrawlerTask(obj.uuid, obj.industry.name, 
-                riskwords, 'riskmonitor', self.stype).build()
+            CrawlerTask(obj.uuid, obj.industry.name, riskwords,
+                invalidwords, 'riskmonitor', self.stype).update(obj.uuid)
         else:
-            CrawlerTask(obj.uuid, obj.industry.name, 
-                riskwords, 'riskmonitor', self.stype).update(obj.uuid)
+            CrawlerTask(obj.uuid, obj.industry.name, riskwords,
+                invalidwords, 'riskmonitor', self.stype).update(obj.uuid)
         obj.riskword = " ".join(riskwords)
+        obj.invalidword = " ".join(invalidwords)
         obj.save()
 
     def delete_model(self, request, obj):
-        CrawlerTask(obj.uuid, obj.industry.name, 
-                list(set(obj.riskword.split())), 'riskmonitor', self.stype).remove(obj.uuid)
+        CrawlerTask(obj.uuid, obj.industry.name, list(set(obj.riskword.split())),
+            list(set(obj.invalidword.split())), 'riskmonitor', self.stype).remove(obj.uuid)
         obj.delete()
 
     def delete_selected(self, request, objs):
         for obj in objs:
-            CrawlerTask(obj.uuid, obj.industry.name, 
-                    list(set(obj.riskword.split())), 'riskmonitor', self.stype).remove(obj.uuid)
+            CrawlerTask(obj.uuid, obj.industry.name, list(set(obj.riskword.split())),
+                list(set(obj.invalidword.split())), 'riskmonitor', self.stype).remove(obj.uuid)
             obj.delete()
 
 

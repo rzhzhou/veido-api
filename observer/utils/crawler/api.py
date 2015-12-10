@@ -6,24 +6,25 @@ from observer.utils.connector.mongo import MongodbQuerApi
 
 class CrawlerTask(object):
 
-    def __init__(self, uuid, industry, riskwords, collection, stype):
+    def __init__(self, uuid, industry, riskwords, invalidwords, collection, stype):
         self.uuid = uuid
         self.industry = industry
         self.riskwords = riskwords
+        self.invalidwords = invalidwords
         self.collection = collection
         self.stype = stype
         self.source = {
-            'baidu': ('+%s+%s', 21600, 'zjld.baidu.newstitle',),
-            'weibo': ('%s %s', 21600, 'zjld.weibo.newstitle',),
-            'sogou': ('+%s+%s', 21600, 'zjld.sogou.keywords',),
-            'sogou_news': ('+%s+%s', 21600, 'zjld.sogou.newstitle',)
+            'baidu': ('"%s" +%s -(%s)', 21600, 'zjld.baidu.newstitle',),
+            # 'weibo': ('%s %s', 21600, 'zjld.weibo.newstitle',),
+            # 'sogou': ('+%s+%s', 21600, 'zjld.sogou.keywords',),
+            # 'sogou_news': ('+%s+%s', 21600, 'zjld.sogou.newstitle',)
         }
 
     def build(self):
         for source, sdata in self.source.items():
             for riskword in self.riskwords:
                 data = {
-                    'key': sdata[0] % (self.industry, riskword),
+                    'key': sdata[0] % (self.industry, riskword, " | ".join(self.invalidwords)),
                     'interval': sdata[1],
                     'type': sdata[2],
                     'source': source,
