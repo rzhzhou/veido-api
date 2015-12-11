@@ -1,29 +1,32 @@
 # -*- coding: utf-8 -*-
+import pytz
 from datetime import datetime, timedelta
 
+from django.conf import settings
 from observer.utils.connector.mongo import MongodbQuerApi
 
 
 class CrawlerTask(object):
 
-    def __init__(self, uuid, industry, riskwords, collection, stype):
+    def __init__(self, uuid, industry, riskwords, invalidwords, collection, stype):
         self.uuid = uuid
         self.industry = industry
         self.riskwords = riskwords
+        self.invalidwords = invalidwords
         self.collection = collection
         self.stype = stype
         self.source = {
-            'baidu': ('+%s+%s', 21600, 'zjld.baidu.newstitle',),
-            'weibo': ('%s %s', 21600, 'zjld.weibo.newstitle',),
-            'sogou': ('+%s+%s', 21600, 'zjld.sogou.keywords',),
-            'sogou_news': ('+%s+%s', 21600, 'zjld.sogou.newstitle',)
+            'baidu': ('"%s" +%s -(%s)', 21600, 'baidu.news',),
+            # 'weibo': ('%s %s', 21600, 'zjld.weibo.newstitle',),
+            # 'sogou': ('+%s+%s', 21600, 'zjld.sogou.keywords',),
+            'sogou': ('"%s" +%s -(%s)', 21600, 'sogou.news',)
         }
 
     def build(self):
         for source, sdata in self.source.items():
             for riskword in self.riskwords:
                 data = {
-                    'key': sdata[0] % (self.industry, riskword),
+                    'key': sdata[0] % (self.industry, riskword, " | ".join(self.invalidwords)),
                     'interval': sdata[1],
                     'type': sdata[2],
                     'source': source,
@@ -32,6 +35,7 @@ class CrawlerTask(object):
                 self.insert(data)
 
     def insert(self, data):
+        tz = pytz.timezone(settings.TIME_ZONE)
         conf = {
             "id": self.uuid,
             "type": data.get('type', ''),
@@ -45,6 +49,10 @@ class CrawlerTask(object):
             "timeout": 3600,
             "key": data.get('key'),
             "data": {
+                "last_info": {
+                    "pubtime": tz.localize(datetime(2015, 1, 1))
+                },
+                "industry": self.industry,
                 "source_type": self.stype,
                 "source": data.get('source', '')
             }
