@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.db import models
-from observer.apps.base.models import User
+from django.contrib.auth.models import User
 
 # Create your models here.
 class CacheType(models.Model):

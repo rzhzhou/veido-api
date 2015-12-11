@@ -61,12 +61,15 @@ class RiskRankView(RiskTotal):
         user = request.myuser
         area_id = user.area.id
         sql = """
-        SELECT * FROM (SELECT industry.`name`, SUM(`risk_news`.`reprinted`) AS `reprinted__sum` FROM industry 
+        SELECT * FROM (SELECT industry.`name`,area.`id` ,SUM(`risk_news`.`reprinted`) AS `reprinted__sum` FROM industry 
         LEFT JOIN risk_news_industry ON industry.`id`=risk_news_industry.`industry_id`
-        LEFT JOIN risk_news ON risk_news.`id`=risk_news_industry.`risknews_id` WHERE industry.area_id=%s 
+        LEFT JOIN risk_news ON risk_news.`id`=risk_news_industry.`risknews_id`
+        LEFT JOIN yqj2.area ON risk_news.`area_id`=area.`id` WHERE area.`id`=%s
         GROUP BY industry.`name` ) AS reprinted
         ORDER BY reprinted__sum DESC
         """
+        if container['type']=='enterprise':
+            sql = sql.replace('industry', 'enterprise')
         cursor = connection.cursor()
         try:
             cursor.execute(sql, [area_id, ])
@@ -74,6 +77,9 @@ class RiskRankView(RiskTotal):
         finally:
             cursor.close()
         return result
+
+
+
 
 
     
