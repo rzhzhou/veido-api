@@ -115,3 +115,10 @@ urlpatterns += patterns(
     url(r'^app$', Sidebar.as_view()),
     url(r'^dashboard$', Dashboard.as_view()),
 )
+
+# urlpatterns += patterns(
+#     'observer.apps.riskmonitor',
+#     url(r'^riskmonitor/head/$', RiskTotal.as_view()),
+#     url(r'^riskmonitor/chart$', RiskChart.as_view()), 
+#     # url(r'^riskmonitor/insrank$')
+# )
