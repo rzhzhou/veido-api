@@ -210,11 +210,13 @@ class RiskNews(models.Model):
     source = models.CharField(max_length=255, blank=True, verbose_name=u'信息来源')
     pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
     publisher = models.ForeignKey(RiskNewsPublisher, verbose_name=u'文章发布者')
-    area = models.ForeignKey(Area, verbose_name=u'地域')
     uuid = models.CharField(max_length=36)
     feeling_factor = models.FloatField(default=-1, verbose_name=u'正负面')
     reprinted = models.IntegerField(verbose_name=u'转载数')
+    status = models.IntegerField(default=0, verbose_name=u'状态')
     
+    area = models.ManyToManyField(Area, null=True, blank=True, related_name='rareas', 
+        related_query_name='rarea',verbose_name=u'地域')
     industry = models.ManyToManyField(Industry, related_name='industrys', 
         related_query_name='industry', null=True, blank=True, verbose_name=u'行业')
     enterprise = models.ManyToManyField(Enterprise, related_name='enterprises', 
