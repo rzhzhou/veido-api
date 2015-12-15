@@ -4,6 +4,7 @@ import uuid
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
+from tinymce.models import HTMLField
 
 from observer.apps.base.models import Area
 
@@ -206,7 +207,7 @@ class RiskNews(models.Model):
     author = models.CharField(max_length=255, verbose_name=u'作者')
     title = models.CharField(max_length=255, blank=True, verbose_name=u'标题')
     url = models.URLField(verbose_name=u'网站链接')
-    content = models.TextField(blank=True, verbose_name=u'正文')
+    content = HTMLField(blank=True, verbose_name=u'正文')
     source = models.CharField(max_length=255, blank=True, verbose_name=u'信息来源')
     pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
     publisher = models.ForeignKey(RiskNewsPublisher, verbose_name=u'文章发布者')
