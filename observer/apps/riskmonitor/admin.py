@@ -93,6 +93,12 @@ class RiskDataAdmin(ForeignKeyAutocompleteAdmin):
     list_filter = ('user_name', 'content', 'comment', 'url', 'area', 'brand', 'industry')
 
 
+class RiskNewsAdmin(ForeignKeyAutocompleteAdmin):
+    related_search_fields = {'area': ('name',)}
+    list_display = ('title', 'url', 'publisher', 'reprinted')
+    search_fields = ('title', 'url', 'publisher', 'reprinted', 'industry', 'enterprise')
+    list_filter = ('title', 'url', 'publisher', 'reprinted', 'industry', 'enterprise')
+
 admin.site.register(Industry, IndustryAdmin)
 admin.site.register(Enterprise, EnterpriseAdmin)
 admin.site.register(Product, ProductAdmin)
@@ -105,4 +111,4 @@ admin.site.register(ScoreEnterprise, ScoreEnterpriseAdmin)
 admin.site.register(ScoreProduct, ScoreProductAdmin)
 admin.site.register(Brand, BrandAdmin)
 admin.site.register(RiskData, RiskDataAdmin)
-admin.site.register(RiskNews)
+admin.site.register(RiskNews, RiskNewsAdmin)
