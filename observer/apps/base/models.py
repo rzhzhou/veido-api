@@ -14,6 +14,7 @@ class Area(models.Model):
     parent = models.ForeignKey('self', null=True, blank=True, verbose_name=u'上一级')
 
     class Meta:
+        app_label = 'base'
         db_table = 'area'
         verbose_name_plural = u'地域'
 
@@ -27,6 +28,7 @@ class WeixinPublisher(models.Model):
     brief = models.CharField(max_length=255, verbose_name=u'简介')
 
     class Meta:
+        app_label = 'base'
         db_table = 'weixinpublisher'
         verbose_name_plural = u'微信发布者'
 
@@ -50,6 +52,7 @@ class Weixin(models.Model):
     likenum = models.IntegerField(blank=True, verbose_name=u'点赞数', default=0)
 
     class Meta:
+        app_label = 'base'
         db_table = 'weixin'
         verbose_name_plural = u'微信'
         ordering = ['-pubtime']
@@ -64,6 +67,7 @@ class WeiboPublisher(models.Model):
     brief = models.CharField(max_length=255, verbose_name=u'简介')
 
     class Meta:
+        app_label = 'base'
         db_table = 'weibopublisher'
         verbose_name_plural = u'微博发布者'
 
@@ -88,6 +92,7 @@ class Weibo(models.Model):
     uuid = models.CharField(max_length=36)
 
     class Meta:
+        app_label = 'base'
         db_table = 'weibo'
         verbose_name_plural = u'微博'
         ordering = ['-pubtime']
@@ -103,6 +108,7 @@ class ArticlePublisher(models.Model):
     searchmode = models.IntegerField(default=0, verbose_name=u'搜索方式')
 
     class Meta:
+        app_label = 'base'
         db_table = 'articlepublisher'
         verbose_name_plural = u'文章发布者'
 
@@ -123,6 +129,7 @@ class Article(models.Model):
     feeling_factor = models.FloatField(default=-1, verbose_name=u'正负面')
 
     class Meta:
+        app_label = 'base'
         db_table = 'article'
         verbose_name_plural = u'文章'
         ordering = ['-pubtime']
@@ -142,6 +149,7 @@ class News(models.Model):
     area = models.ForeignKey(Area, verbose_name=u'地域')
 
     class Meta:
+        app_label = 'base'
         db_table = 'article'
         verbose_name_plural = u'质监热点'
 
@@ -156,11 +164,12 @@ class Topic(models.Model):
     area = models.ForeignKey(Area, verbose_name=u'地域')
     keywords = models.CharField(max_length=255, default=u'', verbose_name=u'关键词', blank=True)
     pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间', null=True, blank=True)
-    articles = models.ManyToManyField(Article, related_name='topics', related_query_name='topic', null=True, blank=True, verbose_name=u'文章')
-    weibo = models.ManyToManyField(Weibo, related_name='topics', related_query_name='topic', null=True, blank=True, verbose_name=u'微博')
-    weixin = models.ManyToManyField(Weixin, related_name='topics', related_query_name='topic', null=True, blank=True, verbose_name=u'微信')
+    articles = models.ManyToManyField(Article, related_name='topics', related_query_name='topic', verbose_name=u'文章')
+    weibo = models.ManyToManyField(Weibo, related_name='topics', related_query_name='topic', verbose_name=u'微博')
+    weixin = models.ManyToManyField(Weixin, related_name='topics', related_query_name='topic', verbose_name=u'微信')
 
     class Meta:
+        app_label = 'base'
         db_table = 'topic'
         verbose_name_plural = u'聚类事件'
         ordering = ['-pubtime']
@@ -178,11 +187,12 @@ class Risk(models.Model):
     score = models.IntegerField(default=0, verbose_name=u'评分')
     pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间', null=True, blank=True,)
 
-    articles = models.ManyToManyField(Article, related_name='risks', related_query_name='risk', null=True, blank=True, verbose_name=u'文章')
-    weibo = models.ManyToManyField(Weibo, related_name='risks', related_query_name='risk', null=True, blank=True, verbose_name=u'微博')
-    weixin = models.ManyToManyField(Weixin, related_name='risks', related_query_name='risk', null=True, blank=True, verbose_name=u'微信')
+    articles = models.ManyToManyField(Article, related_name='risks', related_query_name='risk', verbose_name=u'文章')
+    weibo = models.ManyToManyField(Weibo, related_name='risks', related_query_name='risk', verbose_name=u'微博')
+    weixin = models.ManyToManyField(Weixin, related_name='risks', related_query_name='risk', verbose_name=u'微信')
 
     class Meta:
+        app_label = 'base'
         db_table = 'risk'
         verbose_name_plural = u'风险快讯'
         ordering = ['-pubtime']
@@ -201,6 +211,7 @@ class LRisk(models.Model):
     pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间', null=True, blank=True,)
 
     class Meta:
+        app_label = 'base'
         db_table = 'risk'
         verbose_name_plural = u'本地评分'
 
@@ -218,6 +229,7 @@ class TRisk(models.Model):
     pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间', null=True, blank=True,)
 
     class Meta:
+        app_label = 'base'
         db_table = 'risk'
         verbose_name_plural = u'风险评分'
 
@@ -227,11 +239,12 @@ class TRisk(models.Model):
 
 class RelatedData(models.Model):
     uuid = models.CharField(max_length=36, verbose_name=u'uuid')
-    articles = models.ManyToManyField(Article, related_name='relateddatas', related_query_name='relateddata', null=True, blank=True, verbose_name=u'文章')
-    weibo = models.ManyToManyField(Weibo, related_name='relateddatas', related_query_name='relateddata', null=True, blank=True, verbose_name=u'微博')
-    weixin = models.ManyToManyField(Weixin, related_name='relateddatas', related_query_name='relateddata', null=True, blank=True, verbose_name=u'微信')
+    articles = models.ManyToManyField(Article, related_name='relateddatas', related_query_name='relateddata', verbose_name=u'文章')
+    weibo = models.ManyToManyField(Weibo, related_name='relateddatas', related_query_name='relateddata', verbose_name=u'微博')
+    weixin = models.ManyToManyField(Weixin, related_name='relateddatas', related_query_name='relateddata', verbose_name=u'微信')
 
     class Meta:
+        app_label = 'base'
         db_table = 'relateddata'
         verbose_name_plural = u'关联文章'
 
@@ -243,9 +256,10 @@ class Category(models.Model):
     name = models.CharField(max_length=255, blank=True, verbose_name=u'名称')
     remark = models.CharField(max_length=255, blank=True, verbose_name=u'备注')
 
-    articles = models.ManyToManyField(Article, related_name='categorys', related_query_name='category', null=True, blank=True, verbose_name=u'文章')
+    articles = models.ManyToManyField(Article, related_name='categorys', related_query_name='category', verbose_name=u'文章')
 
     class Meta:
+        app_label = 'base'
         db_table = 'category'
         verbose_name_plural = u'文章分类'
 
@@ -282,6 +296,7 @@ class Group(models.Model):
     company = models.CharField(max_length=255)
 
     class Meta:
+        app_label = 'base'
         db_table = 'yqj_group'
         verbose_name_plural = u'舆情机用户组'
 
@@ -298,6 +313,7 @@ class User(models.Model):
     group = models.ForeignKey(Group)
 
     class Meta:
+        app_label = 'base'
         db_table = 'yqj_user'
         verbose_name_plural = u'舆情机用户'
 
@@ -311,11 +327,12 @@ class User(models.Model):
 class Custom(models.Model):
     searchkeyword = models.CharField(max_length=255, verbose_name=u'关键词')
     # group = models.ManyToManyField(Group, related_name='custom', related_query_name='customs', null=True, blank=True, verbose_name=u'所属组')
-    articles = models.ManyToManyField(Article, related_name='customs', related_query_name='custom', null=True, blank=True, verbose_name=u'文章')
-    weibo = models.ManyToManyField(Weibo, related_name='customs', related_query_name='custom', null=True, blank=True, verbose_name=u'微博')
-    weixin = models.ManyToManyField(Weixin, related_name='customs', related_query_name='custom', null=True, blank=True, verbose_name=u'微信')
+    articles = models.ManyToManyField(Article, related_name='customs', related_query_name='custom', verbose_name=u'文章')
+    weibo = models.ManyToManyField(Weibo, related_name='customs', related_query_name='custom', verbose_name=u'微博')
+    weixin = models.ManyToManyField(Weixin, related_name='customs', related_query_name='custom', verbose_name=u'微信')
 
     class Meta:
+        app_label = 'base'
         db_table = 'custom'
         verbose_name_plural = u'指定监测'
 
@@ -331,6 +348,7 @@ class CustomKeyword(models.Model):
     custom = models.ForeignKey(Custom, null=True, blank=True, default=u'')
 
     class Meta:
+        app_label = 'base'
         db_table = 'custom_keyword'
         verbose_name_plural = u'指定监测关键词'
 
@@ -341,9 +359,10 @@ class CustomKeyword(models.Model):
 class Product(models.Model):
     name = models.CharField(max_length=255, blank=True, verbose_name='名称')
 
-    articles = models.ManyToManyField(Article, related_name='products', related_query_name='product', null=True, blank=True, verbose_name=u'文章')
+    articles = models.ManyToManyField(Article, related_name='products', related_query_name='product', verbose_name=u'文章')
 
     class Meta:
+        app_label = 'base'
         db_table = 'product'
         verbose_name_plural = u'产品监测'
 
@@ -359,6 +378,7 @@ class ProductKeyword(models.Model):
     product = models.ForeignKey(Product, null=True, blank=True, default=u'')
 
     class Meta:
+        app_label = 'base'
         db_table = 'product_keyword'
         verbose_name_plural = u'产品监测关键词'
 
@@ -369,15 +389,16 @@ class ProductKeyword(models.Model):
 class Collection(models.Model):
     user = models.OneToOneField(User, primary_key=True, verbose_name=u'用户')
     articles = models.ManyToManyField(
-        Article, null=True, blank=True, related_name='collections',
+        Article, related_name='collections',
         related_query_name='collection', through='ArticleCollection',
         verbose_name=u'文章')
     events = models.ManyToManyField(
-        Topic, null=True, blank=True, related_name='collections',
+        Topic, related_name='collections',
         related_query_name='collection', through='TopicCollection',
         verbose_name=u'质量事件')
 
     class Meta:
+        app_label = 'base'
         db_table = 'collection'
         verbose_name_plural = u'用户收藏'
 
@@ -393,6 +414,7 @@ class ArticleCollection(models.Model):
     create_time = models.DateTimeField(auto_now=True, verbose_name=u'创建时间')
 
     class Meta:
+        app_label = 'base'
         db_table = 'article_collection'
         verbose_name_plural = u'文章收藏'
         unique_together = (("article", "collection"),)
@@ -408,6 +430,7 @@ class TopicCollection(models.Model):
     create_time = models.DateTimeField(auto_now=True, verbose_name=u'创建时间')
 
     class Meta:
+        app_label = 'base'
         db_table = 'topic_collection'
         verbose_name_plural = u'质量事件收藏'
         unique_together = (("topic", "collection"),)
@@ -416,6 +439,9 @@ class TopicCollection(models.Model):
 class AnonymousUser(User):
     def is_authenticated(self):
         return False
+
+    class Meta:
+        app_label = 'base'
 
 
 class Inspection(models.Model):
@@ -431,6 +457,7 @@ class Inspection(models.Model):
     district = models.CharField(max_length=255, null=True, blank=True, verbose_name=u'地区')
 
     class Meta:
+        app_label = 'base'
         db_table = 'inspection'
         verbose_name_plural = u'抽检'
         ordering = ['-pubtime']
@@ -457,6 +484,7 @@ class ZJInspection(models.Model):
     sync = models.IntegerField(null=True, blank=True, verbose_name=u'同步状态')
 
     class Meta:
+        app_label = 'base'
         db_table = 'inspection'
         verbose_name_plural = u'抽检'
 
@@ -469,6 +497,7 @@ class GroupAuthUser(models.Model):
     group = models.ForeignKey(Group, verbose_name=u'分组')
 
     class Meta:
+        app_label = 'base'
         db_table = 'group_authuser'
         verbose_name_plural = u'用户绑定'
 
@@ -482,6 +511,7 @@ class LocaltionScore(models.Model):
     risk = models.ForeignKey(Risk, verbose_name=u'风险快讯')
 
     class Meta:
+        app_label = 'base'
         db_table = 'localtion_score'
         verbose_name_plural = u'本地评分展示'
 
@@ -494,6 +524,7 @@ class RiskScore(models.Model):
     risk = models.ForeignKey(Risk, verbose_name=u'风险快讯')
 
     class Meta:
+        app_label = 'base'
         db_table = 'risk_score'
         verbose_name_plural = u'风险评分展示'
 
@@ -506,6 +537,7 @@ class RelatedDataAtricle(models.Model):
     relateddata = models.ForeignKey(RelatedData)
 
     class Meta:
+        app_label = 'base'
         db_table = 'relateddata_articles'
 
 
@@ -514,4 +546,5 @@ class CategoryAtricle(models.Model):
     category = models.ForeignKey(Category)
 
     class Meta:
+        app_label = 'base'
         db_table = 'category_articles'

@@ -12,7 +12,7 @@ from django.template.loader import render_to_string
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from observer.apps.base import sidebarUtil, xls_to_response
+from observer.apps.base.initialize import sidebarUtil, xls_to_response
 from observer.apps.base.views import BaseTemplateView
 from observer.apps.base.models import Article, Area, Category, Inspection, Weixin, Weibo
 from observer.utils.connector.mysql import query

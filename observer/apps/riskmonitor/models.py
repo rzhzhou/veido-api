@@ -26,7 +26,7 @@ class Enterprise(models.Model):
     name = models.CharField(max_length=255, verbose_name=u'企业名')
     locate_x = models.FloatField(verbose_name=u'纬度', null=True, blank=True)
     locate_y = models.FloatField(verbose_name=u'经度', null=True, blank=True)
-    scale = models.CharField(max_length=255, null=True, blank=True, verbose_name=u'规模')
+    scale = models.CharField(max_length=255, verbose_name=u'规模')
     ccc = models.BooleanField(default=False, verbose_name=u'ccc认证')
 
     area = models.ForeignKey(Area, verbose_name=u'地域')
@@ -123,7 +123,7 @@ class RiskData(models.Model):
 
 class ScoreIndustry(models.Model):
     score = models.CharField(max_length=255, verbose_name=u'分值')
-    pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间', default=timezone.now())
+    pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间', default=timezone.now)
 
     industry = models.ForeignKey(Industry, verbose_name=u'行业')
 
@@ -137,7 +137,7 @@ class ScoreIndustry(models.Model):
 
 class ScoreEnterprise(models.Model):
     score = models.CharField(max_length=255, verbose_name=u'分值')
-    pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间', default=timezone.now())
+    pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间', default=timezone.now)
 
     enterprise = models.ForeignKey(Enterprise, verbose_name=u'企业')
 
@@ -151,7 +151,7 @@ class ScoreEnterprise(models.Model):
 
 class ScoreProduct(models.Model):
     score = models.CharField(max_length=255, verbose_name=u'分值')
-    pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间', default=timezone.now())
+    pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间', default=timezone.now)
 
     product = models.ForeignKey(Product, verbose_name=u'产品')
 
@@ -216,12 +216,12 @@ class RiskNews(models.Model):
     reprinted = models.IntegerField(verbose_name=u'转载数')
     status = models.IntegerField(default=0, verbose_name=u'状态')
     
-    area = models.ManyToManyField(Area, null=True, blank=True, related_name='rareas', 
+    area = models.ManyToManyField(Area, related_name='rareas', 
         related_query_name='rarea',verbose_name=u'地域')
     industry = models.ManyToManyField(Industry, related_name='industrys', 
-        related_query_name='industry', null=True, blank=True, verbose_name=u'行业')
+        related_query_name='industry', verbose_name=u'行业')
     enterprise = models.ManyToManyField(Enterprise, related_name='enterprises', 
-        related_query_name='enterprise', null=True, blank=True, verbose_name=u'企业')
+        related_query_name='enterprise', verbose_name=u'企业')
 
     class Meta:
         db_table = 'risk_news'

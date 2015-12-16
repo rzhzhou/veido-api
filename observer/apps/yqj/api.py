@@ -14,10 +14,10 @@ from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from observer.apps.base import authenticate, login_required, set_logo, token
+from observer.apps.base.initialize import authenticate, login_required, set_logo, token
 from observer.apps.base.models import save_user, hash_password, User, Area, Category
 from django.conf import settings
-from observer.apps.base import sidebarUtil
+from observer.apps.base.initialize import sidebarUtil
 from observer.apps.base.views import BaseAPIView
 from observer.apps.news.api import NewsApi
 from observer.apps.event.api import EventApi
