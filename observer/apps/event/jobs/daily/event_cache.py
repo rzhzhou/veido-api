@@ -2,7 +2,6 @@ import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "observer.settings.development")
 
 from observer.utils.cache.cache import BaseCatch
-from observer.apps.yqj.redisconnect import RedisQueryApi
 
 
 class Job(BaseCatch):
