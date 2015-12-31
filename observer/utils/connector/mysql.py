@@ -54,7 +54,7 @@ def query_one(sql='', llist=[], user=''):
     else:
         db = mysql('conf').open()
         cursor = db.cursor()
-        sql = u"""SELECT * FROM settings_one WHERE user_id=(SELECT id FROM yqj_user WHERE 
+        sql = u"""SELECT * FROM settings_one WHERE user_id=(SELECT id FROM auth_user WHERE 
             username=%s)"""
         cursor.execute(sql, [user])
         result = cursor.fetchone()

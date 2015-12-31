@@ -22,7 +22,7 @@ sys.path.append(BASE_DIR)
 from observer.utils.connector.mysql import query_one
 
 
-login_user = 'wuhan'
+login_user = 'test'
 
 
 def _load_config():
@@ -31,7 +31,7 @@ def _load_config():
                  RISK_PAGE_LIMIT, EVENT_PAGE_LIMIT, WEIXIN_TABLE_LIMIT, WEIBO_TABLE_LIMIT,\
                  LOCATION_WEIXIN_LIMIT, LOCATION_WEIBO_LIMIT, EVENT_WEIXIN_LIMIT, EVENT_WEIBO_LIMIT,\
                  RISK_WEIXIN_LIMIT, RISK_WEIBO_LIMIT, CUSTOM_NEWS_LIMIT, CUSTOM_WEIXIN_LIMIT, PRODUCT_LIMIT, SEARCH_LIMIT
-    global MYSQL_CONN_STR_DEFAULT, MYSQL_CONN_STR_MASTER, MYSQL_CONN_STR_CORPUS, MONGO_CONN_STR, REDIS_CONN_STR
+    global MYSQL_CONN_STR_DEFAULT, MYSQL_CONN_STR_MASTER, MYSQL_CONN_STR_SLAVE, MONGO_CONN_STR, REDIS_CONN_STR
     global MEDIA_ROOT, STATIC_ROOT
     global NEWS_PAGE_LIMIT
     global CONF, CACHE
@@ -114,16 +114,16 @@ def _load_config():
     # MySQL
     mysql_conn_str_default = confdb['mysql_default']
     mysql_conn_str_master = confdb['mysql_master']
-    mysql_conn_str_corpus = confdb['mysql_corpus']
+    mysql_conn_str_slave = confdb['mysql_slave']
     MYSQL_CONN_STR_DEFAULT = re.match(
         r"mysql://(?P<username>.+):(?P<password>.+)@(?P<host>.+):(?P<port>\d+)/(?P<name>.+)",
         mysql_conn_str_default).groupdict()
     MYSQL_CONN_STR_MASTER = re.match(
         r"mysql://(?P<username>.+):(?P<password>.+)@(?P<host>.+):(?P<port>\d+)/(?P<name>.+)",
         mysql_conn_str_master).groupdict()
-    MYSQL_CONN_STR_CORPUS = re.match(
+    MYSQL_CONN_STR_SLAVE = re.match(
         r"mysql://(?P<username>.+):(?P<password>.+)@(?P<host>.+):(?P<port>\d+)/(?P<name>.+)",
-        mysql_conn_str_corpus).groupdict()
+        mysql_conn_str_slave).groupdict()
 
     # MongoDB
     MONGO_CONN_STR = confdb['mongo_conn']
@@ -246,14 +246,14 @@ DATABASES = {
     },
     'corpus':{
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': MYSQL_CONN_STR_CORPUS['host'],
-        'NAME': MYSQL_CONN_STR_CORPUS['name'],
-        'USER': MYSQL_CONN_STR_CORPUS['username'],
-        'PASSWORD': MYSQL_CONN_STR_CORPUS['password'],
+        'HOST': MYSQL_CONN_STR_SLAVE['host'],
+        'NAME': MYSQL_CONN_STR_SLAVE['name'],
+        'USER': MYSQL_CONN_STR_SLAVE['username'],
+        'PASSWORD': MYSQL_CONN_STR_SLAVE['password'],
     },
 }
 
-DATABASE_ROUTERS = ['observer.apps.corpus.router.MyDB2Router',]
+# DATABASE_ROUTERS = ['observer.apps.corpus.router.MyDB2Router',]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
