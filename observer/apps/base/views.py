@@ -49,7 +49,7 @@ class BaseView(View):
     def news_to_json(self, items):
         result = []
         relateddata_count = RelatedData.objects.filter(
-            uuid__in=[obj.uuid for obj in items]).annotate(Count('articles', distinct=True))
+            uuid__in=[obj.uuid for obj in items]).annotate(Count('articles'))
         hots = {r.uuid: r.articles__count for r in relateddata_count}
 
         for data in items:
@@ -59,7 +59,6 @@ class BaseView(View):
             item['title'] = data.title
             item['author'] = data.author
             item['source'] = data.source
-            item['content'] = data.content
             item['publisher'] = data.publisher.publisher
             item['location'] = data.area.name
             pubtime = data.pubtime
@@ -93,6 +92,12 @@ class BaseView(View):
         return result
 
     def event_to_json(self, items):
+        article_count = items.annotate(Count('articles'))
+        weixin_count = items.annotate(Count('weixin'))
+        weibo_count = items.annotate(Count('weibo'))
+        article_hot = {r: r.articles__count for r in article_count}
+        weixin_hot = {r: r.weixin__count for r in weixin_count}
+        weibo_hot = {r: r.weibo__count for r in weibo_count}
         result = []
         for data in items:
             item = {}
@@ -101,7 +106,7 @@ class BaseView(View):
             item['source'] = data.source
             item['location'] = data.area.name
             item['time'] = data.pubtime.date().strftime('%Y-%m-%d')
-            item['hot'] = data.articles.count() + data.weixin.count() + data.weibo.count()
+            item['hot'] = article_hot[data] + weixin_hot[data] + weibo_hot[data]
             result.append(item)
 
         results = sorted(result, key=lambda item: item['time'], reverse=True)

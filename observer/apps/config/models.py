@@ -88,7 +88,7 @@ class SettingsOne(models.Model):
         default="mongodb://192.168.1.202:27017")
     redis_conn = models.CharField(max_length=225, verbose_name=u'redis_conn', 
         default="redis://192.168.1.205:6379/8")
-    mysql_corpus = models.CharField(max_length=225, verbose_name=u'mysql_corpus', 
+    mysql_slave = models.CharField(max_length=225, verbose_name=u'mysql_slave', 
         default="mysql://root:123456@192.168.1.101:3306/yqj2")
 
     user = models.ForeignKey(User, null=True, blank=True, verbose_name=u'用户')
