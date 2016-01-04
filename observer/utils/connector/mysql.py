@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import MySQLdb
-import MySQLdb.cursors 
+import MySQLdb.cursors
 
 from django.conf import settings
 
@@ -18,7 +18,7 @@ class mysql():
                 mysql_conn['username'],
                 mysql_conn['password'],
                 mysql_conn['name'],
-                charset='utf8') 
+                charset='utf8')
         else:
             return MySQLdb.connect(
                     '192.168.1.101',
@@ -54,7 +54,7 @@ def query_one(sql='', llist=[], user=''):
     else:
         db = mysql('conf').open()
         cursor = db.cursor()
-        sql = u"""SELECT * FROM settings_one WHERE user_id=(SELECT id FROM auth_user WHERE 
+        sql = u"""SELECT * FROM settings_one WHERE user_id=(SELECT id FROM auth_user WHERE
             username=%s)"""
         cursor.execute(sql, [user])
         result = cursor.fetchone()

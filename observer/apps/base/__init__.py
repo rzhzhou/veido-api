@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 
 from django.conf import settings
@@ -9,7 +10,6 @@ from observer.apps.base.models import User, AnonymousUser, hash_password
 from observer.apps.config.models import SettingsOne
 from observer.utils.connector.mysql import query_one
 from observer.utils.connector.redisconnector import RedisQueryApi
-from rest_framework.response import Response
 
 
 def authenticate(username, raw_password):
@@ -61,32 +61,18 @@ def xls_to_response(wb, fname):
 
 
 def sidebarUtil(request):
-    user = request.user
-    try:
-        user = User.objects.get(username=user.username)
-        sidebar = SettingsOne.objects.filter(user=user)[0]
-        business = sidebar.business
-        result = {}
-        result['news'] = sidebar.news
-        result['event'] = sidebar.event
-        result['location'] = sidebar.location
-        result['custom'] = sidebar.custom
-        result['site'] = sidebar.site
-        result['business'] = eval(business) if business else []
-        result['user'] = user.username
-        return result
-
-    except User.DoesNotExist:
-        return {
-        'user': user.username,
-        'news': '',
-        'event': '',
-        'location': '',
-        'custom': '',
-        'site': '',
-        'business': []
-        }
-
+    username = request.user.username
+    result = query_one(user=username)
+    business = result['business']
+    data = {
+        'user': username,
+        'news': result['news'],
+        'event': result['event'],
+        'location': result['location'],
+        'site': result['site'],
+        'business': eval(business) if business else [],
+    }
+    return data
 
 def token(view_func):
 
