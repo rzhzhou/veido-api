@@ -29,4 +29,4 @@ class Corpus(models.Model):
         verbose_name_plural = u'语料库'
 
     def __unicode__(self):
-        return self.uuid
+        return str(self.uuid)
