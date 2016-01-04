@@ -5,9 +5,10 @@ import ConfigParser
 from datetime import datetime, timedelta, date
 
 from django.conf import settings
+from django_extensions.management.jobs import BaseJob
 
-from observer.utils.connector.redis import RedisQueryApi
 from observer.utils.cache import BaseCatch
+from observer.utils.connector.redisconnector import RedisQueryApi
 
 reload(sys)
 sys.setdefaultencoding( "utf-8" )
