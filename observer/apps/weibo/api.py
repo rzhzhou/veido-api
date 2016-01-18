@@ -3,7 +3,7 @@ from django.conf import settings
 from django.template.loader import render_to_string
 from rest_framework.response import Response
 
-from observer.apps.base import authenticate, login_required, set_logo
+from observer.apps.base.initialize import authenticate, login_required, set_logo
 from observer.apps.base.views import BaseAPIView, BaseView
 from observer.apps.base.models import Weibo, Area
 from observer.utils.connector.redisconnector import RedisQueryApi

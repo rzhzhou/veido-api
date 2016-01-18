@@ -4,7 +4,7 @@ from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from observer.apps.base import authenticate, login_required, set_logo
+from observer.apps.base.initialize import authenticate, login_required, set_logo
 from observer.apps.base.views import BaseAPIView, BaseView
 from observer.apps.base.models import Topic
 from observer.apps.base.api_function import chart_line

@@ -18,10 +18,10 @@ from rest_framework_jwt.settings import api_settings
 from rest_framework_jwt.compat import get_request_data
 from rest_framework_jwt.serializers import JSONWebTokenSerializer
 
-from observer.apps.base import authenticate, login_required, set_logo, token
+from observer.apps.base.initialize import authenticate, login_required, set_logo, token
 from observer.apps.base.models import save_user, hash_password, User, Area, Category
 from django.conf import settings
-from observer.apps.base import sidebarUtil
+from observer.apps.base.initialize import sidebarUtil
 from observer.apps.base.views import BaseAPIView
 from observer.apps.news.api import NewsApi
 from observer.apps.event.api import EventApi

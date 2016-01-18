@@ -9,7 +9,7 @@ from django.shortcuts import render_to_response
 from django.views.generic import View
 from rest_framework.views import APIView
 
-from observer.apps.base import login_required, get_user_image, sidebarUtil
+from observer.apps.base.initialize import login_required, get_user_image, sidebarUtil
 from observer.apps.base.models import Area, Category, RelatedData, Weibo
 from observer.utils.connector.redisconnector import RedisQueryApi
 

@@ -7,6 +7,7 @@ class CacheType(models.Model):
     name = models.CharField(max_length=255, verbose_name=u'项目名')
 
     class Meta:
+        app_label = 'config'
         db_table = 'cachetype'
         verbose_name_plural = u'缓存类型'
 
@@ -22,6 +23,7 @@ class CacheConf(models.Model):
     typename = models.ForeignKey(CacheType, null=True, blank=True, verbose_name=u'类型')
 
     class Meta:
+        app_label = 'config'
         db_table = 'cacheconf'
         verbose_name_plural = u'缓存管理'
 
@@ -92,6 +94,7 @@ class SettingsOne(models.Model):
     user = models.ForeignKey(User, null=True, blank=True, verbose_name=u'用户')
 
     class Meta:
+        app_label = 'config'
         db_table = 'settings_one'
         verbose_name_plural = u'设置'
 

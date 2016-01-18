@@ -12,7 +12,7 @@ from django.shortcuts import render, render_to_response
 from django.template.loader import render_to_string
 from django.utils import timezone
 
-from observer.apps.base import login_required, get_user_image, set_logo, sidebarUtil
+from observer.apps.base.initialize import login_required, get_user_image, set_logo, sidebarUtil
 from observer.apps.base.views import BaseTemplateView
 from observer.apps.base.models import (
     Area, Article, ArticlePublisher, Category, Collection, Custom, CustomKeyword,

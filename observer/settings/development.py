@@ -26,7 +26,7 @@ login_user = 'test'
 
 
 def _load_config():
-    global DEBUG, TEMPLATE_DEBUG, ALLOWED_HOSTS
+    global DEBUG, ALLOWED_HOSTS
     global COMPANY_NAME, LANGUAGE_CODE, TIME_ZONE, USE_I18N, USE_L10N, USE_TZ, NEWS_PAGE_LIMIT,\
                  RISK_PAGE_LIMIT, EVENT_PAGE_LIMIT, WEIXIN_TABLE_LIMIT, WEIBO_TABLE_LIMIT,\
                  LOCATION_WEIXIN_LIMIT, LOCATION_WEIBO_LIMIT, EVENT_WEIXIN_LIMIT, EVENT_WEIBO_LIMIT,\
@@ -44,8 +44,6 @@ def _load_config():
     ALLOWED_HOSTS = confdb['allowed_hosts']
 
     DEBUG = confdb['debug']
-
-    TEMPLATE_DEBUG = DEBUG
 
     COMPANY_NAME = confdb['company_name']
 
@@ -175,6 +173,22 @@ MIDDLEWARE_CLASSES = (
     'observer.apps.yqj.middleware.UserAuthenticationMiddlerware',
 )
 
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(PROJECT_ROOT, "templates"),],
+        'APP_DIRS': True,
+        'OPTIONS': {
+                'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
 ROOT_URLCONF = 'observer.urls'
 
 WSGI_APPLICATION = 'observer.wsgi.application'
@@ -266,9 +280,9 @@ STATICFILES_DIRS = (
 )
 
 
-TEMPLATE_DIRS = (
-    os.path.join(PROJECT_ROOT, "templates"),
-)
+# TEMPLATE_DIRS = (
+#     os.path.join(PROJECT_ROOT, "templates"),
+# )
 
 
 if not MEDIA_ROOT:

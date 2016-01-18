@@ -24,6 +24,7 @@ class Corpus(models.Model):
     industry = models.ForeignKey(Industry, null=True, blank=True, verbose_name=u'行业')
 
     class Meta:
+        app_label = 'corpus'
         db_table = 'corpus'
         verbose_name_plural = u'语料库'
 

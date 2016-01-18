@@ -15,6 +15,7 @@ class Brand(models.Model):
     logo = models.URLField(verbose_name=u'图标')
 
     class Meta:
+        app_label = 'riskmonitor'
         db_table = 'brand'
         verbose_name_plural = u'品牌'
 
@@ -26,12 +27,13 @@ class Enterprise(models.Model):
     name = models.CharField(max_length=255, verbose_name=u'企业名')
     locate_x = models.FloatField(verbose_name=u'纬度', null=True, blank=True)
     locate_y = models.FloatField(verbose_name=u'经度', null=True, blank=True)
-    scale = models.CharField(max_length=255, null=True, blank=True, verbose_name=u'规模')
+    scale = models.CharField(max_length=255, verbose_name=u'规模')
     ccc = models.BooleanField(default=False, verbose_name=u'ccc认证')
 
     area = models.ForeignKey(Area, verbose_name=u'地域')
 
     class Meta:
+        app_label = 'riskmonitor'
         db_table = 'enterprise'
         verbose_name_plural = u'企业'
 
@@ -47,6 +49,7 @@ class Industry(models.Model):
     area = models.ManyToManyField(Area, related_name='areas', related_query_name='area', verbose_name=u'地域')
 
     class Meta:
+        app_label = 'riskmonitor'
         db_table = 'industry'
         verbose_name_plural = u'行业'
 
@@ -61,6 +64,7 @@ class Metrics(models.Model):
     parent = models.ForeignKey('self', null=True, blank=True, verbose_name=u'上一级')
 
     class Meta:
+        app_label = 'riskmonitor'
         db_table = 'metrics'
         verbose_name_plural = u'指标'
 
@@ -75,6 +79,7 @@ class Product(models.Model):
     industry = models.ForeignKey(Industry, null=True, blank=True, verbose_name=u'产品')
 
     class Meta:
+        app_label = 'riskmonitor'
         db_table = 'product'
         verbose_name_plural = u'生产产品'
 
@@ -89,6 +94,7 @@ class ProductMetrics(models.Model):
     product = models.ForeignKey(Product, verbose_name=u'产品')
 
     class Meta:
+        app_label = 'riskmonitor'
         db_table = 'metrics_product'
         verbose_name_plural = u'产品指标'
 
@@ -114,6 +120,7 @@ class RiskData(models.Model):
     industry = models.ForeignKey(Industry, verbose_name=u'行业')
 
     class Meta:
+        app_label = 'riskmonitor'
         db_table = 'risk_data'
         verbose_name_plural = u'电商风险评论'
 
@@ -123,11 +130,12 @@ class RiskData(models.Model):
 
 class ScoreIndustry(models.Model):
     score = models.CharField(max_length=255, verbose_name=u'分值')
-    pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间', default=timezone.now())
+    pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间', default=timezone.now)
 
     industry = models.ForeignKey(Industry, verbose_name=u'行业')
 
     class Meta:
+        app_label = 'riskmonitor'
         db_table = 'score_industry'
         verbose_name_plural = u'行业分值'
 
@@ -137,11 +145,12 @@ class ScoreIndustry(models.Model):
 
 class ScoreEnterprise(models.Model):
     score = models.CharField(max_length=255, verbose_name=u'分值')
-    pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间', default=timezone.now())
+    pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间', default=timezone.now)
 
     enterprise = models.ForeignKey(Enterprise, verbose_name=u'企业')
 
     class Meta:
+        app_label = 'riskmonitor'
         db_table = 'score_enterprise'
         verbose_name_plural = u'企业分值'
 
@@ -151,11 +160,12 @@ class ScoreEnterprise(models.Model):
 
 class ScoreProduct(models.Model):
     score = models.CharField(max_length=255, verbose_name=u'分值')
-    pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间', default=timezone.now())
+    pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间', default=timezone.now)
 
     product = models.ForeignKey(Product, verbose_name=u'产品')
 
     class Meta:
+        app_label = 'riskmonitor'
         db_table = 'score_product'
         verbose_name_plural = u'产品分值'
 
@@ -168,6 +178,7 @@ class UserEnterprise(models.Model):
     enterprise = models.ForeignKey(Enterprise, verbose_name=u'企业')
 
     class Meta:
+        app_label = 'riskmonitor'
         db_table = 'user_enterprise'
         verbose_name_plural = u'监测企业'
 
@@ -182,6 +193,7 @@ class UserIndustry(models.Model):
     industry = models.ForeignKey(Industry, verbose_name=u'行业')
 
     class Meta:
+        app_label = 'riskmonitor'
         db_table = 'user_industry'
         verbose_name_plural = u'支柱行业'
 
@@ -196,6 +208,7 @@ class RiskNewsPublisher(models.Model):
     searchmode = models.IntegerField(default=0, verbose_name=u'搜索方式')
 
     class Meta:
+        app_label = 'riskmonitor'
         db_table = 'risknewspublisher'
         verbose_name_plural = u'风险新闻发布者'
 
@@ -216,14 +229,15 @@ class RiskNews(models.Model):
     reprinted = models.IntegerField(verbose_name=u'转载数')
     status = models.IntegerField(default=0, verbose_name=u'状态')
     
-    area = models.ManyToManyField(Area, null=True, blank=True, related_name='rareas', 
+    area = models.ManyToManyField(Area, related_name='rareas', 
         related_query_name='rarea',verbose_name=u'地域')
     industry = models.ManyToManyField(Industry, related_name='industrys', 
-        related_query_name='industry', null=True, blank=True, verbose_name=u'行业')
+        related_query_name='industry', verbose_name=u'行业')
     enterprise = models.ManyToManyField(Enterprise, related_name='enterprises', 
-        related_query_name='enterprise', null=True, blank=True, verbose_name=u'企业')
+        related_query_name='enterprise', verbose_name=u'企业')
 
     class Meta:
+        app_label = 'riskmonitor'
         db_table = 'risk_news'
         verbose_name_plural = u'风险新闻'
         ordering = ['-pubtime']
