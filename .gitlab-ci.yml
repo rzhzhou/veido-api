@@ -1,0 +1,17 @@
+image: base:v1
+before_script:
+  - apt-get update -yq
+  - apt-get install -y python-dev python-pip
+
+stages:
+  - test
+
+test_job:
+  stage: test
+  script:
+    - pip install -r requirement.txt
+    - python manage.py test
+  only:
+    - master
+  tags:
+    - docker
