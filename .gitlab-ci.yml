@@ -6,7 +6,7 @@ before_script:
 stages:
   - test
 
-test_job:
+test:
   stage: test
   script:
     - pip install -r requirement.txt
