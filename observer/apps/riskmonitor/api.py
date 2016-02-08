@@ -13,13 +13,15 @@ from businesslogic.statistic import *
 
 class DispatchView(APIView, BaseTemplateView):
 	def get(self, request, id):
-		container = self.requesthead()
-		type = contarner['type']
+		#container = self.requesthead()
+		#type = contarner['type']
 		func = getattr(globals()['DispatchView'](), type)
 		return func(request, id)
 
 	def homepage(self, request, id):
-	    pass
+        #oprint 'ksfjlsfjsldjf'
+            pass
+        #print HomeData().get_all()        
 
 	def industry_track(self, request, id):
 	    pass
