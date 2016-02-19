@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from rest_framework.response import Response
 
-from observer.apps.base.models import ProductKeyword, Group, Article
+from observer.apps.base.models import Group, Article
+from observer.apps.riskmonitor.models import ProductKeyword
 from observer.apps.base.views import BaseAPIView
 
 

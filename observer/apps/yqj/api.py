@@ -29,8 +29,9 @@ from observer.apps.weixin.api import WeixinApi
 from observer.apps.weibo.api import WeiboApi
 from observer.apps.base.models import (
     Area, Article, ArticlePublisher, Category, Collection, Custom, CustomKeyword,
-    Group, Inspection, LocaltionScore, Product, ProductKeyword, RelatedData,
+    Group, Inspection, LocaltionScore, RelatedData,
     Risk, RiskScore, Topic, Weibo, Weixin)
+from observer.apps.riskmonitor.models import ProductKeyword, Product
 from observer.utils.connector.redisconnector import RedisQueryApi
 from observer.utils.decorators.cache import read_cache
 
