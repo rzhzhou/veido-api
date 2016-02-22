@@ -7,24 +7,24 @@ from businesslogic.abstract import(
     Abstract, )
 
 class HomeData(Abstract):
-    def __init__(start, end, type):
+    def __init__(self, start, end):
         self.start = start
         self.end = end
-        self.type = type
 	
     def risk_status(self):
         return 'A'
     
     def risk_sum(self):
         indusum = ScoreIndustry.objects.filter(
-            pubtime__range(start, end), score__gte=60).count()
+            pubtime__range=(self.start, self.end), score__gte=60).count()
         entesum = ScoreEnterprise.objects.filter(
-            pubtime__range(start, end), score__gte=60).count()
+            pubtime__range=(self.start, self.end), score__gte=60).count()
         prodsum = 6
         names = ['industry', 'enterprise', 'product']
-        option = [{'Industry':indusum}, {'Enterprise': entesum}, {'Product', prodsum}]
+        option = [{'Industry':indusum}, {'Enterprise': entesum}, {'Product': prodsum}]
         datas = []
         for index, i in enumerate(option):
+            print i
             data = {
                 'link': i.keys()[0], 
                 'amount': i.values()[0],	    
@@ -34,7 +34,7 @@ class HomeData(Abstract):
             datas.append(data)
         return datas 
 
-    def risk_industry(self):
+    def industry(self):
         type = 'abstract'
         indunames = self.risk_industry(self.start, self.end, type)	
         data = {
@@ -44,7 +44,7 @@ class HomeData(Abstract):
         }
         return data 
 	
-    def risk_enterprise(self):
+    def enterprise(self):
         type = 'abstract'
         enteobjects = self.risk_enterprise(self.start, self.end, type)
         data = {
@@ -56,7 +56,7 @@ class HomeData(Abstract):
   
     def risk_keywords(self):
         keywords = Corpus.objects.all()
-        keywords = keywords[0].keyword.split(' ')
+        keywords = keywords[0].riskword.split(' ')
         data = {
             'msg': 'shuliang',
             'title': 'fxgjzTOP',
@@ -66,7 +66,7 @@ class HomeData(Abstract):
 
     def risk_data(self):	
         type = 'abstract'
-        nums = self.news_nums(self.start, self.end)
+        nums = self.news_nums(self.start, self.end, type)
         data = {
             'curve': True,
             'data': nums,
@@ -89,14 +89,13 @@ class HomeData(Abstract):
         datas = [
             self.risk_status(),
             self.risk_sum(),
-            self.risk_industry(),
-            self.risk_enterprise(),
+            self.industry(),
+            self.enterprise(),
             self.risk_keywords(),
             self.risk_data(),
             self.risk_level(),
         ] 
-            
-
+        return datas            
 
 
 
