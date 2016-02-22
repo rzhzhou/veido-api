@@ -64,20 +64,35 @@ class Abstract():
         except:
             enteobjects = []
         return enteobjects
-    def news_nums(self, start, end, type, industry=-1, enterprise=-1, source=-1):
-        risknews = RiskNews.objects.filter(industry=industry, enterprise=enterprise, publisher=source)
+    def news_nums(self, start, end, type, industry='%%', enterprise='%%', source=-1):
+        #risknews = RiskNews.objects.filter(industry=industry, enterprise=enterprise, publisher=source)
         days = (end - start).days
         start = start.astimezone(pytz.utc)
         start = time.strftime('%Y-%m-%d %X', start.timetuple())
         start = datetime.strptime(start, '%Y-%m-%d %X')
         date = [(start + timedelta(days=x)) for x in xrange(days)]
         date_range = [(i, i + timedelta(days=1)) for i in date]
-        query_str = map(
-            lambda x: "sum(case when pubtime < '%s' and pubtime >= '%s' then 1 else 0 end)"
-            % (x[1], x[0]),
-            date_range
-        )
-        sum_result = lambda x: 'select %s from %s where industry=%s and enterprise=%s and source=%s' % (','.join(query_str), x, industry, enterprise, source)
-        print sum_result('risk_news')
-        news_data = [i for i in sum_result('risk_news')[0]]
+        if source == -1:
+            query_str = map(
+                lambda x: "sum(case when pubtime < '%s' and pubtime >= '%s' then 1 else 0 end)"
+                % (x[1], x[0]),
+                date_range
+            )
+        else:
+            query_str = map(
+                lambda x: "sum(case when pubtime < '%s' and pubtime >= '%s' and source = %s then 1 else 0 end)"
+                % (x[1], x[0], source),
+                date_range
+            )
+        sum_news = lambda x: query("""
+            SELECT %s FROM %s r LEFT JOIN 
+            risk_news_industry ri ON r.`id`=ri.`risknews_id` 
+            LEFT JOIN industry i ON i.`id`=ri.`industry_id` 
+            LEFT JOIN risk_news_enterprise re ON re.`enterprise_id`=r.`id` 
+            LEFT JOIN enterprise e ON re.`enterprise_id`=e.`id` 
+            LEFT JOIN risk_news_area rna ON rna.`risknews_id`=r.`id` 
+            LEFT JOIN area a ON a.`id`=rna.`area_id`
+            WHERE i.`id` like '%s' AND e.`id` like '%s' 
+            """ %(','.join(query_str), x, industry, enterprise, ))
+        news_data = [i for i in sum_news('risk_news')[0]]
         return news_data
