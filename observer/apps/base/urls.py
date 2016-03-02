@@ -19,6 +19,7 @@ from observer.apps.weibo.api import WeiboView, LocationWeiboView
 from observer.apps.yqj.api import login_view, registe_view, upload_image, change_passwd,\
     reset_passwd, delete_user_view, add_user_view, chart_line_index_view,\
     chart_pie_index_view, map_view, Sidebar, Dashboard, logout_view, ObtainJSONWebToken
+from observer.apps.riskmonitor.api import HomePageView
 
 
 urlpatterns = [
@@ -106,8 +107,6 @@ urlpatterns += [
     url(r'^token-auth$', ObtainJSONWebToken.as_view()),
 ]
 
-# urlpatterns += [
-#     url(r'^riskmonitor/head/$', RiskTotal.as_view()),
-#     url(r'^riskmonitor/chart$', RiskChart.as_view()), 
-#     # url(r'^riskmonitor/insrank$')
-# ]
+urlpatterns += [
+    url(r'^api/dashboard/$', HomePageView.as_view()),
+]

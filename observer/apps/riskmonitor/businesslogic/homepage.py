@@ -1,109 +1,116 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime, timedelta
+
+from django.utils import timezone
+
 from observer.apps.riskmonitor.models import(
     ScoreIndustry, ScoreEnterprise, ScoreProduct, )
 from observer.apps.corpus.models import(
     Corpus, )
-from businesslogic.abstract import(
+from observer.apps.riskmonitor.businesslogic.abstract import(
     Abstract, )
 
+
 class HomeData(Abstract):
+
     def __init__(self, start, end):
         self.start = start
         self.end = end
-	
+
     def risk_status(self):
         return 'A'
-    
+
     def risk_sum(self):
         indusum = ScoreIndustry.objects.filter(
             pubtime__range=(self.start, self.end), score__gte=60).count()
         entesum = ScoreEnterprise.objects.filter(
             pubtime__range=(self.start, self.end), score__gte=60).count()
         prodsum = 6
-        names = ['industry', 'enterprise', 'product']
-        option = [{'Industry':indusum}, {'Enterprise': entesum}, {'Product': prodsum}]
-        datas = []
-        for index, i in enumerate(option):
-            print i
-            data = {
-                'link': i.keys()[0], 
-                'amount': i.values()[0],	    
-                'icon': i.keys()[0].lower(), 
-                'name': names[index]
-                }
-            datas.append(data)
-        return datas 
+
+        data = {
+            'industry': {
+                'amount': indusum
+            },
+            'enterprise': {
+                'amount': entesum
+            },
+            'product': prodsum
+        }
+
+        return data
 
     def industry(self):
         type = 'abstract'
-        indunames = self.risk_industry(self.start, self.end, type)	
+        indunames = self.risk_industry(self.start, self.end, type)
         data = {
-                'msg': 'dengji',
-                'title': 'fxhyTOP',
-                'items': [{'name': induname[0], 'level':induname[1] } for induname in indunames] 
+            'industryRank': {
+                'items': [{'name': induname[0], 'level':induname[1]}
+                          for induname in indunames]
+            }
         }
-        return data 
-	
+        return data
+
     def enterprise(self):
         type = 'abstract'
         enteobjects = self.risk_enterprise(self.start, self.end, type)
         data = {
-            'msg': 'dengji',
-            'title': 'fxqiyeTOP',
-            'items': [{'name': enteobject[0].name, 'level':enteobject[1] } for enteobject in enteobjects] 
+            'enterpriseRank': {
+                'items': [{'name': enteobject[0].name,
+                           'level':enteobject[1]} for enteobject in enteobjects]
+            }
         }
         return data
-  
+
     def risk_keywords(self):
         keywords = Corpus.objects.all()
         keywords = keywords[0].riskword.split(' ')
         data = {
-            'msg': 'shuliang',
-            'title': 'fxgjzTOP',
-            'items': [{'name': keyword, 'level': 5} for keyword in keywords]
+            'keywordsRank': {
+                'items': [{'name': keyword, 'level': 5} for keyword in keywords]
+            }
         }
         return data
 
-    def risk_data(self):	
+    def risk_data(self):
         type = 'abstract'
-        nums = self.news_nums(self.start, self.end, type)
+        # end = timezone.now()
+        # start = end - timedelta(days=7)
+        end = self.end
+        start = end - timedelta(days=7)
+        weeks = [u'æ˜ŸæœŸä¸€', u'æ˜ŸæœŸäºŒ', u'æ˜ŸæœŸä¸‰', u'æ˜ŸæœŸå››', u'æ˜ŸæœŸäº”',
+                 u'æ˜ŸæœŸå…­', u'æ˜ŸæœŸæ—¥']
+        nums = self.news_nums(start, end, type)
         data = {
-            'curve': True,
-            'data': nums,
-            'labels': ['ÖÜÒ»', 'ÖÜ¶ş', 'ÖÜÈı', 'ÖÜËÄ', 'ÖÜÎå', 'ÖÜÁù', 'ÖÜÈÕ'],
-            'id': 'riskData'
+            'riskData': {
+                'data': nums,
+                'labels': [weeks[(end + timedelta(days=(i + 1))).isoweekday() - 1]
+                           for i in range(7)]
+            }
         }
         return data
-         	
+
     def risk_level(self):
         type = 'abstract'
+        end = timezone.now()
+        start = end - timedelta(days=7)
+        weeks = [u'æ˜ŸæœŸä¸€', u'æ˜ŸæœŸäºŒ', u'æ˜ŸæœŸä¸‰', u'æ˜ŸæœŸå››', u'æ˜ŸæœŸäº”',
+                 u'æ˜ŸæœŸå…­', u'æ˜ŸæœŸæ—¥']
         data = {
-            'curve': False,
-            'data': [1, 2, 1, 3, 1, 2, 1],
-            'labels': ['ÖÜÒ»', 'ÖÜ¶ş', 'ÖÜÈı', 'ÖÜËÄ', 'ÖÜÎå', 'ÖÜÁù', 'ÖÜÈÕ'],
-            'id': 'rankData'
+            'rankData': {
+                'data': [1, 2, 1, 3, 1, 2, 1],
+                'labels': [weeks[(end + timedelta(days=(i + 1))).isoweekday() - 1]
+                           for i in range(7)]
+            }
         }
         return data
 
     def get_all(self):
-        datas = [
-            self.risk_status(),
-            self.risk_sum(),
-            self.industry(),
-            self.enterprise(),
-            self.risk_keywords(),
-            self.risk_data(),
-            self.risk_level(),
-        ] 
-        return datas            
-
-
-
-
-
-
-
-
-
-
-	 
+        industryRank = self.industry().items()
+        enterpriseRank = self.enterprise().items()
+        keywordsRank = self.risk_keywords().items()
+        riskData = self.risk_data().items()
+        rankData = self.risk_level().items()
+        risk_count = self.risk_sum().items()
+        datas = dict(industryRank + enterpriseRank + keywordsRank +
+                     riskData + rankData + risk_count)
+        return datas
