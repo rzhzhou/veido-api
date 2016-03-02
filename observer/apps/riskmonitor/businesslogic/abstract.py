@@ -107,8 +107,10 @@ class Abstract():
 
     def compare(self):
 
-        def count():
-            count = RiskNews.objects.aggregate(reprinted=Count('reprinted'))
+        def count(start, end):
+            count = RiskNews.objects.filter(
+                pubtime__range=(start, end)).aggregate(
+                reprinted=Count('reprinted'))
             return count['reprinted']
 
         def compare_with_the_statistics_last_year():
@@ -118,4 +120,13 @@ class Abstract():
             pass
 
         def compare_with_the_statistics_last_month():
+            pass
+
+        def annular_with_the_statistics_last_year():
+            pass
+
+        def annular_with_the_statistics_last_season():
+            pass
+
+        def annular_with_the_statistics_last_month():
             pass
