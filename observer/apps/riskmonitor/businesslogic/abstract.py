@@ -3,6 +3,8 @@ import pytz
 import time
 from datetime import datetime, timedelta
 
+from django.db.models import Count
+
 from observer.apps.riskmonitor.models import(
     ScoreIndustry, ScoreEnterprise, Industry, Enterprise, RiskNews)
 from observer.utils.connector.mysql import query
@@ -101,9 +103,13 @@ class Abstract():
             """ % (','.join(query_str), x, industry, enterprise, ))
         news_data = [i for i in sum_news('risk_news')[0]]
         date = map(lambda x: x.strftime("%m-%d"), datel)
-        return {'data': news_data, 'date':date}
+        return {'data': news_data, 'date': date}
 
     def compare(self):
+
+        def count():
+            count = RiskNews.objects.aggregate(reprinted=Count('reprinted'))
+            return count['reprinted']
 
         def compare_with_the_statistics_last_year():
             pass
