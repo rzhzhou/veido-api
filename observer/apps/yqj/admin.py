@@ -10,11 +10,14 @@ from observer.utils.connector.mongo import CrawlerTask
 from yqj_save import MySQLQuerApi
 from observer.apps.base.models import (
     Area, Article, ArticlePublisher, Category, Custom,
-    CustomKeyword, Group, GroupAuthUser, LocaltionScore, Product, ProductKeyword,
-    Risk, LRisk, TRisk, RiskScore, Topic, User, Weibo, WeiboPublisher, Weixin,
-    WeixinPublisher, save_user, ZJInspection, News)
+    CustomKeyword, Group, GroupAuthUser, LocaltionScore,
+    Risk, RiskScore, Topic, User, Weibo, WeiboPublisher, Weixin,
+    WeixinPublisher, save_user)
+
 from observer.apps.config.models import(
     CacheType, CacheConf)
+from observer.apps.reuse.models import LRisk, TRisk, News, ZJInspection
+from observer.apps.riskmonitor.models import Product, ProductKeyword
 from observer.apps.corpus.models import Event
 from resource import InspectionResources
 from import_export.admin import ImportExportActionModelAdmin

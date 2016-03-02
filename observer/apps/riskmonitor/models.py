@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 
-from observer.apps.base.models import Area
+from observer.apps.base.models import Area, Group
 
 
 class Score(models.Model):
@@ -51,15 +51,31 @@ class Enterprise(models.Model):
 class Product(models.Model):
     name = models.CharField(max_length=255, verbose_name=u'产品')
     score = models.ForeignKey(Score, verbose_name=u'分值')
-    industry = models.ManyToManyField(Industry, related_name='industrys', 
+    industry = models.ManyToManyField(Industry, related_name='industrys',
         related_query_name='industry', null=True, blank=True, verbose_name=u'行业')
 
     class Meta:
+        app_label = 'base'
         db_table = 'product'
         verbose_name_plural = u'产品'
 
     def __unicode__(self):
         return self.name
+
+
+class ProductKeyword(models.Model):
+    newkeyword = models.CharField(max_length=255, verbose_name=u'关键词')
+    review = models.CharField(max_length=255, default=u'', verbose_name=u'审核')
+    # synced = models.CharField(max_length=255, default=u'', verbose_name=u'同步')
+    group = models.ForeignKey(Group)
+    product = models.ForeignKey(Product, null=True, blank=True, default=u'')
+
+    class Meta:
+        db_table = 'product_keyword'
+        verbose_name_plural = u'产品监测关键词'
+
+    def __unicode__(self):
+        return self.newkeyword
 
 
 class EnterpriseProduct(models.Model):

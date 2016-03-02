@@ -4,8 +4,9 @@ import uuid
 from django.conf import settings
 from django.db import IntegrityError, transaction
 from observer.apps.base.models import Article, Area, RelatedData, \
-    ArticlePublisher, RelatedDataAtricle, Category, CategoryAtricle
+    ArticlePublisher, Category
 from django.http import HttpResponse
+from observer.apps.reuse.models import CategoryAtricle, RelatedDataAtricle
 
 from simArticle import _cal_values
 from query import *
