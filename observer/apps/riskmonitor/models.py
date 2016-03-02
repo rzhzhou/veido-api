@@ -6,7 +6,7 @@ from django.db import models
 from django.utils import timezone
 from tinymce.models import HTMLField
 
-from observer.apps.base.models import Area
+from observer.apps.base.models import Area, Group
 
 
 class Brand(models.Model):
@@ -114,7 +114,7 @@ class RiskData(models.Model):
     score = models.IntegerField(null=True, blank=True, verbose_name=u'评分')
     url = models.URLField( null=True, blank=True, verbose_name=u'网站链接')
     uuid = models.CharField(max_length=255, default=uuid.uuid4, verbose_name=u'uuid')
-    
+
     area = models.ForeignKey(Area, verbose_name=u'地域')
     brand = models.ForeignKey(Brand, verbose_name=u'品牌')
     industry = models.ForeignKey(Industry, verbose_name=u'行业')
@@ -228,12 +228,12 @@ class RiskNews(models.Model):
     feeling_factor = models.FloatField(default=-1, verbose_name=u'正负面')
     reprinted = models.IntegerField(verbose_name=u'转载数')
     status = models.IntegerField(default=0, verbose_name=u'状态')
-    
-    area = models.ManyToManyField(Area, related_name='rareas', 
+
+    area = models.ManyToManyField(Area, related_name='rareas',
         related_query_name='rarea',verbose_name=u'地域')
-    industry = models.ManyToManyField(Industry, related_name='industrys', 
+    industry = models.ManyToManyField(Industry, related_name='industrys',
         related_query_name='industry', verbose_name=u'行业')
-    enterprise = models.ManyToManyField(Enterprise, related_name='enterprises', 
+    enterprise = models.ManyToManyField(Enterprise, related_name='enterprises',
         related_query_name='enterprise', verbose_name=u'企业')
 
     class Meta:
@@ -244,3 +244,18 @@ class RiskNews(models.Model):
 
     def __unicode__(self):
         return self.title
+
+
+class ProductKeyword(models.Model):
+    newkeyword = models.CharField(max_length=255, verbose_name=u'关键词')
+    review = models.CharField(max_length=255, default=u'', verbose_name=u'审核')
+    # synced = models.CharField(max_length=255, default=u'', verbose_name=u'同步')
+    group = models.ForeignKey(Group)
+    product = models.ForeignKey(Product, null=True, blank=True, default=u'')
+
+    class Meta:
+        db_table = 'product_keyword'
+        verbose_name_plural = u'产品监测关键词'
+
+    def __unicode__(self):
+        return self.newkeyword

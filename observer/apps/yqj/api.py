@@ -13,10 +13,6 @@ from django.utils import timezone
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework_jwt.views import JSONWebTokenAPIView
-from rest_framework_jwt.settings import api_settings
-from rest_framework_jwt.compat import get_request_data
-from rest_framework_jwt.serializers import JSONWebTokenSerializer
 
 from observer.apps.base.initialize import authenticate, login_required, set_logo, token
 from observer.apps.base.models import save_user, hash_password, User, Area, Category
@@ -29,36 +25,11 @@ from observer.apps.weixin.api import WeixinApi
 from observer.apps.weibo.api import WeiboApi
 from observer.apps.base.models import (
     Area, Article, ArticlePublisher, Category, Collection, Custom, CustomKeyword,
-    Group, Inspection, LocaltionScore, Product, ProductKeyword, RelatedData,
+    Group, Inspection, LocaltionScore, RelatedData,
     Risk, RiskScore, Topic, Weibo, Weixin)
+from observer.apps.riskmonitor.models import ProductKeyword, Product
 from observer.utils.connector.redisconnector import RedisQueryApi
 from observer.utils.decorators.cache import read_cache
-
-
-
-jwt_response_payload_handler = api_settings.JWT_RESPONSE_PAYLOAD_HANDLER
-
-
-class WebToken(JSONWebTokenAPIView):
-
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(
-            data=get_request_data(request)
-        )
-
-        if serializer.is_valid():
-            user = serializer.object.get('user') or request.user
-            token = serializer.object.get('token')
-            response_data = jwt_response_payload_handler(token, user, request)
-            response_data.update({'status': True})
-            return Response(response_data)
-
-        return Response({'status': False})
-
-
-class ObtainJSONWebToken(WebToken):
-
-   serializer_class = JSONWebTokenSerializer
 
 
 def login_view(request):
