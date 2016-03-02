@@ -69,6 +69,7 @@ class Abstract():
 
     def news_nums(self, start, end, type, industry='%%', enterprise='%%', source=-1):
         days = (end - start).days
+        datel = [(start + timedelta(days=i)) for i in xrange(days)]
         start = start.astimezone(pytz.utc)
         start = time.strftime('%Y-%m-%d %X', start.timetuple())
         start = datetime.strptime(start, '%Y-%m-%d %X')
@@ -99,4 +100,5 @@ class Abstract():
             WHERE i.`id` like '%s' AND e.`id` like '%s'
             """ % (','.join(query_str), x, industry, enterprise, ))
         news_data = [i for i in sum_news('risk_news')[0]]
-        return news_data
+        date = map(lambda x: x.strftime("%m-%d"), datel)
+        return {'data': news_data, 'date':date}

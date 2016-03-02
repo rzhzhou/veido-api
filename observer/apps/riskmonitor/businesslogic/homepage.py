@@ -82,7 +82,7 @@ class HomeData(Abstract):
         nums = self.news_nums(start, end, type)
         data = {
             'riskData': {
-                'data': nums,
+                'data': nums['data'],
                 'labels': [weeks[(end + timedelta(days=(i + 1))).isoweekday() - 1]
                            for i in range(7)]
             }
