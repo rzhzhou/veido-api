@@ -113,8 +113,12 @@ class Abstract():
                 reprinted=Count('reprinted'))
             return count['reprinted']
 
-        def compare_with_the_statistics_last_year():
-            pass
+        def compare_with_the_statistics_last_year(start, end):
+            timedelta_one_year = timedelta(year=1)
+            a_period_count = count(start, end)
+            b_period_count = count(
+                start - timedelta_one_year, end - timedelta_one_year)
+            return (a_period_count - b_period_count) / b_period_count
 
         def compare_with_the_statistics_last_season():
             pass
