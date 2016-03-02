@@ -8,6 +8,7 @@ from django.db.models import Count
 from observer.apps.riskmonitor.models import(
     ScoreIndustry, ScoreEnterprise, Industry, Enterprise, RiskNews)
 from observer.utils.connector.mysql import query
+from observer.apps.base.api_function import get_season
 
 
 class Abstract():
@@ -121,16 +122,16 @@ class Abstract():
             return (a_period_count - b_period_count) / b_period_count
 
         def compare_with_the_statistics_last_season():
-            pass
+            timedelta_one_season = timedelta(months=3)
+            a_period_count = count(start, end)
+            b_period_count = count(
+                start - timedelta_one_season, end - timedelta_one_season)
+            return (a_period_count - b_period_count) / b_period_count
 
         def compare_with_the_statistics_last_month():
-            pass
+            timedelta_one_month = timedelta(months=1)
+            a_period_count = count(start, end)
+            b_period_count = count(
+                start - timedelta_one_month, end - timedelta_one_month)
+            return (a_period_count - b_period_count) / b_period_count
 
-        def annular_with_the_statistics_last_year():
-            pass
-
-        def annular_with_the_statistics_last_season():
-            pass
-
-        def annular_with_the_statistics_last_month():
-            pass
