@@ -102,3 +102,14 @@ class Abstract():
         news_data = [i for i in sum_news('risk_news')[0]]
         date = map(lambda x: x.strftime("%m-%d"), datel)
         return {'data': news_data, 'date':date}
+
+    def compare(self):
+
+        def compare_with_the_statistics_last_year():
+            pass
+
+        def compare_with_the_statistics_last_season():
+            pass
+
+        def compare_with_the_statistics_last_month():
+            pass
