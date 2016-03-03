@@ -14,7 +14,7 @@ from businesslogic.detail import *
 from businesslogic.enterprise_rank import EnterpriseRank
 from businesslogic.homepage import *
 from businesslogic.industry_track import IndustryTrack
-from businesslogic.statistic import *
+from businesslogic.statistic import Statistic
 
 
 class HomePageView(APIView, BaseTemplateView):
@@ -50,9 +50,16 @@ class EnterpriseRankView(APIView):
         return Response(data)
 
 
-def statistic(self, request, id):
-    pass
+class StatisticView(APIView):
+
+    def get(self, request):
+        tz = pytz.timezone(settings.TIME_ZONE)
+        start = tz.localize(datetime.strptime('2015-11-22', '%Y-%m-%d'))
+        end = tz.localize(datetime.strptime('2015-11-30', '%Y-%m-%d'))
+        data = Statistic(start=start, end=end).get_all()
+        return Response(data)
 
 
-def detail(self, request, id):
+
+class DetailView(APIView):
     pass

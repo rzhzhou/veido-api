@@ -20,7 +20,7 @@ from observer.apps.yqj.api import login_view, registe_view, upload_image, change
     reset_passwd, delete_user_view, add_user_view, chart_line_index_view,\
     chart_pie_index_view, map_view, Sidebar, Dashboard, logout_view
 from observer.apps.riskmonitor.api import HomePageView, IndustryTrackView,\
-    EnterpriseRankView
+    EnterpriseRankView, StatisticView
 
 
 urlpatterns = [
@@ -112,4 +112,5 @@ urlpatterns += [
     url(r'^dashboard/$', HomePageView.as_view()),
     url(r'^industry/$', IndustryTrackView.as_view()),
     url(r'^enterprise/$', EnterpriseRankView.as_view()),
+    url(r'^statistical/$', StatisticView.as_view())
 ]

@@ -73,7 +73,8 @@ class Abstract():
             enteobjects = []
         return enteobjects
 
-    def news_nums(self, start, end, industry='%%', enterprise='%%', source=-1):
+    def news_nums(self, start, end, industry='%%', enterprise='%%', source='%%',
+                  product='%%'):
         days = (end - start).days
         datel = [(start + timedelta(days=i)) for i in xrange(days)]
         start = start.astimezone(pytz.utc)
@@ -81,20 +82,14 @@ class Abstract():
         start = datetime.strptime(start, '%Y-%m-%d %X')
         date = [(start + timedelta(days=x)) for x in xrange(days)]
         date_range = [(i, i + timedelta(days=1)) for i in date]
-        if source == -1:
-            query_str = map(
-                lambda x: """sum(case when pubtime < '%s' and
-                    pubtime >= '%s' then 1 else 0 end)"""
-                % (x[1], x[0]),
-                date_range
-            )
-        else:
-            query_str = map(
-                lambda x: """sum(case when pubtime < '%s' and
-                    pubtime >= '%s' and source = %s then 1 else 0 end)"""
-                % (x[1], x[0], source),
-                date_range
-            )
+
+        query_str = map(
+            lambda x: """sum(case when pubtime < '%s' and
+                pubtime >= '%s' then 1 else 0 end)"""
+            % (x[1], x[0]),
+            date_range
+        )
+
         sum_news = lambda x: query("""
             SELECT %s FROM %s r LEFT JOIN
             risk_news_industry ri ON r.`id`=ri.`risknews_id`
@@ -103,8 +98,9 @@ class Abstract():
             LEFT JOIN enterprise e ON re.`enterprise_id`=e.`id`
             LEFT JOIN risk_news_area rna ON rna.`risknews_id`=r.`id`
             LEFT JOIN area a ON a.`id`=rna.`area_id`
-            WHERE i.`id` like '%s' AND e.`id` like '%s'
-            """ % (','.join(query_str), x, industry, enterprise, ))
+            LEFT JOIN risknewspublisher rnp ON r.`publisher_id`=rnp.`id`
+            WHERE i.`id` like '%s' AND e.`id` like '%s' AND rnp.`id` like '%s'
+            """ % (','.join(query_str), x, industry, enterprise, source))
         news_data = [i for i in sum_news('risk_news')[0]]
         date = map(lambda x: x.strftime("%m-%d"), datel)
         return {'data': news_data, 'date': date}
@@ -206,7 +202,7 @@ class Abstract():
             WHERE (rn.`pubtime` >= '%s'
             AND rn.`pubtime` < '%s')
             GROUP BY e.`id` ORDER BY se.`score` %s
-            """%(start, end, 'DESC')
+            """ % (start, end, 'DESC')
         results = query(sql)
         iteml = []
         for result in results:
@@ -219,7 +215,7 @@ class Abstract():
             iteml.append(item)
         return {'data': iteml, 'total': len(iteml)}
 
-    def source(self):
+    def sources(self):
         """
         "source": {
             "labels": ["赢商网", "中国产业调研", "新浪", "华西都市网", "人民网"],
