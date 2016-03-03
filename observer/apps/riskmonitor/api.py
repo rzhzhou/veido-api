@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from django.conf import settings
 
 from observer.apps.base.views import BaseTemplateView
+from observer.apps.riskmonitor.models import RiskNews
 from businesslogic.detail import *
 from businesslogic.enterprise_rank import EnterpriseRank
 from businesslogic.homepage import *
@@ -60,6 +61,21 @@ class StatisticView(APIView):
         return Response(data)
 
 
+class DetailNewsView(APIView):
 
-class DetailView(APIView):
-    pass
+    def get(self, request):
+        """
+        {
+          "title": "小米空气净化器疑涉“造假门” 多元化战略隐忧渐显",
+          "source": "新华网",
+          "time": "2015-12-11 18:00",
+          "text": "就在小米科技CEO雷军宣布要将专注小米的核心业务，并将旗下核心业务分为自有产品与生态链产品的次日，小米科技旗下生态链企业智米科技，就曝出了空气净化器产品疑涉“造假门”的消息给这家明星公司的业务转型前景蒙上一层阴影。"
+        }
+        """
+        risk_news = RiskNews.objects.get(pk=request.GET['id'])
+        data = {
+            'title': risk_news.title,
+            'source': risk_news.publisher.publisher,
+            'time': risk_news.pubtime,
+            'text': risk_news.content
+        }

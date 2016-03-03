@@ -14,7 +14,6 @@ class APITest(BaseTestCase):
         response = client.post('/api/token-auth', self.data, format='json')
         token = response.data['token']
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['status'], True)
 
     def test_dashboard(self):
         token = self.get_token()

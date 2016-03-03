@@ -19,7 +19,7 @@ class News(models.Model):
     area = models.ForeignKey(Area, verbose_name=u'地域')
 
     class Meta:
-        app_label = 'base'
+        app_label = 'reuse'
         db_table = 'article'
         verbose_name_plural = u'质监热点'
 
@@ -36,7 +36,7 @@ class LRisk(models.Model):
     pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间', null=True, blank=True,)
 
     class Meta:
-        app_label = 'base'
+        app_label = 'reuse'
         db_table = 'risk'
         verbose_name_plural = u'本地评分'
 
@@ -54,7 +54,7 @@ class TRisk(models.Model):
     pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间', null=True, blank=True,)
 
     class Meta:
-        app_label = 'base'
+        app_label = 'reuse'
         db_table = 'risk'
         verbose_name_plural = u'风险评分'
 
@@ -67,7 +67,7 @@ class ProductMonitor(models.Model):
     articles = models.ManyToManyField(Article, related_name='products', related_query_name='product', blank=True, verbose_name=u'文章')
 
     class Meta:
-        app_label = 'base'
+        app_label = 'reuse'
         db_table = 'product'
         verbose_name_plural = u'产品监测'
 
@@ -92,7 +92,7 @@ class ZJInspection(models.Model):
     sync = models.IntegerField(null=True, blank=True, verbose_name=u'同步状态')
 
     class Meta:
-        app_label = 'corpus'
+        app_label = 'reuse'
         db_table = 'inspection'
         verbose_name_plural = u'抽检'
 
@@ -105,7 +105,7 @@ class RelatedDataAtricle(models.Model):
     relateddata = models.ForeignKey(RelatedData)
 
     class Meta:
-        app_label = 'corpus'
+        app_label = 'reuse'
         db_table = 'relateddata_articles'
 
 
@@ -114,5 +114,5 @@ class CategoryAtricle(models.Model):
     category = models.ForeignKey(Category)
 
     class Meta:
-        app_label = 'base'
+        app_label = 'reuse'
         db_table = 'category_articles'
