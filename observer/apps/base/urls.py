@@ -19,7 +19,8 @@ from observer.apps.weibo.api import WeiboView, LocationWeiboView
 from observer.apps.yqj.api import login_view, registe_view, upload_image, change_passwd,\
     reset_passwd, delete_user_view, add_user_view, chart_line_index_view,\
     chart_pie_index_view, map_view, Sidebar, Dashboard, logout_view
-from observer.apps.riskmonitor.api import HomePageView, IndustryTrackView
+from observer.apps.riskmonitor.api import HomePageView, IndustryTrackView,\
+    EnterpriseRankView
 
 
 urlpatterns = [
@@ -109,5 +110,6 @@ urlpatterns += [
 
 urlpatterns += [
     url(r'^dashboards/$', HomePageView.as_view()),
-    url(r'^industry/$', IndustryTrackView.as_view())
+    url(r'^industry/$', IndustryTrackView.as_view()),
+    url(r'^enterprise/$', EnterpriseRankView.as_view()),
 ]

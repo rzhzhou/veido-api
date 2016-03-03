@@ -17,23 +17,23 @@ from observer.apps.base.api_function import get_season
 class Abstract():
 
     def indu_make_level(self, score):
-        level = 'C'
+        level = 'A'
         if score <= 100 and score >= 90:
-            level = 'A'
+            level = 'C'
         if score < 90 and score >= 80:
             level = 'B'
         if score < 80:
-            level = 'C'
+            level = 'A'
         return level
 
     def ente_make_level(self, score):
-        level = 'C'
+        level = 'A'
         if score <= 100 and score >= 90:
-            level = 'A'
+            level = 'C'
         if score < 90 and score >= 80:
             level = 'B'
         if score < 80:
-            level = 'C'
+            level = 'A'
         return level
 
     def indugenerate(self, induscores):
@@ -196,6 +196,28 @@ class Abstract():
             }
             items.append(item)
         return {'items': items, 'total': data.count()}
+
+    def enterprise_rank(self, start=None, end=None, industry=None):
+        sql = """
+            SELECT e.`id`, e.`name`, se.`score`, COUNT(rn.`id`) FROM enterprise e
+            LEFT JOIN risk_news_enterprise re ON e.`id`=re.`enterprise_id`
+            LEFT JOIN risk_news rn ON re.`risknews_id`=rn.`id`
+            LEFT JOIN score_enterprise se ON e.`id`=se.`enterprise_id`
+            WHERE (rn.`pubtime` >= '%s'
+            AND rn.`pubtime` < '%s')
+            GROUP BY e.`id` ORDER BY se.`score` %s
+            """%(start, end, 'DESC')
+        results = query(sql)
+        iteml = []
+        for result in results:
+            item = {
+                'id': result[0],
+                'name': result[1],
+                'level': self.ente_make_level(result[2]),
+                'count': result[3]
+            }
+            iteml.append(item)
+        return {'data': iteml, 'total': len(iteml)}
 
     def source(self):
         """
