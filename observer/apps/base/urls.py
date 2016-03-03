@@ -112,6 +112,6 @@ urlpatterns += [
     url(r'^dashboards/$', HomePageView.as_view()),
     url(r'^industry/$', IndustryTrackView.as_view()),
     url(r'^enterprise/$', EnterpriseRankView.as_view()),
-    url(r'^statistical/$', StatisticView.as_view())
+    url(r'^statistical/$', StatisticView.as_view()),
     url(r'^news1$', DetailNewsView.as_view())
 ]
