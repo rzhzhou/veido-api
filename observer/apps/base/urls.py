@@ -18,13 +18,18 @@ from observer.apps.weixin.api import WeixinView, LocationWeixinView, WeixinDetai
 from observer.apps.weibo.api import WeiboView, LocationWeiboView
 from observer.apps.yqj.api import login_view, registe_view, upload_image, change_passwd,\
     reset_passwd, delete_user_view, add_user_view, chart_line_index_view,\
+<<<<<<< HEAD
     chart_pie_index_view, map_view, Sidebar, Dashboard, logout_view, ObtainJSONWebToken
 from observer.apps.riskmonitor.api import HomePageView, IndustryTrackView
+=======
+    chart_pie_index_view, map_view, Sidebar, Dashboard, logout_view
+>>>>>>> 82623ee8e0925ff26d3098d03d29857d103c81fb
 
 
 urlpatterns = [
-    url(r'^token-refresh$', 'rest_framework_jwt.views.refresh_jwt_token'),
-    url(r'^token-verify$', 'rest_framework_jwt.views.verify_jwt_token'),
+    url(r'^token-auth$', views.obtain_jwt_token),
+    url(r'^token-refresh$', views.refresh_jwt_token),
+    url(r'^token-verify$', views.verify_jwt_token),
 ]
 
 urlpatterns += [
