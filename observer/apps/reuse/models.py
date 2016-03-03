@@ -64,7 +64,7 @@ class TRisk(models.Model):
 class ProductMonitor(models.Model):
     name = models.CharField(max_length=255, blank=True, verbose_name='名称')
 
-    articles = models.ManyToManyField(Article, related_name='products', related_query_name='product', null=True, blank=True, verbose_name=u'文章')
+    articles = models.ManyToManyField(Article, related_name='products', related_query_name='product', blank=True, verbose_name=u'文章')
 
     class Meta:
         app_label = 'base'
