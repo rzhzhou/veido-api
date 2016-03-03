@@ -46,7 +46,7 @@ class EnterpriseRankView(APIView):
         start = tz.localize(datetime.strptime('2015-11-22', '%Y-%m-%d'))
         end = tz.localize(datetime.strptime('2015-11-30', '%Y-%m-%d'))
         id = 2
-        data = EnterpriseRank(industry=id, start=start, end=end).get_all
+        data = EnterpriseRank(industry=id, start=start, end=end).get_all()
         return Response(data)
 
 

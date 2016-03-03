@@ -15,5 +15,12 @@ class EnterpriseRank(Abstract):
         return result
 
     def get_all(self):
-        self.ente_rank()
-
+        items = self.ente_rank()
+        data = {
+            'list': {
+                'title': [u'排名', u'企业排名', u'风险信息总数', u'等级'],
+                'items': items['data'],
+                'total': items['total']
+            }
+        }
+        return data
