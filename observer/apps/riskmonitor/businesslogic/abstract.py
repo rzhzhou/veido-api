@@ -2,11 +2,14 @@
 import pytz
 import time
 from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 
 from django.db.models import Count
+from django.db.models import Q
 
 from observer.apps.riskmonitor.models import(
-    ScoreIndustry, ScoreEnterprise, Industry, Enterprise, RiskNews, RiskNewsPublisher)
+    ScoreIndustry, ScoreEnterprise, Industry,
+    Enterprise, RiskNews, Product, RiskNewsPublisher)
 from observer.utils.connector.mysql import query
 from observer.apps.base.api_function import get_season
 
@@ -70,7 +73,7 @@ class Abstract():
             enteobjects = []
         return enteobjects
 
-    def news_nums(self, start, end, type, industry='%%', enterprise='%%', source=-1):
+    def news_nums(self, start, end, industry='%%', enterprise='%%', source=-1):
         days = (end - start).days
         datel = [(start + timedelta(days=i)) for i in xrange(days)]
         start = start.astimezone(pytz.utc)
@@ -106,34 +109,93 @@ class Abstract():
         date = map(lambda x: x.strftime("%m-%d"), datel)
         return {'data': news_data, 'date': date}
 
-    def compare(self):
+    def compare(self, start, end, id):
 
-        def count(start, end):
+        def count(start, end, id):
+            industry = Industry.objects.get(id=id)
             count = RiskNews.objects.filter(
-                pubtime__range=(start, end)).aggregate(
+                pubtime__range=(start, end), industry=industry).aggregate(
                 reprinted=Count('reprinted'))
             return count['reprinted']
 
-        def compare_with_the_statistics_last_year(start, end):
-            timedelta_one_year = timedelta(year=1)
-            a_period_count = count(start, end)
+        def compare_with_the_statistics_last_year(start, end, id):
+            timedelta_one_year = relativedelta(years=1)
+            a_period_count = count(start, end, id)
             b_period_count = count(
-                start - timedelta_one_year, end - timedelta_one_year)
-            return (a_period_count - b_period_count) / b_period_count
+                start - timedelta_one_year, end - timedelta_one_year, id)
+            try:
+                increase = (a_period_count - b_period_count) / b_period_count
+            except:
+                increase = 0
+            return increase
 
-        def compare_with_the_statistics_last_season():
-            timedelta_one_season = timedelta(months=3)
-            a_period_count = count(start, end)
+        def compare_with_the_statistics_last_season(start, end, id):
+            timedelta_one_season = relativedelta(months=3)
+            a_period_count = count(start, end, id)
             b_period_count = count(
-                start - timedelta_one_season, end - timedelta_one_season)
-            return (a_period_count - b_period_count) / b_period_count
+                start - timedelta_one_season, end - timedelta_one_season, id)
+            try:
+                increase = (a_period_count - b_period_count) / b_period_count
+            except:
+                increase = 0
+            return increase
 
-        def compare_with_the_statistics_last_month():
-            timedelta_one_month = timedelta(months=1)
-            a_period_count = count(start, end)
+        def compare_with_the_statistics_last_month(start, end, id):
+            timedelta_one_month = relativedelta(months=1)
+            a_period_count = count(start, end, id)
             b_period_count = count(
-                start - timedelta_one_month, end - timedelta_one_month)
-            return (a_period_count - b_period_count) / b_period_count
+                start - timedelta_one_month, end - timedelta_one_month, id)
+            try:
+                increase = (a_period_count - b_period_count) / b_period_count
+            except:
+                increase = 0
+            return increase
+
+        date_range = (end - start).days
+
+        if date_range > 6 * 30:
+            season = get_season(start)
+            data = [[compare_with_the_statistics_last_year(start, end, id)],
+                    [compare_with_the_statistics_last_season(start, end, id)]]
+            return {
+                'data': data,
+                'date': season
+            }
+        # data range by month    less two axis has data
+        else:
+            month = start.month
+            data = [[compare_with_the_statistics_last_year(start, end, id)],
+                    [compare_with_the_statistics_last_month(start, end, id)]]
+            return {
+                'data': data,
+                'date': month
+            }
+
+    def source_data(self, industry=None, enterprise=None, product=None, source=None,
+                    start=None, end=None):
+        industry = Industry.objects.get(
+            id=industry) if industry else None
+        enterprise = Enterprise.objects.get(
+            id=enterprise) if enterprise else None
+        product = Product.objects.get(
+            id=product) if product else None
+
+        data = RiskNews.objects.filter(
+            Q(industry=industry) if industry == None else Q()
+            & Q(enterprise=enterprise) if enterprise == None else Q()
+            & Q(product=product) if product == None else Q()
+            & Q(source=source) if source == None else Q()
+            & Q(pubtime__range=(start, end)))
+        items = []
+        for d in data:
+            item = {
+                'id': d.id,
+                'title': d.title,
+                'source': d.source,
+                'time': d.pubtime
+            }
+            items.append(item)
+        return {'items': items, 'total': data.count()}
 
     def source(self):
         """
