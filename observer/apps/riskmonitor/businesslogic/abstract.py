@@ -9,7 +9,7 @@ from django.db.models import Q
 
 from observer.apps.riskmonitor.models import(
     ScoreIndustry, ScoreEnterprise, Industry,
-    Enterprise, RiskNews, Product)
+    Enterprise, RiskNews, Product, RiskNewsPublisher)
 from observer.utils.connector.mysql import query
 from observer.apps.base.api_function import get_season
 
@@ -210,3 +210,23 @@ class Abstract():
         result = query(sql, start, end)
         print result
 
+    def source(self):
+        """
+        "source": {
+            "labels": ["赢商网", "中国产业调研", "新浪", "华西都市网", "人民网"],
+            "data": [
+                {"value": "335", "name": "赢商网"},
+                {"value": "310", "name": "中国产业调研"},
+                {"value": "234", "name": "新浪"},
+                {"value": "135", "name": "华西都市网"},
+                {"value": "1548", "name": "人民网"}
+            ]
+        }
+        """
+        queryset = RiskNews.objects.all().values('publisher').annotate(
+            num_publishers=Count('publisher')).order_by('-num_publishers')[:5]
+
+        data = [{'value': q['num_publishers'], 'name': RiskNewsPublisher.objects.get(
+            id=q['publisher']).publisher} for q in queryset]
+        labels = [d['name'] for d in data]
+        return {'labels': labels, 'data': data}
