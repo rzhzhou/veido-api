@@ -17,13 +17,9 @@ from observer.apps.risk.api import chart_line_risk_view, chart_pie_risk_view
 from observer.apps.weixin.api import WeixinView, LocationWeixinView, WeixinDetailView
 from observer.apps.weibo.api import WeiboView, LocationWeiboView
 from observer.apps.yqj.api import login_view, registe_view, upload_image, change_passwd,\
-    reset_passwd, delete_user_view, add_user_view, chart_line_index_view,\
-<<<<<<< HEAD
-    chart_pie_index_view, map_view, Sidebar, Dashboard, logout_view, ObtainJSONWebToken
-from observer.apps.riskmonitor.api import HomePageView, IndustryTrackView
-=======
-    chart_pie_index_view, map_view, Sidebar, Dashboard, logout_view
->>>>>>> 82623ee8e0925ff26d3098d03d29857d103c81fb
+    reset_passwd, delete_user_view, add_user_view, chart_line_index_view
+from observer.apps.riskmonitor.api import HomePageView, IndustryTrackView,\
+    EnterpriseRankView
 
 
 urlpatterns = [
@@ -109,10 +105,10 @@ urlpatterns += [
     url(r'^map/$', map_view),
     url(r'^app$', Sidebar.as_view()),
     url(r'^dashboard$', Dashboard.as_view()),
-    url(r'^token-auth$', ObtainJSONWebToken.as_view()),
 ]
 
 urlpatterns += [
     url(r'^dashboard/$', HomePageView.as_view()),
-    url(r'^industry/$', IndustryTrackView.as_view())
+    url(r'^industry/$', IndustryTrackView.as_view()),
+    url(r'^enterprise/$', EnterpriseRankView.as_view()),
 ]

@@ -196,3 +196,17 @@ class Abstract():
             }
             items.append(item)
         return {'items': items, 'total': data.count()}
+
+    def enterprise_rank(self, start=None, end=None, industry=None):
+        sql = """
+            SELECT e.`name`, se.`score`, COUNT(rn.`id`) FROM enterprise e
+            LEFT JOIN risk_news_enterprise re ON e.`id`=re.`enterprise_id`
+            LEFT JOIN risk_news rn ON re.`risknews_id`=rn.`id`
+            LEFT JOIN score_enterprise se ON e.`id`=se.`enterprise_id`
+            WHERE (rn.`pubtime` >= %s
+            AND rn.`pubtime` < %s)
+            GROUP BY e.`id` ORDER BY se.`score` %s
+            """
+        result = query(sql, start, end)
+        print result
+
