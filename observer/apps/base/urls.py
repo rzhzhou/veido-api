@@ -108,6 +108,6 @@ urlpatterns += [
 ]
 
 urlpatterns += [
-    url(r'^dashboard/$', HomePageView.as_view()),
+    url(r'^dashboards/$', HomePageView.as_view()),
     url(r'^industry/$', IndustryTrackView.as_view())
 ]
