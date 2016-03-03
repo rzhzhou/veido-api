@@ -79,3 +79,4 @@ class DetailNewsView(APIView):
             'time': risk_news.pubtime,
             'text': risk_news.content
         }
+        return Response(data)
