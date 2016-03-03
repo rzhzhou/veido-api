@@ -22,9 +22,9 @@ from observer.apps.yqj.api import login_view, registe_view, upload_image, change
 
 
 urlpatterns = [
-    url(r'^token-auth$', 'rest_framework_jwt.views.obtain_jwt_token'),
-    url(r'^token-refresh$', 'rest_framework_jwt.views.refresh_jwt_token'),
-    url(r'^token-verify$', 'rest_framework_jwt.views.verify_jwt_token'),
+    url(r'^token-auth$', views.obtain_jwt_token),
+    url(r'^token-refresh$', views.refresh_jwt_token),
+    url(r'^token-verify$', views.verify_jwt_token),
 ]
 
 urlpatterns += [
