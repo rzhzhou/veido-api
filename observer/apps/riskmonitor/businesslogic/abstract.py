@@ -39,26 +39,26 @@ class Abstract():
 
         if day_diff == 0:
             if second_diff < 10:
-                return "刚刚"
+                return u"刚刚"
             if second_diff < 60:
-                return str(second_diff) + "秒前"
+                return str(second_diff) + u"秒前"
             if second_diff < 120:
-                return "1分钟前"
+                return u"1分钟前"
             if second_diff < 3600:
-                return str(second_diff / 60) + "分钟前"
+                return str(second_diff / 60) + u"分钟前"
             if second_diff < 7200:
-                return "1小时前"
+                return u"1小时前"
             if second_diff < 86400:
-                return str(second_diff / 3600) + "小时前"
+                return str(second_diff / 3600) + u"小时前"
         if day_diff == 1:
-            return "昨天"
+            return u"昨天"
         if day_diff < 7:
-            return str(day_diff) + "天前"
+            return str(day_diff) + u"天前"
         if day_diff < 31:
-            return str(day_diff / 7) + "星期前"
+            return str(day_diff / 7) + u"星期前"
         if day_diff < 365:
-            return str(day_diff / 30) + "月前"
-        return str(day_diff / 365) + "年前"
+            return str(day_diff / 30) + u"月前"
+        return str(day_diff / 365) + u"年前"
 
     def indu_make_level(self, score):
         level = 'A'
