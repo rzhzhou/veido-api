@@ -57,7 +57,7 @@ class Abstract():
         count = 3 if type is 'abstract' else Industry.objects.filter(
             level=1).count()
         try:
-            indunames = [indunames.next() for i in xrange(count - 1)]
+            indunames = [indunames.next() for i in xrange(count)]
         except:
             indunames = []
         return indunames

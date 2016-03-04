@@ -36,7 +36,6 @@ class HomeData(Abstract):
             },
             'product': prodsum
         }
-
         return data
 
     def industry(self):
@@ -63,7 +62,7 @@ class HomeData(Abstract):
 
     def risk_keywords(self):
         keywords = Corpus.objects.all()
-        keywords = keywords[0].riskword.split(' ')
+        keywords = keywords[0].riskword.split(' ')[0:3]
         data = {
             'keywordsRank': {
                 'items': [{'name': keyword, 'level': 5} for keyword in keywords]
@@ -72,14 +71,11 @@ class HomeData(Abstract):
         return data
 
     def risk_data(self):
-        type = 'abstract'
-        # end = timezone.now()
-        # start = end - timedelta(days=7)
         end = self.end
         start = end - timedelta(days=7)
         weeks = [u'星期一', u'星期二', u'星期三', u'星期四', u'星期五',
                  u'星期六', u'星期日']
-        nums = self.news_nums(start, end, type)
+        nums = self.news_nums(start, end)
         data = {
             'riskData': {
                 'data': nums['data'],
