@@ -83,3 +83,18 @@ class DetailNewsView(APIView):
         return Response(data)
 
 
+class SpeciesView(APIView, Abstract):
+
+    def get(self, request):
+        tz = pytz.timezone(settings.TIME_ZONE)
+        start = tz.localize(datetime.strptime('2016-2-1', '%Y-%m-%d'))
+        end = tz.localize(datetime.strptime('2016-2-3', '%Y-%m-%d'))
+        type = 'species'
+        species = self.risk_industry(start, end, type)
+        data = {
+            'species': {
+                'items': [{'name': specie[0], 'level':specie[1], 'id': specie[2]}
+                          for specie in species]
+            }
+        }
+        return Response(data)
