@@ -105,11 +105,11 @@ urlpatterns += [
     url(r'^pie/$', chart_pie_index_view),
     url(r'^map/$', map_view),
     url(r'^app$', Sidebar.as_view()),
-    url(r'^dashboard$', Dashboard.as_view()),
+    url(r'^dashboards$', Dashboard.as_view()),
 ]
 
 urlpatterns += [
-    url(r'^dashboards/$', HomePageView.as_view()),
+    url(r'^dashboard/$', HomePageView.as_view()),
     url(r'^industry/$', IndustryTrackView.as_view()),
     url(r'^enterprise/$', EnterpriseRankView.as_view()),
     url(r'^statistical/$', StatisticView.as_view()),
