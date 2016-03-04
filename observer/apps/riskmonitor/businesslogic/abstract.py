@@ -39,26 +39,26 @@ class Abstract():
 
         if day_diff == 0:
             if second_diff < 10:
-                return "刚刚"
+                return "just now"
             if second_diff < 60:
-                return str(second_diff) + "秒前"
+                return str(second_diff) + " seconds ago"
             if second_diff < 120:
-                return "1分钟前"
+                return "a minute ago"
             if second_diff < 3600:
-                return str(second_diff / 60) + "分钟前"
+                return str(second_diff / 60) + " minutes ago"
             if second_diff < 7200:
-                return "1小时前"
+                return "an hour ago"
             if second_diff < 86400:
-                return str(second_diff / 3600) + "小时前"
+                return str(second_diff / 3600) + " hours ago"
         if day_diff == 1:
-            return "昨天"
+            return "Yesterday"
         if day_diff < 7:
-            return str(day_diff) + "天前"
+            return str(day_diff) + " days ago"
         if day_diff < 31:
-            return str(day_diff / 7) + "星期前"
+            return str(day_diff / 7) + " weeks ago"
         if day_diff < 365:
-            return str(day_diff / 30) + "月前"
-        return str(day_diff / 365) + "年前"
+            return str(day_diff / 30) + " months ago"
+        return str(day_diff / 365) + " years ago"
 
     def indu_make_level(self, score):
         level = 'A'
@@ -145,7 +145,7 @@ class Abstract():
             LEFT JOIN risknewspublisher rnp ON r.`publisher_id`=rnp.`id`
             WHERE i.`id` like '%s' AND e.`id` like '%s' AND rnp.`id` like '%s'
             """ % (','.join(query_str), x, industry, enterprise, source))
-        news_data = [i for i in sum_news('risk_news')[0]]
+        news_data = [int(i) for i in sum_news('risk_news')[0]]
         date = map(lambda x: x.strftime("%m-%d"), datel)
         return {'data': news_data, 'date': date}
 
@@ -232,7 +232,7 @@ class Abstract():
                 'id': d.id,
                 'title': d.title,
                 'source': d.source,
-                'time': d.pubtime.strftime('%Y-%m-%d %H:%M:%S')
+                'time': d.pubtime
             }
             items.append(item)
         return {'items': items, 'total': data.count()}
