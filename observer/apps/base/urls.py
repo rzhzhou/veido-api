@@ -105,7 +105,7 @@ urlpatterns += [
     url(r'^pie/$', chart_pie_index_view),
     url(r'^map/$', map_view),
     url(r'^app$', Sidebar.as_view()),
-    # url(r'^dashboard$', Dashboard.as_view()),
+    url(r'^dashboards$', Dashboard.as_view()),
 ]
 
 urlpatterns += [

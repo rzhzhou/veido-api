@@ -143,7 +143,7 @@ class Abstract():
             LEFT JOIN risknewspublisher rnp ON r.`publisher_id`=rnp.`id`
             WHERE i.`id` like '%s' AND e.`id` like '%s' AND rnp.`id` like '%s'
             """ % (','.join(query_str), x, industry, enterprise, source))
-        news_data = [i for i in sum_news('risk_news')[0]]
+        news_data = [int(i) for i in sum_news('risk_news')[0]]
         date = map(lambda x: x.strftime("%m-%d"), datel)
         return {'data': news_data, 'date': date}
 
@@ -230,7 +230,7 @@ class Abstract():
                 'id': d.id,
                 'title': d.title,
                 'source': d.source,
-                'time': d.pubtime.strftime('%Y-%m-%d %H:%M:%S')
+                'time': d.pubtime
             }
             items.append(item)
         return {'items': items, 'total': data.count()}
