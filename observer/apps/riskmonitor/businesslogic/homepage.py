@@ -17,8 +17,18 @@ class HomeData(Abstract):
         self.start = start
         self.end = end
 
+    def get_time(self):
+        start = datetime.strptime(start, '%Y-%m-%d')
+        end = datetime.strptime(end, '%Y-%m-%d')
+        data = {
+            'time': start + '~' + end
+        }
+
     def risk_status(self):
-        return 'A'
+        data = {
+            'grade': 'A',
+        }
+        return data
 
     def risk_sum(self):
         indusum = ScoreIndustry.objects.filter(
@@ -34,7 +44,9 @@ class HomeData(Abstract):
             'enterprise': {
                 'amount': entesum
             },
-            'product': prodsum
+            'product': {
+                'amount': prodsum
+            }
         }
         return data
 
@@ -93,7 +105,7 @@ class HomeData(Abstract):
                  u'星期六', u'星期日']
         data = {
             'rankData': {
-                'data': [1, 2, 1, 3, 1, 2, 1],
+                'data': ['A', 'B', 'A', 'A', 'C', 'A', 'B'],
                 'labels': [weeks[(end + timedelta(days=(i + 1))).isoweekday() - 1]
                            for i in range(7)]
             }
@@ -107,6 +119,8 @@ class HomeData(Abstract):
         riskData = self.risk_data().items()
         rankData = self.risk_level().items()
         risk_count = self.risk_sum().items()
+        status = self.risk_status().items()
+        # time = self.get_time().items()
         datas = dict(industryRank + enterpriseRank + keywordsRank +
-                     riskData + rankData + risk_count)
+                     riskData + rankData + risk_count + status)
         return datas
