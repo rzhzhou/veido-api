@@ -98,5 +98,3 @@ class SpeciesView(APIView, Abstract):
             }
         }
         return Response(data)
-
-IndustryTrackView().get()
