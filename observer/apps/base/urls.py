@@ -32,8 +32,8 @@ urlpatterns = [
 urlpatterns += [
     url(r'^category/(?P<id>\d+)/news/$', ArticleTableView.as_view()),
     url(r'^location/(?P<id>\d+)/news/$', LocationTableView.as_view()),
-    url(r'^news$', NewsView.as_view()),
-    url(r'^news/(\d+)$', NewsDetailView.as_view()),
+    # url(r'^news$', NewsView.as_view()),
+    # url(r'^news/(\d+)$', NewsDetailView.as_view()),
 ]
 
 urlpatterns += [
@@ -113,5 +113,5 @@ urlpatterns += [
     url(r'^industry/$', IndustryTrackView.as_view()),
     url(r'^enterprise/$', EnterpriseRankView.as_view()),
     url(r'^statistical/$', StatisticView.as_view()),
-    url(r'^news1$', DetailNewsView.as_view())
+    url(r'^news$', DetailNewsView.as_view())
 ]

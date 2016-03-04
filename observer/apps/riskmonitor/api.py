@@ -11,6 +11,7 @@ from django.conf import settings
 
 from observer.apps.base.views import BaseTemplateView
 from observer.apps.riskmonitor.models import RiskNews
+from observer.apps.riskmonitor.businesslogic.abstract import Abstract
 from businesslogic.detail import *
 from businesslogic.enterprise_rank import EnterpriseRank
 from businesslogic.homepage import *
@@ -76,7 +77,7 @@ class DetailNewsView(APIView):
         data = {
             'title': risk_news.title,
             'source': risk_news.publisher.publisher,
-            'time': risk_news.pubtime,
+            'time': Abstract().pretty_date(risk_news.pubtime),
             'text': risk_news.content
         }
         return Response(data)
