@@ -232,7 +232,7 @@ class Abstract():
                 'id': d.id,
                 'title': d.title,
                 'source': d.source,
-                'time': d.pubtime
+                'time': d.pubtime.strftime('%Y-%m-%d %H:%M:%S')
             }
             items.append(item)
         return {'items': items, 'total': data.count()}
