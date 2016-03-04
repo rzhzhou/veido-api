@@ -8,7 +8,8 @@ from django.test import TestCase
 from observer.apps.base.tests import BaseTestCase
 
 
-PROJECT_ROOT = os.path.abspath(os.path.dirname(os.getcwd()+'/../../../'))
+PROJECT_ROOT = os.path.abspath(os.path.dirname(os.getcwd()+'/..'))
+print PROJECT_ROOT
 def test_tools():
 	reload(sys)
 	sys.path.append(PROJECT_ROOT)

@@ -57,7 +57,7 @@ class Abstract():
         if day_diff < 31:
             return str(day_diff / 7) + u"星期前"
         if day_diff < 365:
-            return str(day_diff / 30) + u"个月前"
+            return str(day_diff / 30) + u"月前"
         return str(day_diff / 365) + u"年前"
 
     def indu_make_level(self, score):
@@ -86,7 +86,7 @@ class Abstract():
             score = induscore.score
             level = self.indu_make_level(score)
             if indu.level == 1:
-                yield indu.name, level
+                yield indu.name, level, indu.id
 
     def entegenerate(self, entescores):
         for entescore in entescores:
