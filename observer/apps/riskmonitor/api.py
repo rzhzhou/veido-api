@@ -32,7 +32,7 @@ class HomePageView(APIView, BaseTemplateView):
 
 class IndustryTrackView(APIView):
 
-    def get(self):
+    def get(self, request):
         tz = pytz.timezone(settings.TIME_ZONE)
         start = tz.localize(datetime.strptime('2015-11-22', '%Y-%m-%d'))
         end = tz.localize(datetime.strptime('2015-11-30', '%Y-%m-%d'))
