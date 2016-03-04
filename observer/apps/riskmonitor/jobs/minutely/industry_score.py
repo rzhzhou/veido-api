@@ -1,13 +1,18 @@
 import os
 import sys
 import django
-PROJECT_ROOT = os.path.abspath(os.path.dirname(os.getcwd()+'/../../../../../'))
+PROJECT_ROOT = os.path.abspath(os.path.dirname(os.getcwd()+'/'))
+print PROJECT_ROOT
 reload(sys)
 sys.path.append(PROJECT_ROOT)
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "observer.settings.development");
 django.setup()
 
+import pytz
+from datetime import datetime, timedelta
+
 from django.db.models import Sum
+from django.conf import settings
 
 from observer.apps.riskmonitor.models import (
    RiskNews, Industry, ScoreIndustry)
@@ -21,6 +26,10 @@ def reprinted_per_industry(industry):
     return sum_reprinted['reprinted']
 
 def make_score():
+    tz = pytz.timezone(settings.TIME_ZONE)
+    start = tz.localize(datetime.strptime('2015-11-22', '%Y-%m-%d'))
+    end = tz.localize(datetime.strptime('2015-12-4', '%Y-%m-%d'))
+
     all_reprinted = RiskNews.objects.aggregate(
 	reprinted=Sum('reprinted'))['reprinted']
     industrys = Industry.objects.all()
@@ -28,9 +37,9 @@ def make_score():
 	per_reprint = reprinted_per_industry(industry)
 
 	if per_reprint is None:
-	    ScoreIndustry(score=0, industry=industry).save()
-	else:			
+	    ScoreIndustry(score=0, industry=industry, pubtime=start).save()
+	else:
 	    score = (float(reprinted_per_industry(industry)) / all_reprinted) * 100
 	    score = "%.2f"%score
-	    ScoreIndustry(score=score, industry=industry).save()
+	    ScoreIndustry(score=score, industry=industry, pubtime=start).save()
 make_score()

@@ -12,9 +12,10 @@ from observer.apps.riskmonitor.models import(
     Enterprise, RiskNews, Product, RiskNewsPublisher)
 from observer.utils.connector.mysql import query
 from observer.apps.base.api_function import get_season
+from observer.apps.base.views import BaseView
 
 
-class Abstract():
+class Abstract(BaseView):
 
     def pretty_date(self, time=False):
         """
@@ -26,8 +27,6 @@ class Abstract():
         if type(time) is int:
             diff = now - datetime.fromtimestamp(time)
         elif isinstance(time, datetime):
-            print now
-            print time
             diff = now - time
         elif not time:
             diff = now - now
@@ -212,7 +211,7 @@ class Abstract():
             }
 
     def source_data(self, industry=None, enterprise=None, product=None, source=None,
-                    start=None, end=None):
+                    start=None, end=None, page=1):
         industry = Industry.objects.get(
             id=industry) if industry else None
         enterprise = Enterprise.objects.get(
@@ -227,17 +226,18 @@ class Abstract():
             & Q(source=source) if source == None else Q()
             & Q(pubtime__range=(start, end)))
         items = []
-        for d in data:
+        data = self.paging(data, 10, page)
+        for d in data['items']:
             item = {
                 'id': d.id,
                 'title': d.title,
                 'source': d.source,
-                'time': d.pubtime.strftime('%Y-%m-%d %H:%M:%S')
+                'time': d.pubtime
             }
             items.append(item)
-        return {'items': items, 'total': data.count()}
+        return {'items': items, 'total': data['total_number']}
 
-    def enterprise_rank(self, start=None, end=None, industry=None):
+    def enterprise_rank(self, start=None, end=None, industry=None, page=1):
         sql = """
             SELECT e.`id`, e.`name`, se.`score`, COUNT(rn.`id`) FROM enterprise e
             LEFT JOIN risk_news_enterprise re ON e.`id`=re.`enterprise_id`
@@ -249,7 +249,8 @@ class Abstract():
             """ % (start, end, 'DESC')
         results = query(sql)
         iteml = []
-        for result in results:
+        data = self.paging(results, 10, page)
+        for result in data['items']:
             item = {
                 'id': result[0],
                 'name': result[1],
@@ -257,7 +258,7 @@ class Abstract():
                 'count': result[3]
             }
             iteml.append(item)
-        return {'data': iteml, 'total': len(iteml)}
+        return {'data': iteml, 'total': data['total_number']}
 
     def sources(self):
         """

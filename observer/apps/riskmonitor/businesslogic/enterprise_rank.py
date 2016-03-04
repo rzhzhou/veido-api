@@ -5,13 +5,15 @@ from observer.apps.riskmonitor.businesslogic.abstract import(
 
 class EnterpriseRank(Abstract):
 
-    def __init__(self, start=None, end=None, industry=None):
+    def __init__(self, start=None, end=None, industry=None, page=1):
         self.start = start
         self.end = end
         self.industry = industry
+        self.page = page
 
     def ente_rank(self):
-        result = self.enterprise_rank(self.start, self.end, self.industry)
+        result = self.enterprise_rank(self.start, self.end, self.industry,
+            self.page)
         return result
 
     def get_all(self):

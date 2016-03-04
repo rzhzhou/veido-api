@@ -6,13 +6,14 @@ from observer.apps.riskmonitor.businesslogic.abstract import(
 class Statistic(Abstract):
 
     def __init__(self, start=None, end=None, industry='%%', enterprise='%%',
-                 source='%%', product='%%'):
+                 source='%%', product='%%', page=1):
         self.start = start
         self.end = end
         self.industry = industry
         self.enterprise = enterprise
         self.source = source
         self.product = product
+        self.page = page
 
     def industry_statistic(self):
         result = self.news_nums(self.start, self.end, self.industry,
@@ -39,7 +40,7 @@ class Statistic(Abstract):
         source = None if self.source == '%%' else self.source
         product = None if self.product == '%%' else self.product
         news_data = self.source_data(industry, enterprise, product,
-                                     source, self.start, self.end)
+                                     source, self.start, self.end, self.page)
         data = {
             'trend': {
                 'labels': indu_sta['date'],

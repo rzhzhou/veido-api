@@ -37,7 +37,8 @@ class IndustryTrackView(APIView):
         start = tz.localize(datetime.strptime('2015-11-22', '%Y-%m-%d'))
         end = tz.localize(datetime.strptime('2015-11-30', '%Y-%m-%d'))
         id = 2
-        data = IndustryTrack(industry=id, start=start, end=end).get_all()
+        page = 1
+        data = IndustryTrack(industry=id, start=start, end=end, page=page).get_all()
         return Response(data)
 
 
@@ -46,9 +47,11 @@ class EnterpriseRankView(APIView):
     def get(self, request):
         tz = pytz.timezone(settings.TIME_ZONE)
         start = tz.localize(datetime.strptime('2015-11-22', '%Y-%m-%d'))
-        end = tz.localize(datetime.strptime('2015-11-30', '%Y-%m-%d'))
+        end = tz.localize(datetime.strptime('2015-12-4', '%Y-%m-%d'))
         id = 2
-        data = EnterpriseRank(industry=id, start=start, end=end).get_all()
+        page = 1
+        data = EnterpriseRank(industry=id, start=start, end=end,
+            page=page).get_all()
         return Response(data)
 
 
@@ -58,7 +61,8 @@ class StatisticView(APIView):
         tz = pytz.timezone(settings.TIME_ZONE)
         start = tz.localize(datetime.strptime('2015-11-22', '%Y-%m-%d'))
         end = tz.localize(datetime.strptime('2015-11-30', '%Y-%m-%d'))
-        data = Statistic(start=start, end=end).get_all()
+        data = Statistic(start=start, end=end, industry='%%', enterprise='%%',
+                 source='%%', product='%%', page=1).get_all()
         return Response(data)
 
 
@@ -98,3 +102,4 @@ class SpeciesView(APIView, Abstract):
             }
         }
         return Response(data)
+
