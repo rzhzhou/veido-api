@@ -250,12 +250,15 @@ class Abstract(BaseView):
         results = query(sql)
         iteml = []
         data = self.paging(results, 10, page)
+        ranking = (page - 1) * 10
         for result in data['items']:
+            ranking = ranking + 1
             item = {
                 'id': result[0],
-                'name': result[1],
+                'ranking': ranking,
+                'title': result[1],
                 'level': self.ente_make_level(result[2]),
-                'count': result[3]
+                'number': result[3]
             }
             iteml.append(item)
         return {'data': iteml, 'total': data['total_number']}
