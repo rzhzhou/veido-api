@@ -32,9 +32,9 @@ class HomePageView(APIView, BaseTemplateView):
 
 class IndustryTrackView(APIView):
 
-    def get(self, request):
+    def get(self):
         tz = pytz.timezone(settings.TIME_ZONE)
-        start = tz.localize(datetime.strptime('2016-11-22', '%Y-%m-%d'))
+        start = tz.localize(datetime.strptime('2015-11-22', '%Y-%m-%d'))
         end = tz.localize(datetime.strptime('2015-11-30', '%Y-%m-%d'))
         id = 2
         data = IndustryTrack(industry=id, start=start, end=end).get_all()
@@ -98,3 +98,5 @@ class SpeciesView(APIView, Abstract):
             }
         }
         return Response(data)
+
+IndustryTrackView().get()
