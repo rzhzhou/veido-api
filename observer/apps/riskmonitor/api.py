@@ -23,8 +23,8 @@ class HomePageView(APIView, BaseTemplateView):
 
     def get(self, request):
         tz = pytz.timezone(settings.TIME_ZONE)
-        start = tz.localize(datetime.strptime('2016-2-1', '%Y-%m-%d'))
-        end = tz.localize(datetime.strptime('2016-2-3', '%Y-%m-%d'))
+        start = tz.localize(datetime.strptime('2015-11-22', '%Y-%m-%d'))
+        end = tz.localize(datetime.strptime('2015-11-30', '%Y-%m-%d'))
         start = end - timedelta(days=7)
         data = HomeData(start, end).get_all()
         return Response(data)
