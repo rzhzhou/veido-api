@@ -231,7 +231,7 @@ class Abstract(BaseView):
             item = {
                 'id': d.id,
                 'title': d.title,
-                'source': d.source,
+                'source': d.publisher.publisher,
                 'time': d.pubtime
             }
             items.append(item)
