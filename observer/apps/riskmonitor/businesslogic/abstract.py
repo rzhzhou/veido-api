@@ -39,19 +39,19 @@ class Abstract():
 
         if day_diff == 0:
             if second_diff < 10:
-                return "just now"
+                return "刚刚"
             if second_diff < 60:
                 return str(second_diff) + "秒前"
             if second_diff < 120:
-                return "a minute ago"
+                return "1分钟前"
             if second_diff < 3600:
                 return str(second_diff / 60) + "分钟前"
             if second_diff < 7200:
-                return "an hour ago"
+                return "1小时前"
             if second_diff < 86400:
                 return str(second_diff / 3600) + "小时前"
         if day_diff == 1:
-            return "Yesterday"
+            return "昨天"
         if day_diff < 7:
             return str(day_diff) + "天前"
         if day_diff < 31:
