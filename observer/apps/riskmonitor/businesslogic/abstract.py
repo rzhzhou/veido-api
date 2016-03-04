@@ -26,8 +26,6 @@ class Abstract():
         if type(time) is int:
             diff = now - datetime.fromtimestamp(time)
         elif isinstance(time, datetime):
-            print now
-            print time
             diff = now - time
         elif not time:
             diff = now - now
