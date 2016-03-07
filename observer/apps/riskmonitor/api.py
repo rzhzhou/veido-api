@@ -37,12 +37,13 @@ class IndustryTrackView(APIView):
         page = int(request.GET['page']) if request.GET.has_key('page') else 1
         start = request.GET['start'] if request.GET.has_key('start') else '2015-11-22'
         end = request.GET['end'] if request.GET.has_key('end') else '2015-11-30'
+        dtype = request.GET['type'] if request.GET.has_key('type') else ''
 
         tz = pytz.timezone(settings.TIME_ZONE)
         start = tz.localize(datetime.strptime(start, '%Y-%m-%d'))
         end = tz.localize(datetime.strptime(end, '%Y-%m-%d'))
 
-        if page > 1:
+        if dtype == 'table':
             data = IndustryTrack(industry=pk, start=start, end=end, page=page).news_data()
         else:
             data = IndustryTrack(industry=pk, start=start, end=end, page=page).get_all()
