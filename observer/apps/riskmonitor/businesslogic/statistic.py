@@ -70,15 +70,10 @@ class Statistic(Abstract):
         return bar
 
     def get_chart(self):
-        indu_sta = self.industry_statistic()
-        keywords_sta = self.keywords()
+        indu_sta = self.industry_chart()
+        keywords_sta = self.keywords_chart()
         sources = self.sources()
-        industry = None if self.industry == '%%' else self.industry
-        enterprise = None if self.enterprise == '%%' else self.enterprise
-        source = None if self.source == '%%' else self.source
-        product = None if self.product == '%%' else self.product
-        news_data = self.source_data(industry, enterprise, product,
-                                     source, self.start, self.end, self.page)
+
         data = {
             'trend': {
                 'labels': indu_sta['date'],
@@ -93,6 +88,11 @@ class Statistic(Abstract):
         return data
 
     def get_data(self):
+        industry = None if self.industry == '%%' else self.industry
+        enterprise = None if self.enterprise == '%%' else self.enterprise
+        source = None if self.source == '%%' else self.source
+        product = None if self.product == '%%' else self.product
+
         news_data = self.source_data(industry, enterprise, product,
                                      source, self.start, self.end, self.page)
         data = {

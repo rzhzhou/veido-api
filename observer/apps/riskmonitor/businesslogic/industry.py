@@ -48,7 +48,7 @@ class IndustryTrack(Abstract):
 
     def get_chart(self):
         # newsl = self.news_data()
-        trends = self.Trend_chart()
+        trends = self.trend_chart()
         bar = self.compare_chart()
         data = {
             # 'list': {

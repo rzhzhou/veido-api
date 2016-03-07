@@ -15,7 +15,7 @@ from observer.apps.riskmonitor.businesslogic.abstract import Abstract
 from businesslogic.detail import *
 from businesslogic.enterprise_rank import EnterpriseRank
 from businesslogic.homepage import *
-from businesslogic.industry_track import IndustryTrack
+from businesslogic.industry import IndustryTrack
 from businesslogic.statistic import Statistic
 
 
@@ -46,7 +46,7 @@ class IndustryTrackView(APIView):
         if dtype == 'table':
             data = IndustryTrack(industry=pk, start=start, end=end, page=page).news_data()
         else:
-            data = IndustryTrack(industry=pk, start=start, end=end, page=page).get_all()
+            data = IndustryTrack(industry=pk, start=start, end=end, page=page).get_chart()
         return Response(data)
 
 
