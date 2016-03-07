@@ -32,13 +32,32 @@ class HomePageView(APIView, BaseTemplateView):
 
 class IndustryTrackView(APIView):
 
-    def get(self, request):
+    def get(self, request, pk):
+        pk = int(pk)
+        page = int(request.GET['page']) if request.GET.has_key('page') else 1
+        start = request.GET['start'] if request.GET.has_key('start') else '2015-11-22'
+        end = request.GET['end'] if request.GET.has_key('end') else '2015-11-30'
+
+        tz = pytz.timezone(settings.TIME_ZONE)
+        start = tz.localize(datetime.strptime(start, '%Y-%m-%d'))
+        end = tz.localize(datetime.strptime(end, '%Y-%m-%d'))
+
+        if page > 1:
+            data = IndustryTrack(industry=pk, start=start, end=end, page=page).news_data()
+        else:
+            data = IndustryTrack(industry=pk, start=start, end=end, page=page).get_all()
+        return Response(data)
+
+
+class IndustryDataDetail(APIView):
+
+    def get(self, request, pk):
+        pk = 2
+        page = request.GET['page']
+
         tz = pytz.timezone(settings.TIME_ZONE)
         start = tz.localize(datetime.strptime('2015-11-22', '%Y-%m-%d'))
         end = tz.localize(datetime.strptime('2015-11-30', '%Y-%m-%d'))
-        id = 2
-        page = 1
-        data = IndustryTrack(industry=id, start=start, end=end, page=page).get_all()
         return Response(data)
 
 
