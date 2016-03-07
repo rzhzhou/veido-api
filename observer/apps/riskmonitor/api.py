@@ -78,7 +78,7 @@ class EnterpriseRankView(APIView):
 class StatisticView(APIView):
 
     def get(self, request):
-        pk = int(pk)
+        pk=2
         page = int(request.GET['page']) if request.GET.has_key('page') else 1
         start = request.GET['start'] if request.GET.has_key('start') else '2015-11-22'
         end = request.GET['end'] if request.GET.has_key('end') else '2015-11-30'
@@ -89,9 +89,9 @@ class StatisticView(APIView):
         end = tz.localize(datetime.strptime(end, '%Y-%m-%d'))
 
         if dtype == 'table':
-            data = IndustryTrack(industry=pk, start=start, end=end, page=page).get_data()
+            data = Statistic(industry=pk, start=start, end=end, page=page).get_data()
         else:
-            data = IndustryTrack(industry=pk, start=start, end=end, page=page).get_chart()
+            data = Statistic(industry=pk, start=start, end=end, page=page).get_chart()
         return Response(data)
 
 

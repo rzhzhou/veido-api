@@ -96,10 +96,8 @@ class Statistic(Abstract):
         news_data = self.source_data(industry, enterprise, product,
                                      source, self.start, self.end, self.page)
         data = {
-            'list': {
-                'title': [u'序号', u'标题', u'来源', u'发表时间'],
-                'items': news_data['items']
-            },
+            'title': [u'序号', u'标题', u'来源', u'发表时间'],
+            'items': news_data['items'],
             'total': news_data['total']
         }
         return data
