@@ -19,7 +19,7 @@ class Statistic(Abstract):
         self.product = product
         self.page = page
 
-    def industry_statistic(self):
+    def industry_chart(self):
         days = (self.end - self.start).days
 
         start = self.start.astimezone(pytz.utc)
@@ -48,7 +48,7 @@ class Statistic(Abstract):
         elif days > 100 and days <= 120:
             date_range = date_range(20)
         elif days > 120 and days <= 365:
-            date_range =date_range(30)
+            date_range = date_range(30)
         else:
             date_range = date_range(365)
 
@@ -58,7 +58,7 @@ class Statistic(Abstract):
         result['date'] = date
         return result
 
-    def keywords(self):
+    def keywords_chart(self):
         bar = {
             "name": [u"关键字"],
             "show": "false",
@@ -69,7 +69,7 @@ class Statistic(Abstract):
         }
         return bar
 
-    def get_all(self):
+    def get_chart(self):
         indu_sta = self.industry_statistic()
         keywords_sta = self.keywords()
         sources = self.sources()
@@ -89,6 +89,13 @@ class Statistic(Abstract):
                 'labels': sources['labels'],
                 'data': sources['data']
             },
+        }
+        return data
+
+    def get_data(self):
+        news_data = self.source_data(industry, enterprise, product,
+                                     source, self.start, self.end, self.page)
+        data = {
             'list': {
                 'title': [u'序号', u'标题', u'来源', u'发表时间'],
                 'items': news_data['items']
