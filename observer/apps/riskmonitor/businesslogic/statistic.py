@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+import pytz
+import time
+from datetime import datetime, timedelta
+
 from observer.apps.riskmonitor.businesslogic.abstract import(
     Abstract, )
 
@@ -16,8 +20,42 @@ class Statistic(Abstract):
         self.page = page
 
     def industry_statistic(self):
-        result = self.news_nums(self.start, self.end, self.industry,
+        days = (self.end - self.start).days
+
+        start = self.start.astimezone(pytz.utc)
+        start = time.strftime('%Y-%m-%d %X', start.timetuple())
+        start = datetime.strptime(start, '%Y-%m-%d %X')
+
+        def date_range(interval):
+            scale = days / interval + days % interval
+            list_range = [(i + 1) * interval for i in xrange(scale)]
+            date = [(start + timedelta(days=x)) for x in list_range]
+            date_range = [(i, i + timedelta(days=interval)) for i in date]
+            return {'date_range': date_range, 'date': date}
+
+        if days > 0 and days <= 7:
+            date_range = date_range(1)
+        elif days > 7 and days <= 20:
+            date_range = date_range(2)
+        elif days > 20 and days <= 40:
+            date_range = date_range(4)
+        elif days > 40 and days <= 60:
+            date_range = date_range(7)
+        elif days > 60 and days <= 80:
+            date_range = date_range(10)
+        elif days > 80 and days <= 100:
+            date_range = date_range(15)
+        elif days > 100 and days <= 120:
+            date_range = date_range(20)
+        elif days > 120 and days <= 365:
+            date_range =date_range(30)
+        else:
+            date_range = date_range(365)
+
+        result = self.news_nums(date_range['date_range'], self.industry,
                                 self.enterprise, self.source, self.product)
+        date = map(lambda x: x.strftime("%m-%d"), date_range['date'])
+        result['date'] = date
         return result
 
     def keywords(self):

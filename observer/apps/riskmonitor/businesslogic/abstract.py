@@ -116,16 +116,8 @@ class Abstract(BaseView):
             enteobjects = []
         return enteobjects
 
-    def news_nums(self, start, end, industry='%%', enterprise='%%', source='%%',
-                  product='%%'):
-        days = (end - start).days
-        datel = [(start + timedelta(days=i)) for i in xrange(days)]
-        start = start.astimezone(pytz.utc)
-        start = time.strftime('%Y-%m-%d %X', start.timetuple())
-        start = datetime.strptime(start, '%Y-%m-%d %X')
-        date = [(start + timedelta(days=x)) for x in xrange(days)]
-        date_range = [(i, i + timedelta(days=1)) for i in date]
-
+    def news_nums(self, date_range, industry='%%', enterprise='%%',
+                  source='%%', product='%%'):
         query_str = map(
             lambda x: """sum(case when pubtime < '%s' and
                 pubtime >= '%s' then 1 else 0 end)"""
@@ -145,8 +137,7 @@ class Abstract(BaseView):
             WHERE i.`id` like '%s' AND e.`id` like '%s' AND rnp.`id` like '%s'
             """ % (','.join(query_str), x, industry, enterprise, source))
         news_data = [int(i) for i in sum_news('risk_news')[0]]
-        date = map(lambda x: x.strftime("%m-%d"), datel)
-        return {'data': news_data, 'date': date}
+        return {'data': news_data}
 
     def compare(self, start, end, id):
 

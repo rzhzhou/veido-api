@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime, timedelta
+import pytz
+import time
 
 from django.utils import timezone
 
@@ -84,17 +86,27 @@ class HomeData(Abstract):
 
     def risk_data(self):
         end = self.end
+
+        days = (self.end - self.start).days
+        start = self.start.astimezone(pytz.utc)
+        start = time.strftime('%Y-%m-%d %X', start.timetuple())
+        start = datetime.strptime(start, '%Y-%m-%d %X')
+        date = [(start + timedelta(days=x)) for x in xrange(days)]
+        date_range = [(i, i + timedelta(days=1)) for i in date]
+
         start = end - timedelta(days=7)
         weeks = [u'星期一', u'星期二', u'星期三', u'星期四', u'星期五',
                  u'星期六', u'星期日']
-        nums = self.news_nums(start, end)
+        nums = self.news_nums(date_range)
+
         data = {
             'riskData': {
                 'data': nums['data'],
-                'labels': [weeks[(end + timedelta(days=(i + 1))).isoweekday() - 1]
-                           for i in range(7)]
+                'labels': [weeks[(self.start + timedelta(days=(i + 1))
+                                  ).isoweekday() - 1] for i in range(7)]
             }
         }
+        print data
         return data
 
     def risk_level(self):
