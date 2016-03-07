@@ -4,6 +4,7 @@ import os
 import time
 import datetime, calendar
 import random
+import StringIO
 
 import xlsxwriter
 
@@ -15,10 +16,12 @@ sys.setdefaultencoding("utf-8")
 class article():
     workbook = None
     def __init__(self, data):
-        path = os.path.dirname(__file__)+"/briefing.xlsx"
-        self.workbook = xlsxwriter.Workbook(path)
+        output = StringIO.StringIO()
+        # path = os.path.dirname(__file__)+"/briefing.xlsx"
+        self.workbook = xlsxwriter.Workbook(output)
         drawing(self.workbook, data)
-        saveXls(self.workbook)
+        return output
+        # saveXls(self.workbook)
 
 
 def drawing(workbook, data):
@@ -196,8 +199,8 @@ def get_random_color():
 
 
 
-def saveXls(workbook):
-    workbook.close()
+# def saveXls(workbook):
+#     workbook.close()
 
 
 
