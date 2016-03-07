@@ -13,7 +13,7 @@ from observer.apps.base.views import BaseTemplateView
 from observer.apps.riskmonitor.models import RiskNews
 from observer.apps.riskmonitor.businesslogic.abstract import Abstract
 from businesslogic.detail import *
-from businesslogic.enterprise_rank import EnterpriseRank
+from businesslogic.enterprise import EnterpriseRank
 from businesslogic.homepage import *
 from businesslogic.industry import IndustryTrack
 from businesslogic.statistic import Statistic
@@ -65,13 +65,17 @@ class IndustryDataDetail(APIView):
 class EnterpriseRankView(APIView):
 
     def get(self, request):
+        pk = request.GET.get('industry', 2)
+        page = request.GET.get('page', 1)
+        start = request.GET.get('start', '2015-11-22')
+        end = request.GET.get('start', '2015-11-30')
+
         tz = pytz.timezone(settings.TIME_ZONE)
-        start = tz.localize(datetime.strptime('2015-11-22', '%Y-%m-%d'))
-        end = tz.localize(datetime.strptime('2015-12-4', '%Y-%m-%d'))
-        id = 2
-        page = 1
-        data = EnterpriseRank(industry=id, start=start, end=end,
-            page=page).get_all()
+        start = tz.localize(datetime.strptime(start, '%Y-%m-%d'))
+        end = tz.localize(datetime.strptime(end, '%Y-%m-%d'))
+
+        data = EnterpriseRank(industry=pk, start=start, end=end,
+            page=int(page)).get_all()
         return Response(data)
 
 
