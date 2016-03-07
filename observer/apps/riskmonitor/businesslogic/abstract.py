@@ -136,7 +136,7 @@ class Abstract(BaseView):
             LEFT JOIN risknewspublisher rnp ON r.`publisher_id`=rnp.`id`
             WHERE i.`id` like '%s' AND e.`id` like '%s' AND rnp.`id` like '%s'
             """ % (','.join(query_str), x, industry, enterprise, source))
-        news_data = [int(i) for i in sum_news('risk_news')[0]]
+        news_data = [int(0 if i is None else i) for i in sum_news('risk_news')[0]]
         return {'data': news_data}
 
     def compare(self, start, end, id):
