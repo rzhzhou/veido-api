@@ -18,7 +18,7 @@ class IndustryTrack(Abstract):
 
     def trend_chart(self):
         news_trend = Statistic(industry=self.industry, start=self.start,
-                               end=self.end).industry_statistic()
+                               end=self.end).industry_chart()
         trend = {
             'labels': news_trend['date'],
             'data': news_trend['data']
