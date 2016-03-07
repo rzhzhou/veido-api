@@ -106,7 +106,6 @@ class HomeData(Abstract):
                                   ).isoweekday() - 1] for i in range(7)]
             }
         }
-        print data
         return data
 
     def risk_level(self):
