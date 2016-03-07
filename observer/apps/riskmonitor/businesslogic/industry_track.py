@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from observer.apps.riskmonitor.businesslogic.abstract import(
     Abstract, )
+from observer.apps.riskmonitor.businesslogic.statistic import Statistic
 
 
 class IndustryTrack(Abstract):
@@ -16,8 +17,8 @@ class IndustryTrack(Abstract):
         self.page = page
 
     def Trend_chart(self):
-        news_trend = self.news_nums(start=self.start, end=self.end,
-                                    industry=self.industry)
+        news_trend = Statistic(industry=self.industry, start=self.start,
+                               end=self.end).industry_statistic()
         trend = {
             'labels': news_trend['date'],
             'data': news_trend['data']
