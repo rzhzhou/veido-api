@@ -16,7 +16,7 @@ class IndustryTrack(Abstract):
         self.source = source
         self.page = page
 
-    def Trend_chart(self):
+    def trend_chart(self):
         news_trend = Statistic(industry=self.industry, start=self.start,
                                end=self.end).industry_statistic()
         trend = {
@@ -46,7 +46,7 @@ class IndustryTrack(Abstract):
         }
         return data
 
-    def get_all(self):
+    def get_chart(self):
         # newsl = self.news_data()
         trends = self.Trend_chart()
         bar = self.compare_chart()
