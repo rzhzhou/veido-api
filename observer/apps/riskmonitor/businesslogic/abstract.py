@@ -205,11 +205,11 @@ class Abstract(BaseView):
     def source_data(self, industry=None, enterprise=None, product=None, source=None,
                     start=None, end=None, page=1):
         industry = Industry.objects.get(
-            id=industry) if industry else None
+            id=industry) if industry != None else None
         enterprise = Enterprise.objects.get(
-            id=enterprise) if enterprise else None
+            id=enterprise) if enterprise != None else None
         product = Product.objects.get(
-            id=product) if product else None
+            id=product) if product != None else None
 
         data = RiskNews.objects.filter(
             Q(industry=industry) if industry != None else Q()
