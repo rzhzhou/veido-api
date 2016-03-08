@@ -8,7 +8,7 @@ class EnterpriseRank(Abstract):
     def __init__(self, start=None, end=None, industry=None, page=1):
         self.start = start
         self.end = end
-        self.industry = industry
+        self.industry = industry if industry != 0 else '%%'
         self.page = page
 
     def ente_rank(self):

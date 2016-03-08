@@ -241,7 +241,7 @@ class Abstract(BaseView):
             LEFT JOIN industry i ON i.`id`=rni.`industry_id`
             WHERE rn.`pubtime` >= '%s'
             AND rn.`pubtime` < '%s'
-            AND i.`id`=%s
+            AND i.`id` like '%s'
             GROUP BY e.`id` ORDER BY se.`score` %s
             """ % (start, end, industry, 'DESC')
         results = query(sql)
