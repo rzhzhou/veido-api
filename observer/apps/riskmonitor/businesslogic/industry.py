@@ -47,16 +47,10 @@ class IndustryTrack(Abstract):
         return data
 
     def get_chart(self):
-        # newsl = self.news_data()
         trends = self.trend_chart()
         bar = self.compare_chart()
         data = {
-            # 'list': {
-            #     'title': newsl['title'],
-            #     'items': newsl['items'],
-            # },
             'trend': trends,
             'bar': bar
-            # 'total': newsl['total']
         }
         return data
