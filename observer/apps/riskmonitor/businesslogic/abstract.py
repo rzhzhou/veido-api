@@ -136,7 +136,8 @@ class Abstract(BaseView):
             LEFT JOIN risknewspublisher rnp ON r.`publisher_id`=rnp.`id`
             WHERE i.`id` like '%s' AND e.`id` like '%s' AND rnp.`id` like '%s'
             """ % (','.join(query_str), x, industry, enterprise, source))
-        news_data = [int(0 if i is None else i) for i in sum_news('risk_news')[0]]
+        news_data = [int(0 if i is None else i)
+                     for i in sum_news('risk_news')[0]]
         return {'data': news_data}
 
     def compare(self, start, end, id):
@@ -229,6 +230,8 @@ class Abstract(BaseView):
         return {'items': items, 'total': data['total_number']}
 
     def enterprise_rank(self, start=None, end=None, industry=None, page=1):
+        start = None if start == None else start.strftime('%Y-%m-%d %H:%M:%S')
+        end = None if end == None else end.strftime('%Y-%m-%d %H:%M:%S')
         sql = """
             SELECT e.`id`, e.`name`, se.`score`, COUNT(rn.`id`) FROM enterprise e
             LEFT JOIN risk_news_enterprise re ON e.`id`=re.`enterprise_id`
