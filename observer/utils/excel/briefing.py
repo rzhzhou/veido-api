@@ -8,7 +8,6 @@ import StringIO
 
 import xlsxwriter
 
-import SimulationAPI as api
 
 reload(sys)
 sys.setdefaultencoding("utf-8")
@@ -29,10 +28,6 @@ def drawing(workbook, data):
     line_chart(workbook, worksheet, data["trend"])
     column_chart(workbook, worksheet, data["bar"])
     pie_chart(workbook, worksheet, data["source"])
-
-
-def get_api():
-    return api.getApi()
 
 
 def default(workbook, data):
@@ -202,9 +197,3 @@ def get_random_color():
 # def saveXls(workbook):
 #     workbook.close()
 
-
-
-if __name__ == '__main__':
-    # get_random_color()
-    data = get_api()
-    article(data)
