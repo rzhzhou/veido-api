@@ -136,7 +136,8 @@ class Abstract(BaseView):
             LEFT JOIN risknewspublisher rnp ON r.`publisher_id`=rnp.`id`
             WHERE i.`id` like '%s' AND e.`id` like '%s' AND rnp.`id` like '%s'
             """ % (','.join(query_str), x, industry, enterprise, source))
-        news_data = [int(0 if i is None else i) for i in sum_news('risk_news')[0]]
+        news_data = [int(0 if i is None else i)
+                     for i in sum_news('risk_news')[0]]
         return {'data': news_data}
 
     def compare(self, start, end, id):
@@ -229,15 +230,20 @@ class Abstract(BaseView):
         return {'items': items, 'total': data['total_number']}
 
     def enterprise_rank(self, start=None, end=None, industry=None, page=1):
+        start = None if start == None else start.strftime('%Y-%m-%d %H:%M:%S')
+        end = None if end == None else end.strftime('%Y-%m-%d %H:%M:%S')
         sql = """
             SELECT e.`id`, e.`name`, se.`score`, COUNT(rn.`id`) FROM enterprise e
             LEFT JOIN risk_news_enterprise re ON e.`id`=re.`enterprise_id`
             LEFT JOIN risk_news rn ON re.`risknews_id`=rn.`id`
             LEFT JOIN score_enterprise se ON e.`id`=se.`enterprise_id`
-            WHERE (rn.`pubtime` >= '%s'
-            AND rn.`pubtime` < '%s')
+            LEFT JOIN risk_news_industry rni ON rn.`id`=rni.`risknews_id`
+            LEFT JOIN industry i ON i.`id`=rni.`industry_id`
+            WHERE rn.`pubtime` >= '%s'
+            AND rn.`pubtime` < '%s'
+            AND i.`id`=%s
             GROUP BY e.`id` ORDER BY se.`score` %s
-            """ % (start, end, 'DESC')
+            """ % (start, end, industry, 'DESC')
         results = query(sql)
         iteml = []
         data = self.paging(results, 10, page)
