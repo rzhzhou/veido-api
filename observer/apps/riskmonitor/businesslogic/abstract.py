@@ -234,10 +234,13 @@ class Abstract(BaseView):
             LEFT JOIN risk_news_enterprise re ON e.`id`=re.`enterprise_id`
             LEFT JOIN risk_news rn ON re.`risknews_id`=rn.`id`
             LEFT JOIN score_enterprise se ON e.`id`=se.`enterprise_id`
-            WHERE (rn.`pubtime` >= '%s'
-            AND rn.`pubtime` < '%s')
+            LEFT JOIN risk_news_industry rni ON rn.`id`=rni.`risknews_id`
+            LEFT JOIN industry i ON i.`id`=rni.`industry_id`
+            WHERE rn.`pubtime` >= '%s'
+            AND rn.`pubtime` < '%s'
+            AND i.`id`=%s
             GROUP BY e.`id` ORDER BY se.`score` %s
-            """ % (start, end, 'DESC')
+            """ % (start, end, industry, 'DESC')
         results = query(sql)
         iteml = []
         data = self.paging(results, 10, page)
