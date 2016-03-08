@@ -9,6 +9,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from django.conf import settings
 from django.http import HttpResponse
+from django.views.generic import View
 
 from observer.apps.base.views import BaseTemplateView
 from observer.apps.riskmonitor.models import RiskNews
@@ -25,10 +26,13 @@ from businesslogic.statistic import Statistic
 class HomePageView(APIView, BaseTemplateView):
 
     def get(self, request):
+        start = request.GET.get('start', '2015-11-22')
+        end = request.GET.get('start', '2015-11-30')
+
         tz = pytz.timezone(settings.TIME_ZONE)
-        start = tz.localize(datetime.strptime('2015-11-22', '%Y-%m-%d'))
-        end = tz.localize(datetime.strptime('2015-11-30', '%Y-%m-%d'))
-        start = end - timedelta(days=7)
+        start = tz.localize(datetime.strptime(start, '%Y-%m-%d'))
+        end = tz.localize(datetime.strptime(end, '%Y-%m-%d'))
+
         data = HomeData(start, end).get_all()
         return Response(data)
 
@@ -36,13 +40,11 @@ class HomePageView(APIView, BaseTemplateView):
 class IndustryTrackView(APIView):
 
     def get(self, request, pk):
-        pk = int(pk)
-        page = int(request.GET['page']) if request.GET.has_key('page') else 1
-        start = request.GET['start'] if request.GET.has_key(
-            'start') else '2015-11-22'
-        end = request.GET['end'] if request.GET.has_key(
-            'end') else '2015-11-30'
-        dtype = request.GET['type'] if request.GET.has_key('type') else ''
+        pk = request.GET.get('industry', 0)
+        page = request.GET.get('page', 1)
+        start = request.GET.get('start', '2015-11-22')
+        end = request.GET.get('start', '2015-11-30')
+        dtype = request.GET.get('type', '')
 
         tz = pytz.timezone(settings.TIME_ZONE)
         start = tz.localize(datetime.strptime(start, '%Y-%m-%d'))
@@ -60,19 +62,20 @@ class IndustryTrackView(APIView):
 class IndustryDataDetail(APIView):
 
     def get(self, request, pk):
-        pk = 2
-        page = request.GET['page']
+        page = request.GET.get('page', 1)
+        start = request.GET.get('start', '2015-11-22')
+        end = request.GET.get('start', '2015-11-30')
 
         tz = pytz.timezone(settings.TIME_ZONE)
-        start = tz.localize(datetime.strptime('2015-11-22', '%Y-%m-%d'))
-        end = tz.localize(datetime.strptime('2015-11-30', '%Y-%m-%d'))
+        start = tz.localize(datetime.strptime(start, '%Y-%m-%d'))
+        end = tz.localize(datetime.strptime(end, '%Y-%m-%d'))
         return Response(data)
 
 
 class EnterpriseRankView(APIView):
 
     def get(self, request):
-        pk = request.GET.get('industry', 2)
+        pk = request.GET.get('industry', 0)
         page = request.GET.get('page', 1)
         start = request.GET.get('start', '2015-11-22')
         end = request.GET.get('start', '2015-11-30')
@@ -82,20 +85,18 @@ class EnterpriseRankView(APIView):
         end = tz.localize(datetime.strptime(end, '%Y-%m-%d'))
 
         data = EnterpriseRank(industry=pk, start=start, end=end,
-            page=int(page)).get_all()
+                              page=int(page)).get_all()
         return Response(data)
 
 
 class StatisticView(APIView):
 
     def get(self, request):
-        pk = 2
-        page = int(request.GET['page']) if request.GET.has_key('page') else 1
-        start = request.GET['start'] if request.GET.has_key(
-            'start') else '2015-11-22'
-        end = request.GET['end'] if request.GET.has_key(
-            'end') else '2015-11-30'
-        dtype = request.GET['type'] if request.GET.has_key('type') else ''
+        pk = request.GET.get('industry', 0)
+        page = request.GET.get('page', 1)
+        start = request.GET.get('start', '2015-11-22')
+        end = request.GET.get('start', '2015-11-30')
+        dtype = request.GET.get('type', '')
 
         tz = pytz.timezone(settings.TIME_ZONE)
         start = tz.localize(datetime.strptime(start, '%Y-%m-%d'))
@@ -105,21 +106,34 @@ class StatisticView(APIView):
             data = Statistic(industry=pk, start=start,
                              end=end, page=page).get_data()
             return Response(data)
-        elif dtype == 'excel':
-            data = Statistic(industry=pk, start=start,
-                             end=end, page=page).get_all()
-            brief = article()
-            output = brief.get_output(data)
-            print output
-            output.seek(0)
-            response = HttpResponse(output.read(
-            ), content_type='application/ms-excel')
-            response['Content-Disposition'] = "attachment; filename=test.xlsx"
-            return response
         else:
             data = Statistic(industry=pk, start=start,
                              end=end, page=page).get_chart()
             return Response(data)
+
+
+class StatisticExportView(View):
+
+    def get(self, request):
+        pk = request.GET.get('industry', 0)
+        page = request.GET.get('page', 1)
+        start = request.GET.get('start', '2015-11-22')
+        end = request.GET.get('start', '2015-11-30')
+
+        tz = pytz.timezone(settings.TIME_ZONE)
+        start = tz.localize(datetime.strptime(start, '%Y-%m-%d'))
+        end = tz.localize(datetime.strptime(end, '%Y-%m-%d'))
+
+        data = Statistic(industry=pk, start=start,
+                         end=end, page=page).get_all()
+        brief = article()
+        output = brief.get_output(data)
+        print output
+        output.seek(0)
+        response = HttpResponse(output.read(
+        ), content_type='application/ms-excel')
+        response['Content-Disposition'] = "attachment; filename=data.xlsx"
+        return response
 
 
 class DetailNewsView(APIView):
