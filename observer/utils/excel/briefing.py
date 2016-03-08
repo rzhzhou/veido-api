@@ -171,7 +171,7 @@ def pie_chart(workbook, worksheet, data):
         points.append({'fill': {'color': color}})
 
     chart.add_series({
-        'name':       '饼图',
+        'name':       '初始来源',
         'categories': categories,
         'values':     values,
         'data_labels': {'value': True, 'category': True},
