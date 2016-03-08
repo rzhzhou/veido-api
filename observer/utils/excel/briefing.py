@@ -8,19 +8,23 @@ import StringIO
 
 import xlsxwriter
 
+try:
+    import cStringIO as StringIO
+except ImportError:
+    import StringIO
 
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
 class article():
-    workbook = None
-    def __init__(self, data):
-        output = StringIO.StringIO()
+    def get_output(self, data):
+        workbook = None
         # path = os.path.dirname(__file__)+"/briefing.xlsx"
+        output = StringIO.StringIO()
         self.workbook = xlsxwriter.Workbook(output)
         drawing(self.workbook, data)
+        saveXls(self.workbook)
         return output
-        # saveXls(self.workbook)
 
 
 def drawing(workbook, data):
@@ -54,7 +58,7 @@ def default(workbook, data):
     worksheet.set_column('B:B', 10)
 
     worksheet.write_row('A24', headings, bold)
-    if data["bar"]["show"]:
+    if data["bar"]["show"] == "true":
         lose = map(int, data["bar"]["data"][0])
         lose = [-l for l in lose]
         dataList = lose + map(int, data["bar"]["data"][1])
@@ -194,6 +198,6 @@ def get_random_color():
 
 
 
-# def saveXls(workbook):
-#     workbook.close()
+def saveXls(workbook):
+    workbook.close()
 
