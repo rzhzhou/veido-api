@@ -105,6 +105,5 @@ class Statistic(Abstract):
     def get_all(self):
         chart_data = self.get_chart()
         data = self.get_data()
-        data = {'list': data}
-        data = chart_data + data
-        return data
+        chart_data['list'] = data
+        return chart_data

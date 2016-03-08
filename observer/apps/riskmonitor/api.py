@@ -108,10 +108,12 @@ class StatisticView(APIView):
         elif dtype == 'excel':
             data = Statistic(industry=pk, start=start,
                              end=end, page=page).get_all()
-            output = article(data)
+            brief = article()
+            output = brief.get_output(data)
+            print output
             output.seek(0)
             response = HttpResponse(output.read(
-            ), mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            ), content_type='application/ms-excel')
             response['Content-Disposition'] = "attachment; filename=test.xlsx"
             return response
         else:
