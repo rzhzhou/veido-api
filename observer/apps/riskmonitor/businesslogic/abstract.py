@@ -212,10 +212,10 @@ class Abstract(BaseView):
             id=product) if product else None
 
         data = RiskNews.objects.filter(
-            Q(industry=industry) if industry == None else Q()
-            & Q(enterprise=enterprise) if enterprise == None else Q()
-            & Q(product=product) if product == None else Q()
-            & Q(source=source) if source == None else Q()
+            Q(industry=industry) if industry != None else Q()
+            & Q(enterprise=enterprise) if enterprise != None else Q()
+            & Q(product=product) if product != None else Q()
+            & Q(source=source) if source != None else Q()
             & Q(pubtime__range=(start, end)))
         items = []
         data = self.paging(data, 10, page)
