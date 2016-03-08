@@ -8,12 +8,13 @@ class EnterpriseRank(Abstract):
     def __init__(self, start=None, end=None, industry=None, page=1):
         self.start = start
         self.end = end
-        self.industry = industry if industry != 0 else '%%'
+        self.industry = industry
         self.page = page
 
     def ente_rank(self):
-        result = self.enterprise_rank(self.start, self.end, self.industry,
-            self.page)
+        result = self.enterprise_rank(
+            start=self.start, end=self.end,
+            industry=self.industry if self.industry else '%%', page=self.page)
         return result
 
     def get_all(self):
