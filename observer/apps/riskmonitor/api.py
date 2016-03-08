@@ -40,10 +40,9 @@ class HomePageView(APIView, BaseTemplateView):
 class IndustryTrackView(APIView):
 
     def get(self, request, pk):
-        pk = request.GET.get('industry', 0)
         page = request.GET.get('page', 1)
         start = request.GET.get('start', '2015-11-22')
-        end = request.GET.get('start', '2015-11-30')
+        end = request.GET.get('end', '2015-11-30')
         dtype = request.GET.get('type', '')
 
         tz = pytz.timezone(settings.TIME_ZONE)
