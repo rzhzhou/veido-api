@@ -8,10 +8,13 @@ from rest_framework.views import APIView
 from rest_framework import viewsets
 from rest_framework.response import Response
 from django.conf import settings
+from django.http import HttpResponse
 
 from observer.apps.base.views import BaseTemplateView
 from observer.apps.riskmonitor.models import RiskNews
 from observer.apps.riskmonitor.businesslogic.abstract import Abstract
+from observer.apps.base.initialize import xls_to_response
+from observer.utils.excel.briefing import article
 from businesslogic.detail import *
 from businesslogic.enterprise_rank import EnterpriseRank
 from businesslogic.homepage import *
@@ -35,8 +38,10 @@ class IndustryTrackView(APIView):
     def get(self, request, pk):
         pk = int(pk)
         page = int(request.GET['page']) if request.GET.has_key('page') else 1
-        start = request.GET['start'] if request.GET.has_key('start') else '2015-11-22'
-        end = request.GET['end'] if request.GET.has_key('end') else '2015-11-30'
+        start = request.GET['start'] if request.GET.has_key(
+            'start') else '2015-11-22'
+        end = request.GET['end'] if request.GET.has_key(
+            'end') else '2015-11-30'
         dtype = request.GET['type'] if request.GET.has_key('type') else ''
 
         tz = pytz.timezone(settings.TIME_ZONE)
@@ -44,9 +49,11 @@ class IndustryTrackView(APIView):
         end = tz.localize(datetime.strptime(end, '%Y-%m-%d'))
 
         if dtype == 'table':
-            data = IndustryTrack(industry=pk, start=start, end=end, page=page).news_data()
+            data = IndustryTrack(industry=pk, start=start,
+                                 end=end, page=page).news_data()
         else:
-            data = IndustryTrack(industry=pk, start=start, end=end, page=page).get_chart()
+            data = IndustryTrack(industry=pk, start=start,
+                                 end=end, page=page).get_chart()
         return Response(data)
 
 
@@ -71,17 +78,19 @@ class EnterpriseRankView(APIView):
         id = 2
         page = 1
         data = EnterpriseRank(industry=id, start=start, end=end,
-            page=page).get_all()
+                              page=page).get_all()
         return Response(data)
 
 
 class StatisticView(APIView):
 
     def get(self, request):
-        pk=2
+        pk = 2
         page = int(request.GET['page']) if request.GET.has_key('page') else 1
-        start = request.GET['start'] if request.GET.has_key('start') else '2015-11-22'
-        end = request.GET['end'] if request.GET.has_key('end') else '2015-11-30'
+        start = request.GET['start'] if request.GET.has_key(
+            'start') else '2015-11-22'
+        end = request.GET['end'] if request.GET.has_key(
+            'end') else '2015-11-30'
         dtype = request.GET['type'] if request.GET.has_key('type') else ''
 
         tz = pytz.timezone(settings.TIME_ZONE)
@@ -89,10 +98,22 @@ class StatisticView(APIView):
         end = tz.localize(datetime.strptime(end, '%Y-%m-%d'))
 
         if dtype == 'table':
-            data = Statistic(industry=pk, start=start, end=end, page=page).get_data()
+            data = Statistic(industry=pk, start=start,
+                             end=end, page=page).get_data()
+            return Response(data)
+        elif dtype == 'excel':
+            data = Statistic(industry=pk, start=start,
+                             end=end, page=page).get_all()
+            output = article(data)
+            output.seek(0)
+            response = HttpResponse(output.read(
+            ), mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            response['Content-Disposition'] = "attachment; filename=test.xlsx"
+            return response
         else:
-            data = Statistic(industry=pk, start=start, end=end, page=page).get_chart()
-        return Response(data)
+            data = Statistic(industry=pk, start=start,
+                             end=end, page=page).get_chart()
+            return Response(data)
 
 
 class DetailNewsView(APIView):
@@ -131,4 +152,3 @@ class SpeciesView(APIView, Abstract):
             }
         }
         return Response(data)
-
