@@ -91,7 +91,7 @@ class EnterpriseRankView(APIView):
 class StatisticView(APIView):
 
     def get(self, request):
-        pk = request.GET.get('industry', 0)
+        pk = request.GET.get('industry', None)
         page = request.GET.get('page', 1)
         start = request.GET.get('start', '2015-11-22')
         end = request.GET.get('start', '2015-11-30')
