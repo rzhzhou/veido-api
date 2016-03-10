@@ -143,10 +143,11 @@ class Abstract(BaseView):
     def compare(self, start, end, id):
 
         def count(start, end, id):
-            industry = Industry.objects.get(id=id)
+            industry = Industry.objects.get(id=id) if id is not None else None
             count = RiskNews.objects.filter(
-                pubtime__range=(start, end), industry=industry).aggregate(
-                reprinted=Count('reprinted'))
+                Q(pubtime__range=(start, end)) & Q(industry=industry
+                                                   ) if industry is not None else Q()
+            ).aggregate(reprinted=Count('reprinted'))
             return count['reprinted']
 
         def compare_with_the_statistics_last_year(start, end, id):

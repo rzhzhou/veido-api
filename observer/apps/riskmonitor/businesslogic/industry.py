@@ -6,7 +6,7 @@ from observer.apps.riskmonitor.businesslogic.statistic import Statistic
 
 class IndustryTrack(Abstract):
 
-    def __init__(self, industry=0, enterprise=None, product=None, source=None,
+    def __init__(self, industry=None, enterprise=None, product=None, source=None,
                  start=None, end=None, page=1):
         self.start = start
         self.end = end
@@ -17,7 +17,7 @@ class IndustryTrack(Abstract):
         self.page = page
 
     def trend_chart(self):
-        industry = self.industry if self.industry != 0 else '%%'
+        industry = self.industry if self.industry != None else '%%'
         news_trend = Statistic(industry=industry, start=self.start,
                                end=self.end).industry_chart()
         trend = {
@@ -37,9 +37,13 @@ class IndustryTrack(Abstract):
         return bar
 
     def news_data(self):
-        industry = self.industry if self.industry != 0 else None
-        source_data = self.source_data(industry, self.enterprise,
-                                       self.product, self.source,
+        industry = 'Q()' if self.industry == None or self.industry == None else self.industry
+        enterprise = 'Q()' if self.enterprise == None or self.enterprise == None else self.enterprise
+        source = 'Q()' if self.source == None or self.source == None else self.source
+        product = 'Q()' if self.product == None or self.product == None else self.product
+
+        source_data = self.source_data(industry, enterprise,
+                                       product, source,
                                        self.start, self.end, self.page)
         data = {
             'title': [u'序号', u'标题', u'来源', u'发表时间'],
