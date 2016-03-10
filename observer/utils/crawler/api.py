@@ -16,10 +16,10 @@ class CrawlerTask(object):
         self.collection = collection
         self.stype = stype
         self.source = {
-            'baidu': ('"%s" +%s -(%s)', 21600, 'baidu.news',),
+            'baidu': ('"%s" +%s -(%s)', 21600, 'zjld.baidu.newstitle',),
             # 'weibo': ('%s %s', 21600, 'zjld.weibo.newstitle',),
             # 'sogou': ('+%s+%s', 21600, 'zjld.sogou.keywords',),
-            'sogou': ('"%s" +%s -(%s)', 21600, 'sogou.news',)
+            'sogou': ('"%s" +%s -(%s)', 21600, 'zjld.sogou.newstitle',)
         }
 
     def build(self):
@@ -31,7 +31,7 @@ class CrawlerTask(object):
                     'type': sdata[2],
                     'source': source,
                 }
-                
+
                 self.insert(data)
 
     def insert(self, data):
@@ -43,9 +43,9 @@ class CrawlerTask(object):
             "priority": data.get('priority', 3),
             "interval": data.get('interval', 7200),
             "update_time": datetime.utcnow(),
-            "lastrun": datetime.utcnow(),
-            "nextrun": datetime.utcnow() - timedelta(days=2),
-            "crtetime": datetime.utcnow(),
+            "lastrun": datetime.utcfromtimestamp(0),
+            "nextrun": datetime.now(),
+            "crtetime": datetime.now(),
             "timeout": 3600,
             "key": data.get('key'),
             "data": {
