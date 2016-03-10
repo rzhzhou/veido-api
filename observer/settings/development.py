@@ -160,6 +160,7 @@ INSTALLED_APPS = (
     'django_extensions',
     'import_export',
     'observer.apps.riskmonitor',
+    'observer.apps.reuse',
     'tinymce',
 )
 
