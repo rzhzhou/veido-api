@@ -205,17 +205,18 @@ class Abstract(BaseView):
     def source_data(self, industry=None, enterprise=None, product=None, source=None,
                     start=None, end=None, page=1):
         industry = Industry.objects.get(
-            id=industry) if industry != None else None
+            id=industry) if industry != 'Q()' else None
         enterprise = Enterprise.objects.get(
-            id=enterprise) if enterprise != None else None
+            id=enterprise) if enterprise != 'Q()' else None
         product = Product.objects.get(
-            id=product) if product != None else None
+            id=product) if product != 'Q()' else None
+        source = source if source != 'Q()' else None
 
         data = RiskNews.objects.filter(
-            Q(industry=industry) if industry != None else Q()
-            & Q(enterprise=enterprise) if enterprise != None else Q()
-            & Q(product=product) if product != None else Q()
-            & Q(source=source) if source != None else Q()
+            Q(industry=industry) if industry is not None else Q()
+            & Q(enterprise=enterprise) if enterprise is not None else Q()
+            & Q(product=product) if product is not None else Q()
+            & Q(source=source) if source is not None else Q()
             & Q(pubtime__range=(start, end)))
         items = []
         data = self.paging(data, 10, page)

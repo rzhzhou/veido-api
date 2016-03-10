@@ -9,8 +9,8 @@ from observer.apps.riskmonitor.businesslogic.abstract import(
 
 class Statistic(Abstract):
 
-    def __init__(self, start=None, end=None, industry='%%', enterprise='%%',
-                 source='%%', product='%%', page=1):
+    def __init__(self, start=None, end=None, industry=None, enterprise=None,
+                 source=None, product=None, page=1):
         self.start = start
         self.end = end
         self.industry = industry
@@ -88,10 +88,10 @@ class Statistic(Abstract):
         return data
 
     def get_data(self):
-        industry = None if self.industry == '%%' else self.industry
-        enterprise = None if self.enterprise == '%%' else self.enterprise
-        source = None if self.source == '%%' else self.source
-        product = None if self.product == '%%' else self.product
+        industry = 'Q()' if self.industry == 0 or self.industry == None else self.industry
+        enterprise = 'Q()' if self.enterprise == 0 or self.enterprise == None else self.enterprise
+        source = 'Q()' if self.source == 0 or self.source == None else self.source
+        product = 'Q()' if self.product == 0 or self.product == None else self.product
         news_data = self.source_data(industry, enterprise, product,
                                      source, self.start, self.end, self.page)
         data = {
