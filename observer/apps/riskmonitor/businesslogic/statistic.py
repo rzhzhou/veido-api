@@ -52,8 +52,13 @@ class Statistic(Abstract):
         else:
             date_range = date_range(365)
 
-        result = self.news_nums(date_range['date_range'], self.industry,
-                                self.enterprise, self.source, self.product)
+        industry = '%%' if self.industry == 0 or self.industry == None else self.industry
+        enterprise = '%%' if self.enterprise == 0 or self.enterprise == None else self.enterprise
+        source = '%%' if self.source == 0 or self.source == None else self.source
+        product = '%%' if self.product == 0 or self.product == None else self.product
+
+        result = self.news_nums(date_range['date_range'], industry,
+                                enterprise, source, product)
         date = map(lambda x: x.strftime("%m-%d"), date_range['date'])
         result['date'] = date
         return result

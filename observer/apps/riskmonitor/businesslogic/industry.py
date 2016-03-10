@@ -17,8 +17,8 @@ class IndustryTrack(Abstract):
         self.page = page
 
     def trend_chart(self):
-        industry = self.industry if self.industry != None else '%%'
-        news_trend = Statistic(industry=industry, start=self.start,
+        news_trend = Statistic(industry=self.industry, start=self.start, enterprise=self.enterprise,
+                                product=self.product, source=self.source,
                                end=self.end).industry_chart()
         trend = {
             'labels': news_trend['date'],
