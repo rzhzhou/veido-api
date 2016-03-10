@@ -156,11 +156,10 @@ INSTALLED_APPS = (
     'observer.apps.config',
     'observer.apps.corpus',
     'observer.apps.reuse',
+    'observer.apps.riskmonitor',
     'rest_framework',
     'django_extensions',
     'import_export',
-    'observer.apps.riskmonitor',
-    'observer.apps.reuse',
     'tinymce',
 )
 
