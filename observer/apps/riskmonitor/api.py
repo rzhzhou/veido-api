@@ -27,7 +27,7 @@ class HomePageView(APIView, BaseTemplateView):
 
     def get(self, request):
         start = request.GET.get('start', '2015-11-22')
-        end = request.GET.get('start', '2015-11-30')
+        end = request.GET.get('end', '2015-11-30')
 
         tz = pytz.timezone(settings.TIME_ZONE)
         start = tz.localize(datetime.strptime(start, '%Y-%m-%d'))
@@ -63,7 +63,7 @@ class IndustryDataDetail(APIView):
     def get(self, request, pk):
         page = request.GET.get('page', 1)
         start = request.GET.get('start', '2015-11-22')
-        end = request.GET.get('start', '2015-11-30')
+        end = request.GET.get('end', '2015-11-30')
 
         tz = pytz.timezone(settings.TIME_ZONE)
         start = tz.localize(datetime.strptime(start, '%Y-%m-%d'))
@@ -77,7 +77,7 @@ class EnterpriseRankView(APIView):
         pk = request.GET.get('industry', 0)
         page = request.GET.get('page', 1)
         start = request.GET.get('start', '2015-11-22')
-        end = request.GET.get('start', '2015-11-30')
+        end = request.GET.get('end', '2015-11-30')
 
         tz = pytz.timezone(settings.TIME_ZONE)
         start = tz.localize(datetime.strptime(start, '%Y-%m-%d'))
@@ -91,10 +91,10 @@ class EnterpriseRankView(APIView):
 class StatisticView(APIView):
 
     def get(self, request):
-        pk = request.GET.get('industry', None)
+        pk = request.GET.get('industry', 0)
         page = request.GET.get('page', 1)
         start = request.GET.get('start', '2015-11-22')
-        end = request.GET.get('start', '2015-11-30')
+        end = request.GET.get('end', '2015-11-30')
         dtype = request.GET.get('type', '')
 
         tz = pytz.timezone(settings.TIME_ZONE)
@@ -117,7 +117,7 @@ class StatisticExportView(View):
         pk = request.GET.get('industry', 0)
         page = request.GET.get('page', 1)
         start = request.GET.get('start', '2015-11-22')
-        end = request.GET.get('start', '2015-11-30')
+        end = request.GET.get('end', '2015-11-30')
 
         tz = pytz.timezone(settings.TIME_ZONE)
         start = tz.localize(datetime.strptime(start, '%Y-%m-%d'))
@@ -159,11 +159,15 @@ class DetailNewsView(APIView):
 class SpeciesView(APIView, Abstract):
 
     def get(self, request):
+        start = request.GET.get('start', '2016-2-1')
+        end = request.GET.get('end', '2016-2-3')
+        dtype = request.GET.get('type', 'species')
+
         tz = pytz.timezone(settings.TIME_ZONE)
-        start = tz.localize(datetime.strptime('2016-2-1', '%Y-%m-%d'))
-        end = tz.localize(datetime.strptime('2016-2-3', '%Y-%m-%d'))
-        type = 'species'
-        species = self.risk_industry(start, end, type)
+        start = tz.localize(datetime.strptime(start, '%Y-%m-%d'))
+        end = tz.localize(datetime.strptime(end, '%Y-%m-%d'))
+
+        species = self.risk_industry(start, end, dtype)
         data = {
             'species': {
                 'items': [{'name': specie[0], 'level':specie[1], 'id': specie[2]}
