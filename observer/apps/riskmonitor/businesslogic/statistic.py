@@ -92,7 +92,6 @@ class Statistic(Abstract):
         enterprise = None if self.enterprise == '%%' else self.enterprise
         source = None if self.source == '%%' else self.source
         product = None if self.product == '%%' else self.product
-
         news_data = self.source_data(industry, enterprise, product,
                                      source, self.start, self.end, self.page)
         data = {

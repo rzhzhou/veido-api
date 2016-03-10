@@ -76,7 +76,10 @@ class HomeData(Abstract):
 
     def risk_keywords(self):
         keywords = Corpus.objects.all()
-        keywords = keywords[0].riskword.split(' ')[0:3]
+        if keywords.exists():
+            keywords = keywords[0].riskword.split(' ')[0:3]
+        else:
+            keywords = []
         data = {
             'keywordsRank': {
                 'items': [{'name': keyword, 'level': 5} for keyword in keywords]
