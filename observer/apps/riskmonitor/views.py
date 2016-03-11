@@ -68,6 +68,7 @@ class IndustryDataDetail(APIView):
         tz = pytz.timezone(settings.TIME_ZONE)
         start = tz.localize(datetime.strptime(start, '%Y-%m-%d'))
         end = tz.localize(datetime.strptime(end, '%Y-%m-%d'))
+
         return Response(data)
 
 
@@ -85,6 +86,7 @@ class EnterpriseRankView(APIView):
 
         data = EnterpriseRank(industry=int(pk), start=start, end=end,
                               page=int(page)).get_all()
+
         return Response(data)
 
 
@@ -162,6 +164,7 @@ class SpeciesView(APIView, Abstract):
         start = request.GET.get('start', '2016-2-1')
         end = request.GET.get('end', '2016-2-3')
         dtype = request.GET.get('type', 'species')
+        field = request.GET.get('field', 'name')
 
         tz = pytz.timezone(settings.TIME_ZONE)
         start = tz.localize(datetime.strptime(start, '%Y-%m-%d'))
@@ -170,7 +173,7 @@ class SpeciesView(APIView, Abstract):
         species = self.risk_industry(start, end, dtype)
         data = {
             'species': {
-                'items': [{'name': specie[0], 'level':specie[1], 'id': specie[2]}
+                'items': [{field: specie[0], 'level':specie[1], 'id': specie[2]}
                           for specie in species]
             }
         }
