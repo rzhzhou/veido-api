@@ -19,11 +19,15 @@ from observer.apps.weibo.api import WeiboView, LocationWeiboView
 from observer.apps.yqj.api import login_view, registe_view, upload_image, change_passwd,\
     reset_passwd, delete_user_view, add_user_view, chart_line_index_view,\
     chart_pie_index_view, map_view, Sidebar, Dashboard, logout_view
-from observer.apps.riskmonitor.api import HomePageView, IndustryTrackView,\
-    EnterpriseRankView, StatisticView, DetailNewsView, SpeciesView, StatisticExportView
 
+from observer.apps.riskmonitor.urls import urlpatterns as riskmonitor_urls
 
 urlpatterns = [
+    url(r'', include(riskmonitor_urls, app_name='riskmonitor_urls',
+                    namespace='riskmonitor_urls')),
+]
+
+urlpatterns += [
     url(r'^token-auth$', views.obtain_jwt_token),
     url(r'^token-refresh$', views.refresh_jwt_token),
     url(r'^token-verify$', views.verify_jwt_token),
@@ -106,14 +110,4 @@ urlpatterns += [
     url(r'^map/$', map_view),
     url(r'^app$', Sidebar.as_view()),
     url(r'^dashboards$', Dashboard.as_view()),
-]
-
-urlpatterns += [
-    url(r'^dashboard$', HomePageView.as_view()),
-    url(r'^industry/(?P<pk>[0-9]+)$', IndustryTrackView.as_view()),
-    url(r'^enterprise$', EnterpriseRankView.as_view()),
-    url(r'^statistical$', StatisticView.as_view()),
-    url(r'^statistical/export$', StatisticExportView.as_view()),
-    url(r'^news$', DetailNewsView.as_view()),
-    url(r'^species$', SpeciesView.as_view())
 ]
