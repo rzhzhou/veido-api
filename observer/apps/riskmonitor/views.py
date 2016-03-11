@@ -166,8 +166,6 @@ class AnalyticsExport(View):
                          end=end, page=page).get_all()
         brief = article()
         output = brief.get_output(data)
-        print output
-        output.seek(0)
         response = HttpResponse(output.read(
         ), content_type='application/ms-excel')
         response['Content-Disposition'] = "attachment; filename=data.xlsx"
