@@ -6,12 +6,12 @@ from observer.apps.riskmonitor.views import (
 
 
 urlpatterns = [
-    url(r'^dashboard$', HomePageView.as_view()),
-    url(r'^industry$', IndustryList.as_view()),
-    url(r'^industry/(?P<pk>[0-9]+)$', IndustryDetail.as_view()),
+    url(r'^dashboards$', HomePageView.as_view()),
+    url(r'^industries$', IndustryList.as_view()),
+    url(r'^industries/(?P<pk>[0-9]+)$', IndustryDetail.as_view()),
     url(r'^news$', NewsList.as_view()),
     url(r'^news/(?P<pk>[0-9]+)$', NewsDetail.as_view()),
-    url(r'^enterprise$', EnterpriseList.as_view()),
+    url(r'^enterprises$', EnterpriseList.as_view()),
     url(r'^analytics$', Analytics.as_view()),
     url(r'^analytics/export$', AnalyticsExport.as_view()),
 ]
