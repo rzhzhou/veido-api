@@ -205,28 +205,28 @@ class Abstract(BaseView):
 
     def source_data(self, industry=None, enterprise=None, product=None, source=None,
                     start=None, end=None, page=1):
-        industry = Industry.objects.get(
-            id=industry) if industry != 'Q()' else None
-        enterprise = Enterprise.objects.get(
-            id=enterprise) if enterprise != 'Q()' else None
-        product = Product.objects.get(
-            id=product) if product != 'Q()' else None
-        source = source if source != 'Q()' else None
+        data = query("""
+            SELECT r.`id`, r.`title`, r.`pubtime`, rnp.`publisher`
+            FROM risk_news r LEFT JOIN
+            risk_news_industry ri ON r.`id`=ri.`risknews_id`
+            LEFT JOIN industry i ON i.`id`=ri.`industry_id`
+            LEFT JOIN risk_news_enterprise re ON re.`enterprise_id`=r.`id`
+            LEFT JOIN enterprise e ON re.`enterprise_id`=e.`id`
+            LEFT JOIN risk_news_area rna ON rna.`risknews_id`=r.`id`
+            LEFT JOIN area a ON a.`id`=rna.`area_id`
+            LEFT JOIN risknewspublisher rnp ON r.`publisher_id`=rnp.`id`
+            WHERE i.`id` LIKE '%s' AND e.`id` LIKE '%s' AND rnp.`id` LIKE '%s'
+            AND pubtime >= '%s' AND pubtime < '%s'
+            """ % (industry, enterprise, source, start, end))
 
-        data = RiskNews.objects.filter(
-            Q(industry=industry) if industry is not None else Q()
-            & Q(enterprise=enterprise) if enterprise is not None else Q()
-            & Q(product=product) if product is not None else Q()
-            & Q(source=source) if source is not None else Q()
-            & Q(pubtime__range=(start, end)))
         items = []
         data = self.paging(data, 10, page)
         for d in data['items']:
             item = {
-                'id': d.id,
-                'title': d.title,
-                'source': d.publisher.publisher,
-                'time': d.pubtime.strftime('%Y-%m-%d %H:%M')
+                'id': d[0],
+                'title': d[1],
+                'source': d[3],
+                'time': d[2]
             }
             items.append(item)
         return {'items': items, 'total': data['total_number']}
