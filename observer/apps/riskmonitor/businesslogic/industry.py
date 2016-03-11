@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
+
 from observer.apps.riskmonitor.businesslogic.abstract import(
     Abstract, )
 from observer.apps.riskmonitor.businesslogic.statistic import Statistic
@@ -37,14 +39,16 @@ class IndustryTrack(Abstract):
         return bar
 
     def news_data(self):
-        industry = 'Q()' if self.industry == None or self.industry == None else self.industry
-        enterprise = 'Q()' if self.enterprise == None or self.enterprise == None else self.enterprise
-        source = 'Q()' if self.source == None or self.source == None else self.source
-        product = 'Q()' if self.product == None or self.product == None else self.product
+        industry = '%%' if self.industry == None or self.industry == None else self.industry
+        enterprise = '%%' if self.enterprise == None or self.enterprise == None else self.enterprise
+        source = '%%' if self.source == None or self.source == None else self.source
+        product = '%%' if self.product == None or self.product == None else self.product
+        start = datetime.strftime(self.start, '%Y-%m-%d %H:%M')
+        end = datetime.strftime(self.end, '%Y-%m-%d %H:%M')
 
         source_data = self.source_data(industry, enterprise,
                                        product, source,
-                                       self.start, self.end, self.page)
+                                       start, end, self.page)
         data = {
             'title': [u'序号', u'标题', u'来源', u'发表时间'],
             'items': source_data['items'],

@@ -93,12 +93,14 @@ class Statistic(Abstract):
         return data
 
     def get_data(self):
-        industry = 'Q()' if self.industry == 0 or self.industry == None else self.industry
-        enterprise = 'Q()' if self.enterprise == 0 or self.enterprise == None else self.enterprise
-        source = 'Q()' if self.source == 0 or self.source == None else self.source
-        product = 'Q()' if self.product == 0 or self.product == None else self.product
+        industry = '%%' if self.industry == 0 or self.industry == None else self.industry
+        enterprise = '%%' if self.enterprise == 0 or self.enterprise == None else self.enterprise
+        source = '%%' if self.source == 0 or self.source == None else self.source
+        product = '%%' if self.product == 0 or self.product == None else self.product
+        start = datetime.strftime(self.start, '%Y-%m-%d %H:%M')
+        end = datetime.strftime(self.end, '%Y-%m-%d %H:%M')
         news_data = self.source_data(industry, enterprise, product,
-                                     source, self.start, self.end, self.page)
+                                     source, start, end, self.page)
         data = {
             'title': [u'序号', u'标题', u'来源', u'发表时间'],
             'items': news_data['items'],
