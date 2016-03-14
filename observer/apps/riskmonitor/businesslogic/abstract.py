@@ -226,7 +226,7 @@ class Abstract(BaseView):
                 'id': d[0],
                 'title': d[1],
                 'source': d[3],
-                'time': d[2]
+                'time': d[2].strftime('%Y-%m-%d %H:%M')
             }
             items.append(item)
         return {'items': items, 'total': data['total_number']}
