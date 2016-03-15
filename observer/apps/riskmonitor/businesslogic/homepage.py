@@ -3,10 +3,11 @@ from datetime import datetime, timedelta
 import pytz
 import time
 
+from django.db.models import Count
 from django.utils import timezone
 
 from observer.apps.riskmonitor.models import(
-    ScoreIndustry, ScoreEnterprise, ScoreProduct, )
+    Area, RiskNews, ScoreIndustry, ScoreEnterprise, ScoreProduct, )
 from observer.apps.corpus.models import(
     Corpus, )
 from observer.apps.riskmonitor.businesslogic.abstract import(
@@ -87,6 +88,29 @@ class HomeData(Abstract):
         }
         return data
 
+    def risk_map(self):
+        """
+        [
+            {
+                "name": "北京",
+                "value": 0
+            },
+            {
+                "name": "上海",
+                "value": 0
+            },
+            {
+                "name": "广州",
+                "value": 0
+            },
+        ]
+        """
+
+        queryset = Area.objects.filter(level=2).annotate(risk_news_count=Count('rarea'))
+        data = {'map': [{'name': q.name, 'value': q.risk_news_count}
+                        for q in queryset]}
+        return data
+
     def risk_data(self):
         end = self.end
 
@@ -130,11 +154,12 @@ class HomeData(Abstract):
         industryRank = self.industry().items()
         enterpriseRank = self.enterprise().items()
         keywordsRank = self.risk_keywords().items()
+        risk_map = self.risk_map().items()
         riskData = self.risk_data().items()
         rankData = self.risk_level().items()
         risk_count = self.risk_sum().items()
         status = self.risk_status().items()
         # time = self.get_time().items()
-        datas = dict(industryRank + enterpriseRank + keywordsRank +
+        datas = dict(industryRank + enterpriseRank + keywordsRank + risk_map +
                      riskData + rankData + risk_count + status)
         return datas
