@@ -1,8 +1,9 @@
 from django.conf.urls import url
+from rest_framework.urlpatterns import format_suffix_patterns
 
 from observer.apps.riskmonitor.views import (
     HomePageView, IndustryList, IndustryDetail, NewsList, NewsDetail,
-    EnterpriseList, Analytics, GenerateAnalyticsExport)
+    EnterpriseList, Analytics, GenerateAnalyticsExport, AnalyticsExport)
 
 
 urlpatterns = [
@@ -15,3 +16,9 @@ urlpatterns = [
     url(r'^analytics$', Analytics.as_view()),
     url(r'^analytics/export$', GenerateAnalyticsExport.as_view()),
 ]
+
+urlpatterns += [
+    url(r'^files/(?P<filename>\w+)$', AnalyticsExport.as_view()),
+]
+
+urlpatterns = format_suffix_patterns(urlpatterns, allowed=['xls', 'xlsx'])
