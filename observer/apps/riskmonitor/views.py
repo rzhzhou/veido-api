@@ -4,10 +4,10 @@ import jwt
 from datetime import datetime, timedelta
 
 from rest_framework.views import APIView
-from rest_framework import viewsets
+from rest_framework import exceptions, status
 from rest_framework.response import Response
 from django.conf import settings
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.views.generic import View
 
 from observer.apps.base.views import BaseTemplateView
@@ -156,8 +156,12 @@ class Analytics(APIView):
 class AnalyticsExport(View):
 
     def get(self, request, filename, format=None):
-        jwt_payload = jwt.decode(
-            request.GET['payload'], settings.JWT_AUTH['JWT_SECRET_KEY'])
+        try:
+            jwt_payload = jwt.decode(
+                request.GET['payload'], settings.JWT_AUTH['JWT_SECRET_KEY'])
+        except jwt.ExpiredSignature:
+            msg = 'Signature has expired.'
+            return JsonResponse({'detail': msg}, status=status.HTTP_403_FORBIDDEN)
 
         tz = pytz.timezone(settings.TIME_ZONE)
         start = tz.localize(datetime.strptime(
@@ -168,10 +172,10 @@ class AnalyticsExport(View):
                          'pk'], start=start, end=end, page=jwt_payload['page']).get_all()
         brief = article()
         output = brief.get_output(data)
-        print output
         response = HttpResponse(output.read(
-        ), content_type='application/vnd.ms-excel')
-        response['Content-Disposition'] = "attachment; filename=%s.%s" % (filename, format)
+        ), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response[
+            'Content-Disposition'] = "attachment; filename=%s.%s" % (filename, format)
         return response
 
 
@@ -188,7 +192,8 @@ class GenerateAnalyticsExport(APIView):
             'page': page,
             'start': start,
             'end': end,
-            'exp': datetime.now() + timedelta(seconds=60)
+            'exp': datetime.utcnow() + timedelta(seconds=60)
         }, settings.JWT_AUTH['JWT_SECRET_KEY'])
+        print datetime.now() + timedelta(seconds=60)
 
-        return Response({'url': '/files/%s.xls?payload=%s' % ('data', jwt_payload)})
+        return Response({'url': '/api/files/%s.xlsx?payload=%s' % ('data', jwt_payload)})
