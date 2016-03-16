@@ -2,7 +2,7 @@ from django.conf.urls import url
 
 from observer.apps.riskmonitor.views import (
     HomePageView, IndustryList, IndustryDetail, NewsList, NewsDetail,
-    EnterpriseList, Analytics, AnalyticsExport)
+    EnterpriseList, Analytics, GenerateAnalyticsExport)
 
 
 urlpatterns = [
@@ -13,5 +13,5 @@ urlpatterns = [
     url(r'^news/(?P<pk>[0-9]+)$', NewsDetail.as_view()),
     url(r'^enterprises$', EnterpriseList.as_view()),
     url(r'^analytics$', Analytics.as_view()),
-    url(r'^analytics/export$', AnalyticsExport.as_view()),
+    url(r'^analytics/export$', GenerateAnalyticsExport.as_view()),
 ]

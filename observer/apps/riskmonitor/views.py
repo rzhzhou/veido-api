@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import pytz
+import jwt
 from datetime import datetime, timedelta
 
 from rest_framework.views import APIView
@@ -154,21 +155,40 @@ class Analytics(APIView):
 
 class AnalyticsExport(View):
 
+    def get(self, request, filename, format=None):
+        jwt_payload = jwt.decode(
+            request.GET['payload'], settings.JWT_AUTH['JWT_SECRET_KEY'])
+
+        tz = pytz.timezone(settings.TIME_ZONE)
+        start = tz.localize(datetime.strptime(
+            jwt_payload['start'], '%Y-%m-%d'))
+        end = tz.localize(datetime.strptime(jwt_payload['end'], '%Y-%m-%d'))
+
+        data = Statistic(industry=jwt_payload[
+                         'pk'], start=start, end=end, page=jwt_payload['page']).get_all()
+        brief = article()
+        output = brief.get_output(data)
+        print output
+        response = HttpResponse(output.read(
+        ), content_type='application/vnd.ms-excel')
+        response['Content-Disposition'] = "attachment; filename=%s.%s" % (filename, format)
+        return response
+
+
+class GenerateAnalyticsExport(APIView):
+
     def get(self, request):
         pk = request.GET.get('industry', 0)
         page = request.GET.get('page', 1)
         start = request.GET.get('start', '2015-11-22')
         end = request.GET.get('end', '2015-11-30')
 
-        tz = pytz.timezone(settings.TIME_ZONE)
-        start = tz.localize(datetime.strptime(start, '%Y-%m-%d'))
-        end = tz.localize(datetime.strptime(end, '%Y-%m-%d'))
+        jwt_payload = jwt.encode({
+            'pk': pk,
+            'page': page,
+            'start': start,
+            'end': end,
+            'exp': datetime.now() + timedelta(seconds=60)
+        }, settings.JWT_AUTH['JWT_SECRET_KEY'])
 
-        data = Statistic(industry=pk, start=start,
-                         end=end, page=page).get_all()
-        brief = article()
-        output = brief.get_output(data)
-        response = HttpResponse(output.read(
-        ), content_type='application/ms-excel')
-        response['Content-Disposition'] = "attachment; filename=data.xlsx"
-        return response
+        return Response({'url': '/files/%s.xls?payload=%s' % ('data', jwt_payload)})
