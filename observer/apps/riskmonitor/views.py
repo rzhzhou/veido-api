@@ -194,6 +194,5 @@ class GenerateAnalyticsExport(APIView):
             'end': end,
             'exp': datetime.utcnow() + timedelta(seconds=60)
         }, settings.JWT_AUTH['JWT_SECRET_KEY'])
-        print datetime.now() + timedelta(seconds=60)
 
         return Response({'url': '/api/files/%s.xlsx?payload=%s' % ('data', jwt_payload)})
