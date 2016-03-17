@@ -174,11 +174,7 @@ class AnalyticsExport(View):
         output = brief.get_output(data)
         output.seek(0)
 
-        response = HttpResponse(output.read(
-        ), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-        response[
-            'Content-Disposition'] = "attachment; filename=%s.%s" % (filename, format)
-
+        response = xls_to_response(fname=filename, format=format, source=output)
         return response
 
 

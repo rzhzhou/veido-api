@@ -183,7 +183,7 @@ class DispatchView(APIView, BaseTemplateView):
             for k_index, dct in enumerate(data['province']):
                 ws.write(k_index + 1, 0, dct.values()[0])
                 ws.write(k_index + 1, 1, str(dct.values()[1]))
-        return xls_to_response(wb, 'data.xls')
+        return xls_to_response(wb=wb, fname='data.xls')
 
 
 class AnalyticsChildView(BaseTemplateView):

@@ -53,10 +53,16 @@ def set_logo(obj):
     return obj
 
 
-def xls_to_response(wb, fname):
-    response = HttpResponse(content_type="application/ms-excel")
-    response['Content-Disposition'] = 'attachment; filename=%s' % fname
-    wb.save(response)
+def xls_to_response(wb=None, fname=None, format=None, source=None):
+    if source is None:
+        response = HttpResponse(content_type="application/ms-excel")
+        response['Content-Disposition'] = 'attachment; filename=%s' % fname
+        wb.save(response)
+    else:
+        response = HttpResponse(source.read(
+        ), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response[
+            'Content-Disposition'] = "attachment; filename=%s.%s" % (fname, format)
     return response
 
 
@@ -78,13 +84,13 @@ def sidebarUtil(request):
 
     except User.DoesNotExist:
         return {
-        'user': user.username,
-        'news': '',
-        'event': '',
-        'location': '',
-        'custom': '',
-        'site': '',
-        'business': []
+            'user': user.username,
+            'news': '',
+            'event': '',
+            'location': '',
+            'custom': '',
+            'site': '',
+            'business': []
         }
 
 
@@ -93,7 +99,7 @@ def token(view_func):
     def wrapper(request, *args, **kwargs):
         username = request.user.username
         jwt = request.META['HTTP_AUTHORIZATION']
-        data = RedisQueryApi().keys(username+'*')
+        data = RedisQueryApi().keys(username + '*')
         if data:
             for item in data:
                 value = RedisQueryApi().get(item)
