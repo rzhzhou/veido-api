@@ -7,11 +7,13 @@ from rest_framework.views import APIView
 from rest_framework import exceptions, status
 from rest_framework.response import Response
 from django.conf import settings
+from django.db.models import F
 from django.http import HttpResponse, JsonResponse
 from django.views.generic import View
 
 from observer.apps.base.views import BaseTemplateView
-from observer.apps.riskmonitor.models import RiskNews
+from observer.apps.riskmonitor.models import (
+    RiskNews, Industry, Enterprise, Product, RiskNewsPublisher)
 from observer.apps.riskmonitor.businesslogic.abstract import Abstract
 from observer.apps.base.initialize import xls_to_response
 from observer.utils.excel.briefing import article
@@ -195,3 +197,62 @@ class GenerateAnalyticsExport(APIView):
         }, settings.JWT_AUTH['JWT_SECRET_KEY'])
 
         return Response({'url': '/api/files/%s.xlsx?payload=%s' % ('data', jwt_payload)})
+
+
+class Filters(APIView):
+
+    def get(self, request):
+        """
+        Industries, Enterprises, Products, Publishers Filters
+        {
+            'industries': {
+                'items': [{
+                    'id': 1,
+                    'name': '行业',
+                }]
+            },
+            'enterprises': {
+                'items': [{
+                    'id': 1,
+                    'name': '企业',
+                }]
+            },
+            'products': {
+                'items': [{
+                    'id': 1,
+                    'name': '产品',
+                }]
+            },
+            'publishers': {
+                'items': [{
+                    'id': 1,
+                    'name': '发布者',
+                }]
+            }
+        }
+        """
+        industries = Industry.objects.annotate(
+            text=F('name')).values('id', 'text')[:10]
+        enterprises = Enterprise.objects.annotate(
+            text=F('name')).values('id', 'text')[:10]
+        products = Product.objects.annotate(
+            text=F('name')).values('id', 'text')[:10]
+        publishers = RiskNewsPublisher.objects.annotate(
+            text=F('publisher')).values('id', 'text')[:10]
+
+        data = {
+            'industries': {
+                'items': industries,
+            },
+            'enterprises': {
+                'items': enterprises,
+            },
+            'products': {
+                'items': products,
+            },
+            'publishers': {
+                'items': publishers,
+            }
+        }
+
+        return Response(data)
