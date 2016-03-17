@@ -4,9 +4,10 @@ import os
 import time
 import datetime, calendar
 import random
-import StringIO
+# import StringIO
 
 import xlsxwriter
+
 
 try:
     import cStringIO as StringIO

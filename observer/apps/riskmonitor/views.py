@@ -168,9 +168,9 @@ class AnalyticsExport(View):
                          'pk'], start=start, end=end, page=jwt_payload['page']).get_all()
         brief = article()
         output = brief.get_output(data)
-        print output
-        response = HttpResponse(output.read(
-        ), content_type='application/vnd.ms-excel')
+        output.seek(0)
+        response = HttpResponse(output.read(),
+        content_type='application/vnd.ms-excel')
         response['Content-Disposition'] = "attachment; filename=%s.%s" % (filename, format)
         return response
 
