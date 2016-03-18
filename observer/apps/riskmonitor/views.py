@@ -41,16 +41,16 @@ class HomePageView(APIView):
 class IndustryList(APIView, Abstract):
 
     def get(self, request):
+        user_id = 1
         start = request.GET.get('start', '2016-2-1')
         end = request.GET.get('end', '2016-2-3')
-        dtype = request.GET.get('type', 'industry')
         field = request.GET.get('field', 'name')
 
         tz = pytz.timezone(settings.TIME_ZONE)
         start = tz.localize(datetime.strptime(start, '%Y-%m-%d'))
         end = tz.localize(datetime.strptime(end, '%Y-%m-%d'))
 
-        industries = self.risk_industry(start, end, dtype)
+        industries = self.risk_industry(start, end, user_id)
         data = {
             'industries': {
                 'items': [{field: industry[0], 'level':industry[1], 'id': industry[2]}

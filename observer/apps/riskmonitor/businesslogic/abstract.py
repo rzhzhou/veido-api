@@ -6,6 +6,7 @@ from dateutil.relativedelta import relativedelta
 
 from django.db.models import Count
 from django.db.models import Q
+from django.contrib.auth.models import User
 
 from observer.apps.riskmonitor.models import(
     ScoreIndustry, ScoreEnterprise, Industry,
@@ -79,13 +80,15 @@ class Abstract(BaseView):
             level = 'A'
         return level
 
-    def indugenerate(self, induscores):
+    def indugenerate(self, induscores, user_id):
+        user = User.objects.get(id=user_id)
         for induscore in induscores:
             indu = induscore.industry
-            score = induscore.score
-            level = self.indu_make_level(score)
-            if indu.level == 1:
-                yield indu.name, level, indu.id
+            userindus = indu.userindustry_set.filter(user=user)
+            if userindus.exists() and indu.level == 1:
+                score = induscore.score
+                level = self.indu_make_level(score)
+                yield userindus[0].name, level, indu.id
 
     def entegenerate(self, entescores):
         for entescore in entescores:
@@ -93,15 +96,13 @@ class Abstract(BaseView):
             level = self.ente_make_level(score)
             yield entescore.enterprise, level
 
-    def risk_industry(self, start, end, type):
+    def risk_industry(self, start, end, user_id):
         induscore = ScoreIndustry.objects.filter(
             pubtime__range=(start, end)).order_by('-score')
-        indunames = self.indugenerate(induscore)
-        count = 3 if type is 'abstract' else Industry.objects.filter(
-            level=1).count()
+        indunames = self.indugenerate(induscore, user_id)
         try:
-            indunames = [indunames.next() for i in xrange(count)]
-        except:
+            indunames = [i for i in indunames]
+        except AttributeError:
             indunames = []
         return indunames
 

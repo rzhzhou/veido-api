@@ -16,9 +16,10 @@ from observer.apps.riskmonitor.businesslogic.abstract import(
 
 class HomeData(Abstract):
 
-    def __init__(self, start, end):
+    def __init__(self, start, end, user_id):
         self.start = start
         self.end = end
+        self.user_id = user_id
 
     def get_time(self):
         start = datetime.strptime(start, '%Y-%m-%d')
@@ -54,8 +55,8 @@ class HomeData(Abstract):
         return data
 
     def industry(self):
-        type = 'abstract'
-        indunames = self.risk_industry(self.start, self.end, type)
+        industrys = self.risk_industry(self.start, self.end, user_id)
+        indunames = industrys if len(industrys) < 3 else industrys[:3]
         data = {
             'industryRank': {
                 'items': [{'name': induname[0], 'level':induname[1]}
@@ -106,7 +107,8 @@ class HomeData(Abstract):
         ]
         """
 
-        queryset = Area.objects.filter(level=2).annotate(risk_news_count=Count('rarea'))
+        queryset = Area.objects.filter(level=2).annotate(
+            risk_news_count=Count('rarea'))
         data = {'map': [{'name': q.name, 'value': q.risk_news_count}
                         for q in queryset]}
         return data
