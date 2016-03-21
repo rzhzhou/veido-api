@@ -7,6 +7,8 @@ from dateutil.relativedelta import relativedelta
 from django.db.models import Count
 from django.db.models import Q
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import Http404
 
 from observer.apps.riskmonitor.models import(
     ScoreIndustry, ScoreEnterprise, Industry,
@@ -144,7 +146,10 @@ class Abstract(BaseView):
     def compare(self, start, end, id):
 
         def count(start, end, id):
-            industry = Industry.objects.get(id=id) if id is not None else None
+            try:
+                industry = Industry.objects.get(id=id) if id is not None else None
+            except ObjectDoesNotExist:
+                raise Http404("Industry does not exist")
             count = RiskNews.objects.filter(
                 Q(pubtime__range=(start, end)) & Q(industry=industry
                                                    ) if industry is not None else Q()
