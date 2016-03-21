@@ -8,7 +8,7 @@ from rest_framework import exceptions, status
 from rest_framework.response import Response
 from django.conf import settings
 from django.db.models import F
-from django.http import Http404, HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.views.generic import View
 
 from observer.apps.base.views import BaseTemplateView
@@ -27,6 +27,7 @@ from businesslogic.statistic import Statistic
 class HomePageView(APIView):
 
     def get(self, request):
+        user_id = request.user.id
         start = request.GET.get('start', '2015-11-22')
         end = request.GET.get('end', '2015-11-30')
 
@@ -34,7 +35,7 @@ class HomePageView(APIView):
         start = tz.localize(datetime.strptime(start, '%Y-%m-%d'))
         end = tz.localize(datetime.strptime(end, '%Y-%m-%d'))
 
-        data = HomeData(start, end).get_all()
+        data = HomeData(start, end, user_id).get_all()
         return Response(data)
 
 
@@ -104,11 +105,7 @@ class NewsDetail(APIView):
           "text": "就在小米科技CEO雷军宣布要将专注小米的核心业务，并将旗下核心业务分为自有产品与生态链产品的次日，小米科技旗下生态链企业智米科技，就曝出了空气净化器产品疑涉“造假门”的消息给这家明星公司的业务转型前景蒙上一层阴影。"
         }
         """
-        try:
-            risk_news = RiskNews.objects.get(pk=pk)
-        except RiskNews.DoesNotExist:
-            raise Http404("RiskNews does not exist")
-
+        risk_news = RiskNews.objects.get(pk=pk)
         data = {
             'title': risk_news.title,
             'source': risk_news.publisher.publisher,

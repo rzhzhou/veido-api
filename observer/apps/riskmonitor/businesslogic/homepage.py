@@ -55,7 +55,7 @@ class HomeData(Abstract):
         return data
 
     def industry(self):
-        industrys = self.risk_industry(self.start, self.end, user_id)
+        industrys = self.risk_industry(self.start, self.end, self.user_id)
         indunames = industrys if len(industrys) < 3 else industrys[:3]
         data = {
             'industryRank': {
