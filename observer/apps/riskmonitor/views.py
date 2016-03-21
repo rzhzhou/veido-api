@@ -41,7 +41,7 @@ class HomePageView(APIView):
 class IndustryList(APIView, Abstract):
 
     def get(self, request):
-        user_id = 1
+        user_id = request.user.id
         start = request.GET.get('start', '2016-2-1')
         end = request.GET.get('end', '2016-2-3')
         field = request.GET.get('field', 'name')
