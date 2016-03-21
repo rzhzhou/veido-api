@@ -44,8 +44,8 @@ class CrawlerTask(object):
             "interval": data.get('interval', 7200),
             "update_time": datetime.utcnow(),
             "lastrun": datetime.utcfromtimestamp(0),
-            "nextrun": datetime.now(),
-            "crtetime": datetime.now(),
+            "nextrun": datetime.utcnow(),
+            "crtetime": datetime.utcnow(),
             "timeout": 3600,
             "key": data.get('key'),
             "data": {
