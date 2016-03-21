@@ -37,7 +37,7 @@ class CrawlerTask(object):
     def insert(self, data):
         tz = pytz.timezone(settings.TIME_ZONE)
         conf = {
-            "id": self.uuid,
+            "id": str(self.uuid),
             "type": data.get('type', ''),
             "status": data.get('status', 0),
             "priority": data.get('priority', 3),
