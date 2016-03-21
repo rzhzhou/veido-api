@@ -18,3 +18,19 @@ class APITest(BaseTestCase):
     def test_news_detail_view(self):
         response = self.client.get('/api/news/1')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_enterprises_view(self):
+        response = self.client.get('/enterprises')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_analytics_view(self):
+        response = self.client.get('/analytics')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_analytics_filters_view(self):
+        response = self.client.get('/analytics/filters')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_analytics_export_view(self):
+        response = self.client.get('/analytics/export')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
