@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 from django.contrib.auth.models import User, Group, Permission
 from rest_framework.test import APIClient
+from rest_framework.test import APITestCase
 
 
-class BaseTestCase():
+class BaseTestCase(APITestCase):
+
+    def setUp(self):
+        self.client = self.get_client()
 
     def get_client(self):
         email = 'admin@shendu.info'
