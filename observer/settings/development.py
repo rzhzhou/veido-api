@@ -22,7 +22,7 @@ sys.path.append(BASE_DIR)
 from observer.utils.connector.mysql import query_one
 
 
-login_user = 'test'
+login_user = 'test1'
 
 
 def _load_config():
@@ -155,7 +155,7 @@ INSTALLED_APPS = (
     'observer.apps.collection',
     'observer.apps.config',
     'observer.apps.corpus',
-    'observer.apps.reuse',
+    # 'observer.apps.reuse',
     'observer.apps.riskmonitor',
     'rest_framework',
     'django_extensions',
