@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import pytz
 import jwt
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 from rest_framework.views import APIView
 from rest_framework import exceptions, status
@@ -28,8 +28,9 @@ class HomePageView(APIView):
 
     def get(self, request):
         user_id = request.user.id
-        start = request.GET.get('start', '2015-11-22')
-        end = request.GET.get('end', '2015-11-30')
+        today = date.today()
+        start = request.GET.get('start', str(today))
+        end = request.GET.get('end', str(today - timedelta(days=7)))
 
         tz = pytz.timezone(settings.TIME_ZONE)
         start = tz.localize(datetime.strptime(start, '%Y-%m-%d'))
@@ -43,8 +44,9 @@ class IndustryList(APIView, Abstract):
 
     def get(self, request):
         user_id = request.user.id
-        start = request.GET.get('start', '2016-2-1')
-        end = request.GET.get('end', '2016-2-3')
+        today = date.today()
+        start = request.GET.get('start', str(today))
+        end = request.GET.get('end', str(today - timedelta(days=7)))
         field = request.GET.get('field', 'name')
 
         tz = pytz.timezone(settings.TIME_ZONE)
@@ -65,8 +67,9 @@ class IndustryDetail(APIView):
 
     def get(self, request, pk):
         page = request.GET.get('page', 1)
-        start = request.GET.get('start', '2015-11-22')
-        end = request.GET.get('end', '2015-11-30')
+        today = date.today()
+        start = request.GET.get('start', str(today))
+        end = request.GET.get('end', str(today - timedelta(days=7)))
 
         tz = pytz.timezone(settings.TIME_ZONE)
         start = tz.localize(datetime.strptime(start, '%Y-%m-%d'))
@@ -82,8 +85,9 @@ class NewsList(APIView):
     def get(self, request):
         pk = request.GET.get('industry', None)
         page = request.GET.get('page', 1)
-        start = request.GET.get('start', '2015-11-22')
-        end = request.GET.get('end', '2015-11-30')
+        today = date.today()
+        start = request.GET.get('start', str(today))
+        end = request.GET.get('end', str(today - timedelta(days=7)))
 
         tz = pytz.timezone(settings.TIME_ZONE)
         start = tz.localize(datetime.strptime(start, '%Y-%m-%d'))
@@ -124,8 +128,9 @@ class EnterpriseList(APIView):
     def get(self, request):
         pk = request.GET.get('industry', 0)
         page = request.GET.get('page', 1)
-        start = request.GET.get('start', '2015-11-22')
-        end = request.GET.get('end', '2015-11-30')
+        today = date.today()
+        start = request.GET.get('start', str(today))
+        end = request.GET.get('end', str(today - timedelta(days=7)))
 
         tz = pytz.timezone(settings.TIME_ZONE)
         start = tz.localize(datetime.strptime(start, '%Y-%m-%d'))
@@ -142,8 +147,9 @@ class Analytics(APIView):
     def get(self, request):
         pk = request.GET.get('industry', 0)
         page = request.GET.get('page', 1)
-        start = request.GET.get('start', '2015-11-22')
-        end = request.GET.get('end', '2015-11-30')
+        today = date.today()
+        start = request.GET.get('start', str(today))
+        end = request.GET.get('end', str(today - timedelta(days=7)))
         dtype = request.GET.get('type', '')
 
         tz = pytz.timezone(settings.TIME_ZONE)
@@ -191,8 +197,9 @@ class GenerateAnalyticsExport(APIView):
     def get(self, request):
         pk = request.GET.get('industry', 0)
         page = request.GET.get('page', 1)
-        start = request.GET.get('start', '2015-11-22')
-        end = request.GET.get('end', '2015-11-30')
+        today = date.today()
+        start = request.GET.get('start', str(today))
+        end = request.GET.get('end', str(today - timedelta(days=7)))
 
         jwt_payload = jwt.encode({
             'pk': pk,
