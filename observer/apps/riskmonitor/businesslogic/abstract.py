@@ -12,7 +12,8 @@ from django.http import Http404
 
 from observer.apps.riskmonitor.models import(
     ScoreIndustry, ScoreEnterprise, Industry,
-    Enterprise, RiskNews, Product, RiskNewsPublisher)
+    Enterprise, RiskNews, Product, RiskNewsPublisher,
+    UserIndustry)
 from observer.utils.connector.mysql import query
 from observer.apps.base.api_function import get_season
 from observer.apps.base.views import BaseView
@@ -106,6 +107,11 @@ class Abstract(BaseView):
             indunames = [i for i in indunames]
         except AttributeError:
             indunames = []
+
+        user = User.objects.filter(id=user_id)
+        user_industrys = UserIndustry.objects.filter(user=user)
+        indunames = indunames if indunames else [[i.name, 'A', i.id
+                                                    ] for i in user_industrys]
         return indunames
 
     def risk_enterprise(self, start, end, type):
