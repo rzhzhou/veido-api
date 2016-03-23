@@ -134,7 +134,7 @@ class Abstract(BaseView):
             date_range
         )
 
-        sum_news = lambda x: """
+        sum_news = lambda x: query("""
             SELECT %s FROM %s r LEFT JOIN
             risk_news_industry ri ON r.`id`=ri.`risknews_id`
             LEFT JOIN industry i ON i.`id`=ri.`industry_id`
@@ -144,8 +144,7 @@ class Abstract(BaseView):
             LEFT JOIN area a ON a.`id`=rna.`area_id`
             LEFT JOIN risknewspublisher rnp ON r.`publisher_id`=rnp.`id`
             WHERE i.`id` like '%s' AND e.`id` like '%s' AND rnp.`id` like '%s'
-            """ % (','.join(query_str), x, industry, enterprise, source)
-        print sum_news('risk_news')
+            """ % (','.join(query_str), x, industry, enterprise, source))
         news_data = [int(0 if i is None else i)
                      for i in sum_news('risk_news')[0]]
         return {'data': news_data}
@@ -247,8 +246,8 @@ class Abstract(BaseView):
     def enterprise_rank(self, start=None, end=None, industry=None, page=1):
         start = None if start == None else start.strftime('%Y-%m-%d %H:%M:%S')
         end = None if end == None else end.strftime('%Y-%m-%d %H:%M:%S')
-        sql = """
-            SELECT e.`id`, e.`name`, se.`score`, COUNT(distinct rn.`id`)
+        sql = query("""
+            SELECT e.`id`, e.`name`, se.`score`, COUNT(distinctrn.`id`)
             FROM enterprise e
             LEFT JOIN risk_news_enterprise re ON e.`id`=re.`enterprise_id`
             LEFT JOIN risk_news rn ON re.`risknews_id`=rn.`id`
@@ -259,7 +258,7 @@ class Abstract(BaseView):
             AND rn.`pubtime` < '%s'
             AND i.`id` like '%s'
             GROUP BY e.`id` ORDER BY se.`score` %s
-            """ % (start, end, industry, 'DESC')
+            """ % (start, end, industry, 'DESC'))
         results = query(sql)
         iteml = []
         data = self.paging(results, 10, page)
