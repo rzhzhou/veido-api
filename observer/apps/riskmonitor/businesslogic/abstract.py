@@ -218,7 +218,7 @@ class Abstract(BaseView):
     def source_data(self, industry=None, enterprise=None, product=None, source=None,
                     start=None, end=None, page=1):
         data = query("""
-            SELECT r.`id`, r.`title`, r.`pubtime`, rnp.`publisher`
+            SELECT distinct r.`id`, r.`title`, r.`pubtime`, rnp.`publisher`
             FROM risk_news r LEFT JOIN
             risk_news_industry ri ON r.`id`=ri.`risknews_id`
             LEFT JOIN industry i ON i.`id`=ri.`industry_id`
@@ -247,7 +247,7 @@ class Abstract(BaseView):
         start = None if start == None else start.strftime('%Y-%m-%d %H:%M:%S')
         end = None if end == None else end.strftime('%Y-%m-%d %H:%M:%S')
         sql = """
-            SELECT e.`id`, e.`name`, se.`score`, COUNT(rn.`id`) FROM enterprise e
+            SELECT distinct e.`id`, e.`name`, se.`score`, COUNT(rn.`id`) FROM enterprise e
             LEFT JOIN risk_news_enterprise re ON e.`id`=re.`enterprise_id`
             LEFT JOIN risk_news rn ON re.`risknews_id`=rn.`id`
             LEFT JOIN score_enterprise se ON e.`id`=se.`enterprise_id`
