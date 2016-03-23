@@ -10,10 +10,12 @@ from django.conf import settings
 from django.db.models import F
 from django.http import Http404, HttpResponse, JsonResponse
 from django.views.generic import View
+from django.core.exceptions import ObjectDoesNotExist
 
 from observer.apps.base.views import BaseTemplateView
 from observer.apps.riskmonitor.models import (
-    RiskNews, Industry, Enterprise, Product, RiskNewsPublisher)
+    RiskNews, Industry, Enterprise, Product, RiskNewsPublisher,
+    UserIndustry)
 from observer.apps.riskmonitor.businesslogic.abstract import Abstract
 from observer.apps.base.initialize import xls_to_response
 from observer.utils.excel.briefing import article
@@ -75,6 +77,11 @@ class IndustryDetail(APIView):
         start = tz.localize(datetime.strptime(start, '%Y-%m-%d'))
         end = tz.localize(datetime.strptime(end, '%Y-%m-%d'))
 
+        try:
+            pk = UserIndustry.objects.get(id=pk).industry.id
+        except ObjectDoesNotExist:
+            pk = None
+
         data = IndustryTrack(industry=pk, start=start,
                              end=end, page=page).get_chart()
         return Response(data)
@@ -92,6 +99,11 @@ class NewsList(APIView):
         tz = pytz.timezone(settings.TIME_ZONE)
         start = tz.localize(datetime.strptime(start, '%Y-%m-%d'))
         end = tz.localize(datetime.strptime(end, '%Y-%m-%d'))
+
+        try:
+            pk = UserIndustry.objects.get(id=pk).industry.id
+        except ObjectDoesNotExist:
+            pk = None
 
         data = IndustryTrack(industry=pk, start=start,
                              end=end, page=page).news_data()
