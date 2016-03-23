@@ -134,7 +134,7 @@ class Abstract(BaseView):
             date_range
         )
 
-        sum_news = lambda x: query("""
+        sum_news = lambda x: """
             SELECT %s FROM %s r LEFT JOIN
             risk_news_industry ri ON r.`id`=ri.`risknews_id`
             LEFT JOIN industry i ON i.`id`=ri.`industry_id`
@@ -144,7 +144,8 @@ class Abstract(BaseView):
             LEFT JOIN area a ON a.`id`=rna.`area_id`
             LEFT JOIN risknewspublisher rnp ON r.`publisher_id`=rnp.`id`
             WHERE i.`id` like '%s' AND e.`id` like '%s' AND rnp.`id` like '%s'
-            """ % (','.join(query_str), x, industry, enterprise, source))
+            """ % (','.join(query_str), x, industry, enterprise, source)
+        print sum_news('risk_news')
         news_data = [int(0 if i is None else i)
                      for i in sum_news('risk_news')[0]]
         return {'data': news_data}
@@ -218,7 +219,7 @@ class Abstract(BaseView):
     def source_data(self, industry=None, enterprise=None, product=None, source=None,
                     start=None, end=None, page=1):
         data = query("""
-            SELECT distinct r.`id`, r.`title`, r.`pubtime`, rnp.`publisher`
+            SELECT r.`id`, r.`title`, r.`pubtime`, rnp.`publisher`, count(distinct r.`id`)
             FROM risk_news r LEFT JOIN
             risk_news_industry ri ON r.`id`=ri.`risknews_id`
             LEFT JOIN industry i ON i.`id`=ri.`industry_id`
@@ -228,7 +229,7 @@ class Abstract(BaseView):
             LEFT JOIN area a ON a.`id`=rna.`area_id`
             LEFT JOIN risknewspublisher rnp ON r.`publisher_id`=rnp.`id`
             WHERE i.`id` LIKE '%s' AND e.`id` LIKE '%s' AND rnp.`id` LIKE '%s'
-            AND pubtime >= '%s' AND pubtime < '%s'
+            AND pubtime >= '%s' AND pubtime < '%s' group by r.`id`
             """ % (industry, enterprise, source, start, end))
 
         items = []
@@ -247,7 +248,8 @@ class Abstract(BaseView):
         start = None if start == None else start.strftime('%Y-%m-%d %H:%M:%S')
         end = None if end == None else end.strftime('%Y-%m-%d %H:%M:%S')
         sql = """
-            SELECT distinct e.`id`, e.`name`, se.`score`, COUNT(rn.`id`) FROM enterprise e
+            SELECT e.`id`, e.`name`, se.`score`, COUNT(distinct rn.`id`)
+            FROM enterprise e
             LEFT JOIN risk_news_enterprise re ON e.`id`=re.`enterprise_id`
             LEFT JOIN risk_news rn ON re.`risknews_id`=rn.`id`
             LEFT JOIN score_enterprise se ON e.`id`=se.`enterprise_id`
