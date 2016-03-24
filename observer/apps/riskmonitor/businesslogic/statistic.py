@@ -26,7 +26,7 @@ class Statistic(Abstract):
         def date_range(interval):
             scale = days / interval + days % interval
             list_range = [(i + 1) * interval for i in xrange(scale)]
-            date = [(start + timedelta(days=x)) for x in list_range]
+            date = [(start + timedelta(days=(x-1))) for x in list_range]
             date_range = [(i.strftime('%Y-%m-%d %H:%M:%S'),
                             (i + timedelta(days=interval)).strftime(
                                 '%Y-%m-%d %H:%M:%S')) for i in date]
