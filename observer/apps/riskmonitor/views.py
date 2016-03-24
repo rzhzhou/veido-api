@@ -157,12 +157,12 @@ class EnterpriseList(APIView):
         start = request.GET.get('start', str(today - timedelta(days=7)))
         end = request.GET.get('end', str(today))
 
-        start = start.astimezone(pytz.utc)
-        end = end.astimezone(pytz.utc)
-
         tz = pytz.timezone(settings.TIME_ZONE)
         start = tz.localize(datetime.strptime(start, '%Y-%m-%d'))
         end = tz.localize(datetime.strptime(end, '%Y-%m-%d'))
+
+        start = start.astimezone(pytz.utc)
+        end = end.astimezone(pytz.utc)
 
         data = EnterpriseRank(industry=int(pk), start=start, end=end,
                               page=int(page)).get_all()
