@@ -251,8 +251,8 @@ class Abstract(BaseView):
     def enterprise_rank(self, start=None, end=None, industry=None, page=1):
         start = start.strftime('%Y-%m-%d %H:%M:%S')
         end = end.strftime('%Y-%m-%d %H:%M:%S')
-        sql = query("""
-            SELECT e.`id`, e.`name`, se.`score`, COUNT(distinctrn e.`id`)
+        sql = """
+            SELECT e.`id`, e.`name`, se.`score`, COUNT(distinct e.`id`)
             FROM enterprise e
             LEFT JOIN risk_news_enterprise re ON e.`id`=re.`enterprise_id`
             LEFT JOIN risk_news rn ON re.`risknews_id`=rn.`id`
@@ -263,7 +263,7 @@ class Abstract(BaseView):
             AND rn.`pubtime` < '%s'
             AND i.`id` like '%s'
             GROUP BY e.`id` ORDER BY se.`score` %s
-            """ % (start, end, industry, 'DESC'))
+            """ % (start, end, industry, 'DESC')
         results = query(sql)
         iteml = []
         data = self.paging(results, 10, page)
