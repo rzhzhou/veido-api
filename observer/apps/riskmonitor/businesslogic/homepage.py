@@ -22,8 +22,8 @@ class HomeData(Abstract):
         self.user_id = user_id
 
     def get_time(self):
-        start = datetime.strptime(start, '%Y-%m-%d')
-        end = datetime.strptime(end, '%Y-%m-%d')
+        start = datetime.strftime('%Y-%m-%d')
+        end = datetime.strftime('%Y-%m-%d')
         data = {
             'time': start + '~' + end
         }
@@ -115,13 +115,13 @@ class HomeData(Abstract):
 
     def risk_data(self):
         end = self.end
+        start = self.start
 
-        days = (self.end - self.start).days
-        start = self.start.astimezone(pytz.utc)
-        start = time.strftime('%Y-%m-%d %X', start.timetuple())
-        start = datetime.strptime(start, '%Y-%m-%d %X')
+        days = (end - start).days
         date = [(start + timedelta(days=x)) for x in xrange(days)]
-        date_range = [(i, i + timedelta(days=1)) for i in date]
+        date_range = [(i.strftime('%Y-%m-%d %H:%M:%S')
+                        , (i + timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S'
+                                                            )) for i in date]
 
         start = end - timedelta(days=7)
         weeks = [u'星期一', u'星期二', u'星期三', u'星期四', u'星期五',
@@ -138,15 +138,14 @@ class HomeData(Abstract):
         return data
 
     def risk_level(self):
-        type = 'abstract'
-        end = timezone.now()
-        start = end - timedelta(days=7)
+        start = self.start
+        end = self.end
         weeks = [u'星期一', u'星期二', u'星期三', u'星期四', u'星期五',
                  u'星期六', u'星期日']
         data = {
             'rankData': {
                 'data': ['A', 'B', 'A', 'A', 'C', 'A', 'B'],
-                'labels': [weeks[(end + timedelta(days=(i + 1))).isoweekday() - 1]
+                'labels': [weeks[(start + timedelta(days=(i + 1))).isoweekday() - 1]
                            for i in range(7)]
             }
         }
@@ -161,7 +160,6 @@ class HomeData(Abstract):
         rankData = self.risk_level().items()
         risk_count = self.risk_sum().items()
         status = self.risk_status().items()
-        # time = self.get_time().items()
         datas = dict(industryRank + enterpriseRank + keywordsRank + risk_map +
                      riskData + rankData + risk_count + status)
         return datas

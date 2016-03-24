@@ -39,12 +39,12 @@ class IndustryTrack(Abstract):
         return bar
 
     def news_data(self):
+        start = self.start
+        end = self.end
         industry = '%%' if self.industry == None or self.industry == None else self.industry
         enterprise = '%%' if self.enterprise == None or self.enterprise == None else self.enterprise
         source = '%%' if self.source == None or self.source == None else self.source
         product = '%%' if self.product == None or self.product == None else self.product
-        start = datetime.strftime(self.start, '%Y-%m-%d %H:%M')
-        end = datetime.strftime(self.end, '%Y-%m-%d %H:%M')
 
         source_data = self.source_data(industry, enterprise,
                                        product, source,

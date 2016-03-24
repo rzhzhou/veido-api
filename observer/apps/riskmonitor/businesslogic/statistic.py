@@ -21,16 +21,15 @@ class Statistic(Abstract):
 
     def industry_chart(self):
         days = (self.end - self.start).days
-
-        start = self.start.astimezone(pytz.utc)
-        start = time.strftime('%Y-%m-%d %X', start.timetuple())
-        start = datetime.strptime(start, '%Y-%m-%d %X')
+        start = self.start
 
         def date_range(interval):
             scale = days / interval + days % interval
             list_range = [(i + 1) * interval for i in xrange(scale)]
             date = [(start + timedelta(days=x)) for x in list_range]
-            date_range = [(i, i + timedelta(days=interval)) for i in date]
+            date_range = [(i.strftime('%Y-%m-%d %H:%M:%S'),
+                            (i + timedelta(days=interval)).strftime(
+                                '%Y-%m-%d %H:%M:%S')) for i in date]
             return {'date_range': date_range, 'date': date}
 
         if days > 0 and days <= 7:
@@ -93,12 +92,12 @@ class Statistic(Abstract):
         return data
 
     def get_data(self):
+        start = self.start
+        end = self.end
         industry = '%%' if self.industry == 0 or self.industry == None else self.industry
         enterprise = '%%' if self.enterprise == 0 or self.enterprise == None else self.enterprise
         source = '%%' if self.source == 0 or self.source == None else self.source
         product = '%%' if self.product == 0 or self.product == None else self.product
-        start = datetime.strftime(self.start, '%Y-%m-%d %H:%M')
-        end = datetime.strftime(self.end, '%Y-%m-%d %H:%M')
         news_data = self.source_data(industry, enterprise, product,
                                      source, start, end, self.page)
         data = {

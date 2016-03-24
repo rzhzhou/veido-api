@@ -8,7 +8,7 @@ from observer.apps.base.tests import BaseTestCase
 class APITest(BaseTestCase):
 
     def test_home_page_view(self):
-        response = self.client.get('/api/industries')
+        response = self.client.get('/api/dashboards')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_industry_list_view(self):

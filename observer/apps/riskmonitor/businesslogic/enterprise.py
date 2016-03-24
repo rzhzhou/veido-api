@@ -13,7 +13,7 @@ class EnterpriseRank(Abstract):
 
     def ente_rank(self):
         result = self.enterprise_rank(
-            start=self.start, end=self.end,
+            start=start, end=end,
             industry=self.industry if self.industry else '%%', page=self.page)
         return result
 

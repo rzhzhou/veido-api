@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import pytz
 import jwt
+import time
 from datetime import date, datetime, timedelta
 
 from rest_framework.views import APIView
@@ -38,6 +39,9 @@ class HomePageView(APIView):
         start = tz.localize(datetime.strptime(start, '%Y-%m-%d'))
         end = tz.localize(datetime.strptime(end, '%Y-%m-%d'))
 
+        start = start.astimezone(pytz.utc)
+        end = end.astimezone(pytz.utc)
+
         data = HomeData(start, end, user_id).get_all()
         return Response(data)
 
@@ -54,6 +58,9 @@ class IndustryList(APIView, Abstract):
         tz = pytz.timezone(settings.TIME_ZONE)
         start = tz.localize(datetime.strptime(start, '%Y-%m-%d'))
         end = tz.localize(datetime.strptime(end, '%Y-%m-%d'))
+
+        start = start.astimezone(pytz.utc)
+        end = end.astimezone(pytz.utc)
 
         industries = self.risk_industry(start, end, user_id)
         data = {
@@ -77,6 +84,9 @@ class IndustryDetail(APIView):
         start = tz.localize(datetime.strptime(start, '%Y-%m-%d'))
         end = tz.localize(datetime.strptime(end, '%Y-%m-%d'))
 
+        start = start.astimezone(pytz.utc)
+        end = end.astimezone(pytz.utc)
+
         try:
             pk = UserIndustry.objects.get(id=pk).industry.id
         except ObjectDoesNotExist:
@@ -99,6 +109,9 @@ class NewsList(APIView):
         tz = pytz.timezone(settings.TIME_ZONE)
         start = tz.localize(datetime.strptime(start, '%Y-%m-%d'))
         end = tz.localize(datetime.strptime(end, '%Y-%m-%d'))
+
+        start = start.astimezone(pytz.utc)
+        end = end.astimezone(pytz.utc)
 
         try:
             pk = UserIndustry.objects.get(id=pk).industry.id
@@ -144,6 +157,9 @@ class EnterpriseList(APIView):
         start = request.GET.get('start', str(today - timedelta(days=7)))
         end = request.GET.get('end', str(today))
 
+        start = start.astimezone(pytz.utc)
+        end = end.astimezone(pytz.utc)
+
         tz = pytz.timezone(settings.TIME_ZONE)
         start = tz.localize(datetime.strptime(start, '%Y-%m-%d'))
         end = tz.localize(datetime.strptime(end, '%Y-%m-%d'))
@@ -167,6 +183,9 @@ class Analytics(APIView):
         tz = pytz.timezone(settings.TIME_ZONE)
         start = tz.localize(datetime.strptime(start, '%Y-%m-%d'))
         end = tz.localize(datetime.strptime(end, '%Y-%m-%d'))
+
+        start = start.astimezone(pytz.utc)
+        end = end.astimezone(pytz.utc)
 
         if dtype == 'table':
             data = Statistic(industry=pk, start=start,
@@ -192,6 +211,9 @@ class AnalyticsExport(View):
         start = tz.localize(datetime.strptime(
             jwt_payload['start'], '%Y-%m-%d'))
         end = tz.localize(datetime.strptime(jwt_payload['end'], '%Y-%m-%d'))
+
+        start = start.astimezone(pytz.utc)
+        end = end.astimezone(pytz.utc)
 
         data = Statistic(industry=jwt_payload[
                          'pk'], start=start, end=end, page=jwt_payload['page']).get_all()
@@ -245,7 +267,7 @@ class Filters(APIView):
             'products': {
                 'items': [{
                     'id': 1,
-                    'name': '产品',
+                    'nam'e: '产品',
                 }]
             },
             'publishers': {
