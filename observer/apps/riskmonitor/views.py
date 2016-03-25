@@ -169,6 +169,9 @@ class Analytics(APIView):
 
     def get(self, request):
         pk = request.GET.get('industry', 0)
+        enterprise = request.GET.get('enterprise', None)
+        product = request.GET.get('product', None)
+        source = request.GET.get('source', None)
         page = request.GET.get('page', 1)
         today = date.today()
         start = request.GET.get('start', str(today - timedelta(days=7)))
@@ -183,12 +186,14 @@ class Analytics(APIView):
         end = end.astimezone(pytz.utc)
 
         if dtype == 'table':
-            data = Statistic(industry=pk, start=start,
-                             end=end, page=page).get_data()
+            data = Statistic(industry=pk, enterprise=enterprise, start=start,
+                             source=source, product=product, end=end, page=page
+                                ).get_data()
             return Response(data)
         else:
-            data = Statistic(industry=pk, start=start,
-                             end=end, page=page).get_chart()
+            data = Statistic(industry=pk, enterprise=enterprise, start=start,
+                             source=source, product=product, end=end, page=page
+                                ).get_chart()
             return Response(data)
 
 
