@@ -253,7 +253,7 @@ class Abstract(BaseView):
             LEFT JOIN area a ON a.`id`=rna.`area_id`
             LEFT JOIN risknewspublisher rnp ON r.`publisher_id`=rnp.`id`
             WHERE i.`id` LIKE '%s' AND e.`id` LIKE '%s' AND rnp.`id` LIKE '%s'
-            AND pubtime >= '%s' AND pubtime < '%s' group by r.`id`
+            AND pubtime >= '%s' AND pubtime < '%s' group by r.`id` ORDER BY pubtime desc
             """ % (industry, enterprise, source, start, end))
 
         items = []
