@@ -142,6 +142,8 @@ class Abstract(BaseView):
 
     def news_nums(self, date_range, industry='%%', enterprise='%%',
                   source='%%', product='%%'):
+        industry = industry if industry == '%%' else UserIndustry.objects.get(
+            id=industry).industry.id
         query_str = map(
             lambda x: """sum(case when pubtime < '%s' and
                 pubtime >= '%s' then 1 else 0 end)"""
@@ -236,6 +238,8 @@ class Abstract(BaseView):
 
     def source_data(self, industry=None, enterprise=None, product=None, source=None,
                     start=None, end=None, page=1):
+        industry = industry if industry == '%%' else UserIndustry.objects.get(
+            id=industry).industry.id
         start = start.strftime('%Y-%m-%d %H:%M:%S')
         end = end.strftime('%Y-%m-%d %H:%M:%S')
         data = query("""
@@ -265,6 +269,8 @@ class Abstract(BaseView):
         return {'items': items, 'total': data['total_number']}
 
     def enterprise_rank(self, start=None, end=None, industry=None, page=1):
+        industry = industry if industry == '%%' else UserIndustry.objects.get(
+            id=industry).industry.id
         start = start.strftime('%Y-%m-%d %H:%M:%S')
         end = end.strftime('%Y-%m-%d %H:%M:%S')
         sql = """
