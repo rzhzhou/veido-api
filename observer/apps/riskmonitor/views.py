@@ -113,11 +113,6 @@ class NewsList(APIView):
         start = start.astimezone(pytz.utc)
         end = end.astimezone(pytz.utc)
 
-        try:
-            pk = UserIndustry.objects.get(id=pk).industry.id
-        except ObjectDoesNotExist:
-            pk = None
-
         data = IndustryTrack(industry=pk, start=start,
                              end=end, page=page).news_data()
         return Response(data)
