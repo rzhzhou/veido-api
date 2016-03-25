@@ -50,35 +50,35 @@ class Statistic(Abstract):
         elif days > 7 and days <= 20:
             result = all_result(2)
             result['date'] = [i.strftime(
-                "%m-%d") + '~' +(i + timedelta(days=2)).strftime("%m-%d") for i in result['date']]
+                "%m-%d") + '~' +(i + timedelta(days=1)).strftime("%m-%d") for i in result['date']]
         elif days > 20 and days <= 40:
             result = all_result(4)
             result['date'] = [i.strftime(
-                "%m-%d") + '~' +(i + timedelta(days=4)).strftime("%m-%d") for i in result['date']]
+                "%m-%d") + '~' +(i + timedelta(days=3)).strftime("%m-%d") for i in result['date']]
         elif days > 40 and days <= 60:
             result = all_result(7)
             result['date'] = [i.strftime(
-                "%m-%d") + '~' +(i + timedelta(days=7)).strftime("%m-%d") for i in result['date']]
+                "%m-%d") + '~' +(i + timedelta(days=6)).strftime("%m-%d") for i in result['date']]
         elif days > 60 and days <= 80:
             result = all_result(10)
             result['date'] = [i.strftime(
-                "%m-%d") + '~' +(i + timedelta(days=10)).strftime("%m-%d") for i in result['date']]
+                "%m-%d") + '~' +(i + timedelta(days=9)).strftime("%m-%d") for i in result['date']]
         elif days > 80 and days <= 100:
             result = all_result(15)
             result['date'] = [i.strftime(
-                "%m-%d") + '~' +(i + timedelta(days=15)).strftime("%m-%d") for i in result['date']]
+                "%m-%d") + '~' +(i + timedelta(days=14)).strftime("%m-%d") for i in result['date']]
         elif days > 100 and days <= 120:
             result = all_result(20)
             result['date'] = [i.strftime(
-                "%m-%d") + '~' +(i + timedelta(days=20)).strftime("%m-%d") for i in result['date']]
+                "%m-%d") + '~' +(i + timedelta(days=19)).strftime("%m-%d") for i in result['date']]
         elif days > 120 and days <= 365:
             result = all_result(30)
             result['date'] = [i.strftime(
-                "%m-%d") + '~' +(i + timedelta(days=30)).strftime("%m-%d") for i in result['date']]
+                "%m-%d") + '~' +(i + timedelta(days=29)).strftime("%m-%d") for i in result['date']]
         else:
             result = all_result(365)
             result['date'] = [i.strftime(
-                "%m-%d") + '~' +(i + timedelta(days=365)).strftime("%m-%d") for i in result['date']]
+                "%m-%d") + '~' +(i + timedelta(days=364)).strftime("%m-%d") for i in result['date']]
         return result
 
     def keywords_chart(self):
