@@ -270,8 +270,8 @@ class Filters(APIView):
             }
         }
         """
-        industries = Industry.objects.annotate(
-            text=F('name')).values('id', 'text')[:10]
+        industries = UserIndustry.objects.filter(
+            user__id=request.user.id).annotate(text=F('name')).values('industry', 'text')
         enterprises = Enterprise.objects.annotate(
             text=F('name')).values('id', 'text')[:10]
         products = Product.objects.annotate(
