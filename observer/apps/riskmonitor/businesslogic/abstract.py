@@ -9,6 +9,7 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
+from django.conf import settings
 
 from observer.apps.riskmonitor.models import(
     ScoreIndustry, ScoreEnterprise, Industry,
@@ -63,6 +64,22 @@ class Abstract(BaseView):
             return str(day_diff / 30) + u"个月前"
         return str(day_diff / 365) + u"年前"
 
+    def utc_to_local_time(self, time):
+        """
+        接受一个utc时间参数或者一个时间列表，返回一个本地
+        时区的时间或者时间列表(参数和返回值都为datetime类型)
+        """
+        tz = pytz.timezone(settings.TIME_ZONE)
+
+        datetime_to_local = lambda x: x.astimezone(
+            tz) if x.tzinfo else pytz.utc.localize(x).astimezone(tz)
+
+        if type(time) is list:
+            times = [datetime_to_local(i) for i in time]
+        else:
+            times = datetime_to_local(time)
+        return times
+
     def indu_make_level(self, score):
         level = 'A'
         if score <= 100 and score >= 90:
@@ -111,7 +128,7 @@ class Abstract(BaseView):
         user = User.objects.filter(id=user_id)
         user_industrys = UserIndustry.objects.filter(user=user)
         indunames = indunames if indunames else [[i.name, 'A', i.id
-                                                    ] for i in user_industrys]
+                                                  ] for i in user_industrys]
         return indunames
 
     def risk_enterprise(self, start, end, type):
@@ -156,7 +173,8 @@ class Abstract(BaseView):
 
         def count(start, end, id):
             try:
-                industry = Industry.objects.get(id=id) if id is not None else None
+                industry = Industry.objects.get(
+                    id=id) if id is not None else None
             except ObjectDoesNotExist:
                 raise Http404("Industry does not exist")
             count = RiskNews.objects.filter(
@@ -243,7 +261,7 @@ class Abstract(BaseView):
                 'id': d[0],
                 'title': d[1],
                 'source': d[3],
-                'time': d[2].strftime('%Y-%m-%d %H:%M')
+                'time': self.utc_to_local_time(d[2]).strftime('%Y-%m-%d %H:%M')
             }
             items.append(item)
         return {'items': items, 'total': data['total_number']}

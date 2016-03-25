@@ -58,7 +58,9 @@ class Statistic(Abstract):
 
         result = self.news_nums(date_range['date_range'], industry,
                                 enterprise, source, product)
-        date = map(lambda x: x.strftime("%m-%d"), date_range['date'])
+
+        date = self.utc_to_local_time(date_range['date'])
+        date = map(lambda x: x.strftime("%m-%d"), date)
         result['date'] = date
         return result
 
