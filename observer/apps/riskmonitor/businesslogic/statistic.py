@@ -23,45 +23,49 @@ class Statistic(Abstract):
         days = (self.end - self.start).days
         start = self.start
 
-        def date_range(interval):
+        def all_result(interval):
+            industry = '%%' if self.industry == 0 or self.industry == None else self.industry
+            enterprise = '%%' if self.enterprise == 0 or self.enterprise == None else self.enterprise
+            source = '%%' if self.source == 0 or self.source == None else self.source
+            product = '%%' if self.product == 0 or self.product == None else self.product
+
             scale = days / interval + days % interval
             list_range = [(i + 1) * interval for i in xrange(scale)]
-            date = [(start + timedelta(days=(x-1))) for x in list_range]
+            date = [(start + timedelta(days=(x - 1))) for x in list_range]
             date_range = [(i.strftime('%Y-%m-%d %H:%M:%S'),
-                            (i + timedelta(days=interval)).strftime(
-                                '%Y-%m-%d %H:%M:%S')) for i in date]
-            return {'date_range': date_range, 'date': date}
+                           (i + timedelta(days=interval)).strftime(
+                '%Y-%m-%d %H:%M:%S')) for i in date]
+
+            result = self.news_nums(date_range, industry,
+                                    enterprise, source, product)
+
+            date = self.utc_to_local_time(date)
+
+            format_date = [i.strftime(
+                "%m-%d") + '~' +(i + timedelta(days=interval)).strftime("%m-%d") for i in date]
+
+            result['date'] = format_date
+            return result
 
         if days > 0 and days <= 7:
-            date_range = date_range(1)
+            result = all_result(1)
         elif days > 7 and days <= 20:
-            date_range = date_range(2)
+            result = all_result(2)
         elif days > 20 and days <= 40:
-            date_range = date_range(4)
+            result = all_result(4)
         elif days > 40 and days <= 60:
-            date_range = date_range(7)
+            result = all_result(7)
         elif days > 60 and days <= 80:
-            date_range = date_range(10)
+            result = all_result(10)
         elif days > 80 and days <= 100:
-            date_range = date_range(15)
+            result = all_result(15)
         elif days > 100 and days <= 120:
-            date_range = date_range(20)
+            result = all_result(20)
         elif days > 120 and days <= 365:
-            date_range = date_range(30)
+            result = all_result(30)
         else:
-            date_range = date_range(365)
+            result = all_result(365)
 
-        industry = '%%' if self.industry == 0 or self.industry == None else self.industry
-        enterprise = '%%' if self.enterprise == 0 or self.enterprise == None else self.enterprise
-        source = '%%' if self.source == 0 or self.source == None else self.source
-        product = '%%' if self.product == 0 or self.product == None else self.product
-
-        result = self.news_nums(date_range['date_range'], industry,
-                                enterprise, source, product)
-
-        date = self.utc_to_local_time(date_range['date'])
-        date = map(lambda x: x.strftime("%m-%d"), date)
-        result['date'] = date
         return result
 
     def keywords_chart(self):
