@@ -101,6 +101,9 @@ class NewsList(APIView):
 
     def get(self, request):
         pk = request.GET.get('industry', None)
+        enterprise = request.GET.get('enterprise', None)
+        product = request.GET.get('product', None)
+        source = request.GET.get('source', None)
         page = request.GET.get('page', 1)
         today = date.today()
         start = request.GET.get('start', str(today - timedelta(days=7)))
@@ -113,8 +116,9 @@ class NewsList(APIView):
         start = start.astimezone(pytz.utc)
         end = end.astimezone(pytz.utc)
 
-        data = IndustryTrack(industry=pk, start=start,
-                             end=end, page=page).news_data()
+        data = IndustryTrack(industry=pk, enterprise=enterprise, start=start,
+                             source=source, product=product, end=end, page=page).news_data()
+
         return Response(data)
 
 
@@ -185,16 +189,9 @@ class Analytics(APIView):
         start = start.astimezone(pytz.utc)
         end = end.astimezone(pytz.utc)
 
-        if dtype == 'table':
-            data = Statistic(industry=pk, enterprise=enterprise, start=start,
-                             source=source, product=product, end=end, page=page
-                                ).get_data()
-            return Response(data)
-        else:
-            data = Statistic(industry=pk, enterprise=enterprise, start=start,
-                             source=source, product=product, end=end, page=page
-                                ).get_chart()
-            return Response(data)
+        data = Statistic(industry=pk, enterprise=enterprise, start=start,
+                         source=source, product=product, end=end, page=page).get_chart()
+        return Response(data)
 
 
 class AnalyticsExport(View):
