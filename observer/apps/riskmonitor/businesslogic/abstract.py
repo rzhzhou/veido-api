@@ -101,14 +101,13 @@ class Abstract(BaseView):
         return level
 
     def indugenerate(self, induscores, user_id):
-        user = User.objects.get(id=user_id)
         for induscore in induscores:
             indu = induscore.industry
-            userindus = indu.userindustry_set.filter(user=user)
+            userindus = indu.userindustry_set.filter(user__id=user_id)
             if userindus.exists() and indu.level == 1:
                 score = induscore.score
                 level = self.indu_make_level(score)
-                yield userindus[0].name, level, indu.id
+                yield userindus[0].name, level, userindus[0].id
 
     def entegenerate(self, entescores):
         for entescore in entescores:
@@ -125,8 +124,7 @@ class Abstract(BaseView):
         except AttributeError:
             indunames = []
 
-        user = User.objects.filter(id=user_id)
-        user_industrys = UserIndustry.objects.filter(user=user)
+        user_industrys = UserIndustry.objects.filter(user__id=user_id)
         indunames = indunames if indunames else [[i.name, 'A', i.id
                                                   ] for i in user_industrys]
         return indunames
