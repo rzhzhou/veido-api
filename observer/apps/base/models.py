@@ -5,6 +5,7 @@ import hashlib
 from django.conf import settings
 from tinymce.models import HTMLField
 from django.db import models
+from django.contrib.auth.models import User
 from django.utils.crypto import get_random_string
 
 
@@ -20,6 +21,19 @@ class Area(models.Model):
 
     def __unicode__(self):
         return self.name
+
+
+class UserArea(models.Model):
+    user = models.ForeignKey(User, verbose_name=u'用户')
+    area = models.ForeignKey(Area, verbose_name=u'地域')
+
+    class Meta:
+        app_label = 'base'
+        db_table = 'user_area'
+        verbose_name_plural = u'用户地域弱关联'
+
+    def __unicode__(self):
+        return self.user.username
 
 
 class WeixinPublisher(models.Model):
