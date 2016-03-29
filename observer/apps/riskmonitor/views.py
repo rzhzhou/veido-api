@@ -25,6 +25,7 @@ from businesslogic.enterprise import EnterpriseRank
 from businesslogic.homepage import *
 from businesslogic.industry import IndustryTrack
 from businesslogic.statistic import Statistic
+from utils.date.tz import get_timezone, get_loc_dt
 
 
 class HomePageView(APIView):
@@ -74,45 +75,62 @@ class IndustryList(APIView, Abstract):
 
 class IndustryDetail(APIView):
 
-    def get(self, request, pk):
-        page = request.GET.get('page', 1)
+    def __init__(self):
         today = date.today()
-        start = request.GET.get('start', str(today - timedelta(days=7)))
-        end = request.GET.get('end', str(today))
 
-        tz = pytz.timezone(settings.TIME_ZONE)
-        start = tz.localize(datetime.strptime(start, '%Y-%m-%d'))
-        end = tz.localize(datetime.strptime(end, '%Y-%m-%d'))
+        self.query_params = {
+            'industry': None,
+            'enterprise': None,
+            'product': None,
+            'source': None,
+            'page': 1,
+            'start': str(today - timedelta(days=7)),
+            'end': str(today)
+        }
 
-        start = start.astimezone(pytz.utc)
-        end = end.astimezone(pytz.utc)
+    def get(self, request, pk):
+        self.query_params['industry'] = pk
 
-        data = IndustryTrack(industry=pk, start=start,
-                             end=end, page=page).get_chart()
+        for param, value in request.GET.iteritems():
+            self.query_params[param] = value
+
+        tz = get_timezone(settings.TIME_ZONE)
+        self.query_params['start'] = get_loc_dt(
+            tz, self.query_params['start'], pytz.utc)
+        self.query_params['end'] = get_loc_dt(
+            tz, self.query_params['end'], pytz.utc)
+
+        data = IndustryTrack(params=self.query_params).get_chart()
+
         return Response(data)
 
 
 class NewsList(APIView):
 
-    def get(self, request):
-        pk = request.GET.get('industry', None)
-        enterprise = request.GET.get('enterprise', None)
-        product = request.GET.get('product', None)
-        source = request.GET.get('source', None)
-        page = request.GET.get('page', 1)
+    def __init__(self):
         today = date.today()
-        start = request.GET.get('start', str(today - timedelta(days=7)))
-        end = request.GET.get('end', str(today))
 
-        tz = pytz.timezone(settings.TIME_ZONE)
-        start = tz.localize(datetime.strptime(start, '%Y-%m-%d'))
-        end = tz.localize(datetime.strptime(end, '%Y-%m-%d'))
+        self.query_params = {
+            'industry': None,
+            'enterprise': None,
+            'product': None,
+            'source': None,
+            'page': 1,
+            'start': str(today - timedelta(days=7)),
+            'end': str(today)
+        }
 
-        start = start.astimezone(pytz.utc)
-        end = end.astimezone(pytz.utc)
+    def get(self, request):
+        for param, value in request.GET.iteritems():
+            self.query_params[param] = value
 
-        data = IndustryTrack(industry=pk, enterprise=enterprise, start=start,
-                             source=source, product=product, end=end, page=page).news_data()
+        tz = get_timezone(settings.TIME_ZONE)
+        self.query_params['start'] = get_loc_dt(
+            tz, self.query_params['start'], pytz.utc)
+        self.query_params['end'] = get_loc_dt(
+            tz, self.query_params['end'], pytz.utc)
+
+        data = IndustryTrack(params=self.query_params).news_data()
 
         return Response(data)
 

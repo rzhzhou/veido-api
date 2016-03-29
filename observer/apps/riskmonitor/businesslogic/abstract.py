@@ -142,8 +142,12 @@ class Abstract(BaseView):
 
     def news_nums(self, date_range, industry='%%', enterprise='%%',
                   source='%%', product='%%'):
-        industry = industry if industry == '%%' else UserIndustry.objects.get(
-            id=industry).industry.id
+        try:
+            if isinstance(industry, int):
+                industry = UserIndustry.objects.get(id=industry).industry.id
+        except UserIndustry.DoesNotExist:
+            industry = '%%'
+
         query_str = map(
             lambda x: """sum(case when pubtime < '%s' and
                 pubtime >= '%s' then 1 else 0 end)"""
