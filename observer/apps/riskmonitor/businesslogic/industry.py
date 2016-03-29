@@ -8,15 +8,9 @@ from observer.apps.riskmonitor.businesslogic.statistic import Statistic
 
 class IndustryTrack(Abstract):
 
-    def __init__(self, industry=None, enterprise=None, product=None, source=None,
-                 start=None, end=None, page=1):
-        self.start = start
-        self.end = end
-        self.industry = industry
-        self.enterprise = enterprise
-        self.product = product
-        self.source = source
-        self.page = page
+    def __init__(self, params={}):
+        for k, v in params.iteritems():
+            setattr(self, k, v)
 
     def trend_chart(self):
         news_trend = Statistic(industry=self.industry, start=self.start, enterprise=self.enterprise,
