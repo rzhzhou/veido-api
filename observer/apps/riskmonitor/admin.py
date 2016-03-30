@@ -5,7 +5,7 @@ from observer.apps.riskmonitor.models import(
     Brand, Enterprise, Product, Industry,Metrics,
     ProductMetrics, RiskData, ScoreIndustry,
     ScoreEnterprise, ScoreProduct, UserIndustry,
-    UserEnterprise, RiskNews)
+    UserEnterprise, RiskNews, UserArea)
 
 
 class IndustryAdmin(admin.ModelAdmin):
@@ -99,6 +99,13 @@ class RiskNewsAdmin(admin.ModelAdmin):
     search_fields = ('title', 'url', 'publisher', 'reprinted', 'industry', 'enterprise')
     list_filter = ('industry', 'enterprise', 'area')
 
+
+class UserAreaAdmin(admin.ModelAdmin):
+    list_display = ('user', 'area')
+    search_fields = ('user', 'area')
+    list_filter = ('user', 'area')
+
+
 admin.site.register(Industry, IndustryAdmin)
 admin.site.register(Enterprise, EnterpriseAdmin)
 admin.site.register(Product, ProductAdmin)
@@ -112,3 +119,4 @@ admin.site.register(ScoreProduct, ScoreProductAdmin)
 admin.site.register(Brand, BrandAdmin)
 admin.site.register(RiskData, RiskDataAdmin)
 admin.site.register(RiskNews, RiskNewsAdmin)
+admin.site.register(UserArea, UserAreaAdmin)

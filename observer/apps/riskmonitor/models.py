@@ -261,3 +261,16 @@ class ProductKeyword(models.Model):
 
     def __unicode__(self):
         return self.newkeyword
+
+
+class UserArea(models.Model):
+    user = models.ForeignKey(User, verbose_name=u'用户')
+    area = models.ForeignKey(Area, verbose_name=u'地域')
+
+    class Meta:
+        app_label = 'auth'
+        db_table = 'user_area'
+        verbose_name_plural = u'用户地域弱关联'
+
+    def __unicode__(self):
+        return self.user.username
