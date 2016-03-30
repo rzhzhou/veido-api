@@ -1,17 +1,15 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime, timedelta
-import pytz
 import time
+from datetime import datetime, timedelta
 
+import pytz
 from django.db.models import Count
 from django.utils import timezone
 
-from observer.apps.riskmonitor.models import(
-    Area, RiskNews, ScoreIndustry, ScoreEnterprise, ScoreProduct, )
-from observer.apps.corpus.models import(
-    Corpus, )
-from observer.apps.riskmonitor.businesslogic.abstract import(
-    Abstract, )
+from observer.apps.corpus.models import Corpus
+from observer.apps.riskmonitor.businesslogic.abstract import Abstract
+from observer.apps.riskmonitor.models import (Area, RiskNews, ScoreEnterprise,
+                                              ScoreIndustry, ScoreProduct)
 
 
 class HomeData(Abstract):

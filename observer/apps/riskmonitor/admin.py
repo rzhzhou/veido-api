@@ -1,11 +1,12 @@
 from django.contrib import admin
 from django_extensions.admin import ForeignKeyAutocompleteAdmin
 
-from observer.apps.riskmonitor.models import(
-    Brand, Enterprise, Product, Industry,Metrics,
-    ProductMetrics, RiskData, ScoreIndustry,
-    ScoreEnterprise, ScoreProduct, UserIndustry,
-    UserEnterprise, RiskNews)
+from observer.apps.riskmonitor.models import (Brand, Enterprise, Industry,
+                                              Metrics, Product, ProductMetrics,
+                                              RiskData, RiskNews,
+                                              ScoreEnterprise, ScoreIndustry,
+                                              ScoreProduct, UserEnterprise,
+                                              UserIndustry)
 
 
 class IndustryAdmin(admin.ModelAdmin):

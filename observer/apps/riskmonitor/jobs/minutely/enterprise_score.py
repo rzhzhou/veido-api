@@ -1,16 +1,19 @@
 import os
 import sys
+
 import django
+from django.db.models import Sum
+
+from observer.apps.riskmonitor.models import (Enterprise, RiskNews,
+                                              ScoreEnterprise)
+
 PROJECT_ROOT = os.path.abspath(os.path.dirname(os.getcwd()+'/../../../../../'))
 reload(sys)
 sys.path.append(PROJECT_ROOT)
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "observer.settings.development");
 django.setup()
 
-from django.db.models import Sum
 
-from observer.apps.riskmonitor.models import (
-   RiskNews, Enterprise, ScoreEnterprise)
 
 
 def reprinted_per_enterprise(enterprise):

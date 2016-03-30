@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-import pytz
 import time
 from datetime import datetime, timedelta
 
-from observer.apps.riskmonitor.businesslogic.abstract import(
-    Abstract, )
+import pytz
+
+from observer.apps.riskmonitor.businesslogic.abstract import Abstract
 
 
 class Statistic(Abstract):

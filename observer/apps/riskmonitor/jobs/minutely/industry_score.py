@@ -1,6 +1,14 @@
 import os
 import sys
+from datetime import datetime, timedelta
+
 import django
+import pytz
+from django.conf import settings
+from django.db.models import Sum
+
+from observer.apps.riskmonitor.models import Industry, RiskNews, ScoreIndustry
+
 PROJECT_ROOT = os.path.abspath(os.path.dirname(os.getcwd()+'/'))
 print PROJECT_ROOT
 reload(sys)
@@ -8,14 +16,8 @@ sys.path.append(PROJECT_ROOT)
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "observer.settings.development");
 django.setup()
 
-import pytz
-from datetime import datetime, timedelta
 
-from django.db.models import Sum
-from django.conf import settings
 
-from observer.apps.riskmonitor.models import (
-   RiskNews, Industry, ScoreIndustry)
 
 # first = Industry.objects.all()
 # print first[3].industrys.all()

@@ -1,23 +1,26 @@
 import os
 import sys
+from datetime import datetime, timedelta
+
 import django
+import pytz
+from dateutil.relativedelta import relativedelta
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
+from django_extensions.management.jobs import BaseJob
+
+from observer.apps.riskmonitor.models import (Industry, RiskNews,
+                                              ScoreIndustry, UserIndustry)
+
 reload(sys)
 sys.path.append('/home/code/gitlab/test/api/')
 os.environ.setdefault("DJANGO_SETTINGS_MODULE",
                       "observer.settings.development")
 django.setup()
 
-import pytz
-from datetime import datetime, timedelta
-from dateutil.relativedelta import relativedelta
 
-from django_extensions.management.jobs import BaseJob
-from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist
-from django.conf import settings
 
-from observer.apps.riskmonitor.models import (
-    RiskNews, ScoreIndustry, UserIndustry, Industry)
 
 
 class Job(BaseJob):
