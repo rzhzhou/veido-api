@@ -1,23 +1,22 @@
 # -*- coding: utf-8 -*-
-import pytz
 import time
 from datetime import datetime, timedelta
-from dateutil.relativedelta import relativedelta
 
-from django.db.models import Count
-from django.db.models import Q
+import pytz
+from dateutil.relativedelta import relativedelta
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Count, Q
 from django.http import Http404
-from django.conf import settings
 
-from observer.apps.riskmonitor.models import(
-    ScoreIndustry, ScoreEnterprise, Industry,
-    Enterprise, RiskNews, Product, RiskNewsPublisher,
-    UserIndustry)
-from observer.utils.connector.mysql import query
 from observer.apps.base.api_function import get_season
 from observer.apps.base.views import BaseView
+from observer.apps.riskmonitor.models import (Enterprise, Industry, Product,
+                                              RiskNews, RiskNewsPublisher,
+                                              ScoreEnterprise, ScoreIndustry,
+                                              UserIndustry)
+from observer.utils.connector.mysql import query
 
 
 class Abstract(BaseView):

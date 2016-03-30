@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from observer.apps.riskmonitor.businesslogic.abstract import(
-    Abstract, )
+from observer.apps.riskmonitor.businesslogic.abstract import Abstract
 from observer.apps.riskmonitor.businesslogic.statistic import Statistic
 
 

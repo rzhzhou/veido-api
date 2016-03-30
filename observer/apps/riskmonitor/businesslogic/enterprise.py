@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-from observer.apps.riskmonitor.businesslogic.abstract import(
-    Abstract, )
+from observer.apps.riskmonitor.businesslogic.abstract import Abstract
 
 
 class EnterpriseRank(Abstract):

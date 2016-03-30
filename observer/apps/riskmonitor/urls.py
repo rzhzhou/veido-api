@@ -1,10 +1,12 @@
 from django.conf.urls import url
 from rest_framework.urlpatterns import format_suffix_patterns
 
-from observer.apps.riskmonitor.views import (
-    HomePageView, IndustryList, IndustryDetail, NewsList, NewsDetail,
-    EnterpriseList, Analytics, Filters, GenerateAnalyticsExport, AnalyticsExport)
-
+from observer.apps.riskmonitor.views import (Analytics, AnalyticsExport,
+                                             EnterpriseList, Filters,
+                                             GenerateAnalyticsExport,
+                                             HomePageView, IndustryDetail,
+                                             IndustryList, NewsDetail,
+                                             NewsList)
 
 urlpatterns = [
     url(r'^dashboards$', HomePageView.as_view()),
