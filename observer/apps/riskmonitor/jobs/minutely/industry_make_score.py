@@ -30,12 +30,12 @@ class Job(BaseJob):
         self.reduce_score = 1
         self.user = 'changzhou'
         self.cycle = 90
-        self.time = datetime.today() - timedelta(days=1)
+        self.time = datetime.today() - timedelta(days=0)
 
     def reducescore(self, industry):
         tz = pytz.timezone(settings.TIME_ZONE)
-        end = tz.localize(self.time).replace(hour=0, minute=0, second=0, microsecond=0)
-        start = (end - timedelta(days=1))
+        end = tz.localize(self.time).replace(hour=23, minute=59, second=59, microsecond=0)
+        start = end.replace(hour=0, minute=0, second=0, microsecond=0)
         risknews = RiskNews.objects.filter(pubtime__range=(start, end), industry=industry)
         reducescore = risknews.count() * self.reduce_score
         return reducescore

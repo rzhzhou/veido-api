@@ -23,19 +23,6 @@ class Area(models.Model):
         return self.name
 
 
-class UserArea(models.Model):
-    user = models.ForeignKey(User, verbose_name=u'用户')
-    area = models.ForeignKey(Area, verbose_name=u'地域')
-
-    class Meta:
-        app_label = 'base'
-        db_table = 'user_area'
-        verbose_name_plural = u'用户地域弱关联'
-
-    def __unicode__(self):
-        return self.user.username
-
-
 class WeixinPublisher(models.Model):
     photo = models.URLField(verbose_name=u'用户头像')
     publisher = models.CharField(max_length=255, verbose_name=u'发布者')
