@@ -21,7 +21,5 @@ urlpatterns = [
 ]
 
 urlpatterns += [
-    url(r'^files/(?P<filename>\w+)$', AnalyticsExport.as_view()),
+    url(r'^files/(?P<filename>[a-z]+)$', AnalyticsExport.as_view()),
 ]
-
-urlpatterns = format_suffix_patterns(urlpatterns, allowed=['xls', 'xlsx'])

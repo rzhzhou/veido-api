@@ -183,34 +183,6 @@ class Analytics(BaseView):
         return Response(data)
 
 
-class AnalyticsExport(BaseView):
-
-    def __init__(self):
-        pass
-
-    def set_params(self, params):
-        super(AnalyticsExport, self).set_params(params)
-
-    def get(self, request, filename, format=None):
-        try:
-            jwt_payload = jwt.decode(
-                request.GET['payload'], settings.JWT_AUTH['JWT_SECRET_KEY'])
-        except jwt.ExpiredSignature:
-            msg = 'Signature has expired.'
-            return JsonResponse({'detail': msg}, status=status.HTTP_403_FORBIDDEN)
-
-        self.set_params(jwt_payload)
-
-        data = Statistic(params=jwt_payload).get_all()
-        brief = article()
-        output = brief.get_output(data)
-        output.seek(0)
-
-        response = xls_to_response(
-            fname=filename, format=format, source=output)
-        return response
-
-
 class GenerateAnalyticsExport(BaseView):
 
     def __init__(self):
@@ -225,7 +197,35 @@ class GenerateAnalyticsExport(BaseView):
 
         jwt_payload = jwt.encode(
             self.query_params, settings.JWT_AUTH['JWT_SECRET_KEY'])
-        return Response({'url': '/api/files/%s.xlsx?payload=%s' % ('data', jwt_payload)})
+        return Response({'url': '/api/files/%s?payload=%s' % ('data', jwt_payload)})
+
+
+class AnalyticsExport(BaseView):
+
+    def __init__(self):
+        super(AnalyticsExport, self).__init__()
+
+    def set_params(self, params):
+        super(AnalyticsExport, self).set_params(params)
+
+    def get(self, request, filename):
+        try:
+            jwt_payload = jwt.decode(
+                request.GET['payload'], settings.JWT_AUTH['JWT_SECRET_KEY'])
+        except jwt.ExpiredSignature:
+            msg = 'Signature has expired.'
+            return JsonResponse({'detail': msg}, status=status.HTTP_403_FORBIDDEN)
+
+        self.set_params(jwt_payload)
+
+        data = Statistic(params=self.query_params).get_all()
+        brief = article()
+        output = brief.get_output(data)
+        output.seek(0)
+
+        response = xls_to_response(
+            fname=filename, format='xlsx', source=output)
+        return response
 
 
 class Filters(BaseView):
