@@ -4,11 +4,9 @@ from observer.apps.riskmonitor.businesslogic.abstract import Abstract
 
 class EnterpriseRank(Abstract):
 
-    def __init__(self, start=None, end=None, industry=None, page=1):
-        self.start = start
-        self.end = end
-        self.industry = industry
-        self.page = page
+    def __init__(self, params={}):
+        for k, v in params.iteritems():
+            setattr(self, k, v)
 
     def ente_rank(self):
         start = self.start

@@ -14,10 +14,9 @@ from observer.apps.riskmonitor.models import (Area, RiskNews, ScoreEnterprise,
 
 class HomeData(Abstract):
 
-    def __init__(self, start, end, user_id):
-        self.start = start
-        self.end = end
-        self.user_id = user_id
+    def __init__(self, params={}):
+        for k, v in params.iteritems():
+            setattr(self, k, v)
 
     def get_time(self):
         start = datetime.strftime('%Y-%m-%d')

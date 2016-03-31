@@ -28,42 +28,66 @@ from observer.utils.excel.briefing import article
 from utils.date.tz import get_loc_dt, get_timezone
 
 
-class HomePageView(APIView):
+class BaseView(APIView):
+
+    def __init__(self):
+        self.tz = pytz.timezone(settings.TIME_ZONE)
+        self.today = date.today()
+        self.query_params = {
+            'industry': None,
+            'enterprise': None,
+            'product': None,
+            'source': None,
+            'page': 1,
+            'start': str(self.today - timedelta(days=7)),
+            'end': str(self.today)
+        }
+
+    def set_params(self, params, loc_dt=True):
+        """
+        set params
+        """
+
+        for param, value in params.iteritems():
+            self.query_params[param] = value
+
+        if loc_dt:
+            self.query_params['start'] = get_loc_dt(
+                self.tz, self.query_params['start'], pytz.utc)
+            self.query_params['end'] = get_loc_dt(
+                self.tz, self.query_params['end'], pytz.utc)
+
+
+class HomePageView(BaseView):
+
+    def __init__(self):
+        super(HomePageView, self).__init__()
+
+    def set_params(self, request):
+        super(HomePageView, self).set_params(request.GET)
+        self.query_params['user_id'] = request.user.id
 
     def get(self, request):
-        user_id = request.user.id
-        today = date.today()
-        start = request.GET.get('start', str(today - timedelta(days=7)))
-        end = request.GET.get('end', str(today))
+        self.set_params(request)
 
-        tz = pytz.timezone(settings.TIME_ZONE)
-        start = tz.localize(datetime.strptime(start, '%Y-%m-%d'))
-        end = tz.localize(datetime.strptime(end, '%Y-%m-%d'))
-
-        start = start.astimezone(pytz.utc)
-        end = end.astimezone(pytz.utc)
-
-        data = HomeData(start, end, user_id).get_all()
+        data = HomeData(params=self.query_params).get_all()
         return Response(data)
 
 
-class IndustryList(APIView, Abstract):
+class IndustryList(BaseView, Abstract):
+
+    def __init__(self):
+        super(IndustryList, self).__init__()
+
+    def set_params(self, request):
+        super(IndustryList, self).set_params(request.GET)
+        self.query_params['user_id'] = request.user.id
 
     def get(self, request):
-        user_id = request.user.id
-        today = date.today()
-        start = request.GET.get('start', str(today - timedelta(days=7)))
-        end = request.GET.get('end', str(today))
-        field = request.GET.get('field', 'name')
+        self.set_params(request)
 
-        tz = pytz.timezone(settings.TIME_ZONE)
-        start = tz.localize(datetime.strptime(start, '%Y-%m-%d'))
-        end = tz.localize(datetime.strptime(end, '%Y-%m-%d'))
-
-        start = start.astimezone(pytz.utc)
-        end = end.astimezone(pytz.utc)
-
-        industries = self.risk_industry(start, end, user_id)
+        industries = self.risk_industry(self.query_params['start'], self.query_params[
+                                        'end'], self.query_params['user_id'])
         data = {
             'industries': {
                 'items': [{field: industry[0], 'level':industry[1], 'id': industry[2]}
@@ -73,69 +97,38 @@ class IndustryList(APIView, Abstract):
         return Response(data)
 
 
-class IndustryDetail(APIView):
+class IndustryDetail(BaseView):
 
     def __init__(self):
-        today = date.today()
+        super(IndustryDetail, self).__init__()
 
-        self.query_params = {
-            'industry': None,
-            'enterprise': None,
-            'product': None,
-            'source': None,
-            'page': 1,
-            'start': str(today - timedelta(days=7)),
-            'end': str(today)
-        }
-
-    def get(self, request, pk):
+    def set_params(self, request, pk):
+        super(IndustryDetail, self).set_params(request.GET)
         self.query_params['industry'] = pk
 
-        for param, value in request.GET.iteritems():
-            self.query_params[param] = value
-
-        tz = get_timezone(settings.TIME_ZONE)
-        self.query_params['start'] = get_loc_dt(
-            tz, self.query_params['start'], pytz.utc)
-        self.query_params['end'] = get_loc_dt(
-            tz, self.query_params['end'], pytz.utc)
+    def get(self, request, pk):
+        self.set_params(request, pk)
 
         data = IndustryTrack(params=self.query_params).get_chart()
-
         return Response(data)
 
 
-class NewsList(APIView):
+class NewsList(BaseView):
 
     def __init__(self):
-        today = date.today()
+        super(NewsList, self).__init__()
 
-        self.query_params = {
-            'industry': None,
-            'enterprise': None,
-            'product': None,
-            'source': None,
-            'page': 1,
-            'start': str(today - timedelta(days=7)),
-            'end': str(today)
-        }
+    def set_params(self, request):
+        super(NewsList, self).set_params(request.GET)
 
     def get(self, request):
-        for param, value in request.GET.iteritems():
-            self.query_params[param] = value
-
-        tz = get_timezone(settings.TIME_ZONE)
-        self.query_params['start'] = get_loc_dt(
-            tz, self.query_params['start'], pytz.utc)
-        self.query_params['end'] = get_loc_dt(
-            tz, self.query_params['end'], pytz.utc)
+        self.set_params(request)
 
         data = IndustryTrack(params=self.query_params).news_data()
-
         return Response(data)
 
 
-class NewsDetail(APIView):
+class NewsDetail(BaseView):
 
     def get(self, request, pk):
         """
@@ -160,58 +153,43 @@ class NewsDetail(APIView):
         return Response(data)
 
 
-class EnterpriseList(APIView):
+class EnterpriseList(BaseView):
+
+    def __init__(self):
+        super(EnterpriseList, self).__init__()
+
+    def set_params(self, request):
+        super(EnterpriseList, self).set_params(request.GET)
 
     def get(self, request):
-        pk = request.GET.get('industry', 0)
-        page = request.GET.get('page', 1)
-        today = date.today()
-        start = request.GET.get('start', str(today - timedelta(days=7)))
-        end = request.GET.get('end', str(today))
+        self.set_params(request)
 
-        tz = pytz.timezone(settings.TIME_ZONE)
-        start = tz.localize(datetime.strptime(start, '%Y-%m-%d'))
-        end = tz.localize(datetime.strptime(end, '%Y-%m-%d'))
-
-        start = start.astimezone(pytz.utc)
-        end = end.astimezone(pytz.utc)
-
-        data = EnterpriseRank(industry=int(pk), start=start, end=end,
-                              page=int(page)).get_all()
-
+        data = EnterpriseRank(params=self.query_params).get_all()
         return Response(data)
 
 
-class Analytics(APIView):
+class Analytics(BaseView):
 
     def __init__(self):
-        today = date.today()
+        super(Analytics, self).__init__()
 
-        self.query_params = {
-            'industry': None,
-            'enterprise': None,
-            'product': None,
-            'source': None,
-            'page': 1,
-            'start': str(today - timedelta(days=7)),
-            'end': str(today)
-        }
+    def set_params(self, request):
+        super(Analytics, self).set_params(request.GET)
 
     def get(self, request):
-        for param, value in request.GET.iteritems():
-            self.query_params[param] = value
-
-        tz = get_timezone(settings.TIME_ZONE)
-        self.query_params['start'] = get_loc_dt(
-            tz, self.query_params['start'], pytz.utc)
-        self.query_params['end'] = get_loc_dt(
-            tz, self.query_params['end'], pytz.utc)
+        self.set_params(request)
 
         data = Statistic(params=self.query_params).get_chart()
         return Response(data)
 
 
-class AnalyticsExport(View):
+class AnalyticsExport(BaseView):
+
+    def __init__(self):
+        pass
+
+    def set_params(self, params):
+        super(AnalyticsExport, self).set_params(params)
 
     def get(self, request, filename, format=None):
         try:
@@ -221,9 +199,7 @@ class AnalyticsExport(View):
             msg = 'Signature has expired.'
             return JsonResponse({'detail': msg}, status=status.HTTP_403_FORBIDDEN)
 
-        tz = get_timezone(settings.TIME_ZONE)
-        jwt_payload['start'] = get_loc_dt(tz, jwt_payload['start'], pytz.utc)
-        jwt_payload['end'] = get_loc_dt(tz, jwt_payload['end'], pytz.utc)
+        self.set_params(jwt_payload)
 
         data = Statistic(params=jwt_payload).get_all()
         brief = article()
@@ -235,33 +211,24 @@ class AnalyticsExport(View):
         return response
 
 
-class GenerateAnalyticsExport(APIView):
+class GenerateAnalyticsExport(BaseView):
 
     def __init__(self):
-        today = date.today()
+        super(GenerateAnalyticsExport, self).__init__()
 
-        self.query_params = {
-            'industry': None,
-            'enterprise': None,
-            'product': None,
-            'source': None,
-            'page': 1,
-            'start': str(today - timedelta(days=7)),
-            'end': str(today)
-        }
+    def set_params(self, request, loc_dt=False):
+        super(GenerateAnalyticsExport, self).set_params(request.GET, loc_dt)
+        self.query_params['exp'] = datetime.utcnow() + timedelta(seconds=60)
 
     def get(self, request):
-        for param, value in request.GET.iteritems():
-            self.query_params[param] = value
-        self.query_params['exp'] = datetime.utcnow() + timedelta(seconds=60)
+        self.set_params(request)
 
         jwt_payload = jwt.encode(
             self.query_params, settings.JWT_AUTH['JWT_SECRET_KEY'])
-
         return Response({'url': '/api/files/%s.xlsx?payload=%s' % ('data', jwt_payload)})
 
 
-class Filters(APIView):
+class Filters(BaseView):
 
     def get(self, request):
         """
