@@ -6,7 +6,7 @@ from observer.apps.riskmonitor.models import (Brand, Enterprise, Industry,
                                               RiskData, RiskNews,
                                               ScoreEnterprise, ScoreIndustry,
                                               ScoreProduct, UserEnterprise,
-                                              UserIndustry)
+                                              UserIndustry, UserArea)
 
 
 class IndustryAdmin(admin.ModelAdmin):

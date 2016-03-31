@@ -134,7 +134,8 @@ class ScoreIndustry(models.Model):
     increment = models.IntegerField(default=0, verbose_name=u'增量')
     reducescore = models.IntegerField(default=0, verbose_name=u'所减的分数')
 
-    industry = models.ForeignKey(Industry, verbose_name=u'行业')
+    industry = models.ForeignKey(Industry, null=True, verbose_name=u'行业')
+    user = models.ForeignKey(User, null=True, verbose_name=u'用户')
 
     class Meta:
         app_label = 'riskmonitor'
@@ -268,7 +269,7 @@ class UserArea(models.Model):
     area = models.ForeignKey(Area, verbose_name=u'地域')
 
     class Meta:
-        app_label = 'auth'
+        app_label = 'riskmonitor'
         db_table = 'user_area'
         verbose_name_plural = u'用户地域弱关联'
 
