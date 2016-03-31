@@ -101,7 +101,8 @@ class RiskNewsAdmin(admin.ModelAdmin):
     list_filter = ('industry', 'enterprise', 'area')
 
 
-class UserAreaAdmin(admin.ModelAdmin):
+class UserAreaAdmin(ForeignKeyAutocompleteAdmin):
+    related_search_fields = {'area': ('name',)}
     list_display = ('user', 'area')
     search_fields = ('user', 'area')
     list_filter = ('user', 'area')

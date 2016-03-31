@@ -59,8 +59,8 @@ class Job(BaseJob):
                                         industry=i)
                 addscore = int(scoreindustry[0].reducescore) if scoreindustry else 0
 
-                ScoreIndustry(score=(int(upscore) - self.reducescore(i) +
-                    addscore), increment=increment, reducescore=self.reducescore(i),
+                ScoreIndustry(score=(int(upscore) - self.reducescore(i, area) +
+                    addscore), increment=increment, reducescore=self.reducescore(i, area),
                     industry=i,
                     pubtime=self.time,
                     user=user
