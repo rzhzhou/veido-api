@@ -184,26 +184,30 @@ class EnterpriseList(APIView):
 
 class Analytics(APIView):
 
-    def get(self, request):
-        pk = request.GET.get('industry', 0)
-        enterprise = request.GET.get('enterprise', None)
-        product = request.GET.get('product', None)
-        source = request.GET.get('source', None)
-        page = request.GET.get('page', 1)
+    def __init__(self):
         today = date.today()
-        start = request.GET.get('start', str(today - timedelta(days=7)))
-        end = request.GET.get('end', str(today))
-        dtype = request.GET.get('type', '')
 
-        tz = pytz.timezone(settings.TIME_ZONE)
-        start = tz.localize(datetime.strptime(start, '%Y-%m-%d'))
-        end = tz.localize(datetime.strptime(end, '%Y-%m-%d'))
+        self.query_params = {
+            'industry': None,
+            'enterprise': None,
+            'product': None,
+            'source': None,
+            'page': 1,
+            'start': str(today - timedelta(days=7)),
+            'end': str(today)
+        }
 
-        start = start.astimezone(pytz.utc)
-        end = end.astimezone(pytz.utc)
+    def get(self, request):
+        for param, value in request.GET.iteritems():
+            self.query_params[param] = value
 
-        data = Statistic(industry=pk, enterprise=enterprise, start=start,
-                         source=source, product=product, end=end, page=page).get_chart()
+        tz = get_timezone(settings.TIME_ZONE)
+        self.query_params['start'] = get_loc_dt(
+            tz, self.query_params['start'], pytz.utc)
+        self.query_params['end'] = get_loc_dt(
+            tz, self.query_params['end'], pytz.utc)
+
+        data = Statistic(params=self.query_params).get_chart()
         return Response(data)
 
 
@@ -217,16 +221,11 @@ class AnalyticsExport(View):
             msg = 'Signature has expired.'
             return JsonResponse({'detail': msg}, status=status.HTTP_403_FORBIDDEN)
 
-        tz = pytz.timezone(settings.TIME_ZONE)
-        start = tz.localize(datetime.strptime(
-            jwt_payload['start'], '%Y-%m-%d'))
-        end = tz.localize(datetime.strptime(jwt_payload['end'], '%Y-%m-%d'))
+        tz = get_timezone(settings.TIME_ZONE)
+        jwt_payload['start'] = get_loc_dt(tz, jwt_payload['start'], pytz.utc)
+        jwt_payload['end'] = get_loc_dt(tz, jwt_payload['end'], pytz.utc)
 
-        start = start.astimezone(pytz.utc)
-        end = end.astimezone(pytz.utc)
-
-        data = Statistic(industry=jwt_payload[
-                         'pk'], start=start, end=end, page=jwt_payload['page']).get_all()
+        data = Statistic(params=jwt_payload).get_all()
         brief = article()
         output = brief.get_output(data)
         output.seek(0)
@@ -238,20 +237,26 @@ class AnalyticsExport(View):
 
 class GenerateAnalyticsExport(APIView):
 
-    def get(self, request):
-        pk = request.GET.get('industry', 0)
-        page = request.GET.get('page', 1)
+    def __init__(self):
         today = date.today()
-        start = request.GET.get('start', str(today - timedelta(days=7)))
-        end = request.GET.get('end', str(today))
 
-        jwt_payload = jwt.encode({
-            'pk': pk,
-            'page': page,
-            'start': start,
-            'end': end,
-            'exp': datetime.utcnow() + timedelta(seconds=60)
-        }, settings.JWT_AUTH['JWT_SECRET_KEY'])
+        self.query_params = {
+            'industry': None,
+            'enterprise': None,
+            'product': None,
+            'source': None,
+            'page': 1,
+            'start': str(today - timedelta(days=7)),
+            'end': str(today)
+        }
+
+    def get(self, request):
+        for param, value in request.GET.iteritems():
+            self.query_params[param] = value
+        self.query_params['exp'] = datetime.utcnow() + timedelta(seconds=60)
+
+        jwt_payload = jwt.encode(
+            self.query_params, settings.JWT_AUTH['JWT_SECRET_KEY'])
 
         return Response({'url': '/api/files/%s.xlsx?payload=%s' % ('data', jwt_payload)})
 

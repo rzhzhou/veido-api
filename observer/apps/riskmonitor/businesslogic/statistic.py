@@ -9,15 +9,9 @@ from observer.apps.riskmonitor.businesslogic.abstract import Abstract
 
 class Statistic(Abstract):
 
-    def __init__(self, start=None, end=None, industry=None, enterprise=None,
-                 source=None, product=None, page=1):
-        self.start = start
-        self.end = end
-        self.industry = industry
-        self.enterprise = enterprise
-        self.source = source
-        self.product = product
-        self.page = page
+    def __init__(self, params={}):
+        for k, v in params.iteritems():
+            setattr(self, k, v)
 
     def industry_chart(self):
         days = (self.end - self.start).days
