@@ -51,7 +51,7 @@ class HomeData(Abstract):
         }
         return data
 
-    def industry(self):
+    def get_industry(self):
         industrys = self.risk_industry(self.start, self.end, self.user_id)
         indunames = industrys if len(industrys) < 3 else industrys[:3]
         data = {
@@ -62,7 +62,7 @@ class HomeData(Abstract):
         }
         return data
 
-    def enterprise(self):
+    def get_enterprise(self):
         type = 'abstract'
         enteobjects = self.risk_enterprise(self.start, self.end, type)
         data = {
@@ -149,8 +149,8 @@ class HomeData(Abstract):
         return data
 
     def get_all(self):
-        industryRank = self.industry().items()
-        enterpriseRank = self.enterprise().items()
+        industryRank = self.get_industry().items()
+        enterpriseRank = self.get_enterprise().items()
         keywordsRank = self.risk_keywords().items()
         risk_map = self.risk_map().items()
         riskData = self.risk_data().items()
