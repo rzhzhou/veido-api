@@ -3,6 +3,12 @@ import sys
 from datetime import datetime, timedelta
 
 import django
+reload(sys)
+sys.path.append('/home/code/gitlab/test/api/')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE",
+                      "observer.settings.development")
+django.setup()
+
 import pytz
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
@@ -13,11 +19,6 @@ from django_extensions.management.jobs import BaseJob
 from observer.apps.riskmonitor.models import (Industry, RiskNews,
                                               ScoreIndustry, UserIndustry)
 
-reload(sys)
-sys.path.append('/home/code/gitlab/test/api/')
-os.environ.setdefault("DJANGO_SETTINGS_MODULE",
-                      "observer.settings.development")
-django.setup()
 
 
 
@@ -40,8 +41,12 @@ class Job(BaseJob):
         reducescore = risknews.count() * self.reduce_score
         return reducescore
 
+    # def getusers(self):
+    #     users = User.objects.all()
+    #     UserIndustry.objects.get(user=user).industry
+
     def industry_make_score(self):
-        user = User.objects.get(username=self.user)
+        # user = User.objects.get(username=self.user)
         industrys = Industry.objects.all()
 
         upresult = ScoreIndustry.objects.last()
