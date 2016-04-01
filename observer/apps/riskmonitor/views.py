@@ -58,13 +58,13 @@ class BaseView(APIView):
                 self.tz, self.query_params['end'], pytz.utc)
 
 
-class HomePageView(BaseView):
+class Dashboard(BaseView):
 
     def __init__(self):
-        super(HomePageView, self).__init__()
+        super(Dashboard, self).__init__()
 
     def set_params(self, request):
-        super(HomePageView, self).set_params(request.GET)
+        super(Dashboard, self).set_params(request.GET)
         self.query_params['user_id'] = request.user.id
 
     def get(self, request):
