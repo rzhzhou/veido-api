@@ -3,12 +3,6 @@ import sys
 from datetime import datetime, timedelta
 
 import django
-reload(sys)
-sys.path.append('/home/code/gitlab/test/api/')
-os.environ.setdefault("DJANGO_SETTINGS_MODULE",
-                      "observer.settings.development")
-django.setup()
-
 import pytz
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
@@ -17,8 +11,16 @@ from django.core.exceptions import ObjectDoesNotExist
 from django_extensions.management.jobs import BaseJob
 
 from observer.apps.riskmonitor.models import (Industry, RiskNews,
-                                              ScoreIndustry, UserIndustry,
-                                              UserArea)
+                                              ScoreIndustry, UserArea,
+                                              UserIndustry)
+
+reload(sys)
+sys.path.append('/home/code/gitlab/test/api/')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE",
+                      "observer.settings.development")
+django.setup()
+
+
 
 
 class Job(BaseJob):
