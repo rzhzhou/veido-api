@@ -142,6 +142,8 @@ class Abstract(BaseView):
     def news_nums(self, date_range, industry='%%', enterprise='%%',
                   source='%%', product='%%'):
         try:
+            if industry != "%%":
+                industry = int(industry)
             if isinstance(industry, int):
                 industry = UserIndustry.objects.get(id=industry).industry.id
         except UserIndustry.DoesNotExist:

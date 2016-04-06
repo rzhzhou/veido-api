@@ -58,13 +58,13 @@ class BaseView(APIView):
                 self.tz, self.query_params['end'], pytz.utc)
 
 
-class HomePageView(BaseView):
+class Dashboard(BaseView):
 
     def __init__(self):
-        super(HomePageView, self).__init__()
+        super(Dashboard, self).__init__()
 
     def set_params(self, request):
-        super(HomePageView, self).set_params(request.GET)
+        super(Dashboard, self).set_params(request.GET)
         self.query_params['user_id'] = request.user.id
 
     def get(self, request):
@@ -78,6 +78,7 @@ class IndustryList(BaseView, Abstract):
 
     def __init__(self):
         super(IndustryList, self).__init__()
+        self.query_params['field'] = 'name'
 
     def set_params(self, request):
         super(IndustryList, self).set_params(request.GET)
@@ -86,12 +87,16 @@ class IndustryList(BaseView, Abstract):
     def get(self, request):
         self.set_params(request)
 
-        industries = self.risk_industry(self.query_params['start'], self.query_params[
-                                        'end'], self.query_params['user_id'])
+        industries = self.risk_industry(self.query_params['start'],
+                                        self.query_params['end'],
+                                        self.query_params['user_id'])
         data = {
             'industries': {
-                'items': [{field: industry[0], 'level':industry[1], 'id': industry[2]}
-                          for industry in industries]
+                'items': [{
+                    self.query_params['field']: industry[0],
+                    'level':industry[1],
+                    'id': industry[2]
+                } for industry in industries]
             }
         }
         return Response(data)
