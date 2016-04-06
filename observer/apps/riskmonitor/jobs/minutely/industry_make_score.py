@@ -28,10 +28,11 @@ class Job(BaseJob):
         self.reduce_score = 1
         self.user = 'changzhou'
         self.cycle = 90
-        self.time = datetime.today() - timedelta(days=4)
+        self.time = datetime.today() - timedelta(days=1)
 
     def reducescore(self, industry, area):
-        tz = pytz.timezone(settings.TIME_ZONE)
+        # tz = pytz.timezone(settings.TIME_ZONE)
+        tz = pytz.timezone('UTC')
         end = tz.localize(self.time).replace(hour=23, minute=59, second=59, microsecond=0)
         start = end.replace(hour=0, minute=0, second=0, microsecond=0)
         risknews = RiskNews.objects.filter(pubtime__range=(start, end), industry=industry,
@@ -39,26 +40,23 @@ class Job(BaseJob):
         reducescore = risknews.count() * self.reduce_score
         return reducescore
 
-    def industry_make_score(self, user):
+    def industry_make_score(self, user, area):
         try:
-            area = UserArea.objects.get(user=user).area
             user_industrys = UserIndustry.objects.filter(user=user)
             industrys = [i.industry for i in user_industrys]
         except ObjectDoesNotExist:
             industrys = []
 
-        upresult = ScoreIndustry.objects.last()
         for i in industrys:
+            upresult = ScoreIndustry.objects.filter(industry=i, user=user).order_by('-pubtime')
             if upresult:
-                increment = upresult.increment + 1
-                upscore = ScoreIndustry.objects.filter(increment=upresult.increment,
-                    industry=i)[0].score
+                increment = upresult[0].increment + 1
+                upscore = upresult[0].score
 
                 scoreindustry = ScoreIndustry.objects.filter(increment=(
                                         increment - self.cycle),
                                         industry=i)
                 addscore = int(scoreindustry[0].reducescore) if scoreindustry else 0
-
                 ScoreIndustry(score=(int(upscore) - self.reducescore(i, area) +
                     addscore), increment=increment, reducescore=self.reducescore(i, area),
                     industry=i,
@@ -74,9 +72,9 @@ class Job(BaseJob):
 
 
     def execute(self):
-        users = User.objects.all()
+        users = UserArea.objects.all()
         for u in users:
-            self.industry_make_score(u)
+            self.industry_make_score(u.user, u.area)
 
 
 Job().execute()
