@@ -34,7 +34,6 @@ class Job(BaseJob):
         self.time = datetime.today() - timedelta(days=1)
 
     def reducescore(self, industry, areas):
-        # tz = pytz.timezone(settings.TIME_ZONE)
         tz = pytz.timezone('UTC')
         end = tz.localize(self.time).replace(hour=23, minute=59, second=59, microsecond=0)
         start = end.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -44,11 +43,8 @@ class Job(BaseJob):
         return reducescore
 
     def industry_make_score(self, user, areas):
-        try:
-            user_industrys = UserIndustry.objects.filter(user=user)
-            industrys = [i.industry for i in user_industrys]
-        except ObjectDoesNotExist:
-            industrys = []
+        user_industrys = UserIndustry.objects.filter(user=user)
+        industrys = [i.industry for i in user_industrys]
 
         for i in industrys:
             upresult = ScoreIndustry.objects.filter(industry=i, user=user).order_by('-pubtime')
@@ -56,22 +52,20 @@ class Job(BaseJob):
                 increment = upresult[0].increment + 1
                 upscore = upresult[0].score
 
-                scoreindustry = ScoreIndustry.objects.filter(increment=(
-                                        increment - self.cycle),
-                                        industry=i)
-                addscore = int(scoreindustry[0].reducescore) if scoreindustry else 0
-                ScoreIndustry(score=(int(upscore) - self.reducescore(i, areas) +
-                    addscore), increment=increment, reducescore=self.reducescore(i, areas),
-                    industry=i,
-                    pubtime=self.time,
-                    user=user
-                    ).save()
             else:
-                ScoreIndustry(score=100,
-                                industry=i,
-                                pubtime=self.time,
-                                user=user
-                                ).save()
+                increment = 0
+                upscore = self.base_score
+
+            scoreindustry = ScoreIndustry.objects.filter(increment=(
+                                    increment - self.cycle),
+                                    industry=i)
+            addscore = int(scoreindustry[0].reducescore) if scoreindustry else 0
+            ScoreIndustry(score=(int(upscore) - self.reducescore(i, areas) +
+                addscore), increment=increment, reducescore=self.reducescore(i, areas),
+                industry=i,
+                pubtime=self.time,
+                user=user
+                ).save()
 
     def get_areas(self, area):
         """
