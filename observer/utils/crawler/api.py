@@ -19,7 +19,7 @@ class CrawlerTask(object):
             'baidu': ('"%s" +%s -(%s)', 21600, 'zjld.baidu.newstitle',),
             # 'weibo': ('%s %s', 21600, 'zjld.weibo.newstitle',),
             # 'sogou': ('+%s+%s', 21600, 'zjld.sogou.keywords',),
-            'sogou': ('"%s" +%s -(%s)', 21600, 'zjld.sogou.newstitle',)
+            # 'sogou': ('"%s" +%s -(%s)', 21600, 'zjld.sogou.newstitle',)
         }
 
     def build(self):

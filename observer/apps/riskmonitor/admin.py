@@ -24,39 +24,40 @@ class EnterpriseAdmin(ForeignKeyAutocompleteAdmin):
     list_filter = ('name', 'locate_x', 'locate_y', 'scale', 'ccc', 'area')
 
 
-class ProductAdmin(admin.ModelAdmin):
-    fields = ('name', 'enterprise', 'industry')
-    list_display = ('name', 'enterprise', 'industry')
-    search_fields = ('name', 'enterprise', 'industry')
-    list_filter = ('name', 'enterprise', 'industry')
+# class ProductAdmin(admin.ModelAdmin):
+#     fields = ('name', 'enterprise', 'industry')
+#     list_display = ('name', 'enterprise', 'industry')
+#     search_fields = ('name', 'enterprise', 'industry')
+#     list_filter = ('name', 'enterprise', 'industry')
 
 
-class MetricsAdmin(admin.ModelAdmin):
-    fields = ('name', 'level', 'parent')
-    list_display = ('name', 'level', 'parent')
-    search_fields = ('name', 'level', 'parent')
-    list_filter = ('name', 'level', 'parent')
+# class MetricsAdmin(admin.ModelAdmin):
+#     fields = ('name', 'level', 'parent')
+#     list_display = ('name', 'level', 'parent')
+#     search_fields = ('name', 'level', 'parent')
+#     list_filter = ('name', 'level', 'parent')
 
 
-class ProductMetricsAdmin(admin.ModelAdmin):
-    fields = ('weight', 'metrics', 'product')
-    list_display = ('weight', 'metrics', 'product')
-    search_fields = ('weight', 'metrics', 'product')
-    list_filter = ('weight', 'metrics', 'product')
+# class ProductMetricsAdmin(admin.ModelAdmin):
+#     fields = ('weight', 'metrics', 'product')
+#     list_display = ('weight', 'metrics', 'product')
+#     search_fields = ('weight', 'metrics', 'product')
+#     list_filter = ('weight', 'metrics', 'product')
 
 
-class UserIndustryAdmin(admin.ModelAdmin):
+class UserIndustryAdmin(ForeignKeyAutocompleteAdmin):
+    related_search_fields = {'industry': ('name',)}
     fields = ('name', 'user', 'industry')
     list_display = ('name', 'user', 'industry')
     search_fields = ('name', 'user', 'industry')
-    list_filter = ('name', 'user', 'industry')
+    list_filter = ('user', )
 
 
-class UserEnterpriseAdmin(admin.ModelAdmin):
-    fields = ('user', 'enterprise')
-    list_display = ('user', 'enterprise')
-    search_fields = ('user', 'enterprise')
-    list_filter = ('user', 'enterprise')
+# class UserEnterpriseAdmin(admin.ModelAdmin):
+#     fields = ('user', 'enterprise')
+#     list_display = ('user', 'enterprise')
+#     search_fields = ('user', 'enterprise')
+#     list_filter = ('user', 'enterprise')
 
 
 class ScoreIndustryAdmin(admin.ModelAdmin):
@@ -73,18 +74,18 @@ class ScoreEnterpriseAdmin(admin.ModelAdmin):
     list_filter = ('score', 'pubtime', 'enterprise')
 
 
-class ScoreProductAdmin(admin.ModelAdmin):
-    fields = ('score', 'pubtime', 'product')
-    list_display = ('score', 'pubtime', 'product')
-    search_fields = ('score', 'pubtime', 'product')
-    list_filter = ('score', 'pubtime', 'product')
+# class ScoreProductAdmin(admin.ModelAdmin):
+#     fields = ('score', 'pubtime', 'product')
+#     list_display = ('score', 'pubtime', 'product')
+#     search_fields = ('score', 'pubtime', 'product')
+#     list_filter = ('score', 'pubtime', 'product')
 
 
-class BrandAdmin(admin.ModelAdmin):
-    fields = ('zh_name', 'en_name', 'logo')
-    list_display = ('zh_name', 'en_name', 'logo')
-    search_fields = ('zh_name', 'en_name', 'logo')
-    list_filter = ('zh_name', 'en_name', 'logo')
+# class BrandAdmin(admin.ModelAdmin):
+#     fields = ('zh_name', 'en_name', 'logo')
+#     list_display = ('zh_name', 'en_name', 'logo')
+#     search_fields = ('zh_name', 'en_name', 'logo')
+#     list_filter = ('zh_name', 'en_name', 'logo')
 
 
 class RiskDataAdmin(ForeignKeyAutocompleteAdmin):
@@ -96,9 +97,9 @@ class RiskDataAdmin(ForeignKeyAutocompleteAdmin):
 
 class RiskNewsAdmin(admin.ModelAdmin):
     # related_search_fields = {'area': ('name',)}
-    list_display = ('title', 'url', 'publisher', 'reprinted')
-    search_fields = ('title', 'url', 'publisher', 'reprinted', 'industry', 'enterprise')
-    list_filter = ('industry', 'enterprise', 'area')
+    list_display = ('title', 'url', 'publisher', 'reprinted', 'pubtime')
+    search_fields = ('title', 'url', 'reprinted', 'publisher__publisher', 'industry__name')
+    list_filter = ('pubtime', 'industry', )
 
 
 class UserAreaAdmin(ForeignKeyAutocompleteAdmin):
@@ -110,15 +111,15 @@ class UserAreaAdmin(ForeignKeyAutocompleteAdmin):
 
 admin.site.register(Industry, IndustryAdmin)
 admin.site.register(Enterprise, EnterpriseAdmin)
-admin.site.register(Product, ProductAdmin)
-admin.site.register(Metrics, MetricsAdmin)
-admin.site.register(ProductMetrics, ProductMetricsAdmin)
+# admin.site.register(Product, ProductAdmin)
+# admin.site.register(Metrics, MetricsAdmin)
+# admin.site.register(ProductMetrics, ProductMetricsAdmin)
 admin.site.register(UserIndustry, UserIndustryAdmin)
-admin.site.register(UserEnterprise, UserEnterpriseAdmin)
+# admin.site.register(UserEnterprise, UserEnterpriseAdmin)
 admin.site.register(ScoreIndustry, ScoreIndustryAdmin)
 admin.site.register(ScoreEnterprise, ScoreEnterpriseAdmin)
-admin.site.register(ScoreProduct, ScoreProductAdmin)
-admin.site.register(Brand, BrandAdmin)
-admin.site.register(RiskData, RiskDataAdmin)
+# admin.site.register(ScoreProduct, ScoreProductAdmin)
+# admin.site.register(Brand, BrandAdmin)
+# admin.site.register(RiskData, RiskDataAdmin)
 admin.site.register(RiskNews, RiskNewsAdmin)
 admin.site.register(UserArea, UserAreaAdmin)
