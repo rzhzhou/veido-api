@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.contrib import admin
 from django_extensions.admin import ForeignKeyAutocompleteAdmin
 
@@ -12,16 +13,16 @@ from observer.apps.riskmonitor.models import (Brand, Enterprise, Industry,
 class IndustryAdmin(admin.ModelAdmin):
     fields = ('name', 'level', 'parent')
     list_display = ('name', 'level', 'parent')
-    search_fields = ('name', 'level', 'parent')
-    list_filter = ('name', 'level', 'parent')
+    search_fields = ('name', 'level', 'parent__name')
+    list_filter = ('level', )
 
 
 class EnterpriseAdmin(ForeignKeyAutocompleteAdmin):
     related_search_fields = {'area': ('name',)}
     fields = ('name', 'locate_x', 'locate_y', 'scale', 'ccc', 'area')
     list_display = ('name', 'locate_x', 'locate_y', 'scale', 'ccc', 'area')
-    search_fields = ('name', 'locate_x', 'locate_y', 'scale', 'ccc', 'area')
-    list_filter = ('name', 'locate_x', 'locate_y', 'scale', 'ccc', 'area')
+    search_fields = ('name', 'locate_x', 'locate_y', 'scale', 'ccc', 'area__name')
+    list_filter = ('name', )
 
 
 # class ProductAdmin(admin.ModelAdmin):
@@ -44,12 +45,11 @@ class EnterpriseAdmin(ForeignKeyAutocompleteAdmin):
 #     search_fields = ('weight', 'metrics', 'product')
 #     list_filter = ('weight', 'metrics', 'product')
 
-
 class UserIndustryAdmin(ForeignKeyAutocompleteAdmin):
     related_search_fields = {'industry': ('name',)}
     fields = ('name', 'user', 'industry')
     list_display = ('name', 'user', 'industry')
-    search_fields = ('name', 'user', 'industry')
+    search_fields = ('name', 'user__username', 'industry__name')
     list_filter = ('user', )
 
 
@@ -61,17 +61,26 @@ class UserIndustryAdmin(ForeignKeyAutocompleteAdmin):
 
 
 class ScoreIndustryAdmin(admin.ModelAdmin):
-    fields = ('score', 'pubtime', 'industry')
-    list_display = ('score', 'pubtime', 'industry')
-    search_fields = ('score', 'pubtime', 'industry')
-    list_filter = ('score', 'pubtime', 'industry')
+    def show_putime(self, obj):
+        return obj.pubtime.strftime("%Y-%m-%d %H:%M")
+
+    show_putime.short_description = u'发布时间'
+
+    fields = ('score', 'pubtime', 'industry', 'user')
+    list_display = ('score', 'industry', 'user', 'show_putime')
+    search_fields = ('score', 'industry__name', 'user__username')
+    list_filter = ('pubtime', 'user')
 
 
 class ScoreEnterpriseAdmin(admin.ModelAdmin):
-    fields = ('score', 'pubtime', 'enterprise')
-    list_display = ('score', 'pubtime', 'enterprise')
-    search_fields = ('score', 'pubtime', 'enterprise')
-    list_filter = ('score', 'pubtime', 'enterprise')
+    def show_putime(self, obj):
+        return obj.pubtime.strftime("%Y-%m-%d %H:%M")
+
+    show_putime.short_description = u'发布时间'
+    fields = ('score', 'enterprise', 'pubtime',)
+    list_display = ('score', 'enterprise', 'user', 'show_putime')
+    search_fields = ('score', 'enterprise__name', 'user__username')
+    list_filter = ('pubtime', 'user' )
 
 
 # class ScoreProductAdmin(admin.ModelAdmin):
@@ -98,15 +107,16 @@ class RiskDataAdmin(ForeignKeyAutocompleteAdmin):
 class RiskNewsAdmin(admin.ModelAdmin):
     # related_search_fields = {'area': ('name',)}
     list_display = ('title', 'url', 'publisher', 'reprinted', 'pubtime')
-    search_fields = ('title', 'url', 'reprinted', 'publisher__publisher', 'industry__name')
-    list_filter = ('pubtime', 'industry', )
+    search_fields = ('title', 'url', 'reprinted', 'publisher__publisher',
+        'industry__name', 'enterprise__name')
+    list_filter = ('pubtime', )
 
 
 class UserAreaAdmin(ForeignKeyAutocompleteAdmin):
     related_search_fields = {'area': ('name',)}
     list_display = ('user', 'area')
-    search_fields = ('user', 'area')
-    list_filter = ('user', 'area')
+    search_fields = ('user__username', 'area__name')
+    # list_filter = ('user', 'area')
 
 
 admin.site.register(Industry, IndustryAdmin)
