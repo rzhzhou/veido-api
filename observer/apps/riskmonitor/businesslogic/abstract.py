@@ -320,8 +320,21 @@ class Abstract(BaseView):
             ]
         }
         """
-        queryset = RiskNews.objects.all().values('publisher').annotate(
-            num_publishers=Count('publisher')).order_by('-num_publishers')[:5]
+        cond = {
+            'pubtime__gte': self.start,
+            'pubtime__lt': self.end,
+            'industry__id': UserIndustry.objects.get(
+                id=self.industry).industry.id if self.industry else None,
+            'enterprise__id': self.enterprise,
+            'publisher__id': self.source
+        }
+        args = {}
+        for k, v in cond.iteritems():
+            if v:
+                args[k] = v
+
+        queryset = RiskNews.objects.filter(**args).values(
+            'publisher').annotate(num_publishers=Count('publisher')).order_by('-num_publishers')[:20]
 
         data = [{'value': q['num_publishers'], 'name': RiskNewsPublisher.objects.get(
             id=q['publisher']).publisher} for q in queryset]
