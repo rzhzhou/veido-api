@@ -142,11 +142,17 @@ class Abstract(BaseView):
     def news_nums(self, date_range):
         args = {}
         aggregate_args = {}
+
+        try:
+            self.industry = UserIndustry.objects.get(
+                id=self.industry).industry.id
+        except UserIndustry.DoesNotExist:
+            self.industry = None
+
         cond = {
             'pubtime__gte': self.start,
             'pubtime__lt': self.end,
-            'industry__id': UserIndustry.objects.get(
-                id=self.industry).industry.id if self.industry else None,
+            'industry__id': self.industry,
             'enterprise__id': self.enterprise,
             'publisher__id': self.source
         }

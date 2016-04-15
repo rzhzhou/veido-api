@@ -116,18 +116,22 @@ class HomeData(Abstract):
 
         days = (end - start).days
         date = [(start + timedelta(days=x)) for x in xrange(days)]
-        date_range = [(i.strftime('%Y-%m-%d %H:%M:%S')
-                        , (i + timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S'
-                                                            )) for i in date]
+        date_range = [(i, (i + timedelta(days=1))) for i in date]
 
         start = end - timedelta(days=7)
         weeks = [u'星期一', u'星期二', u'星期三', u'星期四', u'星期五',
                  u'星期六', u'星期日']
         nums = self.news_nums(date_range)
 
+        data = {}
+        for k, v in nums.iteritems():
+            data[self.utc_to_local_time(datetime.strptime(k, '%Y-%m-%d %H:%M:%S'))] = v
+
+        nums = zip(*sorted(data.items(), key=lambda data: data[0]))
+
         data = {
             'riskData': {
-                'data': nums['data'],
+                'data': nums[1],
                 'labels': [weeks[(self.start + timedelta(days=(i + 1))
                                   ).isoweekday() - 1] for i in range(7)]
             }
