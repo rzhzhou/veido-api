@@ -169,7 +169,12 @@ class Abstract(BaseView):
 
         queryset = RiskNews.objects.filter(**args).aggregate(**aggregate_args)
 
-        return queryset
+        """
+        for k, v in queryset.iteritems():
+            if v is None:
+                queryset[k] = 0
+        """
+        return dict(map(lambda x: (x[0], x[1] if x[1] is not None else 0), queryset.iteritems()))
 
     def compare(self, start, end, id):
 
