@@ -13,14 +13,13 @@ from rest_framework import exceptions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from businesslogic.detail import *
-from businesslogic.enterprise import EnterpriseRank
-from businesslogic.homepage import *
-from businesslogic.industry import IndustryTrack
+from observer.apps.riskmonitor.businesslogic.abstract import Abstract
+from observer.apps.riskmonitor.businesslogic.enterprise import EnterpriseRank
+from observer.apps.riskmonitor.businesslogic.homepage import HomeData
+from observer.apps.riskmonitor.businesslogic.industry import IndustryTrack
 from businesslogic.statistic import Statistic
 from observer.apps.base.initialize import xls_to_response
 from observer.apps.base.views import BaseTemplateView
-from observer.apps.riskmonitor.businesslogic.abstract import Abstract
 from observer.apps.riskmonitor.models import (Enterprise, Industry, Product,
                                               RiskNews, RiskNewsPublisher,
                                               UserIndustry)
@@ -75,7 +74,7 @@ class Dashboard(BaseView):
         return Response(data)
 
 
-class IndustryList(BaseView, Abstract):
+class IndustryList(BaseView):
 
     def __init__(self):
         super(IndustryList, self).__init__()
@@ -88,9 +87,9 @@ class IndustryList(BaseView, Abstract):
     def get(self, request):
         self.set_params(request)
 
-        industries = self.risk_industry(self.query_params['start'],
-                                        self.query_params['end'],
-                                        self.query_params['user_id'])
+        industries = Abstract().risk_industry(self.query_params['start'],
+                                              self.query_params['end'],
+                                              self.query_params['user_id'])
         data = {
             'industries': {
                 'items': [{
