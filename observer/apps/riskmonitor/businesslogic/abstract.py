@@ -7,7 +7,7 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Count, Q
+from django.db.models import Case, Count, IntegerField, Q, Sum, When
 from django.http import Http404
 
 from observer.apps.base.api_function import get_season
@@ -139,40 +139,31 @@ class Abstract(BaseView):
             enteobjects = []
         return enteobjects
 
-    def news_nums(self, date_range, industry='%%', enterprise='%%',
-                  source='%%', product='%%'):
-        try:
-            if industry != "%%":
-                industry = int(industry)
-            if isinstance(industry, int):
-                industry = UserIndustry.objects.get(id=industry).industry.id
-        except UserIndustry.DoesNotExist:
-            industry = '%%'
+    def news_nums(self, date_range):
+        args = {}
+        aggregate_args = {}
+        cond = {
+            'pubtime__gte': self.start,
+            'pubtime__lt': self.end,
+            'industry__id': UserIndustry.objects.get(
+                id=self.industry).industry.id if self.industry else None,
+            'enterprise__id': self.enterprise,
+            'publisher__id': self.source
+        }
 
-        query_str = map(
-            lambda x: """sum(case when pubtime < '%s' and
-                pubtime >= '%s' then 1 else 0 end)"""
-            % (x[1], x[0]),
-            date_range
-        )
+        for k, v in cond.iteritems():
+            if v:
+                args[k] = v
 
-        sum_news = lambda x: query("""
-            SELECT %s FROM (
-            SELECT count(distinct r.`id`), r.`pubtime` FROM %s r
-            LEFT JOIN risk_news_industry ri ON r.`id`=ri.`risknews_id`
-            LEFT JOIN industry i ON i.`id`=ri.`industry_id`
-            LEFT JOIN risk_news_enterprise re ON re.`enterprise_id`=r.`id`
-            LEFT JOIN enterprise e ON re.`enterprise_id`=e.`id`
-            LEFT JOIN risk_news_area rna ON rna.`risknews_id`=r.`id`
-            LEFT JOIN area a ON a.`id`=rna.`area_id`
-            LEFT JOIN risknewspublisher rnp ON r.`publisher_id`=rnp.`id`
-            WHERE i.`id` like '%s' AND e.`id` like '%s' AND rnp.`id` like '%s'
-            GROUP BY r.id) b
-            """ % (','.join(query_str), x, industry, enterprise, source))
-        risk_news = sum_news('risk_news')[0]
-        news_data = [int(0 if i is None else i)
-                     for i in risk_news]
-        return {'data': news_data}
+        for start, end in date_range:
+            aggregate_args[start.strftime('%Y-%m-%d %H:%M:%S')] = Sum(
+                Case(When(pubtime__gte=start, pubtime__lt=end, then=1),
+                     output_field=IntegerField(), default=0)
+            )
+
+        queryset = RiskNews.objects.filter(**args).aggregate(**aggregate_args)
+
+        return queryset
 
     def compare(self, start, end, id):
 
