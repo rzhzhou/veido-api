@@ -17,6 +17,7 @@ from observer.apps.riskmonitor.models import (Enterprise, Industry, Product,
                                               ScoreEnterprise, ScoreIndustry,
                                               UserIndustry)
 from observer.utils.connector.mysql import query
+from observer.utils.date.tz import utc_to_local_time
 
 
 class Abstract(BaseView):
@@ -62,22 +63,6 @@ class Abstract(BaseView):
         if day_diff < 365:
             return str(day_diff / 30) + u"个月前"
         return str(day_diff / 365) + u"年前"
-
-    def utc_to_local_time(self, time):
-        """
-        接受一个utc时间参数或者一个时间列表，返回一个本地
-        时区的时间或者时间列表(参数和返回值都为datetime类型)
-        """
-        tz = pytz.timezone(settings.TIME_ZONE)
-
-        datetime_to_local = lambda x: x.astimezone(
-            tz) if x.tzinfo else pytz.utc.localize(x).astimezone(tz)
-
-        if type(time) is list:
-            times = [datetime_to_local(i) for i in time]
-        else:
-            times = datetime_to_local(time)
-        return times
 
     def indu_make_level(self, score):
         level = 'A'
@@ -270,7 +255,7 @@ class Abstract(BaseView):
                 'id': d[0],
                 'title': d[1],
                 'source': d[3],
-                'time': self.utc_to_local_time(d[2]).strftime('%Y-%m-%d %H:%M')
+                'time': utc_to_local_time(d[2]).strftime('%Y-%m-%d %H:%M')
             }
             items.append(item)
         return {'items': items, 'total': data['total_number']}

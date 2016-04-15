@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 import pytz
 
 from observer.apps.riskmonitor.businesslogic.abstract import Abstract
+from observer.utils.date.tz import utc_to_local_time
 
 
 class Statistic(Abstract):
@@ -27,7 +28,7 @@ class Statistic(Abstract):
 
             data = {}
             for k, v in result.iteritems():
-                data[self.utc_to_local_time(datetime.strptime(k, '%Y-%m-%d %H:%M:%S'))] = v
+                data[utc_to_local_time(datetime.strptime(k, '%Y-%m-%d %H:%M:%S'))] = v
 
             result = zip(*sorted(data.items(), key=lambda data: data[0]))
 

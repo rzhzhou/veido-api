@@ -25,7 +25,8 @@ from observer.apps.riskmonitor.models import (Enterprise, Industry, Product,
                                               RiskNews, RiskNewsPublisher,
                                               UserIndustry)
 from observer.utils.excel.briefing import article
-from utils.date.tz import get_loc_dt, get_timezone
+from observer.utils.date.tz import get_loc_dt, get_timezone
+from observer.utils.date import pretty
 
 
 class BaseView(APIView):
@@ -152,7 +153,7 @@ class NewsDetail(BaseView):
         data = {
             'title': risk_news.title,
             'source': risk_news.publisher.publisher,
-            'time': Abstract().pretty_date(risk_news.pubtime),
+            'time': pretty(risk_news.pubtime),
             'text': risk_news.content
         }
         return Response(data)

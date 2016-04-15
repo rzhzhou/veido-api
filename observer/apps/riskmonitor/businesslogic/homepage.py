@@ -10,6 +10,7 @@ from observer.apps.corpus.models import Corpus
 from observer.apps.riskmonitor.businesslogic.abstract import Abstract
 from observer.apps.riskmonitor.models import (Area, RiskNews, ScoreEnterprise,
                                               ScoreIndustry, ScoreProduct)
+from observer.utils.date.tz import utc_to_local_time
 
 
 class HomeData(Abstract):
@@ -125,7 +126,7 @@ class HomeData(Abstract):
 
         data = {}
         for k, v in nums.iteritems():
-            data[self.utc_to_local_time(datetime.strptime(k, '%Y-%m-%d %H:%M:%S'))] = v
+            data[utc_to_local_time(datetime.strptime(k, '%Y-%m-%d %H:%M:%S'))] = v
 
         nums = zip(*sorted(data.items(), key=lambda data: data[0]))
 
