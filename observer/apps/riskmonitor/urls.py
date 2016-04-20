@@ -4,12 +4,12 @@ from rest_framework.urlpatterns import format_suffix_patterns
 from observer.apps.riskmonitor.views import (Analytics, AnalyticsExport,
                                              EnterpriseList, Filters,
                                              GenerateAnalyticsExport,
-                                             Dashboard, IndustryDetail,
+                                             DashboardList, IndustryDetail,
                                              IndustryList, NewsDetail,
                                              NewsList)
 
 urlpatterns = [
-    url(r'^dashboards$', Dashboard.as_view()),
+    url(r'^dashboards$', DashboardList.as_view()),
     url(r'^industries$', IndustryList.as_view()),
     url(r'^industries/(?P<pk>[0-9]+)$', IndustryDetail.as_view()),
     url(r'^news$', NewsList.as_view()),
