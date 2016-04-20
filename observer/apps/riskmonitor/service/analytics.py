@@ -4,15 +4,14 @@ from datetime import datetime, timedelta
 
 import pytz
 
-from observer.apps.riskmonitor.businesslogic.abstract import Abstract
+from observer.apps.riskmonitor.service.news import NewsQuerySet
 from observer.utils.date.tz import utc_to_local_time
 
 
-class Statistic(Abstract):
+class AnalyticsCal(NewsQuerySet):
 
     def __init__(self, params={}):
-        for k, v in params.iteritems():
-            setattr(self, k, v)
+        super(AnalyticsCal, self).__init__(params)
 
     def industry_chart(self):
         days = (self.end - self.start).days
@@ -28,7 +27,8 @@ class Statistic(Abstract):
 
             data = {}
             for k, v in result.iteritems():
-                data[utc_to_local_time(datetime.strptime(k, '%Y-%m-%d %H:%M:%S'))] = v
+                data[utc_to_local_time(
+                    datetime.strptime(k, '%Y-%m-%d %H:%M:%S'))] = v
 
             result = zip(*sorted(data.items(), key=lambda data: data[0]))
 
@@ -86,41 +86,15 @@ class Statistic(Abstract):
         return bar
 
     def get_chart(self):
-        indu_sta = self.industry_chart()
-        keywords_sta = self.keywords_chart()
-        sources = self.sources()
-
         data = {
-            'trend': {
-                'labels': indu_sta['date'],
-                'data': indu_sta['data']
-            },
-            'bar': keywords_sta,
-            'source': {
-                'labels': sources['labels'],
-                'data': sources['data']
-            },
-        }
-        return data
-
-    def get_data(self):
-        start = self.start
-        end = self.end
-        industry = '%%' if self.industry == 0 or self.industry == None else self.industry
-        enterprise = '%%' if self.enterprise == 0 or self.enterprise == None else self.enterprise
-        source = '%%' if self.source == 0 or self.source == None else self.source
-        product = '%%' if self.product == 0 or self.product == None else self.product
-        news_data = self.source_data(industry, enterprise, product,
-                                     source, start, end, self.page)
-        data = {
-            'title': [u'序号', u'标题', u'来源', u'发表时间'],
-            'items': news_data['items'],
-            'total': news_data['total']
+            'trend': self.industry_chart(),
+            'bar': self.keywords_chart(),
+            'source': self.sources()
         }
         return data
 
     def get_all(self):
         chart_data = self.get_chart()
-        data = self.get_data()
-        chart_data['list'] = data
+        chart_data['list'] = self.get_news_list()
+
         return chart_data

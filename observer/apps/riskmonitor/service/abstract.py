@@ -20,7 +20,11 @@ from observer.utils.connector.mysql import query
 from observer.utils.date.tz import utc_to_local_time
 
 
-class Abstract(BaseView):
+class Abstract(object):
+
+    def __init__(self, params):
+        for k, v in params.iteritems():
+            setattr(self, k, v)
 
     def indu_make_level(self, score):
         level = 'A'
@@ -57,16 +61,16 @@ class Abstract(BaseView):
             level = self.ente_make_level(score)
             yield entescore.enterprise, level
 
-    def risk_industry(self, start, end, user_id):
+    def risk_industry(self):
         induscore = ScoreIndustry.objects.filter(
-            pubtime__range=(start, end)).order_by('-score')
-        indunames = self.indugenerate(induscore, user_id)
+            pubtime__gte=self.start, pubtime__lt=self.end).order_by('-score')
+        indunames = self.indugenerate(induscore, self.user_id)
         try:
             indunames = [i for i in indunames]
         except AttributeError:
             indunames = []
 
-        user_industrys = UserIndustry.objects.filter(user__id=user_id)
+        user_industrys = UserIndustry.objects.filter(user__id=self.user_id)
         indunames = indunames if indunames else [[i.name, 'A', i.id
                                                   ] for i in user_industrys]
         return indunames
@@ -83,9 +87,6 @@ class Abstract(BaseView):
         return enteobjects
 
     def news_nums(self, date_range):
-        args = {}
-        aggregate_args = {}
-
         try:
             self.industry = UserIndustry.objects.get(
                 id=self.industry).industry.id
@@ -100,23 +101,21 @@ class Abstract(BaseView):
             'publisher__id': self.source
         }
 
-        for k, v in cond.iteritems():
-            if v:
-                args[k] = v
+        # Exclude $cond None Value
+        args = dict([(k, v) for k, v in cond.iteritems() if v is not None])
 
-        for start, end in date_range:
-            aggregate_args[start.strftime('%Y-%m-%d %H:%M:%S')] = Sum(
+        # Generate $aggregate_args by date_range
+        aggregate_args = dict([(
+            start.strftime('%Y-%m-%d %H:%M:%S'),  # Type must be <Str>
+            Sum(
                 Case(When(pubtime__gte=start, pubtime__lt=end, then=1),
                      output_field=IntegerField(), default=0)
             )
+        ) for start, end in date_range])
 
         queryset = RiskNews.objects.filter(**args).aggregate(**aggregate_args)
 
-        """
-        for k, v in queryset.iteritems():
-            if v is None:
-                queryset[k] = 0
-        """
+        # Convert $queryset None Value to Zero
         return dict(map(lambda x: (x[0], x[1] if x[1] is not None else 0), queryset.iteritems()))
 
     def compare(self, start, end, id):
@@ -186,71 +185,28 @@ class Abstract(BaseView):
                 'date': month
             }
 
-    def source_data(self, industry=None, enterprise=None, product=None, source=None,
-                    start=None, end=None, page=1):
-        industry = industry if industry == '%%' else UserIndustry.objects.get(
-            id=industry).industry.id
-        start = start.strftime('%Y-%m-%d %H:%M:%S')
-        end = end.strftime('%Y-%m-%d %H:%M:%S')
-        data = query("""
-            SELECT r.`id`, r.`title`, r.`pubtime`, rnp.`publisher`, count(distinct r.`id`)
-            FROM risk_news r
-            LEFT JOIN risk_news_industry ri ON r.`id`=ri.`risknews_id`
-            LEFT JOIN industry i ON i.`id`=ri.`industry_id`
-            LEFT JOIN risk_news_enterprise re ON re.`enterprise_id`=r.`id`
-            LEFT JOIN enterprise e ON re.`enterprise_id`=e.`id`
-            LEFT JOIN risk_news_area rna ON rna.`risknews_id`=r.`id`
-            LEFT JOIN area a ON a.`id`=rna.`area_id`
-            LEFT JOIN risknewspublisher rnp ON r.`publisher_id`=rnp.`id`
-            WHERE i.`id` LIKE '%s' AND e.`id` LIKE '%s' AND rnp.`id` LIKE '%s'
-            AND pubtime >= '%s' AND pubtime < '%s' group by r.`id` ORDER BY pubtime desc
-            """ % (industry, enterprise, source, start, end))
+    def enterprise_rank(self):
+        fields = ('enterprise__id', 'enterprise__name', 'score')
 
-        items = []
-        data = self.paging(data, 10, page)
-        for d in data['items']:
-            item = {
-                'id': d[0],
-                'title': d[1],
-                'source': d[3],
-                'time': utc_to_local_time(d[2]).strftime('%Y-%m-%d %H:%M')
-            }
-            items.append(item)
-        return {'items': items, 'total': data['total_number']}
+        try:
+            self.industry = UserIndustry.objects.get(
+                id=self.industry).industry.id
+        except UserIndustry.DoesNotExist:
+            self.industry = None
 
-    def enterprise_rank(self, start=None, end=None, industry=None, page=1):
-        industry = industry if industry == '%%' else UserIndustry.objects.get(
-            id=industry).industry.id
-        start = start.strftime('%Y-%m-%d %H:%M:%S')
-        end = end.strftime('%Y-%m-%d %H:%M:%S')
-        sql = """
-            SELECT e.`id`, e.`name`, se.`score`, COUNT(distinct e.`id`)
-            FROM enterprise e
-            LEFT JOIN risk_news_enterprise re ON e.`id`=re.`enterprise_id`
-            LEFT JOIN risk_news rn ON re.`risknews_id`=rn.`id`
-            LEFT JOIN score_enterprise se ON e.`id`=se.`enterprise_id`
-            LEFT JOIN risk_news_industry rni ON rn.`id`=rni.`risknews_id`
-            LEFT JOIN industry i ON i.`id`=rni.`industry_id`
-            WHERE rn.`pubtime` >= '%s'
-            AND rn.`pubtime` < '%s'
-            AND i.`id` like '%s'
-            GROUP BY e.`id` ORDER BY se.`score` %s
-            """ % (start, end, industry, 'DESC')
-        results = query(sql)
-        iteml = []
-        data = self.paging(results, 10, page)
-        ranking = (page - 1) * 10
-        for result in data['items']:
-            ranking = ranking + 1
-            item = {
-                'id': result[0],
-                'ranking': ranking,
-                'title': result[1],
-                'level': self.ente_make_level(result[2]),
-                'number': result[3]
-            }
-            iteml.append(item)
-        return {'data': iteml, 'total': data['total_number']}
+        cond = {
+            'pubtime__gte': self.start,
+            'pubtime__lt': self.end,
+            'industry__id': self.industry,
+        }
+
+        # Exclude $cond None Value
+        args = dict([(k, v) for k, v in cond.iteritems() if v is not None])
+
+        queryset = ScoreEnterprise.objects.filter(
+            **args).order_by('score').values(*fields)
+
+        return queryset
 
     def sources(self):
         """
