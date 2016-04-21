@@ -108,8 +108,9 @@ class DashboardList(BaseView):
             },
             'industryRank': {
                 'items': [{
-                    'name': i[0],
-                    'level':i[1]
+                    'id': i[0],
+                    'name': i[1],
+                    'level':i[2]
                 } for i in queryset['industries']]
             },
             'product': {
