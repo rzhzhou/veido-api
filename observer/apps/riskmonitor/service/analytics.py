@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 import pytz
 
 from observer.apps.riskmonitor.service.news import NewsQuerySet
-from observer.utils.date.tz import utc_to_local_time
 
 
 class AnalyticsCal(NewsQuerySet):
@@ -23,14 +22,7 @@ class AnalyticsCal(NewsQuerySet):
             date = [(start + timedelta(days=(x - 1))) for x in list_range]
             date_range = [(i, (i + timedelta(days=interval))) for i in date]
 
-            result = self.news_nums(date_range)
-
-            data = {}
-            for k, v in result.iteritems():
-                data[utc_to_local_time(
-                    datetime.strptime(k, '%Y-%m-%d %H:%M:%S'))] = v
-
-            result = zip(*sorted(data.items(), key=lambda data: data[0]))
+            result = self.cal_news_nums(date_range)
 
             return {
                 'date': result[0],

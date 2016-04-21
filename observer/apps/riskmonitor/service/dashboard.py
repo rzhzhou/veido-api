@@ -10,7 +10,6 @@ from observer.apps.corpus.models import Corpus
 from observer.apps.riskmonitor.service.abstract import Abstract
 from observer.apps.riskmonitor.models import (Area, RiskNews, ScoreEnterprise,
                                               ScoreIndustry, ScoreProduct)
-from observer.utils.date.tz import utc_to_local_time
 
 
 class Dashboard(Abstract):
@@ -61,11 +60,9 @@ class Dashboard(Abstract):
         date = [(self.start + timedelta(days=x)) for x in xrange(days)]
         date_range = [(i, (i + timedelta(days=1))) for i in date]
 
-        nums = self.news_nums(date_range)
-        nums = [(utc_to_local_time(k), v) for k, v in nums.iteritems()]
-        nums = zip(*sorted(nums, key=lambda data: data[0]))
+        result = self.cal_news_nums(date_range)
 
-        return nums[1]
+        return result[1]
 
     def risk_level(self):
         return ['A', 'B', 'A', 'A', 'C', 'A', 'B']

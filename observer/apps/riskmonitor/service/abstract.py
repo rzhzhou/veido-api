@@ -81,7 +81,7 @@ class Abstract(object):
             enteobjects = []
         return enteobjects
 
-    def news_nums(self, date_range):
+    def cal_news_nums(self, date_range):
         try:
             self.industry = UserIndustry.objects.get(
                 id=self.industry).industry.id
@@ -110,8 +110,16 @@ class Abstract(object):
 
         queryset = RiskNews.objects.filter(**args).aggregate(**aggregate_args)
 
-        # Convert $queryset None Value to Zero
-        return dict(map(lambda x: (x[0], x[1] if x[1] is not None else 0), queryset.iteritems()))
+        # Convert $queryset
+        # key:      str     ->  local datetime
+        # value:    None    ->  0
+        result = [(
+            utc_to_local_time(k),
+            v if v is not None else 0
+        ) for k, v in queryset.iteritems()]
+
+        # sorted by $queryset key
+        return zip(*sorted(result, key=lambda data: data[0]))
 
     def compare(self, start, end, id):
 
