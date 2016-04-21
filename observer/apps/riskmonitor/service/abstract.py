@@ -66,7 +66,7 @@ class Abstract(object):
 
             score = queryset.aggregate(Avg('score')) if queryset else 100
 
-            industries.append((u.industry.id, u.name, score['score__avg']))
+            industries.append((u.industry.id, u.name, round(score['score__avg'])))
 
         return sorted(industries, key=lambda industry: industry[2])
 
