@@ -220,7 +220,7 @@ class NewsList(BaseView):
             'items': map(lambda r: {
                 'id': r['id'],
                 'title': r['title'],
-                'time': r['pubtime'],
+                'time': r['pubtime'].strftime('%Y-%m-%d %H:%M'),
                 'source': r['publisher__publisher']
             }, results),
             'total': results.paginator.num_pages
@@ -364,7 +364,7 @@ class AnalyticsExport(BaseView):
                 'items': map(lambda r: {
                     'id': r['id'],
                     'title': r['title'],
-                    'time': r['pubtime'],
+                    'time': r['pubtime'].strftime('%Y-%m-%d %H:%M'),
                     'source': r['publisher__publisher']
                 }, queryset['list']),
                 'total': results.paginator.num_pages
