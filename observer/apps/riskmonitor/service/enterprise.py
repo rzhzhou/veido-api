@@ -10,12 +10,6 @@ class EnterpriseRank(Abstract):
     def __init__(self, params={}):
         super(EnterpriseRank, self).__init__(params)
 
-        try:
-            self.industry = UserIndustry.objects.get(
-                id=self.industry).industry.id
-        except UserIndustry.DoesNotExist:
-            self.industry = None
-
     def get_enterprises(self):
         fields = ('enterprise__id', 'enterprise__name')
 

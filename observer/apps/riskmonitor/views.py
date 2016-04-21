@@ -167,7 +167,7 @@ class IndustryList(BaseView):
     def get(self, request):
         self.set_params(request)
 
-        queryset = Abstract(params=self.query_params).risk_industry()
+        queryset = IndustryTrack(params=self.query_params).get_industries()
 
         return Response(self.serialize(queryset))
 
@@ -400,7 +400,10 @@ class Filters(BaseView):
     def serialize(self, queryset):
         data = {
             'industries': {
-                'items': queryset[0],
+                'items': [{
+                    'id': q['industry__id'],
+                    'text': q['name']
+                } for q in queryset[0]],
             },
             'enterprises': {
                 'items': queryset[1],
@@ -416,7 +419,7 @@ class Filters(BaseView):
 
     def get(self, request):
         industries = UserIndustry.objects.filter(
-            user__id=request.user.id).annotate(text=F('name')).values('id', 'text')
+            user__id=request.user.id).values('industry__id', 'name')
         enterprises = Enterprise.objects.annotate(
             text=F('name')).values('id', 'text')[:10]
         products = Product.objects.annotate(

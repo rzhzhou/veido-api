@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
+from django.db.models import Avg
+
 from observer.apps.riskmonitor.service.news import NewsQuerySet
 from observer.apps.riskmonitor.service.analytics import AnalyticsCal
-from observer.apps.riskmonitor.models import (RiskNews, UserIndustry)
+from observer.apps.riskmonitor.models import (
+    RiskNews, ScoreIndustry, UserIndustry)
 
 
 class IndustryTrack(AnalyticsCal):
@@ -19,3 +22,22 @@ class IndustryTrack(AnalyticsCal):
 
     def get_chart(self):
         return (self.trend_chart(), self.compare_chart())
+
+    def get_industries(self):
+        industries = []
+
+        user_industries = UserIndustry.objects.filter(user__id=self.user_id)
+
+        for u in user_industries:
+            queryset = ScoreIndustry.objects.filter(
+                pubtime__gte=self.start,
+                pubtime__lt=self.end,
+                industry=u.industry.id
+            ).order_by('-score')
+
+            score = queryset.aggregate(Avg('score')) if queryset else 100
+
+            industries.append(
+                (u.industry.id, u.name, round(score['score__avg'])))
+
+        return sorted(industries, key=lambda industry: industry[2])

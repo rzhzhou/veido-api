@@ -7,17 +7,13 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Avg, Case, Count, IntegerField, Q, Sum, When
+from django.db.models import Count, Q
 from django.http import Http404
 
 from observer.apps.base.api_function import get_season
 from observer.apps.base.views import BaseView
-from observer.apps.riskmonitor.models import (Enterprise, Industry, Product,
-                                              RiskNews, RiskNewsPublisher,
-                                              ScoreEnterprise, ScoreIndustry,
-                                              UserIndustry)
-from observer.utils.connector.mysql import query
-from observer.utils.date.tz import utc_to_local_time
+from observer.apps.riskmonitor.models import (
+    Industry, RiskNews, RiskNewsPublisher, UserIndustry)
 
 
 class Abstract(object):
@@ -25,6 +21,12 @@ class Abstract(object):
     def __init__(self, params):
         for k, v in params.iteritems():
             setattr(self, k, v)
+
+        try:
+            self.industry = UserIndustry.objects.get(
+                id=self.industry).industry.id
+        except UserIndustry.DoesNotExist:
+            self.industry = None
 
     def indu_make_level(self, score):
         level = 'A'
@@ -45,64 +47,6 @@ class Abstract(object):
         if score < 80:
             level = 'A'
         return level
-
-    def risk_industry(self):
-        industries = []
-
-        user_industries = UserIndustry.objects.filter(user__id=self.user_id)
-
-        for u in user_industries:
-            queryset = ScoreIndustry.objects.filter(
-                pubtime__gte=self.start,
-                pubtime__lt=self.end,
-                industry=u.industry.id
-            ).order_by('-score')
-
-            score = queryset.aggregate(Avg('score')) if queryset else 100
-
-            industries.append((u.industry.id, u.name, round(score['score__avg'])))
-
-        return sorted(industries, key=lambda industry: industry[2])
-
-    def cal_news_nums(self, date_range):
-        try:
-            self.industry = UserIndustry.objects.get(
-                id=self.industry).industry.id
-        except UserIndustry.DoesNotExist:
-            self.industry = None
-
-        cond = {
-            'pubtime__gte': self.start,
-            'pubtime__lt': self.end,
-            'industry__id': self.industry,
-            'enterprise__id': self.enterprise,
-            'publisher__id': self.source
-        }
-
-        # Exclude $cond None Value
-        args = dict([(k, v) for k, v in cond.iteritems() if v is not None])
-
-        # Generate $aggregate_args by date_range
-        aggregate_args = dict([(
-            start.strftime('%Y-%m-%d %H:%M:%S'),  # Type must be <Str>
-            Sum(
-                Case(When(pubtime__gte=start, pubtime__lt=end, then=1),
-                     output_field=IntegerField(), default=0)
-            )
-        ) for start, end in date_range])
-
-        queryset = RiskNews.objects.filter(**args).aggregate(**aggregate_args)
-
-        # Convert $queryset
-        # key:      str     ->  local datetime
-        # value:    None    ->  0
-        result = [(
-            utc_to_local_time(k),
-            v if v is not None else 0
-        ) for k, v in queryset.iteritems()]
-
-        # sorted by $queryset key
-        return zip(*sorted(result, key=lambda data: data[0]))
 
     def compare(self, start, end, id):
 
@@ -187,8 +131,7 @@ class Abstract(object):
         cond = {
             'pubtime__gte': self.start,
             'pubtime__lt': self.end,
-            'industry__id': UserIndustry.objects.get(
-                id=self.industry).industry.id if self.industry else None,
+            'industry__id': self.industry,
             'enterprise__id': self.enterprise,
             'publisher__id': self.source
         }
