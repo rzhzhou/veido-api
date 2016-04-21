@@ -7,12 +7,12 @@ from django.db.models import Count
 from django.utils import timezone
 
 from observer.apps.corpus.models import Corpus
-from observer.apps.riskmonitor.service.abstract import Abstract
+from observer.apps.riskmonitor.service.enterprise import EnterpriseRank
 from observer.apps.riskmonitor.models import (Area, RiskNews, ScoreEnterprise,
                                               ScoreIndustry, ScoreProduct)
 
 
-class Dashboard(Abstract):
+class Dashboard(EnterpriseRank):
 
     def __init__(self, params={}):
         super(Dashboard, self).__init__(params)
@@ -38,10 +38,6 @@ class Dashboard(Abstract):
 
     def get_industry(self):
         return self.risk_industry()[:3]
-
-    def get_enterprise(self):
-        type = 'abstract'
-        return self.risk_enterprise(self.start, self.end, type)
 
     def risk_keywords(self):
         keywords = Corpus.objects.all()
@@ -71,7 +67,7 @@ class Dashboard(Abstract):
         data = {
             'status': self.risk_status(),
             'industries': self.get_industry(),
-            'enterprises': self.get_enterprise(),
+            'enterprises': self.get_enterprises()[:3],
             'keywords': self.risk_keywords(),
             'map': self.risk_map(),
             'risk_data': self.risk_data(),

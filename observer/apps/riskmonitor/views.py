@@ -99,8 +99,9 @@ class DashboardList(BaseView):
             'grade': queryset['status'],
             'enterpriseRank': {
                 'items': [{
-                    'name': e[0].name,
-                    'level':e[1]
+                    'id': e['enterprise__id'],
+                    'name': e['enterprise__name'],
+                    'level': round(e['score__avg'])
                 } for e in queryset['enterprises']]
             },
             'industry': {
@@ -275,7 +276,7 @@ class EnterpriseList(BaseView):
                 'id': r[1]['enterprise__id'],
                 'ranking': r[0],
                 'title': r[1]['enterprise__name'],
-                'level': r[1]['score'],
+                'level': round(r[1]['score__avg']),
                 'number': 0
             }, enumerate(results, (int(self.query_params['page']) - 1) * 10 + 1)),
             'total': results.paginator.num_pages
@@ -285,7 +286,7 @@ class EnterpriseList(BaseView):
     def get(self, request):
         self.set_params(request)
 
-        queryset = EnterpriseRank(params=self.query_params).enterprise_rank()
+        queryset = EnterpriseRank(params=self.query_params).get_enterprises()
 
         return Response(self.serialize(queryset))
 

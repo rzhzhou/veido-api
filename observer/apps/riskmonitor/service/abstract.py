@@ -46,12 +46,6 @@ class Abstract(object):
             level = 'A'
         return level
 
-    def entegenerate(self, entescores):
-        for entescore in entescores:
-            score = entescore.score
-            level = self.ente_make_level(score)
-            yield entescore.enterprise, level
-
     def risk_industry(self):
         industries = []
 
@@ -69,17 +63,6 @@ class Abstract(object):
             industries.append((u.industry.id, u.name, round(score['score__avg'])))
 
         return sorted(industries, key=lambda industry: industry[2])
-
-    def risk_enterprise(self, start, end, type):
-        entescore = ScoreEnterprise.objects.filter(
-            pubtime__range=(start, end)).order_by('-score')
-        enteobject = self.entegenerate(entescore)
-        count = 3 if type is 'abstract' else Enterprise.objects.all().count()
-        try:
-            enteobjects = [enteobject.next() for i in xrange(count)]
-        except:
-            enteobjects = []
-        return enteobjects
 
     def cal_news_nums(self, date_range):
         try:
@@ -187,29 +170,6 @@ class Abstract(object):
                 'data': data,
                 'date': month
             }
-
-    def enterprise_rank(self):
-        fields = ('enterprise__id', 'enterprise__name', 'score')
-
-        try:
-            self.industry = UserIndustry.objects.get(
-                id=self.industry).industry.id
-        except UserIndustry.DoesNotExist:
-            self.industry = None
-
-        cond = {
-            'pubtime__gte': self.start,
-            'pubtime__lt': self.end,
-            'industry__id': self.industry,
-        }
-
-        # Exclude $cond None Value
-        args = dict([(k, v) for k, v in cond.iteritems() if v is not None])
-
-        queryset = ScoreEnterprise.objects.filter(
-            **args).order_by('score').values(*fields)
-
-        return queryset
 
     def sources(self):
         """
