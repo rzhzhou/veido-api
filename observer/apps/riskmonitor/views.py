@@ -154,9 +154,9 @@ class IndustryList(BaseView):
         data = {
             'industries': {
                 'items': [{
-                    self.query_params['field']: q[0],
-                    'level':q[1],
-                    'id': q[2]
+                    'id': q[0],
+                    self.query_params['field']: q[1],
+                    'level':q[2]
                 } for q in queryset]
             }
         }

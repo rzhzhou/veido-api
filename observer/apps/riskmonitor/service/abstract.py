@@ -7,7 +7,7 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Case, Count, IntegerField, Q, Sum, When
+from django.db.models import Avg, Case, Count, IntegerField, Q, Sum, When
 from django.http import Http404
 
 from observer.apps.base.api_function import get_season
@@ -46,15 +46,6 @@ class Abstract(object):
             level = 'A'
         return level
 
-    def indugenerate(self, induscores, user_id):
-        for induscore in induscores:
-            indu = induscore.industry
-            userindus = indu.userindustry_set.filter(user__id=user_id)
-            if userindus.exists() and indu.level == 1:
-                score = induscore.score
-                level = self.indu_make_level(score)
-                yield userindus[0].name, level, userindus[0].id
-
     def entegenerate(self, entescores):
         for entescore in entescores:
             score = entescore.score
@@ -62,18 +53,22 @@ class Abstract(object):
             yield entescore.enterprise, level
 
     def risk_industry(self):
-        induscore = ScoreIndustry.objects.filter(
-            pubtime__gte=self.start, pubtime__lt=self.end).order_by('-score')
-        indunames = self.indugenerate(induscore, self.user_id)
-        try:
-            indunames = [i for i in indunames]
-        except AttributeError:
-            indunames = []
+        industries = []
 
-        user_industrys = UserIndustry.objects.filter(user__id=self.user_id)
-        indunames = indunames if indunames else [[i.name, 'A', i.id
-                                                  ] for i in user_industrys]
-        return indunames
+        user_industries = UserIndustry.objects.filter(user__id=self.user_id)
+
+        for u in user_industries:
+            queryset = ScoreIndustry.objects.filter(
+                pubtime__gte=self.start,
+                pubtime__lt=self.end,
+                industry=u.industry.id
+            ).order_by('-score')
+
+            score = queryset.aggregate(Avg('score')) if queryset else 100
+
+            industries.append((u.industry.id, u.name, score['score__avg']))
+
+        return sorted(industries, key=lambda industry: industry[2])
 
     def risk_enterprise(self, start, end, type):
         entescore = ScoreEnterprise.objects.filter(
