@@ -277,7 +277,7 @@ class EnterpriseList(BaseView):
                 'ranking': r[0],
                 'title': r[1]['enterprise__name'],
                 'level': round(r[1]['score__avg']),
-                'number': 0
+                'number': RiskNews.objects.filter(enterprise__id=r[1]['enterprise__id']).count()
             }, enumerate(results, (int(self.query_params['page']) - 1) * 10 + 1)),
             'total': results.paginator.num_pages
         }
