@@ -63,7 +63,7 @@ class Dashboard(IndustryTrack, EnterpriseRank, NewsQuerySet):
                 parent__id=q['id']).values_list('id', flat=True)
             q['count'] = RiskNews.objects.filter(
                 Q(pubtime__gte=self.start) &
-                Q(pubtime__lt=self.end) &
+                Q(pubtime__lt=self.end),
                 Q(area__id=q['id']) |
                 Q(area__id__in=areas_id) |
                 Q(area__parent__id__in=areas_id)
