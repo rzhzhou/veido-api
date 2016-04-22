@@ -41,7 +41,7 @@ class BaseView(APIView):
             'product': None,
             'source': None,
             'page': 1,
-            'start': str(self.today - timedelta(days=7)),
+            'start': str(self.today - timedelta(days=6)),
             'end': str(self.today)
         }
 
@@ -52,6 +52,12 @@ class BaseView(APIView):
 
         for param, value in params.iteritems():
             self.query_params[param] = value
+
+        # end date add 1 day
+        self.query_params['end'] = datetime.strptime(
+            self.query_params['end'], '%Y-%m-%d') + timedelta(days=1)
+        self.query_params['end'] = self.query_params[
+            'end'].strftime('%Y-%m-%d')
 
         if loc_dt:
             self.query_params['start'] = get_loc_dt(
