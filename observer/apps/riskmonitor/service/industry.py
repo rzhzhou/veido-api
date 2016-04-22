@@ -33,11 +33,11 @@ class IndustryTrack(AnalyticsCal):
                 pubtime__gte=self.start,
                 pubtime__lt=self.end,
                 industry=u.industry.id
-            ).order_by('-score')
+            )
 
-            score = queryset.aggregate(Avg('score')) if queryset else 100
+            score = queryset.aggregate(Avg('score'))[
+                'score__avg'] if queryset else 100
 
-            industries.append(
-                (u.industry.id, u.name, round(score['score__avg'])))
+            industries.append((u.industry.id, u.name, round(score)))
 
         return sorted(industries, key=lambda industry: industry[2])
