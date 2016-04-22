@@ -3,14 +3,14 @@ import time
 from datetime import datetime, timedelta
 
 import pytz
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.utils import timezone
 
 from observer.apps.corpus.models import Corpus
 from observer.apps.riskmonitor.service.industry import IndustryTrack
 from observer.apps.riskmonitor.service.enterprise import EnterpriseRank
 from observer.apps.riskmonitor.service.news import NewsQuerySet
-from observer.apps.riskmonitor.models import (Area, ScoreEnterprise,
+from observer.apps.riskmonitor.models import (Area, RiskNews, ScoreEnterprise,
                                               ScoreIndustry, ScoreProduct)
 
 
@@ -48,7 +48,20 @@ class Dashboard(IndustryTrack, EnterpriseRank, NewsQuerySet):
         return keywords
 
     def risk_map(self):
-        return Area.objects.filter(level=2).annotate(risk_news_count=Count('rarea'))
+        queryset = Area.objects.filter(level=2).values('id', 'name')
+
+        for q in queryset:
+            areas_id = Area.objects.filter(
+                parent__id=q['id']).values_list('id', flat=True)
+            q['count'] = RiskNews.objects.filter(
+                Q(pubtime__gte=self.start) &
+                Q(pubtime__lt=self.end) &
+                Q(area__id=q['id']) |
+                Q(area__id__in=areas_id) |
+                Q(area__parent__id__in=areas_id)
+            ).count()
+
+        return queryset
 
     def risk_data(self):
         days = (self.end - self.start).days

@@ -88,8 +88,8 @@ class DashboardList(BaseView):
         weeks = [u'星期一', u'星期二', u'星期三', u'星期四', u'星期五', u'星期六', u'星期日']
         data = {
             'map': [{
-                'name': m.name,
-                'value': m.risk_news_count
+                'name': m['name'],
+                'value': m['count']
             } for m in queryset['map']],
             'rankData': {
                 'labels': [weeks[(self.query_params['start'] + timedelta(days=(i + 1))).isoweekday() - 1]
