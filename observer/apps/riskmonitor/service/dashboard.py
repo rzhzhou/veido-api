@@ -10,8 +10,8 @@ from observer.apps.corpus.models import Corpus
 from observer.apps.riskmonitor.service.industry import IndustryTrack
 from observer.apps.riskmonitor.service.enterprise import EnterpriseRank
 from observer.apps.riskmonitor.service.news import NewsQuerySet
-from observer.apps.riskmonitor.models import (Area, RiskNews, ScoreEnterprise,
-                                              ScoreIndustry, ScoreProduct)
+from observer.apps.riskmonitor.models import (
+    Area, Product, RiskNews, ScoreEnterprise, ScoreIndustry, ScoreProduct)
 
 
 class Dashboard(IndustryTrack, EnterpriseRank, NewsQuerySet):
@@ -29,12 +29,20 @@ class Dashboard(IndustryTrack, EnterpriseRank, NewsQuerySet):
     def risk_status(self):
         return 'A'
 
-    def risk_sum(self):
+    def risk_number(self):
         i_count = ScoreIndustry.objects.filter(
-            pubtime__range=(self.start, self.end), score__gte=60).count()
+            pubtime__gte=self.start,
+            pubtime__lt=self.end,
+            score__lt=90
+        ).values_list('industry').distinct().count()
+
         e_count = ScoreEnterprise.objects.filter(
-            pubtime__range=(self.start, self.end), score__gte=60).count()
-        p_count = 6
+            pubtime__gte=self.start,
+            pubtime__lt=self.end,
+            score__lt=90
+        ).values_list('enterprise').distinct().count()
+
+        p_count = Product.objects.count()
 
         return [i_count, e_count, p_count]
 
@@ -84,6 +92,6 @@ class Dashboard(IndustryTrack, EnterpriseRank, NewsQuerySet):
             'map': self.risk_map(),
             'risk_data': self.risk_data(),
             'rank_data': self.risk_level(),
-            'risk_count': self.risk_sum()
+            'risk_count': self.risk_number()
         }
         return data
