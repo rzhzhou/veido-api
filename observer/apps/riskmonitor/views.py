@@ -6,6 +6,7 @@ import jwt
 import pytz
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import F
 from django.http import Http404, HttpResponse, JsonResponse
 from django.views.generic import View
@@ -13,19 +14,20 @@ from rest_framework import exceptions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from businesslogic.detail import *
-from businesslogic.enterprise import EnterpriseRank
-from businesslogic.homepage import *
-from businesslogic.industry import IndustryTrack
-from businesslogic.statistic import Statistic
+from observer.apps.riskmonitor.service.abstract import Abstract
+from observer.apps.riskmonitor.service.enterprise import EnterpriseRank
+from observer.apps.riskmonitor.service.dashboard import Dashboard
+from observer.apps.riskmonitor.service.industry import IndustryTrack
+from observer.apps.riskmonitor.service.analytics import AnalyticsCal
+from observer.apps.riskmonitor.service.news import NewsQuerySet
 from observer.apps.base.initialize import xls_to_response
 from observer.apps.base.views import BaseTemplateView
-from observer.apps.riskmonitor.businesslogic.abstract import Abstract
 from observer.apps.riskmonitor.models import (Enterprise, Industry, Product,
                                               RiskNews, RiskNewsPublisher,
                                               UserIndustry)
 from observer.utils.excel.briefing import article
-from utils.date.tz import get_loc_dt, get_timezone
+from observer.utils.date.tz import get_loc_dt, get_timezone
+from observer.utils.date import pretty
 
 
 class BaseView(APIView):
@@ -39,7 +41,7 @@ class BaseView(APIView):
             'product': None,
             'source': None,
             'page': 1,
-            'start': str(self.today - timedelta(days=7)),
+            'start': str(self.today - timedelta(days=6)),
             'end': str(self.today)
         }
 
@@ -51,30 +53,102 @@ class BaseView(APIView):
         for param, value in params.iteritems():
             self.query_params[param] = value
 
+        # end date add 1 day
+        self.query_params['end'] = datetime.strptime(
+            self.query_params['end'], '%Y-%m-%d') + timedelta(days=1)
+        self.query_params['end'] = self.query_params[
+            'end'].strftime('%Y-%m-%d')
+
         if loc_dt:
             self.query_params['start'] = get_loc_dt(
                 self.tz, self.query_params['start'], pytz.utc)
             self.query_params['end'] = get_loc_dt(
                 self.tz, self.query_params['end'], pytz.utc)
 
+    def paging(self, queryset, page, num):
+        paginator = Paginator(queryset, num)  # Show $num <QuerySet> per page
 
-class Dashboard(BaseView):
+        try:
+            results = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            results = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999), deliver last page of
+            # results.
+            results = paginator.page(paginator.num_pages)
+
+        return results
+
+
+class DashboardList(BaseView):
 
     def __init__(self):
-        super(Dashboard, self).__init__()
+        super(DashboardList, self).__init__()
 
     def set_params(self, request):
-        super(Dashboard, self).set_params(request.GET)
+        super(DashboardList, self).set_params(request.GET)
         self.query_params['user_id'] = request.user.id
+
+    def serialize(self, queryset):
+        weeks = [u'星期一', u'星期二', u'星期三', u'星期四', u'星期五', u'星期六', u'星期日']
+        data = {
+            'map': [{
+                'name': m['name'],
+                'value': m['count']
+            } for m in queryset['map']],
+            'rankData': {
+                'labels': [weeks[(self.query_params['start'] + timedelta(days=(i + 1))).isoweekday() - 1]
+                           for i in range(7)],
+                'data': queryset['rank_data']
+            },
+            'grade': queryset['status'],
+            'enterpriseRank': {
+                'items': [{
+                    'id': e['enterprise__id'],
+                    'name': e['enterprise__name'],
+                    'level': round(e['score__avg'])
+                } for e in queryset['enterprises']]
+            },
+            'industry': {
+                'amount': queryset['risk_count'][0]
+            },
+            'industryRank': {
+                'items': [{
+                    'id': i[0],
+                    'name': i[1],
+                    'level':i[2]
+                } for i in queryset['industries']]
+            },
+            'product': {
+                'amount': queryset['risk_count'][2]
+            },
+            'riskData': {
+                'labels': [weeks[(self.query_params['start'] + timedelta(days=(i + 1))).isoweekday() - 1]
+                           for i in range(7)],
+                'data': queryset['risk_data']
+            },
+            'keywordsRank': {
+                'items': [{
+                    'name': k,
+                    'level': 5
+                } for k in queryset['keywords']]
+            },
+            'enterprise': {
+                'amount': queryset['risk_count'][1]
+            }
+        }
+        return data
 
     def get(self, request):
         self.set_params(request)
 
-        data = HomeData(params=self.query_params).get_all()
-        return Response(data)
+        queryset = Dashboard(params=self.query_params).get_all()
+
+        return Response(self.serialize(queryset))
 
 
-class IndustryList(BaseView, Abstract):
+class IndustryList(BaseView):
 
     def __init__(self):
         super(IndustryList, self).__init__()
@@ -84,22 +158,24 @@ class IndustryList(BaseView, Abstract):
         super(IndustryList, self).set_params(request.GET)
         self.query_params['user_id'] = request.user.id
 
-    def get(self, request):
-        self.set_params(request)
-
-        industries = self.risk_industry(self.query_params['start'],
-                                        self.query_params['end'],
-                                        self.query_params['user_id'])
+    def serialize(self, queryset):
         data = {
             'industries': {
                 'items': [{
-                    self.query_params['field']: industry[0],
-                    'level':industry[1],
-                    'id': industry[2]
-                } for industry in industries]
+                    'id': q[0],
+                    self.query_params['field']: q[1],
+                    'level':q[2]
+                } for q in queryset]
             }
         }
-        return Response(data)
+        return data
+
+    def get(self, request):
+        self.set_params(request)
+
+        queryset = IndustryTrack(params=self.query_params).get_industries()
+
+        return Response(self.serialize(queryset))
 
 
 class IndustryDetail(BaseView):
@@ -111,11 +187,27 @@ class IndustryDetail(BaseView):
         super(IndustryDetail, self).set_params(request.GET)
         self.query_params['industry'] = pk
 
+    def serialize(self, queryset):
+        data = {
+            'trend': {
+                'labels': queryset[0]['date'],
+                'data': queryset[0]['data']
+            },
+            'bar': {
+                'name': [u'同比', u'环比'],
+                'show': 'true',
+                'lables': [queryset[1]['date']],
+                'data': [queryset[1]['data']]
+            }
+        }
+        return data
+
     def get(self, request, pk):
         self.set_params(request, pk)
 
-        data = IndustryTrack(params=self.query_params).get_chart()
-        return Response(data)
+        queryset = IndustryTrack(params=self.query_params).get_chart()
+
+        return Response(self.serialize(queryset))
 
 
 class NewsList(BaseView):
@@ -126,36 +218,49 @@ class NewsList(BaseView):
     def set_params(self, request):
         super(NewsList, self).set_params(request.GET)
 
+    def paging(self, queryset):
+        return super(NewsList, self).paging(queryset, self.query_params['page'], 10)
+
+    def serialize(self, queryset):
+        results = self.paging(queryset)
+        data = {
+            'title': [u'序号', u'标题', u'来源', u'发表时间'],
+            'items': map(lambda r: {
+                'id': r['id'],
+                'title': r['title'],
+                'time': r['pubtime'].strftime('%Y-%m-%d %H:%M'),
+                'source': r['publisher__publisher']
+            }, results),
+            'total': results.paginator.num_pages
+        }
+        return data
+
     def get(self, request):
         self.set_params(request)
 
-        data = IndustryTrack(params=self.query_params).news_data()
-        return Response(data)
+        queryset = NewsQuerySet(params=self.query_params).get_news_list()
+
+        return Response(self.serialize(queryset))
 
 
 class NewsDetail(BaseView):
 
-    def get(self, request, pk):
-        """
-        {
-          "title": "小米空气净化器疑涉“造假门” 多元化战略隐忧渐显",
-          "source": "新华网",
-          "time": "2015-12-11 18:00",
-          "text": "就在小米科技CEO雷军宣布要将专注小米的核心业务，并将旗下核心业务分为自有产品与生态链产品的次日，小米科技旗下生态链企业智米科技，就曝出了空气净化器产品疑涉“造假门”的消息给这家明星公司的业务转型前景蒙上一层阴影。"
+    def serialize(self, queryset):
+        data = {
+            'title': queryset.title,
+            'source': queryset.publisher.publisher,
+            'time': pretty(queryset.pubtime),
+            'text': queryset.content
         }
-        """
+        return data
+
+    def get(self, request, pk):
         try:
-            risk_news = RiskNews.objects.get(pk=pk)
+            queryset = RiskNews.objects.get(pk=pk)
         except RiskNews.DoesNotExist:
             raise Http404("RiskNews does not exist")
 
-        data = {
-            'title': risk_news.title,
-            'source': risk_news.publisher.publisher,
-            'time': Abstract().pretty_date(risk_news.pubtime),
-            'text': risk_news.content
-        }
-        return Response(data)
+        return Response(self.serialize(queryset))
 
 
 class EnterpriseList(BaseView):
@@ -166,11 +271,30 @@ class EnterpriseList(BaseView):
     def set_params(self, request):
         super(EnterpriseList, self).set_params(request.GET)
 
+    def paging(self, queryset):
+        return super(EnterpriseList, self).paging(queryset, self.query_params['page'], 10)
+
+    def serialize(self, queryset):
+        results = self.paging(queryset)
+        data = {
+            'title': [u'排名', u'企业名称', u'风险信息总数', u'等级'],
+            'items': map(lambda r: {
+                'id': r[1]['enterprise__id'],
+                'ranking': r[0],
+                'title': r[1]['enterprise__name'],
+                'level': round(r[1]['score__avg']),
+                'number': RiskNews.objects.filter(enterprise__id=r[1]['enterprise__id']).count()
+            }, enumerate(results, (int(self.query_params['page']) - 1) * 10 + 1)),
+            'total': results.paginator.num_pages
+        }
+        return data
+
     def get(self, request):
         self.set_params(request)
 
-        data = EnterpriseRank(params=self.query_params).get_all()
-        return Response(data)
+        queryset = EnterpriseRank(params=self.query_params).get_enterprises()
+
+        return Response(self.serialize(queryset))
 
 
 class Analytics(BaseView):
@@ -181,11 +305,26 @@ class Analytics(BaseView):
     def set_params(self, request):
         super(Analytics, self).set_params(request.GET)
 
+    def serialize(self, queryset):
+        data = {
+            'trend': {
+                'labels': queryset['trend']['date'],
+                'data': queryset['trend']['data']
+            },
+            'bar': queryset['bar'],
+            'source': {
+                'labels': queryset['source']['labels'],
+                'data': queryset['source']['data']
+            }
+        }
+        return data
+
     def get(self, request):
         self.set_params(request)
 
-        data = Statistic(params=self.query_params).get_chart()
-        return Response(data)
+        queryset = AnalyticsCal(params=self.query_params).get_chart()
+
+        return Response(self.serialize(queryset))
 
 
 class GenerateAnalyticsExport(BaseView):
@@ -213,6 +352,34 @@ class AnalyticsExport(BaseView):
     def set_params(self, params):
         super(AnalyticsExport, self).set_params(params)
 
+    def paging(self, queryset):
+        return super(AnalyticsExport, self).paging(queryset, self.query_params['page'], 10)
+
+    def serialize(self, queryset):
+        results = self.paging(queryset['list'])
+        data = {
+            'trend': {
+                'labels': queryset['trend']['date'],
+                'data': queryset['trend']['data']
+            },
+            'bar': queryset['bar'],
+            'source': {
+                'labels': queryset['source']['labels'],
+                'data': queryset['source']['data']
+            },
+            'list': {
+                'title': [u'序号', u'标题', u'来源', u'发表时间'],
+                'items': map(lambda r: {
+                    'id': r['id'],
+                    'title': r['title'],
+                    'time': r['pubtime'].strftime('%Y-%m-%d %H:%M'),
+                    'source': r['publisher__publisher']
+                }, queryset['list']),
+                'total': results.paginator.num_pages
+            }
+        }
+        return data
+
     def get(self, request, filename):
         try:
             jwt_payload = jwt.decode(
@@ -223,9 +390,10 @@ class AnalyticsExport(BaseView):
 
         self.set_params(jwt_payload)
 
-        data = Statistic(params=self.query_params).get_all()
+        queryset = AnalyticsCal(params=self.query_params).get_all()
+
         brief = article()
-        output = brief.get_output(data)
+        output = brief.get_output(self.serialize(queryset))
         output.seek(0)
 
         response = xls_to_response(
@@ -235,38 +403,29 @@ class AnalyticsExport(BaseView):
 
 class Filters(BaseView):
 
-    def get(self, request):
-        """
-        Industries, Enterprises, Products, Publishers Filters
-        {
+    def serialize(self, queryset):
+        data = {
             'industries': {
                 'items': [{
-                    'id': 1,
-                    'name': '行业',
-                }]
+                    'id': q['industry__id'],
+                    'text': q['name']
+                } for q in queryset[0]],
             },
             'enterprises': {
-                'items': [{
-                    'id': 1,
-                    'name': '企业',
-                }]
+                'items': queryset[1],
             },
             'products': {
-                'items': [{
-                    'id': 1,
-                    'nam'e: '产品',
-                }]
+                'items': queryset[2],
             },
             'publishers': {
-                'items': [{
-                    'id': 1,
-                    'name': '发布者',
-                }]
+                'items': queryset[3],
             }
         }
-        """
+        return data
+
+    def get(self, request):
         industries = UserIndustry.objects.filter(
-            user__id=request.user.id).annotate(text=F('name')).values('id', 'text')
+            user__id=request.user.id).values('industry__id', 'name')
         enterprises = Enterprise.objects.annotate(
             text=F('name')).values('id', 'text')[:10]
         products = Product.objects.annotate(
@@ -274,19 +433,6 @@ class Filters(BaseView):
         publishers = RiskNewsPublisher.objects.annotate(
             text=F('publisher')).values('id', 'text')[:10]
 
-        data = {
-            'industries': {
-                'items': industries,
-            },
-            'enterprises': {
-                'items': enterprises,
-            },
-            'products': {
-                'items': products,
-            },
-            'publishers': {
-                'items': publishers,
-            }
-        }
+        queryset = (industries, enterprises, products, publishers)
 
-        return Response(data)
+        return Response(self.serialize(queryset))
