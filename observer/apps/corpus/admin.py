@@ -5,12 +5,13 @@ from django.contrib import admin
 
 from observer.apps.corpus.models import Corpus
 from observer.utils.crawler.api import CrawlerTask
+from django_extensions.admin import ForeignKeyAutocompleteAdmin
 
-
-class CorpusAdmin(admin.ModelAdmin):
+class CorpusAdmin(ForeignKeyAutocompleteAdmin):
+    related_search_fields = {'industry': ('name',)}
     list_display = ('industry', 'riskword', 'invalidword')
     list_filter = ('industry', 'riskword', 'invalidword')
-    search_fields = ('industry', 'riskword', 'invalidword')
+    search_fields = ('industry__name', 'riskword', 'invalidword')
     readonly_fields = ['uuid']
     actions = ['delete_selected']
 

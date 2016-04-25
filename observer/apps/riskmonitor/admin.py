@@ -108,7 +108,7 @@ class RiskNewsAdmin(admin.ModelAdmin):
     # related_search_fields = {'area': ('name',)}
     list_display = ('title', 'url', 'publisher', 'reprinted', 'pubtime')
     search_fields = ('title', 'url', 'reprinted', 'publisher__publisher',
-        'industry__name', 'enterprise__name')
+        'industry__name', 'enterprise__name', 'area__name')
     list_filter = ('pubtime', )
 
 
