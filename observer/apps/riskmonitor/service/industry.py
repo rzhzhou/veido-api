@@ -48,6 +48,6 @@ class IndustryTrack(NewsQuerySet):
             score = queryset.aggregate(Avg('score'))[
                 'score__avg'] if queryset else 100
 
-            industries.append((u.industry.id, u.name, round(score)))
+            industries.append((u.id, u.name, round(score)))
 
         return sorted(industries, key=lambda industry: industry[2])
