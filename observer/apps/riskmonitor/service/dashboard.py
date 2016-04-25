@@ -9,12 +9,11 @@ from django.utils import timezone
 from observer.apps.corpus.models import Corpus
 from observer.apps.riskmonitor.service.industry import IndustryTrack
 from observer.apps.riskmonitor.service.enterprise import EnterpriseRank
-from observer.apps.riskmonitor.service.news import NewsQuerySet
 from observer.apps.riskmonitor.models import (
     Area, Product, RiskNews, ScoreEnterprise, ScoreIndustry, ScoreProduct)
 
 
-class Dashboard(IndustryTrack, EnterpriseRank, NewsQuerySet):
+class Dashboard(IndustryTrack, EnterpriseRank):
 
     def __init__(self, params={}):
         super(Dashboard, self).__init__(params)
@@ -72,11 +71,16 @@ class Dashboard(IndustryTrack, EnterpriseRank, NewsQuerySet):
         return queryset
 
     def risk_data(self):
-        days = (self.end - self.start).days
-        date = [(self.start + timedelta(days=x)) for x in xrange(days)]
-        date_range = [(i, (i + timedelta(days=1))) for i in date]
+        self.days = (self.end - self.start).days
 
-        result = self.cal_news_nums(date_range)
+        cal_date_func = lambda x: (
+            self.start + timedelta(days=x),
+            self.start + timedelta(days=x + 1)
+        )
+
+        date_range = map(cal_date_func, xrange(self.days))
+
+        result = self.cal_news_nums(date_range, 'day')
 
         return result[1]
 
