@@ -222,6 +222,17 @@ class RiskNewsPublisher(models.Model):
         return self.publisher
 
 
+class RiskKeyword(models.Model):
+    keyword = models.CharField(max_length=255, verbose_name=u'关键词')
+
+    class Meta:
+        db_table = 'risk_keyword'
+        verbose_name_plural = u'风险新闻关键词'
+
+    def __unicode__(self):
+        return self.keyword
+
+
 class RiskNews(models.Model):
     author = models.CharField(max_length=255, verbose_name=u'作者')
     title = models.CharField(max_length=255, blank=True, verbose_name=u'标题')
@@ -241,6 +252,9 @@ class RiskNews(models.Model):
         related_query_name='industry', verbose_name=u'行业')
     enterprise = models.ManyToManyField(Enterprise, related_name='enterprises',
         related_query_name='enterprise', verbose_name=u'企业')
+
+    risk_keyword = models.ForeignKey(RiskKeyword, null= True, blank=True,
+        default=u'', verbose_name= u'风险新闻关键词')
 
     class Meta:
         app_label = 'riskmonitor'
