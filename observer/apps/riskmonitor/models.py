@@ -129,7 +129,7 @@ class RiskData(models.Model):
 
 
 class ScoreIndustry(models.Model):
-    score = models.CharField(max_length=255, verbose_name=u'分值')
+    score = models.IntegerField(default=0, verbose_name=u'分值')
     pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间', default=timezone.now)
     increment = models.IntegerField(default=0, verbose_name=u'增量')
     reducescore = models.IntegerField(default=0, verbose_name=u'所减的分数')
@@ -147,7 +147,7 @@ class ScoreIndustry(models.Model):
 
 
 class ScoreEnterprise(models.Model):
-    score = models.CharField(max_length=255, verbose_name=u'分值')
+    score = models.IntegerField(default=0, verbose_name=u'分值')
     pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间', default=timezone.now)
     increment = models.IntegerField(default=0, verbose_name=u'增量')
     reducescore = models.IntegerField(default=0, verbose_name=u'所减的分数')
