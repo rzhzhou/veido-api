@@ -229,7 +229,7 @@ class NewsList(BaseView):
                 'id': r['id'],
                 'title': r['title'],
                 'time': r['pubtime'].strftime('%Y-%m-%d %H:%M'),
-                'source': r['publisher__publisher']
+                'source': r['publisher__name']
             }, results),
             'total': results.paginator.num_pages
         }
@@ -383,7 +383,7 @@ class AnalyticsExport(BaseView):
                     'id': r['id'],
                     'title': r['title'],
                     'time': r['pubtime'].strftime('%Y-%m-%d %H:%M'),
-                    'source': r['publisher__publisher']
+                    'source': r['publisher__name']
                 }, queryset['list']),
                 'total': results.paginator.num_pages
             }
@@ -437,7 +437,7 @@ class Filters(BaseView):
             'publishers': {
                 'items': [{
                     'id': q['publisher__id'],
-                    'text': q['publisher__publisher']
+                    'text': q['publisher__name']
                 } for q in queryset[3]],
             }
         }

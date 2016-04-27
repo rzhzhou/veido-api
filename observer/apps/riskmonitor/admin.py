@@ -108,7 +108,7 @@ class RiskDataAdmin(ForeignKeyAutocompleteAdmin):
 class RiskNewsAdmin(admin.ModelAdmin):
     # related_search_fields = {'area': ('name',)}
     list_display = ('title', 'url', 'publisher', 'reprinted', 'pubtime')
-    search_fields = ('title', 'url', 'reprinted', 'publisher__publisher',
+    search_fields = ('title', 'url', 'reprinted', 'publisher__name',
         'industry__name', 'enterprise__name', 'area__name')
     list_filter = ('pubtime', )
     actions = ['delete_selected']

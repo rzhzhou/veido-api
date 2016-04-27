@@ -22,7 +22,7 @@ class AnalyticsCal(IndustryTrack):
         products = []
 
         publishers = RiskNews.objects.filter(
-            **args).values('publisher__id', 'publisher__publisher')
+            **args).values('publisher__id', 'publisher__name')
 
         return (industries, enterprises, products, publishers)
 
