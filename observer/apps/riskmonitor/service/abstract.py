@@ -21,6 +21,20 @@ class Abstract(object):
         except UserIndustry.DoesNotExist:
             self.industry = None
 
+    def set_args(self):
+        cond = {
+            'pubtime__gte': self.start,
+            'pubtime__lt': self.end,
+            'industry__id': self.industry,
+            'enterprise__id': self.enterprise,
+            'publisher__id': self.source
+        }
+
+        # Exclude $cond None Value
+        args = dict([(k, v) for k, v in cond.iteritems() if v is not None])
+
+        return args
+
     def indu_make_level(self, score):
         level = 'A'
         if score <= 100 and score >= 90:
@@ -109,28 +123,7 @@ class Abstract(object):
             }
 
     def sources(self):
-        """
-        "source": {
-            "labels": ["赢商网", "中国产业调研", "新浪", "华西都市网", "人民网"],
-            "data": [
-                {"value": "335", "name": "赢商网"},
-                {"value": "310", "name": "中国产业调研"},
-                {"value": "234", "name": "新浪"},
-                {"value": "135", "name": "华西都市网"},
-                {"value": "1548", "name": "人民网"}
-            ]
-        }
-        """
-        cond = {
-            'pubtime__gte': self.start,
-            'pubtime__lt': self.end,
-            'industry__id': self.industry,
-            'enterprise__id': self.enterprise,
-            'publisher__id': self.source
-        }
-
-        # Exclude $cond None Value
-        args = dict([(k, v) for k, v in cond.iteritems() if v is not None])
+        args = self.set_args()
 
         queryset = RiskNews.objects.filter(**args).values(
             'publisher').annotate(num_publishers=Count('publisher')).order_by('-num_publishers')[:20]

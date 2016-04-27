@@ -16,16 +16,7 @@ class NewsQuerySet(Abstract):
     def get_news_list(self):
         fields = ('id', 'title', 'pubtime', 'publisher__publisher')
 
-        cond = {
-            'pubtime__gte': self.start,
-            'pubtime__lt': self.end,
-            'industry__id': self.industry,
-            'enterprise__id': self.enterprise,
-            'publisher__id': self.source
-        }
-
-        # Exclude $cond None Value
-        args = dict([(k, v) for k, v in cond.iteritems() if v is not None])
+        args = self.set_args()
 
         queryset = RiskNews.objects.filter(**args).values(*fields)
 
@@ -86,16 +77,7 @@ class NewsQuerySet(Abstract):
         }
 
     def cal_news_nums(self, date_range, x_axis_units):
-        cond = {
-            'pubtime__gte': self.start,
-            'pubtime__lt': self.end,
-            'industry__id': self.industry,
-            'enterprise__id': self.enterprise,
-            'publisher__id': self.source
-        }
-
-        # Exclude $cond None Value
-        args = dict([(k, v) for k, v in cond.iteritems() if v is not None])
+        args = self.set_args()
 
         if x_axis_units == 'day':
             # Generate $aggregate_args by date_range

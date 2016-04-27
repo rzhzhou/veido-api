@@ -13,13 +13,7 @@ class EnterpriseRank(Abstract):
     def get_enterprises(self):
         fields = ('enterprise__id', 'enterprise__name')
 
-        cond = {
-            'pubtime__gte': self.start,
-            'pubtime__lt': self.end,
-        }
-
-        # Exclude $cond None Value
-        args = dict([(k, v) for k, v in cond.iteritems() if v is not None])
+        args = self.set_args()
 
         queryset = ScoreEnterprise.objects.filter(
             **args).values(*fields).annotate(Avg('score')).order_by('score__avg')
