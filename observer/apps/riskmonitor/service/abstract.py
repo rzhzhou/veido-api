@@ -129,6 +129,6 @@ class Abstract(object):
             'publisher').annotate(num_publishers=Count('publisher')).order_by('-num_publishers')[:20]
 
         data = [{'value': q['num_publishers'], 'name': RiskNewsPublisher.objects.get(
-            id=q['publisher']).publisher} for q in queryset]
+            id=q['publisher']).name} for q in queryset]
         labels = [d['name'] for d in data]
         return {'labels': labels, 'data': data}
