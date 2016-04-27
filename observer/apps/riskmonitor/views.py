@@ -417,7 +417,7 @@ class Filters(BaseView):
         data = {
             'industries': {
                 'items': [{
-                    'id': q['industry__id'],
+                    'id': q['id'],
                     'text': q['name']
                 } for q in queryset[0]],
             },
@@ -435,7 +435,7 @@ class Filters(BaseView):
 
     def get(self, request):
         industries = UserIndustry.objects.filter(
-            user__id=request.user.id).values('industry__id', 'name')
+            user__id=request.user.id).values('id', 'name')
         enterprises = Enterprise.objects.annotate(
             text=F('name')).values('id', 'text')[:10]
         products = Product.objects.annotate(
