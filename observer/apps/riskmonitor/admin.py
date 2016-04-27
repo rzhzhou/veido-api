@@ -7,7 +7,8 @@ from observer.apps.riskmonitor.models import (Brand, Enterprise, Industry,
                                               RiskData, RiskNews,
                                               ScoreEnterprise, ScoreIndustry,
                                               ScoreProduct, UserArea,
-                                              UserEnterprise, UserIndustry)
+                                              UserEnterprise, UserIndustry,
+                                              ScoreIndustry, ScoreEnterprise)
 
 
 class IndustryAdmin(admin.ModelAdmin):
@@ -110,6 +111,33 @@ class RiskNewsAdmin(admin.ModelAdmin):
     search_fields = ('title', 'url', 'reprinted', 'publisher__publisher',
         'industry__name', 'enterprise__name', 'area__name')
     list_filter = ('pubtime', )
+    actions = ['delete_selected']
+
+    def reduce_score(self, obj):
+        industrys = obj.industry.all()
+        enterprises = obj.enterprise.all()
+        for industry in industrys:
+            items = ScoreIndustry.objects.filter(industry=industry)
+            for item in items:
+                score = int(item.score)-1
+                ScoreIndustry.objects.filter(id=item.id).update(score=score)
+
+        for enterprise in enterprises:
+            items = ScoreEnterprise.objects.filter(enterprise=enterprise)
+            for item in items:
+                score = int(item.score)-1
+                ScoreEnterprise.objects.filter(id=item.id).update(score=score)
+        return
+
+    def delete_model(self, request, obj):
+        self.reduce_score(obj)
+        obj.delete()
+
+
+    def delete_selected(self, request, objs):
+        for obj in objs:
+            self.reduce_score(obj)
+            obj.delete()
 
 
 class UserAreaAdmin(ForeignKeyAutocompleteAdmin):
