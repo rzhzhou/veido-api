@@ -223,14 +223,14 @@ class RiskNewsPublisher(models.Model):
 
 
 class RiskKeyword(models.Model):
-    keyword = models.CharField(max_length=255, verbose_name=u'关键词')
+    name = models.CharField(max_length=255, verbose_name=u'关键词')
 
     class Meta:
         db_table = 'risk_keyword'
         verbose_name_plural = u'风险新闻关键词'
 
     def __unicode__(self):
-        return self.keyword
+        return self.name
 
 
 class RiskNews(models.Model):
