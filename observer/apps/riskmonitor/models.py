@@ -209,7 +209,7 @@ class UserIndustry(models.Model):
 
 class RiskNewsPublisher(models.Model):
     photo = models.URLField(verbose_name=u'用户头像')
-    publisher = models.CharField(max_length=255, verbose_name=u'发布者')
+    name = models.CharField(max_length=255, verbose_name=u'发布者')
     brief = models.CharField(max_length=255, verbose_name=u'简介')
     searchmode = models.IntegerField(default=0, verbose_name=u'搜索方式')
 
@@ -219,7 +219,7 @@ class RiskNewsPublisher(models.Model):
         verbose_name_plural = u'风险新闻发布者'
 
     def __unicode__(self):
-        return self.publisher
+        return self.name
 
 
 class RiskKeyword(models.Model):
