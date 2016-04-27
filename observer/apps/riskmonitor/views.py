@@ -130,9 +130,9 @@ class DashboardList(BaseView):
             },
             'keywordsRank': {
                 'items': [{
-                    'name': k,
-                    'level': 5
-                } for k in queryset['keywords']]
+                    'name': name,
+                    'level': value
+                } for name, value in zip(*queryset['keywords'])]
             },
             'enterprise': {
                 'amount': queryset['risk_count'][1]
@@ -311,7 +311,12 @@ class Analytics(BaseView):
                 'labels': queryset['trend']['date'],
                 'data': queryset['trend']['data']
             },
-            'bar': queryset['bar'],
+            'bar': {
+                'name': [u'关键字'],
+                'show': 'false',
+                'labels': queryset['bar'][0],
+                'data': [queryset['bar'][1]]
+            },
             'source': {
                 'labels': queryset['source']['labels'],
                 'data': queryset['source']['data']
@@ -362,7 +367,12 @@ class AnalyticsExport(BaseView):
                 'labels': queryset['trend']['date'],
                 'data': queryset['trend']['data']
             },
-            'bar': queryset['bar'],
+            'bar':  {
+                'name': [u'关键字'],
+                'show': 'false',
+                'labels': queryset['bar'][0],
+                'data': [queryset['bar'][1]]
+            },
             'source': {
                 'labels': queryset['source']['labels'],
                 'data': queryset['source']['data']

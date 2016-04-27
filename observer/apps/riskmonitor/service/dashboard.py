@@ -8,10 +8,10 @@ from observer.apps.riskmonitor.models import (Area, Product, RiskNews,
                                               ScoreEnterprise, ScoreIndustry,
                                               ScoreProduct)
 from observer.apps.riskmonitor.service.enterprise import EnterpriseRank
-from observer.apps.riskmonitor.service.industry import IndustryTrack
+from observer.apps.riskmonitor.service.analytics import AnalyticsCal
 
 
-class Dashboard(IndustryTrack, EnterpriseRank):
+class Dashboard(AnalyticsCal, EnterpriseRank):
 
     def __init__(self, params={}):
         super(Dashboard, self).__init__(params)
@@ -44,13 +44,7 @@ class Dashboard(IndustryTrack, EnterpriseRank):
         return [i_count, e_count, p_count]
 
     def risk_keywords(self):
-        keywords = Corpus.objects.all()
-        if keywords.exists():
-            keywords = keywords[0].riskword.split()[0:3]
-        else:
-            keywords = []
-
-        return keywords
+        return self.keywords_chart(num=3)
 
     def risk_map(self):
         queryset = Area.objects.filter(level=2).values('id', 'name')
