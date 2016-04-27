@@ -12,16 +12,7 @@ class AnalyticsCal(IndustryTrack):
         super(AnalyticsCal, self).__init__(params)
 
     def get_filters(self):
-        cond = {
-            'pubtime__gte': self.start,
-            'pubtime__lt': self.end,
-            'industry__id': self.industry,
-            'enterprise__id': self.enterprise,
-            'publisher__id': self.source
-        }
-
-        # Exclude $cond None Value
-        args = dict([(k, v) for k, v in cond.iteritems() if v is not None])
+        args = self.set_args()
 
         industries = UserIndustry.objects.filter(
             user__id=self.user_id).values('id', 'name')
@@ -39,16 +30,7 @@ class AnalyticsCal(IndustryTrack):
         return self.trend_chart()
 
     def keywords_chart(self, num):
-        cond = {
-            'pubtime__gte': self.start,
-            'pubtime__lt': self.end,
-            'industry__id': self.industry,
-            'enterprise__id': self.enterprise,
-            'publisher__id': self.source
-        }
-
-        # Exclude $cond None Value
-        args = dict([(k, v) for k, v in cond.iteritems() if v is not None])
+        args = self.set_args()
 
         queryset = RiskNews.objects.filter(**args).values_list('risk_keyword__name').annotate(
             Count('risk_keyword__name')).order_by('-risk_keyword__name__count')[:num]
