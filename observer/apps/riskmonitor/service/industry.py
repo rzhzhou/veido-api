@@ -3,9 +3,9 @@ from datetime import datetime
 
 from django.db.models import Avg
 
+from observer.apps.riskmonitor.models import (RiskNews, ScoreIndustry,
+                                              UserIndustry)
 from observer.apps.riskmonitor.service.news import NewsQuerySet
-from observer.apps.riskmonitor.models import (
-    RiskNews, ScoreIndustry, UserIndustry)
 
 
 class IndustryTrack(NewsQuerySet):

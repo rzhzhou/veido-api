@@ -7,10 +7,11 @@ from django.db.models import Count, Q
 from django.utils import timezone
 
 from observer.apps.corpus.models import Corpus
-from observer.apps.riskmonitor.service.industry import IndustryTrack
+from observer.apps.riskmonitor.models import (Area, Product, RiskNews,
+                                              ScoreEnterprise, ScoreIndustry,
+                                              ScoreProduct)
 from observer.apps.riskmonitor.service.enterprise import EnterpriseRank
-from observer.apps.riskmonitor.models import (
-    Area, Product, RiskNews, ScoreEnterprise, ScoreIndustry, ScoreProduct)
+from observer.apps.riskmonitor.service.industry import IndustryTrack
 
 
 class Dashboard(IndustryTrack, EnterpriseRank):

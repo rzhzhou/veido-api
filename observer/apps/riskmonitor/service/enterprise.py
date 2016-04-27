@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from django.db.models import Avg
 
+from observer.apps.riskmonitor.models import ScoreEnterprise, UserIndustry
 from observer.apps.riskmonitor.service.abstract import Abstract
-from observer.apps.riskmonitor.models import (ScoreEnterprise, UserIndustry)
 
 
 class EnterpriseRank(Abstract):

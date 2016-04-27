@@ -12,8 +12,8 @@ from django.http import Http404
 
 from observer.apps.base.api_function import get_season
 from observer.apps.base.views import BaseView
-from observer.apps.riskmonitor.models import (
-    Industry, RiskNews, RiskNewsPublisher, UserIndustry)
+from observer.apps.riskmonitor.models import (Industry, RiskNews,
+                                              RiskNewsPublisher, UserIndustry)
 
 
 class Abstract(object):

@@ -6,7 +6,7 @@ import jwt
 import pytz
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models import F
 from django.http import Http404, HttpResponse, JsonResponse
 from django.views.generic import View
@@ -14,20 +14,20 @@ from rest_framework import exceptions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from observer.apps.riskmonitor.service.abstract import Abstract
-from observer.apps.riskmonitor.service.enterprise import EnterpriseRank
-from observer.apps.riskmonitor.service.dashboard import Dashboard
-from observer.apps.riskmonitor.service.industry import IndustryTrack
-from observer.apps.riskmonitor.service.analytics import AnalyticsCal
-from observer.apps.riskmonitor.service.news import NewsQuerySet
 from observer.apps.base.initialize import xls_to_response
 from observer.apps.base.views import BaseTemplateView
 from observer.apps.riskmonitor.models import (Enterprise, Industry, Product,
                                               RiskNews, RiskNewsPublisher,
                                               UserIndustry)
-from observer.utils.excel.briefing import article
-from observer.utils.date.tz import get_loc_dt, get_timezone
+from observer.apps.riskmonitor.service.abstract import Abstract
+from observer.apps.riskmonitor.service.analytics import AnalyticsCal
+from observer.apps.riskmonitor.service.dashboard import Dashboard
+from observer.apps.riskmonitor.service.enterprise import EnterpriseRank
+from observer.apps.riskmonitor.service.industry import IndustryTrack
+from observer.apps.riskmonitor.service.news import NewsQuerySet
 from observer.utils.date import pretty
+from observer.utils.date.tz import get_loc_dt, get_timezone
+from observer.utils.excel.briefing import article
 
 
 class BaseView(APIView):
