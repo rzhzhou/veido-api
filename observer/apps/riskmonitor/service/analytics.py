@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-import time
-from datetime import datetime, timedelta
-
-import pytz
+from django.db.models import Count
 
 from observer.apps.riskmonitor.service.industry import IndustryTrack
+
+from observer.apps.riskmonitor.models import RiskNews
 
 
 class AnalyticsCal(IndustryTrack):
@@ -15,21 +14,30 @@ class AnalyticsCal(IndustryTrack):
     def industry_chart(self):
         return self.trend_chart()
 
-    def keywords_chart(self):
-        bar = {
-            'name': [u'关键字'],
-            'show': 'false',
-            'labels': [u'辐射大', u'爆炸', u'频闪', u'甲醛', u'有毒',
-                       u'防腐剂', u'死亡', u'人工色素', u'致癌', u'重金属'],
-            'data': [['180', '160', '140', '130', '120', '110', '100',
-                      '90', '80', '70']]
+    def keywords_chart(self, num):
+        cond = {
+            'pubtime__gte': self.start,
+            'pubtime__lt': self.end,
+            'industry__id': self.industry,
+            'enterprise__id': self.enterprise,
+            'publisher__id': self.source
         }
-        return bar
+
+        # Exclude $cond None Value
+        args = dict([(k, v) for k, v in cond.iteritems() if v is not None])
+
+        queryset = RiskNews.objects.filter(**args).values_list('risk_keyword__name').annotate(
+            Count('risk_keyword__name')).order_by('-risk_keyword__name__count')[:num]
+
+        if not queryset:
+            return [[], []]
+
+        return zip(*queryset)
 
     def get_chart(self):
         data = {
             'trend': self.industry_chart(),
-            'bar': self.keywords_chart(),
+            'bar': self.keywords_chart(num=10),
             'source': self.sources()
         }
         return data

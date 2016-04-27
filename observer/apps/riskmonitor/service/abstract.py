@@ -1,17 +1,10 @@
 # -*- coding: utf-8 -*-
-import time
-from datetime import datetime, timedelta
-
-import pytz
 from dateutil.relativedelta import relativedelta
-from django.conf import settings
-from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, Q
 from django.http import Http404
 
 from observer.apps.base.api_function import get_season
-from observer.apps.base.views import BaseView
 from observer.apps.riskmonitor.models import (Industry, RiskNews,
                                               RiskNewsPublisher, UserIndustry)
 
@@ -135,10 +128,9 @@ class Abstract(object):
             'enterprise__id': self.enterprise,
             'publisher__id': self.source
         }
-        args = {}
-        for k, v in cond.iteritems():
-            if v:
-                args[k] = v
+
+        # Exclude $cond None Value
+        args = dict([(k, v) for k, v in cond.iteritems() if v is not None])
 
         queryset = RiskNews.objects.filter(**args).values(
             'publisher').annotate(num_publishers=Count('publisher')).order_by('-num_publishers')[:20]
