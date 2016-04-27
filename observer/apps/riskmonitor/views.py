@@ -413,6 +413,13 @@ class AnalyticsExport(BaseView):
 
 class Filters(BaseView):
 
+    def __init__(self):
+        super(Filters, self).__init__()
+
+    def set_params(self, request):
+        super(Filters, self).set_params(request.GET)
+        self.query_params['user_id'] = request.user.id
+
     def serialize(self, queryset):
         data = {
             'industries': {
@@ -428,21 +435,17 @@ class Filters(BaseView):
                 'items': queryset[2],
             },
             'publishers': {
-                'items': queryset[3],
+                'items': [{
+                    'id': q['publisher__id'],
+                    'text': q['publisher__publisher']
+                } for q in queryset[3]],
             }
         }
         return data
 
     def get(self, request):
-        industries = UserIndustry.objects.filter(
-            user__id=request.user.id).values('id', 'name')
-        enterprises = Enterprise.objects.annotate(
-            text=F('name')).values('id', 'text')[:10]
-        products = Product.objects.annotate(
-            text=F('name')).values('id', 'text')[:10]
-        publishers = RiskNewsPublisher.objects.annotate(
-            text=F('publisher')).values('id', 'text')[:10]
+        self.set_params(request)
 
-        queryset = (industries, enterprises, products, publishers)
+        queryset = AnalyticsCal(params=self.query_params).get_filters()
 
         return Response(self.serialize(queryset))

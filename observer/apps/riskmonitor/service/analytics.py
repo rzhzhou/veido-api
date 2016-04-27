@@ -3,13 +3,37 @@ from django.db.models import Count
 
 from observer.apps.riskmonitor.service.industry import IndustryTrack
 
-from observer.apps.riskmonitor.models import RiskNews
+from observer.apps.riskmonitor.models import RiskNews, UserIndustry, Enterprise, Product
 
 
 class AnalyticsCal(IndustryTrack):
 
     def __init__(self, params={}):
         super(AnalyticsCal, self).__init__(params)
+
+    def get_filters(self):
+        cond = {
+            'pubtime__gte': self.start,
+            'pubtime__lt': self.end,
+            'industry__id': self.industry,
+            'enterprise__id': self.enterprise,
+            'publisher__id': self.source
+        }
+
+        # Exclude $cond None Value
+        args = dict([(k, v) for k, v in cond.iteritems() if v is not None])
+
+        industries = UserIndustry.objects.filter(
+            user__id=self.user_id).values('id', 'name')
+
+        enterprises = []
+
+        products = []
+
+        publishers = RiskNews.objects.filter(
+            **args).values('publisher__id', 'publisher__publisher')
+
+        return (industries, enterprises, products, publishers)
 
     def industry_chart(self):
         return self.trend_chart()
