@@ -248,7 +248,7 @@ class NewsDetail(BaseView):
     def serialize(self, queryset):
         data = {
             'title': queryset.title,
-            'source': queryset.publisher.publisher,
+            'source': queryset.publisher.name,
             'time': pretty(queryset.pubtime),
             'text': queryset.content
         }
