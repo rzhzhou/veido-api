@@ -128,10 +128,9 @@ class Abstract(object):
             'enterprise__id': self.enterprise,
             'publisher__id': self.source
         }
-        args = {}
-        for k, v in cond.iteritems():
-            if v:
-                args[k] = v
+
+        # Exclude $cond None Value
+        args = dict([(k, v) for k, v in cond.iteritems() if v is not None])
 
         queryset = RiskNews.objects.filter(**args).values(
             'publisher').annotate(num_publishers=Count('publisher')).order_by('-num_publishers')[:20]
