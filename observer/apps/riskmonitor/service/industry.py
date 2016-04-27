@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime
-
 from django.db.models import Avg
 
 from observer.apps.riskmonitor.models import (RiskNews, ScoreIndustry,

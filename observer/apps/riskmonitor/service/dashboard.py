@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
-import time
 from datetime import datetime, timedelta
 
-import pytz
 from django.db.models import Count, Q
-from django.utils import timezone
 
 from observer.apps.corpus.models import Corpus
 from observer.apps.riskmonitor.models import (Area, Product, RiskNews,

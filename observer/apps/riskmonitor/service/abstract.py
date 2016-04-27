@@ -1,17 +1,10 @@
 # -*- coding: utf-8 -*-
-import time
-from datetime import datetime, timedelta
-
-import pytz
 from dateutil.relativedelta import relativedelta
-from django.conf import settings
-from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, Q
 from django.http import Http404
 
 from observer.apps.base.api_function import get_season
-from observer.apps.base.views import BaseView
 from observer.apps.riskmonitor.models import (Industry, RiskNews,
                                               RiskNewsPublisher, UserIndustry)
 
