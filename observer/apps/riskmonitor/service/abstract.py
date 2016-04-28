@@ -121,14 +121,3 @@ class Abstract(object):
                 'data': data,
                 'date': month
             }
-
-    def sources(self):
-        args = self.set_args()
-
-        queryset = RiskNews.objects.filter(**args).values(
-            'publisher').annotate(num_publishers=Count('publisher')).order_by('-num_publishers')[:20]
-
-        data = [{'value': q['num_publishers'], 'name': RiskNewsPublisher.objects.get(
-            id=q['publisher']).name} for q in queryset]
-        labels = [d['name'] for d in data]
-        return {'labels': labels, 'data': data}

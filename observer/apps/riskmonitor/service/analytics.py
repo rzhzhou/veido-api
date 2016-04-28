@@ -40,11 +40,19 @@ class AnalyticsCal(IndustryTrack):
 
         return zip(*queryset)
 
+    def cal_publisher_count(self):
+        args = self.set_args()
+
+        queryset = RiskNews.objects.filter(**args).values_list('publisher__name').annotate(
+            Count('publisher__name')).order_by('-publisher__name__count')[:20]
+
+        return queryset
+
     def get_chart(self):
         data = {
             'trend': self.industry_chart(),
             'bar': self.keywords_chart(num=10),
-            'source': self.sources()
+            'source': self.cal_publisher_count()
         }
         return data
 
