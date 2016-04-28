@@ -241,7 +241,7 @@ class RiskNews(models.Model):
     source = models.CharField(max_length=255, blank=True, verbose_name=u'信息来源')
     pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
     publisher = models.ForeignKey(RiskNewsPublisher, verbose_name=u'文章发布者')
-    uuid = models.CharField(max_length=36)
+    uuid = models.CharField(max_length=36, default=uuid.uuid1())
     feeling_factor = models.FloatField(default=-1, verbose_name=u'正负面')
     reprinted = models.IntegerField(verbose_name=u'转载数')
     status = models.IntegerField(default=0, verbose_name=u'状态')

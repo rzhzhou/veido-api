@@ -119,14 +119,20 @@ class RiskNewsAdmin(admin.ModelAdmin):
         for industry in industrys:
             items = ScoreIndustry.objects.filter(industry=industry)
             for item in items:
-                score = int(item.score) + 1
-                ScoreIndustry.objects.filter(id=item.id).update(score=score)
+                if item.score <= 100:
+                    score = int(item.score) + 1
+                    ScoreIndustry.objects.filter(id=item.id).update(score=score)
+                else:
+                    continue
 
         for enterprise in enterprises:
             items = ScoreEnterprise.objects.filter(enterprise=enterprise)
             for item in items:
-                score = int(item.score) + 1
-                ScoreEnterprise.objects.filter(id=item.id).update(score=score)
+                if item.score <= 100:
+                    score = int(item.score) + 1
+                    ScoreEnterprise.objects.filter(id=item.id).update(score=score)
+                else:
+                    continue
         return
 
     def delete_model(self, request, obj):
