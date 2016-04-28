@@ -318,8 +318,11 @@ class Analytics(BaseView):
                 'data': [queryset['bar'][1]]
             },
             'source': {
-                'labels': queryset['source']['labels'],
-                'data': queryset['source']['data']
+                'labels': zip(*queryset['source'])[0] if queryset['source'] else [],
+                'data': [{
+                    'name': q[0],
+                    'value': q[1]
+                } for q in queryset['source']]
             }
         }
         return data
@@ -374,8 +377,11 @@ class AnalyticsExport(BaseView):
                 'data': [queryset['bar'][1]]
             },
             'source': {
-                'labels': queryset['source']['labels'],
-                'data': queryset['source']['data']
+                'labels': zip(*queryset['source'])[0] if queryset['source'] else [],
+                'data': [{
+                    'name': q[0],
+                    'value': q[1]
+                } for q in queryset['source']]
             },
             'list': {
                 'title': [u'序号', u'标题', u'来源', u'发表时间'],
