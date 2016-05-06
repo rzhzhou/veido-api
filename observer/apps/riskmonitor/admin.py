@@ -20,10 +20,10 @@ class IndustryAdmin(admin.ModelAdmin):
 
 class EnterpriseAdmin(ForeignKeyAutocompleteAdmin):
     related_search_fields = {'area': ('name',)}
-    fields = ('name', 'locate_x', 'locate_y', 'scale', 'ccc', 'area')
-    list_display = ('name', 'locate_x', 'locate_y', 'scale', 'ccc', 'area')
-    search_fields = ('name', 'locate_x', 'locate_y', 'scale', 'ccc', 'area__name')
-    list_filter = ('name', )
+    fields = ('name', 'area')
+    list_display = ('name', 'area')
+    search_fields = ('name', 'area__name')
+    list_filter = ('area', )
 
 
 # class ProductAdmin(admin.ModelAdmin):
@@ -51,7 +51,7 @@ class UserIndustryAdmin(ForeignKeyAutocompleteAdmin):
     fields = ('name', 'user', 'industry')
     list_display = ('name', 'user', 'industry')
     search_fields = ('name', 'user__username', 'industry__name')
-    list_filter = ('user', )
+    list_filter = ('user', 'industry__level')
 
 
 # class UserEnterpriseAdmin(admin.ModelAdmin):
@@ -69,8 +69,8 @@ class ScoreIndustryAdmin(admin.ModelAdmin):
 
     fields = ('score', 'pubtime', 'industry', 'user')
     list_display = ('score', 'industry', 'user', 'show_putime')
-    search_fields = ('score', 'industry__name', 'user__username')
-    list_filter = ('pubtime', 'user')
+    search_fields = ('score', 'industry__name', 'user__username',)
+    list_filter = ('pubtime', 'user', )
 
 
 class ScoreEnterpriseAdmin(admin.ModelAdmin):
