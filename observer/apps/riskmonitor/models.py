@@ -302,6 +302,7 @@ class RiskInspection(models.Model):
     pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
     publisher = models.ForeignKey(RiskInspectionPublisher, verbose_name=u'文章发布者')
     qualitied = models.FloatField(verbose_name=u'合格率')
+    reprinted = models.IntegerField(verbose_name=u'转载数', default=0)
 
     area = models.ManyToManyField(Area, related_name='risk_inspections',
         related_query_name='risk_inspection',verbose_name=u'地域')
