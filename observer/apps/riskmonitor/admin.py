@@ -8,7 +8,17 @@ from observer.apps.riskmonitor.models import (Brand, Enterprise, Industry,
                                               ScoreEnterprise, ScoreIndustry,
                                               ScoreProduct, UserArea,
                                               UserEnterprise, UserIndustry,
-                                              ScoreIndustry, ScoreEnterprise)
+                                              RiskInspection,RiskInspectionPublisher)
+from import_export.admin import ImportExportActionModelAdmin
+from import_export.admin import ImportExportModelAdmin
+from resource import RiskInspectionResources
+
+
+class RiskInspectionAdmin(ImportExportModelAdmin):
+    resource_class = RiskInspectionResources
+    search_fields = ('url', 'title',)
+    list_display = ('title', 'qualitied', 'pubtime','publisher')
+    list_filter = ('pubtime', 'qualitied' )
 
 
 class IndustryAdmin(admin.ModelAdmin):
@@ -167,3 +177,5 @@ admin.site.register(ScoreEnterprise, ScoreEnterpriseAdmin)
 # admin.site.register(RiskData, RiskDataAdmin)
 admin.site.register(RiskNews, RiskNewsAdmin)
 admin.site.register(UserArea, UserAreaAdmin)
+admin.site.register(RiskInspectionPublisher)
+admin.site.register(RiskInspection, RiskInspectionAdmin)
