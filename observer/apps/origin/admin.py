@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
+from import_export.admin import ImportExportActionModelAdmin
 from import_export.admin import ImportExportModelAdmin
-from resource import InspectionResources
-from observer.apps.base.models import Area
+
 from observer.apps.origin.models import InspectionPublisher, Inspection
-from observer.apps.riskmonitor.models import Industry, Enterprise
+from resource import InspectionResources
 
 
-
-class InspectionAdmin(ImportExportModelAdmin):
+class InspectionAdmin(ImportExportActionModelAdmin):
     resource_class = InspectionResources
-    search_fields = ('url', 'title',)
-    list_display = ('title', 'qualitied', 'pubtime', 'publisher')
+    search_fields = ('url', 'title', 'enterprise__name', 'industry__name', 'area__name')
+    list_display = ('title', 'qualitied', 'pubtime', 'publisher',)
     list_filter = ('pubtime', 'qualitied' )
 
 admin.site.register(InspectionPublisher)
