@@ -15,7 +15,6 @@ from observer.apps.riskmonitor.models import Industry, Enterprise
 class InspectionResources(resources.ModelResource):
     pubtime = fields.Field(attribute='pubtime', column_name=u'发布日期')
     title = fields.Field(attribute='title', column_name=u'标题')
-    author = fields.Field(attribute='author', column_name=u'作者')
     url = fields.Field(attribute='url', column_name=u'链接')
     qualitied = fields.Field(attribute='qualitied', column_name=u'合格率')
     reprinted = fields.Field(attribute='reprinted', column_name=u'转载数')

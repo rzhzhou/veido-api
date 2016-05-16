@@ -17,7 +17,6 @@ class InspectionPublisher(models.Model):
 
 
 class Inspection(models.Model):
-    author = models.CharField(max_length=255, blank=True, null=True, verbose_name=u'作者')
     title = models.CharField(max_length=255, blank=True, verbose_name=u'标题')
     url = models.URLField(verbose_name=u'网站链接')
     content = models.TextField(blank=True, null=True, verbose_name=u'正文')
