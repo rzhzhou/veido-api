@@ -12,7 +12,8 @@ from import_export.admin import ImportExportActionModelAdmin
 from import_export.admin import ImportExportModelAdmin
 
 
-class IndustryAdmin(admin.ModelAdmin):
+class IndustryAdmin(ForeignKeyAutocompleteAdmin):
+    related_search_fields = {'parent': ('name',)}
     fields = ('name', 'level', 'parent')
     list_display = ('name', 'level', 'parent')
     search_fields = ('name', 'level', 'parent__name')
