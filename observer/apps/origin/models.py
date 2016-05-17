@@ -24,7 +24,7 @@ class Inspection(models.Model):
     samtime = models.DateTimeField(blank=True, null=True, auto_now=False, verbose_name=u'抽检时间')
     publisher = models.ForeignKey(InspectionPublisher, verbose_name=u'抽检单位')
     qualitied = models.FloatField(blank=True, null=True, verbose_name=u'合格率')
-    unitem = models.CharField(max_length=255, blank=True, null=True, verbose_name=u'不合格项')
+    unitem = models.TextField(blank=True, null=True, verbose_name=u'不合格项')
     brand = models.CharField(max_length=255, blank=True, null=True, verbose_name=u'商标')
 
     area = models.ManyToManyField(Area, related_name='inspections',
