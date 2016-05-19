@@ -21,11 +21,11 @@ class Inspection(models.Model):
     url = models.URLField(blank=True, null=True, verbose_name=u'网站链接')
     content = models.TextField(blank=True, null=True, verbose_name=u'正文')
     pubtime = models.DateTimeField(blank=True, null=True, auto_now=False, verbose_name=u'发布时间')
-    samtime = models.DateTimeField(blank=True, null=True, auto_now=False, verbose_name=u'抽检时间')
     publisher = models.ForeignKey(InspectionPublisher, verbose_name=u'抽检单位')
     qualitied = models.FloatField(blank=True, null=True, verbose_name=u'合格率')
     unitem = models.TextField(blank=True, null=True, verbose_name=u'不合格项')
     brand = models.CharField(max_length=255, blank=True, null=True, verbose_name=u'商标')
+    product = models.CharField(max_length=255, blank=True, null=True, verbose_name=u'产品种类')
 
     area = models.ManyToManyField(Area, related_name='inspections',
         related_query_name='inspection',verbose_name=u'抽检地域')

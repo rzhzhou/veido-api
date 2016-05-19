@@ -14,13 +14,13 @@ from observer.apps.riskmonitor.models import Industry, Enterprise
 
 class InspectionResources(resources.ModelResource):
     pubtime = fields.Field(attribute='pubtime', column_name=u'发布日期')
-    samtime = fields.Field(attribute='samtime', column_name=u'抽检日期')
     title = fields.Field(attribute='title', column_name=u'标题')
     url = fields.Field(attribute='url', column_name=u'链接')
     qualitied = fields.Field(attribute='qualitied', column_name=u'合格率')
     content = fields.Field(attribute='content', column_name=u'正文')
     unitem = fields.Field(attribute='unitem', column_name=u'不合格项')
     brand = fields.Field(attribute='brand', column_name=u'商标')
+    product = fields.Field(attribute='product', column_name=u'产品种类')
     publisher = fields.Field(
         column_name=u'抽检单位',
         attribute='publisher',
@@ -53,11 +53,5 @@ class InspectionResources(resources.ModelResource):
         elif isinstance(instance.pubtime, float):
             instance.pubtime = xlrd.xldate.xldate_as_datetime(instance.pubtime, 0)
 
-        if not instance.samtime:
-            instance.samtime = datetime.now()
-        elif isinstance(instance.samtime, basestring):
-            instance.samtime = datetime.strptime(instance.samtime, '%Y-%m-%d %H:%M:%S')
-        elif isinstance(instance.samtime, float):
-            instance.samtime = xlrd.xldate.xldate_as_datetime(instance.samtime, 0)
 
 
