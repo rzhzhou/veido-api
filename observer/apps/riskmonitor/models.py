@@ -42,8 +42,6 @@ class Industry(models.Model):
     level = models.BigIntegerField(null=False, verbose_name=u'行业层级')
     parent = models.ForeignKey('self', null=True, blank=True, verbose_name=u'上一级')
 
-    area = models.ManyToManyField(Area, related_name='areas', related_query_name='area', verbose_name=u'地域')
-
     class Meta:
         app_label = 'riskmonitor'
         db_table = 'industry'
