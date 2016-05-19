@@ -278,3 +278,77 @@ class UserArea(models.Model):
 
     def __unicode__(self):
         return self.user.username
+
+
+class ManageIndex(models.Model):
+    licence = models.BooleanField(default=False, verbose_name=u'列入许可证目录')
+    productauth = models.BooleanField(default=False, verbose_name=u'列入产品认证目录')
+    policy = models.CharField(max_length=255, blank=True, null=True, verbose_name=u'产业政策')
+    year = models.CharField(max_length=255, blank=True, null=True, verbose_name=u'年度')
+    industry = models.ForeignKey(Industry, verbose_name=u'行业')
+
+    class Meta:
+        app_label = 'riskmonitor'
+        db_table = 'manage_index'
+        verbose_name_plural = u'管理指标(维)'
+
+    def __unicode__(self):
+        return licence
+
+
+class SocietyIndex(models.Model):
+    trade = models.CharField(max_length=255, blank=True, null=True, verbose_name=u'贸易量')
+    qualified = models.CharField(max_length=255, blank=True, null=True, verbose_name=u'抽检合格率')
+    accident = models.CharField(max_length=255, blank=True, null=True, verbose_name=u'案例发生状况')
+    year = models.CharField(max_length=255, blank=True, null=True, verbose_name=u'年度')
+    industry = models.ForeignKey(Industry, verbose_name=u'行业')
+
+    class Meta:
+        app_label = 'riskmonitor'
+        db_table = 'society_index'
+        verbose_name_plural = u'社会性指标(维)'
+
+    def __unicode__(self):
+        return trade
+
+
+class ConsumeIndex(models.Model):
+    force = models.CharField(max_length=255, blank=True, null=True,
+                                verbose_name=u'国家强制性要求')
+    close = models.CharField(max_length=255, blank=True, null=True,
+                                verbose_name=u'密切程度')
+    consume = models.CharField(max_length=255, blank=True, null=True,
+                                verbose_name=u'涉及特定消费群体和特殊要求')
+    year = models.CharField(max_length=255, blank=True, null=True,
+                                verbose_name=u'年度')
+    industry = models.ForeignKey(Industry, verbose_name=u'行业')
+
+    class Meta:
+        app_label = 'riskmonitor'
+        db_table = 'consume_index'
+        verbose_name_plural = u'消费指标(维)'
+
+    def __unicode__(self):
+        return close
+
+
+class MultiDimension(models.Model):
+    manage = models.CharField(max_length=255, blank=True, null=True,
+                                verbose_name=u'管理纬')
+    society = models.CharField(max_length=255, blank=True, null=True,
+                                verbose_name=u'社会影响纬')
+    consume = models.CharField(max_length=255, blank=True, null=True,
+                                verbose_name=u'民生相关纬')
+    news = models.CharField(max_length=255, blank=True, null=True,
+                                verbose_name=u'互联网信息纬')
+    inspection = models.CharField(max_length=255, blank=True, null=True,
+                                verbose_name=u'抽检纬')
+    industry = models.ForeignKey(Industry, verbose_name=u'行业')
+
+    class Meta:
+        app_label = 'riskmonitor'
+        db_table = 'multi_dimension'
+        verbose_name_plural = u'多维表'
+
+    def __unicode__(self):
+        return manage
