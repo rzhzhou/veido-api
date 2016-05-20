@@ -7,7 +7,9 @@ from observer.apps.riskmonitor.models import (Brand, Enterprise, Industry,
                                               RiskData, RiskNews,
                                               ScoreEnterprise, ScoreIndustry,
                                               ScoreProduct, UserArea,
-                                              UserEnterprise, UserIndustry,)
+                                              UserEnterprise, UserIndustry,
+                                              SocietyIndex, ConsumeIndex,
+                                              ManageIndex)
 from import_export.admin import ImportExportActionModelAdmin
 from import_export.admin import ImportExportModelAdmin
 
@@ -155,6 +157,30 @@ class UserAreaAdmin(ForeignKeyAutocompleteAdmin):
     # list_filter = ('user', 'area')
 
 
+class SocietyIndexAdmin(admin.ModelAdmin):
+    fields = ('trade', 'qualified', 'accident','year', 'industry')
+    list_display = ('trade', 'qualified', 'accident', 'year','industry', )
+    search_fields = ('trade', 'industry__name', 'year')
+    list_filter = ('year', 'trade', 'qualified', 'accident' )
+
+
+class ConsumeIndexAdmin(admin.ModelAdmin):
+    fields = ('force', 'close', 'consume','year', 'industry')
+    list_display = ('force', 'close', 'consume','year', 'industry',)
+    search_fields = ('force', 'industry__name', 'year')
+    list_filter = ('year', 'force', 'close', 'consume' )
+
+
+class ManageIndexAdmin(admin.ModelAdmin):
+    fields = ('licence', 'productauth', 'encourage', 'limit', 'remove',
+            'year', 'industry')
+    list_display = ('licence', 'productauth', 'encourage', 'limit',
+            'remove', 'year', 'industry', )
+    search_fields = ('licence', 'productauth', 'encourage', 'limit', 'remove',
+            'industry__name', 'year')
+    list_filter = ('year', 'productauth',)
+
+
 admin.site.register(Industry, IndustryAdmin)
 admin.site.register(Enterprise, EnterpriseAdmin)
 # admin.site.register(Product, ProductAdmin)
@@ -169,3 +195,6 @@ admin.site.register(ScoreEnterprise, ScoreEnterpriseAdmin)
 # admin.site.register(RiskData, RiskDataAdmin)
 admin.site.register(RiskNews, RiskNewsAdmin)
 admin.site.register(UserArea, UserAreaAdmin)
+admin.site.register(SocietyIndex, SocietyIndexAdmin)
+admin.site.register(ConsumeIndex, ConsumeIndexAdmin)
+admin.site.register(ManageIndex, ManageIndexAdmin)

@@ -281,9 +281,11 @@ class UserArea(models.Model):
 
 
 class ManageIndex(models.Model):
-    licence = models.BooleanField(default=False, verbose_name=u'列入许可证目录')
-    productauth = models.BooleanField(default=False, verbose_name=u'列入产品认证目录')
-    policy = models.CharField(max_length=255, blank=True, null=True, verbose_name=u'产业政策')
+    licence = models.BooleanField(default=0, verbose_name=u'列入许可证目录')
+    productauth = models.BooleanField(default=0, verbose_name=u'列入产品认证目录')
+    encourage = models.BooleanField(default=0, verbose_name=u'是否鼓励')
+    limit = models.BooleanField(default=0, verbose_name=u'是否限制')
+    remove = models.BooleanField(default=0, verbose_name=u'是否淘汰')
     year = models.CharField(max_length=255, blank=True, null=True, verbose_name=u'年度')
     industry = models.ForeignKey(Industry, verbose_name=u'行业')
 
@@ -330,25 +332,3 @@ class ConsumeIndex(models.Model):
 
     def __unicode__(self):
         return close
-
-
-class MultiDimension(models.Model):
-    manage = models.CharField(max_length=255, blank=True, null=True,
-                                verbose_name=u'管理纬')
-    society = models.CharField(max_length=255, blank=True, null=True,
-                                verbose_name=u'社会影响纬')
-    consume = models.CharField(max_length=255, blank=True, null=True,
-                                verbose_name=u'民生相关纬')
-    news = models.CharField(max_length=255, blank=True, null=True,
-                                verbose_name=u'互联网信息纬')
-    inspection = models.CharField(max_length=255, blank=True, null=True,
-                                verbose_name=u'抽检纬')
-    industry = models.ForeignKey(Industry, verbose_name=u'行业')
-
-    class Meta:
-        app_label = 'riskmonitor'
-        db_table = 'multi_dimension'
-        verbose_name_plural = u'多维表'
-
-    def __unicode__(self):
-        return manage
