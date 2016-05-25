@@ -36,6 +36,11 @@ class BaseView(APIView):
         self.tz = pytz.timezone(settings.TIME_ZONE)
         self.today = date.today()
         self.query_params = {
+            'industry': None,
+            'enterprise': None,
+            'product': None,
+            'source': None,
+
             'page': 1,
             'start': str(self.today - timedelta(days=6)),
             'end': str(self.today)
