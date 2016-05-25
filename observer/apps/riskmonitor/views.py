@@ -40,7 +40,6 @@ class BaseView(APIView):
             'enterprise': None,
             'product': None,
             'source': None,
-
             'page': 1,
             'start': str(self.today - timedelta(days=6)),
             'end': str(self.today)
@@ -88,7 +87,13 @@ class DashboardList(BaseView):
         super(DashboardList, self).__init__()
 
     def set_params(self, request):
-        super(DashboardList, self).set_params(request.GET)
+        # request.GET add key --> level
+        request_value = {}
+        for param, value in request.GET.iteritems():
+            request_value[param] = value
+        request_value["level"] = request_value.get("level", 3)
+
+        super(DashboardList, self).set_params(request_value)
         self.query_params['user_id'] = request.user.id
 
     def serialize(self, queryset):
@@ -137,7 +142,12 @@ class DashboardList(BaseView):
             },
             'enterprise': {
                 'amount': queryset['risk_count'][1]
-            }
+            },
+            'boards': [
+                {'value': 20, 'name': '整体'},
+                {'value': 61, 'name': '互联网'},
+                {'value': 90, 'name': '抽检'}
+              ]
         }
         return data
 
@@ -156,8 +166,13 @@ class IndustryList(BaseView):
         self.query_params['field'] = 'name'
 
     def set_params(self, request):
-        # (request.GET)    {level}
-        super(IndustryList, self).set_params(request.GET)
+        # request.GET add key --> level
+        request_value = {}
+        for param, value in request.GET.iteritems():
+            request_value[param] = value
+        request_value["level"] = request_value.get("level", 3)
+
+        super(IndustryList, self).set_params(request_value)
         self.query_params['user_id'] = request.user.id
 
     def serialize(self, queryset):
