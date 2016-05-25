@@ -80,6 +80,15 @@ class Dashboard(AnalyticsCal, EnterpriseRank):
     def risk_level(self):
         return ['A', 'B', 'A', 'A', 'C', 'A', 'B']
 
+    def risk_product(self):
+        products = self.get_industries()[:5]
+        name = []
+        score = []
+        for item in products:
+            name.append(item[1])
+            score.append(item[2])
+        return [name, score]
+
     def get_all(self):
         data = {
             'status': self.risk_status(),
@@ -89,6 +98,7 @@ class Dashboard(AnalyticsCal, EnterpriseRank):
             'map': self.risk_map(),
             'risk_data': self.risk_data(),
             'rank_data': self.risk_level(),
-            'risk_count': self.risk_number()
+            'risk_count': self.risk_number(),
+            'risk_product': self.risk_product(),
         }
         return data

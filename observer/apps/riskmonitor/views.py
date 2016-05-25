@@ -126,6 +126,11 @@ class DashboardList(BaseView):
                     'level':i[2]
                 } for i in queryset['industries']]
             },
+
+            'risk_product': {
+                'name': queryset['risk_product'][0],
+                'value': queryset['risk_product'][1]
+            },
             'product': {
                 'amount': queryset['risk_count'][2]
             },
