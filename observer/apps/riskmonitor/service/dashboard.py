@@ -82,12 +82,7 @@ class Dashboard(AnalyticsCal, EnterpriseRank):
 
     def risk_product(self):
         products = self.get_industries()[:5]
-        name = []
-        score = []
-        for item in products:
-            name.append(item[1])
-            score.append(item[2])
-        return [name, score]
+        return zip(*products)
 
     def get_all(self):
         data = {

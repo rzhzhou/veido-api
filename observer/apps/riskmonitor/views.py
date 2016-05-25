@@ -128,8 +128,8 @@ class DashboardList(BaseView):
             },
 
             'risk_product': {
-                'name': queryset['risk_product'][0],
-                'value': queryset['risk_product'][1]
+                'name': queryset['risk_product'][1],
+                'value': queryset['risk_product'][2]
             },
             'product': {
                 'amount': queryset['risk_count'][2]
