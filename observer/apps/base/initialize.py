@@ -98,7 +98,8 @@ def token(view_func):
 
     def wrapper(request, *args, **kwargs):
         username = request.user.username
-        jwt = request.META['HTTP_AUTHORIZATION']
+        jwt = eval(request.body)['token']
+        # jwt = request.META['HTTP_AUTHORIZATION']
         data = RedisQueryApi().keys(username + '*')
         if data:
             for item in data:
