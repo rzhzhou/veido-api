@@ -34,7 +34,8 @@ class IndustryTrack(NewsQuerySet):
     def get_industries(self):
         industries = []
 
-        user_industries = UserIndustry.objects.filter(user__id=self.user_id)
+        user_industries = UserIndustry.objects.filter(user__id=self.user_id,
+            industry__level=self.level)
 
         for u in user_industries:
             queryset = ScoreIndustry.objects.filter(

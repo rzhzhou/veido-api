@@ -155,6 +155,7 @@ class IndustryList(BaseView):
         self.query_params['field'] = 'name'
 
     def set_params(self, request):
+        # (request.GET)    {level}
         super(IndustryList, self).set_params(request.GET)
         self.query_params['user_id'] = request.user.id
 
