@@ -4,7 +4,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, Q
 from django.http import Http404
 
-from observer.apps.base.api_function import get_season
 from observer.apps.riskmonitor.models import (Industry, RiskNews,
                                               RiskNewsPublisher, UserIndustry)
 
@@ -121,3 +120,13 @@ class Abstract(object):
                 'data': data,
                 'date': month
             }
+
+
+def get_season(now):
+    if isinstance(now, datetime):
+        now = now.date()
+    now = now.replace(year=1)
+    for season, (start, end) in seasons:
+        if start <= now <= end:
+            return season
+    assert 0, 'never happens'
