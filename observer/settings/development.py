@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 
 import os
 import datetime
+import re
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -195,3 +196,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# MongoDB
+MONGO_CONN_STR = 'mongodb://192.168.1.181:27017'
+
+# Redis
+redis_conn_str = 'redis://192.168.1.205:16379/8'
+REDIS_CONN_STR = re.match(
+    r"redis://(?P<host>.+):(?P<port>\d+)/(?P<db>.+)",
+    redis_conn_str).groupdict()
