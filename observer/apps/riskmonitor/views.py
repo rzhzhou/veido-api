@@ -97,63 +97,49 @@ class DashboardList(BaseView):
         self.query_params['user_id'] = request.user.id
 
     def serialize(self, queryset):
-        weeks = [u'星期一', u'星期二', u'星期三', u'星期四', u'星期五', u'星期六', u'星期日']
-        data = {
+        weeks = [u'周一', u'周二', u'周三', u'周四', u'周五', u'周六', u'周日']
+        data = {'dashboard':{
             'map': [{
                 'name': m['name'],
                 'value': m['count']
             } for m in queryset['map']],
-            'rankData': {
+            'rankLine': {
                 'labels': [weeks[(self.query_params['start'] + timedelta(days=(i + 1))).isoweekday() - 1]
                            for i in range(7)],
                 'data': queryset['rank_data']
             },
-            'grade': queryset['status'],
-            'enterpriseRank': {
-                'items': [{
-                    'id': e['enterprise__id'],
-                    'name': e['enterprise__name'],
-                    'level': round(e['score__avg'])
-                } for e in queryset['enterprises']]
-            },
-            'industry': {
-                'amount': queryset['risk_count'][0]
-            },
-            'industryRank': {
-                'items': [{
-                    'id': i[0],
-                    'name': i[1],
-                    'level':i[2]
-                } for i in queryset['industries']]
-            },
 
-            'risk_product': {
+            'bar': {
                 'name': queryset['risk_product'][1],
                 'value': queryset['risk_product'][2]
             },
-            'product': {
-                'amount': queryset['risk_count'][2]
-            },
-            'riskData': {
+            'riskLine': {
                 'labels': [weeks[(self.query_params['start'] + timedelta(days=(i + 1))).isoweekday() - 1]
                            for i in range(7)],
                 'data': queryset['risk_data']
-            },
-            'keywordsRank': {
-                'items': [{
-                    'name': name,
-                    'level': value
-                } for name, value in zip(*queryset['keywords'])]
-            },
-            'enterprise': {
-                'amount': queryset['risk_count'][1]
             },
             'boards': [
                 {'value': 20, 'name': '整体'},
                 {'value': 61, 'name': '互联网'},
                 {'value': 90, 'name': '抽检'}
-              ]
-        }
+              ],
+            'barIndustry': [
+                {
+                    'name': '家具',
+                    'type': 'bar',
+                    'data': [320, 100, 301, 334, 390, 330, 320, 110, 320, 332, 301, 334]
+                 },
+                {
+                  'name': '儿童服装',
+                  'type': 'bar',
+                  'data': [120, 132, 101, 134, 90, 230, 210, 110, 320, 332, 351, 334]
+                },
+                {
+                  'name': '复合肥料',
+                  'type': 'bar',
+                  'data': [220, 182, 191, 234, 290, 330, 310, 110, 320, 332, 201, 334]
+                }],
+        }}
         return data
 
     def get(self, request):
