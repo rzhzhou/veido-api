@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 
 from django.db.models import Count, Q
 
-from observer.apps.corpus.models import Corpus
 from observer.apps.riskmonitor.models import (Area, Product, RiskNews,
                                               ScoreEnterprise, ScoreIndustry,
                                               ScoreProduct)

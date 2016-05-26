@@ -46,13 +46,6 @@ INSTALLED_APPS = [
     'tinymce',
 
     'observer.apps.base',
-    'observer.apps.yqj',
-    'observer.apps.event',
-    'observer.apps.analytics',
-    'observer.apps.collection',
-    'observer.apps.config',
-    'observer.apps.corpus',
-    'observer.apps.reuse',
     'observer.apps.riskmonitor',
     'observer.apps.origin',
 ]
