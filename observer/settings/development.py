@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'observer.apps.base',
     'observer.apps.riskmonitor',
     'observer.apps.origin',
+    'observer.apps.corpus',
 ]
 
 MIDDLEWARE_CLASSES = [
