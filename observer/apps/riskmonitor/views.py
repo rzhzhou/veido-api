@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import time
+import uuid
 from datetime import date, datetime, timedelta
 
 import jwt
@@ -27,6 +28,8 @@ from observer.utils.date import pretty
 from observer.utils.date.tz import get_loc_dt, get_timezone
 from observer.utils.excel import xls_to_response
 from observer.utils.excel.briefing import article
+from observer.utils.decorators.cache import token
+from observer.utils.connector.redisconnector import RedisQueryApi
 
 
 class BaseView(APIView):
@@ -462,3 +465,17 @@ class Filters(BaseView):
         queryset = AnalyticsCal(params=self.query_params).get_filters()
 
         return Response(self.serialize(queryset))
+
+
+@token
+def logout_view(request):
+    auth = settings.JWT_AUTH
+    secret_key = auth['JWT_SECRET_KEY']
+    algorithm = auth['JWT_ALGORITHM']
+    token = eval(request.body)['token']
+    result = jwt.decode(token, secret_key, algorithm)
+    name = result['username'] + str(uuid.uuid1())
+    RedisQueryApi().set(name, token)
+    RedisQueryApi().expire(name, result['exp'])
+    return JsonResponse({'status': 'true'})
+
