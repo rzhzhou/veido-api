@@ -80,7 +80,7 @@ class Dashboard(AnalyticsCal, EnterpriseRank):
         return ['A', 'B', 'A', 'A', 'C', 'A', 'B']
 
     def risk_product(self):
-        products = self.get_industries()[:5]
+        products = self.get_industries()[2][:5]
         return zip(*products)
 
     def get_all(self):

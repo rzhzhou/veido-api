@@ -175,7 +175,9 @@ class IndustryList(BaseView):
                     'id': q[0],
                     self.query_params['field']: q[1],
                     'level':q[2]
-                } for q in queryset]
+                } for q in queryset[2]],
+                'thead': queryset[0],
+                'level': queryset[1]
             }
         }
         return data

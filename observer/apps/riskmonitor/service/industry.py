@@ -32,6 +32,15 @@ class IndustryTrack(NewsQuerySet):
         return (self.trend_chart(), self.compare_chart())
 
     def get_industries(self):
+        thead = [u'排名', u'产品类别', u'风险等级', u'产品状态']
+        level = 3
+        if int(self.level) == 2:
+            thead = [u'排名', u'二级行业', u'风险等级', u'行业状态']
+            level = 2
+        elif int(self.level) == 1:
+            thead = [u'排名', u'一级行业', u'风险等级', u'行业状态']
+            level = 1
+
         industries = []
 
         user_industries = UserIndustry.objects.filter(user__id=self.user_id,
@@ -49,4 +58,4 @@ class IndustryTrack(NewsQuerySet):
 
             industries.append((u.id, u.name, round(score)))
 
-        return sorted(industries, key=lambda industry: industry[2])
+        return [thead, level, sorted(industries, key=lambda industry: industry[2])]
