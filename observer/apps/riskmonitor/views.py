@@ -44,7 +44,8 @@ class BaseView(APIView):
             'source': None,
             'page': 1,
             'start': str(self.today - timedelta(days=6)),
-            'end': str(self.today)
+            'end': str(self.today),
+            'level': 3
         }
 
     def set_params(self, params, loc_dt=True):
@@ -90,12 +91,7 @@ class DashboardList(BaseView):
 
     def set_params(self, request):
         # request.GET add key --> level
-        request_value = {}
-        for param, value in request.GET.iteritems():
-            request_value[param] = value
-        request_value["level"] = request_value.get("level", 3)
-
-        super(DashboardList, self).set_params(request_value)
+        super(DashboardList, self).set_params(request.GET)
         self.query_params['user_id'] = request.user.id
 
     def serialize(self, queryset):
@@ -160,12 +156,7 @@ class IndustryList(BaseView):
 
     def set_params(self, request):
         # request.GET add key --> level
-        request_value = {}
-        for param, value in request.GET.iteritems():
-            request_value[param] = value
-        request_value["level"] = request_value.get("level", 3)
-
-        super(IndustryList, self).set_params(request_value)
+        super(IndustryList, self).set_params(request.GET)
         self.query_params['user_id'] = request.user.id
 
     def serialize(self, queryset):
