@@ -2,7 +2,7 @@
 from django.db.models import Avg
 
 from observer.apps.riskmonitor.models import (RiskNews, ScoreIndustry,
-                                              UserIndustry)
+                                              UserIndustry, Industry)
 from observer.apps.riskmonitor.service.news import NewsQuerySet
 
 
@@ -32,19 +32,15 @@ class IndustryTrack(NewsQuerySet):
         return (self.trend_chart(), self.compare_chart())
 
     def get_industries(self):
-        thead = [u'排名', u'产品类别', u'风险等级', u'产品状态']
-        level = 3
-        if int(self.level) == 2:
-            thead = [u'排名', u'二级行业', u'风险等级', u'行业状态']
-            level = 2
-        elif int(self.level) == 1:
-            thead = [u'排名', u'一级行业', u'风险等级', u'行业状态']
-            level = 1
-
         industries = []
-
         user_industries = UserIndustry.objects.filter(user__id=self.user_id,
             industry__level=self.level)
+
+        if self.id:
+            user_industries = UserIndustry.objects.filter(user__id=self.user_id,
+                industry__parent__id=int(self.id))
+            if user_industries:
+                self.level = user_industries[0].industry.level
 
         for u in user_industries:
             queryset = ScoreIndustry.objects.filter(
@@ -56,6 +52,6 @@ class IndustryTrack(NewsQuerySet):
             score = queryset.aggregate(Avg('score'))[
                 'score__avg'] if queryset else 100
 
-            industries.append((u.id, u.name, round(score)))
+            industries.append((u.industry.id, u.name, round(score)))
 
-        return [thead, level, sorted(industries, key=lambda industry: industry[2])]
+        return [sorted(industries, key=lambda industry: industry[2]), self.level]

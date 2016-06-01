@@ -45,7 +45,8 @@ class BaseView(APIView):
             'page': 1,
             'start': str(self.today - timedelta(days=6)),
             'end': str(self.today),
-            'level': 3
+            'level': 3,
+            'id': 0
         }
 
     def set_params(self, params, loc_dt=True):
@@ -96,7 +97,7 @@ class DashboardList(BaseView):
 
     def serialize(self, queryset):
         weeks = [u'周一', u'周二', u'周三', u'周四', u'周五', u'周六', u'周日']
-        data = {'dashboard':{
+        data = {
             'map': [{
                 'name': m['name'],
                 'value': m['count']
@@ -137,7 +138,7 @@ class DashboardList(BaseView):
                   'type': 'bar',
                   'data': [220, 182, 191, 234, 290, 330, 310, 110, 320, 332, 201, 334]
                 }],
-        }}
+        }
         return data
 
     def get(self, request):
@@ -160,17 +161,12 @@ class IndustryList(BaseView):
         self.query_params['user_id'] = request.user.id
 
     def serialize(self, queryset):
-        data = {
-            'industries': {
-                'items': [{
+        data = [{
                     'id': q[0],
-                    self.query_params['field']: q[1],
-                    'level':q[2]
-                } for q in queryset[2]],
-                'thead': queryset[0],
-                'level': queryset[1]
-            }
-        }
+                    'category': q[1],
+                    'score':q[2],
+                    'level': int(queryset[1])
+                } for q in queryset[0]]
         return data
 
     def get(self, request):
