@@ -192,7 +192,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 # MongoDB
-MONGO_CONN_STR = 'mongodb://192.168.1.181:27017'
+MONGO_CONN_STR = 'mongodb://192.168.1.150:27017'
 
 # Redis
 redis_conn_str = 'redis://192.168.1.205:16379/8'
