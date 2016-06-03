@@ -14,12 +14,6 @@ class Abstract(object):
         for k, v in params.iteritems():
             setattr(self, k, v)
 
-        try:
-            self.industry = UserIndustry.objects.get(
-                id=self.industry).industry.id
-        except UserIndustry.DoesNotExist:
-            self.industry = None
-
     def set_args(self):
         cond = {
             'pubtime__gte': self.start,

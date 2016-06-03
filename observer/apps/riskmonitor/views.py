@@ -216,6 +216,7 @@ class NewsList(BaseView):
 
     def set_params(self, request):
         super(NewsList, self).set_params(request.GET)
+        self.query_params['industry'] = int(self.query_params['id'])
 
     def paging(self, queryset):
         return super(NewsList, self).paging(queryset, self.query_params['page'], 10)
