@@ -58,6 +58,9 @@ class BaseView(APIView):
             self.query_params[param] = value
 
         # end date add 1 day
+        if self.query_params['end'] > self.today.strftime('%Y-%m-%d'):
+            self.query_params['end'] = self.today.strftime('%Y-%m-%d')
+
         self.query_params['end'] = datetime.strptime(
             self.query_params['end'], '%Y-%m-%d') + timedelta(days=1)
         self.query_params['end'] = self.query_params[
@@ -68,6 +71,7 @@ class BaseView(APIView):
                 self.tz, self.query_params['start'], pytz.utc)
             self.query_params['end'] = get_loc_dt(
                 self.tz, self.query_params['end'], pytz.utc)
+
 
     def paging(self, queryset, page, num):
         paginator = Paginator(queryset, num)  # Show $num <QuerySet> per page
@@ -113,9 +117,8 @@ class DashboardList(BaseView):
                 'value': queryset['risk_product'][2]
             },
             'riskLine': {
-                'labels': [weeks[(self.query_params['start'] + timedelta(days=(i + 1))).isoweekday() - 1]
-                           for i in range(7)],
-                'data': queryset['risk_data']
+                'data': queryset['risk_data'][0],
+                'labels': queryset['risk_data'][1]
             },
             'boards': [
                 {'value': 20, 'name': '整体'},
