@@ -14,7 +14,7 @@ class NewsQuerySet(Abstract):
         super(NewsQuerySet, self).__init__(params)
 
     def get_news_list(self):
-        fields = ('id', 'title', 'pubtime', 'publisher__name')
+        fields = ('id', 'title', 'pubtime', 'url', 'publisher__name')
 
         args = self.set_args()
 

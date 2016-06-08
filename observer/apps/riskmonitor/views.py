@@ -223,16 +223,14 @@ class NewsList(BaseView):
 
     def serialize(self, queryset):
         results = self.paging(queryset)
-        data = {
-            'title': [u'序号', u'标题', u'来源', u'发表时间'],
-            'items': map(lambda r: {
+        data = map(lambda r: {
                 'id': r['id'],
+                'url': r['url'],
                 'title': r['title'],
                 'time': r['pubtime'].strftime('%Y-%m-%d %H:%M'),
                 'source': r['publisher__name']
-            }, results),
-            'total': results.paginator.num_pages
-        }
+            }, results)
+
         return data
 
     def get(self, request):
