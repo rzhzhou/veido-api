@@ -137,7 +137,7 @@ class ScoreIndustry(models.Model):
         verbose_name_plural = u'行业分值'
 
     def __unicode__(self):
-        return self.score
+        return unicode(self.score)
 
 
 class ScoreEnterprise(models.Model):
@@ -155,7 +155,7 @@ class ScoreEnterprise(models.Model):
         verbose_name_plural = u'企业分值'
 
     def __unicode__(self):
-        return self.score
+        return unicode(self.score)
 
 
 class ScoreProduct(models.Model):

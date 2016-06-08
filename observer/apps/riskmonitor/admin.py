@@ -22,8 +22,7 @@ class IndustryAdmin(ForeignKeyAutocompleteAdmin):
     list_filter = ('level', )
 
 
-class EnterpriseAdmin(ForeignKeyAutocompleteAdmin):
-    related_search_fields = {'area': ('name',)}
+class EnterpriseAdmin(admin.ModelAdmin):
     fields = ('name', 'area')
     list_display = ('name', 'area')
     search_fields = ('name', 'area__name')
