@@ -101,6 +101,14 @@ DATABASES = {
         'USER': 'root',
         'PASSWORD': '123456',
     },
+    'crawler': {
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': '192.168.1.205',
+        'NAME': 'crawler',
+        'USER': 'shendu',
+        'PASSWORD': 'P@55word',
+        'PORT': 13306
+    },
 }
 
 
