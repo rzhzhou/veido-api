@@ -89,17 +89,19 @@ WSGI_APPLICATION = 'observer.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': '192.168.1.101',
-        'NAME': 'yqj',
-        'USER': 'root',
-        'PASSWORD': '123456',
+        'HOST': '192.168.1.205',
+        'NAME': 'yqj2',
+        'USER': 'shendu',
+        'PASSWORD': 'P@55word',
+        'PORT': 13306
     },
     'master': {
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': '192.168.1.101',
-        'NAME': 'yqj',
-        'USER': 'root',
-        'PASSWORD': '123456',
+        'HOST': '192.168.1.205',
+        'NAME': 'yqj2',
+        'USER': 'shendu',
+        'PASSWORD': 'P@55word',
+        'PORT': 13306
     },
     'crawler': {
         'ENGINE': 'django.db.backends.mysql',
