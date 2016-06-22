@@ -11,8 +11,7 @@ from observer.utils.connector.redisconnector import RedisQueryApi
 
 
 class BaseCatch(BaseJob):
-
-    def cache(self, datas):
+    def request_tools(self, url):
         # url_cfg = CacheConf.object.get(name='dashboard').url
         url_cfg = 'http://192.168.1.200:19980'
         headers = {
@@ -25,15 +24,21 @@ class BaseCatch(BaseJob):
             "password": 'wuhan'}
             )
         headers['Authorization'] = 'Bearer ' + eval(res.text)['token']
-        url_cache = datas['url'] %(url_cfg)
+        url_cache = url %(url_cfg)
         result = requests.get(url=url_cache, headers=headers)
+        return result
+
+    def abstract_cache(self, datas):
+        result = self.request_tools(datas['url'])
         RedisQueryApi().hset(datas['hset_name'], datas['hset_key'], result.text)
 
     def get(self, name, url):
         datas = {'url': url,
                 'hset_name' : name,
                 'hset_key' : u'abstract'}
-        self.cache(datas)
+        self.abstract_cache(datas)
+
+    
 
 if __name__ == '__main__':
     BaseCatch().get(name=u'dashboard', url=u'%s/api/dashboard?cache=0')

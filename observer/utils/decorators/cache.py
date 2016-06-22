@@ -18,3 +18,21 @@ def read_cache(view_func):
                 return Response(eval(data))
         return view_func(view_class, *args, **kwargs)
     return wrapper
+
+
+''' set token black list,  when user logout  '''
+def token(view_func):
+
+    def wrapper(request, *args, **kwargs):
+        username = request.user.username
+        jwt = eval(request.body)['token']
+        data = RedisQueryApi().keys(username + '*')
+        if data:
+            for item in data:
+                value = RedisQueryApi().get(item)
+                if jwt == value:
+                    return HttpResponse(status=403)
+        else:
+            return view_func(request, *args, **kwargs)
+        return view_func(request, *args, **kwargs)
+    return wrapper
