@@ -9,8 +9,7 @@ from import_export.widgets import DateWidget, ForeignKeyWidget, ManyToManyWidget
 from import_export import widgets
 from import_export import resources, fields
 from observer.apps.base.models import Area
-from observer.apps.origin.models import InspectionPublisher, Inspection
-from observer.apps.riskmonitor.models import Industry, Enterprise
+from observer.apps.origin.models import Industry, Enterprise, InspectionPublisher, Inspection
 
 
 class EnterpriseResources(resources.ModelResource):
@@ -25,6 +24,25 @@ class EnterpriseResources(resources.ModelResource):
         model = Enterprise
         fields = ('id', 'name', 'area')
         export_order = ('id', 'name', 'area')
+
+    def before_save_instance(self, instance, dry_run):
+        queryset = Enterprise.objects.filter(name=instance.name)
+        if queryset:
+            return
+
+
+class InspectionPublisherResources(resources.ModelResource):
+    name = fields.Field(attribute='name', column_name=u'抽检单位')
+
+    class Meta:
+        model = InspectionPublisher
+        fields = ('id', 'name')
+        export_order = ('id', 'name')
+
+    def before_save_instance(self, instance, dry_run):
+        queryset = InspectionPublisher.objects.filter(name=instance.name)
+        if queryset:
+            return
 
 
 class InspectionResources(resources.ModelResource):
@@ -56,7 +74,7 @@ class InspectionResources(resources.ModelResource):
     class Meta:
         model = Inspection
         fields = ('id', 'pubtime', 'title', 'url', 'qualitied', 'publisher',
-            'area', 'industry', 'enterprise')
+                  'area', 'industry', 'enterprise')
         export_order = ('id', 'pubtime', 'title', 'url', 'qualitied', 'publisher',
                         'area', 'industry', 'enterprise')
 

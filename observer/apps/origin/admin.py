@@ -4,8 +4,10 @@ from django_extensions.admin import ForeignKeyAutocompleteAdmin
 from import_export.admin import ImportExportActionModelAdmin
 from import_export.admin import ImportExportModelAdmin
 
-from observer.apps.origin.models import Enterprise, Industry, InspectionPublisher, Inspection
-from observer.apps.origin.resource import InspectionResources, EnterpriseResources
+from observer.apps.origin.models import (Enterprise, Industry,
+                                         InspectionPublisher, Inspection)
+from observer.apps.origin.resource import (InspectionPublisherResources,
+                                           InspectionResources, EnterpriseResources)
 
 
 class IndustryAdmin(ForeignKeyAutocompleteAdmin):
@@ -24,6 +26,10 @@ class EnterpriseAdmin(ImportExportModelAdmin):
     list_filter = ('area', )
 
 
+class InspectionPublisherAdmin(ImportExportActionModelAdmin):
+    resource_class = InspectionPublisherResources
+
+
 class InspectionAdmin(ImportExportActionModelAdmin):
     resource_class = InspectionResources
     search_fields = ('url', 'title', 'enterprise__name',
@@ -34,5 +40,5 @@ class InspectionAdmin(ImportExportActionModelAdmin):
 
 admin.site.register(Enterprise, EnterpriseAdmin)
 admin.site.register(Industry, IndustryAdmin)
-admin.site.register(InspectionPublisher)
+admin.site.register(InspectionPublisher, InspectionPublisherAdmin)
 admin.site.register(Inspection, InspectionAdmin)
