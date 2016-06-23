@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-import pytz, xlrd
+import pytz
+import xlrd
 from datetime import datetime
 
 from django.conf import settings
@@ -10,6 +11,20 @@ from import_export import resources, fields
 from observer.apps.base.models import Area
 from observer.apps.origin.models import InspectionPublisher, Inspection
 from observer.apps.riskmonitor.models import Industry, Enterprise
+
+
+class EnterpriseResources(resources.ModelResource):
+    name = fields.Field(attribute='name', column_name=u'企业名')
+
+    area = fields.Field(
+        column_name=u'地域',
+        attribute='area',
+        widget=ForeignKeyWidget(Area, 'name'))
+
+    class Meta:
+        model = Enterprise
+        fields = ('id', 'name', 'area')
+        export_order = ('id', 'name', 'area')
 
 
 class InspectionResources(resources.ModelResource):
@@ -43,15 +58,14 @@ class InspectionResources(resources.ModelResource):
         fields = ('id', 'pubtime', 'title', 'url', 'qualitied', 'publisher',
             'area', 'industry', 'enterprise')
         export_order = ('id', 'pubtime', 'title', 'url', 'qualitied', 'publisher',
-            'area', 'industry', 'enterprise')
+                        'area', 'industry', 'enterprise')
 
     def before_save_instance(self, instance, dry_run):
         if not instance.pubtime:
             instance.pubtime = datetime.now()
         elif isinstance(instance.pubtime, basestring):
-            instance.pubtime = datetime.strptime(instance.pubtime, '%Y-%m-%d %H:%M:%S')
+            instance.pubtime = datetime.strptime(
+                instance.pubtime, '%Y-%m-%d %H:%M:%S')
         elif isinstance(instance.pubtime, float):
-            instance.pubtime = xlrd.xldate.xldate_as_datetime(instance.pubtime, 0)
-
-
-
+            instance.pubtime = xlrd.xldate.xldate_as_datetime(
+                instance.pubtime, 0)

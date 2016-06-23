@@ -7,6 +7,7 @@ from django.utils import timezone
 from tinymce.models import HTMLField
 
 from observer.apps.base.models import Area, Group
+from observer.apps.origin.models import Enterprise, Industry
 
 
 class Brand(models.Model):
@@ -21,34 +22,6 @@ class Brand(models.Model):
 
     def __unicode__(self):
         return self.en_name+self.zh_name
-
-
-class Enterprise(models.Model):
-    name = models.CharField(max_length=255, verbose_name=u'企业名')
-
-    area = models.ForeignKey(Area, verbose_name=u'地域')
-
-    class Meta:
-        app_label = 'riskmonitor'
-        db_table = 'enterprise'
-        verbose_name_plural = u'企业'
-
-    def __unicode__(self):
-        return self.name
-
-
-class Industry(models.Model):
-    name = models.CharField(max_length=255, verbose_name=u'名称')
-    level = models.BigIntegerField(null=False, verbose_name=u'行业层级')
-    parent = models.ForeignKey('self', null=True, blank=True, verbose_name=u'上一级')
-
-    class Meta:
-        app_label = 'riskmonitor'
-        db_table = 'industry'
-        verbose_name_plural = u'行业'
-
-    def __unicode__(self):
-        return self.name
 
 
 class Metrics(models.Model):

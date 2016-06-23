@@ -10,23 +10,6 @@ from observer.apps.riskmonitor.models import (Brand, Enterprise, Industry,
                                               UserEnterprise, UserIndustry,
                                               SocietyIndex, ConsumeIndex,
                                               ManageIndex)
-from import_export.admin import ImportExportActionModelAdmin
-from import_export.admin import ImportExportModelAdmin
-
-
-class IndustryAdmin(ForeignKeyAutocompleteAdmin):
-    related_search_fields = {'parent': ('name',)}
-    fields = ('name', 'level', 'parent')
-    list_display = ('name', 'level', 'parent')
-    search_fields = ('name', 'level', 'parent__name')
-    list_filter = ('level', )
-
-
-class EnterpriseAdmin(admin.ModelAdmin):
-    fields = ('name', 'area')
-    list_display = ('name', 'area')
-    search_fields = ('name', 'area__name')
-    list_filter = ('area', )
 
 
 # class ProductAdmin(admin.ModelAdmin):
@@ -65,6 +48,7 @@ class UserIndustryAdmin(ForeignKeyAutocompleteAdmin):
 
 
 class ScoreIndustryAdmin(admin.ModelAdmin):
+
     def show_putime(self, obj):
         return obj.pubtime.strftime("%Y-%m-%d %H:%M")
 
@@ -77,6 +61,7 @@ class ScoreIndustryAdmin(admin.ModelAdmin):
 
 
 class ScoreEnterpriseAdmin(admin.ModelAdmin):
+
     def show_putime(self, obj):
         return obj.pubtime.strftime("%Y-%m-%d %H:%M")
 
@@ -84,7 +69,7 @@ class ScoreEnterpriseAdmin(admin.ModelAdmin):
     fields = ('score', 'enterprise', 'pubtime',)
     list_display = ('score', 'enterprise', 'user', 'show_putime')
     search_fields = ('score', 'enterprise__name', 'user__username')
-    list_filter = ('pubtime', 'user' )
+    list_filter = ('pubtime', 'user')
 
 
 # class ScoreProductAdmin(admin.ModelAdmin):
@@ -103,16 +88,19 @@ class ScoreEnterpriseAdmin(admin.ModelAdmin):
 
 class RiskDataAdmin(ForeignKeyAutocompleteAdmin):
     related_search_fields = {'area': ('name',)}
-    list_display = ('user_name', 'content', 'comment', 'url', 'area', 'brand', 'industry')
-    search_fields = ('user_name', 'content', 'comment', 'url', 'area', 'brand', 'industry')
-    list_filter = ('user_name', 'content', 'comment', 'url', 'area', 'brand', 'industry')
+    list_display = ('user_name', 'content', 'comment',
+                    'url', 'area', 'brand', 'industry')
+    search_fields = ('user_name', 'content', 'comment',
+                     'url', 'area', 'brand', 'industry')
+    list_filter = ('user_name', 'content', 'comment',
+                   'url', 'area', 'brand', 'industry')
 
 
 class RiskNewsAdmin(admin.ModelAdmin):
     # related_search_fields = {'area': ('name',)}
     list_display = ('title', 'url', 'publisher', 'reprinted', 'pubtime')
     search_fields = ('title', 'url', 'reprinted', 'publisher__name',
-        'industry__name', 'enterprise__name', 'area__name')
+                     'industry__name', 'enterprise__name', 'area__name')
     list_filter = ('pubtime', )
     actions = ['delete_selected']
 
@@ -124,7 +112,8 @@ class RiskNewsAdmin(admin.ModelAdmin):
             for item in items:
                 if item.score < 100:
                     score = int(item.score) + 1
-                    ScoreIndustry.objects.filter(id=item.id).update(score=score)
+                    ScoreIndustry.objects.filter(
+                        id=item.id).update(score=score)
                 else:
                     continue
 
@@ -133,7 +122,8 @@ class RiskNewsAdmin(admin.ModelAdmin):
             for item in items:
                 if item.score < 100:
                     score = int(item.score) + 1
-                    ScoreEnterprise.objects.filter(id=item.id).update(score=score)
+                    ScoreEnterprise.objects.filter(
+                        id=item.id).update(score=score)
                 else:
                     continue
         return
@@ -141,7 +131,6 @@ class RiskNewsAdmin(admin.ModelAdmin):
     def delete_model(self, request, obj):
         self.reduce_score(obj)
         obj.delete()
-
 
     def delete_selected(self, request, objs):
         for obj in objs:
@@ -157,31 +146,29 @@ class UserAreaAdmin(ForeignKeyAutocompleteAdmin):
 
 
 class SocietyIndexAdmin(admin.ModelAdmin):
-    fields = ('trade', 'qualified', 'accident','year', 'industry')
-    list_display = ('trade', 'qualified', 'accident', 'year','industry', )
+    fields = ('trade', 'qualified', 'accident', 'year', 'industry')
+    list_display = ('trade', 'qualified', 'accident', 'year', 'industry', )
     search_fields = ('trade', 'industry__name', 'year')
-    list_filter = ('year', 'trade', 'qualified', 'accident' )
+    list_filter = ('year', 'trade', 'qualified', 'accident')
 
 
 class ConsumeIndexAdmin(admin.ModelAdmin):
-    fields = ('force', 'close', 'consume','year', 'industry')
-    list_display = ('force', 'close', 'consume','year', 'industry',)
+    fields = ('force', 'close', 'consume', 'year', 'industry')
+    list_display = ('force', 'close', 'consume', 'year', 'industry',)
     search_fields = ('force', 'industry__name', 'year')
-    list_filter = ('year', 'force', 'close', 'consume' )
+    list_filter = ('year', 'force', 'close', 'consume')
 
 
 class ManageIndexAdmin(admin.ModelAdmin):
     fields = ('licence', 'productauth', 'encourage', 'limit', 'remove',
-            'year', 'industry')
+              'year', 'industry')
     list_display = ('licence', 'productauth', 'encourage', 'limit',
-            'remove', 'year', 'industry', )
+                    'remove', 'year', 'industry', )
     search_fields = ('licence', 'productauth', 'encourage', 'limit', 'remove',
-            'industry__name', 'year')
+                     'industry__name', 'year')
     list_filter = ('year', 'productauth',)
 
 
-admin.site.register(Industry, IndustryAdmin)
-admin.site.register(Enterprise, EnterpriseAdmin)
 # admin.site.register(Product, ProductAdmin)
 # admin.site.register(Metrics, MetricsAdmin)
 # admin.site.register(ProductMetrics, ProductMetricsAdmin)
