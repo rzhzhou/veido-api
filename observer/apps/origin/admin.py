@@ -4,10 +4,18 @@ from django_extensions.admin import ForeignKeyAutocompleteAdmin
 from import_export.admin import ImportExportActionModelAdmin
 from import_export.admin import ImportExportModelAdmin
 
-from observer.apps.origin.models import (Enterprise, Industry,
+from observer.apps.origin.models import (Area, Enterprise, Industry,
                                          InspectionPublisher, Inspection)
 from observer.apps.origin.resource import (InspectionPublisherResources,
                                            InspectionResources, EnterpriseResources)
+
+
+class AreaAdmin(ForeignKeyAutocompleteAdmin):
+    related_search_fields = {'parent': ('name',)}
+    fields = ('name', 'level', 'parent')
+    list_display = ('name', 'level', 'parent')
+    search_fields = ('name', 'level', 'parent__name')
+    list_filter = ('level', )
 
 
 class IndustryAdmin(ForeignKeyAutocompleteAdmin):
@@ -38,6 +46,7 @@ class InspectionAdmin(ImportExportActionModelAdmin):
     list_filter = ('pubtime', 'qualitied')
 
 
+admin.site.register(Area, AreaAdmin)
 admin.site.register(Enterprise, EnterpriseAdmin)
 admin.site.register(Industry, IndustryAdmin)
 admin.site.register(InspectionPublisher, InspectionPublisherAdmin)
