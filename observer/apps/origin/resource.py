@@ -25,7 +25,7 @@ class EnterpriseResources(resources.ModelResource):
         fields = ('id', 'name', 'area')
         export_order = ('id', 'name', 'area')
 
-    def before_save_instance(self, instance, dry_run):
+    def save_instance(self, instance, dry_run=False):
         queryset = Enterprise.objects.filter(name=instance.name)
         if queryset:
             return
@@ -39,7 +39,7 @@ class InspectionPublisherResources(resources.ModelResource):
         fields = ('id', 'name')
         export_order = ('id', 'name')
 
-    def before_save_instance(self, instance, dry_run):
+    def save_instance(self, instance, dry_run):
         queryset = InspectionPublisher.objects.filter(name=instance.name)
         if queryset:
             return
