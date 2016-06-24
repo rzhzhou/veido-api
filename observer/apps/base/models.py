@@ -8,19 +8,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils.crypto import get_random_string
 
-
-class Area(models.Model):
-    name = models.CharField(max_length=255, verbose_name=u'名称')
-    level = models.BigIntegerField(null=False, verbose_name=u'等级')
-    parent = models.ForeignKey('self', null=True, blank=True, verbose_name=u'上一级')
-
-    class Meta:
-        app_label = 'base'
-        db_table = 'area'
-        verbose_name_plural = u'地域'
-
-    def __unicode__(self):
-        return self.name
+from observer.apps.origin.models import Area
 
 
 class WeixinPublisher(models.Model):
