@@ -59,12 +59,14 @@ class Inspection(models.Model):
     product = models.CharField(
         max_length=255, blank=True, null=True, verbose_name=u'产品种类')
 
-    area = models.ManyToManyField(Area, related_name='inspections',
-                                  related_query_name='inspection', verbose_name=u'抽检地域')
-    industry = models.ManyToManyField(Industry, related_name='inspections',
-                                      related_query_name='inspection', verbose_name=u'行业')
-    enterprise = models.ManyToManyField(Enterprise, related_name='inspections',
-                                        related_query_name='inspection', verbose_name=u'企业')
+    area = models.ManyToManyField(Area, related_name='areas',
+                                  related_query_name='area', verbose_name=u'抽检地域')
+    industry = models.ManyToManyField(Industry, related_name='industries',
+                                      related_query_name='industry', verbose_name=u'行业')
+    enterprise_qualified = models.ManyToManyField(Enterprise, related_name='enterprises_qualified',
+                                        related_query_name='enterprise_qualified', verbose_name=u'合格企业')
+    enterprise_unqualified = models.ManyToManyField(Enterprise, related_name='enterprises_unqualified',
+                                        related_query_name='enterprise_unqualified', verbose_name=u'不合格企业')
 
     class Meta:
         app_label = 'origin'
