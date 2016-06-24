@@ -3,8 +3,7 @@ import uuid
 
 from django.db import models
 
-from observer.apps.riskmonitor.models import (Industry, Product, Enterprise,
-    Metrics)
+from observer.apps.origin.models import Industry
 
 
 class Corpus(models.Model):
