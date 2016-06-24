@@ -27,8 +27,8 @@ class EnterpriseResources(resources.ModelResource):
 
     def save_instance(self, instance, dry_run=False):
         queryset = Enterprise.objects.filter(name=instance.name)
-        if queryset:
-            return
+        if not queryset:
+            instance.save()
 
 
 class InspectionPublisherResources(resources.ModelResource):
@@ -41,8 +41,8 @@ class InspectionPublisherResources(resources.ModelResource):
 
     def save_instance(self, instance, dry_run):
         queryset = InspectionPublisher.objects.filter(name=instance.name)
-        if queryset:
-            return
+        if not queryset:
+            instance.save()
 
 
 class InspectionResources(resources.ModelResource):
