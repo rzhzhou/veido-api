@@ -66,17 +66,21 @@ class InspectionResources(resources.ModelResource):
         column_name=u'行业',
         attribute='industry',
         widget=ManyToManyWidget(Industry, ' ', 'name'))
-    enterprise = fields.Field(
-        column_name=u'企业',
-        attribute='enterprise',
+    enterprise_qualified = fields.Field(
+        column_name=u'合格企业',
+        attribute='enterprise_qualified',
+        widget=ManyToManyWidget(Enterprise, ' ', 'name'))
+    enterprise_unqualified = fields.Field(
+        column_name=u'不合格企业',
+        attribute='enterprise_unqualified',
         widget=ManyToManyWidget(Enterprise, ' ', 'name'))
 
     class Meta:
         model = Inspection
         fields = ('id', 'pubtime', 'title', 'url', 'qualitied', 'publisher',
-                  'area', 'industry', 'enterprise')
+                  'area', 'industry', 'enterprise_qualified', 'enterprise_unqualified')
         export_order = ('id', 'pubtime', 'title', 'url', 'qualitied', 'publisher',
-                        'area', 'industry', 'enterprise')
+                        'area', 'industry', 'enterprise_qualified', 'enterprise_unqualified')
 
     def before_save_instance(self, instance, dry_run):
         if not instance.pubtime:
