@@ -46,9 +46,10 @@ INSTALLED_APPS = [
     'tinymce',
 
     'observer.apps.base',
-    'observer.apps.riskmonitor',
-    'observer.apps.origin',
     'observer.apps.corpus',
+    'observer.apps.crawler',
+    'observer.apps.origin',
+    'observer.apps.riskmonitor',
 ]
 
 MIDDLEWARE_CLASSES = [
