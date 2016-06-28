@@ -24,23 +24,24 @@ class CorpusAdmin(ForeignKeyAutocompleteAdmin):
         invalidwords = list(set(obj.invalidword.split()))
         if not change:
             CrawlerTask(obj.uuid, obj.industry.name, riskwords,
-                invalidwords, 'riskmonitor', self.stype).update(obj.uuid)
+                invalidwords).build()
         else:
+            corpus = Corpus.objects.get(id=obj.id)
             CrawlerTask(obj.uuid, obj.industry.name, riskwords,
-                invalidwords, 'riskmonitor', self.stype).update(obj.uuid)
+                invalidwords).update(corpus)
         obj.riskword = " ".join(riskwords)
         obj.invalidword = " ".join(invalidwords)
         obj.save()
 
     def delete_model(self, request, obj):
         CrawlerTask(obj.uuid, obj.industry.name, list(set(obj.riskword.split())),
-            list(set(obj.invalidword.split())), 'riskmonitor', self.stype).remove(obj.uuid)
+            list(set(obj.invalidword.split()))).remove(obj)
         obj.delete()
 
     def delete_selected(self, request, objs):
         for obj in objs:
             CrawlerTask(obj.uuid, obj.industry.name, list(set(obj.riskword.split())),
-                list(set(obj.invalidword.split())), 'riskmonitor', self.stype).remove(obj.uuid)
+                list(set(obj.invalidword.split()))).remove(obj)
             obj.delete()
 
 

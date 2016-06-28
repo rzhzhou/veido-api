@@ -3,72 +3,67 @@ import pytz
 from datetime import datetime, timedelta
 
 from django.conf import settings
-from observer.utils.connector.mongo import MongodbQuerApi
+
+from observer.apps.crawler.models import Task
 
 
 class CrawlerTask(object):
 
-    def __init__(self, uuid, industry, riskwords, invalidwords, collection, stype):
-        self.uuid = uuid
+    def __init__(self, uuid, industry, riskwords, invalidwords):
+        self.uuid = str(uuid)
         self.industry = industry
         self.riskwords = riskwords
         self.invalidwords = invalidwords
-        self.collection = collection
-        self.stype = stype
         self.source = {
-            'baidu': ('"%s" +%s -(%s)', 21600, 'zjld.baidu.newstitle',),
+            'baidu': '"%s" +%s -(%s)',
             # 'weibo': ('%s %s', 21600, 'zjld.weibo.newstitle',),
             # 'sogou': ('+%s+%s', 21600, 'zjld.sogou.keywords',),
             # 'sogou': ('"%s" +%s -(%s)', 21600, 'zjld.sogou.newstitle',)
         }
 
     def build(self):
-        for source, sdata in self.source.items():
+        for k, v in self.source.items():
             for riskword in self.riskwords:
                 data = {
-                    'key': sdata[0] % (self.industry, riskword, " | ".join(self.invalidwords)),
-                    'interval': sdata[1],
-                    'type': sdata[2],
-                    'source': source,
+                    'url': v % (self.industry, riskword, " | ".join(self.invalidwords)),
+                    'source': k,
                 }
 
                 self.insert(data)
 
     def insert(self, data):
         tz = pytz.timezone(settings.TIME_ZONE)
-        conf = {
-            "id": str(self.uuid),
-            "type": data.get('type', ''),
-            "status": data.get('status', 0),
-            "priority": data.get('priority', 3),
-            "interval": data.get('interval', 7200),
-            "update_time": datetime.utcnow(),
-            "lastrun": datetime.utcfromtimestamp(0),
-            "nextrun": datetime.utcnow(),
-            "crtetime": datetime.utcnow(),
-            "timeout": 3600,
-            "key": data.get('key'),
-            "data": {
+        params = {
+            'app': 'seer',
+            'module': '',
+            'crawlerimpl': 'baidu',
+            'rank': 1,
+            'url': data.get('url'),
+            'data': {
                 "last_info": {
                     "pubtime": tz.localize(datetime(2015, 1, 1))
                 },
                 "industry": self.industry,
-                "source_type": self.stype,
-                "source": data.get('source', '')
-            }
+                "source": data.get('source')
+            },
+            'priority': 0,
+            'interval': 3600,
+            'timeout': 3600,
+            'last_run': datetime.min.replace(tzinfo=pytz.utc),
+            'next_run': datetime.utcnow().replace(tzinfo=pytz.utc),
+            'status': 0
         }
 
-        MongodbQuerApi(self.collection).save(conf)
+        task = Task(**params)
+        task.save(using='crawler')
 
-    def update(self, uuid):
-        cond = {
-            'id': self.uuid
-        }
-        MongodbQuerApi(self.collection).delete(cond)
+    def update(self, corpus):
+        self.remove(corpus)
         self.build()
 
-    def remove(self, uuid):
-        cond = {
-            'id': self.uuid
-        }
-        MongodbQuerApi(self.collection).delete(cond)
+    def remove(self, corpus):
+        for v in self.source.itervalues():
+            for riskword in corpus.riskword.split():
+                url = v % (corpus.industry, riskword,
+                           " | ".join(corpus.invalidword.split()))
+                Task.objects.using('crawler').filter(url=url).delete()
