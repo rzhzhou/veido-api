@@ -72,7 +72,6 @@ class BaseView(APIView):
             self.query_params['end'] = get_loc_dt(
                 self.tz, self.query_params['end'], pytz.utc)
 
-
     def paging(self, queryset, page, num):
         paginator = Paginator(queryset, num)  # Show $num <QuerySet> per page
 
@@ -124,22 +123,22 @@ class DashboardList(BaseView):
                 {'value': 20, 'name': '整体'},
                 {'value': 61, 'name': '互联网'},
                 {'value': 90, 'name': '抽检'}
-              ],
+            ],
             'barIndustry': [
                 {
                     'name': '家具',
                     'type': 'bar',
                     'data': [320, 100, 301, 334, 390, 330, 320, 110, 320, 332, 301, 334]
-                 },
-                {
-                  'name': '儿童服装',
-                  'type': 'bar',
-                  'data': [120, 132, 101, 134, 90, 230, 210, 110, 320, 332, 351, 334]
                 },
                 {
-                  'name': '复合肥料',
-                  'type': 'bar',
-                  'data': [220, 182, 191, 234, 290, 330, 310, 110, 320, 332, 201, 334]
+                    'name': '儿童服装',
+                    'type': 'bar',
+                    'data': [120, 132, 101, 134, 90, 230, 210, 110, 320, 332, 351, 334]
+                },
+                {
+                    'name': '复合肥料',
+                    'type': 'bar',
+                    'data': [220, 182, 191, 234, 290, 330, 310, 110, 320, 332, 201, 334]
                 }],
         }
         return data
@@ -165,11 +164,11 @@ class IndustryList(BaseView):
 
     def serialize(self, queryset):
         data = [{
-                    'id': q[0],
-                    'category': q[1],
-                    'score':q[2],
-                    'level': int(queryset[1])
-                } for q in queryset[0]]
+            'id': q[0],
+            'category': q[1],
+            'score':q[2],
+            'level': int(queryset[1])
+        } for q in queryset[0]]
         return data
 
     def get(self, request):
@@ -178,6 +177,38 @@ class IndustryList(BaseView):
         queryset = IndustryTrack(params=self.query_params).get_industries()
 
         return Response(self.serialize(queryset))
+
+
+# class IndustryDetail(BaseView):
+
+#     def __init__(self):
+#         super(IndustryDetail, self).__init__()
+
+#     def set_params(self, request, pk):
+#         super(IndustryDetail, self).set_params(request.GET)
+#         self.query_params['industry'] = pk
+
+#     def serialize(self, queryset):
+#         data = {
+#             'trend': {
+#                 'labels': queryset[0]['date'],
+#                 'data': queryset[0]['data']
+#             },
+#             'bar': {
+#                 'name': [u'同比', u'环比'],
+#                 'show': 'true',
+#                 'lables': [queryset[1]['date']],
+#                 'data': [queryset[1]['data']]
+#             }
+#         }
+#         return data
+
+#     def get(self, request, pk):
+#         self.set_params(request, pk)
+
+#         queryset = IndustryTrack(params=self.query_params).get_chart()
+
+#         return Response(self.serialize(queryset))
 
 
 class IndustryDetail(BaseView):
@@ -191,15 +222,21 @@ class IndustryDetail(BaseView):
 
     def serialize(self, queryset):
         data = {
-            'trend': {
-                'labels': queryset[0]['date'],
-                'data': queryset[0]['data']
+            'total': {
+                'level': 'A',
+                'score': 93,
+                'color': '#03d108'
             },
-            'bar': {
-                'name': [u'同比', u'环比'],
-                'show': 'true',
-                'lables': [queryset[1]['date']],
-                'data': [queryset[1]['data']]
+            'indicators': [
+                {'title': '消费指标', 'score': 85, 'color': '#059df3'},
+                {'title': '社会性指标', 'score': 95, 'color': '#03d108'},
+                {'title': '管理指标', 'score': 15, 'color': '#ff3756'},
+                {'title': '风险新闻', 'score': 90, 'color': '#03d108'},
+                {'title': '风险抽检', 'score': 20, 'color': '#ff3756'}
+            ],
+            'trend': {
+                'categories': ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+                'data': [12, 34, 56, 10, 23, 11, 5]
             }
         }
         return data
@@ -227,12 +264,12 @@ class NewsList(BaseView):
     def serialize(self, queryset):
         results = self.paging(queryset)
         data = map(lambda r: {
-                'id': r['id'],
-                'url': r['url'],
-                'title': r['title'],
-                'time': r['pubtime'].strftime('%Y-%m-%d %H:%M'),
-                'source': r['publisher__name']
-            }, results)
+            'id': r['id'],
+            'url': r['url'],
+            'title': r['title'],
+            'time': r['pubtime'].strftime('%Y-%m-%d %H:%M'),
+            'source': r['publisher__name']
+        }, results)
 
         return data
 
@@ -469,4 +506,3 @@ def logout_view(request):
     RedisQueryApi().set(name, token)
     RedisQueryApi().expire(name, result['exp'])
     return JsonResponse({'status': 'true'})
-
