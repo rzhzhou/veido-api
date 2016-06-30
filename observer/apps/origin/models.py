@@ -89,13 +89,15 @@ class Inspection(models.Model):
         Enterprise,
         related_name='enterprises_qualified',
         related_query_name='enterprise_qualified',
-        verbose_name=u'合格企业'
+        verbose_name=u'合格企业',
+        blank=True
     )
     enterprise_unqualified = models.ManyToManyField(
         Enterprise,
         related_name='enterprises_unqualified',
         related_query_name='enterprise_unqualified',
-        verbose_name=u'不合格企业'
+        verbose_name=u'不合格企业',
+        blank=True
     )
 
     class Meta:
