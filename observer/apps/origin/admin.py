@@ -40,8 +40,7 @@ class InspectionPublisherAdmin(ImportExportActionModelAdmin):
 
 class InspectionAdmin(ImportExportActionModelAdmin):
     resource_class = InspectionResources
-    search_fields = ('url', 'title', 'enterprise__name',
-                     'industry__name', 'area__name')
+    search_fields = ('title',)
     list_display = ('title', 'qualitied', 'pubtime', 'publisher',)
     list_filter = ('pubtime', 'qualitied')
 
