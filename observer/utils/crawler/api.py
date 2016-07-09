@@ -44,7 +44,8 @@ class CrawlerTask(object):
                     "pubtime": tz.localize(datetime(2015, 1, 1))
                 },
                 "industry": self.industry,
-                "source": data.get('source')
+                "source": data.get('source'),
+                'source_type': u'行业监测',
             },
             'priority': 0,
             'interval': 3600,
