@@ -425,12 +425,25 @@ class IndustryDetail(BaseView):
                 {
                     'title': '风险新闻',
                     'score': 90,
-                    'color': '#03d108'
+                    'color': '#03d108',
+                    'norms': [{
+                        'title': q.title,
+                        'source': q.publisher.name,
+                        'time': q.pubtime.strftime('%Y-%m-%d'),
+                        'url': q.url
+                    } for q in queryset['source'][0][:25]]
                 },
                 {
                     'title': '风险抽检',
                     'score': 20,
-                    'color': '#ff3756'
+                    'color': '#ff3756',
+                    'norms': [{
+                        'title': q.title,
+                        'source': q.publisher.name,
+                        'time': q.pubtime.strftime('%Y-%m-%d'),
+                        'url': q.url,
+                        'qualitied': q.qualitied
+                    } for q in queryset['source'][1][:25]]
                 }
             ],
             'trend': {
