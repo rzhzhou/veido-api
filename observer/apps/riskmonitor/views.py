@@ -294,11 +294,144 @@ class IndustryDetail(BaseView):
                 'color': '#03d108'
             },
             'indicators': [
-                {'title': '消费指标', 'score': 85, 'color': '#059df3'},
-                {'title': '社会性指标', 'score': 95, 'color': '#03d108'},
-                {'title': '管理指标', 'score': 15, 'color': '#ff3756'},
-                {'title': '风险新闻', 'score': 90, 'color': '#03d108'},
-                {'title': '风险抽检', 'score': 20, 'color': '#ff3756'}
+                {
+                    'title': u'消费指标',
+                    'score': 85,
+                    'color': '#059df3',
+                    'norms': [
+                        {
+                            'name': u'国家强制性要求',
+                            'options': [
+                                {'label': u'有', 'selected': queryset[
+                                    'indicators'][0].force == u'有'},
+                                {'label': u'无', 'selected': queryset[
+                                    'indicators'][0].force == u'无'}
+                            ]
+                        },
+                        {
+                            'name': u'密切程度',
+                            'options': [
+                                {'label': u'高', 'selected': queryset[
+                                    'indicators'][0].close == u'高'},
+                                {'label': u'中', 'selected': queryset[
+                                    'indicators'][0].close == u'中'},
+                                {'label': u'低', 'selected': queryset[
+                                    'indicators'][0].close == u'低'}
+                            ]
+                        },
+                        {
+                            'name': u'涉及特定消费群体',
+                            'options': [
+                                {'label': u'是', 'selected': queryset[
+                                    'indicators'][0].consume == u'是'},
+                                {'label': u'否', 'selected': queryset[
+                                    'indicators'][0].consume == u'否'}
+                            ]
+                        }
+                    ]
+                },
+                {
+                    'title': u'社会性指标',
+                    'score': 95,
+                    'color': '#03d108',
+                    'norms': [
+                        {
+                            'name': u'贸易量',
+                            'options': [
+                                {'label': u'高', 'selected': queryset[
+                                    'indicators'][1].trade == u'高'},
+                                {'label': u'中', 'selected': queryset[
+                                    'indicators'][1].trade == u'中'},
+                                {'label': u'低', 'selected': queryset[
+                                    'indicators'][1].trade == u'低'}
+                            ]
+                        },
+                        {
+                            'name': u'抽检合格率',
+                            'options': [
+                                {'label': u'高', 'selected': queryset[
+                                    'indicators'][1].qualified == u'高'},
+                                {'label': u'中', 'selected': queryset[
+                                    'indicators'][1].qualified == u'中'},
+                                {'label': u'低', 'selected': queryset[
+                                    'indicators'][1].qualified == u'低'}
+                            ]
+                        },
+                        {
+                            'name': u'案例发生状况',
+                            'options': [
+                                {'label': u'高', 'selected': queryset[
+                                    'indicators'][1].accident == u'高'},
+                                {'label': u'中', 'selected': queryset[
+                                    'indicators'][1].accident == u'中'},
+                                {'label': u'低', 'selected': queryset[
+                                    'indicators'][1].accident == u'低'}
+                            ]
+                        }
+                    ]
+                },
+                {
+                    'title': '管理指标',
+                    'score': 15,
+                    'color': '#ff3756',
+                    'norms': [
+                        {
+                            'name': u'列入许可证目录',
+                            'options': [
+                                {'label': u'是', 'selected': queryset[
+                                    'indicators'][2].licence == u'是'},
+                                {'label': u'否', 'selected': queryset[
+                                    'indicators'][2].licence == u'否'}
+                            ]
+                        },
+                        {
+                            'name': u'列入产品认证目录',
+                            'options': [
+                                {'label': u'是', 'selected': queryset[
+                                    'indicators'][2].productauth == u'是'},
+                                {'label': u'否', 'selected': queryset[
+                                    'indicators'][2].productauth == u'否'}
+                            ]
+                        },
+                        {
+                            'name': u'是否鼓励',
+                            'options': [
+                                {'label': u'是', 'selected': queryset[
+                                    'indicators'][2].encourage == u'是'},
+                                {'label': u'否', 'selected': queryset[
+                                    'indicators'][2].encourage == u'否'}
+                            ]
+                        },
+                        {
+                            'name': u'是否限制',
+                            'options': [
+                                {'label': u'是', 'selected': queryset[
+                                    'indicators'][2].limit == u'是'},
+                                {'label': u'否', 'selected': queryset[
+                                    'indicators'][2].limit == u'否'}
+                            ]
+                        },
+                        {
+                            'name': u'是否淘汰',
+                            'options': [
+                                {'label': u'是', 'selected': queryset[
+                                    'indicators'][2].remove == u'是'},
+                                {'label': u'否', 'selected': queryset[
+                                    'indicators'][2].remove == u'否'}
+                            ]
+                        }
+                    ]
+                },
+                {
+                    'title': '风险新闻',
+                    'score': 90,
+                    'color': '#03d108'
+                },
+                {
+                    'title': '风险抽检',
+                    'score': 20,
+                    'color': '#ff3756'
+                }
             ],
             'trend': {
                 'categories': ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
@@ -310,7 +443,7 @@ class IndustryDetail(BaseView):
     def get(self, request, pk):
         self.set_params(request, pk)
 
-        queryset = IndustryTrack(params=self.query_params).get_chart()
+        queryset = IndustryTrack(params=self.query_params).get_all()
 
         return Response(self.serialize(queryset))
 

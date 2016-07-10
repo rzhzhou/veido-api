@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from django.db.models import Avg
 
-from observer.apps.riskmonitor.models import (RiskNews, ScoreIndustry,
-                                              UserIndustry, Industry)
+from observer.apps.origin.models import Inspection
+from observer.apps.riskmonitor.models import (
+    RiskNews, ScoreIndustry, UserIndustry, Industry, ManageIndex, SocietyIndex, ConsumeIndex)
 from observer.apps.riskmonitor.service.news import NewsQuerySet
 
 
@@ -31,14 +32,34 @@ class IndustryTrack(NewsQuerySet):
     def get_chart(self):
         return (self.trend_chart(), self.compare_chart())
 
+    def get_dimension(self):
+        c_dimension = ConsumeIndex.objects.get(industry__id=self.industry)
+        s_dimension = SocietyIndex.objects.get(industry__id=self.industry)
+        m_dimension = ManageIndex.objects.get(industry__id=self.industry)
+
+        return (c_dimension, s_dimension, m_dimension)
+
+    def get_source(self):
+        risknews = RiskNews.objects.filter(industry__id=self.industry)
+        inspections = Inspection.objects.filter(industry__id=self.industry)
+
+        return (risknews, inspections)
+
+    def get_all(self):
+        data = {
+            'indicators': self.get_dimension(),
+            'source': self.get_source()
+        }
+        return data
+
     def get_industries(self):
         industries = []
         user_industries = UserIndustry.objects.filter(user__id=self.user_id,
-            industry__level=self.level)
+                                                      industry__level=self.level)
 
         if self.id:
             user_industries = UserIndustry.objects.filter(user__id=self.user_id,
-                industry__parent__id=int(self.id))
+                                                          industry__parent__id=int(self.id))
             if user_industries:
                 self.level = user_industries[0].industry.level
 
