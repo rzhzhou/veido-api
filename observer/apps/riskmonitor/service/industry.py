@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.db.models import Avg
+from django.shortcuts import get_object_or_404
 
 from observer.apps.origin.models import Inspection
 from observer.apps.riskmonitor.models import (
@@ -33,9 +34,12 @@ class IndustryTrack(NewsQuerySet):
         return (self.trend_chart(), self.compare_chart())
 
     def get_dimension(self):
-        c_dimension = ConsumeIndex.objects.get(industry__id=self.industry)
-        s_dimension = SocietyIndex.objects.get(industry__id=self.industry)
-        m_dimension = ManageIndex.objects.get(industry__id=self.industry)
+        c_dimension = get_object_or_404(
+            ConsumeIndex, industry__id=self.industry)
+        s_dimension = get_object_or_404(
+            SocietyIndex, industry__id=self.industry)
+        m_dimension = get_object_or_404(
+            ManageIndex, industry__id=self.industry)
 
         return (c_dimension, s_dimension, m_dimension)
 
