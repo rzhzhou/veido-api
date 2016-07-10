@@ -100,47 +100,113 @@ class DashboardList(BaseView):
 
     def serialize(self, queryset):
         weeks = [u'周一', u'周二', u'周三', u'周四', u'周五', u'周六', u'周日']
+        categories = [weeks[(self.query_params['start'] + timedelta(days=(i + 1))).isoweekday() - 1]
+                               for i in range(7)]
         data = {
-            'map': [{
+            "summaries": [
+                {
+                    "name": "整体",
+                    "value": 20
+                },
+                {
+                    "name": "互联网",
+                    "value": 61
+                },
+                {
+                    "name": "抽检",
+                    "value": 90
+                }
+            ],
+            "products": {
+                'categories': categories,
+                'data': queryset['risk_product'][2]
+            },
+            "source": [{
                 'name': m['name'],
                 'value': m['count']
             } for m in queryset['map']],
-            'rankLine': {
-                'labels': [weeks[(self.query_params['start'] + timedelta(days=(i + 1))).isoweekday() - 1]
-                           for i in range(7)],
-                'data': queryset['rank_data']
+            "risk": {
+                'categories': categories,
+                'data': queryset['risk_data'][0]
             },
-
-            'bar': {
-                'name': queryset['risk_product'][1],
-                'value': queryset['risk_product'][2]
+            "industries": {
+                "categories": [
+                    "1月",
+                    "2月",
+                    "3月",
+                    "4月",
+                    "5月",
+                    "6月",
+                    "7月",
+                    "8月",
+                    "9月",
+                    "10月",
+                    "11月",
+                    "12月"
+                ],
+                "data": [
+                    {
+                        "data": [
+                            320,
+                            100,
+                            301,
+                            334,
+                            390,
+                            330,
+                            320,
+                            110,
+                            320,
+                            332,
+                            301,
+                            334
+                        ],
+                        "type": "bar",
+                        "name": "家具"
+                    },
+                    {
+                        "data": [
+                            120,
+                            132,
+                            101,
+                            134,
+                            90,
+                            230,
+                            210,
+                            110,
+                            320,
+                            332,
+                            351,
+                            334
+                        ],
+                        "type": "bar",
+                        "name": "儿童服装"
+                    },
+                    {
+                        "data": [
+                            220,
+                            182,
+                            191,
+                            234,
+                            290,
+                            330,
+                            310,
+                            110,
+                            320,
+                            332,
+                            201,
+                            334
+                        ],
+                        "type": "bar",
+                        "name": "复合肥料"
+                    }
+                ]
             },
-            'riskLine': {
-                'data': queryset['risk_data'][0],
-                'labels': queryset['risk_data'][1]
-            },
-            'boards': [
-                {'value': 20, 'name': '整体'},
-                {'value': 61, 'name': '互联网'},
-                {'value': 90, 'name': '抽检'}
-            ],
-            'barIndustry': [
-                {
-                    'name': '家具',
-                    'type': 'bar',
-                    'data': [320, 100, 301, 334, 390, 330, 320, 110, 320, 332, 301, 334]
-                },
-                {
-                    'name': '儿童服装',
-                    'type': 'bar',
-                    'data': [120, 132, 101, 134, 90, 230, 210, 110, 320, 332, 351, 334]
-                },
-                {
-                    'name': '复合肥料',
-                    'type': 'bar',
-                    'data': [220, 182, 191, 234, 290, 330, 310, 110, 320, 332, 201, 334]
-                }],
+            "rank": {
+                "categories": categories,
+                "data": zip(queryset['rank_data'], categories)
+            }
         }
+
         return data
 
     def get(self, request):
