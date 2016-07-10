@@ -379,45 +379,45 @@ class IndustryDetail(BaseView):
                             'name': u'列入许可证目录',
                             'options': [
                                 {'label': u'是', 'selected': queryset[
-                                    'indicators'][2].licence == u'是'},
+                                    'indicators'][2].licence == 1},
                                 {'label': u'否', 'selected': queryset[
-                                    'indicators'][2].licence == u'否'}
+                                    'indicators'][2].licence == 0}
                             ]
                         },
                         {
                             'name': u'列入产品认证目录',
                             'options': [
                                 {'label': u'是', 'selected': queryset[
-                                    'indicators'][2].productauth == u'是'},
+                                    'indicators'][2].productauth == 1},
                                 {'label': u'否', 'selected': queryset[
-                                    'indicators'][2].productauth == u'否'}
+                                    'indicators'][2].productauth == 0}
                             ]
                         },
                         {
                             'name': u'是否鼓励',
                             'options': [
                                 {'label': u'是', 'selected': queryset[
-                                    'indicators'][2].encourage == u'是'},
+                                    'indicators'][2].encourage == 1},
                                 {'label': u'否', 'selected': queryset[
-                                    'indicators'][2].encourage == u'否'}
+                                    'indicators'][2].encourage == 0}
                             ]
                         },
                         {
                             'name': u'是否限制',
                             'options': [
                                 {'label': u'是', 'selected': queryset[
-                                    'indicators'][2].limit == u'是'},
+                                    'indicators'][2].limit == 1},
                                 {'label': u'否', 'selected': queryset[
-                                    'indicators'][2].limit == u'否'}
+                                    'indicators'][2].limit == 0}
                             ]
                         },
                         {
                             'name': u'是否淘汰',
                             'options': [
                                 {'label': u'是', 'selected': queryset[
-                                    'indicators'][2].remove == u'是'},
+                                    'indicators'][2].remove == 1},
                                 {'label': u'否', 'selected': queryset[
-                                    'indicators'][2].remove == u'否'}
+                                    'indicators'][2].remove == 0}
                             ]
                         }
                     ]
