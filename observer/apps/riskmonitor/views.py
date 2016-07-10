@@ -101,52 +101,52 @@ class DashboardList(BaseView):
     def serialize(self, queryset):
         weeks = [u'周一', u'周二', u'周三', u'周四', u'周五', u'周六', u'周日']
         categories = [weeks[(self.query_params['start'] + timedelta(days=(i + 1))).isoweekday() - 1]
-                               for i in range(7)]
+                      for i in range(7)]
         data = {
-            "summaries": [
+            'summaries': [
                 {
-                    "name": "整体",
-                    "value": 20
+                    'name': '整体',
+                    'value': 20
                 },
                 {
-                    "name": "互联网",
-                    "value": 61
+                    'name': '互联网',
+                    'value': 61
                 },
                 {
-                    "name": "抽检",
-                    "value": 90
+                    'name': '抽检',
+                    'value': 90
                 }
             ],
-            "products": {
+            'products': {
                 'categories': queryset['risk_product'][1],
                 'data': queryset['risk_product'][2]
             },
-            "source": [{
+            'source': [{
                 'name': m['name'],
                 'value': m['count']
             } for m in queryset['map']],
-            "risk": {
+            'risk': {
                 'categories': categories,
                 'data': queryset['risk_data'][0]
             },
-            "industries": {
-                "categories": [
-                    "1月",
-                    "2月",
-                    "3月",
-                    "4月",
-                    "5月",
-                    "6月",
-                    "7月",
-                    "8月",
-                    "9月",
-                    "10月",
-                    "11月",
-                    "12月"
+            'industries': {
+                'categories': [
+                    '1月',
+                    '2月',
+                    '3月',
+                    '4月',
+                    '5月',
+                    '6月',
+                    '7月',
+                    '8月',
+                    '9月',
+                    '10月',
+                    '11月',
+                    '12月'
                 ],
-                "data": [
+                'data': [
                     {
-                        "data": [
+                        'data': [
                             320,
                             100,
                             301,
@@ -160,11 +160,11 @@ class DashboardList(BaseView):
                             301,
                             334
                         ],
-                        "type": "bar",
-                        "name": "家具"
+                        'type': 'bar',
+                        'name': '家具'
                     },
                     {
-                        "data": [
+                        'data': [
                             120,
                             132,
                             101,
@@ -178,11 +178,11 @@ class DashboardList(BaseView):
                             351,
                             334
                         ],
-                        "type": "bar",
-                        "name": "儿童服装"
+                        'type': 'bar',
+                        'name': '儿童服装'
                     },
                     {
-                        "data": [
+                        'data': [
                             220,
                             182,
                             191,
@@ -196,14 +196,14 @@ class DashboardList(BaseView):
                             201,
                             334
                         ],
-                        "type": "bar",
-                        "name": "复合肥料"
+                        'type': 'bar',
+                        'name': '复合肥料'
                     }
                 ]
             },
-            "rank": {
-                "categories": categories,
-                "data": zip(queryset['rank_data'], categories)
+            'rank': {
+                'categories': categories,
+                'data': zip(categories, queryset['rank_data'])
             }
         }
 
