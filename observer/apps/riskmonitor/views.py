@@ -379,18 +379,24 @@ class EnterpriseList(BaseView):
         return super(EnterpriseList, self).paging(queryset, self.query_params['page'], 10)
 
     def serialize(self, queryset):
-        results = self.paging(queryset)
-        data = {
-            'title': [u'排名', u'企业名称', u'风险信息总数', u'等级'],
-            'items': map(lambda r: {
-                'id': r[1]['enterprise__id'],
-                'ranking': r[0],
-                'title': r[1]['enterprise__name'],
-                'level': round(r[1]['score__avg']),
-                'number': RiskNews.objects.filter(enterprise__id=r[1]['enterprise__id']).count()
-            }, enumerate(results, (int(self.query_params['page']) - 1) * 10 + 1)),
-            'total': results.paginator.num_pages
-        }
+        # results = self.paging(queryset)
+        # data = {
+        #     'title': [u'排名', u'企业名称', u'风险信息总数', u'等级'],
+        #     'items': map(lambda r: {
+        #         'id': r[1]['enterprise__id'],
+        #         'ranking': r[0],
+        #         'title': r[1]['enterprise__name'],
+        #         'level': round(r[1]['score__avg']),
+        #         'number': RiskNews.objects.filter(enterprise__id=r[1]['enterprise__id']).count()
+        #     }, enumerate(results, (int(self.query_params['page']) - 1) * 10 + 1)),
+        #     'total': results.paginator.num_pages
+        # }
+        # return data
+        data = [{
+            'name': q.name,
+            'total': RiskNews.objects.filter(enterprise__id=q.id).count()
+        } for q in queryset[:25]]
+
         return data
 
     def get(self, request):

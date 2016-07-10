@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db.models import Avg
 
-from observer.apps.riskmonitor.models import ScoreEnterprise, UserIndustry
+from observer.apps.riskmonitor.models import Enterprise, ScoreEnterprise, UserIndustry
 from observer.apps.riskmonitor.service.abstract import Abstract
 
 
@@ -15,7 +15,8 @@ class EnterpriseRank(Abstract):
 
         args = self.set_args()
 
-        queryset = ScoreEnterprise.objects.filter(
-            **args).values(*fields).annotate(Avg('score')).order_by('score__avg')
+        # queryset = ScoreEnterprise.objects.filter(
+        #     **args).values(*fields).annotate(Avg('score')).order_by('score__avg')
+        queryset =  Enterprise.objects.all()
 
         return queryset
