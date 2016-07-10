@@ -580,7 +580,7 @@ class Search(BaseView):
             'title': q.title,
             'source': q.publisher.name,
             'reprint': q.reprinted,
-            'time': q.pubtime,
+            'time': q.pubtime.strftime('%Y-%m-%d'),
             'url': q.url
         } for q in queryset[:25]]
 
