@@ -5,7 +5,7 @@ from observer.apps.riskmonitor.views import (Analytics, AnalyticsExport,
                                              DashboardList, EnterpriseList,
                                              Filters, GenerateAnalyticsExport,
                                              IndustryDetail, IndustryList,
-                                             NewsDetail, NewsList)
+                                             NewsDetail, NewsList, Search)
 
 urlpatterns = [
     url(r'^dashboards$', DashboardList.as_view()),
@@ -17,6 +17,7 @@ urlpatterns = [
     url(r'^analytics$', Analytics.as_view()),
     url(r'^analytics/filters$', Filters.as_view()),
     url(r'^analytics/export$', GenerateAnalyticsExport.as_view()),
+    url(r'^search$', Search.as_view()),
 ]
 
 urlpatterns += [

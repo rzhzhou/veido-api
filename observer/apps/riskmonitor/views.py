@@ -8,7 +8,7 @@ import pytz
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from django.db.models import F
+from django.db.models import F, Q
 from django.http import Http404, HttpResponse, JsonResponse
 from django.views.generic import View
 from rest_framework import exceptions, status
@@ -563,6 +563,36 @@ class Filters(BaseView):
         self.set_params(request)
 
         queryset = AnalyticsCal(params=self.query_params).get_filters()
+
+        return Response(self.serialize(queryset))
+
+
+class Search(BaseView):
+
+    def __init__(self):
+        super(Search, self).__init__()
+
+    def set_params(self, request):
+        self.query_params['keyword'] = request.GET.get('keyword')
+
+    def serialize(self, queryset):
+        data = [{
+            'title': q.title,
+            'source': q.publisher.name,
+            'reprint': q.reprinted,
+            'time': q.pubtime,
+            'url': q.url
+        } for q in queryset[:25]]
+
+        return data
+
+    def get(self, request):
+        self.set_params(request)
+
+        queryset = RiskNews.objects.filter(
+            Q(title__contains=self.query_params['keyword']) |
+            Q(content__contains=self.query_params['keyword'])
+        )
 
         return Response(self.serialize(queryset))
 
