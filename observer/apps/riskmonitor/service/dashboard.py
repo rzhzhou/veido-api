@@ -84,7 +84,7 @@ class Dashboard(AnalyticsCal, EnterpriseRank):
         return (result[1], date)
 
     def risk_level(self):
-        return ['A', 'B', 'A', 'A', 'C', 'A', 'B']
+        return ['0', '1', '0', '0', '2', '0', '1']
 
     def risk_product(self):
         products = self.get_industries()[0]
