@@ -743,7 +743,6 @@ class Search(BaseView):
         return Response(self.serialize(queryset))
 
 
-@token
 def logout_view(request):
     auth = settings.JWT_AUTH
     secret_key = auth['JWT_SECRET_KEY']
