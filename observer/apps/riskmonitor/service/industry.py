@@ -59,14 +59,18 @@ class IndustryTrack(NewsQuerySet):
 
     def get_industries(self):
         industries = []
-        user_industries = UserIndustry.objects.filter(user__id=self.user_id,
-                                                      industry__level=self.level)
 
-        if self.id:
-            user_industries = UserIndustry.objects.filter(user__id=self.user_id,
-                                                          industry__parent__id=int(self.id))
-            if user_industries:
-                self.level = user_industries[0].industry.level
+        cond = {
+            'user__id': self.user_id,
+            'industry__name': self.name,
+            'industry__level': self.level,
+            'industry__parent__id': self.parent
+        }
+
+        # Exclude $cond None Value
+        args = dict([(k, v) for k, v in cond.iteritems() if v is not None])
+
+        user_industries = UserIndustry.objects.filter(**args)
 
         for u in user_industries:
             queryset = ScoreIndustry.objects.filter(
@@ -78,6 +82,6 @@ class IndustryTrack(NewsQuerySet):
             score = queryset.aggregate(Avg('score'))[
                 'score__avg'] if queryset else 100
 
-            industries.append((u.industry.id, u.name, round(score)))
+            industries.append((u.industry.id, u.name, u.industry.level, round(score)))
 
-        return [sorted(industries, key=lambda industry: industry[2]), self.level]
+        return sorted(industries, key=lambda industry: industry[2])

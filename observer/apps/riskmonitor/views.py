@@ -45,8 +45,6 @@ class BaseView(APIView):
             'page': 1,
             'start': str(self.today - timedelta(days=6)),
             'end': str(self.today),
-            'level': 3,
-            'id': 0
         }
 
     def set_params(self, params, loc_dt=True):
@@ -221,10 +219,11 @@ class IndustryList(BaseView):
 
     def __init__(self):
         super(IndustryList, self).__init__()
-        self.query_params['field'] = 'name'
+        self.query_params['name'] = None
+        self.query_params['level'] = 3
+        self.query_params['parent'] = None
 
     def set_params(self, request):
-        # request.GET add key --> level
         super(IndustryList, self).set_params(request.GET)
         self.query_params['user_id'] = request.user.id
 
@@ -232,9 +231,9 @@ class IndustryList(BaseView):
         data = [{
             'id': q[0],
             'category': q[1],
-            'score':q[2],
-            'level': int(queryset[1])
-        } for q in queryset[0]]
+            'level': q[2],
+            'score':q[3]
+        } for q in queryset]
         return data
 
     def get(self, request):
