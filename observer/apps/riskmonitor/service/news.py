@@ -72,7 +72,7 @@ class NewsQuerySet(Abstract):
         result = self.cal_news_nums(date_range, x_axis_units)
 
         return {
-            'date': result[0],
+            'categories': result[0],
             'data': result[1]
         }
 

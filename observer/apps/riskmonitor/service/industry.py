@@ -19,11 +19,11 @@ class IndustryTrack(NewsQuerySet):
         # less than equal 4 months (122 = 31 + 31 + 30 + 30)
         if self.days > 0 and self.days <= 122:
             result = self.cal_date_range('day')
-            result['date'] = [i.strftime('%m-%d') for i in result['date']]
+            result['categories'] = [i.strftime('%m-%d') for i in result['categories']]
 
         elif self.days > 122:  # great than 4 months
             result = self.cal_date_range('month')
-            result['date'] = [i.strftime('%Y-%m') for i in result['date']]
+            result['categories'] = [i.strftime('%Y-%m') for i in result['categories']]
 
         return result
 
@@ -52,7 +52,8 @@ class IndustryTrack(NewsQuerySet):
     def get_all(self):
         data = {
             'indicators': self.get_dimension(),
-            'source': self.get_source()
+            'source': self.get_source(),
+            'trend': self.trend_chart()
         }
         return data
 
