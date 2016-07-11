@@ -296,8 +296,8 @@ class IndustryDetail(BaseView):
             'indicators': [
                 {
                     'title': u'消费指标',
-                    'score': 85,
-                    'color': '#059df3',
+                    'score': 100,
+                    'color': '#03d108',
                     'norms': [
                         {
                             'name': u'国家强制性要求',
@@ -332,7 +332,7 @@ class IndustryDetail(BaseView):
                 },
                 {
                     'title': u'社会性指标',
-                    'score': 95,
+                    'score': 100,
                     'color': '#03d108',
                     'norms': [
                         {
@@ -372,8 +372,8 @@ class IndustryDetail(BaseView):
                 },
                 {
                     'title': '管理指标',
-                    'score': 15,
-                    'color': '#ff3756',
+                    'score': 100,
+                    'color': '#03d108',
                     'norms': [
                         {
                             'name': u'列入许可证目录',
@@ -424,7 +424,7 @@ class IndustryDetail(BaseView):
                 },
                 {
                     'title': '风险新闻',
-                    'score': 90,
+                    'score': 100,
                     'color': '#03d108',
                     'norms': [{
                         'title': q.title,
@@ -435,8 +435,8 @@ class IndustryDetail(BaseView):
                 },
                 {
                     'title': '风险抽检',
-                    'score': 20,
-                    'color': '#ff3756',
+                    'score': 100,
+                    'color': '#03d108',
                     'norms': [{
                         'title': q.title,
                         'source': q.publisher.name,
