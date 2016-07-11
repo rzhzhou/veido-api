@@ -38,7 +38,7 @@ class IndustryTrack(NewsQuerySet):
         s = SocietyIndex.objects.filter(industry__id=self.industry)
         m = ManageIndex.objects.filter(industry__id=self.industry)
 
-        c_dimension = (c[0].force, c[0].close, c[0].consume) if c else (-1, -1, -1)
+        c_dimension = (c[0].force, c[0].close, c[0].consume) if c else (0, 1, 0)
         c_score = (100 * c_dimension[0] + 50 * (c_dimension[1] - 1) + 100 * c_dimension[2]) / 3
         if 0 <= c_score < 34:
             c_color = '#ff3756'
@@ -47,7 +47,7 @@ class IndustryTrack(NewsQuerySet):
         else:
             c_color = '#03d108'
 
-        s_dimension = (s[0].trade, s[0].qualified, s[0].accident) if s else (-1, -1, -1)
+        s_dimension = (s[0].trade, s[0].qualified, s[0].accident) if s else (1, 1, 1)
         s_score = (50 * (s_dimension[0] - 1) + 50 * (s_dimension[1] - 1) + 50 * (s_dimension[2] - 1)) / 3
         if 0 <= s_score < 34:
             s_color = '#ff3756'
@@ -56,7 +56,7 @@ class IndustryTrack(NewsQuerySet):
         else:
             s_color = '#03d108'
 
-        m_dimension = (m[0].licence, m[0].productauth, m[0].encourage, m[0].limit, m[0].remove) if m else (-1, -1, -1, -1, -1)
+        m_dimension = (m[0].licence, m[0].productauth, m[0].encourage, m[0].limit, m[0].remove) if m else (0, 0, 0, 0, 0)
         m_score = (100 * m_dimension[0] + 100 * m_dimension[1] + 100 * m_dimension[2] + 100 * m_dimension[3] + 100 * m_dimension[4]) / 5
         if 0 <= m_score < 34:
             m_color = '#ff3756'
