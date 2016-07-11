@@ -17,6 +17,6 @@ class EnterpriseRank(Abstract):
 
         # queryset = ScoreEnterprise.objects.filter(
         #     **args).values(*fields).annotate(Avg('score')).order_by('score__avg')
-        queryset =  Enterprise.objects.all()
+        queryset =  Enterprise.objects.filter(area__name=u'常州')
 
         return queryset
