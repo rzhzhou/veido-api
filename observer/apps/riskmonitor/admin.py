@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
 from django_extensions.admin import ForeignKeyAutocompleteAdmin
+from import_export.admin import ImportExportActionModelAdmin
+from import_export.admin import ImportExportModelAdmin
 
+from observer.apps.riskmonitor.resource import (
+    ConsumeIndexResources, ManageIndexResources, SocietyIndexResources)
 from observer.apps.riskmonitor.models import (Brand, Enterprise, Industry,
                                               Metrics, Product, ProductMetrics,
                                               RiskData, RiskNews,
@@ -145,21 +149,26 @@ class UserAreaAdmin(ForeignKeyAutocompleteAdmin):
     # list_filter = ('user', 'area')
 
 
-class SocietyIndexAdmin(admin.ModelAdmin):
+class ConsumeIndexAdmin(ImportExportModelAdmin):
+    resource_class = ConsumeIndexResources
+
+    fields = ('force', 'close', 'consume', 'year', 'industry')
+    list_display = ('force', 'close', 'consume', 'year', 'industry')
+    search_fields = ('force', 'industry__name', 'year')
+    list_filter = ('year', 'force', 'close', 'consume')
+
+
+class SocietyIndexAdmin(ImportExportModelAdmin):
+    resource_class = SocietyIndexResources
     fields = ('trade', 'qualified', 'accident', 'year', 'industry')
     list_display = ('trade', 'qualified', 'accident', 'year', 'industry', )
     search_fields = ('trade', 'industry__name', 'year')
     list_filter = ('year', 'trade', 'qualified', 'accident')
 
 
-class ConsumeIndexAdmin(admin.ModelAdmin):
-    fields = ('force', 'close', 'consume', 'year', 'industry')
-    list_display = ('force', 'close', 'consume', 'year', 'industry',)
-    search_fields = ('force', 'industry__name', 'year')
-    list_filter = ('year', 'force', 'close', 'consume')
+class ManageIndexAdmin(ImportExportModelAdmin):
+    resource_class = ManageIndexResources
 
-
-class ManageIndexAdmin(admin.ModelAdmin):
     fields = ('licence', 'productauth', 'encourage', 'limit', 'remove',
               'year', 'industry')
     list_display = ('licence', 'productauth', 'encourage', 'limit',

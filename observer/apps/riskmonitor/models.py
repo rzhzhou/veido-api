@@ -315,9 +315,6 @@ class ConsumeIndex(models.Model):
         db_table = 'consume_index'
         verbose_name_plural = u'消费指标(维)'
 
-    def __unicode__(self):
-        return close
-
 
 class SocietyIndex(models.Model):
     trade = models.IntegerField(
@@ -351,9 +348,6 @@ class SocietyIndex(models.Model):
         app_label = 'riskmonitor'
         db_table = 'society_index'
         verbose_name_plural = u'社会性指标(维)'
-
-    def __unicode__(self):
-        return trade
 
 
 class ManageIndex(models.Model):
@@ -400,6 +394,3 @@ class ManageIndex(models.Model):
         app_label = 'riskmonitor'
         db_table = 'manage_index'
         verbose_name_plural = u'管理指标(维)'
-
-    def __unicode__(self):
-        return licence
