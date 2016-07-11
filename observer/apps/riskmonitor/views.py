@@ -43,7 +43,7 @@ class BaseView(APIView):
             'product': None,
             'source': None,
             'page': 1,
-            'start': str(self.today - timedelta(days=6)),
+            'start': str(self.today - timedelta(days=32)),
             'end': str(self.today),
         }
 
