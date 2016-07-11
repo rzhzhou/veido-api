@@ -87,7 +87,7 @@ class Dashboard(AnalyticsCal, EnterpriseRank):
         return [0, 1, 0, 0, 2, 0, 1]
 
     def risk_product(self):
-        products = self.get_industries()[0]
+        products = self.get_industries()
         if len(products) >= 5:
             products = products[:5]
         return zip(*products)
