@@ -95,6 +95,9 @@ class DashboardList(BaseView):
         # request.GET add key --> level
         super(DashboardList, self).set_params(request.GET)
         self.query_params['user_id'] = request.user.id
+        self.query_params['name'] = None
+        self.query_params['level'] = 3
+        self.query_params['parent'] = None
 
     def serialize(self, queryset):
         weeks = [u'周一', u'周二', u'周三', u'周四', u'周五', u'周六', u'周日']
