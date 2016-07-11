@@ -301,8 +301,7 @@ class ConsumeIndex(models.Model):
         null=True,
         verbose_name=u'涉及特定消费群体和特殊要求'
     )
-    year = models.CharField(
-        max_length=255,
+    year = models.IntegerField(
         blank=True,
         null=True,
         verbose_name=u'年度'
@@ -335,8 +334,7 @@ class SocietyIndex(models.Model):
         null=True,
         verbose_name=u'案例发生状况'
     )
-    year = models.CharField(
-        max_length=255,
+    year = models.IntegerField(
         blank=True,
         null=True,
         verbose_name=u'年度'
@@ -381,8 +379,7 @@ class ManageIndex(models.Model):
         null=True,
         verbose_name=u'是否淘汰'
     )
-    year = models.CharField(
-        max_length=255,
+    year = models.IntegerField(
         blank=True,
         null=True,
         verbose_name=u'年度'
