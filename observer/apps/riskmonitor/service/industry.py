@@ -34,14 +34,42 @@ class IndustryTrack(NewsQuerySet):
         return (self.trend_chart(), self.compare_chart())
 
     def get_dimension(self):
-        c_dimension = get_object_or_404(
-            ConsumeIndex, industry__id=self.industry)
-        s_dimension = get_object_or_404(
-            SocietyIndex, industry__id=self.industry)
-        m_dimension = get_object_or_404(
-            ManageIndex, industry__id=self.industry)
+        c = ConsumeIndex.objects.filter(industry__id=self.industry)
+        s = SocietyIndex.objects.filter(industry__id=self.industry)
+        m = ManageIndex.objects.filter(industry__id=self.industry)
 
-        return (c_dimension, s_dimension, m_dimension)
+        c_dimension = (c[0].force, c[0].close, c[0].consume) if c else (-1, -1, -1)
+        c_score = (100 * c_dimension[0] + 50 * (c_dimension[1] - 1) + 100 * c_dimension[2]) / 3
+        if 0 <= c_score < 34:
+            c_color = '#ff3756'
+        elif 34 <= c_score < 67:
+            c_color = '#059df3'
+        else:
+            c_color = '#03d108'
+
+        s_dimension = (s[0].trade, s[0].qualified, s[0].accident) if s else (-1, -1, -1)
+        s_score = (50 * (s_dimension[0] - 1) + 50 * (s_dimension[1] - 1) + 50 * (s_dimension[2] - 1)) / 3
+        if 0 <= s_score < 34:
+            s_color = '#ff3756'
+        elif 34 <= s_score < 67:
+            s_color = '#059df3'
+        else:
+            s_color = '#03d108'
+
+        m_dimension = (m[0].licence, m[0].productauth, m[0].encourage, m[0].limit, m[0].remove) if m else (-1, -1, -1, -1, -1)
+        m_score = (100 * m_dimension[0] + 100 * m_dimension[1] + 100 * m_dimension[2] + 100 * m_dimension[3] + 100 * m_dimension[4]) / 5
+        if 0 <= m_score < 34:
+            m_color = '#ff3756'
+        elif 34 <= m_score < 67:
+            m_color = '#059df3'
+        else:
+            m_color = '#03d108'
+
+        return (
+            (c_dimension, c_score, c_color),
+            (s_dimension, s_score, s_color),
+            (m_dimension, m_score, m_color)
+        )
 
     def get_source(self):
         risknews = RiskNews.objects.filter(industry__id=self.industry)

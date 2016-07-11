@@ -298,128 +298,128 @@ class IndustryDetail(BaseView):
             'indicators': [
                 {
                     'title': u'消费指标',
-                    'score': 100,
-                    'color': '#03d108',
+                    'score': queryset['indicators'][0][1],
+                    'color': queryset['indicators'][0][2],
                     'norms': [
                         {
                             'name': u'国家强制性要求',
                             'options': [
                                 {'label': u'有', 'selected': queryset[
-                                    'indicators'][0].force == u'有'},
+                                    'indicators'][0][0][0] == 1},
                                 {'label': u'无', 'selected': queryset[
-                                    'indicators'][0].force == u'无'}
+                                    'indicators'][0][0][0] == 0}
                             ]
                         },
                         {
                             'name': u'密切程度',
                             'options': [
                                 {'label': u'高', 'selected': queryset[
-                                    'indicators'][0].close == u'高'},
+                                    'indicators'][0][0][1] == 3},
                                 {'label': u'中', 'selected': queryset[
-                                    'indicators'][0].close == u'中'},
+                                    'indicators'][0][0][1] == 2},
                                 {'label': u'低', 'selected': queryset[
-                                    'indicators'][0].close == u'低'}
+                                    'indicators'][0][0][1] == 1}
                             ]
                         },
                         {
                             'name': u'涉及特定消费群体',
                             'options': [
                                 {'label': u'是', 'selected': queryset[
-                                    'indicators'][0].consume == u'是'},
+                                    'indicators'][0][0][2] == 1},
                                 {'label': u'否', 'selected': queryset[
-                                    'indicators'][0].consume == u'否'}
+                                    'indicators'][0][0][2] == 0}
                             ]
                         }
                     ]
                 },
                 {
                     'title': u'社会性指标',
-                    'score': 100,
-                    'color': '#03d108',
+                    'score': queryset['indicators'][1][1],
+                    'color': queryset['indicators'][1][2],
                     'norms': [
                         {
                             'name': u'贸易量',
                             'options': [
                                 {'label': u'高', 'selected': queryset[
-                                    'indicators'][1].trade == u'高'},
+                                    'indicators'][1][0][0] == 3},
                                 {'label': u'中', 'selected': queryset[
-                                    'indicators'][1].trade == u'中'},
+                                    'indicators'][1][0][0] == 2},
                                 {'label': u'低', 'selected': queryset[
-                                    'indicators'][1].trade == u'低'}
+                                    'indicators'][1][0][0] == 1}
                             ]
                         },
                         {
                             'name': u'抽检合格率',
                             'options': [
                                 {'label': u'高', 'selected': queryset[
-                                    'indicators'][1].qualified == u'高'},
+                                    'indicators'][1][0][1] == 3},
                                 {'label': u'中', 'selected': queryset[
-                                    'indicators'][1].qualified == u'中'},
+                                    'indicators'][1][0][1] == 2},
                                 {'label': u'低', 'selected': queryset[
-                                    'indicators'][1].qualified == u'低'}
+                                    'indicators'][1][0][1] == 1}
                             ]
                         },
                         {
                             'name': u'案例发生状况',
                             'options': [
                                 {'label': u'高', 'selected': queryset[
-                                    'indicators'][1].accident == u'高'},
+                                    'indicators'][1][0][2] == 3},
                                 {'label': u'中', 'selected': queryset[
-                                    'indicators'][1].accident == u'中'},
+                                    'indicators'][1][0][2] == 2},
                                 {'label': u'低', 'selected': queryset[
-                                    'indicators'][1].accident == u'低'}
+                                    'indicators'][1][0][2] == 1}
                             ]
                         }
                     ]
                 },
                 {
                     'title': '管理指标',
-                    'score': 100,
-                    'color': '#03d108',
+                    'score': queryset['indicators'][2][1],
+                    'color': queryset['indicators'][2][2],
                     'norms': [
                         {
                             'name': u'列入许可证目录',
                             'options': [
                                 {'label': u'是', 'selected': queryset[
-                                    'indicators'][2].licence == 1},
+                                    'indicators'][2][0][0] == 1},
                                 {'label': u'否', 'selected': queryset[
-                                    'indicators'][2].licence == 0}
+                                    'indicators'][2][0][0] == 0}
                             ]
                         },
                         {
                             'name': u'列入产品认证目录',
                             'options': [
                                 {'label': u'是', 'selected': queryset[
-                                    'indicators'][2].productauth == 1},
+                                    'indicators'][2][0][1] == 1},
                                 {'label': u'否', 'selected': queryset[
-                                    'indicators'][2].productauth == 0}
+                                    'indicators'][2][0][1] == 0}
                             ]
                         },
                         {
                             'name': u'是否鼓励',
                             'options': [
                                 {'label': u'是', 'selected': queryset[
-                                    'indicators'][2].encourage == 1},
+                                    'indicators'][2][0][2] == 1},
                                 {'label': u'否', 'selected': queryset[
-                                    'indicators'][2].encourage == 0}
+                                    'indicators'][2][0][2] == 0}
                             ]
                         },
                         {
                             'name': u'是否限制',
                             'options': [
                                 {'label': u'是', 'selected': queryset[
-                                    'indicators'][2].limit == 1},
+                                    'indicators'][2][0][3] == 1},
                                 {'label': u'否', 'selected': queryset[
-                                    'indicators'][2].limit == 0}
+                                    'indicators'][2][0][3] == 0}
                             ]
                         },
                         {
                             'name': u'是否淘汰',
                             'options': [
                                 {'label': u'是', 'selected': queryset[
-                                    'indicators'][2].remove == 1},
+                                    'indicators'][2][0][4] == 1},
                                 {'label': u'否', 'selected': queryset[
-                                    'indicators'][2].remove == 0}
+                                    'indicators'][2][0][4] == 0}
                             ]
                         }
                     ]
