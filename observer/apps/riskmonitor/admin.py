@@ -149,8 +149,10 @@ class UserAreaAdmin(ForeignKeyAutocompleteAdmin):
     # list_filter = ('user', 'area')
 
 
-class ConsumeIndexAdmin(ImportExportModelAdmin):
+class ConsumeIndexAdmin(ImportExportModelAdmin, ForeignKeyAutocompleteAdmin):
     resource_class = ConsumeIndexResources
+
+    related_search_fields = {'industry': ('name',)}
 
     fields = ('force', 'close', 'consume', 'year', 'industry')
     list_display = ('force', 'close', 'consume', 'year', 'industry')
@@ -158,16 +160,21 @@ class ConsumeIndexAdmin(ImportExportModelAdmin):
     list_filter = ('year', 'force', 'close', 'consume')
 
 
-class SocietyIndexAdmin(ImportExportModelAdmin):
+class SocietyIndexAdmin(ImportExportModelAdmin, ForeignKeyAutocompleteAdmin):
     resource_class = SocietyIndexResources
+
+    related_search_fields = {'industry': ('name',)}
+
     fields = ('trade', 'qualified', 'accident', 'year', 'industry')
     list_display = ('trade', 'qualified', 'accident', 'year', 'industry', )
     search_fields = ('trade', 'industry__name', 'year')
     list_filter = ('year', 'trade', 'qualified', 'accident')
 
 
-class ManageIndexAdmin(ImportExportModelAdmin):
+class ManageIndexAdmin(ImportExportModelAdmin, ForeignKeyAutocompleteAdmin):
     resource_class = ManageIndexResources
+
+    related_search_fields = {'industry': ('name',)}
 
     fields = ('licence', 'productauth', 'encourage', 'limit', 'remove',
               'year', 'industry')
