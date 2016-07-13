@@ -223,7 +223,7 @@ class IndustryList(BaseView):
     def __init__(self):
         super(IndustryList, self).__init__()
         self.query_params['name'] = None
-        self.query_params['level'] = 3
+        self.query_params['level'] = None
         self.query_params['parent'] = None
 
     def set_params(self, request):
