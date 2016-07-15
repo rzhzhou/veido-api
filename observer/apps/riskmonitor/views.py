@@ -127,8 +127,8 @@ class DashboardList(BaseView):
                 'value': m['count']
             } for m in queryset['map']],
             'risk': {
-                'categories': categories,
-                'data': queryset['risk_data'][0]
+                'categories': queryset['risk_data'][0],
+                'data': queryset['risk_data'][1]
             },
             'industries': {
                 'categories': [
@@ -203,8 +203,8 @@ class DashboardList(BaseView):
                 ]
             },
             'rank': {
-                'categories': categories,
-                'data': zip(categories, queryset['rank_data'])
+                'categories': queryset['risk_level'][0],
+                'data': queryset['risk_level'][1]
             }
         }
 

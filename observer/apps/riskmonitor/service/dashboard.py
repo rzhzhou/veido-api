@@ -63,7 +63,6 @@ class Dashboard(AnalyticsCal, EnterpriseRank):
         return queryset
 
     def risk_data(self):
-        weeks = [u'周一', u'周二', u'周三', u'周四', u'周五', u'周六', u'周日']
         self.days = (self.end - self.start).days
 
         cal_date_func = lambda x: (
@@ -76,15 +75,24 @@ class Dashboard(AnalyticsCal, EnterpriseRank):
         result = self.cal_news_nums(date_range, 'day')
 
         date = map(lambda x: x[1].strftime('%m-%d'), date_range)
-        if self.days == 7:
-            date = [weeks[(self.start + timedelta(days=(i + 1))).isoweekday() - 1]
-                        for i in range(7)]
 
-
-        return (result[1], date)
+        return (date, result[1])
 
     def risk_level(self):
-        return [0, 1, 0, 0, 2, 0, 1]
+        self.days = (self.end - self.start).days
+
+        cal_date_func = lambda x: (
+            self.start + timedelta(days=x),
+            self.start + timedelta(days=x + 1)
+        )
+
+        date_range = map(cal_date_func, xrange(self.days))
+
+        result = [0, 1, 0, 0, 2, 0, 1]
+
+        date = map(lambda x: x[1].strftime('%m-%d'), date_range)
+
+        return (date, zip(date, result))
 
     def risk_product(self):
         products = self.get_industries()
@@ -100,7 +108,7 @@ class Dashboard(AnalyticsCal, EnterpriseRank):
             'keywords': self.risk_keywords(),
             'map': self.risk_map(),
             'risk_data': self.risk_data(),
-            'rank_data': self.risk_level(),
+            'risk_level': self.risk_level(),
             'risk_count': self.risk_number(),
             'risk_product': self.risk_product(),
         }
