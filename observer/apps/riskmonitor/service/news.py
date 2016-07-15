@@ -101,13 +101,16 @@ class NewsQuerySet(Abstract):
 
         queryset = RiskNews.objects.filter(**args).aggregate(**aggregate_args)
 
-        # Convert $queryset
-        # key:      str     ->  local datetime
-        # value:    None    ->  0
-        result = [(
-            utc_to_local_time(k),
-            v if v is not None else 0
-        ) for k, v in queryset.iteritems()]
+        if queryset:
+            # Convert $queryset
+            # key:      str     ->  local datetime
+            # value:    None    ->  0
+            result = [(
+                utc_to_local_time(k),
+                v if v is not None else 0
+            ) for k, v in queryset.iteritems()]
 
-        # sorted by $queryset key
-        return zip(*sorted(result, key=lambda data: data[0]))
+            # sorted by $queryset key
+            return zip(*sorted(result, key=lambda data: data[0]))
+
+        return [[], []]
