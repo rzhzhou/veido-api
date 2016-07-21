@@ -737,10 +737,13 @@ class Search(BaseView):
     def get(self, request):
         self.set_params(request)
 
-        queryset = RiskNews.objects.filter(
-            Q(title__contains=self.query_params['keyword']) |
-            Q(content__contains=self.query_params['keyword'])
-        )
+        if self.query_params['keyword']:
+            queryset = RiskNews.objects.filter(
+                Q(title__contains=self.query_params['keyword']) |
+                Q(content__contains=self.query_params['keyword'])
+            )
+        else:
+            queryset = RiskNews.objects.all()
 
         return Response(self.serialize(queryset))
 
