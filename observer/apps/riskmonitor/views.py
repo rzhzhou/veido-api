@@ -293,7 +293,7 @@ class IndustryDetail(BaseView):
             'total': {
                 'level': 'A',
                 'score': 93,
-                'color': '#03d108'
+                'color': '#95c5ab'
             },
             'indicators': [
                 {
@@ -427,7 +427,7 @@ class IndustryDetail(BaseView):
                 {
                     'title': '风险新闻',
                     'score': 100,
-                    'color': '#03d108',
+                    'color': '#95c5ab',
                     'norms': [{
                         'title': q.title,
                         'source': q.publisher.name,
@@ -438,7 +438,7 @@ class IndustryDetail(BaseView):
                 {
                     'title': '风险抽检',
                     'score': 100,
-                    'color': '#03d108',
+                    'color': '#95c5ab',
                     'norms': [{
                         'title': q.title,
                         'source': q.publisher.name,
