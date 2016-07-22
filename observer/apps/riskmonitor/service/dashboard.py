@@ -98,7 +98,9 @@ class Dashboard(AnalyticsCal, EnterpriseRank):
         products = self.get_industries()
         if len(products) >= 5:
             products = products[:5]
-        return zip(*products)
+            return zip(*products)
+        else:
+            return ((), (), ())
 
     def get_all(self):
         data = {
