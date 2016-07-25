@@ -17,7 +17,7 @@ from rest_framework.views import APIView
 
 from observer.apps.riskmonitor.models import (Enterprise, Industry, Product,
                                               RiskNews, RiskNewsPublisher,
-                                              UserIndustry)
+                                              UserIndustry, UserArea)
 from observer.apps.riskmonitor.service.abstract import Abstract
 from observer.apps.riskmonitor.service.analytics import AnalyticsCal
 from observer.apps.riskmonitor.service.dashboard import Dashboard
@@ -522,6 +522,7 @@ class EnterpriseList(BaseView):
 
     def set_params(self, request):
         super(EnterpriseList, self).set_params(request.GET)
+        self.query_params['user_area'] = UserArea.objects.get(user__id=request.user.id).area
 
     def paging(self, queryset):
         return super(EnterpriseList, self).paging(queryset, self.query_params['page'], 10)
@@ -541,7 +542,9 @@ class EnterpriseList(BaseView):
         # }
         # return data
         data = [{
+            'id': q.id,
             'name': q.name,
+            'focus': (self.query_params['user_area'] == q.area),
             'total': RiskNews.objects.filter(enterprise__id=q.id).count()
         } for q in queryset[:25]]
 
