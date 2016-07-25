@@ -15,7 +15,7 @@ from rest_framework import exceptions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from observer.apps.riskmonitor.models import (Enterprise, Industry, Product,
+from observer.apps.riskmonitor.models import (Area, Enterprise, Industry, Product,
                                               RiskNews, RiskNewsPublisher,
                                               UserIndustry, UserArea)
 from observer.apps.riskmonitor.service.abstract import Abstract
@@ -725,6 +725,7 @@ class Search(BaseView):
 
     def set_params(self, request):
         self.query_params['keyword'] = request.GET.get('keyword')
+        self.query_params['area'] = request.GET.get('area')
 
     def serialize(self, queryset):
         data = [{
@@ -740,13 +741,24 @@ class Search(BaseView):
     def get(self, request):
         self.set_params(request)
 
+        area_id = Area.objects.get(name=self.query_params['area']).id
+        areas_id = Area.objects.filter(
+            parent__id=area_id).values_list('id', flat=True)
+
         if self.query_params['keyword']:
             queryset = RiskNews.objects.filter(
                 Q(title__contains=self.query_params['keyword']) |
-                Q(content__contains=self.query_params['keyword'])
+                Q(content__contains=self.query_params['keyword']),
+                Q(area__id=area_id) |
+                Q(area__id__in=areas_id) |
+                Q(area__parent__id__in=areas_id)
             )
         else:
-            queryset = RiskNews.objects.all()
+            queryset = RiskNews.objects.filter(
+                Q(area__id=area_id) |
+                Q(area__id__in=areas_id) |
+                Q(area__parent__id__in=areas_id)
+            )
 
         return Response(self.serialize(queryset))
 
