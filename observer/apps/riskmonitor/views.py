@@ -558,6 +558,33 @@ class EnterpriseList(BaseView):
         return Response(self.serialize(queryset))
 
 
+class EnterpriseDetail(BaseView):
+
+    def __init__(self):
+        super(EnterpriseDetail, self).__init__()
+
+    def set_params(self, request):
+        super(EnterpriseDetail, self).set_params(request.GET)
+
+    def serialize(self, queryset):
+        data = map(lambda r: {
+            'id': r.id,
+            'url': r.url,
+            'title': r.title,
+            'time': r.pubtime.strftime('%Y-%m-%d %H:%M'),
+            'source': r.publisher.name
+        }, queryset)
+
+        return data
+
+    def get(self, request, pk):
+        self.set_params(request)
+
+        queryset = RiskNews.objects.filter(enterprise__id=pk)
+
+        return Response(self.serialize(queryset))
+
+
 class Analytics(BaseView):
 
     def __init__(self):
