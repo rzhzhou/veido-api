@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
 from django_extensions.admin import ForeignKeyAutocompleteAdmin
-from import_export.admin import ImportExportActionModelAdmin
-from import_export.admin import ImportExportModelAdmin
+from import_export.admin import ImportExportModelAdmin, ImportExportActionModelAdmin
 
 from observer.apps.riskmonitor.resource import (
-    ConsumeIndexResources, ManageIndexResources, SocietyIndexResources)
+    ConsumeIndexResources, ManageIndexResources, SocietyIndexResources, RiskNewsResources)
 from observer.apps.riskmonitor.models import (Brand, Enterprise, Industry,
                                               Metrics, Product, ProductMetrics,
-                                              RiskData, RiskNews,
+                                              RiskData, RiskNewsPublisher, RiskNews,
                                               ScoreEnterprise, ScoreIndustry,
                                               ScoreProduct, UserArea,
                                               UserEnterprise, UserIndustry,
@@ -100,12 +99,14 @@ class RiskDataAdmin(ForeignKeyAutocompleteAdmin):
                    'url', 'area', 'brand', 'industry')
 
 
-class RiskNewsAdmin(admin.ModelAdmin):
+class RiskNewsAdmin(ImportExportActionModelAdmin):
+    resource_class = RiskNewsResources
+
     # related_search_fields = {'area': ('name',)}
     list_display = ('title', 'url', 'publisher', 'reprinted', 'pubtime')
-    search_fields = ('title', 'url', 'reprinted', 'publisher__name',
+    search_fields = ('title', 'content', 'url', 'reprinted', 'publisher__name',
                      'industry__name', 'enterprise__name', 'area__name')
-    list_filter = ('pubtime', )
+    list_filter = ('pubtime', 'industry__name')
     actions = ['delete_selected']
 
     def reduce_score(self, obj):
@@ -195,6 +196,7 @@ admin.site.register(ScoreEnterprise, ScoreEnterpriseAdmin)
 # admin.site.register(ScoreProduct, ScoreProductAdmin)
 # admin.site.register(Brand, BrandAdmin)
 # admin.site.register(RiskData, RiskDataAdmin)
+admin.site.register(RiskNewsPublisher)
 admin.site.register(RiskNews, RiskNewsAdmin)
 admin.site.register(UserArea, UserAreaAdmin)
 admin.site.register(SocietyIndex, SocietyIndexAdmin)

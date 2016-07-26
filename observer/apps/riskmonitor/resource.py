@@ -5,10 +5,71 @@ from datetime import datetime
 
 from django.conf import settings
 
-from import_export.widgets import DateWidget, ForeignKeyWidget, ManyToManyWidget
+from import_export.widgets import (
+    DateTimeWidget, ForeignKeyWidget, IntegerWidget, ManyToManyWidget)
 from import_export import widgets
 from import_export import resources, fields
-from observer.apps.riskmonitor.models import ConsumeIndex, ManageIndex, SocietyIndex, Industry
+from observer.apps.origin.models import Area, Enterprise, Industry
+from observer.apps.riskmonitor.models import (
+    Area, ConsumeIndex, ManageIndex, SocietyIndex, RiskKeyword, RiskNews, RiskNewsPublisher)
+
+
+class RiskNewsResources(resources.ModelResource):
+    title = fields.Field(
+        attribute='title',
+        column_name=u'标题'
+    )
+    url = fields.Field(
+        attribute='url',
+        column_name=u'网站链接'
+    )
+    content = fields.Field(
+        attribute='content',
+        column_name=u'正文'
+    )
+    pubtime = fields.Field(
+        attribute='pubtime',
+        column_name=u'发布时间',
+        widget=DateTimeWidget()
+    )
+    reprinted = fields.Field(
+        attribute='reprinted',
+        column_name=u'转载数',
+        widget=IntegerWidget
+    )
+
+    risk_keyword = fields.Field(
+        attribute='risk_keyword',
+        column_name=u'风险新闻关键词',
+        widget=ForeignKeyWidget(RiskKeyword, 'name')
+    )
+    publisher = fields.Field(
+        attribute='publisher',
+        column_name=u'文章发布者',
+        widget=ForeignKeyWidget(RiskNewsPublisher, 'name')
+    )
+    area = fields.Field(
+        attribute='area',
+        column_name=u'地域',
+        widget=ManyToManyWidget(Area, ' ', 'name')
+    )
+    industry = fields.Field(
+        attribute='industry',
+        column_name=u'行业',
+        widget=ManyToManyWidget(Industry, ' ', 'name')
+    )
+    enterprise = fields.Field(
+        attribute='enterprise',
+        column_name=u'企业',
+        widget=ManyToManyWidget(Enterprise, ' ', 'name')
+    )
+
+    class Meta:
+        model = RiskNews
+        fields = ('id', 'title', 'url', 'content', 'pubtime', 'reprinted',
+                  'publisher', 'area', 'industry', 'enterprise', 'risk_keyword')
+        export_order = ('id', 'title', 'url', 'content', 'pubtime', 'reprinted',
+                        'publisher', 'area', 'industry', 'enterprise', 'risk_keyword')
 
 
 class ConsumeIndexResources(resources.ModelResource):
@@ -18,8 +79,8 @@ class ConsumeIndexResources(resources.ModelResource):
     year = fields.Field(attribute='year', column_name=u'年度')
 
     industry = fields.Field(
-        column_name=u'行业',
         attribute='industry',
+        column_name=u'行业',
         widget=ForeignKeyWidget(Industry, 'name')
     )
 
@@ -36,8 +97,8 @@ class SocietyIndexResources(resources.ModelResource):
     year = fields.Field(attribute='year', column_name=u'年度')
 
     industry = fields.Field(
-        column_name=u'行业',
         attribute='industry',
+        column_name=u'行业',
         widget=ForeignKeyWidget(Industry, 'name')
     )
 
@@ -58,8 +119,8 @@ class ManageIndexResources(resources.ModelResource):
     year = fields.Field(attribute='year', column_name=u'年度')
 
     industry = fields.Field(
-        column_name=u'行业',
         attribute='industry',
+        column_name=u'行业',
         widget=ForeignKeyWidget(Industry, 'name')
     )
 
