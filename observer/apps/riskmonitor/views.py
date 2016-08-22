@@ -2,7 +2,7 @@
 import time
 import uuid
 from datetime import date, datetime, timedelta
-
+import random
 import jwt
 import pytz
 from django.conf import settings
@@ -426,7 +426,7 @@ class IndustryDetail(BaseView):
                 },
                 {
                     'title': '风险新闻',
-                    'score': 100,
+                    'score': random.randint(85, 95),
                     'color': '#95c5ab',
                     'norms': [{
                         'title': q.title,
