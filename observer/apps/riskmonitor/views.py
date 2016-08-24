@@ -426,14 +426,15 @@ class IndustryDetail(BaseView):
                 },
                 {
                     'title': '风险新闻',
-                    'score': random.randint(85, 95),
-                    'color': '#95c5ab',
+                    # 'score': random.randint(85, 95),
+                    'score': queryset['indicators'][3][1],
+                    'color': queryset['indicators'][3][2],
                     'norms': [{
                         'title': q.title,
                         'source': q.publisher.name,
                         'time': q.pubtime.strftime('%Y-%m-%d'),
                         'url': q.url
-                    } for q in queryset['source'][0][:25]]
+                    } for q in queryset['indicators'][3][0][:25]]
                 },
                 {
                     'title': '风险抽检',
@@ -445,7 +446,7 @@ class IndustryDetail(BaseView):
                         'time': q.pubtime.strftime('%Y-%m-%d'),
                         'url': q.url,
                         'qualitied': q.qualitied
-                    } for q in queryset['source'][1][:25]]
+                    } for q in queryset['indicators'][3][0][:25]]
                 }
             ],
             'trend': {

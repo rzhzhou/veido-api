@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
+from datetime import date, datetime, timedelta
 
+from observer.utils.date.convert import datetime_to_timestamp
 from observer.apps.origin.models import Inspection
 from observer.apps.riskmonitor.models import (
     RiskNews, ScoreIndustry, UserIndustry, Industry, ManageIndex, SocietyIndex, ConsumeIndex)
@@ -33,10 +35,37 @@ class IndustryTrack(NewsQuerySet):
     def get_chart(self):
         return (self.trend_chart(), self.compare_chart())
 
+    def count_score(self):
+        score = 100
+        risk_keyword_id = []
+       
+        for q in RiskNews.objects.filter(industry__id=self.industry)[0:]:
+
+            if self.end >= q.pubtime <= self.start:
+                #得到风险新闻关键词对应的 id
+                risk_keyword_id.append(q.risk_keyword.id)
+       
+        myset = set(risk_keyword_id)
+        for item in myset:
+            #得到每个风险关键词出现的次数
+            count_number = risk_keyword_id.count(item)
+
+            #如果一个风险关键词出现次数过高, 就让其分值变大
+            if count_number > 10:
+                score -= 0.5*1.2*count_number
+            else:
+                score -= 0.5*count_number
+
+        if score < 60:
+            score = 60
+
+        return score
+
     def get_dimension(self):
         c = ConsumeIndex.objects.filter(industry__id=self.industry)
         s = SocietyIndex.objects.filter(industry__id=self.industry)
         m = ManageIndex.objects.filter(industry__id=self.industry)
+        n = Inspection.objects.filter(industry__id=self.industry)
 
         c_dimension = (c[0].force, c[0].close, c[0].consume) if c else (0, 1, 0)
         c_score = (100 * c_dimension[0] + 50 * (c_dimension[1] - 1) + 100 * c_dimension[2]) / 3
@@ -65,22 +94,26 @@ class IndustryTrack(NewsQuerySet):
         else:
             m_color = '#95c5ab'
 
+        n_dimension = n
+        n_score = self.count_score()
+        if 60 <= n_score < 70:
+            n_color = '#bc3f2b'
+        elif 70 <= n_score < 90:
+            n_color = '#6586a1'
+        else:
+            n_color = '#95c5ab'
+
         return (
             (c_dimension, c_score, c_color),
             (s_dimension, s_score, s_color),
-            (m_dimension, m_score, m_color)
+            (m_dimension, m_score, m_color),
+            (n_dimension, n_score, n_color)
         )
-
-    def get_source(self):
-        risknews = RiskNews.objects.filter(industry__id=self.industry)
-        inspections = Inspection.objects.filter(industry__id=self.industry)
-
-        return (risknews, inspections)
 
     def get_all(self):
         data = {
             'indicators': self.get_dimension(),
-            'source': self.get_source(),
+            'source': RiskNews.objects.filter(industry__id=self.industry),
             'trend': self.trend_chart()
         }
         return data
