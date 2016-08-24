@@ -446,7 +446,7 @@ class IndustryDetail(BaseView):
                         'time': q.pubtime.strftime('%Y-%m-%d'),
                         'url': q.url,
                         'qualitied': q.qualitied
-                    } for q in queryset['indicators'][3][0][:25]]
+                    } for q in queryset['indicators'][4][0][:25]]
                 }
             ],
             'trend': {

@@ -37,24 +37,23 @@ class IndustryTrack(NewsQuerySet):
 
     def count_score(self):
         score = 100
-        risk_keyword_id = []
-       
-        for q in RiskNews.objects.filter(industry__id=self.industry)[0:]:
 
-            if self.end >= q.pubtime <= self.start:
-                #得到风险新闻关键词对应的 id
-                risk_keyword_id.append(q.risk_keyword.id)
-       
-        myset = set(risk_keyword_id)
-        for item in myset:
+        n_dimension = RiskNews.objects.filter(industry__id=self.industry, pubtime__gte=self.start, pubtime__lt=self.end)
+        
+        risk_keyword__ids = map(lambda x: x['risk_keyword__id'], n_dimension.values('risk_keyword__id'))
+
+        risk_keywords_set = set(risk_keyword__ids)
+
+        for risk_keyword_id in risk_keywords_set:
+
             #得到每个风险关键词出现的次数
-            count_number = risk_keyword_id.count(item)
+            count = risk_keyword__ids.count(risk_keyword_id)
 
             #如果一个风险关键词出现次数过高, 就让其分值变大
-            if count_number > 10:
-                score -= 0.5*1.2*count_number
+            if count > 10:
+                score -= 0.5 * 1.2 * count
             else:
-                score -= 0.5*count_number
+                score -= 0.5 * count
 
         if score < 60:
             score = 60
@@ -65,7 +64,8 @@ class IndustryTrack(NewsQuerySet):
         c = ConsumeIndex.objects.filter(industry__id=self.industry)
         s = SocietyIndex.objects.filter(industry__id=self.industry)
         m = ManageIndex.objects.filter(industry__id=self.industry)
-        n = Inspection.objects.filter(industry__id=self.industry)
+        n_dimension = RiskNews.objects.filter(industry__id=self.industry, pubtime__gte=self.start, pubtime__lt=self.end)
+        i_dimension = Inspection.objects.filter(industry__id=self.industry)
 
         c_dimension = (c[0].force, c[0].close, c[0].consume) if c else (0, 1, 0)
         c_score = (100 * c_dimension[0] + 50 * (c_dimension[1] - 1) + 100 * c_dimension[2]) / 3
@@ -94,7 +94,6 @@ class IndustryTrack(NewsQuerySet):
         else:
             m_color = '#95c5ab'
 
-        n_dimension = n
         n_score = self.count_score()
         if 60 <= n_score < 70:
             n_color = '#bc3f2b'
@@ -103,17 +102,19 @@ class IndustryTrack(NewsQuerySet):
         else:
             n_color = '#95c5ab'
 
+        i_score = ''
+        i_color = ''
         return (
             (c_dimension, c_score, c_color),
             (s_dimension, s_score, s_color),
             (m_dimension, m_score, m_color),
-            (n_dimension, n_score, n_color)
+            (n_dimension, n_score, n_color),
+            (i_dimension, i_score, i_color)
         )
 
     def get_all(self):
         data = {
             'indicators': self.get_dimension(),
-            'source': RiskNews.objects.filter(industry__id=self.industry),
             'trend': self.trend_chart()
         }
         return data
