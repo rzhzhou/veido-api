@@ -42,6 +42,7 @@ class IndustryTrack(NewsQuerySet):
         
         risk_keyword__ids = map(lambda x: x['risk_keyword__id'], n_dimension.values('risk_keyword__id'))
 
+                            # [x['ri'] for x in n_dimension.values('risk_keyword__id')]
         risk_keywords_set = set(risk_keyword__ids)
 
         for risk_keyword_id in risk_keywords_set:
