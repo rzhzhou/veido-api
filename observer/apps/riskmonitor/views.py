@@ -291,9 +291,9 @@ class IndustryDetail(BaseView):
     def serialize(self, queryset):
         data = {
             'total': {
-                'level': 'A',
-                'score': 93,
-                'color': '#95c5ab'
+                'level': queryset['risk_rank'][0],
+                'score': queryset['risk_rank'][1],
+                'color': queryset['risk_rank'][2]
             },
             'indicators': [
                 {
@@ -523,7 +523,8 @@ class EnterpriseList(BaseView):
 
     def set_params(self, request):
         super(EnterpriseList, self).set_params(request.GET)
-        self.query_params['user_area'] = UserArea.objects.get(user__id=request.user.id).area
+        self.query_params['user_area'] = UserArea.objects.get(
+            user__id=request.user.id).area
 
     def paging(self, queryset):
         return super(EnterpriseList, self).paging(queryset, self.query_params['page'], 10)
