@@ -37,16 +37,12 @@ class IndustryTrack(NewsQuerySet):
     def get_chart(self):
         return (self.trend_chart(), self.compare_chart())
 
-    def count_risk_news_score(self):
+    def count_risk_news_score(self, risk_news_dimension):
         score = 100
 
-        n_dimension = RiskNews.objects.filter(
-            industry__id=self.industry, pubtime__gte=self.start, pubtime__lt=self.end)
-
         risk_keyword__ids = map(
-            lambda x: x['risk_keyword__id'], n_dimension.values('risk_keyword__id'))
+            lambda x: x['risk_keyword__id'], risk_news_dimension.values('risk_keyword__id'))
 
-        # [x['ri'] for x in n_dimension.values('risk_keyword__id')]
         risk_keywords_set = set(risk_keyword__ids)
 
         for risk_keyword_id in risk_keywords_set:
@@ -65,17 +61,17 @@ class IndustryTrack(NewsQuerySet):
 
         return score
 
-    def count_risk_inspection_socre(self):
-        score = 100
-        # risk_inspection = Inspection.objects.filter(
-        # industry__id=self.industry, pubtime__gte=self.start,
-        # pubtime__lt=self.end)
+    def count_risk_inspection_socre(self, risk_inspection_dimension):
+        score = (100 - risk_inspection_dimension.count() * 0.5)
+
+        if score < 60:
+            score = 60
 
         return score
 
     def get_total_risk_rank(self):
 
-        risk_rank_score = int((self.get_dimension()[0][1] + self.get_dimension()[1][1] + self.get_dimension()[
+        risk_rank_score = round((self.get_dimension()[0][1] + self.get_dimension()[1][1] + self.get_dimension()[
             2][1] + self.get_dimension()[3][1] + self.get_dimension()[4][1]) / 5)
 
         if risk_rank_score < 65:
@@ -103,7 +99,8 @@ class IndustryTrack(NewsQuerySet):
         m = ManageIndex.objects.filter(industry__id=industry)
         n_dimension = RiskNews.objects.filter(
             industry__id=industry, pubtime__gte=self.start, pubtime__lt=self.end)
-        i_dimension = Inspection.objects.filter(industry__id=industry)
+        i_dimension = Inspection.objects.filter(
+            industry__id=industry, pubtime__gte=self.start, pubtime__lt=self.end)
 
         c_dimension = (c[0].force, c[0].close, c[
                        0].consume) if c else (0, 1, 0)
@@ -118,7 +115,8 @@ class IndustryTrack(NewsQuerySet):
 
         s_dimension = (s[0].trade, s[0].qualified, s[
                        0].accident) if s else (1, 1, 1)
-        s_score = ((50 * (s_dimension[0] - 1)) + (50 * (s_dimension[1] - 1)) + (50 * (s_dimension[2] - 1))) / 3
+        s_score = ((50 * (s_dimension[0] - 1)) + (50 *
+                                                  (s_dimension[1] - 1)) + (50 * (s_dimension[2] - 1))) / 3
         if s_score <= 0:
             s_score = 0
             s_color = '#bc3f2b'
@@ -141,18 +139,20 @@ class IndustryTrack(NewsQuerySet):
         else:
             m_color = '#95c5ab'
 
-        n_score = self.count_risk_news_score()
-        if 60 <= n_score < 70:
+        n_score = self.count_risk_news_score(risk_news_dimension=n_dimension)
+        if n_score < 70:
             n_color = '#bc3f2b'
         elif 70 <= n_score < 90:
             n_color = '#6586a1'
         else:
             n_color = '#95c5ab'
 
-        i_score = self.count_risk_inspection_socre()
-        if 60 <= n_score < 70:
+        i_score = self.count_risk_inspection_socre(
+            risk_inspection_dimension=i_dimension)
+
+        if i_score < 70:
             i_color = '#bc3f2b'
-        elif 70 <= n_score < 90:
+        elif 70 <= i_score < 90:
             i_color = '#6586a1'
         else:
             i_color = '#95c5ab'
@@ -206,6 +206,6 @@ class IndustryTrack(NewsQuerySet):
             #     risk_rank_word = 'A'
 
             industries.append(
-                (u.industry.id, u.name, u.industry.level, risk_rank_score))
+                (u.industry.id, u.name, u.industry.level, round(risk_rank_score, 2)))
 
         return sorted(industries, key=lambda industry: industry[2])

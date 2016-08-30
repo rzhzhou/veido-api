@@ -440,8 +440,8 @@ class IndustryDetail(BaseView):
                 },
                 {
                     'title': '风险抽检',
-                    'score': 100,
-                    'color': '#95c5ab',
+                    'score': queryset['indicators'][4][1],
+                    'color': queryset['indicators'][4][2],
                     'norms': [{
                         'title': q.title,
                         'source': q.publisher.name,
