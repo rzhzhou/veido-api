@@ -195,14 +195,14 @@ class IndustryTrack(NewsQuerySet):
             risk_rank_score = (self.get_dimension(u.industry.id)[0][1] + self.get_dimension(u.industry.id)[1][1] + self.get_dimension(u.industry.id)[
                 2][1] + self.get_dimension(u.industry.id)[3][1] + self.get_dimension(u.industry.id)[4][1]) / 5
 
-            if risk_rank_score < 65:
-                risk_rank_word = 'C'
-            elif 65 <= risk_rank_score < 85:
-                risk_rank_word = 'B'
-            else:
-                risk_rank_word = 'A'
+            # if risk_rank_score < 65:
+            #     risk_rank_word = 'C'
+            # elif 65 <= risk_rank_score < 85:
+            #     risk_rank_word = 'B'
+            # else:
+            #     risk_rank_word = 'A'
 
             industries.append(
-                (u.industry.id, u.name, u.industry.level, risk_rank_word))
+                (u.industry.id, u.name, u.industry.level, risk_rank_score))
 
         return sorted(industries, key=lambda industry: industry[2])
