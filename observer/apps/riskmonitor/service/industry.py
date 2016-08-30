@@ -73,34 +73,37 @@ class IndustryTrack(NewsQuerySet):
 
         return score
 
-    def get_risk_rank(self):
+    def get_total_risk_rank(self):
 
         risk_rank_score = (self.get_dimension()[0][1] + self.get_dimension()[1][1] + self.get_dimension()[
                            2][1] + self.get_dimension()[3][1] + self.get_dimension()[4][1]) / 5
 
-        if risk_rank_score < 70:
+        if risk_rank_score < 65:
             risk_rank_color = '#bc3f2b'
-        elif 70 <= risk_rank_score < 90:
+        elif 65 <= risk_rank_score < 85:
             risk_rank_color = '#6586a1'
         else:
             risk_rank_color = '#95c5ab'
 
-        if risk_rank_score < 70:
+        if risk_rank_score < 65:
             risk_rank_word = 'C'
-        elif 70 <= risk_rank_score < 90:
+        elif 65 <= risk_rank_score < 85:
             risk_rank_word = 'B'
         else:
             risk_rank_word = 'A'
 
         return (risk_rank_word, risk_rank_score, risk_rank_color)
 
-    def get_dimension(self):
-        c = ConsumeIndex.objects.filter(industry__id=self.industry)
-        s = SocietyIndex.objects.filter(industry__id=self.industry)
-        m = ManageIndex.objects.filter(industry__id=self.industry)
+    def get_dimension(self, industry=''):
+        if industry == '':
+            industry = self.industry
+        # c = ConsumeIndex.objects.filter(industry__id=self.industry)
+        c = ConsumeIndex.objects.filter(industry__id=industry)
+        s = SocietyIndex.objects.filter(industry__id=industry)
+        m = ManageIndex.objects.filter(industry__id=industry)
         n_dimension = RiskNews.objects.filter(
-            industry__id=self.industry, pubtime__gte=self.start, pubtime__lt=self.end)
-        i_dimension = Inspection.objects.filter(industry__id=self.industry)
+            industry__id=industry, pubtime__gte=self.start, pubtime__lt=self.end)
+        i_dimension = Inspection.objects.filter(industry__id=industry)
 
         c_dimension = (c[0].force, c[0].close, c[
                        0].consume) if c else (0, 1, 0)
@@ -161,7 +164,7 @@ class IndustryTrack(NewsQuerySet):
 
     def get_all(self):
         data = {
-            'risk_rank': self.get_risk_rank(),
+            'risk_rank': self.get_total_risk_rank(),
             'indicators': self.get_dimension(),
             'trend': self.trend_chart()
         }
@@ -189,10 +192,17 @@ class IndustryTrack(NewsQuerySet):
                 industry=u.industry.id
             )
 
-            score = queryset.aggregate(Avg('score'))[
-                'score__avg'] if queryset else 100
+            risk_rank_score = (self.get_dimension(u.industry.id)[0][1] + self.get_dimension(u.industry.id)[1][1] + self.get_dimension(u.industry.id)[
+                2][1] + self.get_dimension(u.industry.id)[3][1] + self.get_dimension(u.industry.id)[4][1]) / 5
+
+            if risk_rank_score < 65:
+                risk_rank_word = 'C'
+            elif 65 <= risk_rank_score < 85:
+                risk_rank_word = 'B'
+            else:
+                risk_rank_word = 'A'
 
             industries.append(
-                (u.industry.id, u.name, u.industry.level, round(score)))
+                (u.industry.id, u.name, u.industry.level, risk_rank_word))
 
         return sorted(industries, key=lambda industry: industry[2])
