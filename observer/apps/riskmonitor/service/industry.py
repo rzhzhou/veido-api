@@ -37,18 +37,6 @@ class IndustryTrack(NewsQuerySet):
     def get_chart(self):
         return (self.trend_chart(), self.compare_chart())
 
-    def count_consume_index_socre(self):
-        score = 100
-        return score
-
-    def count_society_index_socre(self):
-        score = 100
-        return score
-
-    def count_manage_index_index_socre(self):
-        score = 100
-        return score
-
     def count_risk_news_score(self):
         score = 100
 
@@ -79,21 +67,25 @@ class IndustryTrack(NewsQuerySet):
 
     def count_risk_inspection_socre(self):
         score = 100
+        # risk_inspection = Inspection.objects.filter(
+        # industry__id=self.industry, pubtime__gte=self.start,
+        # pubtime__lt=self.end)
+
         return score
 
     def get_risk_rank(self):
-        risk_rank_score = ((self.count_consume_index_socre() + self.count_society_index_socre() +
-                            self.count_manage_index_index_socre() + self.count_risk_news_score() +
-                            self.count_risk_inspection_socre()) / 5)
 
-        if 60 <= risk_rank_score < 70:
+        risk_rank_score = (self.get_dimension()[0][1] + self.get_dimension()[1][1] + self.get_dimension()[
+                           2][1] + self.get_dimension()[3][1] + self.get_dimension()[4][1]) / 5
+
+        if risk_rank_score < 70:
             risk_rank_color = '#bc3f2b'
         elif 70 <= risk_rank_score < 90:
             risk_rank_color = '#6586a1'
         else:
             risk_rank_color = '#95c5ab'
 
-        if 60 <= risk_rank_score < 70:
+        if risk_rank_score < 70:
             risk_rank_word = 'C'
         elif 70 <= risk_rank_score < 90:
             risk_rank_word = 'B'
@@ -151,8 +143,14 @@ class IndustryTrack(NewsQuerySet):
         else:
             n_color = '#95c5ab'
 
-        i_score = ''
-        i_color = ''
+        i_score = self.count_risk_inspection_socre()
+        if 60 <= n_score < 70:
+            i_color = '#bc3f2b'
+        elif 70 <= n_score < 90:
+            i_color = '#6586a1'
+        else:
+            i_color = '#95c5ab'
+
         return (
             (c_dimension, c_score, c_color),
             (s_dimension, s_score, s_color),
