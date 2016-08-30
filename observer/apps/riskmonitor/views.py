@@ -5,6 +5,7 @@ from datetime import date, datetime, timedelta
 import random
 import jwt
 import pytz
+import operator
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
@@ -237,13 +238,14 @@ class IndustryList(BaseView):
             'level': q[2],
             'score':q[3]
         } for q in queryset]
+        data = sorted(data, key=operator.itemgetter('score'), reverse=False)
+
         return data
 
     def get(self, request):
         self.set_params(request)
 
         queryset = IndustryTrack(params=self.query_params).get_industries()
-
         return Response(self.serialize(queryset))
 
 
