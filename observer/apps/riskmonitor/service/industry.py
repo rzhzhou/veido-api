@@ -54,7 +54,7 @@ class IndustryTrack(NewsQuerySet):
             # 得到每个风险关键词出现的次数
             count = risk_keyword__ids.count(risk_keyword_id)
 
-            #如果一个风险关键词出现次数过高, 就让其分值变大
+            # 如果一个风险关键词出现次数过高, 就让其分值变大
             if count > 10:
                 score -= 0.5 * 1.2 * count
             else:
@@ -75,8 +75,8 @@ class IndustryTrack(NewsQuerySet):
 
     def get_total_risk_rank(self):
 
-        risk_rank_score = (self.get_dimension()[0][1] + self.get_dimension()[1][1] + self.get_dimension()[
-                           2][1] + self.get_dimension()[3][1] + self.get_dimension()[4][1]) / 5
+        risk_rank_score = int((self.get_dimension()[0][1] + self.get_dimension()[1][1] + self.get_dimension()[
+            2][1] + self.get_dimension()[3][1] + self.get_dimension()[4][1]) / 5)
 
         if risk_rank_score < 65:
             risk_rank_color = '#bc3f2b'
@@ -118,9 +118,12 @@ class IndustryTrack(NewsQuerySet):
 
         s_dimension = (s[0].trade, s[0].qualified, s[
                        0].accident) if s else (1, 1, 1)
-        s_score = (50 * (s_dimension[0] - 1) + 50 *
-                   (s_dimension[1] - 1) + 50 * (s_dimension[2] - 1)) / 3
-        if 0 <= s_score < 34:
+        s_score = ((50 * (s_dimension[0] - 1)) + (50 * (s_dimension[1] - 1)) + (50 * (s_dimension[2] - 1))) / 3
+        if s_score <= 0:
+            s_score = 0
+            s_color = '#bc3f2b'
+            s_dimension = (1, 1, 1)
+        elif 0 < s_score < 34:
             s_color = '#bc3f2b'
         elif 34 <= s_score < 67:
             s_color = '#6586a1'
@@ -128,7 +131,7 @@ class IndustryTrack(NewsQuerySet):
             s_color = '#95c5ab'
 
         m_dimension = (m[0].licence, m[0].productauth, m[0].encourage, m[
-                       0].limit, m[0].remove) if m else (0, 0, 0, 0, 0)
+            0].limit, m[0].remove) if m else (0, 0, 0, 0, 0)
         m_score = (100 * m_dimension[0] + 100 * m_dimension[1] + 100 *
                    m_dimension[2] + 100 * m_dimension[3] + 100 * m_dimension[4]) / 5
         if 0 <= m_score < 34:
