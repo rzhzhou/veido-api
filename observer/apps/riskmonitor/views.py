@@ -121,7 +121,7 @@ class DashboardList(BaseView):
             ],
             'products': {
                 'categories': queryset['risk_product'][1],
-                'data': queryset['risk_product'][2]
+                'data': queryset['risk_product'][3]
             },
             'source': [{
                 'name': m['name'],
