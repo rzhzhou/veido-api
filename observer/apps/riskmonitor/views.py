@@ -121,7 +121,7 @@ class DashboardList(BaseView):
             ],
             'products': {
                 'categories': queryset['risk_product'][1],
-                'data': queryset['risk_product'][2]
+                'data': queryset['risk_product'][3]
             },
             'source': [{
                 'name': m['name'],
@@ -238,7 +238,6 @@ class IndustryList(BaseView):
             'level': q[2],
             'score':q[3]
         } for q in queryset]
-        data = sorted(data, key=operator.itemgetter('score'), reverse=False)
 
         return data
 

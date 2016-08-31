@@ -229,7 +229,7 @@ class IndustryTrack(NewsQuerySet):
                 pubtime__lt=self.end,
                 industry=u.industry.id
             )
-            
+
             count_consume_index_score = self.count_consume_index_data(u.industry.id)[1]
             count_society_index_score = self.count_society_index_data(u.industry.id)[1]
             count_manage_index_score = self.count_manage_index_data(u.industry.id)[1]
@@ -249,4 +249,4 @@ class IndustryTrack(NewsQuerySet):
             industries.append(
                 (u.industry.id, u.name, u.industry.level, round(count_risk_rank_score, 2)))
 
-        return sorted(industries, key=lambda industry: industry[2])
+        return sorted(industries, key=lambda industry: industry[3])
