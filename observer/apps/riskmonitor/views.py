@@ -108,15 +108,15 @@ class DashboardList(BaseView):
             'summaries': [
                 {
                     'name': '整体',
-                    'value': 20
+                    'value': queryset['summaries_score'][0]
                 },
                 {
                     'name': '互联网',
-                    'value': 61
+                    'value': queryset['summaries_score'][1]
                 },
                 {
                     'name': '抽检',
-                    'value': 90
+                    'value': queryset['summaries_score'][2]
                 }
             ],
             'products': {

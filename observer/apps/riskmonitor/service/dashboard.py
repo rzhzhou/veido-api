@@ -30,13 +30,13 @@ class Dashboard(AnalyticsCal, EnterpriseRank):
             pubtime__gte=self.start,
             pubtime__lt=self.end,
             score__lt=90,
-            user__id= self.user_id
+            user__id=self.user_id
         ).values_list('industry').distinct().count()
         e_count = ScoreEnterprise.objects.filter(
             pubtime__gte=self.start,
             pubtime__lt=self.end,
             score__lt=90,
-            user__id= self.user_id
+            user__id=self.user_id
         ).values_list('enterprise').distinct().count()
 
         p_count = Product.objects.count()
@@ -113,5 +113,6 @@ class Dashboard(AnalyticsCal, EnterpriseRank):
             'risk_level': self.risk_level(),
             'risk_count': self.risk_number(),
             'risk_product': self.risk_product(),
+            'summaries_score': self.get_overall_overview_score(),
         }
         return data
