@@ -88,11 +88,20 @@ class Dashboard(AnalyticsCal, EnterpriseRank):
 
         date_range = map(cal_date_func, xrange(self.days))
 
-        result = [0, 1, 0, 0, 2, 0, 1]
+        result = self.cal_news_nums(date_range, 'day')
+
+        level = []
+        for number in result[1]:
+            if number < 333:
+                level.append(0)
+            elif number < 666:
+                level.append(1)
+            else:
+                level.append(2)
 
         date = map(lambda x: x[1].strftime('%m-%d'), date_range)
 
-        return (date, zip(date, result))
+        return (date, zip(date, level))
 
     def risk_product(self):
         products = self.get_industries()
