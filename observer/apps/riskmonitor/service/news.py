@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from django.db.models import Case, IntegerField, Sum, When
 
@@ -84,18 +84,25 @@ class NewsQuerySet(Abstract):
             aggregate_args = dict([(
                 start.strftime('%Y-%m-%d %H:%M:%S'),  # Type must be <Str>
                 Sum(
-                    Case(When(pubtime__gte=start, pubtime__lt=end, then=1),
-                         output_field=IntegerField(), default=0)
+                    Case(
+                        When(pubtime__gte=start, pubtime__lt=end, then=1),
+                        default=0,
+                        output_field=IntegerField()
+                    )
                 )
             ) for start, end in date_range])
 
         elif x_axis_units == 'month':
             # Generate $aggregate_args by months
             aggregate_args = dict([(
-                '%s-%s-01 00:00:00' % (year, month),  # Type must be <Str>
+                datetime(year, month, 1).strftime(
+                    '%Y-%m-%d %H:%M:%S'),  # Type must be <Str>
                 Sum(
-                    Case(When(pubtime__year=year, pubtime__month=month, then=1),
-                         output_field=IntegerField(), default=0)
+                    Case(
+                        When(pubtime__year=year, pubtime__month=month, then=1),
+                        default=0,
+                        output_field=IntegerField()
+                    )
                 )
             ) for year, month in date_range])
 

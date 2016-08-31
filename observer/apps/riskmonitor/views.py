@@ -249,38 +249,6 @@ class IndustryList(BaseView):
         return Response(self.serialize(queryset))
 
 
-# class IndustryDetail(BaseView):
-
-#     def __init__(self):
-#         super(IndustryDetail, self).__init__()
-
-#     def set_params(self, request, pk):
-#         super(IndustryDetail, self).set_params(request.GET)
-#         self.query_params['industry'] = pk
-
-#     def serialize(self, queryset):
-#         data = {
-#             'trend': {
-#                 'labels': queryset[0]['date'],
-#                 'data': queryset[0]['data']
-#             },
-#             'bar': {
-#                 'name': [u'同比', u'环比'],
-#                 'show': 'true',
-#                 'lables': [queryset[1]['date']],
-#                 'data': [queryset[1]['data']]
-#             }
-#         }
-#         return data
-
-#     def get(self, request, pk):
-#         self.set_params(request, pk)
-
-#         queryset = IndustryTrack(params=self.query_params).get_chart()
-
-#         return Response(self.serialize(queryset))
-
-
 class IndustryDetail(BaseView):
 
     def __init__(self):
