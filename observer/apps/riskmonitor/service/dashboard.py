@@ -6,11 +6,10 @@ from django.db.models import Count, Q
 from observer.apps.riskmonitor.models import (Area, Product, RiskNews,
                                               ScoreEnterprise, ScoreIndustry,
                                               ScoreProduct)
-from observer.apps.riskmonitor.service.enterprise import EnterpriseRank
 from observer.apps.riskmonitor.service.analytics import AnalyticsCal
 
 
-class Dashboard(AnalyticsCal, EnterpriseRank):
+class Dashboard(AnalyticsCal):
 
     def __init__(self, params={}):
         super(Dashboard, self).__init__(params)
@@ -115,7 +114,6 @@ class Dashboard(AnalyticsCal, EnterpriseRank):
         data = {
             'status': self.risk_status(),
             'industries': self.get_industries()[:3],
-            'enterprises': self.get_enterprises()[:3],
             'keywords': self.risk_keywords(),
             'map': self.risk_map(),
             'risk_data': self.risk_data(),
