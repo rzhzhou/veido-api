@@ -98,11 +98,11 @@ class Dashboard(AnalyticsCal):
                 pubtime_gte=index[0], pubtime_lt=index[1])[0]
 
             if total_score < 60:
-                level.append(0)
+                level.append(2)
             elif total_score < 90:
                 level.append(1)
             else:
-                level.append(2)
+                level.append(0)
 
         return (date, zip(date, level))
 
