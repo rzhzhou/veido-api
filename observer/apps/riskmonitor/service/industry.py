@@ -181,7 +181,7 @@ class IndustryTrack(NewsQuerySet):
             self.count_risk_inspection_data()
         )
 
-    def get_overall_overview_score(self, pubtime_gte = '', pubtime_lt = ''):
+    def get_overall_overview_score(self, pubtime_gte='', pubtime_lt=''):
         if pubtime_gte == '' and pubtime_lt == '':
             pubtime_gte = self.start
             pubtime_lt = self.end
@@ -194,7 +194,10 @@ class IndustryTrack(NewsQuerySet):
         i = Inspection.objects.filter(
             pubtime__gte=pubtime_gte, pubtime__lt=pubtime_lt).count()
 
-        news_socre = 100 - int(str(n * 0.45)[:2])
+        if (n * 0.45) > 100:
+            news_socre = 100 - int(str(n * 0.45)[:2])
+        else:
+            news_socre = 100 - (n * 0.45)
 
         inspection_score = 100 - (i * 0.2)
 
