@@ -61,6 +61,7 @@ class Dashboard(AnalyticsCal):
 
         return provinces
 
+    @property
     def risk_data(self):
         self.days = (self.end - self.start).days
 
@@ -77,6 +78,7 @@ class Dashboard(AnalyticsCal):
 
         return (date, result[1])
 
+    @property
     def risk_level(self):
         self.days = (self.end - self.start).days
 
@@ -104,6 +106,7 @@ class Dashboard(AnalyticsCal):
 
         return (date, zip(date, level))
 
+    @property
     def risk_product(self):
         products = self.get_industries()
         if len(products) >= 5:
@@ -115,9 +118,9 @@ class Dashboard(AnalyticsCal):
     def get_all(self):
         data = {
             'map': self.map,
-            'risk_data': self.risk_data(),
-            'risk_level': self.risk_level(),
-            'risk_product': self.risk_product(),
+            'risk_data': self.risk_data,
+            'risk_level': self.risk_level,
+            'risk_product': self.risk_product,
             'summaries_score': self.get_overall_overview_score(),
         }
         return data

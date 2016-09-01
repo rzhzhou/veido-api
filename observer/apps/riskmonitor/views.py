@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 import time
 import uuid
-from datetime import date, datetime, timedelta
 import random
 import jwt
 import pytz
-import operator
+from datetime import date, datetime, timedelta
+
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
