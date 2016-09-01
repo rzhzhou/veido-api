@@ -101,9 +101,6 @@ class DashboardList(BaseView):
         self.query_params['parent'] = None
 
     def serialize(self, queryset):
-        weeks = [u'周一', u'周二', u'周三', u'周四', u'周五', u'周六', u'周日']
-        categories = [weeks[(self.query_params['start'] + timedelta(days=(i + 1))).isoweekday() - 1]
-                      for i in range(7)]
         data = {
             'summaries': [
                 {
