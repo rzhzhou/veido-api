@@ -87,18 +87,20 @@ class Dashboard(AnalyticsCal):
 
         date_range = map(cal_date_func, xrange(self.days))
 
-        result = self.cal_news_nums(date_range, 'day')
+        date = map(lambda x: x[1].strftime('%m-%d'), date_range)
 
         level = []
-        for number in result[1]:
-            if number < 333:
+
+        for index in date_range:
+            total_score = self.get_overall_overview_score(
+                pubtime_gte=index[0], pubtime_lt=index[1])[0]
+
+            if total_score < 60:
                 level.append(0)
-            elif number < 666:
+            elif total_score < 90:
                 level.append(1)
             else:
                 level.append(2)
-
-        date = map(lambda x: x[1].strftime('%m-%d'), date_range)
 
         return (date, zip(date, level))
 
