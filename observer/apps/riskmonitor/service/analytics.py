@@ -29,17 +29,6 @@ class AnalyticsCal(IndustryTrack):
     def industry_chart(self):
         return self.trend_chart()
 
-    def keywords_chart(self, num):
-        args = self.set_args()
-
-        queryset = RiskNews.objects.filter(**args).values_list('risk_keyword__name').annotate(
-            Count('risk_keyword__name')).order_by('-risk_keyword__name__count')[:num]
-
-        if not queryset:
-            return [[], []]
-
-        return zip(*queryset)
-
     def cal_publisher_count(self):
         args = self.set_args()
 

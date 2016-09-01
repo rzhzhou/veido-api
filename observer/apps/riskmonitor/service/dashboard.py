@@ -14,37 +14,6 @@ class Dashboard(AnalyticsCal):
     def __init__(self, params={}):
         super(Dashboard, self).__init__(params)
 
-    def get_time(self):
-        start = datetime.strftime('%Y-%m-%d')
-        end = datetime.strftime('%Y-%m-%d')
-        data = {
-            'time': start + '~' + end
-        }
-
-    def risk_status(self):
-        return 'A'
-
-    def risk_number(self):
-        i_count = ScoreIndustry.objects.filter(
-            pubtime__gte=self.start,
-            pubtime__lt=self.end,
-            score__lt=90,
-            user__id=self.user_id
-        ).values_list('industry').distinct().count()
-        e_count = ScoreEnterprise.objects.filter(
-            pubtime__gte=self.start,
-            pubtime__lt=self.end,
-            score__lt=90,
-            user__id=self.user_id
-        ).values_list('enterprise').distinct().count()
-
-        p_count = Product.objects.count()
-
-        return [i_count, e_count, p_count]
-
-    def risk_keywords(self):
-        return self.keywords_chart(num=3)
-
     @property
     def map(self):
         provinces = Area.objects.filter(level=2).values('id', 'name')
@@ -143,13 +112,9 @@ class Dashboard(AnalyticsCal):
 
     def get_all(self):
         data = {
-            'status': self.risk_status(),
-            'industries': self.get_industries()[:3],
-            'keywords': self.risk_keywords(),
             'map': self.map,
             'risk_data': self.risk_data(),
             'risk_level': self.risk_level(),
-            'risk_count': self.risk_number(),
             'risk_product': self.risk_product(),
             'summaries_score': self.get_overall_overview_score(),
         }
