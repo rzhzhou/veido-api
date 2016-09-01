@@ -62,23 +62,6 @@ class Dashboard(AnalyticsCal):
         return provinces
 
     @property
-    def risk_data(self):
-        self.days = (self.end - self.start).days
-
-        cal_date_func = lambda x: (
-            self.start + timedelta(days=x),
-            self.start + timedelta(days=x + 1)
-        )
-
-        date_range = map(cal_date_func, xrange(self.days))
-
-        result = self.cal_news_nums(date_range, 'day')
-
-        date = map(lambda x: x[1].strftime('%m-%d'), date_range)
-
-        return (date, result[1])
-
-    @property
     def risk_level(self):
         self.days = (self.end - self.start).days
 
@@ -121,7 +104,7 @@ class Dashboard(AnalyticsCal):
     def get_all(self):
         data = {
             'map': self.map,
-            'risk_data': self.risk_data,
+            'risk': self.industry_chart(),
             'risk_level': self.risk_level,
             'risk_product': self.risk_product,
             'risk_product_trend': self.risk_product_trend,
