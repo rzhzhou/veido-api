@@ -181,17 +181,23 @@ class IndustryTrack(NewsQuerySet):
             self.count_risk_inspection_data()
         )
 
-    def get_overall_overview_score(self):
+    def get_overall_overview_score(self, pubtime_gte='', pubtime_lt=''):
+        if pubtime_gte == '' and pubtime_lt == '':
+            pubtime_gte = self.start
+            pubtime_lt = self.end
 
         c = ConsumeIndex.objects.count()
         s = SocietyIndex.objects.count()
         m = ManageIndex.objects.count()
         n = RiskNews.objects.filter(
-            pubtime__gte=self.start, pubtime__lt=self.end).count()
+            pubtime__gte=pubtime_gte, pubtime__lt=pubtime_lt).count()
         i = Inspection.objects.filter(
-            pubtime__gte=self.start, pubtime__lt=self.end).count()
+            pubtime__gte=pubtime_gte, pubtime__lt=pubtime_lt).count()
 
-        news_socre = 100 - int(str(n * 0.45)[:2])
+        if (n * 0.45) > 100:
+            news_socre = 100 - int(str(n * 0.45)[:2])
+        else:
+            news_socre = 100 - (n * 0.45)
 
         inspection_score = 100 - (i * 0.2)
 
@@ -230,11 +236,15 @@ class IndustryTrack(NewsQuerySet):
                 industry=u.industry.id
             )
 
-            count_consume_index_score = self.count_consume_index_data(u.industry.id)[1]
-            count_society_index_score = self.count_society_index_data(u.industry.id)[1]
-            count_manage_index_score = self.count_manage_index_data(u.industry.id)[1]
+            count_consume_index_score = self.count_consume_index_data(u.industry.id)[
+                1]
+            count_society_index_score = self.count_society_index_data(u.industry.id)[
+                1]
+            count_manage_index_score = self.count_manage_index_data(u.industry.id)[
+                1]
             count_risk_news_score = self.count_risk_news_data(u.industry.id)[1]
-            count_risk_inspection_score = self.count_risk_inspection_data(u.industry.id)[1]
+            count_risk_inspection_score = self.count_risk_inspection_data(u.industry.id)[
+                1]
 
             count_risk_rank_score = (count_consume_index_score + count_society_index_score +
                                      count_manage_index_score + count_risk_news_score + count_risk_inspection_score) / 5
