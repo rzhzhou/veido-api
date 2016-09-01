@@ -72,10 +72,12 @@ class Dashboard(AnalyticsCal):
 
         date_range = map(cal_date_func, xrange(self.days))
 
-        date = map(lambda x: x[1].strftime('%m-%d'), date_range)
+        seven_days = date_range[len(date_range) - 7::]
+
+        date = map(lambda x: x[1].strftime('%m-%d'), seven_days)
 
         level = []
-        for index in date_range[:7]:
+        for index in seven_days:
             total_score = self.get_overall_overview_score(
                 pubtime_gte=index[0], pubtime_lt=index[1])[0]
 
@@ -85,7 +87,6 @@ class Dashboard(AnalyticsCal):
                 level.append(1)
             else:
                 level.append(0)
-
         return (date, zip(date, level))
 
     @property
