@@ -124,10 +124,7 @@ class DashboardList(BaseView):
                 'name': m['name'],
                 'value': m['count']
             } for m in queryset['map']],
-            'risk': {
-                'categories': queryset['risk_data'][0],
-                'data': queryset['risk_data'][1]
-            },
+            'risk': queryset['risk'],
             'industries': {
                 'categories': [
                     '1月',
