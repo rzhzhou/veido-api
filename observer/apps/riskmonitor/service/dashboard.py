@@ -113,12 +113,17 @@ class Dashboard(AnalyticsCal):
         else:
             return ((), (), ())
 
+    @property
+    def risk_product_trend(self):
+        pass
+
     def get_all(self):
         data = {
             'map': self.map,
             'risk_data': self.risk_data,
             'risk_level': self.risk_level,
             'risk_product': self.risk_product,
+            'risk_product_trend': self.risk_product_trend,
             'summaries_score': self.get_overall_overview_score(),
         }
         return data
