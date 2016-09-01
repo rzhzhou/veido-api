@@ -208,6 +208,7 @@ class IndustryTrack(NewsQuerySet):
 
     def get_all(self):
         data = {
+            'name': Industry.objects.get(pk=self.industry).name,
             'risk_rank': self.get_total_risk_rank(),
             'indicators': self.get_dimension(),
             'trend': self.trend_chart()

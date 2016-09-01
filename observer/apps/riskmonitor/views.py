@@ -237,6 +237,7 @@ class IndustryDetail(BaseView):
 
     def serialize(self, queryset):
         data = {
+            'name': queryset['name'],
             'total': {
                 'level': queryset['risk_rank'][0],
                 'score': queryset['risk_rank'][1],
