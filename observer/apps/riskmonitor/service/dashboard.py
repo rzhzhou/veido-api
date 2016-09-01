@@ -92,8 +92,7 @@ class Dashboard(AnalyticsCal):
         date = map(lambda x: x[1].strftime('%m-%d'), date_range)
 
         level = []
-
-        for index in date_range:
+        for index in date_range[:7]:
             total_score = self.get_overall_overview_score(
                 pubtime_gte=index[0], pubtime_lt=index[1])[0]
 
