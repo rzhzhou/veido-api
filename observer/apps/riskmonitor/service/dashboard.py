@@ -45,21 +45,52 @@ class Dashboard(AnalyticsCal):
     def risk_keywords(self):
         return self.keywords_chart(num=3)
 
-    def risk_map(self):
-        queryset = Area.objects.filter(level=2).values('id', 'name')
+    @property
+    def map(self):
+        provinces = Area.objects.filter(level=2).values('id', 'name')
+        risknews_area = zip(
+            *list(
+                RiskNews.objects.filter(
+                    pubtime__gte=self.start,
+                    pubtime__lt=self.end
+                ).exclude(
+                    area=None
+                ).values_list(
+                    'area__id',
+                    'area__parent__id'
+                )
+            )
+        )  # area__id = risknews_area[0], area__parent__id = risknews_area[1]
 
-        for q in queryset:
-            areas_id = Area.objects.filter(
-                parent__id=q['id']).values_list('id', flat=True)
-            q['count'] = RiskNews.objects.filter(
-                Q(pubtime__gte=self.start) &
-                Q(pubtime__lt=self.end),
-                Q(area__id=q['id']) |
-                Q(area__id__in=areas_id) |
-                Q(area__parent__id__in=areas_id)
-            ).count()
+        for province in provinces:
+            cities_id = list(
+                Area.objects.filter(
+                    parent__id=province['id']
+                ).values_list(
+                    'id',
+                    flat=True
+                )
+            )
 
-        return queryset
+            areas_id = cities_id + [province['id']]
+
+            province['count'] = sum([
+                sum(
+                    map(
+                        lambda x: risknews_area[0].count(x),
+                        areas_id
+                    )
+                ),
+                sum(
+                    map(
+                        # area__parent__id__in=cities_id
+                        lambda x: risknews_area[1].count(x),
+                        cities_id
+                    )
+                )
+            ])
+
+        return provinces
 
     def risk_data(self):
         self.days = (self.end - self.start).days
@@ -115,7 +146,7 @@ class Dashboard(AnalyticsCal):
             'status': self.risk_status(),
             'industries': self.get_industries()[:3],
             'keywords': self.risk_keywords(),
-            'map': self.risk_map(),
+            'map': self.map,
             'risk_data': self.risk_data(),
             'risk_level': self.risk_level(),
             'risk_count': self.risk_number(),
