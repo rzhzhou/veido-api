@@ -73,8 +73,12 @@ class IndustryTrack(NewsQuerySet):
             s_color = '#bc3f2b'
         elif 34 <= s_score < 67:
             s_color = '#6586a1'
-        else:
+        elif 67 <= s_score < 100:
             s_color = '#95c5ab'
+        else:
+            s_score = 100
+            s_color = '#95c5ab'
+            s_dimension = (0, 0, 0)
 
         return (s_dimension, s_score, s_color)
 
@@ -186,9 +190,9 @@ class IndustryTrack(NewsQuerySet):
             pubtime_gte = self.start
             pubtime_lt = self.end
 
-        c = ConsumeIndex.objects.count()
-        s = SocietyIndex.objects.count()
-        m = ManageIndex.objects.count()
+        # c = ConsumeIndex.objects.count()
+        # s = SocietyIndex.objects.count()
+        # m = ManageIndex.objects.count()
         n = RiskNews.objects.filter(
             pubtime__gte=pubtime_gte, pubtime__lt=pubtime_lt).count()
         i = Inspection.objects.filter(
@@ -201,8 +205,9 @@ class IndustryTrack(NewsQuerySet):
 
         inspection_score = 100 - (i * 0.2)
 
-        total_score = ((100 - c * 0.2) + (100 - s * 0.2) +
-                       (100 - m * 0.2) + news_socre + inspection_score) / 5
+        # total_score = ((100 - c * 0.2) + (100 - s * 0.2) +
+        #                (100 - m * 0.2) + news_socre + inspection_score) / 5
+        total_score = 90
 
         return (total_score, news_socre, inspection_score)
 
