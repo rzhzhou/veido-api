@@ -224,6 +224,7 @@ class IndustryList(BaseView):
         self.set_params(request)
 
         queryset = IndustryTrack(params=self.query_params).get_industries()
+
         return Response(self.serialize(queryset))
 
 
