@@ -73,8 +73,12 @@ class IndustryTrack(NewsQuerySet):
             s_color = '#bc3f2b'
         elif 34 <= s_score < 67:
             s_color = '#6586a1'
-        else:
+        elif 67 <= s_score < 100:
             s_color = '#95c5ab'
+        else:
+            s_score = 100
+            s_color = '#95c5ab'
+            s_dimension = (0, 0, 0)
 
         return (s_dimension, s_score, s_color)
 
