@@ -16,6 +16,7 @@ from rest_framework import exceptions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from observer.apps.origin.models import Inspection
 from observer.apps.riskmonitor.models import (Area, Enterprise, Industry, Product,
                                               RiskNews, RiskNewsPublisher,
                                               UserIndustry, UserArea)
@@ -482,7 +483,7 @@ class EnterpriseList(BaseView):
             'id': q[0],
             'name': q[1],
             'focus': (self.query_params['user_area'] == q[2]),
-            'total': RiskNews.objects.filter(enterprise__id=q[0]).count()
+            'total': Inspection.objects.filter(enterprise_unqualified__id=q[0]).count()
         } for q in queryset]
 
         return data
@@ -517,7 +518,7 @@ class EnterpriseDetail(BaseView):
     def get(self, request, pk):
         self.set_params(request)
 
-        queryset = RiskNews.objects.filter(enterprise__id=pk)
+        queryset = Inspection.objects.filter(enterprise_unqualified__id=pk)
 
         return Response(self.serialize(queryset))
 
