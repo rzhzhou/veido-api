@@ -12,7 +12,7 @@ from observer.apps.riskmonitor.models import (Brand, Enterprise, Industry,
                                               ScoreProduct, UserArea,
                                               UserEnterprise, UserIndustry,
                                               SocietyIndex, ConsumeIndex,
-                                              ManageIndex)
+                                              ManageIndex, Cache)
 
 
 # class ProductAdmin(admin.ModelAdmin):
@@ -202,3 +202,4 @@ admin.site.register(UserArea, UserAreaAdmin)
 admin.site.register(SocietyIndex, SocietyIndexAdmin)
 admin.site.register(ConsumeIndex, ConsumeIndexAdmin)
 admin.site.register(ManageIndex, ManageIndexAdmin)
+admin.site.register(Cache)
