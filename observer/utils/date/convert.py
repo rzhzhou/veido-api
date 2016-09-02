@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import pytz
-from datetime import datetime
+from datetime import date, datetime
 from time import mktime
 
 from django.conf import settings
@@ -13,19 +13,20 @@ def utc_to_local_time(dt):
     """
     tz = pytz.timezone(settings.TIME_ZONE)
 
-    datetime_to_local = lambda x: x.astimezone(
-        tz) if x.tzinfo else pytz.utc.localize(x).astimezone(tz)
+    utc_to_local = lambda x: x.astimezone(tz) if x.tzinfo else tz.localize(x)
 
-    while True:
-        if isinstance(dt, str):
-            dt = datetime.strptime(dt, '%Y-%m-%d %H:%M:%S')
-            continue
-        elif isinstance(dt, list):
-            return [datetime_to_local(i) for i in dt]
-        elif isinstance(dt, datetime):
-            return datetime_to_local(dt)
-        else:
-            raise TypeError
+    if isinstance(dt, str):
+        dt = datetime.strptime(dt, '%Y-%m-%d %H:%M:%S')
+    elif isinstance(dt, list):
+        return [utc_to_local(i) for i in dt]
+    elif isinstance(dt, date):
+        dt = datetime.combine(dt, datetime.min.time())
+    elif isinstance(dt, datetime):
+        pass
+    else:
+        raise TypeError
+
+    return utc_to_local(dt)
 
 
 def datetime_to_timestamp(dt):
