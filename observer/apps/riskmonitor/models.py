@@ -391,3 +391,12 @@ class ManageIndex(models.Model):
         app_label = 'riskmonitor'
         db_table = 'manage_index'
         verbose_name_plural = u'管理指标(维)'
+
+
+class Cache(models.Model):
+    k = models.CharField(max_length=255, blank=True, verbose_name=u'键')
+    v = models.TextField(blank=True, verbose_name=u'值')
+    update_at = models.DateTimeField(auto_now=True, verbose_name=u'更新时间')
+
+    def __unicode__(self):
+        return self.k
