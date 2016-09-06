@@ -12,7 +12,7 @@ from observer.apps.riskmonitor.models import (Brand, Enterprise, Industry,
                                               ScoreProduct, UserArea,
                                               UserEnterprise, UserIndustry,
                                               SocietyIndex, ConsumeIndex,
-                                              ManageIndex, Cache)
+                                              ManageIndex, Cache, CacheConf)
 
 
 # class ProductAdmin(admin.ModelAdmin):
@@ -186,6 +186,20 @@ class ManageIndexAdmin(ImportExportModelAdmin, ForeignKeyAutocompleteAdmin):
     list_filter = ('year', 'productauth',)
 
 
+class CacheAdmin(admin.ModelAdmin):
+    fields = ('k', 'v', 'update_at')
+    list_display = ('k', 'update_at')
+    list_filter = ('k',)
+    search_fields = ('k',)
+
+
+class CacheConfAdmin(admin.ModelAdmin):
+    fields = ('name', 'days', 'params')
+    list_display = ('name', 'days', 'params')
+    list_filter = ('name', 'days')
+    search_fields = ('name',)
+
+
 # admin.site.register(Product, ProductAdmin)
 # admin.site.register(Metrics, MetricsAdmin)
 # admin.site.register(ProductMetrics, ProductMetricsAdmin)
@@ -202,4 +216,5 @@ admin.site.register(UserArea, UserAreaAdmin)
 admin.site.register(SocietyIndex, SocietyIndexAdmin)
 admin.site.register(ConsumeIndex, ConsumeIndexAdmin)
 admin.site.register(ManageIndex, ManageIndexAdmin)
-admin.site.register(Cache)
+admin.site.register(Cache, CacheAdmin)
+admin.site.register(CacheConf, CacheConfAdmin)
