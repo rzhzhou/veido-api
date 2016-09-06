@@ -404,3 +404,16 @@ class Cache(models.Model):
 
     def __unicode__(self):
         return self.k
+
+
+class CacheConf(models.Model):
+    name = models.CharField(max_length=255, verbose_name=u'名称')
+    days = models.IntegerField(verbose_name=u'间隔天数')
+    params = models.TextField(blank=True, verbose_name=u'参数')
+
+    class Meta:
+        app_label = 'riskmonitor'
+        verbose_name_plural = u'缓存配置'
+
+    def __unicode__(self):
+        return self.name
