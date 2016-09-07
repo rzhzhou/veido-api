@@ -141,7 +141,7 @@ class IndustryTrack(NewsQuerySet):
         i_dimension = Inspection.objects.filter(
             industry__id=industry, pubtime__gte=self.start, pubtime__lt=self.end)
 
-        i_score = (100 - i_dimension.count() * 0.5)
+        i_score = (100 - i_dimension.count() * 10)
 
         if i_score < 60:
             i_score = 60
@@ -157,8 +157,8 @@ class IndustryTrack(NewsQuerySet):
 
     def get_total_risk_rank(self):
 
-        risk_rank_score = round((self.get_dimension()[0][1] + self.get_dimension()[1][1] + self.get_dimension()[
-            2][1] + self.get_dimension()[3][1] + self.get_dimension()[4][1]) / 5)
+        risk_rank_score = round(self.get_dimension()[0][1] * 0.1 + self.get_dimension()[1][1] * 0.1 + self.get_dimension()[
+            2][1] * 0.1 + self.get_dimension()[3][1] * 0.3 + self.get_dimension()[4][1] * 0.4)
 
         if risk_rank_score < 65:
             risk_rank_color = '#bc3f2b'
@@ -252,8 +252,7 @@ class IndustryTrack(NewsQuerySet):
             count_risk_inspection_score = self.count_risk_inspection_data(u.industry.id)[
                 1]
 
-            count_risk_rank_score = (count_consume_index_score + count_society_index_score +
-                                     count_manage_index_score + count_risk_news_score + count_risk_inspection_score) / 5
+            count_risk_rank_score = count_consume_index_score * 0.1 + count_society_index_score * 0.1 + count_manage_index_score * 0.1 + count_risk_news_score * 0.3 + count_risk_inspection_score * 0.4
 
             # if risk_rank_score < 65:
             #     risk_rank_word = 'C'
