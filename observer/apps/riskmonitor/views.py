@@ -29,7 +29,7 @@ from observer.apps.riskmonitor.service.news import NewsQuerySet
 from observer.apps.riskmonitor.jobs.hourly.dashboard import Job as DashboardJob
 from observer.apps.riskmonitor.jobs.hourly.industries import Job as IndustriesJob
 from observer.utils.date import pretty
-from observer.utils.date.tz import get_loc_dt, get_timezone
+from observer.utils.date.convert import utc_to_local_time
 from observer.utils.excel import xls_to_response
 from observer.utils.excel.briefing import article
 from observer.utils.decorators.cache import token
@@ -39,40 +39,19 @@ from observer.utils.connector.redisconnector import RedisQueryApi
 class BaseView(APIView):
 
     def __init__(self):
-        self.tz = pytz.timezone(settings.TIME_ZONE)
-        self.today = date.today()
+        self.today = date.today() + timedelta(days=1)
         self.query_params = {
-            'industry': None,
-            'enterprise': None,
-            'product': None,
-            'source': None,
-            'page': 1,
-            'start': str(self.today - timedelta(days=32)),
-            'end': str(self.today),
+            'start': self.today - timedelta(days=30),
+            'end': self.today,
         }
 
-    def set_params(self, params, loc_dt=True):
-        """
-        set params
-        """
+    def set_params(self, params):
+        for k, v in params.iteritems():
+            self.query_params[k] = v
 
-        for param, value in params.iteritems():
-            self.query_params[param] = value
-
-        # end date add 1 day
-        if self.query_params['end'] > self.today.strftime('%Y-%m-%d'):
-            self.query_params['end'] = self.today.strftime('%Y-%m-%d')
-
-        self.query_params['end'] = datetime.strptime(
-            self.query_params['end'], '%Y-%m-%d') + timedelta(days=1)
-        self.query_params['end'] = self.query_params[
-            'end'].strftime('%Y-%m-%d')
-
-        if loc_dt:
-            self.query_params['start'] = get_loc_dt(
-                self.tz, self.query_params['start'], pytz.utc)
-            self.query_params['end'] = get_loc_dt(
-                self.tz, self.query_params['end'], pytz.utc)
+        self.query_params['start'], self.query_params['end'] = utc_to_local_time(
+            [self.query_params['start'], self.query_params['end']]
+        )
 
     def paging(self, queryset, page, num):
         paginator = Paginator(queryset, num)  # Show $num <QuerySet> per page
@@ -582,23 +561,6 @@ class Analytics(BaseView):
         queryset = AnalyticsCal(params=self.query_params).get_chart()
 
         return Response(self.serialize(queryset))
-
-
-class GenerateAnalyticsExport(BaseView):
-
-    def __init__(self):
-        super(GenerateAnalyticsExport, self).__init__()
-
-    def set_params(self, request, loc_dt=False):
-        super(GenerateAnalyticsExport, self).set_params(request.GET, loc_dt)
-        self.query_params['exp'] = datetime.utcnow() + timedelta(seconds=60)
-
-    def get(self, request):
-        self.set_params(request)
-
-        jwt_payload = jwt.encode(
-            self.query_params, settings.JWT_AUTH['JWT_SECRET_KEY'])
-        return Response({'url': '/api/files/%s?payload=%s' % ('data', jwt_payload)})
 
 
 class AnalyticsExport(BaseView):
