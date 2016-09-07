@@ -191,6 +191,7 @@ class CacheAdmin(admin.ModelAdmin):
     list_display = ('k', 'update_at')
     list_filter = ('k',)
     search_fields = ('k',)
+    readonly_fields = ('update_at',)
 
 
 class CacheConfAdmin(admin.ModelAdmin):
