@@ -27,7 +27,7 @@ from observer.apps.riskmonitor.service.enterprise import EnterpriseRank
 from observer.apps.riskmonitor.service.industry import IndustryTrack
 from observer.apps.riskmonitor.service.news import NewsQuerySet
 from observer.apps.riskmonitor.jobs.hourly.dashboard import Job as DashboardJob
-from observer.apps.riskmonitor.jobs.hourly.get_industries import Job as IndustriesJob
+from observer.apps.riskmonitor.jobs.hourly.industries import Job as IndustriesJob
 from observer.utils.date import pretty
 from observer.utils.date.tz import get_loc_dt, get_timezone
 from observer.utils.excel import xls_to_response
@@ -233,7 +233,7 @@ class IndustryList(BaseView):
         return data
 
     def generate_cache_name(self):
-        self.query_params['cache_conf_name'] = 'get_industries'
+        self.query_params['cache_conf_name'] = 'industries'
         self.query_params['days'] = (
             self.query_params['end'] - self.query_params['start']).days
         return IndustriesJob().generate_cache_name(self.query_params)

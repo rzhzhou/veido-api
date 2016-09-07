@@ -6,7 +6,6 @@ from django.db.models import Count, Q
 from observer.apps.riskmonitor.models import (Area, Product, RiskNews,
                                               ScoreEnterprise, ScoreIndustry,
                                               ScoreProduct)
-from observer.apps.riskmonitor.jobs.hourly.get_industries import Job
 from observer.apps.riskmonitor.service.analytics import AnalyticsCal
 
 
