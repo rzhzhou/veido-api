@@ -15,10 +15,16 @@ def utc_to_local_time(dt):
 
     utc_to_local = lambda x: x.astimezone(tz) if x.tzinfo else tz.localize(x)
 
-    if isinstance(dt, str):
-        dt = datetime.strptime(dt, '%Y-%m-%d %H:%M:%S')
-    elif isinstance(dt, list):
-        return [utc_to_local(i) for i in dt]
+    if isinstance(dt, (str, unicode)):
+        for fmt in ('%Y-%m-%d', '%Y-%m-%d %H:%M:%S'):
+            try:
+                dt = datetime.strptime(dt, fmt)
+                return utc_to_local(dt)
+            except ValueError:
+                pass
+        raise ValueError('no valid date format found')
+    elif isinstance(dt, (list, tuple)):
+        return [utc_to_local_time(i) for i in dt]
     elif isinstance(dt, date):
         dt = datetime.combine(dt, datetime.min.time())
     elif isinstance(dt, datetime):
