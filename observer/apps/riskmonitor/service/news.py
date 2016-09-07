@@ -5,7 +5,7 @@ from django.db.models import Case, IntegerField, Sum, When
 
 from observer.apps.riskmonitor.models import RiskNews
 from observer.apps.riskmonitor.service.abstract import Abstract
-from observer.utils.date.tz import utc_to_local_time
+from observer.utils.date.convert import utc_to_local_time
 
 
 class NewsQuerySet(Abstract):
