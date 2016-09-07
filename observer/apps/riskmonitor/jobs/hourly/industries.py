@@ -31,11 +31,12 @@ class Job(HourlyJob):
 
     def generate_cache_name(self, query_params):
         name = query_params['cache_conf_name']
-        days = query_params['days']
+        start = query_params['start'].strftime('%Y-%m-%d')
+        end = query_params['end'].strftime('%Y-%m-%d')
         level = query_params['level']
         area = query_params['area']
         user = query_params['user_id']
-        return u'%s.%s.%s.%s.%s' % (name, days, level, area, user)
+        return u'%s.%s.%s.%s.%s.%s' % (name, start, end, level, area, user)
 
     @property
     def cache_confs(self):
