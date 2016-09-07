@@ -6,6 +6,7 @@ from django.db.models import Count, Q
 from observer.apps.riskmonitor.models import (Area, Product, RiskNews,
                                               ScoreEnterprise, ScoreIndustry,
                                               ScoreProduct)
+from observer.apps.riskmonitor.jobs.hourly.get_industries import Job
 from observer.apps.riskmonitor.service.analytics import AnalyticsCal
 
 
@@ -16,7 +17,7 @@ class Dashboard(AnalyticsCal):
 
     @property
     def map(self):
-        provinces = Area.objects.filter(level=2).values('id', 'name')
+        provinces = list(Area.objects.filter(level=2).values('id', 'name'))
         risknews_area = zip(
             *list(
                 RiskNews.objects.filter(
@@ -92,6 +93,7 @@ class Dashboard(AnalyticsCal):
     @property
     def risk_product(self):
         products = self.get_industries()
+
         if len(products) >= 5:
             products = reversed(products[:5])
             return zip(*products)

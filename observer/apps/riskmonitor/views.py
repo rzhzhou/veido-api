@@ -26,7 +26,8 @@ from observer.apps.riskmonitor.service.dashboard import Dashboard
 from observer.apps.riskmonitor.service.enterprise import EnterpriseRank
 from observer.apps.riskmonitor.service.industry import IndustryTrack
 from observer.apps.riskmonitor.service.news import NewsQuerySet
-from observer.apps.riskmonitor.jobs.hourly.get_industries import Job
+from observer.apps.riskmonitor.jobs.hourly.dashboard import Job as DashboardJob
+from observer.apps.riskmonitor.jobs.hourly.get_industries import Job as IndustriesJob
 from observer.utils.date import pretty
 from observer.utils.date.tz import get_loc_dt, get_timezone
 from observer.utils.excel import xls_to_response
@@ -191,10 +192,20 @@ class DashboardList(BaseView):
 
         return data
 
+    def generate_cache_name(self):
+        self.query_params['cache_conf_name'] = 'dashboard'
+        self.query_params['days'] = (
+            self.query_params['end'] - self.query_params['start']).days
+        return DashboardJob().generate_cache_name(self.query_params)
+
     def get(self, request):
         self.set_params(request)
 
-        queryset = Dashboard(params=self.query_params).get_all()
+        try:
+            cache = Cache.objects.get(k=self.generate_cache_name())
+            queryset = eval(cache.v)
+        except Cache.DoesNotExist:
+            queryset = Dashboard(params=self.query_params).get_all()
 
         return Response(self.serialize(queryset))
 
@@ -225,7 +236,7 @@ class IndustryList(BaseView):
         self.query_params['cache_conf_name'] = 'get_industries'
         self.query_params['days'] = (
             self.query_params['end'] - self.query_params['start']).days
-        return Job().generate_cache_name(self.query_params)
+        return IndustriesJob().generate_cache_name(self.query_params)
 
     def get(self, request):
         self.set_params(request)
