@@ -49,9 +49,13 @@ class BaseView(APIView):
         for k, v in params.iteritems():
             self.query_params[k] = v
 
+        # start, end convert to local datetime
         self.query_params['start'], self.query_params['end'] = utc_to_local_time(
             [self.query_params['start'], self.query_params['end']]
         )
+
+        # end add 1 day
+        self.query_params['end'] = self.query_params['end'] + timedelta(days=1)
 
     def paging(self, queryset, page, num):
         paginator = Paginator(queryset, num)  # Show $num <QuerySet> per page
