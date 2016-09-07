@@ -17,7 +17,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from observer.apps.origin.models import Inspection
-from observer.apps.riskmonitor.models import (Area, Enterprise, Industry, Product,
+from observer.apps.riskmonitor.models import (Area, Cache, Enterprise, Industry, Product,
                                               RiskNews, RiskNewsPublisher,
                                               UserIndustry, UserArea)
 from observer.apps.riskmonitor.service.abstract import Abstract
@@ -26,6 +26,7 @@ from observer.apps.riskmonitor.service.dashboard import Dashboard
 from observer.apps.riskmonitor.service.enterprise import EnterpriseRank
 from observer.apps.riskmonitor.service.industry import IndustryTrack
 from observer.apps.riskmonitor.service.news import NewsQuerySet
+from observer.apps.riskmonitor.jobs.hourly.get_industries import Job
 from observer.utils.date import pretty
 from observer.utils.date.tz import get_loc_dt, get_timezone
 from observer.utils.excel import xls_to_response
@@ -220,10 +221,20 @@ class IndustryList(BaseView):
 
         return data
 
+    def generate_cache_name(self):
+        self.query_params['cache_conf_name'] = 'get_industries'
+        self.query_params['days'] = (
+            self.query_params['end'] - self.query_params['start']).days
+        return Job().generate_cache_name(self.query_params)
+
     def get(self, request):
         self.set_params(request)
 
-        queryset = IndustryTrack(params=self.query_params).get_industries()
+        try:
+            cache = Cache.objects.get(k=self.generate_cache_name())
+            queryset = eval(cache.v)
+        except Cache.DoesNotExist:
+            queryset = IndustryTrack(params=self.query_params).get_industries()
 
         return Response(self.serialize(queryset))
 
