@@ -22,11 +22,6 @@ class Job(HourlyJob):
             'days': cache_conf.days,
             'level': cache_conf.params['level'],
             'user_id': cache_conf.params['user_id'],
-            'name': None,
-            'parent': None,
-            'industry': None,
-            'enterprise': None,
-            'source': None,
             'start': utc_to_local_time(self.today - timedelta(days=cache_conf.days)),
             'end': utc_to_local_time(self.today)
         }

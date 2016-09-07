@@ -225,9 +225,9 @@ class IndustryTrack(NewsQuerySet):
 
         cond = {
             'user__id': self.user_id,
-            'industry__name': self.name,
+            'industry__name': getattr(self, 'name', None),
             'industry__level': self.level,
-            'industry__parent__id': self.parent
+            'industry__parent__id': getattr(self, 'parent', None)
         }
 
         # Exclude $cond None Value

@@ -19,9 +19,8 @@ class Abstract(object):
         cond = {
             'pubtime__gte': self.start,
             'pubtime__lt': self.end,
-            'industry__id': self.industry,
-            'enterprise__id': self.enterprise,
-            'publisher__id': self.source
+            'industry__id': getattr(self, 'industry', None),
+            'enterprise__id': getattr(self, 'enterprise', None)
         }
 
         # Exclude $cond None Value
