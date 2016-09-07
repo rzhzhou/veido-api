@@ -50,5 +50,7 @@ class Job(HourlyJob):
 
             Cache.objects.update_or_create(
                 k=cache_name,
-                v=IndustryTrack(params=query_params).get_industries()
+                defaults={
+                    'v': IndustryTrack(params=query_params).get_industries()
+                }
             )

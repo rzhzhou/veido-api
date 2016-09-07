@@ -51,5 +51,7 @@ class Job(HourlyJob):
 
             Cache.objects.update_or_create(
                 k=cache_name,
-                v=Dashboard(params=query_params).get_all()
+                defaults={
+                    'v': Dashboard(params=query_params).get_all()
+                }
             )
