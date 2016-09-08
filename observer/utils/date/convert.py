@@ -84,18 +84,15 @@ def get_days(days=60, current_date=''):
 
 def get_start_end(days=60):
 
-    def date_to_tuple(dt):
+    def date_to_str(dt):
         current_y_m_d = str(dt).split('-')
         current_year = int(current_y_m_d[0])
         current_month = int(current_y_m_d[1])
         current_day = int(current_y_m_d[2])
-        return (current_year, current_month, current_day)
+        return '%s-%s-%s' % (current_year, current_month + 1, 1)
 
-    end_str_date = date_to_tuple(date.today())
-    thedays = monthrange(end_str_date[0], end_str_date[1])[1]
-    end_date = '%s-%s-%s' % (end_str_date[0], end_str_date[1], thedays)
+    end_date = date_to_str(date.today())
 
-    start_str_date = date_to_tuple(date.today() - timedelta(days=get_days(days)))
-    start_date = '%s-%s-%s' % (start_str_date[0], (start_str_date[1] + 1), 1)
+    start_date = date_to_str(date.today() - timedelta(days=get_days(days)))
 
     return (start_date, end_date)
