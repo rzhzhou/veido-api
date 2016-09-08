@@ -3,7 +3,7 @@ from django.db.models import Count
 
 from observer.apps.riskmonitor.service.industry import IndustryTrack
 
-from observer.apps.riskmonitor.models import RiskNews, UserIndustry, Enterprise, Product
+from observer.apps.riskmonitor.models import RiskNews, AreaIndustry, Enterprise, Product
 
 
 class AnalyticsCal(IndustryTrack):
@@ -14,7 +14,7 @@ class AnalyticsCal(IndustryTrack):
     def get_filters(self):
         args = self.set_args()
 
-        industries = UserIndustry.objects.filter(
+        industries = AreaIndustry.objects.filter(
             user__id=self.user_id).values('id', 'name')
 
         enterprises = []

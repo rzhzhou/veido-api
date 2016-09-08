@@ -19,7 +19,7 @@ from rest_framework.views import APIView
 from observer.apps.origin.models import Inspection
 from observer.apps.riskmonitor.models import (Area, Cache, Enterprise, Industry, Product,
                                               RiskNews, RiskNewsPublisher,
-                                              UserIndustry, UserArea)
+                                              AreaIndustry, UserArea)
 from observer.apps.riskmonitor.service.abstract import Abstract
 from observer.apps.riskmonitor.service.analytics import AnalyticsCal
 from observer.apps.riskmonitor.service.dashboard import Dashboard

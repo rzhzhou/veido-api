@@ -188,16 +188,21 @@ class UserEnterprise(models.Model):
         return self.enterprise.name
 
 
-class UserIndustry(models.Model):
+class AreaIndustry(models.Model):
     name = models.CharField(max_length=255, verbose_name=u'名称')
 
-    user = models.ForeignKey(User, verbose_name=u'用户')
-    industry = models.ForeignKey(Industry, verbose_name=u'行业')
+    area = models.ForeignKey(
+        Area,
+        verbose_name=u'地域'
+    )
+    industry = models.ForeignKey(
+        Industry,
+        verbose_name=u'行业'
+    )
 
     class Meta:
         app_label = 'riskmonitor'
-        db_table = 'user_industry'
-        verbose_name_plural = u'支柱行业'
+        verbose_name_plural = u'地域行业'
 
     def __unicode__(self):
         return self.name

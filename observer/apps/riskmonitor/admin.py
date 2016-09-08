@@ -10,7 +10,7 @@ from observer.apps.riskmonitor.models import (Brand, Enterprise, Industry,
                                               RiskData, RiskNewsPublisher, RiskNews,
                                               ScoreEnterprise, ScoreIndustry,
                                               ScoreProduct, UserArea,
-                                              UserEnterprise, UserIndustry,
+                                              UserEnterprise, AreaIndustry,
                                               SocietyIndex, ConsumeIndex,
                                               ManageIndex, Cache, CacheConf)
 
@@ -35,12 +35,12 @@ from observer.apps.riskmonitor.models import (Brand, Enterprise, Industry,
 #     search_fields = ('weight', 'metrics', 'product')
 #     list_filter = ('weight', 'metrics', 'product')
 
-class UserIndustryAdmin(ForeignKeyAutocompleteAdmin):
+class AreaIndustryAdmin(ForeignKeyAutocompleteAdmin):
     related_search_fields = {'industry': ('name',)}
-    fields = ('name', 'user', 'industry')
-    list_display = ('name', 'user', 'industry')
-    search_fields = ('name', 'user__username', 'industry__name')
-    list_filter = ('user', 'industry__level')
+    fields = ('name', 'area', 'industry')
+    list_display = ('name', 'area', 'industry')
+    search_fields = ('name', 'industry__name')
+    list_filter = ('area', 'industry__level')
 
 
 # class UserEnterpriseAdmin(admin.ModelAdmin):
@@ -204,7 +204,7 @@ class CacheConfAdmin(admin.ModelAdmin):
 # admin.site.register(Product, ProductAdmin)
 # admin.site.register(Metrics, MetricsAdmin)
 # admin.site.register(ProductMetrics, ProductMetricsAdmin)
-admin.site.register(UserIndustry, UserIndustryAdmin)
+admin.site.register(AreaIndustry, AreaIndustryAdmin)
 # admin.site.register(UserEnterprise, UserEnterpriseAdmin)
 admin.site.register(ScoreIndustry, ScoreIndustryAdmin)
 admin.site.register(ScoreEnterprise, ScoreEnterpriseAdmin)

@@ -6,7 +6,7 @@ from datetime import date, datetime, timedelta
 from observer.utils.date.convert import datetime_to_timestamp
 from observer.apps.origin.models import Inspection
 from observer.apps.riskmonitor.models import (
-    RiskNews, ScoreIndustry, UserIndustry, Industry, ManageIndex, SocietyIndex, ConsumeIndex)
+    RiskNews, ScoreIndustry, AreaIndustry, Industry, ManageIndex, SocietyIndex, ConsumeIndex)
 from observer.apps.riskmonitor.service.news import NewsQuerySet
 
 
@@ -233,7 +233,7 @@ class IndustryTrack(NewsQuerySet):
         # Exclude $cond None Value
         args = dict([(k, v) for k, v in cond.iteritems() if v is not None])
 
-        user_industries = UserIndustry.objects.filter(**args)
+        user_industries = AreaIndustry.objects.filter(**args)
 
         for u in user_industries:
             queryset = ScoreIndustry.objects.filter(

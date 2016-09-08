@@ -6,7 +6,7 @@ from django.db.models import Count, Q
 from django.http import Http404
 
 from observer.apps.riskmonitor.models import (Industry, RiskNews,
-                                              RiskNewsPublisher, UserIndustry)
+                                              RiskNewsPublisher, AreaIndustry)
 
 
 class Abstract(object):
