@@ -4,7 +4,7 @@ from django_extensions.management.jobs import HourlyJob
 
 from observer.apps.riskmonitor.service.industry import IndustryTrack
 from observer.apps.riskmonitor.models import Cache, CacheConf
-from observer.utils.date.convert import utc_to_local_time
+from observer.utils.date.convert import utc_to_local_time, get_days, get_start_end
 
 
 class Job(HourlyJob):
@@ -16,16 +16,22 @@ class Job(HourlyJob):
 
     def generate_query_params(self, cache_conf):
         cache_conf.params = eval(cache_conf.params)
+        days = cache_conf.days
 
         query_params = {
             'cache_conf_name': cache_conf.name,
-            'days': cache_conf.days,
             'level': cache_conf.params['level'],
             'area': cache_conf.params['area'],
             'user_id': cache_conf.params['user_id'],
-            'start': utc_to_local_time(self.today - timedelta(days=cache_conf.days)),
+            'start': utc_to_local_time(self.today - timedelta(days=days)),
             'end': utc_to_local_time(self.today)
         }
+
+        if days in [180, 360]:
+            start_end = get_start_end(days)
+            query_params['start'] = utc_to_local_time(start_end[0])
+            query_params['end'] = utc_to_local_time(start_end[1])
+
 
         return query_params
 
