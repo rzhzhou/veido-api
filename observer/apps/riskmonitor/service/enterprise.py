@@ -2,6 +2,7 @@
 from django.db.models import Count
 
 from observer.apps.origin.models import Inspection
+from observer.apps.origin.models import Area
 from observer.apps.riskmonitor.models import ScoreEnterprise, UserIndustry
 from observer.apps.riskmonitor.service.abstract import Abstract
 
@@ -18,7 +19,9 @@ class EnterpriseRank(Abstract):
         cond = {
             'pubtime__gte': self.start,
             'pubtime__lt': self.end,
-            'enterprise_unqualified__area__name': self.focus
+            'enterprise_unqualified__area__id__in': Area.objects.filter(
+                parent__name=self.focus
+            ).values_list('id', flat=True)
         }
 
         # Exclude $cond None Value
