@@ -39,7 +39,7 @@ class Job(HourlyJob):
         name = query_params['cache_conf_name']
         start = query_params['start'].strftime('%Y-%m-%d')
         end = query_params['end'].strftime('%Y-%m-%d')
-        level = query_params['level']
+        level = query_params.get('level')
         area = query_params['area']
         user = query_params['user_id']
         return u'%s.%s.%s.%s.%s.%s' % (name, start, end, level, area, user)

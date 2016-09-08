@@ -226,7 +226,7 @@ class IndustryTrack(NewsQuerySet):
         cond = {
             'user__id': self.user_id,
             'industry__name': getattr(self, 'name', None),
-            'industry__level': self.level,
+            'industry__level': getattr(self, 'level', None),
             'industry__parent__id': getattr(self, 'parent', None)
         }
 
