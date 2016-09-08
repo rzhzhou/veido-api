@@ -198,7 +198,6 @@ class IndustryList(BaseView):
 
     def set_params(self, request):
         super(IndustryList, self).set_params(request.GET)
-        self.query_params['user_id'] = request.user.id
 
     def serialize(self, queryset):
         data = [{
