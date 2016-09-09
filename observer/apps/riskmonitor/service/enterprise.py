@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.db.models import Count
+from django.db.models import Count, Q
 
 from observer.apps.origin.models import Inspection
 from observer.apps.origin.models import Area
@@ -20,7 +20,8 @@ class EnterpriseRank(Abstract):
             'pubtime__gte': self.start,
             'pubtime__lt': self.end,
             'enterprise_unqualified__area__id__in': Area.objects.filter(
-                parent__name=self.focus
+                Q(parent__name=self.focus) |
+                Q(name=self.focus)
             ).values_list('id', flat=True)
         }
 
