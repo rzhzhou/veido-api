@@ -6,7 +6,7 @@ from datetime import date, datetime, timedelta
 from observer.utils.date.convert import datetime_to_timestamp
 from observer.apps.origin.models import Inspection
 from observer.apps.riskmonitor.models import (
-    RiskNews, ScoreIndustry, AreaIndustry, Industry, ManageIndex, SocietyIndex, ConsumeIndex)
+    RiskNews, ScoreIndustry, AreaIndustry, Industry, ManageIndex, SocietyIndex, ConsumeIndex, UserArea)
 from observer.apps.riskmonitor.service.news import NewsQuerySet
 
 
@@ -224,7 +224,11 @@ class IndustryTrack(NewsQuerySet):
         industries = []
 
         cond = {
-            'area__name': getattr(self, 'area', u'全国'),
+            'area__name': getattr(
+                self,
+                'area',
+                UserArea.objects.get(user__id=self.user_id).area.name
+            ),
             'industry__name': getattr(self, 'name', None),
             'industry__level': getattr(self, 'level', None),
             'industry__parent__id': getattr(self, 'parent', None)
