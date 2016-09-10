@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import uuid
-
+from datetime import date
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
@@ -422,3 +422,15 @@ class CacheConf(models.Model):
 
     def __unicode__(self):
         return self.name
+
+
+class SummariesScore(models.Model):
+    score = models.IntegerField(verbose_name=u'整体分数')
+    pubtime = models.DateField(default=date.today, verbose_name=u'创建时间')
+
+    class Meta:
+        app_label = 'riskmonitor'
+        verbose_name_plural = u'整体分数'
+
+    def __unicode__(self):
+        return str(self.score)

@@ -6,7 +6,7 @@ from datetime import date, datetime, timedelta
 from observer.utils.date.convert import datetime_to_timestamp
 from observer.apps.origin.models import Inspection
 from observer.apps.riskmonitor.models import (
-    RiskNews, ScoreIndustry, AreaIndustry, Industry, ManageIndex, SocietyIndex, ConsumeIndex, UserArea)
+    RiskNews, ScoreIndustry, AreaIndustry, Industry, ManageIndex, SocietyIndex, ConsumeIndex, UserArea, SummariesScore)
 from observer.apps.riskmonitor.service.news import NewsQuerySet
 
 
@@ -207,7 +207,7 @@ class IndustryTrack(NewsQuerySet):
 
         # total_score = ((100 - c * 0.2) + (100 - s * 0.2) +
         #                (100 - m * 0.2) + news_socre + inspection_score) / 5
-        total_score = 90
+        total_score = (SummariesScore.objects.get(pubtime=date.today())).score
 
         return (total_score, news_socre, inspection_score)
 
@@ -256,7 +256,9 @@ class IndustryTrack(NewsQuerySet):
             count_risk_inspection_score = self.count_risk_inspection_data(u.industry.id)[
                 1]
 
-            count_risk_rank_score = count_consume_index_score * 0.1 + count_society_index_score * 0.1 + count_manage_index_score * 0.1 + count_risk_news_score * 0.3 + count_risk_inspection_score * 0.4
+            count_risk_rank_score = count_consume_index_score * 0.1 + count_society_index_score * 0.1 + \
+                count_manage_index_score * 0.1 + count_risk_news_score * \
+                0.3 + count_risk_inspection_score * 0.4
 
             # if risk_rank_score < 65:
             #     risk_rank_word = 'C'

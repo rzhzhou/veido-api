@@ -12,7 +12,8 @@ from observer.apps.riskmonitor.models import (Brand, Enterprise, Industry,
                                               ScoreProduct, UserArea,
                                               UserEnterprise, AreaIndustry,
                                               SocietyIndex, ConsumeIndex,
-                                              ManageIndex, Cache, CacheConf)
+                                              ManageIndex, Cache, CacheConf,
+                                              SummariesScore)
 
 
 # class ProductAdmin(admin.ModelAdmin):
@@ -200,6 +201,12 @@ class CacheConfAdmin(admin.ModelAdmin):
     list_filter = ('name', 'days')
     search_fields = ('name',)
 
+class SummariesScoreAdmin(admin.ModelAdmin):
+    fields = ('score', 'pubtime')
+    list_display = ('score', 'pubtime')
+    list_filter = ('score', 'pubtime')
+    search_fields = ('pubtime',)
+
 
 # admin.site.register(Product, ProductAdmin)
 # admin.site.register(Metrics, MetricsAdmin)
@@ -219,3 +226,4 @@ admin.site.register(ConsumeIndex, ConsumeIndexAdmin)
 admin.site.register(ManageIndex, ManageIndexAdmin)
 admin.site.register(Cache, CacheAdmin)
 admin.site.register(CacheConf, CacheConfAdmin)
+admin.site.register(SummariesScore, SummariesScoreAdmin)
