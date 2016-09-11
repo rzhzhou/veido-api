@@ -185,11 +185,13 @@ class IndustryTrack(NewsQuerySet):
             self.count_risk_inspection_data()
         )
 
-    def get_overall_overview_score(self, pubtime_gte='', pubtime_lt=''):
+    def get_overall_overview_score(self, pubtime_gte='', pubtime_lt='', pubtime=''):
         if pubtime_gte == '' and pubtime_lt == '':
             pubtime_gte = self.start
             pubtime_lt = self.end
 
+        if pubtime == '':
+            pubtime = date.today()
         # c = ConsumeIndex.objects.count()
         # s = SocietyIndex.objects.count()
         # m = ManageIndex.objects.count()
@@ -207,7 +209,7 @@ class IndustryTrack(NewsQuerySet):
 
         # total_score = ((100 - c * 0.2) + (100 - s * 0.2) +
         #                (100 - m * 0.2) + news_socre + inspection_score) / 5
-        total_score = (SummariesScore.objects.get(pubtime=date.today())).score
+        total_score = (SummariesScore.objects.get(pubtime=pubtime)).score
 
         return (total_score, news_socre, inspection_score)
 
