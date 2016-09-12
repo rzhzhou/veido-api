@@ -484,6 +484,9 @@ class EnterpriseList(BaseView):
             'id': q[0],
             'name': q[1],
             'focus': (self.query_params['user_area'] == q[2]),
+            'area': q[2],
+            'product': q[3],
+            'issure': q[4],
             'total': Inspection.objects.filter(enterprise_unqualified__id=q[0]).count()
         } for q in queryset]
 

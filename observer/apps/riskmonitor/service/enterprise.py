@@ -14,8 +14,8 @@ class EnterpriseRank(Abstract):
 
     def get_enterprises(self):
         fields = ('enterprise_unqualified__id', 'enterprise_unqualified__name',
-                  'enterprise_unqualified__product_name', 'enterprise_unqualified__issues',
-                  'enterprise_unqualified__area__name')
+                  'enterprise_unqualified__area__name', 'enterprise_unqualified__product_name',
+                  'enterprise_unqualified__issues')
 
         cond = {
             'pubtime__gte': self.start,
