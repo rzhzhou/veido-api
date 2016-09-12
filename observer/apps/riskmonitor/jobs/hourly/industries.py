@@ -40,7 +40,7 @@ class Job(HourlyJob):
         start = query_params['start'].strftime('%Y-%m-%d')
         end = query_params['end'].strftime('%Y-%m-%d')
         level = query_params.get('level')
-        area = query_params['area']
+        area = query_params.get('area', u'全国')
         return u'%s.%s.%s.%s.%s' % (name, start, end, level, area)
 
     @property
