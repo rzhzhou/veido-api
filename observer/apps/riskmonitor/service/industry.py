@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from random import randint
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from datetime import date, datetime, timedelta
@@ -123,7 +124,7 @@ class IndustryTrack(NewsQuerySet):
                 n_score -= 0.5 * count
 
         if n_score < 60:
-            n_score = 60
+            n_score = randint(55, 60)
 
         if n_score < 70:
             n_color = '#bc3f2b'
@@ -144,7 +145,7 @@ class IndustryTrack(NewsQuerySet):
         i_score = (100 - i_dimension.count() * 10)
 
         if i_score < 60:
-            i_score = 60
+            i_score = randint(55, 60)
 
         if i_score < 70:
             i_color = '#bc3f2b'
