@@ -434,3 +434,4 @@ class SummariesScore(models.Model):
 
     def __unicode__(self):
         return str(self.score)
+

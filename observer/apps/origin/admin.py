@@ -28,9 +28,9 @@ class IndustryAdmin(ForeignKeyAutocompleteAdmin):
 
 class EnterpriseAdmin(ImportExportModelAdmin):
     resource_class = EnterpriseResources
-    fields = ('name', 'area')
-    list_display = ('name', 'area')
-    search_fields = ('name', 'area__name')
+    fields = ('name', 'area', 'product_name', 'issues')
+    list_display = ('name', 'area', 'product_name', 'issues')
+    search_fields = ('name', 'area__name', 'product_name', 'issues')
     list_filter = ('area', )
 
 

@@ -19,7 +19,9 @@ class Area(models.Model):
 
 class Enterprise(models.Model):
     name = models.CharField(max_length=255, verbose_name=u'企业名')
-
+    product_name = models.CharField(
+        max_length=255, null=True, verbose_name=u'风险产品名称')
+    issues = models.CharField(max_length=255, null=True, verbose_name=u'风险事项')
     area = models.ForeignKey(Area, verbose_name=u'地域')
 
     class Meta:
