@@ -74,26 +74,23 @@ class Dashboard(AnalyticsCal):
 
         date_range = map(cal_date_func, xrange(self.days))
 
-        seven_days = date_range[len(date_range) - 7::]
+        area_days = date_range[len(date_range) - 7::]
 
-        date = map(lambda x: x[1].strftime('%m-%d'), seven_days)
-        level = []
-        for index in seven_days:
+        date = map(lambda x: x[1].strftime('%m-%d'), area_days)
+        area_score = []
+        for index in area_days:
 
             pubtime = index[0].strftime('%Y-%m-%d')
 
             try:
-                total_score = self.get_overall_overview_score(pubtime=pubtime)[0]
+                total_score = self.get_overall_overview_score(pubtime=pubtime)[
+                    0]
             except:
-                total_score = random.randint(60,100)
+                total_score = random.randint(60, 100)
 
-            if total_score < 60:
-                level.append(2)
-            elif total_score < 90:
-                level.append(1)
-            else:
-                level.append(0)
-        return (date, zip(date, level))
+            area_score.append(total_score)
+
+        return (date, zip(date, area_score))
 
     @property
     def risk_product(self):
