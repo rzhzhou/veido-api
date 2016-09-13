@@ -123,8 +123,8 @@ class IndustryTrack(NewsQuerySet):
             else:
                 n_score -= 0.5 * count
 
-        if n_score < 60:
-            n_score = randint(55, 60)
+        if n_score < 30:
+            n_score = randint(25, 60)
 
         if n_score < 70:
             n_color = '#bc3f2b'
@@ -144,12 +144,12 @@ class IndustryTrack(NewsQuerySet):
 
         i_score = (100 - i_dimension.count() * 10)
 
-        if i_score < 60:
-            i_score = randint(55, 60)
+        if i_score < 30:
+            i_score = randint(25, 60)
 
-        if i_score < 70:
+        if i_score < 30:
             i_color = '#bc3f2b'
-        elif 70 <= i_score < 90:
+        elif 30 <= i_score < 70:
             i_color = '#6586a1'
         else:
             i_color = '#95c5ab'
@@ -161,16 +161,16 @@ class IndustryTrack(NewsQuerySet):
         risk_rank_score = round(self.get_dimension()[0][1] * 0.1 + self.get_dimension()[1][1] * 0.1 + self.get_dimension()[
             2][1] * 0.1 + self.get_dimension()[3][1] * 0.3 + self.get_dimension()[4][1] * 0.4)
 
-        if risk_rank_score < 65:
+        if risk_rank_score < 30:
             risk_rank_color = '#bc3f2b'
-        elif 65 <= risk_rank_score < 85:
+        elif 30 <= risk_rank_score < 70:
             risk_rank_color = '#6586a1'
         else:
             risk_rank_color = '#95c5ab'
 
-        if risk_rank_score < 65:
+        if risk_rank_score < 30:
             risk_rank_word = 'C'
-        elif 65 <= risk_rank_score < 85:
+        elif 30 <= risk_rank_score < 70:
             risk_rank_word = 'B'
         else:
             risk_rank_word = 'A'
@@ -202,16 +202,16 @@ class IndustryTrack(NewsQuerySet):
         inspection_score = (insepction_count * 10) / area_industry_count
 
         if inspection_score < 60:
-            inspection_score = randint(90, 100)
+            inspection_score = randint(70, 100)
         elif inspection_score < 80:
-            inspection_score = randint(70, 90)
+            inspection_score = randint(70, 30)
         else:
-            inspection_score = randint(60, 70)
+            inspection_score = randint(30, 60)
 
         try:
             total_score = (SummariesScore.objects.get(pubtime=pubtime)).score
         except:
-            total_score = randint(60, 100)
+            total_score = randint(30, 100)
 
         try:
             internet_score = (InternetScore.objects.get(pubtime=pubtime)).score
@@ -219,7 +219,7 @@ class IndustryTrack(NewsQuerySet):
             # n_dimension = RiskNews.objects.filter(pubtime__gte=self.start, pubtime__lt=self.end).count()
             # if (100 - n_dimension / area_industry_count * 0.5) < 60:
             #     internet_score = randint(55, 70)
-            internet_score = randint(55, 70)
+            internet_score = randint(25, 60)
         return (total_score, internet_score, inspection_score)
 
     def get_all(self):
