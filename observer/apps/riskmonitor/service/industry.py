@@ -196,17 +196,21 @@ class IndustryTrack(NewsQuerySet):
         # c = ConsumeIndex.objects.count()
         # s = SocietyIndex.objects.count()
         # m = ManageIndex.objects.count()
-        n = RiskNews.objects.filter(
-            pubtime__gte=pubtime_gte, pubtime__lt=pubtime_lt).count()
-        i = Inspection.objects.filter(
-            pubtime__gte=pubtime_gte, pubtime__lt=pubtime_lt).count()
+        # n = RiskNews.objects.filter(
+        #     pubtime__gte=pubtime_gte, pubtime__lt=pubtime_lt).count()
 
-        if (n * 0.45) > 100:
-            news_socre = 100 - int(str(n * 0.45)[:2])
-        else:
-            news_socre = 100 - (n * 0.45)
+        i_dimension = Inspection.objects.filter(pubtime__gte=self.start, pubtime__lt=self.end)
 
-        inspection_score = 100 - (i * 0.2)
+        inspection_score = (100 - i_dimension.count() * 10)
+
+        if inspection_score < 60:
+            inspection_score = randint(55, 60)
+
+        # if (n * 0.45) > 100:
+        #     news_socre = 100 - int(str(n * 0.45)[:2])
+        # else:
+        #     news_socre = 100 - (n * 0.45)
+        news_socre = randint(60, 100)
 
         # total_score = ((100 - c * 0.2) + (100 - s * 0.2) +
         #                (100 - m * 0.2) + news_socre + inspection_score) / 5
