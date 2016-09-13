@@ -435,13 +435,14 @@ class SummariesScore(models.Model):
     def __unicode__(self):
         return str(self.score)
 
-class RiskScore(models.Model):
-    score = models.IntegerField(verbose_name=u'整体分数')
+
+class InternetScore(models.Model):
+    score = models.IntegerField(verbose_name=u'互联网分数')
     pubtime = models.DateField(default=date.today, verbose_name=u'创建时间')
 
     class Meta:
         app_label = 'riskmonitor'
-        verbose_name_plural = u'整体分数'
+        verbose_name_plural = u'互联网分数'
 
     def __unicode__(self):
         return str(self.score)

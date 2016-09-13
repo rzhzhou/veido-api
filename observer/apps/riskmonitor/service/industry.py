@@ -7,7 +7,7 @@ from datetime import date, datetime, timedelta
 from observer.utils.date.convert import datetime_to_timestamp
 from observer.apps.origin.models import Inspection
 from observer.apps.riskmonitor.models import (
-    RiskNews, ScoreIndustry, AreaIndustry, Industry, ManageIndex, SocietyIndex, ConsumeIndex, UserArea, SummariesScore)
+    RiskNews, ScoreIndustry, AreaIndustry, Industry, ManageIndex, SocietyIndex, ConsumeIndex, UserArea, SummariesScore, InternetScore)
 from observer.apps.riskmonitor.service.news import NewsQuerySet
 
 
@@ -193,30 +193,32 @@ class IndustryTrack(NewsQuerySet):
 
         if pubtime == '':
             pubtime = date.today()
-        # c = ConsumeIndex.objects.count()
-        # s = SocietyIndex.objects.count()
-        # m = ManageIndex.objects.count()
-        # n = RiskNews.objects.filter(
-        #     pubtime__gte=pubtime_gte, pubtime__lt=pubtime_lt).count()
 
-        i_dimension = Inspection.objects.filter(pubtime__gte=self.start, pubtime__lt=self.end)
+        insepction_count = Inspection.objects.filter(pubtime__gte=self.start, pubtime__lt=self.end).count()
 
-        inspection_score = (100 - i_dimension.count() * 10)
+        area_industry_count = AreaIndustry.objects.filter(area='2360').count()
+
+        inspection_score = (insepction_count * 10 ) / area_industry_count
 
         if inspection_score < 60:
-            inspection_score = randint(55, 60)
+            inspection_score = randint(90, 100)
+        elif inspection_score < 80:
+            inspection_score = randint(70, 90)
+        else:
+            inspection_score = randint(60, 70)
 
-        # if (n * 0.45) > 100:
-        #     news_socre = 100 - int(str(n * 0.45)[:2])
-        # else:
-        #     news_socre = 100 - (n * 0.45)
-        news_socre = randint(60, 100)
+        try:
+            total_score = (SummariesScore.objects.get(pubtime=pubtime)).score
+        except:
+            total_score = randint(60, 100)
 
-        # total_score = ((100 - c * 0.2) + (100 - s * 0.2) +
-        #                (100 - m * 0.2) + news_socre + inspection_score) / 5
-        total_score = (SummariesScore.objects.get(pubtime=pubtime)).score
+        try:
+            internet_score = (InternetScore.objects.get(pubtime=pubtime)).score
+        except:
+            internet_score = randint(60, 100)
 
-        return (total_score, news_socre, inspection_score)
+
+        return (total_score, internet_score, inspection_score)
 
     def get_all(self):
         data = {
