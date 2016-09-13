@@ -74,9 +74,20 @@ class Dashboard(AnalyticsCal):
 
         date_range = map(cal_date_func, xrange(self.days))
 
-        area_days = date_range[len(date_range) - 7::]
+        date_range_len = len(date_range)
+        if date_range_len <= 10:
+            area_days = date_range[date_range_len - 6::]
+            date = map(lambda x: x[1].strftime('%m-%d'), area_days)
+        elif date_range_len <= 30:
+            area_days = date_range[::5]
+            date = map(lambda x: x[1].strftime('%m-%d'), area_days)
+        elif date_range_len <= 190:
+            area_days = date_range[::31]
+            date = map(lambda x: x[1].strftime('20%y-%m'), area_days)
+        elif date_range_len <= 370:
+            area_days = date_range[::61]
+            date = map(lambda x: x[1].strftime('20%y-%m'), area_days)
 
-        date = map(lambda x: x[1].strftime('%m-%d'), area_days)
         area_score = []
         for index in area_days:
 
@@ -89,7 +100,6 @@ class Dashboard(AnalyticsCal):
                 total_score = random.randint(60, 100)
 
             area_score.append(total_score)
-
         return (date, zip(date, area_score))
 
     @property

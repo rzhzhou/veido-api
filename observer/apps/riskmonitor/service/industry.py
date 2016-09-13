@@ -194,11 +194,12 @@ class IndustryTrack(NewsQuerySet):
         if pubtime == '':
             pubtime = date.today()
 
-        insepction_count = Inspection.objects.filter(pubtime__gte=self.start, pubtime__lt=self.end).count()
+        insepction_count = Inspection.objects.filter(
+            pubtime__gte=self.start, pubtime__lt=self.end).count()
 
         area_industry_count = AreaIndustry.objects.filter(area='2360').count()
 
-        inspection_score = (insepction_count * 10 ) / area_industry_count
+        inspection_score = (insepction_count * 10) / area_industry_count
 
         if inspection_score < 60:
             inspection_score = randint(90, 100)
@@ -215,9 +216,10 @@ class IndustryTrack(NewsQuerySet):
         try:
             internet_score = (InternetScore.objects.get(pubtime=pubtime)).score
         except:
-            internet_score = randint(60, 100)
-
-
+            # n_dimension = RiskNews.objects.filter(pubtime__gte=self.start, pubtime__lt=self.end).count()
+            # if (100 - n_dimension / area_industry_count * 0.5) < 60:
+            #     internet_score = randint(55, 70)
+            internet_score = randint(55, 70)
         return (total_score, internet_score, inspection_score)
 
     def get_all(self):
