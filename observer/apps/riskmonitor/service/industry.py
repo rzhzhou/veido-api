@@ -60,7 +60,6 @@ class IndustryTrack(NewsQuerySet):
     def count_society_index_data(self, industry=''):
         if industry == '':
             industry = self.industry
-
         s = SocietyIndex.objects.filter(industry__id=industry)
         s_dimension = (s[0].trade, s[0].qualified, s[
                        0].accident) if s else (1, 1, 1)
@@ -86,7 +85,6 @@ class IndustryTrack(NewsQuerySet):
     def count_manage_index_data(self, industry=''):
         if industry == '':
             industry = self.industry
-
         m = ManageIndex.objects.filter(industry__id=industry)
         m_dimension = (m[0].licence, m[0].productauth, m[0].encourage, m[
             0].limit, m[0].remove) if m else (0, 0, 0, 0, 0)
@@ -223,11 +221,6 @@ class IndustryTrack(NewsQuerySet):
             inspection_score = randint(30, 60)
 
         try:
-            total_score = (SummariesScore.objects.get(pubtime=pubtime)).score
-        except:
-            total_score = randint(80, 100)
-
-        try:
             internet_score = (
                 InternetScore.objects.get(pubtime=pubtime)).score
         except:
@@ -236,7 +229,13 @@ class IndustryTrack(NewsQuerySet):
             internet_score = 100 - n_dimension / area_industry_count * 0.5
             if (100 - n_dimension / area_industry_count * 0.5) < 60:
                 internet_score = randint(30, 60)
-            # internet_score = randint(80, 100)
+
+        try:
+            total_score = (SummariesScore.objects.get(pubtime=pubtime)).score
+        except:
+            total_score = inspection_score * 0.4 + internet_score * 0.3 + 100 * 0.1 + 100 * 0.1 + 100 * 0.1
+            total_score = round(total_score, 1)
+
         return (total_score, internet_score, inspection_score)
 
     def get_all(self):
