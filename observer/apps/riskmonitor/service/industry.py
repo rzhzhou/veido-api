@@ -101,7 +101,6 @@ class IndustryTrack(NewsQuerySet):
         return (m_dimension, m_score, m_color)
 
     def count_risk_news_data(self, industry=''):
-        n_score = 100
         if industry == '':
             industry = self.industry
 
@@ -119,7 +118,7 @@ class IndustryTrack(NewsQuerySet):
         elif time_interval > 350:
             risk_news_count = risk_news_count / 12
 
-
+        n_score = 1
         for risk_keyword_id in risk_keywords_set:
             # 得到每个风险关键词出现的次数
             count = risk_keyword__ids.count(risk_keyword_id)
@@ -130,7 +129,8 @@ class IndustryTrack(NewsQuerySet):
                 n_score = 1
 
         if risk_news_count > 60:
-            risk_news_count = 60 + int((risk_news_count - 60) * 0.1)
+            risk_news_count = risk_news_count - 60
+            risk_news_count = 60 - risk_news_count * 0.05
         else:
             risk_news_count = 100 - risk_news_count * 0.5
 
@@ -143,7 +143,10 @@ class IndustryTrack(NewsQuerySet):
         else:
             n_color = '#95c5ab'
 
-        return (n_dimension, n_score, n_color)
+        if n_score > 100:
+            n_score = 100
+
+        return (n_dimension, int(n_score), n_color)
 
     def count_risk_inspection_data(self, industry=''):
         if industry == '':
@@ -221,7 +224,7 @@ class IndustryTrack(NewsQuerySet):
         try:
             total_score = (SummariesScore.objects.get(pubtime=pubtime)).score
         except:
-            total_score = randint(55, 100)
+            total_score = randint(80, 100)
 
         try:
             internet_score = (InternetScore.objects.get(pubtime=pubtime)).score
@@ -229,7 +232,7 @@ class IndustryTrack(NewsQuerySet):
             # n_dimension = RiskNews.objects.filter(pubtime__gte=self.start, pubtime__lt=self.end).count()
             # if (100 - n_dimension / area_industry_count * 0.5) < 60:
             #     internet_score = randint(25, 60)
-            internet_score = randint(55, 100)
+            internet_score = randint(80, 100)
         return (total_score, internet_score, inspection_score)
 
     def get_all(self):
