@@ -110,7 +110,8 @@ class IndustryTrack(NewsQuerySet):
             lambda x: x['risk_keyword__id'], n_dimension.values('risk_keyword__id'))
 
         risk_keywords_set = set(risk_keyword__ids)
-        time_interval = int(str(self.end.__sub__(self.start)).split(",")[0].split(' ')[0])
+        time_interval = int(str(self.end.__sub__(
+            self.start)).split(",")[0].split(' ')[0])
         risk_news_count = n_dimension.count()
 
         if time_interval > 170:
@@ -227,12 +228,15 @@ class IndustryTrack(NewsQuerySet):
             total_score = randint(80, 100)
 
         try:
-            internet_score = (InternetScore.objects.get(pubtime=pubtime)).score
+            internet_score = (
+                InternetScore.objects.get(pubtime=pubtime)).score
         except:
-            # n_dimension = RiskNews.objects.filter(pubtime__gte=self.start, pubtime__lt=self.end).count()
-            # if (100 - n_dimension / area_industry_count * 0.5) < 60:
-            #     internet_score = randint(25, 60)
-            internet_score = randint(80, 100)
+            n_dimension = RiskNews.objects.filter(
+                pubtime__gte=self.start, pubtime__lt=self.end).count()
+            internet_score = 100 - n_dimension / area_industry_count * 0.5
+            if (100 - n_dimension / area_industry_count * 0.5) < 60:
+                internet_score = randint(30, 60)
+            # internet_score = randint(80, 100)
         return (total_score, internet_score, inspection_score)
 
     def get_all(self):
