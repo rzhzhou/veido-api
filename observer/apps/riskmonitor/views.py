@@ -665,24 +665,51 @@ class Search(BaseView):
     def get(self, request):
         self.set_params(request)
 
-        area_id = Area.objects.get(name=self.query_params['area']).id
-        areas_id = Area.objects.filter(
-            parent__id=area_id).values_list('id', flat=True)
+        area = Area.objects.get(name=self.query_params['area'])
+        areas_id = [area.id]
+
+        if area.level == 1:
+            areas_id = None
+        elif area.level == 2:
+            level_3_id = Area.objects.filter(
+                parent__id=area.id
+            ).values_list(
+                'id',
+                flat=True
+            )
+            level_4_id = Area.objects.filter(
+                parent__id__in=level_3_id
+            ).values_list(
+                'id',
+                flat=True
+            )
+            areas_id = areas_id + list(level_3_id) + list(level_4_id)
+        elif area.level == 3:
+            level_4_id = Area.objects.filter(
+                parent__id=area.id
+            ).values_list(
+                'id',
+                flat=True
+            )
+            areas_id = areas_id + list(level_4_id)
+
+        cond = {
+            'area__id__in': areas_id
+        }
+
+        # Exclude $cond None Value
+        args = dict([(k, v) for k, v in cond.iteritems() if v is not None])
 
         if self.query_params['keyword']:
             queryset = RiskNews.objects.filter(
                 Q(title__contains=self.query_params['keyword']) |
                 Q(content__contains=self.query_params['keyword']),
-                Q(area__id=area_id) |
-                Q(area__id__in=areas_id) |
-                Q(area__parent__id__in=areas_id)
+                **args
             )
         else:
-            queryset = RiskNews.objects.filter(
-                Q(area__id=area_id) |
-                Q(area__id__in=areas_id) |
-                Q(area__parent__id__in=areas_id)
-            )
+            queryset = RiskNews.objects.filter(**args)
+
+        queryset = queryset.distinct()
 
         return Response(self.serialize(queryset))
 

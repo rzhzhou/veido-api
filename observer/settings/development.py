@@ -232,7 +232,7 @@ MONGO_CONN_STR = 'mongodb://27.17.61.26:27017'
 
 # Redis
 # redis_conn_str = 'redis://192.168.1.205:16379/8'
-redis_conn_str = 'redis://27.17.61.26:16379/8'
+redis_conn_str = 'redis://27.17.61.26:6379/8'
 REDIS_CONN_STR = re.match(
     r"redis://(?P<host>.+):(?P<port>\d+)/(?P<db>.+)",
     redis_conn_str).groupdict()
