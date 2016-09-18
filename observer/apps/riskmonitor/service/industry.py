@@ -136,9 +136,9 @@ class IndustryTrack(NewsQuerySet):
 
         n_score = risk_news_count * n_score
 
-        if n_score < 70:
+        if n_score < 30:
             n_color = '#bc3f2b'
-        elif 70 <= n_score < 90:
+        elif 30 <= n_score < 70:
             n_color = '#6586a1'
         else:
             n_color = '#95c5ab'
