@@ -111,20 +111,30 @@ class IndustryTrack(NewsQuerySet):
             lambda x: x['risk_keyword__id'], n_dimension.values('risk_keyword__id'))
 
         risk_keywords_set = set(risk_keyword__ids)
+        time_interval = int(str(self.end.__sub__(self.start)).split(",")[0].split(' ')[0])
+        risk_news_count = n_dimension.count()
+
+        if time_interval > 170:
+            risk_news_count = risk_news_count / 6
+        elif time_interval > 350:
+            risk_news_count = risk_news_count / 12
+
 
         for risk_keyword_id in risk_keywords_set:
-
             # 得到每个风险关键词出现的次数
             count = risk_keyword__ids.count(risk_keyword_id)
-
             # 如果一个风险关键词出现次数过高, 就让其分值变大
             if count > 10:
-                n_score -= 0.5 * 1.2 * count
+                n_score = 1.2
             else:
-                n_score -= 0.5 * count
+                n_score = 1
 
-        if n_score < 30:
-            n_score = randint(25, 60)
+        if risk_news_count > 60:
+            risk_news_count = 60 + int((risk_news_count - 60) * 0.1)
+        else:
+            risk_news_count = 100 - risk_news_count * 0.5
+
+        n_score = risk_news_count * n_score
 
         if n_score < 70:
             n_color = '#bc3f2b'
@@ -145,7 +155,7 @@ class IndustryTrack(NewsQuerySet):
         i_score = (100 - i_dimension.count() * 10)
 
         if i_score < 30:
-            i_score = randint(25, 60)
+            i_score = randint(55, 60)
 
         if i_score < 30:
             i_color = '#bc3f2b'
@@ -211,15 +221,15 @@ class IndustryTrack(NewsQuerySet):
         try:
             total_score = (SummariesScore.objects.get(pubtime=pubtime)).score
         except:
-            total_score = randint(30, 100)
+            total_score = randint(55, 100)
 
         try:
             internet_score = (InternetScore.objects.get(pubtime=pubtime)).score
         except:
             # n_dimension = RiskNews.objects.filter(pubtime__gte=self.start, pubtime__lt=self.end).count()
             # if (100 - n_dimension / area_industry_count * 0.5) < 60:
-            #     internet_score = randint(55, 70)
-            internet_score = randint(25, 60)
+            #     internet_score = randint(25, 60)
+            internet_score = randint(55, 100)
         return (total_score, internet_score, inspection_score)
 
     def get_all(self):
