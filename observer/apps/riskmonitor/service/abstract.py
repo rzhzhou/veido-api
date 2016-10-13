@@ -6,7 +6,7 @@ from django.db.models import Count, Q
 from django.http import Http404
 
 from observer.apps.riskmonitor.models import (Industry, RiskNews,
-                                              RiskNewsPublisher, UserIndustry)
+                                              RiskNewsPublisher, AreaIndustry)
 
 
 class Abstract(object):
@@ -19,9 +19,8 @@ class Abstract(object):
         cond = {
             'pubtime__gte': self.start,
             'pubtime__lt': self.end,
-            'industry__id': self.industry,
-            'enterprise__id': self.enterprise,
-            'publisher__id': self.source
+            'industry__id': getattr(self, 'industry', None),
+            'enterprise__id': getattr(self, 'enterprise', None)
         }
 
         # Exclude $cond None Value

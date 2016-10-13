@@ -1,31 +1,35 @@
 # -*- coding: utf-8 -*-
 import time
 import uuid
-from datetime import date, datetime, timedelta
-
+import random
 import jwt
 import pytz
+from datetime import date, datetime, timedelta
+
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from django.db.models import F
+from django.db.models import F, Q
 from django.http import Http404, HttpResponse, JsonResponse
 from django.views.generic import View
 from rest_framework import exceptions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from observer.apps.riskmonitor.models import (Enterprise, Industry, Product,
+from observer.apps.origin.models import Inspection
+from observer.apps.riskmonitor.models import (Area, Cache, Enterprise, Industry, Product,
                                               RiskNews, RiskNewsPublisher,
-                                              UserIndustry)
+                                              AreaIndustry, UserArea)
 from observer.apps.riskmonitor.service.abstract import Abstract
 from observer.apps.riskmonitor.service.analytics import AnalyticsCal
 from observer.apps.riskmonitor.service.dashboard import Dashboard
 from observer.apps.riskmonitor.service.enterprise import EnterpriseRank
 from observer.apps.riskmonitor.service.industry import IndustryTrack
 from observer.apps.riskmonitor.service.news import NewsQuerySet
+from observer.apps.riskmonitor.jobs.hourly.dashboard import Job as DashboardJob
+from observer.apps.riskmonitor.jobs.hourly.industries import Job as IndustriesJob
 from observer.utils.date import pretty
-from observer.utils.date.tz import get_loc_dt, get_timezone
+from observer.utils.date.convert import utc_to_local_time
 from observer.utils.excel import xls_to_response
 from observer.utils.excel.briefing import article
 from observer.utils.decorators.cache import token
@@ -35,43 +39,23 @@ from observer.utils.connector.redisconnector import RedisQueryApi
 class BaseView(APIView):
 
     def __init__(self):
-        self.tz = pytz.timezone(settings.TIME_ZONE)
-        self.today = date.today()
+        self.today = date.today() + timedelta(days=1)
         self.query_params = {
-            'industry': None,
-            'enterprise': None,
-            'product': None,
-            'source': None,
-            'page': 1,
-            'start': str(self.today - timedelta(days=6)),
-            'end': str(self.today),
-            'level': 3,
-            'id': 0
+            'start': self.today - timedelta(days=30),
+            'end': self.today,
         }
 
-    def set_params(self, params, loc_dt=True):
-        """
-        set params
-        """
+    def set_params(self, params):
+        for k, v in params.iteritems():
+            self.query_params[k] = v
 
-        for param, value in params.iteritems():
-            self.query_params[param] = value
+        # start, end convert to local datetime
+        self.query_params['start'], self.query_params['end'] = utc_to_local_time(
+            [self.query_params['start'], self.query_params['end']]
+        )
 
-        # end date add 1 day
-        if self.query_params['end'] > self.today.strftime('%Y-%m-%d'):
-            self.query_params['end'] = self.today.strftime('%Y-%m-%d')
-
-        self.query_params['end'] = datetime.strptime(
-            self.query_params['end'], '%Y-%m-%d') + timedelta(days=1)
-        self.query_params['end'] = self.query_params[
-            'end'].strftime('%Y-%m-%d')
-
-        if loc_dt:
-            self.query_params['start'] = get_loc_dt(
-                self.tz, self.query_params['start'], pytz.utc)
-            self.query_params['end'] = get_loc_dt(
-                self.tz, self.query_params['end'], pytz.utc)
-
+        # end add 1 day
+        self.query_params['end'] = self.query_params['end'] + timedelta(days=1)
 
     def paging(self, queryset, page, num):
         paginator = Paginator(queryset, num)  # Show $num <QuerySet> per page
@@ -98,56 +82,83 @@ class DashboardList(BaseView):
         # request.GET add key --> level
         super(DashboardList, self).set_params(request.GET)
         self.query_params['user_id'] = request.user.id
+        self.query_params['level'] = 3
 
     def serialize(self, queryset):
-        weeks = [u'周一', u'周二', u'周三', u'周四', u'周五', u'周六', u'周日']
         data = {
-            'map': [{
+            'summaries': [
+                {
+                    'name': '整体',
+                    'value': queryset['summaries_score'][0]
+                },
+                {
+                    'name': '互联网',
+                    'value': queryset['summaries_score'][1]
+                },
+                {
+                    'name': '抽检',
+                    'value': queryset['summaries_score'][2]
+                }
+            ],
+            'products': {
+                'categories': queryset['risk_product'][1],
+                'data': queryset['risk_product'][3]
+            },
+            'source': [{
                 'name': m['name'],
                 'value': m['count']
             } for m in queryset['map']],
-            'rankLine': {
-                'labels': [weeks[(self.query_params['start'] + timedelta(days=(i + 1))).isoweekday() - 1]
-                           for i in range(7)],
-                'data': queryset['rank_data']
+            'risk': queryset['risk'],
+            'industries': {
+                'categories': [
+                    '内燃机/1月',
+                    '空调器/2月',
+                    '水泥/3月',
+                    '水泥/4月',
+                    '空调器/5月',
+                    '空调器/6月',
+                    '水泥/7月',
+                    '水泥/8月'
+                ],
+                'data': [
+                    {
+                        'data': [
+                            72.2,
+                            71.1,
+                            68.1,
+                            68.1,
+                            65.4,
+                            65.4,
+                            63.5,
+                            56.1
+                        ],
+                        'barWidth': '30%',
+                        'type': 'bar'
+                    }
+                ]
             },
-
-            'bar': {
-                'name': queryset['risk_product'][1],
-                'value': queryset['risk_product'][2]
-            },
-            'riskLine': {
-                'data': queryset['risk_data'][0],
-                'labels': queryset['risk_data'][1]
-            },
-            'boards': [
-                {'value': 20, 'name': '整体'},
-                {'value': 61, 'name': '互联网'},
-                {'value': 90, 'name': '抽检'}
-              ],
-            'barIndustry': [
-                {
-                    'name': '家具',
-                    'type': 'bar',
-                    'data': [320, 100, 301, 334, 390, 330, 320, 110, 320, 332, 301, 334]
-                 },
-                {
-                  'name': '儿童服装',
-                  'type': 'bar',
-                  'data': [120, 132, 101, 134, 90, 230, 210, 110, 320, 332, 351, 334]
-                },
-                {
-                  'name': '复合肥料',
-                  'type': 'bar',
-                  'data': [220, 182, 191, 234, 290, 330, 310, 110, 320, 332, 201, 334]
-                }],
+            'rank': {
+                'categories': queryset['risk_level'][0],
+                'data': queryset['risk_level'][1]
+            }
         }
+
         return data
+
+    def generate_cache_name(self):
+        self.query_params['cache_conf_name'] = 'dashboard'
+        self.query_params['days'] = (
+            self.query_params['end'] - self.query_params['start']).days
+        return DashboardJob().generate_cache_name(self.query_params)
 
     def get(self, request):
         self.set_params(request)
 
-        queryset = Dashboard(params=self.query_params).get_all()
+        try:
+            cache = Cache.objects.get(k=self.generate_cache_name())
+            queryset = eval(cache.v)
+        except Cache.DoesNotExist:
+            queryset = Dashboard(params=self.query_params).get_all()
 
         return Response(self.serialize(queryset))
 
@@ -156,26 +167,35 @@ class IndustryList(BaseView):
 
     def __init__(self):
         super(IndustryList, self).__init__()
-        self.query_params['field'] = 'name'
 
     def set_params(self, request):
-        # request.GET add key --> level
         super(IndustryList, self).set_params(request.GET)
         self.query_params['user_id'] = request.user.id
 
     def serialize(self, queryset):
         data = [{
-                    'id': q[0],
-                    'category': q[1],
-                    'score':q[2],
-                    'level': int(queryset[1])
-                } for q in queryset[0]]
+            'id': q[0],
+            'category': q[1],
+            'level': q[2],
+            'score':q[3]
+        } for q in queryset]
+
         return data
+
+    def generate_cache_name(self):
+        self.query_params['cache_conf_name'] = 'industries'
+        self.query_params['days'] = (
+            self.query_params['end'] - self.query_params['start']).days
+        return IndustriesJob().generate_cache_name(self.query_params)
 
     def get(self, request):
         self.set_params(request)
 
-        queryset = IndustryTrack(params=self.query_params).get_industries()
+        try:
+            cache = Cache.objects.get(k=self.generate_cache_name())
+            queryset = eval(cache.v)
+        except Cache.DoesNotExist:
+            queryset = IndustryTrack(params=self.query_params).get_industries()
 
         return Response(self.serialize(queryset))
 
@@ -191,15 +211,169 @@ class IndustryDetail(BaseView):
 
     def serialize(self, queryset):
         data = {
-            'trend': {
-                'labels': queryset[0]['date'],
-                'data': queryset[0]['data']
+            'name': queryset['name'],
+            'total': {
+                'level': queryset['risk_rank'][0],
+                'score': queryset['risk_rank'][1],
+                'color': queryset['risk_rank'][2]
             },
-            'bar': {
-                'name': [u'同比', u'环比'],
-                'show': 'true',
-                'lables': [queryset[1]['date']],
-                'data': [queryset[1]['data']]
+            'indicators': [
+                {
+                    'title': u'消费指标',
+                    'score': queryset['indicators'][0][1],
+                    'color': queryset['indicators'][0][2],
+                    'norms': [
+                        {
+                            'name': u'国家强制性要求',
+                            'options': [
+                                {'label': u'有', 'selected': queryset[
+                                    'indicators'][0][0][0] == 1},
+                                {'label': u'无', 'selected': queryset[
+                                    'indicators'][0][0][0] == 0}
+                            ]
+                        },
+                        {
+                            'name': u'密切程度',
+                            'options': [
+                                {'label': u'高', 'selected': queryset[
+                                    'indicators'][0][0][1] == 3},
+                                {'label': u'中', 'selected': queryset[
+                                    'indicators'][0][0][1] == 2},
+                                {'label': u'低', 'selected': queryset[
+                                    'indicators'][0][0][1] == 1}
+                            ]
+                        },
+                        {
+                            'name': u'涉及特定消费群体',
+                            'options': [
+                                {'label': u'是', 'selected': queryset[
+                                    'indicators'][0][0][2] == 1},
+                                {'label': u'否', 'selected': queryset[
+                                    'indicators'][0][0][2] == 0}
+                            ]
+                        }
+                    ]
+                },
+                {
+                    'title': u'社会性指标',
+                    'score': queryset['indicators'][1][1],
+                    'color': queryset['indicators'][1][2],
+                    'norms': [
+                        {
+                            'name': u'贸易量',
+                            'options': [
+                                {'label': u'高', 'selected': queryset[
+                                    'indicators'][1][0][0] == 3},
+                                {'label': u'中', 'selected': queryset[
+                                    'indicators'][1][0][0] == 2},
+                                {'label': u'低', 'selected': queryset[
+                                    'indicators'][1][0][0] == 1}
+                            ]
+                        },
+                        {
+                            'name': u'抽检合格率',
+                            'options': [
+                                {'label': u'高', 'selected': queryset[
+                                    'indicators'][1][0][1] == 3},
+                                {'label': u'中', 'selected': queryset[
+                                    'indicators'][1][0][1] == 2},
+                                {'label': u'低', 'selected': queryset[
+                                    'indicators'][1][0][1] == 1}
+                            ]
+                        },
+                        {
+                            'name': u'案例发生状况',
+                            'options': [
+                                {'label': u'高', 'selected': queryset[
+                                    'indicators'][1][0][2] == 3},
+                                {'label': u'中', 'selected': queryset[
+                                    'indicators'][1][0][2] == 2},
+                                {'label': u'低', 'selected': queryset[
+                                    'indicators'][1][0][2] == 1}
+                            ]
+                        }
+                    ]
+                },
+                {
+                    'title': '管理指标',
+                    'score': queryset['indicators'][2][1],
+                    'color': queryset['indicators'][2][2],
+                    'norms': [
+                        {
+                            'name': u'列入许可证目录',
+                            'options': [
+                                {'label': u'是', 'selected': queryset[
+                                    'indicators'][2][0][0] == 1},
+                                {'label': u'否', 'selected': queryset[
+                                    'indicators'][2][0][0] == 0}
+                            ]
+                        },
+                        {
+                            'name': u'列入产品认证目录',
+                            'options': [
+                                {'label': u'是', 'selected': queryset[
+                                    'indicators'][2][0][1] == 1},
+                                {'label': u'否', 'selected': queryset[
+                                    'indicators'][2][0][1] == 0}
+                            ]
+                        },
+                        {
+                            'name': u'是否鼓励',
+                            'options': [
+                                {'label': u'是', 'selected': queryset[
+                                    'indicators'][2][0][2] == 1},
+                                {'label': u'否', 'selected': queryset[
+                                    'indicators'][2][0][2] == 0}
+                            ]
+                        },
+                        {
+                            'name': u'是否限制',
+                            'options': [
+                                {'label': u'是', 'selected': queryset[
+                                    'indicators'][2][0][3] == 1},
+                                {'label': u'否', 'selected': queryset[
+                                    'indicators'][2][0][3] == 0}
+                            ]
+                        },
+                        {
+                            'name': u'是否淘汰',
+                            'options': [
+                                {'label': u'是', 'selected': queryset[
+                                    'indicators'][2][0][4] == 1},
+                                {'label': u'否', 'selected': queryset[
+                                    'indicators'][2][0][4] == 0}
+                            ]
+                        }
+                    ]
+                },
+                {
+                    'title': '风险新闻',
+                    # 'score': random.randint(85, 95),
+                    'score': queryset['indicators'][3][1],
+                    'color': queryset['indicators'][3][2],
+                    'norms': [{
+                        'title': q.title,
+                        'source': q.publisher.name,
+                        'time': q.pubtime.strftime('%Y-%m-%d'),
+                        'url': q.url
+                    } for q in queryset['indicators'][3][0]]
+                },
+                {
+                    'title': '风险抽检',
+                    'score': queryset['indicators'][4][1],
+                    'color': queryset['indicators'][4][2],
+                    'norms': [{
+                        'title': q.title,
+                        'source': q.publisher.name,
+                        'time': q.pubtime.strftime('%Y-%m-%d'),
+                        'url': q.url,
+                        'qualitied': q.qualitied
+                    } for q in queryset['indicators'][4][0]]
+                }
+            ],
+            'trend': {
+                'categories': queryset['trend']['categories'],
+                'data': queryset['trend']['data']
             }
         }
         return data
@@ -207,7 +381,7 @@ class IndustryDetail(BaseView):
     def get(self, request, pk):
         self.set_params(request, pk)
 
-        queryset = IndustryTrack(params=self.query_params).get_chart()
+        queryset = IndustryTrack(params=self.query_params).get_all()
 
         return Response(self.serialize(queryset))
 
@@ -227,12 +401,12 @@ class NewsList(BaseView):
     def serialize(self, queryset):
         results = self.paging(queryset)
         data = map(lambda r: {
-                'id': r['id'],
-                'url': r['url'],
-                'title': r['title'],
-                'time': r['pubtime'].strftime('%Y-%m-%d %H:%M'),
-                'source': r['publisher__name']
-            }, results)
+            'id': r['id'],
+            'url': r['url'],
+            'title': r['title'],
+            'time': r['pubtime'].strftime('%Y-%m-%d %H:%M'),
+            'source': r['publisher__name']
+        }, results)
 
         return data
 
@@ -271,29 +445,56 @@ class EnterpriseList(BaseView):
 
     def set_params(self, request):
         super(EnterpriseList, self).set_params(request.GET)
+        self.query_params['user_area'] = UserArea.objects.get(
+            user__id=request.user.id).area.name
 
     def paging(self, queryset):
         return super(EnterpriseList, self).paging(queryset, self.query_params['page'], 10)
 
     def serialize(self, queryset):
-        results = self.paging(queryset)
-        data = {
-            'title': [u'排名', u'企业名称', u'风险信息总数', u'等级'],
-            'items': map(lambda r: {
-                'id': r[1]['enterprise__id'],
-                'ranking': r[0],
-                'title': r[1]['enterprise__name'],
-                'level': round(r[1]['score__avg']),
-                'number': RiskNews.objects.filter(enterprise__id=r[1]['enterprise__id']).count()
-            }, enumerate(results, (int(self.query_params['page']) - 1) * 10 + 1)),
-            'total': results.paginator.num_pages
-        }
+        data = [{
+            'id': q[0],
+            'name': q[1],
+            'focus': (self.query_params['user_area'] == q[2]),
+            'area': q[2],
+            'product': q[3],
+            'issure': q[4],
+            'total': Inspection.objects.filter(enterprise_unqualified__id=q[0]).count()
+        } for q in queryset]
+
         return data
 
     def get(self, request):
         self.set_params(request)
 
         queryset = EnterpriseRank(params=self.query_params).get_enterprises()
+
+        return Response(self.serialize(queryset))
+
+
+class EnterpriseDetail(BaseView):
+
+    def __init__(self):
+        super(EnterpriseDetail, self).__init__()
+
+    def set_params(self, request):
+        super(EnterpriseDetail, self).set_params(request.GET)
+
+    def serialize(self, queryset):
+        data = map(lambda r: {
+            'id': r.id,
+            'url': r.url,
+            'title': r.title,
+            'time': r.pubtime.strftime('%Y-%m-%d %H:%M'),
+            'source': r.publisher.name
+        }, queryset)
+
+        return data
+
+    def get(self, request, pk):
+        self.set_params(request)
+
+        queryset = Inspection.objects.filter(enterprise_unqualified__id=pk)
 
         return Response(self.serialize(queryset))
 
@@ -334,23 +535,6 @@ class Analytics(BaseView):
         queryset = AnalyticsCal(params=self.query_params).get_chart()
 
         return Response(self.serialize(queryset))
-
-
-class GenerateAnalyticsExport(BaseView):
-
-    def __init__(self):
-        super(GenerateAnalyticsExport, self).__init__()
-
-    def set_params(self, request, loc_dt=False):
-        super(GenerateAnalyticsExport, self).set_params(request.GET, loc_dt)
-        self.query_params['exp'] = datetime.utcnow() + timedelta(seconds=60)
-
-    def get(self, request):
-        self.set_params(request)
-
-        jwt_payload = jwt.encode(
-            self.query_params, settings.JWT_AUTH['JWT_SECRET_KEY'])
-        return Response({'url': '/api/files/%s?payload=%s' % ('data', jwt_payload)})
 
 
 class AnalyticsExport(BaseView):
@@ -458,7 +642,78 @@ class Filters(BaseView):
         return Response(self.serialize(queryset))
 
 
-@token
+class Search(BaseView):
+
+    def __init__(self):
+        super(Search, self).__init__()
+
+    def set_params(self, request):
+        self.query_params['keyword'] = request.GET.get('keyword')
+        self.query_params['area'] = request.GET.get('area')
+
+    def serialize(self, queryset):
+        data = [{
+            'title': q.title,
+            'source': q.publisher.name,
+            'reprint': q.reprinted,
+            'time': q.pubtime.strftime('%Y-%m-%d'),
+            'url': q.url
+        } for q in queryset[:25]]
+
+        return data
+
+    def get(self, request):
+        self.set_params(request)
+
+        area = Area.objects.get(name=self.query_params['area'])
+        areas_id = [area.id]
+
+        if area.level == 1:
+            areas_id = None
+        elif area.level == 2:
+            level_3_id = Area.objects.filter(
+                parent__id=area.id
+            ).values_list(
+                'id',
+                flat=True
+            )
+            level_4_id = Area.objects.filter(
+                parent__id__in=level_3_id
+            ).values_list(
+                'id',
+                flat=True
+            )
+            areas_id = areas_id + list(level_3_id) + list(level_4_id)
+        elif area.level == 3:
+            level_4_id = Area.objects.filter(
+                parent__id=area.id
+            ).values_list(
+                'id',
+                flat=True
+            )
+            areas_id = areas_id + list(level_4_id)
+
+        cond = {
+            'area__id__in': areas_id
+        }
+
+        # Exclude $cond None Value
+        args = dict([(k, v) for k, v in cond.iteritems() if v is not None])
+
+        if self.query_params['keyword']:
+            queryset = RiskNews.objects.filter(
+                Q(title__contains=self.query_params['keyword']) |
+                Q(content__contains=self.query_params['keyword']),
+                **args
+            )
+        else:
+            queryset = RiskNews.objects.filter(**args)
+
+        queryset = queryset.distinct()
+
+        return Response(self.serialize(queryset))
+
+
 def logout_view(request):
     auth = settings.JWT_AUTH
     secret_key = auth['JWT_SECRET_KEY']
@@ -469,4 +724,3 @@ def logout_view(request):
     RedisQueryApi().set(name, token)
     RedisQueryApi().expire(name, result['exp'])
     return JsonResponse({'status': 'true'})
-

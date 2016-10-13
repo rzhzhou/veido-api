@@ -41,9 +41,7 @@ class CrawlerTask(object):
             'rank': 1,
             'url': data.get('url'),
             'data': {
-                "last_info": {
-                    "pubtime": datetime_to_timestamp(datetime(2015, 1, 1))
-                },
+                "last_pubtime": datetime_to_timestamp(datetime(2015, 1, 1)),
                 "industry": self.industry,
                 "source": data.get('source'),
                 'source_type': u'行业监测',

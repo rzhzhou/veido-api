@@ -19,7 +19,9 @@ class Area(models.Model):
 
 class Enterprise(models.Model):
     name = models.CharField(max_length=255, verbose_name=u'企业名')
-
+    product_name = models.CharField(
+        max_length=255, null=True, verbose_name=u'风险产品名称')
+    issues = models.CharField(max_length=255, null=True, verbose_name=u'风险事项')
     area = models.ForeignKey(Area, verbose_name=u'地域')
 
     class Meta:
@@ -89,13 +91,15 @@ class Inspection(models.Model):
         Enterprise,
         related_name='enterprises_qualified',
         related_query_name='enterprise_qualified',
-        verbose_name=u'合格企业'
+        verbose_name=u'合格企业',
+        blank=True
     )
     enterprise_unqualified = models.ManyToManyField(
         Enterprise,
         related_name='enterprises_unqualified',
         related_query_name='enterprise_unqualified',
-        verbose_name=u'不合格企业'
+        verbose_name=u'不合格企业',
+        blank=True
     )
 
     class Meta:

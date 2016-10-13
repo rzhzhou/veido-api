@@ -28,9 +28,9 @@ class IndustryAdmin(ForeignKeyAutocompleteAdmin):
 
 class EnterpriseAdmin(ImportExportModelAdmin):
     resource_class = EnterpriseResources
-    fields = ('name', 'area')
-    list_display = ('name', 'area')
-    search_fields = ('name', 'area__name')
+    fields = ('name', 'area', 'product_name', 'issues')
+    list_display = ('name', 'area', 'product_name', 'issues')
+    search_fields = ('name', 'area__name', 'product_name', 'issues')
     list_filter = ('area', )
 
 
@@ -40,8 +40,7 @@ class InspectionPublisherAdmin(ImportExportActionModelAdmin):
 
 class InspectionAdmin(ImportExportActionModelAdmin):
     resource_class = InspectionResources
-    search_fields = ('url', 'title', 'enterprise__name',
-                     'industry__name', 'area__name')
+    search_fields = ('title',)
     list_display = ('title', 'qualitied', 'pubtime', 'publisher',)
     list_filter = ('pubtime', 'qualitied')
 

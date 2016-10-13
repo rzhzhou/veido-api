@@ -1,15 +1,19 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
 from django_extensions.admin import ForeignKeyAutocompleteAdmin
+from import_export.admin import ImportExportModelAdmin, ImportExportActionModelAdmin
 
+from observer.apps.riskmonitor.resource import (
+    ConsumeIndexResources, ManageIndexResources, SocietyIndexResources, RiskNewsResources)
 from observer.apps.riskmonitor.models import (Brand, Enterprise, Industry,
                                               Metrics, Product, ProductMetrics,
-                                              RiskData, RiskNews,
+                                              RiskData, RiskNewsPublisher, RiskNews,
                                               ScoreEnterprise, ScoreIndustry,
                                               ScoreProduct, UserArea,
-                                              UserEnterprise, UserIndustry,
+                                              UserEnterprise, AreaIndustry,
                                               SocietyIndex, ConsumeIndex,
-                                              ManageIndex)
+                                              ManageIndex, Cache, CacheConf,
+                                              SummariesScore, InternetScore)
 
 
 # class ProductAdmin(admin.ModelAdmin):
@@ -32,12 +36,12 @@ from observer.apps.riskmonitor.models import (Brand, Enterprise, Industry,
 #     search_fields = ('weight', 'metrics', 'product')
 #     list_filter = ('weight', 'metrics', 'product')
 
-class UserIndustryAdmin(ForeignKeyAutocompleteAdmin):
+class AreaIndustryAdmin(ForeignKeyAutocompleteAdmin):
     related_search_fields = {'industry': ('name',)}
-    fields = ('name', 'user', 'industry')
-    list_display = ('name', 'user', 'industry')
-    search_fields = ('name', 'user__username', 'industry__name')
-    list_filter = ('user', 'industry__level')
+    fields = ('name', 'area', 'industry')
+    list_display = ('name', 'area', 'industry')
+    search_fields = ('name', 'industry__name')
+    list_filter = ('area', 'industry__level')
 
 
 # class UserEnterpriseAdmin(admin.ModelAdmin):
@@ -96,12 +100,14 @@ class RiskDataAdmin(ForeignKeyAutocompleteAdmin):
                    'url', 'area', 'brand', 'industry')
 
 
-class RiskNewsAdmin(admin.ModelAdmin):
+class RiskNewsAdmin(ImportExportActionModelAdmin):
+    resource_class = RiskNewsResources
+
     # related_search_fields = {'area': ('name',)}
     list_display = ('title', 'url', 'publisher', 'reprinted', 'pubtime')
-    search_fields = ('title', 'url', 'reprinted', 'publisher__name',
+    search_fields = ('title', 'content', 'url', 'reprinted', 'publisher__name',
                      'industry__name', 'enterprise__name', 'area__name')
-    list_filter = ('pubtime', )
+    list_filter = ('pubtime', 'industry__name')
     actions = ['delete_selected']
 
     def reduce_score(self, obj):
@@ -145,21 +151,33 @@ class UserAreaAdmin(ForeignKeyAutocompleteAdmin):
     # list_filter = ('user', 'area')
 
 
-class SocietyIndexAdmin(admin.ModelAdmin):
+class ConsumeIndexAdmin(ImportExportModelAdmin, ForeignKeyAutocompleteAdmin):
+    resource_class = ConsumeIndexResources
+
+    related_search_fields = {'industry': ('name',)}
+
+    fields = ('force', 'close', 'consume', 'year', 'industry')
+    list_display = ('force', 'close', 'consume', 'year', 'industry')
+    search_fields = ('force', 'industry__name', 'year')
+    list_filter = ('year', 'force', 'close', 'consume')
+
+
+class SocietyIndexAdmin(ImportExportModelAdmin, ForeignKeyAutocompleteAdmin):
+    resource_class = SocietyIndexResources
+
+    related_search_fields = {'industry': ('name',)}
+
     fields = ('trade', 'qualified', 'accident', 'year', 'industry')
     list_display = ('trade', 'qualified', 'accident', 'year', 'industry', )
     search_fields = ('trade', 'industry__name', 'year')
     list_filter = ('year', 'trade', 'qualified', 'accident')
 
 
-class ConsumeIndexAdmin(admin.ModelAdmin):
-    fields = ('force', 'close', 'consume', 'year', 'industry')
-    list_display = ('force', 'close', 'consume', 'year', 'industry',)
-    search_fields = ('force', 'industry__name', 'year')
-    list_filter = ('year', 'force', 'close', 'consume')
+class ManageIndexAdmin(ImportExportModelAdmin, ForeignKeyAutocompleteAdmin):
+    resource_class = ManageIndexResources
 
+    related_search_fields = {'industry': ('name',)}
 
-class ManageIndexAdmin(admin.ModelAdmin):
     fields = ('licence', 'productauth', 'encourage', 'limit', 'remove',
               'year', 'industry')
     list_display = ('licence', 'productauth', 'encourage', 'limit',
@@ -169,18 +187,50 @@ class ManageIndexAdmin(admin.ModelAdmin):
     list_filter = ('year', 'productauth',)
 
 
+class CacheAdmin(admin.ModelAdmin):
+    fields = ('k', 'v', 'update_at')
+    list_display = ('k', 'update_at')
+    list_filter = ('k',)
+    search_fields = ('k',)
+    readonly_fields = ('update_at',)
+
+
+class CacheConfAdmin(admin.ModelAdmin):
+    fields = ('name', 'days', 'params')
+    list_display = ('name', 'days', 'params')
+    list_filter = ('name', 'days')
+    search_fields = ('name',)
+
+class SummariesScoreAdmin(admin.ModelAdmin):
+    fields = ('score', 'pubtime')
+    list_display = ('score', 'pubtime')
+    list_filter = ('score', 'pubtime')
+    search_fields = ('pubtime',)
+
+
+class InternetScoreAdmin(admin.ModelAdmin):
+    fields = ('score', 'pubtime')
+    list_display = ('score', 'pubtime')
+    list_filter = ('score', 'pubtime')
+    search_fields = ('pubtime',)
+
 # admin.site.register(Product, ProductAdmin)
 # admin.site.register(Metrics, MetricsAdmin)
 # admin.site.register(ProductMetrics, ProductMetricsAdmin)
-admin.site.register(UserIndustry, UserIndustryAdmin)
+admin.site.register(AreaIndustry, AreaIndustryAdmin)
 # admin.site.register(UserEnterprise, UserEnterpriseAdmin)
 admin.site.register(ScoreIndustry, ScoreIndustryAdmin)
 admin.site.register(ScoreEnterprise, ScoreEnterpriseAdmin)
 # admin.site.register(ScoreProduct, ScoreProductAdmin)
 # admin.site.register(Brand, BrandAdmin)
 # admin.site.register(RiskData, RiskDataAdmin)
+admin.site.register(RiskNewsPublisher)
 admin.site.register(RiskNews, RiskNewsAdmin)
 admin.site.register(UserArea, UserAreaAdmin)
 admin.site.register(SocietyIndex, SocietyIndexAdmin)
 admin.site.register(ConsumeIndex, ConsumeIndexAdmin)
 admin.site.register(ManageIndex, ManageIndexAdmin)
+admin.site.register(Cache, CacheAdmin)
+admin.site.register(CacheConf, CacheConfAdmin)
+admin.site.register(SummariesScore, SummariesScoreAdmin)
+admin.site.register(InternetScore, InternetScoreAdmin)

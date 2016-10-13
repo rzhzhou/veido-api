@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'observer.apps.base',
     'observer.apps.corpus',
     'observer.apps.crawler',
+    'observer.apps.inspection',
     'observer.apps.origin',
     'observer.apps.riskmonitor',
 ]
@@ -88,30 +89,54 @@ WSGI_APPLICATION = 'observer.wsgi.application'
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'HOST': '192.168.1.205',
-        'NAME': 'yqj2',
-        'USER': 'shendu',
-        'PASSWORD': 'P@55word',
-        'PORT': 13306
+    'default':{
+        'ENGINE':'django.db.backends.mysql',
+        'HOST':'27.17.61.26',
+        'NAME':'yqj2',
+        'USER':'shendu',
+        'PASSWORD':'P@55word',
+        'PORT':3306
     },
     'master': {
-        'ENGINE': 'django.db.backends.mysql',
-        'HOST': '192.168.1.205',
-        'NAME': 'yqj2',
-        'USER': 'shendu',
-        'PASSWORD': 'P@55word',
-        'PORT': 13306
+        'ENGINE':'django.db.backends.mysql',
+        'HOST':'27.17.61.26',
+        'NAME':'yqj2',
+        'USER':'shendu',
+        'PASSWORD':'P@55word',
+        'PORT':3306
     },
     'crawler': {
-        'ENGINE': 'django.db.backends.mysql',
-        'HOST': '192.168.1.205',
-        'NAME': 'crawler',
-        'USER': 'shendu',
-        'PASSWORD': 'P@55word',
-        'PORT': 13306
+        'ENGINE':'django.db.backends.mysql',
+        'HOST':'27.17.61.26',
+        'NAME':'yqj2',
+        'USER':'shendu',
+        'PASSWORD':'P@55word',
+        'PORT':3306
     },
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.mysql',
+    #     'HOST': '192.168.1.205',
+    #     'NAME': 'yqj2',
+    #     'USER': 'shendu',
+    #     'PASSWORD': 'P@55word',
+    #     'PORT': 13306
+    # },
+    # 'master': {
+    #     'ENGINE': 'django.db.backends.mysql',
+    #     'HOST': '192.168.1.205',
+    #     'NAME': 'yqj2',
+    #     'USER': 'shendu',
+    #     'PASSWORD': 'P@55word',
+    #     'PORT': 13306
+    # },
+    # 'crawler': {
+    #     'ENGINE': 'django.db.backends.mysql',
+    #     'HOST': '192.168.1.205',
+    #     'NAME': 'crawler',
+    #     'USER': 'shendu',
+    #     'PASSWORD': 'P@55word',
+    #     'PORT': 13306
+    # },
 }
 
 
@@ -203,10 +228,12 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 # MongoDB
-MONGO_CONN_STR = 'mongodb://192.168.1.150:27017'
+# MONGO_CONN_STR = 'mongodb://192.168.1.150:27017'
+MONGO_CONN_STR = 'mongodb://27.17.61.26:27017'
 
 # Redis
-redis_conn_str = 'redis://192.168.1.205:16379/8'
+# redis_conn_str = 'redis://192.168.1.205:16379/8'
+redis_conn_str = 'redis://27.17.61.26:6379/8'
 REDIS_CONN_STR = re.match(
     r"redis://(?P<host>.+):(?P<port>\d+)/(?P<db>.+)",
     redis_conn_str).groupdict()
