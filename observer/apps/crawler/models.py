@@ -5,10 +5,10 @@ from django.db import models
 
 
 class Task(models.Model):
-    app = models.CharField(max_length=255, verbose_name='应用')
-    module = models.CharField(blank=True, max_length=255, verbose_name='模块')
-    crawlerimpl = models.CharField(max_length=255, verbose_name='文件名')
-    rank = models.IntegerField(verbose_name='等级')
+    app = models.CharField(max_length=255, verbose_name=u'应用')
+    sub_app = models.CharField(blank=True, max_length=255, verbose_name=u'子应用')
+    file = models.CharField(max_length=255, verbose_name=u'文件名')
+    rank = models.IntegerField(verbose_name=u'等级')
     url = models.URLField(verbose_name=u'链接')
     data = models.TextField(blank=True, verbose_name=u'数据')
     priority = models.IntegerField(verbose_name=u'优先级')
@@ -22,6 +22,7 @@ class Task(models.Model):
 
     class Meta:
         app_label = 'crawler'
+        ordering = ['-rank', 'next_run', '-priority']
         verbose_name_plural = u'爬虫任务'
 
     def __unicode__(self):
@@ -29,10 +30,10 @@ class Task(models.Model):
 
 
 class TaskConf(models.Model):
-    app = models.CharField(max_length=255, verbose_name='应用')
-    module = models.CharField(blank=True, max_length=255, verbose_name='模块')
-    crawlerimpl = models.CharField(max_length=255, verbose_name='文件名')
-    rank = models.IntegerField(verbose_name='等级')
+    app = models.CharField(max_length=255, verbose_name=u'应用')
+    sub_app = models.CharField(blank=True, max_length=255, verbose_name=u'子应用')
+    file = models.CharField(max_length=255, verbose_name=u'文件名')
+    rank = models.IntegerField(verbose_name=u'等级')
     priority = models.IntegerField(verbose_name=u'优先级')
     interval = models.IntegerField(verbose_name=u'周期')
     timeout = models.IntegerField(verbose_name=u'超时时间')
@@ -45,4 +46,8 @@ class TaskConf(models.Model):
         verbose_name_plural = u'爬虫任务配置'
 
     def __unicode__(self):
-        return '%s.%s.%s.%s' % (self.app, self.module, self.crawlerimpl, self.rank)
+        if not self.sub_app:
+            crawler_key = [self.app, self.file, str(self.rank)]
+        else:
+            crawler_key = [self.app, self.sub_app, self.file, str(self.rank)]
+        return '.'.join(crawler_key)

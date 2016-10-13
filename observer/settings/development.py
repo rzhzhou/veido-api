@@ -89,54 +89,30 @@ WSGI_APPLICATION = 'observer.wsgi.application'
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 
 DATABASES = {
-    'default':{
-        'ENGINE':'django.db.backends.mysql',
-        'HOST':'27.17.61.26',
-        'NAME':'yqj2',
-        'USER':'shendu',
-        'PASSWORD':'P@55word',
-        'PORT':3306
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': '27.17.61.26',
+        'NAME': 'yqj2',
+        'USER': 'shendu',
+        'PASSWORD': 'P@55word',
+        'PORT': 3306
     },
     'master': {
-        'ENGINE':'django.db.backends.mysql',
-        'HOST':'27.17.61.26',
-        'NAME':'yqj2',
-        'USER':'shendu',
-        'PASSWORD':'P@55word',
-        'PORT':3306
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': '27.17.61.26',
+        'NAME': 'yqj2',
+        'USER': 'shendu',
+        'PASSWORD': 'P@55word',
+        'PORT': 3306
     },
     'crawler': {
-        'ENGINE':'django.db.backends.mysql',
-        'HOST':'27.17.61.26',
-        'NAME':'yqj2',
-        'USER':'shendu',
-        'PASSWORD':'P@55word',
-        'PORT':3306
-    },
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.mysql',
-    #     'HOST': '192.168.1.205',
-    #     'NAME': 'yqj2',
-    #     'USER': 'shendu',
-    #     'PASSWORD': 'P@55word',
-    #     'PORT': 13306
-    # },
-    # 'master': {
-    #     'ENGINE': 'django.db.backends.mysql',
-    #     'HOST': '192.168.1.205',
-    #     'NAME': 'yqj2',
-    #     'USER': 'shendu',
-    #     'PASSWORD': 'P@55word',
-    #     'PORT': 13306
-    # },
-    # 'crawler': {
-    #     'ENGINE': 'django.db.backends.mysql',
-    #     'HOST': '192.168.1.205',
-    #     'NAME': 'crawler',
-    #     'USER': 'shendu',
-    #     'PASSWORD': 'P@55word',
-    #     'PORT': 13306
-    # },
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': '27.17.61.26',
+        'NAME': 'crawler',
+        'USER': 'shendu',
+        'PASSWORD': 'P@55word',
+        'PORT': 3306
+    }
 }
 
 
