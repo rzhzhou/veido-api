@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from django.conf import settings
 
 from observer.apps.crawler.models import Task
+from observer.utils.date.convert import datetime_to_timestamp
 
 
 class CrawlerTask(object):
@@ -41,10 +42,11 @@ class CrawlerTask(object):
             'url': data.get('url'),
             'data': {
                 "last_info": {
-                    "pubtime": tz.localize(datetime(2015, 1, 1))
+                    "pubtime": datetime_to_timestamp(datetime(2015, 1, 1))
                 },
                 "industry": self.industry,
-                "source": data.get('source')
+                "source": data.get('source'),
+                'source_type': u'行业监测',
             },
             'priority': 0,
             'interval': 3600,
