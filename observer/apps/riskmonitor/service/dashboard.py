@@ -66,6 +66,7 @@ class Dashboard(AnalyticsCal):
     @property
     def risk_level(self):
         self.days = (self.end - self.start).days
+
         cal_date_func = lambda x: (
             self.start + timedelta(days=x),
             self.start + timedelta(days=x + 1)
