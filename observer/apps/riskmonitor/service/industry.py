@@ -152,7 +152,11 @@ class IndustryTrack(NewsQuerySet):
             industry = self.industry
 
         i_dimension = Inspection.objects.filter(
-            industry__id=industry, pubtime__gte=self.start, pubtime__lt=self.end)
+            industry__id=industry,
+            qualitied__lt=1,
+            pubtime__gte=self.start,
+            pubtime__lt=self.end
+        )
 
         i_score = (100 - i_dimension.count() * 10)
 
@@ -233,7 +237,8 @@ class IndustryTrack(NewsQuerySet):
         try:
             total_score = (SummariesScore.objects.get(pubtime=pubtime)).score
         except:
-            total_score = inspection_score * 0.4 + internet_score * 0.3 + 100 * 0.1 + 100 * 0.1 + 100 * 0.1
+            total_score = inspection_score * 0.4 + internet_score * \
+                0.3 + 100 * 0.1 + 100 * 0.1 + 100 * 0.1
             total_score = round(total_score, 1)
 
         return (total_score, internet_score, inspection_score)

@@ -35,7 +35,7 @@ class RiskNewsResources(resources.ModelResource):
     reprinted = fields.Field(
         attribute='reprinted',
         column_name=u'转载数',
-        widget=IntegerWidget
+        widget=IntegerWidget()
     )
 
     risk_keyword = fields.Field(

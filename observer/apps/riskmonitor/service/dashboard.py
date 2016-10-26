@@ -75,25 +75,36 @@ class Dashboard(AnalyticsCal):
         date_range = map(cal_date_func, xrange(self.days))
 
         date_range_len = len(date_range)
+
         if date_range_len <= 7:
             area_days = date_range[::]
-            date = map(lambda x: x[1].strftime('%m-%d'), area_days)
+            last_time = str((date_range[date_range_len-1][0]).strftime('%m-%d'))
+            date = map(lambda x: x[0].strftime('%m-%d'), area_days)
+            date.append(last_time)
         elif  7 < date_range_len <= 32:
-            area_days = date_range[::date_range_len / 7]
-            date = map(lambda x: x[1].strftime('%m-%d'), area_days)
+            area_days = date_range[::date_range_len / 6]
+            last_time = str((date_range[date_range_len-1][0]).strftime('%m-%d'))
+            date = map(lambda x: x[0].strftime('%m-%d'), area_days)
+            date.append(last_time)
         elif date_range_len <= 190:
             area_days = date_range[::31]
-            date = map(lambda x: x[1].strftime('20%y-%m'), area_days)
+            last_time = str((date_range[date_range_len-1][0]).strftime('20%y-%m'))
+            date = map(lambda x: x[0].strftime('20%y-%m'), area_days)
+            date.append(last_time)
         elif date_range_len <= 370:
             area_days = date_range[::61]
-            date = map(lambda x: x[1].strftime('20%y-%m'), area_days)
+            last_time = str((date_range[date_range_len-1][0]).strftime('20%y-%m'))
+            date = map(lambda x: x[0].strftime('20%y-%m'), area_days)
+            date.append(last_time)
 
         area_score = []
         for index in area_days:
             pubtime = index[0].strftime('%Y-%m-%d')
             total_score = self.get_overall_overview_score(pubtime=pubtime)[0]
             area_score.append(total_score)
-
+        last_datetime = (date_range[date_range_len-1][0]).strftime('20%y-%m-%d')
+        last_datetimescore = self.get_overall_overview_score(pubtime=last_datetime)[0]
+        area_score.append(last_datetimescore)
         return (date, zip(date, area_score))
 
     @property

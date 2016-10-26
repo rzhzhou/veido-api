@@ -100,10 +100,11 @@ class RiskDataAdmin(ForeignKeyAutocompleteAdmin):
                    'url', 'area', 'brand', 'industry')
 
 
-class RiskNewsAdmin(ImportExportActionModelAdmin):
+class RiskNewsAdmin(ImportExportModelAdmin, ImportExportActionModelAdmin, ForeignKeyAutocompleteAdmin):
     resource_class = RiskNewsResources
 
     # related_search_fields = {'area': ('name',)}
+
     list_display = ('title', 'url', 'publisher', 'reprinted', 'pubtime')
     search_fields = ('title', 'content', 'url', 'reprinted', 'publisher__name',
                      'industry__name', 'enterprise__name', 'area__name')
@@ -144,6 +145,7 @@ class RiskNewsAdmin(ImportExportActionModelAdmin):
             obj.delete()
 
 
+
 class UserAreaAdmin(ForeignKeyAutocompleteAdmin):
     related_search_fields = {'area': ('name',)}
     list_display = ('user', 'area')
@@ -151,18 +153,19 @@ class UserAreaAdmin(ForeignKeyAutocompleteAdmin):
     # list_filter = ('user', 'area')
 
 
-class ConsumeIndexAdmin(ImportExportModelAdmin, ForeignKeyAutocompleteAdmin):
+class ConsumeIndexAdmin(ImportExportModelAdmin, ImportExportActionModelAdmin, ForeignKeyAutocompleteAdmin):
     resource_class = ConsumeIndexResources
 
     related_search_fields = {'industry': ('name',)}
 
+    export_order = ('force', 'close', 'consume', 'year', 'industry')
     fields = ('force', 'close', 'consume', 'year', 'industry')
     list_display = ('force', 'close', 'consume', 'year', 'industry')
     search_fields = ('force', 'industry__name', 'year')
     list_filter = ('year', 'force', 'close', 'consume')
 
 
-class SocietyIndexAdmin(ImportExportModelAdmin, ForeignKeyAutocompleteAdmin):
+class SocietyIndexAdmin(ImportExportModelAdmin, ImportExportActionModelAdmin, ForeignKeyAutocompleteAdmin):
     resource_class = SocietyIndexResources
 
     related_search_fields = {'industry': ('name',)}
@@ -173,7 +176,7 @@ class SocietyIndexAdmin(ImportExportModelAdmin, ForeignKeyAutocompleteAdmin):
     list_filter = ('year', 'trade', 'qualified', 'accident')
 
 
-class ManageIndexAdmin(ImportExportModelAdmin, ForeignKeyAutocompleteAdmin):
+class ManageIndexAdmin(ImportExportModelAdmin, ImportExportActionModelAdmin, ForeignKeyAutocompleteAdmin):
     resource_class = ManageIndexResources
 
     related_search_fields = {'industry': ('name',)}
