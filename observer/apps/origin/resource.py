@@ -82,7 +82,7 @@ class InspectionResources(resources.ModelResource):
         export_order = ('id', 'pubtime', 'title', 'url', 'qualitied', 'publisher',
                         'area', 'industry', 'enterprise_qualified', 'enterprise_unqualified')
 
-    def before_save_instance(self, instance, dry_run):
+    def before_save_instance(self, instance, dry_run, temp=''):
         if not instance.pubtime:
             instance.pubtime = datetime.now()
         elif isinstance(instance.pubtime, basestring):

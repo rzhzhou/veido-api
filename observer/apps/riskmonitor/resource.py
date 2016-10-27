@@ -29,8 +29,7 @@ class RiskNewsResources(resources.ModelResource):
     )
     pubtime = fields.Field(
         attribute='pubtime',
-        column_name=u'发布时间',
-        widget=DateTimeWidget()
+        column_name=u'发布时间'
     )
     reprinted = fields.Field(
         attribute='reprinted',
@@ -70,6 +69,16 @@ class RiskNewsResources(resources.ModelResource):
                   'publisher', 'area', 'industry', 'enterprise', 'risk_keyword')
         export_order = ('id', 'title', 'url', 'content', 'pubtime', 'reprinted',
                         'publisher', 'area', 'industry', 'enterprise', 'risk_keyword')
+
+    def before_save_instance(self, instance, dry_run, temp=''):
+        if not instance.pubtime:
+            instance.pubtime = datetime.now()
+        elif isinstance(instance.pubtime, basestring):
+            instance.pubtime = datetime.strptime(
+                instance.pubtime, '%Y-%m-%d %H:%M:%S')
+        elif isinstance(instance.pubtime, float):
+            instance.pubtime = xlrd.xldate.xldate_as_datetime(
+                instance.pubtime, 0)
 
 
 class ConsumeIndexResources(resources.ModelResource):
