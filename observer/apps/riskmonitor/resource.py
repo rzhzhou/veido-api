@@ -71,7 +71,6 @@ class RiskNewsResources(resources.ModelResource):
                         'publisher', 'area', 'industry', 'enterprise', 'risk_keyword')
 
     def before_save_instance(self, instance, dry_run, temp=''):
-        print instance, dry_run, temp
         if not instance.pubtime:
             instance.pubtime = datetime.now()
         elif isinstance(instance.pubtime, basestring):
