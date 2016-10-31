@@ -36,8 +36,8 @@ class CrawlerTask(object):
         tz = pytz.timezone(settings.TIME_ZONE)
         params = {
             'app': 'seer',
-            'module': '',
-            'crawlerimpl': 'baidu',
+            'sub_app': '',
+            'file': 'baidu',
             'rank': 1,
             'url': data.get('url'),
             'data': {
