@@ -42,7 +42,7 @@ class InspectionAdmin(ImportExportActionModelAdmin):
     resource_class = InspectionResources
     search_fields = ('title',)
     list_display = ('title', 'qualitied', 'pubtime', 'publisher',)
-    list_filter = ('pubtime', 'qualitied')
+    list_filter = ('pubtime', 'industry', 'qualitied')
 
 
 admin.site.register(Area, AreaAdmin)
