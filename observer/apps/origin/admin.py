@@ -3,7 +3,7 @@ from django.contrib import admin
 from django_extensions.admin import ForeignKeyAutocompleteAdmin
 from import_export.admin import ImportExportActionModelAdmin
 from import_export.admin import ImportExportModelAdmin
-
+from daterange_filter.filter import DateRangeFilter
 from observer.apps.origin.models import (Area, Enterprise, Industry,
                                          InspectionPublisher, Inspection)
 from observer.apps.origin.resource import (InspectionPublisherResources,
@@ -42,7 +42,7 @@ class InspectionAdmin(ImportExportActionModelAdmin):
     resource_class = InspectionResources
     search_fields = ('title',)
     list_display = ('title', 'qualitied', 'pubtime', 'publisher',)
-    list_filter = ('pubtime', 'industry', 'qualitied')
+    list_filter = (('pubtime', DateRangeFilter), 'industry', 'qualitied')
 
 
 admin.site.register(Area, AreaAdmin)
