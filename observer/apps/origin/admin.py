@@ -26,7 +26,7 @@ class IndustryAdmin(ForeignKeyAutocompleteAdmin):
     list_filter = ('level', )
 
 
-class EnterpriseAdmin(ImportExportModelAdmin):
+class EnterpriseAdmin(ImportExportModelAdmin, ImportExportActionModelAdmin):
     resource_class = EnterpriseResources
     fields = ('name', 'area', 'product_name', 'issues')
     list_display = ('name', 'area', 'product_name', 'issues')
@@ -40,9 +40,9 @@ class InspectionPublisherAdmin(ImportExportActionModelAdmin):
 
 class InspectionAdmin(ImportExportActionModelAdmin):
     resource_class = InspectionResources
-    search_fields = ('title',)
+    search_fields = ('title', 'publisher__name',)
     list_display = ('title', 'qualitied', 'pubtime', 'publisher',)
-    list_filter = (('pubtime', DateRangeFilter), 'industry', 'qualitied')
+    list_filter = (('pubtime', DateRangeFilter), 'industry', 'qualitied',)
 
 
 admin.site.register(Area, AreaAdmin)
