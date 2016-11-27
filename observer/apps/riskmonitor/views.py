@@ -191,7 +191,7 @@ class IndustryList(BaseView):
     def get(self, request):
         self.set_params(request)
 
-        limit = int(self.query_params['limit'])
+        limit = int(self.query_params.get('limit', 0))
 
         try:
             cache = Cache.objects.get(k=self.generate_cache_name())
@@ -199,7 +199,10 @@ class IndustryList(BaseView):
         except Cache.DoesNotExist:
             queryset = IndustryTrack(params=self.query_params).get_industries()
 
-        return Response(self.serialize(queryset[:limit]))
+        if limit:
+            queryset = queryset[:limit]
+
+        return Response(self.serialize(queryset))
 
 
 class IndustryDetail(BaseView):
