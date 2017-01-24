@@ -243,15 +243,6 @@ class IndustryTrack(NewsQuerySet):
 
         return (total_score, internet_score, inspection_score)
 
-    def get_all(self):
-        data = {
-            'name': Industry.objects.get(pk=self.industry).name,
-            'risk_rank': self.get_total_risk_rank(),
-            'indicators': self.get_dimension(),
-            'trend': self.trend_chart()
-        }
-        return data
-
     def get_industries(self):
         industries = []
 
@@ -303,3 +294,44 @@ class IndustryTrack(NewsQuerySet):
                 (u.industry.id, u.name, u.industry.level, round(count_risk_rank_score, 2)))
 
         return sorted(industries, key=lambda industry: industry[3])
+
+    def while_risk(self):
+        result = self.trend_chart()
+        categories = result.get("categories")
+        lastTime = categories[len(categories) - 1]
+
+        cal_date_func = lambda x: (
+            self.start + timedelta(days=x),
+            self.start + timedelta(days=x + 1)
+        )
+
+        date_range = map(cal_date_func, xrange(self.days))
+
+        date_range = date_range[::-1]
+        date_range = date_range[:7:]
+
+        while_risk_data = []
+        while_risk_datetime = []
+        total_score = []
+        for date in date_range:
+            self.start = date[0]
+            self.end = date[1]
+            total_score.append(self.get_overall_overview_score()[0])
+            while_risk_datetime.append(datetime.strftime(self.end, "%m-%d"))
+            while_risk_data.append(sorted(self.get_industries()))
+
+        while_risk_data.append(while_risk_datetime)
+        while_risk_data.append(total_score)
+
+
+        return while_risk_data
+
+    def get_all(self):
+        data = {
+            'name': Industry.objects.get(pk=self.industry).name,
+            'risk_rank': self.get_total_risk_rank(),
+            'indicators': self.get_dimension(),
+            'trend': self.trend_chart(),
+            'while_risk': self.while_risk(),
+        }
+        return data

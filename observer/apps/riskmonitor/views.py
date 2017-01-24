@@ -172,13 +172,24 @@ class IndustryList(BaseView):
         super(IndustryList, self).set_params(request.GET)
         self.query_params['user_id'] = request.user.id
 
-    def serialize(self, queryset):
+    def serialize(self, queryset, queryset2):
         data = [{
             'id': q[0],
             'category': q[1],
             'level': q[2],
-            'score':q[3]
+            'score':q[3],
         } for q in queryset]
+
+        data.append({'first': queryset2[0],
+                     'second': queryset2[1],
+                     'third': queryset2[2],
+                     'forth': queryset2[3],
+                     'fifth': queryset2[4],
+                     'sixth': queryset2[5],
+                     'seventh': queryset2[6],
+                     'datetime': queryset2[7],
+                     'totalScore': queryset2[8],
+                     })
 
         return data
 
@@ -202,7 +213,9 @@ class IndustryList(BaseView):
         if limit:
             queryset = queryset[:limit]
 
-        return Response(self.serialize(queryset))
+        queryset2 = IndustryTrack(params=self.query_params).while_risk()
+
+        return Response(self.serialize(queryset, queryset2))
 
 
 class IndustryDetail(BaseView):
@@ -380,6 +393,7 @@ class IndustryDetail(BaseView):
                 'categories': queryset['trend']['categories'],
                 'data': queryset['trend']['data']
             }
+
         }
         return data
 
