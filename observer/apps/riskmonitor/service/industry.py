@@ -246,11 +246,6 @@ class IndustryTrack(NewsQuerySet):
     def get_industries(self):
         industries = []
 
-        try:
-            user_id = self.user_id
-        except:
-            user_id = 9
-
         cond = {
             'area__name': getattr(
                 self,
@@ -336,7 +331,6 @@ class IndustryTrack(NewsQuerySet):
             'name': Industry.objects.get(pk=self.industry).name,
             'risk_rank': self.get_total_risk_rank(),
             'indicators': self.get_dimension(),
-            'trend': self.trend_chart(),
-            'while_risk': self.while_risk(),
+            'trend': self.trend_chart()
         }
         return data
