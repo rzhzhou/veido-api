@@ -296,6 +296,11 @@ class IndustryTrack(NewsQuerySet):
         return sorted(industries, key=lambda industry: industry[3])
 
     def while_risk(self):
+        try:
+            user_id = self.user_id
+        except:
+            user_id = 9
+
         result = self.trend_chart()
         categories = result.get("categories")
         lastTime = categories[len(categories) - 1]
@@ -322,7 +327,6 @@ class IndustryTrack(NewsQuerySet):
 
         while_risk_data.append(while_risk_datetime)
         while_risk_data.append(total_score)
-
 
         return while_risk_data
 
