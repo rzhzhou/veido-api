@@ -250,7 +250,7 @@ class IndustryTrack(NewsQuerySet):
             'area__name': getattr(
                 self,
                 'area',
-                UserArea.objects.get(user__id=user_id).area.name
+                UserArea.objects.get(user__id=self.user_id).area.name
             ),
             'industry__name': getattr(self, 'name', None),
             'industry__level': getattr(self, 'level', None),
