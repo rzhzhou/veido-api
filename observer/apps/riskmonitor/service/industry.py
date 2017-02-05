@@ -246,11 +246,16 @@ class IndustryTrack(NewsQuerySet):
     def get_industries(self):
         industries = []
 
+        try:
+            user_id = self.user_id
+        except:
+            user_id = 9
+
         cond = {
             'area__name': getattr(
                 self,
                 'area',
-                UserArea.objects.get(user__id=self.user_id).area.name
+                UserArea.objects.get(user__id=user_id).area.name
             ),
             'industry__name': getattr(self, 'name', None),
             'industry__level': getattr(self, 'level', None),
@@ -296,10 +301,6 @@ class IndustryTrack(NewsQuerySet):
         return sorted(industries, key=lambda industry: industry[3])
 
     def while_risk(self):
-        try:
-            user_id = self.user_id
-        except:
-            user_id = 9
 
         result = self.trend_chart()
         categories = result.get("categories")
