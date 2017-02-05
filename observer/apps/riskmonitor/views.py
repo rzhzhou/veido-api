@@ -180,7 +180,7 @@ class IndustryList(BaseView):
             'score':q[3],
         } for q in queryset]
 
-        if queryset[0][2] == 1:
+        if queryset[0][2] == 1 and self.query_params.get('externalcall') is not None:
 
             queryset2 = IndustryTrack(params=self.query_params).while_risk()
 
