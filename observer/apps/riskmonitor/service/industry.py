@@ -127,7 +127,9 @@ class IndustryTrack(NewsQuerySet):
             else:
                 n_score = 1
 
-        if risk_news_count > 60:
+        if risk_news_count > 800:
+            risk_news_count = 60 - risk_news_count * 0.02
+        elif risk_news_count > 60:
             risk_news_count = risk_news_count - 60
             risk_news_count = 60 - risk_news_count * 0.05
         else:
