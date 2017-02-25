@@ -535,7 +535,7 @@ class RiskNewsList(BaseView):
         super(RiskNewsList, self).set_params(request.GET)
 
     def paging(self, queryset):
-        return super(RiskNewsList, self).paging(queryset, self.query_params['page'], 10)
+        return super(RiskNewsList, self).paging(queryset, self.query_params['limit'], 10)
 
     def serialize(self, queryset):
         results = self.paging(queryset)
@@ -552,7 +552,12 @@ class RiskNewsList(BaseView):
     def get(self, request):
         self.set_params(request)
 
+        limit = int(self.query_params.get('limit', 0))
+
         queryset = NewsQuerySet(params=self.query_params).get_news_list()
+
+        if limit:
+            queryset = queryset[:limit]
 
         return Response(self.serialize(queryset))
 
@@ -567,7 +572,7 @@ class InspectionList(BaseView):
         super(InspectionList, self).set_params(request.GET)
 
     def paging(self, queryset):
-        return super(InspectionList, self).paging(queryset, self.query_params['page'], 10)
+        return super(InspectionList, self).paging(queryset, self.query_params['limit'], 10)
 
     def serialize(self, queryset):
         results = self.paging(queryset)
@@ -584,7 +589,13 @@ class InspectionList(BaseView):
     def get(self, request):
         self.set_params(request)
 
+        limit = int(self.query_params.get('limit', 0))
+
         queryset = InspectionQuerySet(params=self.query_params).get_inspection_list()
+
+        if limit:
+            queryset = queryset[:limit]
+
 
         return Response(self.serialize(queryset))
 
