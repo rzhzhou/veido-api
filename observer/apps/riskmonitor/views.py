@@ -25,6 +25,7 @@ from observer.apps.riskmonitor.service.analytics import AnalyticsCal
 from observer.apps.riskmonitor.service.dashboard import Dashboard
 from observer.apps.riskmonitor.service.enterprise import EnterpriseRank
 from observer.apps.riskmonitor.service.industry import IndustryTrack
+from observer.apps.riskmonitor.service.inspection import InspectionQuerySet
 from observer.apps.riskmonitor.service.news import NewsQuerySet
 from observer.apps.riskmonitor.jobs.hourly.dashboard import Job as DashboardJob
 from observer.apps.riskmonitor.jobs.hourly.industries import Job as IndustriesJob
@@ -521,6 +522,69 @@ class EnterpriseDetail(BaseView):
         self.set_params(request)
 
         queryset = Inspection.objects.filter(enterprise_unqualified__id=pk)
+
+        return Response(self.serialize(queryset))
+
+
+class RiskNewsList(BaseView):
+
+    def __init__(self):
+        super(RiskNewsList, self).__init__()
+
+    def set_params(self, request):
+        super(RiskNewsList, self).set_params(request.GET)
+
+    def paging(self, queryset):
+        return super(RiskNewsList, self).paging(queryset, self.query_params['page'], 10)
+
+    def serialize(self, queryset):
+        results = self.paging(queryset)
+        data = map(lambda r: {
+            'id': r['id'],
+            'url': r['url'],
+            'title': r['title'],
+            'time': r['pubtime'].strftime('%Y-%m-%d %H:%M'),
+            'source': r['publisher__name']
+        }, results)
+
+        return data
+
+    def get(self, request):
+        self.set_params(request)
+
+        queryset = NewsQuerySet(params=self.query_params).get_news_list()
+
+        return Response(self.serialize(queryset))
+
+
+
+class InspectionList(BaseView):
+
+    def __init__(self):
+        super(InspectionList, self).__init__()
+
+    def set_params(self, request):
+        super(InspectionList, self).set_params(request.GET)
+
+    def paging(self, queryset):
+        return super(InspectionList, self).paging(queryset, self.query_params['page'], 10)
+
+    def serialize(self, queryset):
+        results = self.paging(queryset)
+        data = map(lambda r: {
+            'id': r['id'],
+            'url': r['url'],
+            'title': r['title'],
+            'time': r['pubtime'].strftime('%Y-%m-%d %H:%M'),
+            'source': r['publisher__name']
+        }, results)
+
+        return data
+
+    def get(self, request):
+        self.set_params(request)
+
+        queryset = InspectionQuerySet(params=self.query_params).get_inspection_list()
 
         return Response(self.serialize(queryset))
 
