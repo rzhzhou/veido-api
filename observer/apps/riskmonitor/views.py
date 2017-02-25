@@ -488,7 +488,12 @@ class EnterpriseList(BaseView):
     def get(self, request):
         self.set_params(request)
 
+        limit = int(self.query_params.get('limit', 0))
+
         queryset = EnterpriseRank(params=self.query_params).get_enterprises()
+
+        if limit:
+            queryset = queryset[:limit]
 
         return Response(self.serialize(queryset))
 
