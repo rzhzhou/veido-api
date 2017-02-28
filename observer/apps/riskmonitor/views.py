@@ -112,26 +112,26 @@ class DashboardList(BaseView):
             'risk': queryset['risk'],
             'industries': {
                 'categories': [
-                    '空调器/5月',
-                    '空调器/6月',
                     '水泥/7月',
                     '水泥/8月',
                     '床上用品/9月',
                     '床上用品/10月',
                     '床上用品/11月',
                     'LED灯/12月',
+                    '水泥/1月'
+                    '床上用品/2月'
                 ],
                 'data': [
                     {
                         'data': [
-                            65.4,
-                            65.4,
                             63.5,
                             56.1,
                             44.8,
                             52.5,
                             54.9,
                             64.5,
+                            68.4,
+                            69.8,
                         ],
                         'barWidth': '30%',
                         'type': 'bar'
@@ -560,7 +560,6 @@ class RiskNewsList(BaseView):
             queryset = queryset[:limit]
 
         return Response(self.serialize(queryset))
-
 
 
 class InspectionList(BaseView):
