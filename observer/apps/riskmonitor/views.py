@@ -84,6 +84,7 @@ class DashboardList(BaseView):
         super(DashboardList, self).set_params(request.GET)
         self.query_params['user_id'] = request.user.id
         self.query_params['level'] = 3
+        self.query_params['area_name'] = request.query_params.get("area") if request.query_params.get("area") is not None else u'常州'
 
     def serialize(self, queryset):
         data = {
@@ -118,7 +119,7 @@ class DashboardList(BaseView):
                     '床上用品/10月',
                     '床上用品/11月',
                     'LED灯/12月',
-                    '水泥/1月'
+                    '水泥/1月',
                     '床上用品/2月'
                 ],
                 'data': [
@@ -132,6 +133,33 @@ class DashboardList(BaseView):
                             64.5,
                             68.4,
                             69.8,
+                        ],
+                        'barWidth': '30%',
+                        'type': 'bar'
+                    }
+                ]
+            } if self.query_params['area_name'] == u'常州' else {
+                'categories': [
+                    '农药/7月',
+                    '眼镜/8月',
+                    '农药/9月',
+                    '床上用品/10月',
+                    '床上用品/11月',
+                    '儿童服装/12月',
+                    '烟花爆竹/1月',
+                    '电热毯/2月'
+                ],
+                'data': [
+                    {
+                        'data': [
+                            58.3,
+                            48.2,
+                            46.9,
+                            53,
+                            56.1,
+                            49.4,
+                            42.9,
+                            60,
                         ],
                         'barWidth': '30%',
                         'type': 'bar'

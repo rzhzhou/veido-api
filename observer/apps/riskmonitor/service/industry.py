@@ -103,7 +103,7 @@ class IndustryTrack(NewsQuerySet):
             industry = self.industry
 
         n_dimension = RiskNews.objects.filter(
-            industry__id=industry, pubtime__gte=self.start, pubtime__lt=self.end)
+            industry__id=industry, pubtime__gte=self.start, pubtime__lt=self.end, area__name=self.area_name if self.area_name is not None else u'常州')
         risk_keyword__ids = map(
             lambda x: x['risk_keyword__id'], n_dimension.values('risk_keyword__id'))
 
@@ -213,9 +213,10 @@ class IndustryTrack(NewsQuerySet):
             pubtime = date.today()
 
         insepction_count = Inspection.objects.filter(
-            pubtime__gte=self.start, pubtime__lt=self.end).count()
+            pubtime__gte=self.start, pubtime__lt=self.end, ).count()
 
-        area_industry_count = AreaIndustry.objects.filter(area='2360').count()
+        area_industry_count = AreaIndustry.objects.filter(
+            area__name=self.area_name if self.area_name is not None else u'常州').count()
 
         inspection_score = (insepction_count * 10) / area_industry_count
 
@@ -252,7 +253,8 @@ class IndustryTrack(NewsQuerySet):
             'area__name': getattr(
                 self,
                 'area',
-                UserArea.objects.get(user__id=self.user_id).area.name
+                self.area_name if self.area_name is not None else UserArea.objects.get(
+                    user__id=self.user_id).area.name
             ),
             'industry__name': getattr(self, 'name', None),
             'industry__level': getattr(self, 'level', None),
@@ -284,13 +286,6 @@ class IndustryTrack(NewsQuerySet):
             count_risk_rank_score = count_consume_index_score * 0.1 + count_society_index_score * 0.1 + \
                 count_manage_index_score * 0.1 + count_risk_news_score * \
                 0.3 + count_risk_inspection_score * 0.4
-
-            # if risk_rank_score < 65:
-            #     risk_rank_word = 'C'
-            # elif 65 <= risk_rank_score < 85:
-            #     risk_rank_word = 'B'
-            # else:
-            #     risk_rank_word = 'A'
 
             industries.append(
                 (u.industry.id, u.name, u.industry.level, round(count_risk_rank_score, 2)))
