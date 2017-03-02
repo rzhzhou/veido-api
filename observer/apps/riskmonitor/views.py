@@ -505,7 +505,7 @@ class EnterpriseList(BaseView):
         data = [{
             'id': q[0],
             'name': q[1],
-            'focus': (self.query_params['user_area'] == q[2] or self.query_params['user_area'] == u'溧阳' or self.query_params['user_area'] == u'金坛'),
+            'focus': (self.query_params['user_area'] == q[2] or u'溧阳' == q[2] or u'金坛' == q[2]),
             'area': q[2],
             'product': q[3],
             'issure': q[4],
