@@ -42,7 +42,8 @@ class IndustryTrack(NewsQuerySet):
         if industry == '':
             industry = self.industry
 
-        c = ConsumeIndex.objects.filter(industry__id=industry)
+        c = ConsumeIndex.objects.filter(industry__id=industry, area=UserArea.objects.get(user__id=self.user_id).area)
+        c = c if list(c) != list([]) else ConsumeIndex.objects.filter(industry__id=industry, area__name=u'全国')
 
         c_dimension = (c[0].force, c[0].close, c[
                        0].consume) if c else (0, 1, 0)
@@ -60,7 +61,9 @@ class IndustryTrack(NewsQuerySet):
     def count_society_index_data(self, industry=''):
         if industry == '':
             industry = self.industry
-        s = SocietyIndex.objects.filter(industry__id=industry)
+        s = SocietyIndex.objects.filter(industry__id=industry, area=UserArea.objects.get(user__id=self.user_id).area)
+        s = s if list(s) != list([]) else SocietyIndex.objects.filter(industry__id=industry, area__name=u'全国')
+
         s_dimension = (s[0].trade, s[0].qualified, s[
                        0].accident) if s else (1, 1, 1)
         s_score = 100 - ((50 * (s_dimension[0] - 1)) + (
@@ -85,7 +88,9 @@ class IndustryTrack(NewsQuerySet):
     def count_manage_index_data(self, industry=''):
         if industry == '':
             industry = self.industry
-        m = ManageIndex.objects.filter(industry__id=industry)
+        m = ManageIndex.objects.filter(industry__id=industry, area=UserArea.objects.get(user__id=self.user_id).area)
+        m = m if list(m) != list([]) else ManageIndex.objects.filter(industry__id=industry, area__name=u'全国')
+
         m_dimension = (m[0].licence, m[0].productauth, m[0].encourage, m[
             0].limit, m[0].remove) if m else (0, 0, 0, 0, 0)
         m_score = 100 - (100 * m_dimension[0] + 100 * m_dimension[1] + 100 *

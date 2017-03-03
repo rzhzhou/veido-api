@@ -228,6 +228,7 @@ class IndustryDetail(BaseView):
     def set_params(self, request, pk):
         super(IndustryDetail, self).set_params(request.GET)
         self.query_params['industry'] = pk
+        self.query_params['user_id'] = request.user.id
 
     def serialize(self, queryset):
         data = {
