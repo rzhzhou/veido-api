@@ -313,6 +313,7 @@ class ConsumeIndex(models.Model):
     )
 
     industry = models.ForeignKey(Industry, verbose_name=u'行业')
+    area = models.ForeignKey(Area, default=1, verbose_name=u'地域')
 
     class Meta:
         app_label = 'riskmonitor'
@@ -346,6 +347,7 @@ class SocietyIndex(models.Model):
     )
 
     industry = models.ForeignKey(Industry, verbose_name=u'行业')
+    area = models.ForeignKey(Area,  default=1, verbose_name=u'地域')
 
     class Meta:
         app_label = 'riskmonitor'
@@ -391,6 +393,7 @@ class ManageIndex(models.Model):
     )
 
     industry = models.ForeignKey(Industry, verbose_name=u'行业')
+    area = models.ForeignKey(Area, default=1, verbose_name=u'地域')
 
     class Meta:
         app_label = 'riskmonitor'
