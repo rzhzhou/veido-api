@@ -93,10 +93,16 @@ class ConsumeIndexResources(resources.ModelResource):
         widget=ForeignKeyWidget(Industry, 'name')
     )
 
+    area = fields.Field(
+        attribute='area',
+        column_name=u'地域',
+        widget=ForeignKeyWidget(Area, 'name')
+    )
+
     class Meta:
         model = ConsumeIndex
-        fields = ('id', 'force', 'close', 'consume', 'year', 'industry')
-        export_order = ('id', 'force', 'close', 'consume', 'year', 'industry')
+        fields = ('id', 'force', 'close', 'consume', 'year', 'industry', 'area')
+        export_order = ('id', 'force', 'close', 'consume', 'year', 'industry', 'area')
 
 
 class SocietyIndexResources(resources.ModelResource):
@@ -110,12 +116,17 @@ class SocietyIndexResources(resources.ModelResource):
         column_name=u'行业',
         widget=ForeignKeyWidget(Industry, 'name')
     )
+    area = fields.Field(
+        attribute='area',
+        column_name=u'地域',
+        widget=ForeignKeyWidget(Area, 'name')
+    )
 
     class Meta:
         model = SocietyIndex
-        fields = ('id', 'trade', 'qualified', 'accident', 'year', 'industry')
+        fields = ('id', 'trade', 'qualified', 'accident', 'year', 'industry', 'area')
         export_order = ('id', 'trade', 'qualified',
-                        'accident', 'year', 'industry')
+                        'accident', 'year', 'industry', 'area')
 
 
 class ManageIndexResources(resources.ModelResource):
@@ -132,10 +143,15 @@ class ManageIndexResources(resources.ModelResource):
         column_name=u'行业',
         widget=ForeignKeyWidget(Industry, 'name')
     )
+    area = fields.Field(
+        attribute='area',
+        column_name=u'地域',
+        widget=ForeignKeyWidget(Area, 'name')
+    )
 
     class Meta:
         model = ManageIndex
         fields = ('id', 'licence', 'productauth', 'encourage',
-                  'limit', 'remove', 'year', 'industry')
+                  'limit', 'remove', 'year', 'industry', 'area')
         export_order = ('id', 'licence', 'productauth',
-                        'encourage', 'limit', 'remove', 'year', 'industry')
+                        'encourage', 'limit', 'remove', 'year', 'industry', 'area')

@@ -22,6 +22,7 @@ class Job(HourlyJob):
             'cache_conf_name': cache_conf.name,
             'days': cache_conf.days,
             'level': cache_conf.params['level'],
+            'area': cache_conf.params['area'],
             'user_id': cache_conf.params['user_id'],
             'start': utc_to_local_time(self.today - timedelta(days=cache_conf.days)),
             'end': utc_to_local_time(self.today)
@@ -40,7 +41,8 @@ class Job(HourlyJob):
         end = query_params['end'].strftime('%Y-%m-%d')
         level = query_params['level']
         user = query_params['user_id']
-        return u'%s.%s.%s.%s.%s' % (name, start, end, level, user)
+        area = query_params.get('area', u'常州')
+        return u'%s.%s.%s.%s.%s.%s' % (name, start, end, level, user, area)
 
     @property
     def cache_confs(self):

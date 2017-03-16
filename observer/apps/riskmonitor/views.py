@@ -25,6 +25,7 @@ from observer.apps.riskmonitor.service.analytics import AnalyticsCal
 from observer.apps.riskmonitor.service.dashboard import Dashboard
 from observer.apps.riskmonitor.service.enterprise import EnterpriseRank
 from observer.apps.riskmonitor.service.industry import IndustryTrack
+from observer.apps.riskmonitor.service.inspection import InspectionQuerySet
 from observer.apps.riskmonitor.service.news import NewsQuerySet
 from observer.apps.riskmonitor.jobs.hourly.dashboard import Job as DashboardJob
 from observer.apps.riskmonitor.jobs.hourly.industries import Job as IndustriesJob
@@ -83,6 +84,7 @@ class DashboardList(BaseView):
         super(DashboardList, self).set_params(request.GET)
         self.query_params['user_id'] = request.user.id
         self.query_params['level'] = 3
+        self.query_params['area_name'] = request.query_params.get("area") if request.query_params.get("area") is not None else u'常州'
 
     def serialize(self, queryset):
         data = {
@@ -111,26 +113,53 @@ class DashboardList(BaseView):
             'risk': queryset['risk'],
             'industries': {
                 'categories': [
-                    '空调器/5月',
-                    '空调器/6月',
                     '水泥/7月',
                     '水泥/8月',
                     '床上用品/9月',
                     '床上用品/10月',
                     '床上用品/11月',
                     'LED灯/12月',
+                    '水泥/1月',
+                    '床上用品/2月'
                 ],
                 'data': [
                     {
                         'data': [
-                            65.4,
-                            65.4,
                             63.5,
                             56.1,
                             44.8,
                             52.5,
                             54.9,
                             64.5,
+                            68.4,
+                            69.8,
+                        ],
+                        'barWidth': '30%',
+                        'type': 'bar'
+                    }
+                ]
+            } if self.query_params['area_name'] == u'常州' else {
+                'categories': [
+                    '农药/7月',
+                    '眼镜/8月',
+                    '农药/9月',
+                    '床上用品/10月',
+                    '床上用品/11月',
+                    '儿童服装/12月',
+                    '烟花爆竹/1月',
+                    '电热毯/2月'
+                ],
+                'data': [
+                    {
+                        'data': [
+                            58.3,
+                            48.2,
+                            46.9,
+                            53,
+                            56.1,
+                            49.4,
+                            42.9,
+                            60,
                         ],
                         'barWidth': '30%',
                         'type': 'bar'
@@ -358,6 +387,7 @@ class IndustryDetail(BaseView):
     def set_params(self, request, pk):
         super(IndustryDetail, self).set_params(request.GET)
         self.query_params['industry'] = pk
+        self.query_params['user_id'] = request.user.id
 
     def serialize(self, queryset):
         data = {
@@ -606,10 +636,10 @@ class EnterpriseList(BaseView):
         data = [{
             'id': q[0],
             'name': q[1],
-            'focus': (self.query_params['user_area'] == q[2]),
+            'focus': (self.query_params['user_area'] == q[2] or u'溧阳' == q[2] or u'金坛' == q[2]),
             'area': q[2],
-            'product': q[3],
-            'issure': q[4],
+            'products': q[3],
+            'issues': q[4],
             'total': Inspection.objects.filter(enterprise_unqualified__id=q[0]).count()
         } for q in queryset]
 
@@ -651,6 +681,79 @@ class EnterpriseDetail(BaseView):
         self.set_params(request)
 
         queryset = Inspection.objects.filter(enterprise_unqualified__id=pk)
+
+        return Response(self.serialize(queryset))
+
+
+class RiskNewsList(BaseView):
+
+    def __init__(self):
+        super(RiskNewsList, self).__init__()
+
+    def set_params(self, request):
+        super(RiskNewsList, self).set_params(request.GET)
+
+    def paging(self, queryset):
+        return super(RiskNewsList, self).paging(queryset, self.query_params['limit'], 10)
+
+    def serialize(self, queryset):
+        results = self.paging(queryset)
+        data = map(lambda r: {
+            'id': r['id'],
+            'url': r['url'],
+            'title': r['title'],
+            'time': r['pubtime'].strftime('%Y-%m-%d %H:%M'),
+            'source': r['publisher__name']
+        }, results)
+
+        return data
+
+    def get(self, request):
+        self.set_params(request)
+
+        limit = int(self.query_params.get('limit', 0))
+
+        queryset = NewsQuerySet(params=self.query_params).get_news_list()
+
+        if limit:
+            queryset = queryset[:limit]
+
+        return Response(self.serialize(queryset))
+
+
+class InspectionList(BaseView):
+
+    def __init__(self):
+        super(InspectionList, self).__init__()
+
+    def set_params(self, request):
+        super(InspectionList, self).set_params(request.GET)
+
+    def paging(self, queryset):
+        return super(InspectionList, self).paging(queryset, self.query_params['limit'], 10)
+
+    def serialize(self, queryset):
+        results = self.paging(queryset)
+        data = map(lambda r: {
+            'id': r['id'],
+            'url': r['url'],
+            'title': r['title'],
+            'time': r['pubtime'].strftime('%Y-%m-%d %H:%M'),
+            'source': r['publisher__name']
+        }, results)
+
+        return data
+
+    def get(self, request):
+        self.set_params(request)
+
+        limit = int(self.query_params.get('limit', 0))
+
+        queryset = InspectionQuerySet(params=self.query_params).get_inspection_list()
+
+        if limit:
+            queryset = queryset[:limit]
+
 
         return Response(self.serialize(queryset))
 

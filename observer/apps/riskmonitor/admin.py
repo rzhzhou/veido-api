@@ -158,11 +158,12 @@ class ConsumeIndexAdmin(ImportExportModelAdmin, ImportExportActionModelAdmin, Fo
 
     related_search_fields = {'industry': ('name',)}
 
-    export_order = ('force', 'close', 'consume', 'year', 'industry')
-    fields = ('force', 'close', 'consume', 'year', 'industry')
-    list_display = ('force', 'close', 'consume', 'year', 'industry')
+    export_order = ('force', 'close', 'consume', 'year', 'industry', 'area')
+    fields = ('force', 'close', 'consume', 'year', 'industry', 'area')
+    list_display = ('force', 'close', 'consume', 'year', 'industry', 'area')
     search_fields = ('force', 'industry__name', 'year')
     list_filter = ('year', 'force', 'close', 'consume')
+
 
 
 class SocietyIndexAdmin(ImportExportModelAdmin, ImportExportActionModelAdmin, ForeignKeyAutocompleteAdmin):
@@ -170,8 +171,8 @@ class SocietyIndexAdmin(ImportExportModelAdmin, ImportExportActionModelAdmin, Fo
 
     related_search_fields = {'industry': ('name',)}
 
-    fields = ('trade', 'qualified', 'accident', 'year', 'industry')
-    list_display = ('trade', 'qualified', 'accident', 'year', 'industry', )
+    fields = ('trade', 'qualified', 'accident', 'year', 'industry', 'area')
+    list_display = ('trade', 'qualified', 'accident', 'year', 'industry', 'area')
     search_fields = ('trade', 'industry__name', 'year')
     list_filter = ('year', 'trade', 'qualified', 'accident')
 
@@ -182,9 +183,9 @@ class ManageIndexAdmin(ImportExportModelAdmin, ImportExportActionModelAdmin, For
     related_search_fields = {'industry': ('name',)}
 
     fields = ('licence', 'productauth', 'encourage', 'limit', 'remove',
-              'year', 'industry')
+              'year', 'industry', 'area')
     list_display = ('licence', 'productauth', 'encourage', 'limit',
-                    'remove', 'year', 'industry', )
+                    'remove', 'year', 'industry', 'area',)
     search_fields = ('licence', 'productauth', 'encourage', 'limit', 'remove',
                      'industry__name', 'year')
     list_filter = ('year', 'productauth',)

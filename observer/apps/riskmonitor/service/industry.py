@@ -15,6 +15,11 @@ class IndustryTrack(NewsQuerySet):
 
     def __init__(self, params={}):
         super(IndustryTrack, self).__init__(params)
+        try:
+            self.area_name = self.area_name
+        except Exception as e:
+            self.area_name = UserArea.objects.get(user__id=self.user_id).area.name
+
 
     def trend_chart(self):
         self.days = (self.end - self.start).days
@@ -42,7 +47,8 @@ class IndustryTrack(NewsQuerySet):
         if industry == '':
             industry = self.industry
 
-        c = ConsumeIndex.objects.filter(industry__id=industry)
+        c = ConsumeIndex.objects.filter(industry__id=industry, area=UserArea.objects.get(user__id=self.user_id).area)
+        c = c if list(c) != list([]) else ConsumeIndex.objects.filter(industry__id=industry, area__name=u'全国')
 
         c_dimension = (c[0].force, c[0].close, c[
                        0].consume) if c else (0, 1, 0)
@@ -60,7 +66,9 @@ class IndustryTrack(NewsQuerySet):
     def count_society_index_data(self, industry=''):
         if industry == '':
             industry = self.industry
-        s = SocietyIndex.objects.filter(industry__id=industry)
+        s = SocietyIndex.objects.filter(industry__id=industry, area=UserArea.objects.get(user__id=self.user_id).area)
+        s = s if list(s) != list([]) else SocietyIndex.objects.filter(industry__id=industry, area__name=u'全国')
+
         s_dimension = (s[0].trade, s[0].qualified, s[
                        0].accident) if s else (1, 1, 1)
         s_score = 100 - ((50 * (s_dimension[0] - 1)) + (
@@ -85,7 +93,9 @@ class IndustryTrack(NewsQuerySet):
     def count_manage_index_data(self, industry=''):
         if industry == '':
             industry = self.industry
-        m = ManageIndex.objects.filter(industry__id=industry)
+        m = ManageIndex.objects.filter(industry__id=industry, area=UserArea.objects.get(user__id=self.user_id).area)
+        m = m if list(m) != list([]) else ManageIndex.objects.filter(industry__id=industry, area__name=u'全国')
+
         m_dimension = (m[0].licence, m[0].productauth, m[0].encourage, m[
             0].limit, m[0].remove) if m else (0, 0, 0, 0, 0)
         m_score = 100 - (100 * m_dimension[0] + 100 * m_dimension[1] + 100 *
@@ -103,7 +113,7 @@ class IndustryTrack(NewsQuerySet):
             industry = self.industry
 
         n_dimension = RiskNews.objects.filter(
-            industry__id=industry, pubtime__gte=self.start, pubtime__lt=self.end)
+            industry__id=industry, pubtime__gte=self.start, pubtime__lt=self.end, area__name=self.area_name if self.area_name is not None else u'常州')
         risk_keyword__ids = map(
             lambda x: x['risk_keyword__id'], n_dimension.values('risk_keyword__id'))
 
@@ -213,9 +223,10 @@ class IndustryTrack(NewsQuerySet):
             pubtime = date.today()
 
         insepction_count = Inspection.objects.filter(
-            pubtime__gte=self.start, pubtime__lt=self.end).count()
+            pubtime__gte=self.start, pubtime__lt=self.end, ).count()
 
-        area_industry_count = AreaIndustry.objects.filter(area='2360').count()
+        area_industry_count = AreaIndustry.objects.filter(
+            area__name=self.area_name if self.area_name is not None else u'常州').count()
 
         inspection_score = (insepction_count * 10) / area_industry_count
 
@@ -252,7 +263,8 @@ class IndustryTrack(NewsQuerySet):
             'area__name': getattr(
                 self,
                 'area',
-                UserArea.objects.get(user__id=self.user_id).area.name
+                self.area_name if self.area_name is not None else UserArea.objects.get(
+                    user__id=self.user_id).area.name
             ),
             'industry__name': getattr(self, 'name', None),
             'industry__level': getattr(self, 'level', None),
@@ -284,13 +296,6 @@ class IndustryTrack(NewsQuerySet):
             count_risk_rank_score = count_consume_index_score * 0.1 + count_society_index_score * 0.1 + \
                 count_manage_index_score * 0.1 + count_risk_news_score * \
                 0.3 + count_risk_inspection_score * 0.4
-
-            # if risk_rank_score < 65:
-            #     risk_rank_word = 'C'
-            # elif 65 <= risk_rank_score < 85:
-            #     risk_rank_word = 'B'
-            # else:
-            #     risk_rank_word = 'A'
 
             industries.append(
                 (u.industry.id, u.name, u.industry.level, round(count_risk_rank_score, 2)))
