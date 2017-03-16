@@ -163,6 +163,136 @@ class DashboardList(BaseView):
         return Response(self.serialize(queryset))
 
 
+class AreaList(BaseView):
+
+    def __init__(self):
+        super(AreaList, self).__init__()
+
+    def set_params(self, request):
+        super(DashboardList, self).set_params(request.GET)
+
+    def serialize(self, queryset):
+        data = {
+            title: {
+                text: '',
+                subtext: '苏州市',
+                left: 'center'
+            },
+            tooltip: {
+                trigger: 'item',
+                formatter: '{b} : {c}',
+            },
+            legend: {
+                orient: 'vertical',
+                left: 'left',
+                data: ['烟花爆竹', '床上用品', '电热毯']
+            },
+            visualMap: {
+                min: 0,
+                max: 2500,
+                left: 'left',
+                top: 'bottom',
+                text: ['高', '低'], # 文本，默认为数值文本
+                calculable: true
+            },
+            toolbox: {
+                show: true,
+                orient: 'vertical',
+                left: 'right',
+                top: 'center',
+                feature: {
+                    dataView: {readOnly: true},
+                    restore: {show: true},
+                    saveAsImage: {show: true}
+                }
+            },
+            series: [{
+                name: '烟花爆竹',
+                type: 'map',
+                map: 'suzhou',
+                label: {
+                    normal: {
+                        show: true,
+                        textStyle: {
+                            color: '#333'
+                        }
+                    },
+                    emphasis: {
+                        show: true
+                    }
+                },
+                data: [
+                    {name: '姑苏区', value: Math.round(Math.random() * 1000)},
+                    {name: '虎丘区', value: Math.round(Math.random() * 1000)},
+                    {name: '相城区', value: Math.round(Math.random() * 1000)},
+                    {name: '吴中区', value: Math.round(Math.random() * 1000)},
+                    {name: '吴江区', value: Math.round(Math.random() * 1000)},
+                    {name: '常熟市', value: Math.round(Math.random() * 1000)},
+                    {name: '张家港市', value: Math.round(Math.random() * 1000)},
+                    {name: '昆山市', value: Math.round(Math.random() * 1000)},
+                    {name: '太仓市', value: Math.round(Math.random() * 1000)}
+                ]
+            }, {
+                name: '床上用品',
+                type: 'map',
+                map: 'suzhou',
+                label: {
+                    normal: {
+                        show: true,
+                        textStyle: {
+                            color: '#333'
+                        }
+                    },
+                    emphasis: {
+                        show: true
+                    }
+                },
+                data: [
+                    {name: '姑苏区', value: Math.round(Math.random() * 1000)},
+                    {name: '虎丘区', value: Math.round(Math.random() * 1000)},
+                    {name: '相城区', value: Math.round(Math.random() * 1000)},
+                    {name: '吴中区', value: Math.round(Math.random() * 1000)},
+                    {name: '吴江区', value: Math.round(Math.random() * 1000)},
+                    {name: '常熟市', value: Math.round(Math.random() * 1000)},
+                    {name: '张家港市', value: Math.round(Math.random() * 1000)},
+                    {name: '昆山市', value: Math.round(Math.random() * 1000)},
+                    {name: '太仓市', value: Math.round(Math.random() * 1000)}
+                ]
+            }, {
+                name: '电热毯',
+                type: 'map',
+                map: 'suzhou',
+                label: {
+                    normal: {
+                        show: true,
+                        textStyle: {
+                            color: '#333'
+                        }
+                    },
+                    emphasis: {
+                        show: true
+                    }
+                },
+                data: [
+                    {name: '姑苏区', value: Math.round(Math.random() * 1000)},
+                    {name: '虎丘区', value: Math.round(Math.random() * 1000)},
+                    {name: '相城区', value: Math.round(Math.random() * 1000)},
+                    {name: '吴中区', value: Math.round(Math.random() * 1000)},
+                    {name: '吴江区', value: Math.round(Math.random() * 1000)},
+                    {name: '常熟市', value: Math.round(Math.random() * 1000)},
+                    {name: '张家港市', value: Math.round(Math.random() * 1000)},
+                    {name: '昆山市', value: Math.round(Math.random() * 1000)},
+                    {name: '太仓市', value: Math.round(Math.random() * 1000)}
+                ]
+            }]
+        }
+
+        return data
+
+    def get(self, request):
+        pass
+
+
 class IndustryList(BaseView):
 
     def __init__(self):
