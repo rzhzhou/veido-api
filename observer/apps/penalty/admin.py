@@ -10,9 +10,9 @@ from observer.apps.penalty.models import AdministrativePenalties
 class AdministrativePenaltiesAdmin(ImportExportModelAdmin):
 
     # related_search_fields = {'area': ('name',)}
-    fields = ('title', 'url', 'publisher', 'pubtime','province','city','district','industry','productCategory','brand','caseName','penaltyOrgan','punishedName','punishedDistrict','illegalBehavior','punishmentBasis','punishmentRsult')
-    list_display = ('title', 'url', 'publisher', 'pubtime','publisher','province','city','district','industry','productCategory','brand','caseName','penaltyOrgan','punishedName','punishedDistrict','illegalBehavior','punishmentBasis','punishmentRsult')
-    search_fields = ('title', 'url', 'publisher', 'pubtime','publisher','province','city','district','industry','productCategory','brand','caseName','penaltyOrgan','punishedName','punishedDistrict','illegalBehavior','punishmentBasis','punishmentRsult')
+    fields = ('title', 'url', 'publisher', 'pubtime','area','industry','enterprise','inspectionPublisher','caseName','illegalBehavior','punishmentBasis','punishmentRsult')
+    list_display = ('title', 'url', 'publisher', 'pubtime','area','industry','enterprise','inspectionPublisher','caseName','illegalBehavior','punishmentBasis','punishmentRsult')
+    search_fields = ('title', 'url', 'publisher', 'pubtime','area','industry','enterprise','inspectionPublisher','caseName','illegalBehavior','punishmentBasis','punishmentRsult')
 
 
 admin.site.register(AdministrativePenalties, AdministrativePenaltiesAdmin)
