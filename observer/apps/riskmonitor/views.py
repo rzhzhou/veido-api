@@ -720,7 +720,7 @@ class RiskNewsList(BaseView):
 
         limit = int(self.query_params.get('limit', 0))
 
-        queryset = NewsQuerySet(params=self.query_params).get_news_list()
+        queryset = NewsQuerySet(params=self.query_params).get_news_list().order_by('-pubtime')
 
         if limit:
             queryset = queryset[:limit]
