@@ -84,7 +84,8 @@ class DashboardList(BaseView):
         super(DashboardList, self).set_params(request.GET)
         self.query_params['user_id'] = request.user.id
         self.query_params['level'] = 3
-        self.query_params['area_name'] = request.query_params.get("area") if request.query_params.get("area") is not None else u'常州'
+        self.query_params['area_name'] = request.query_params.get(
+            "area") if request.query_params.get("area") is not None else u'常州'
 
     def serialize(self, queryset):
         data = {
@@ -221,7 +222,7 @@ class AreaList(BaseView):
                 max: 2500,
                 left: 'left',
                 top: 'bottom',
-                text: ['高', '低'], # 文本，默认为数值文本
+                text: ['高', '低'],  # 文本，默认为数值文本
                 calculable: true
             },
             toolbox: {
@@ -700,18 +701,17 @@ class RiskNewsList(BaseView):
     def serialize(self, queryset):
         results = self.paging(queryset)
         data = {
-                "draw":self.query_params['draw'] ,
-                "recordsTotal": NewsQuerySet(params=self.query_params).get_news_list().count(),
-                "recordsFiltered": NewsQuerySet(params=self.query_params).get_news_list().count(),
-                data: map(lambda r: {
-                    'id': r['id'],
-                    'url': r['url'],
-                    'title': r['title'],
-                    'time': r['pubtime'],
-                    'source': r['publisher__name']
-                }, results)
-            }
-
+            "draw": self.query_params['draw'],
+            "recordsTotal": NewsQuerySet(params=self.query_params).get_news_list().count(),
+            "recordsFiltered": NewsQuerySet(params=self.query_params).get_news_list().count(),
+            "data": map(lambda r: {
+                'id': r['id'],
+                'url': r['url'],
+                'title': r['title'],
+                'time': r['pubtime'],
+                'source': r['publisher__name']
+            }, results)
+        }
 
         return data
 
@@ -749,8 +749,10 @@ class RiskNewsDetail(BaseView):
 
     def get(self, request):
         self.set_params(request)
-        queryset = NewsQuerySet(params=self.query_params).get_news_list().order_by('-pubtime')
+        queryset = NewsQuerySet(
+            params=self.query_params).get_news_list().order_by('-pubtime')
         return Response(self.serialize(queryset))
+
 
 class InspectionList(BaseView):
 
@@ -780,11 +782,11 @@ class InspectionList(BaseView):
 
         limit = int(self.query_params.get('limit', 0))
 
-        queryset = InspectionQuerySet(params=self.query_params).get_inspection_list()
+        queryset = InspectionQuerySet(
+            params=self.query_params).get_inspection_list()
 
         if limit:
             queryset = queryset[:limit]
-
 
         return Response(self.serialize(queryset))
 
