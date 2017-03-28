@@ -720,7 +720,7 @@ class RiskNewsList(BaseView):
 
         limit = int(self.query_params.get('limit', 0))
 
-        queryset = NewsQuerySet(params=self.query_params).get_news_list()
+        queryset = NewsQuerySet(params=self.query_params).get_news_list().order_by('-pubtime')
 
         if limit:
             queryset = queryset[:limit]
@@ -759,26 +759,32 @@ class InspectionList(BaseView):
     def __init__(self):
         super(InspectionList, self).__init__()
 
-    def set_params(self, request):
-        super(InspectionList, self).set_params(request.GET)
+    def set_params(self, params):
+        for k, v in params.iteritems():
+            self.query_params[k] = v
 
     def paging(self, queryset):
-        return super(InspectionList, self).paging(queryset, self.query_params['limit'], 10)
+        return super(InspectionList, self).paging(queryset, self.query_params['start'], self.query_params['length'])
 
     def serialize(self, queryset):
         results = self.paging(queryset)
-        data = map(lambda r: {
-            'id': r['id'],
-            'url': r['url'],
-            'title': r['title'],
-            'time': r['pubtime'].strftime('%Y-%m-%d %H:%M'),
-            'source': r['publisher__name']
-        }, results)
+        data = {
+            "draw": self.query_params['draw'],
+            "recordsTotal": InspectionQuerySet(params=self.query_params).get_inspection_list().count(),
+            "recordsFiltered": InspectionQuerySet(params=self.query_params).get_inspection_list().count(),
+            "data": map(lambda r: {
+                'id': r['id'],
+                'url': r['url'],
+                'title': r['title'],
+                'time': r['pubtime'].strftime('%Y-%m-%d %H:%M'),
+                'source': r['publisher__name']
+            }, results)
+        }
 
         return data
 
     def get(self, request):
-        self.set_params(request)
+        self.set_params(request.GET)
 
         limit = int(self.query_params.get('limit', 0))
 

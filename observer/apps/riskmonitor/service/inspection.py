@@ -16,7 +16,7 @@ class InspectionQuerySet(Abstract):
     def get_inspection_list(self):
         fields = ('id', 'title', 'pubtime', 'url', 'publisher__name')
 
-        args = self.set_args()
+        args = {}
 
         queryset = Inspection.objects.filter(**args).values(*fields)
 
