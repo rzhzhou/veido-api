@@ -708,7 +708,7 @@ class RiskNewsList(BaseView):
                 'id': r['id'],
                 'url': r['url'],
                 'title': r['title'],
-                'time': r['pubtime'],
+                'time': r['pubtime'].strftime('%Y-%m-%d %H:%M'),
                 'source': r['publisher__name']
             }, results)
         }
