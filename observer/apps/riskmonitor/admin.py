@@ -2,7 +2,7 @@
 from django.contrib import admin
 from django_extensions.admin import ForeignKeyAutocompleteAdmin
 from import_export.admin import ImportExportModelAdmin, ImportExportActionModelAdmin
-
+from daterange_filter.filter import DateRangeFilter
 from observer.apps.riskmonitor.resource import (
     ConsumeIndexResources, ManageIndexResources, SocietyIndexResources, RiskNewsResources)
 from observer.apps.riskmonitor.models import (Brand, Enterprise, Industry,
@@ -108,7 +108,7 @@ class RiskNewsAdmin(ImportExportModelAdmin, ImportExportActionModelAdmin, Foreig
     list_display = ('title', 'url', 'publisher', 'reprinted', 'pubtime')
     search_fields = ('title', 'content', 'url', 'reprinted', 'publisher__name',
                      'industry__name', 'enterprise__name', 'area__name')
-    list_filter = ('pubtime', 'industry__name')
+    list_filter = (('pubtime', DateRangeFilter), 'industry__name')
     actions = ['delete_selected']
 
     def reduce_score(self, obj):

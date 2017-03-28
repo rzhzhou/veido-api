@@ -16,7 +16,7 @@ class NewsQuerySet(Abstract):
     def get_news_list(self):
         fields = ('id', 'title', 'pubtime', 'url', 'publisher__name')
 
-        args = self.set_args()
+        args = {}
 
         queryset = RiskNews.objects.filter(**args).values(*fields)
 
