@@ -706,8 +706,7 @@ class RiskNewsList(BaseView):
             "recordsFiltered": NewsQuerySet(params=self.query_params).get_news_list().count(),
             "data": map(lambda r: {
                 'id': r['id'],
-                'url': r['url'],
-                'title': r['title'],
+                'titleAndurl': [r['title'],r['url']],
                 'time': r['pubtime'].strftime('%Y-%m-%d %H:%M'),
                 'source': r['publisher__name']
             }, results)
@@ -774,8 +773,7 @@ class InspectionList(BaseView):
             "recordsFiltered": InspectionQuerySet(params=self.query_params).get_inspection_list().count(),
             "data": map(lambda r: {
                 'id': r['id'],
-                'url': r['url'],
-                'title': r['title'],
+                'titleAndurl': [r['title'],r['url']],
                 'time': r['pubtime'].strftime('%Y-%m-%d %H:%M'),
                 'source': r['publisher__name']
             }, results)
