@@ -86,8 +86,9 @@ class InspectionResources(resources.ModelResource):
         if not instance.pubtime:
             instance.pubtime = datetime.now()
         elif isinstance(instance.pubtime, basestring):
+            instance.pubtime=str(instance.pubtime).split('+')[0]
             instance.pubtime = datetime.strptime(
-                instance.pubtime, '%Y-%m-%d %H:%M:%S')
+                str(instance.pubtime), '%Y-%m-%d %H:%M:%S')
         elif isinstance(instance.pubtime, float):
             instance.pubtime = xlrd.xldate.xldate_as_datetime(
                 instance.pubtime, 0)
