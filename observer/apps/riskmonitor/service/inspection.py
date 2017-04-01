@@ -2,6 +2,7 @@
 from datetime import datetime, timedelta
 
 from django.db.models import Case, IntegerField, Sum, When
+from django.db.models import Q
 
 from observer.apps.origin.models import Inspection
 from observer.apps.riskmonitor.service.abstract import Abstract
@@ -13,14 +14,15 @@ class InspectionQuerySet(Abstract):
     def __init__(self, params={}):
         super(InspectionQuerySet, self).__init__(params)
 
-    def get_inspection_list(self):
+    def get_inspection_list(self,search_value):
         fields = ('id', 'title', 'pubtime', 'url',
                   'publisher__name', 'qualitied', 'product')
 
         args = {}
-
-        queryset = Inspection.objects.filter(**args).values(*fields)
-
+        if not search_value:
+            queryset = Inspection.objects.filter(**args).values(*fields)
+        else:
+            queryset = Inspection.objects.filter(Q(publisher__name__contains=search_value) | Q(title__contains=search_value)).values(*fields)
         return queryset
 
     def cal_date_range(self, x_axis_units):

@@ -704,8 +704,8 @@ class RiskNewsList(BaseView):
         results = self.paging(queryset)
         data = {
             "draw": self.query_params['draw'],
-            "recordsTotal": NewsQuerySet(params=self.query_params).get_news_list().count(),
-            "recordsFiltered": NewsQuerySet(params=self.query_params).get_news_list().count(),
+            "recordsTotal": NewsQuerySet(params=self.query_params).get_news_list('').count(),
+            "recordsFiltered": NewsQuerySet(params=self.query_params).get_news_list('').count(),
             "data": map(lambda r: {
                 'id': r['id'],
                 'titleAndurl': [r['title'], r['url']],
@@ -721,7 +721,7 @@ class RiskNewsList(BaseView):
 
         limit = int(self.query_params.get('limit', 0))
 
-        queryset = NewsQuerySet(params=self.query_params).get_news_list()
+        queryset = NewsQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).order_by('-pubtime')
 
         if limit:
             queryset = queryset[:limit]
@@ -771,10 +771,11 @@ class InspectionList(BaseView):
 
     def serialize(self, queryset):
         results = self.paging(queryset)
+        print self.query_params['search[value]'],
         data = {
             "draw": self.query_params['draw'],
-            "recordsTotal": InspectionQuerySet(params=self.query_params).get_inspection_list().count(),
-            "recordsFiltered": InspectionQuerySet(params=self.query_params).get_inspection_list().count(),
+            "recordsTotal": InspectionQuerySet(params=self.query_params).get_inspection_list('').count(),
+            "recordsFiltered": InspectionQuerySet(params=self.query_params).get_inspection_list('').count(),
             "data": map(lambda r: {
                 'id': r['id'],
                 'titleAndurl': [r['title'], r['url']],
@@ -793,7 +794,7 @@ class InspectionList(BaseView):
         limit = int(self.query_params.get('limit', 0))
 
         queryset = InspectionQuerySet(
-            params=self.query_params).get_inspection_list().order_by('-pubtime')
+            params=self.query_params).get_inspection_list(self.query_params['search[value]'].strip()).order_by('-pubtime')
 
         if limit:
             queryset = queryset[:limit]

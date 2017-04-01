@@ -2,6 +2,7 @@
 from datetime import datetime, timedelta
 
 from django.db.models import Case, IntegerField, Sum, When
+from django.db.models import Q
 
 from observer.apps.riskmonitor.models import RiskNews
 from observer.apps.riskmonitor.service.abstract import Abstract
@@ -13,12 +14,15 @@ class NewsQuerySet(Abstract):
     def __init__(self, params={}):
         super(NewsQuerySet, self).__init__(params)
 
-    def get_news_list(self):
+    def get_news_list(self,search_value):
         fields = ('id', 'title', 'pubtime', 'url', 'publisher__name')
 
         args = {}
 
-        queryset = RiskNews.objects.filter(**args).values(*fields)
+        if not search_value:
+            queryset = RiskNews.objects.filter(**args).values(*fields)
+        else:
+            queryset = RiskNews.objects.filter(Q(publisher__name__contains=search_value) | Q(title__contains=search_value)).values(*fields)
 
         return queryset
 
