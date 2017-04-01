@@ -696,7 +696,9 @@ class RiskNewsList(BaseView):
             self.query_params[k] = v
 
     def paging(self, queryset):
-        return super(RiskNewsList, self).paging(queryset, self.query_params['start'], self.query_params['length'])
+        page = (int(self.query_params['start']) /
+                int(self.query_params['length'])) + 1
+        return super(RiskNewsList, self).paging(queryset, page, self.query_params['length'])
 
     def serialize(self, queryset):
         results = self.paging(queryset)
@@ -706,7 +708,7 @@ class RiskNewsList(BaseView):
             "recordsFiltered": NewsQuerySet(params=self.query_params).get_news_list().count(),
             "data": map(lambda r: {
                 'id': r['id'],
-                'titleAndurl': [r['title'],r['url']],
+                'titleAndurl': [r['title'], r['url']],
                 'time': r['pubtime'].strftime('%Y-%m-%d %H:%M'),
                 'source': r['publisher__name']
             }, results)
@@ -763,7 +765,9 @@ class InspectionList(BaseView):
             self.query_params[k] = v
 
     def paging(self, queryset):
-        return super(InspectionList, self).paging(queryset, self.query_params['start'], self.query_params['length'])
+        page = (int(self.query_params['start']) /
+                int(self.query_params['length'])) + 1
+        return super(InspectionList, self).paging(queryset, page, self.query_params['length'])
 
     def serialize(self, queryset):
         results = self.paging(queryset)
@@ -773,7 +777,7 @@ class InspectionList(BaseView):
             "recordsFiltered": InspectionQuerySet(params=self.query_params).get_inspection_list().count(),
             "data": map(lambda r: {
                 'id': r['id'],
-                'titleAndurl': [r['title'],r['url']],
+                'titleAndurl': [r['title'], r['url']],
                 'time': r['pubtime'].strftime('%Y-%m-%d %H:%M'),
                 'source': r['publisher__name']
             }, results)
