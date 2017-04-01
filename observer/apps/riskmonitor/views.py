@@ -771,6 +771,9 @@ class InspectionList(BaseView):
 
     def serialize(self, queryset):
         results = self.paging(queryset)
+        # for r in results:
+        #     print r['pubtime'], r['pubtime'].astimezone(pytz.timezone(settings.TIME_ZONE))
+        #     print r['pubtime'], utc_to_local_time(r['pubtime'])
         data = {
             "draw": self.query_params['draw'],
             "recordsTotal": InspectionQuerySet(params=self.query_params).get_inspection_list().count(),
@@ -780,7 +783,7 @@ class InspectionList(BaseView):
                 'titleAndurl': [r['title'], r['url']],
                 'time': utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d'),
                 'source': r['publisher__name'],
-                'qualitied': "%.2f%%"  %(r['qualitied']*100),
+                'qualitied': "%.2f%%" % (r['qualitied'] * 100),
                 'product': r['product']
             }, results)
         }
