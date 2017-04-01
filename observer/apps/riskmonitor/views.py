@@ -779,7 +779,9 @@ class InspectionList(BaseView):
                 'id': r['id'],
                 'titleAndurl': [r['title'], r['url']],
                 'time': r['pubtime'].strftime('%Y-%m-%d %H:%M'),
-                'source': r['publisher__name']
+                'source': r['publisher__name'],
+                'qualitied': "%.2f%%"  %(r['qualitied']*100),
+                'product': r['product']
             }, results)
         }
 

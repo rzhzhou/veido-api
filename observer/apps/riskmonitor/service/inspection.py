@@ -14,7 +14,8 @@ class InspectionQuerySet(Abstract):
         super(InspectionQuerySet, self).__init__(params)
 
     def get_inspection_list(self):
-        fields = ('id', 'title', 'pubtime', 'url', 'publisher__name')
+        fields = ('id', 'title', 'pubtime', 'url',
+                  'publisher__name', 'qualitied', 'product')
 
         args = {}
 
@@ -106,7 +107,8 @@ class InspectionQuerySet(Abstract):
                 )
             ) for year, month in date_range])
 
-        queryset = Inspection.objects.filter(**args).aggregate(**aggregate_args)
+        queryset = Inspection.objects.filter(
+            **args).aggregate(**aggregate_args)
 
         if queryset:
             # Convert $queryset
