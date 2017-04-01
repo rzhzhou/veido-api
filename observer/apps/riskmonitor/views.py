@@ -709,7 +709,7 @@ class RiskNewsList(BaseView):
             "data": map(lambda r: {
                 'id': r['id'],
                 'titleAndurl': [r['title'], r['url']],
-                'time': r['pubtime'].strftime('%Y-%m-%d %H:%M'),
+                'time': utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d'),
                 'source': r['publisher__name']
             }, results)
         }
@@ -778,7 +778,7 @@ class InspectionList(BaseView):
             "data": map(lambda r: {
                 'id': r['id'],
                 'titleAndurl': [r['title'], r['url']],
-                'time': r['pubtime'].strftime('%Y-%m-%d %H:%M'),
+                'time': utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d'),
                 'source': r['publisher__name'],
                 'qualitied': "%.2f%%"  %(r['qualitied']*100),
                 'product': r['product']
