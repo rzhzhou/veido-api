@@ -791,7 +791,7 @@ class InspectionList(BaseView):
         limit = int(self.query_params.get('limit', 0))
 
         queryset = InspectionQuerySet(
-            params=self.query_params).get_inspection_list().order_by('pubtime')
+            params=self.query_params).get_inspection_list().order_by('-pubtime')
 
         if limit:
             queryset = queryset[:limit]
