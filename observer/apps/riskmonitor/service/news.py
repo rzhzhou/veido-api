@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime, timedelta
 
-from django.db.models import Case, IntegerField, Sum, When
+from django.db.models import Case, IntegerField, Sum, When, Max
 from django.db.models import Q
 
 from observer.apps.riskmonitor.models import RiskNews
@@ -14,15 +14,20 @@ class NewsQuerySet(Abstract):
     def __init__(self, params={}):
         super(NewsQuerySet, self).__init__(params)
 
-    def get_news_list(self,search_value):
+    def get_news_list(self, search_value):
         fields = ('id', 'title', 'pubtime', 'url', 'publisher__name')
 
-        args = {}
+        max_id = RiskNews.objects.all().aggregate(Max('id'))
+
+        args = {
+            'id__lte': max_id.get('id__max'),
+        }
 
         if not search_value:
             queryset = RiskNews.objects.filter(**args).values(*fields)
         else:
-            queryset = RiskNews.objects.filter(Q(publisher__name__contains=search_value) | Q(title__contains=search_value)).values(*fields)
+            queryset = RiskNews.objects.filter(Q(publisher__name__contains=search_value) | Q(
+                title__contains=search_value) | Q(id__lte=max_id.get('id__max'))).values(*fields)
 
         return queryset
 
