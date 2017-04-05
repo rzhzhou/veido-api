@@ -704,8 +704,8 @@ class RiskNewsList(BaseView):
         results = self.paging(queryset)
         data = {
             "draw": self.query_params['draw'],
-            "recordsTotal": NewsQuerySet(params=self.query_params).get_news_list('').count(),
-            "recordsFiltered": NewsQuerySet(params=self.query_params).get_news_list('').count(),
+            "recordsTotal": NewsQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
+            "recordsFiltered": NewsQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
             "data": map(lambda r: {
                 'id': r['id'],
                 'titleAndurl': [r['title'], r['url']],
@@ -774,8 +774,8 @@ class InspectionList(BaseView):
         print self.query_params['search[value]'],
         data = {
             "draw": self.query_params['draw'],
-            "recordsTotal": InspectionQuerySet(params=self.query_params).get_inspection_list('').count(),
-            "recordsFiltered": InspectionQuerySet(params=self.query_params).get_inspection_list('').count(),
+            "recordsTotal": InspectionQuerySet(params=self.query_params).get_inspection_list(self.query_params['search[value]'].strip()).count(),
+            "recordsFiltered": InspectionQuerySet(params=self.query_params).get_inspection_list(self.query_params['search[value]'].strip()).count(),
             "data": map(lambda r: {
                 'id': r['id'],
                 'titleAndurl': [r['title'], r['url']],
