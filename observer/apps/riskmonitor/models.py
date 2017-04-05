@@ -8,6 +8,7 @@ from tinymce.models import HTMLField
 
 from observer.apps.base.models import Area, Group
 from observer.apps.origin.models import Enterprise, Industry
+from observer.utils.fulltext import SearchManager
 
 A_CHOICES = (
     (1, u'低'),
@@ -232,6 +233,8 @@ class RiskKeyword(models.Model):
 
 
 class RiskNews(models.Model):
+    objects    = SearchManager(['title', 'content'])
+
     title = models.CharField(max_length=255, blank=True, verbose_name=u'标题')
     url = models.URLField(verbose_name=u'网站链接')
     content = HTMLField(blank=True, verbose_name=u'正文')
