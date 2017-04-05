@@ -21,13 +21,10 @@ class NewsQuerySet(Abstract):
 
         args = {
             'id__lte': max_id.get('id__max'),
+            'content__search': search_value
         }
 
-        if not search_value:
-            queryset = RiskNews.objects.filter(**args).values(*fields)
-        else:
-            queryset = RiskNews.objects.filter(Q(publisher__name__contains=search_value) | Q(
-                title__contains=search_value)).values(*fields)
+        queryset = RiskNews.objects.filter(**args).values(*fields)
 
         return queryset
 
