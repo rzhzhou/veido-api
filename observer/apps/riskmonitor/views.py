@@ -696,18 +696,20 @@ class RiskNewsList(BaseView):
             self.query_params[k] = v
 
     def paging(self, queryset):
-        return super(RiskNewsList, self).paging(queryset, self.query_params['start'], self.query_params['length'])
+        page = (int(self.query_params['start']) /
+                int(self.query_params['length'])) + 1
+        return super(RiskNewsList, self).paging(queryset, page, self.query_params['length'])
 
     def serialize(self, queryset):
         results = self.paging(queryset)
         data = {
             "draw": self.query_params['draw'],
-            "recordsTotal": NewsQuerySet(params=self.query_params).get_news_list().count(),
-            "recordsFiltered": NewsQuerySet(params=self.query_params).get_news_list().count(),
+            "recordsTotal": NewsQuerySet(params=self.query_params).get_news_list('').count(),
+            "recordsFiltered": NewsQuerySet(params=self.query_params).get_news_list('').count(),
             "data": map(lambda r: {
                 'id': r['id'],
-                'titleAndurl': [r['title'],r['url']],
-                'time': r['pubtime'].strftime('%Y-%m-%d %H:%M'),
+                'titleAndurl': [r['title'], r['url']],
+                'time': utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d'),
                 'source': r['publisher__name']
             }, results)
         }
@@ -719,7 +721,7 @@ class RiskNewsList(BaseView):
 
         limit = int(self.query_params.get('limit', 0))
 
-        queryset = NewsQuerySet(params=self.query_params).get_news_list()
+        queryset = NewsQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).order_by('-pubtime')
 
         if limit:
             queryset = queryset[:limit]
@@ -763,19 +765,24 @@ class InspectionList(BaseView):
             self.query_params[k] = v
 
     def paging(self, queryset):
-        return super(InspectionList, self).paging(queryset, self.query_params['start'], self.query_params['length'])
+        page = (int(self.query_params['start']) /
+                int(self.query_params['length'])) + 1
+        return super(InspectionList, self).paging(queryset, page, self.query_params['length'])
 
     def serialize(self, queryset):
         results = self.paging(queryset)
+        print self.query_params['search[value]'],
         data = {
             "draw": self.query_params['draw'],
-            "recordsTotal": InspectionQuerySet(params=self.query_params).get_inspection_list().count(),
-            "recordsFiltered": InspectionQuerySet(params=self.query_params).get_inspection_list().count(),
+            "recordsTotal": InspectionQuerySet(params=self.query_params).get_inspection_list('').count(),
+            "recordsFiltered": InspectionQuerySet(params=self.query_params).get_inspection_list('').count(),
             "data": map(lambda r: {
                 'id': r['id'],
-                'titleAndurl': [r['title'],r['url']],
-                'time': r['pubtime'].strftime('%Y-%m-%d %H:%M'),
-                'source': r['publisher__name']
+                'titleAndurl': [r['title'], r['url']],
+                'time': utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d'),
+                'source': r['publisher__name'],
+                'qualitied': "%.2f%%" % (r['qualitied'] * 100),
+                'product': r['product']
             }, results)
         }
 
@@ -787,7 +794,7 @@ class InspectionList(BaseView):
         limit = int(self.query_params.get('limit', 0))
 
         queryset = InspectionQuerySet(
-            params=self.query_params).get_inspection_list().order_by('pubtime')
+            params=self.query_params).get_inspection_list(self.query_params['search[value]'].strip()).order_by('-pubtime')
 
         if limit:
             queryset = queryset[:limit]

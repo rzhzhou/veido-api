@@ -27,9 +27,9 @@ def utc_to_local_time(dt):
         raise ValueError('no valid date format found')
     elif isinstance(dt, (list, tuple)):
         return [utc_to_local_time(i) for i in dt]
-    elif isinstance(dt, date):
+    elif type(dt) is date:
         dt = datetime.combine(dt, datetime.min.time())
-    elif isinstance(dt, datetime):
+    elif type(dt) is datetime:
         pass
     else:
         raise TypeError
