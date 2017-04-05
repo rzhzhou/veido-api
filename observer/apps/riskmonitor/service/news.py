@@ -21,8 +21,10 @@ class NewsQuerySet(Abstract):
 
         args = {
             'id__lte': max_id.get('id__max'),
-            'content__search': search_value
         }
+
+        if search_value:
+            args['content__search'] = search_value
 
         queryset = RiskNews.objects.filter(**args).values(*fields)
 
