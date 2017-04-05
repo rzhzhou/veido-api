@@ -24,7 +24,7 @@ class NewsQuerySet(Abstract):
         }
 
         if search_value:
-            args['content__search'] = search_value
+            args['title__search'] = search_value
 
         queryset = RiskNews.objects.filter(**args).values(*fields)
 
