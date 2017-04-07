@@ -535,7 +535,7 @@ class IndustryDetail(BaseView):
                     'norms': [{
                         'title': q.title,
                         'source': q.publisher.name,
-                        'time': q.pubtime.strftime('%Y-%m-%d'),
+                        'time': utc_to_local_time(q.pubtime).strftime('%Y-%m-%d'),
                         'url': q.url
                     } for q in queryset['indicators'][3][0]]
                 },
@@ -546,7 +546,7 @@ class IndustryDetail(BaseView):
                     'norms': [{
                         'title': q.title,
                         'source': q.publisher.name,
-                        'time': q.pubtime.strftime('%Y-%m-%d'),
+                        'time': utc_to_local_time(q.pubtime).strftime('%Y-%m-%d'),
                         'url': q.url,
                         'qualitied': q.qualitied
                     } for q in queryset['indicators'][4][0]]
@@ -586,7 +586,7 @@ class NewsList(BaseView):
             'id': r['id'],
             'url': r['url'],
             'title': r['title'],
-            'time': r['pubtime'].strftime('%Y-%m-%d %H:%M'),
+            'time': utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d %H:%M'),
             'source': r['publisher__name']
         }, results)
 
@@ -672,7 +672,7 @@ class EnterpriseDetail(BaseView):
             'id': r.id,
             'url': r.url,
             'title': r.title,
-            'time': r.pubtime.strftime('%Y-%m-%d %H:%M'),
+            'time': utc_to_local_time(r.pubtime).strftime('%Y-%m-%d %H:%M'),
             'source': r.publisher.name
         }, queryset)
 
@@ -721,7 +721,8 @@ class RiskNewsList(BaseView):
 
         limit = int(self.query_params.get('limit', 0))
 
-        queryset = NewsQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).order_by('-pubtime')
+        queryset = NewsQuerySet(params=self.query_params).get_news_list(
+            self.query_params['search[value]'].strip()).order_by('-pubtime')
 
         if limit:
             queryset = queryset[:limit]
@@ -742,7 +743,7 @@ class RiskNewsDetail(BaseView):
             'id': r['id'],
             'url': r['url'],
             'title': r['title'],
-            'time': r['pubtime'].strftime('%Y-%m-%d %H:%M'),
+            'time': utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d %H:%M'),
             'source': r['publisher__name']
         }, queryset)
 
@@ -876,7 +877,7 @@ class AnalyticsExport(BaseView):
                 'items': map(lambda r: {
                     'id': r['id'],
                     'title': r['title'],
-                    'time': r['pubtime'].strftime('%Y-%m-%d %H:%M'),
+                    'time': utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d %H:%M'),
                     'source': r['publisher__name']
                 }, queryset['list']),
                 'total': results.paginator.num_pages
@@ -959,7 +960,7 @@ class Search(BaseView):
             'title': q.title,
             'source': q.publisher.name,
             'reprint': q.reprinted,
-            'time': q.pubtime.strftime('%Y-%m-%d'),
+            'time': utc_to_local_time(q.pubtime).strftime('%Y-%m-%d'),
             'url': q.url
         } for q in queryset[:25]]
 
