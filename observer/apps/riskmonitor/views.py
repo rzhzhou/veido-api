@@ -756,6 +756,102 @@ class RiskNewsDetail(BaseView):
         return Response(self.serialize(queryset))
 
 
+class RiskNewsUpdate(BaseView):
+
+    def __init__(self):
+        super(RiskNewsUpdate, self).__init__()
+
+    def set_params(self, params):
+        for k, v in params.iteritems():
+            self.query_params[k] = v
+
+    def update(self, queryset):
+        risk_news_ids = self.query_params['risk_news_ids']
+        RiskNews.objects.filter(id__in=risk_news_ids).update(is_delete=False)
+
+    def paging(self, queryset):
+        page = (int(self.query_params['start']) /
+                int(self.query_params['length'])) + 1
+        return super(RiskNewsUpdate, self).paging(queryset, page, self.query_params['length'])
+
+    def serialize(self, queryset):
+        results = self.paging(queryset)
+        data = {
+            "draw": self.query_params['draw'],
+            "recordsTotal": NewsQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
+            "recordsFiltered": NewsQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
+            "data": map(lambda r: {
+                'id': r['id'],
+                'titleAndurl': [r['title'], r['url']],
+                'time': utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d'),
+                'source': r['publisher__name']
+            }, results)
+        }
+
+        return data
+
+    def get(self, request):
+        self.set_params(request.GET)
+
+        limit = int(self.query_params.get('limit', 0))
+
+        queryset = NewsQuerySet(params=self.query_params).get_news_list(
+            self.query_params['search[value]'].strip()).order_by('-pubtime')
+
+        if limit:
+            queryset = queryset[:limit]
+
+        return Response(self.serialize(queryset))
+
+
+class RiskNewsDelete(BaseView):
+
+    def __init__(self):
+        super(RiskNewsDelete, self).__init__()
+
+    def set_params(self, params):
+        for k, v in params.iteritems():
+            self.query_params[k] = v
+
+    def delete(self, queryset):
+        risk_news_ids = self.query_params['risk_news_ids']
+        RiskNews.objects.filter(id__in=risk_news_ids).delete()
+
+    def paging(self, queryset):
+        page = (int(self.query_params['start']) /
+                int(self.query_params['length'])) + 1
+        return super(RiskNewsDelete, self).paging(queryset, page, self.query_params['length'])
+
+    def serialize(self, queryset):
+        results = self.paging(queryset)
+        data = {
+            "draw": self.query_params['draw'],
+            "recordsTotal": NewsQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
+            "recordsFiltered": NewsQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
+            "data": map(lambda r: {
+                'id': r['id'],
+                'titleAndurl': [r['title'], r['url']],
+                'time': utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d'),
+                'source': r['publisher__name']
+            }, results)
+        }
+
+        return data
+
+    def get(self, request):
+        self.set_params(request.GET)
+
+        limit = int(self.query_params.get('limit', 0))
+
+        queryset = NewsQuerySet(params=self.query_params).get_news_list(
+            self.query_params['search[value]'].strip()).order_by('-pubtime')
+
+        if limit:
+            queryset = queryset[:limit]
+
+        return Response(self.serialize(queryset))
+
+
 class InspectionList(BaseView):
 
     def __init__(self):
