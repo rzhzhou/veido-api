@@ -10,5 +10,8 @@ class Job(HourlyJob):
     help = "Get Cleansing job."
 
     def execute(self):
+        print "CLEANSING RISKNEWS START!"
         for corpus_obj in Corpus.objects.exclude(invalidword=u''):
-            RiskNews.objects.filter(industry=corpus_obj.industry).filter(title__contains=corpus_obj.invalidword).delete()
+            for invalidword in corpus_obj.invalidword.split(' '):
+                RiskNews.objects.filter(industry=corpus_obj.industry).filter(title__contains=invalidword).update(is_delete=True)
+        print "CLEANSING RISKNEWS END!"

@@ -233,7 +233,7 @@ class RiskKeyword(models.Model):
 
 
 class RiskNews(models.Model):
-    objects    = SearchManager(['title', 'content'])
+    objects = SearchManager(['title', 'content'])
 
     title = models.CharField(max_length=255, blank=True, verbose_name=u'标题')
     url = models.URLField(verbose_name=u'网站链接')
@@ -241,7 +241,8 @@ class RiskNews(models.Model):
     pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
     publisher = models.ForeignKey(RiskNewsPublisher, verbose_name=u'文章发布者')
     reprinted = models.IntegerField(verbose_name=u'转载数')
-
+    is_delete = models.BooleanField(default=0, verbose_name=u'是否删除')
+    
     area = models.ManyToManyField(Area, related_name='rareas',
                                   related_query_name='rarea', verbose_name=u'地域')
     industry = models.ManyToManyField(Industry, related_name='industrys',
@@ -452,4 +453,3 @@ class InternetScore(models.Model):
 
     def __unicode__(self):
         return str(self.score)
-
