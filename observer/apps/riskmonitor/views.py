@@ -26,7 +26,8 @@ from observer.apps.riskmonitor.service.dashboard import Dashboard
 from observer.apps.riskmonitor.service.enterprise import EnterpriseRank
 from observer.apps.riskmonitor.service.industry import IndustryTrack
 from observer.apps.riskmonitor.service.inspection import InspectionQuerySet
-from observer.apps.riskmonitor.service.news import NewsQuerySet
+from observer.apps.riskmonitor.service.news import (
+    NewsQuerySet, NewsRecycleQuerySet)
 from observer.apps.riskmonitor.jobs.hourly.dashboard import Job as DashboardJob
 from observer.apps.riskmonitor.jobs.hourly.industries import Job as IndustriesJob
 from observer.utils.date import pretty
@@ -730,10 +731,54 @@ class RiskNewsList(BaseView):
         return Response(self.serialize(queryset))
 
 
+class RiskNewsRecycleList(BaseView):
+
+    def __init__(self):
+        super(RiskNewsRecycleList, self).__init__()
+
+    def set_params(self, params):
+        for k, v in params.iteritems():
+            self.query_params[k] = v
+
+    def paging(self, queryset):
+        page = (int(self.query_params['start']) /
+                int(self.query_params['length'])) + 1
+        return super(RiskNewsRecycleList, self).paging(queryset, page, self.query_params['length'])
+
+    def serialize(self, queryset):
+        results = self.paging(queryset)
+        data = {
+            "draw": self.query_params['draw'],
+            "recordsTotal": NewsRecycleQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
+            "recordsFiltered": NewsRecycleQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
+            "data": map(lambda r: {
+                'id': r['id'],
+                'titleAndurl': [r['title'], r['url']],
+                'time': utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d'),
+                'source': r['publisher__name']
+            }, results)
+        }
+
+        return data
+
+    def get(self, request):
+        self.set_params(request.GET)
+
+        limit = int(self.query_params.get('limit', 0))
+
+        queryset = NewsRecycleQuerySet(params=self.query_params).get_news_list(
+            self.query_params['search[value]'].strip()).order_by('-pubtime')
+
+        if limit:
+            queryset = queryset[:limit]
+
+        return Response(self.serialize(queryset))
+
+
 class RiskNewsDetail(BaseView):
 
     def __init__(self):
-        super(RiskNewsList, self).__init__()
+        super(RiskNewsDetail, self).__init__()
 
     def set_params(self, request):
         super(RiskNewsDetail, self).set_params(request.GET)
