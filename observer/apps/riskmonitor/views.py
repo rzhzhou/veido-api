@@ -810,11 +810,10 @@ class RiskNewsUpdate(BaseView):
         for k, v in params.iteritems():
             self.query_params[k] = v
 
-    def update(self, queryset):
-        risk_news_ids = self.query_params['risk_news_ids']
-        RiskNews.objects.filter(id__in=risk_news_ids).update(is_delete=False)
-
     def paging(self, queryset):
+        risk_news_ids = self.query_params['risk_news_ids']
+        risk_news_ids_list =  risk_news_ids.split(",")
+        RiskNews.objects.filter(id__in=risk_news_ids_list[0:len(risk_news_ids_list)-1:1]).update(is_delete=True)
         page = (int(self.query_params['start']) /
                 int(self.query_params['length'])) + 1
         return super(RiskNewsUpdate, self).paging(queryset, page, self.query_params['length'])
