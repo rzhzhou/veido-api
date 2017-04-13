@@ -7,7 +7,7 @@ from observer.apps.riskmonitor.views import (Analytics, AnalyticsExport,
                                              IndustryDetail, IndustryList,
                                              NewsDetail, NewsList, RiskNewsList,
                                              RiskNewsRecycleList,
-                                             RiskNewsUpdate, RiskNewsDelete, 
+                                             RiskNewsRecycle, RiskNewsRestore, RiskNewsDelete, 
                                              InspectionList, Search)
 
 urlpatterns = [
@@ -17,8 +17,9 @@ urlpatterns = [
     url(r'^news$', NewsList.as_view()),
     url(r'^news/(?P<pk>[0-9]+)$', NewsDetail.as_view()),
     url(r'^risknews$', RiskNewsList.as_view()),
-    url(r'^risknews_recycle$', RiskNewsRecycleList.as_view()),
-    url(r'^risknews_update$', RiskNewsUpdate.as_view()),
+    url(r'^risknews_list$', RiskNewsRecycleList.as_view()),
+    url(r'^risknews_recycle$', RiskNewsRecycle.as_view()),
+    url(r'^risknews_restore$', RiskNewsRestore.as_view()),
     url(r'^risknews_delete$', RiskNewsDelete.as_view()),
     url(r'^inspection$', InspectionList.as_view()),
     url(r'^enterprises$', EnterpriseList.as_view()),
