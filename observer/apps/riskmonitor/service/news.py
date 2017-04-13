@@ -31,6 +31,23 @@ class NewsQuerySet(Abstract):
 
         return queryset
 
+    def get_all_news_list(self, search_value):
+        fields = ('id', 'title', 'pubtime', 'url')
+
+        max_id = RiskNews.objects.all().aggregate(Max('id'))
+
+        args = {
+            'id__lte': max_id.get('id__max'),
+            'is_delete': False,
+        }
+
+        if search_value:
+            queryset = RiskNews.objects.search(search_value)
+        else:
+            queryset = RiskNews.objects.filter(**args)
+
+        return queryset
+
     def cal_date_range(self, x_axis_units):
         if x_axis_units == 'day':
             cal_date_func = lambda x: (
@@ -151,6 +168,23 @@ class NewsRecycleQuerySet(Abstract):
             queryset = RiskNews.objects.search(search_value).values(*fields)
         else:
             queryset = RiskNews.objects.filter(**args).values(*fields)
+
+        return queryset
+
+    def get_all_news_list(self, search_value):
+        fields = ('id', 'title', 'pubtime', 'url')
+
+        max_id = RiskNews.objects.all().aggregate(Max('id'))
+
+        args = {
+            'id__lte': max_id.get('id__max'),
+            'is_delete': True,
+        }
+
+        if search_value:
+            queryset = RiskNews.objects.search(search_value)
+        else:
+            queryset = RiskNews.objects.filter(**args)
 
         return queryset
 
