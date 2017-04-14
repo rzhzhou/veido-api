@@ -25,7 +25,7 @@ class NewsQuerySet(Abstract):
         }
 
         if search_value:
-            queryset = RiskNews.objects.search(search_value).values(*fields)
+            queryset = RiskNews.objects.search(search_value).filter(**args).values(*fields)
         else:
             queryset = RiskNews.objects.filter(**args).values(*fields)
 
@@ -42,7 +42,7 @@ class NewsQuerySet(Abstract):
         }
 
         if search_value:
-            queryset = RiskNews.objects.search(search_value)
+            queryset = RiskNews.objects.search(search_value).filter(**args)
         else:
             queryset = RiskNews.objects.filter(**args)
 
@@ -165,7 +165,7 @@ class NewsRecycleQuerySet(Abstract):
         }
 
         if search_value:
-            queryset = RiskNews.objects.search(search_value).values(*fields)
+            queryset = RiskNews.objects.search(search_value).filter(**args).values(*fields)
         else:
             queryset = RiskNews.objects.filter(**args).values(*fields)
 
@@ -182,7 +182,7 @@ class NewsRecycleQuerySet(Abstract):
         }
 
         if search_value:
-            queryset = RiskNews.objects.search(search_value)
+            queryset = RiskNews.objects.search(search_value).filter(**args)
         else:
             queryset = RiskNews.objects.filter(**args)
 
