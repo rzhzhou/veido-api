@@ -113,7 +113,7 @@ class IndustryTrack(NewsQuerySet):
             industry = self.industry
 
         n_dimension = RiskNews.objects.filter(
-            industry__id=industry, pubtime__gte=self.start, pubtime__lt=self.end)
+            industry__id=industry, pubtime__gte=self.start, pubtime__lt=self.end, is_delete=False)
         risk_keyword__ids = map(
             lambda x: x['risk_keyword__id'], n_dimension.values('risk_keyword__id'))
 
@@ -242,7 +242,7 @@ class IndustryTrack(NewsQuerySet):
                 InternetScore.objects.get(pubtime=pubtime)).score
         except:
             n_dimension = RiskNews.objects.filter(
-                pubtime__gte=self.start, pubtime__lt=self.end).count()
+                pubtime__gte=self.start, pubtime__lt=self.end, is_delete=False).count()
             internet_score = 100 - n_dimension / area_industry_count * 0.5
             if (100 - n_dimension / area_industry_count * 0.5) < 60:
                 internet_score = randint(30, 60)
