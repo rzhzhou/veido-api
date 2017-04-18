@@ -711,7 +711,9 @@ class RiskNewsList(BaseView):
                 'id': r['id'],
                 'titleAndurl': [r['title'], r['url']],
                 'time': utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d'),
-                'source': r['publisher__name']
+                'source': r['publisher__name'], 
+                'industry': r['industry__name'],
+                'riskKeyword':r['risk_keyword__name'],
             }, results)
         }
 
@@ -755,7 +757,9 @@ class RiskNewsRecycleList(BaseView):
                 'id': r['id'],
                 'titleAndurl': [r['title'], r['url']],
                 'time': utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d'),
-                'source': r['publisher__name']
+                'source': r['publisher__name'],
+                'industry': r['industry__name'],
+                'riskKeyword':r['risk_keyword__name']
             }, results)
         }
 
@@ -831,7 +835,9 @@ class RiskNewsRecycle(BaseView):
                 'id': r['id'],
                 'titleAndurl': [r['title'], r['url']],
                 'time': utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d'),
-                'source': r['publisher__name']
+                'source': r['publisher__name'],
+                'industry': r['industry__name'],
+                'riskKeyword':r['risk_keyword__name'],
             }, results)
         }
 
@@ -881,7 +887,9 @@ class RiskNewsRestore(BaseView):
                 'id': r['id'],
                 'titleAndurl': [r['title'], r['url']],
                 'time': utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d'),
-                'source': r['publisher__name']
+                'source': r['publisher__name'],
+                'industry': r['industry__name'],
+                'riskKeyword':r['risk_keyword__name'],
             }, results)
         }
 
@@ -931,7 +939,9 @@ class RiskNewsDelete(BaseView):
                 'id': r['id'],
                 'titleAndurl': [r['title'], r['url']],
                 'time': utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d'),
-                'source': r['publisher__name']
+                'source': r['publisher__name'],
+                'industry': r['industry__name'],
+                'riskKeyword':r['risk_keyword__name'],
             }, results)
         }
 

@@ -15,7 +15,7 @@ class NewsQuerySet(Abstract):
         super(NewsQuerySet, self).__init__(params)
 
     def get_news_list(self, search_value):
-        fields = ('id', 'title', 'pubtime', 'url', 'publisher__name')
+        fields = ('id', 'title', 'pubtime', 'url', 'publisher__name', 'industry__name', 'risk_keyword__name')
 
         max_id = RiskNews.objects.all().aggregate(Max('id'))
 
@@ -155,7 +155,7 @@ class NewsRecycleQuerySet(Abstract):
         super(NewsRecycleQuerySet, self).__init__(params)
 
     def get_news_list(self, search_value):
-        fields = ('id', 'title', 'pubtime', 'url', 'publisher__name')
+        fields = ('id', 'title', 'pubtime', 'url', 'publisher__name', 'industry__name', 'risk_keyword__name')
 
         max_id = RiskNews.objects.all().aggregate(Max('id'))
 
