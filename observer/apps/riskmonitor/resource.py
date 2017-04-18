@@ -5,13 +5,13 @@ from datetime import datetime
 
 from django.conf import settings
 
-from import_export.widgets import (
-    DateTimeWidget, ForeignKeyWidget, IntegerWidget, ManyToManyWidget)
+from import_export.widgets import (DateTimeWidget, ForeignKeyWidget,
+                                   IntegerWidget, ManyToManyWidget)
 from import_export import widgets
 from import_export import resources, fields
 from observer.apps.origin.models import Area, Enterprise, Industry
-from observer.apps.riskmonitor.models import (
-    Area, ConsumeIndex, ManageIndex, SocietyIndex, RiskKeyword, RiskNews, RiskNewsPublisher)
+from observer.apps.riskmonitor.models import (Area, ConsumeIndex, ManageIndex, SocietyIndex,
+                                              RiskNews, RiskNewsPublisher)
 
 
 class RiskNewsResources(resources.ModelResource):
@@ -36,11 +36,17 @@ class RiskNewsResources(resources.ModelResource):
         column_name=u'转载数',
         widget=IntegerWidget()
     )
-
+    is_delete = fields.Field(
+        attribute='is_delete',
+        column_name=u'是否删除',
+    )
     risk_keyword = fields.Field(
         attribute='risk_keyword',
         column_name=u'风险新闻关键词',
-        widget=ForeignKeyWidget(RiskKeyword, 'name')
+    )
+    invalid_keyword = fields.Field(
+        attribute='invalid_keyword',
+        column_name=u'无效关键词',
     )
     publisher = fields.Field(
         attribute='publisher',
@@ -66,9 +72,9 @@ class RiskNewsResources(resources.ModelResource):
     class Meta:
         model = RiskNews
         fields = ('id', 'title', 'url', 'content', 'pubtime', 'reprinted',
-                  'publisher', 'area', 'industry', 'enterprise', 'risk_keyword')
+                  'publisher', 'area', 'industry', 'enterprise', 'is_delete', 'risk_keyword', 'invalid_keyword',)
         export_order = ('id', 'title', 'url', 'content', 'pubtime', 'reprinted',
-                        'publisher', 'area', 'industry', 'enterprise', 'risk_keyword')
+                        'publisher', 'area', 'industry', 'enterprise', 'is_delete', 'risk_keyword', 'invalid_keyword',)
 
     def before_save_instance(self, instance, dry_run, temp=''):
         if not instance.pubtime:
@@ -101,8 +107,10 @@ class ConsumeIndexResources(resources.ModelResource):
 
     class Meta:
         model = ConsumeIndex
-        fields = ('id', 'force', 'close', 'consume', 'year', 'industry', 'area')
-        export_order = ('id', 'force', 'close', 'consume', 'year', 'industry', 'area')
+        fields = ('id', 'force', 'close', 'consume',
+                  'year', 'industry', 'area')
+        export_order = ('id', 'force', 'close', 'consume',
+                        'year', 'industry', 'area')
 
 
 class SocietyIndexResources(resources.ModelResource):
@@ -124,7 +132,8 @@ class SocietyIndexResources(resources.ModelResource):
 
     class Meta:
         model = SocietyIndex
-        fields = ('id', 'trade', 'qualified', 'accident', 'year', 'industry', 'area')
+        fields = ('id', 'trade', 'qualified',
+                  'accident', 'year', 'industry', 'area')
         export_order = ('id', 'trade', 'qualified',
                         'accident', 'year', 'industry', 'area')
 

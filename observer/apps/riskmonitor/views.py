@@ -711,9 +711,10 @@ class RiskNewsList(BaseView):
                 'id': r['id'],
                 'titleAndurl': [r['title'], r['url']],
                 'time': utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d'),
-                'source': r['publisher__name'], 
+                'risk_keyword':r['risk_keyword'],
+                'invalid_keyword':r['invalid_keyword'],
+                'source': r['publisher__name'],
                 'industry': r['industry__name'],
-                'riskKeyword':r['risk_keyword__name'],
             }, results)
         }
 
@@ -757,9 +758,10 @@ class RiskNewsRecycleList(BaseView):
                 'id': r['id'],
                 'titleAndurl': [r['title'], r['url']],
                 'time': utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d'),
+                'risk_keyword':r['risk_keyword'],
+                'invalid_keyword':r['invalid_keyword'],
                 'source': r['publisher__name'],
                 'industry': r['industry__name'],
-                'riskKeyword':r['risk_keyword__name']
             }, results)
         }
 
@@ -835,9 +837,10 @@ class RiskNewsRecycle(BaseView):
                 'id': r['id'],
                 'titleAndurl': [r['title'], r['url']],
                 'time': utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d'),
+                'risk_keyword':r['risk_keyword'],
+                'invalid_keyword':r['invalid_keyword'],
                 'source': r['publisher__name'],
                 'industry': r['industry__name'],
-                'riskKeyword':r['risk_keyword__name'],
             }, results)
         }
 
@@ -887,9 +890,10 @@ class RiskNewsRestore(BaseView):
                 'id': r['id'],
                 'titleAndurl': [r['title'], r['url']],
                 'time': utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d'),
+                'risk_keyword':r['risk_keyword'],
+                'invalid_keyword':r['invalid_keyword'],
                 'source': r['publisher__name'],
                 'industry': r['industry__name'],
-                'riskKeyword':r['risk_keyword__name'],
             }, results)
         }
 
@@ -939,9 +943,10 @@ class RiskNewsDelete(BaseView):
                 'id': r['id'],
                 'titleAndurl': [r['title'], r['url']],
                 'time': utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d'),
+                'risk_keyword':r['risk_keyword'],
+                'invalid_keyword':r['invalid_keyword'],
                 'source': r['publisher__name'],
                 'industry': r['industry__name'],
-                'riskKeyword':r['risk_keyword__name'],
             }, results)
         }
 

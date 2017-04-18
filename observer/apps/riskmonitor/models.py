@@ -221,20 +221,7 @@ class RiskNewsPublisher(models.Model):
         return self.name
 
 
-class RiskKeyword(models.Model):
-    name = models.CharField(max_length=255, verbose_name=u'关键词')
-
-    class Meta:
-        db_table = 'risk_keyword'
-        verbose_name_plural = u'风险新闻关键词'
-
-    def __unicode__(self):
-        return self.name
-
-
 class RiskNews(models.Model):
-    objects = SearchManager(['title', 'content'])
-
     title = models.CharField(max_length=255, blank=True, verbose_name=u'标题')
     url = models.URLField(verbose_name=u'网站链接')
     content = HTMLField(blank=True, verbose_name=u'正文')
@@ -242,19 +229,31 @@ class RiskNews(models.Model):
     publisher = models.ForeignKey(RiskNewsPublisher, verbose_name=u'文章发布者')
     reprinted = models.IntegerField(verbose_name=u'转载数')
     is_delete = models.BooleanField(default=0, verbose_name=u'是否删除')
-    
-    area = models.ManyToManyField(Area, related_name='rareas',
-                                  related_query_name='rarea', verbose_name=u'地域')
-    industry = models.ManyToManyField(Industry, related_name='industrys',
-                                      related_query_name='industry', verbose_name=u'行业')
-    enterprise = models.ManyToManyField(Enterprise, related_name='enterprises',
-                                        related_query_name='enterprise', verbose_name=u'企业')
+    risk_keyword = models.CharField(max_length=255, blank=True, default=u'', verbose_name=u'风险新闻关键词')
+    invalid_keyword = models.CharField(max_length=255, blank=True, default=u'', verbose_name=u'无效关键词')
 
-    risk_keyword = models.ForeignKey(RiskKeyword, null=True, blank=True,
-                                     default=u'', verbose_name=u'风险新闻关键词')
+    area = models.ManyToManyField(
+        Area,
+        related_name='rareas',
+        related_query_name='rarea',
+        verbose_name=u'地域'
+    )
+
+    industry = models.ManyToManyField(
+        Industry,
+        related_name='industrys',
+        related_query_name='industry',
+        verbose_name=u'行业'
+    )
+
+    enterprise = models.ManyToManyField(
+        Enterprise,
+        related_name='enterprises',
+        related_query_name='enterprise',
+        verbose_name=u'企业'
+    )
 
     class Meta:
-        app_label = 'riskmonitor'
         db_table = 'risk_news'
         verbose_name_plural = u'风险新闻'
         ordering = ['-pubtime']
