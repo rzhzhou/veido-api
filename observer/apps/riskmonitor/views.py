@@ -714,7 +714,6 @@ class RiskNewsList(BaseView):
                 'risk_keyword':r['risk_keyword'],
                 'invalid_keyword':r['invalid_keyword'],
                 'source': r['publisher__name'],
-                'industry': r['industry__name'],
             }, results)
         }
 
@@ -761,7 +760,6 @@ class RiskNewsRecycleList(BaseView):
                 'risk_keyword':r['risk_keyword'],
                 'invalid_keyword':r['invalid_keyword'],
                 'source': r['publisher__name'],
-                'industry': r['industry__name'],
             }, results)
         }
 
@@ -840,7 +838,6 @@ class RiskNewsRecycle(BaseView):
                 'risk_keyword':r['risk_keyword'],
                 'invalid_keyword':r['invalid_keyword'],
                 'source': r['publisher__name'],
-                'industry': r['industry__name'],
             }, results)
         }
 
@@ -893,7 +890,6 @@ class RiskNewsRestore(BaseView):
                 'risk_keyword':r['risk_keyword'],
                 'invalid_keyword':r['invalid_keyword'],
                 'source': r['publisher__name'],
-                'industry': r['industry__name'],
             }, results)
         }
 
@@ -946,7 +942,6 @@ class RiskNewsDelete(BaseView):
                 'risk_keyword':r['risk_keyword'],
                 'invalid_keyword':r['invalid_keyword'],
                 'source': r['publisher__name'],
-                'industry': r['industry__name'],
             }, results)
         }
 
