@@ -114,10 +114,10 @@ class IndustryTrack(NewsQuerySet):
 
         n_dimension = RiskNews.objects.filter(
             industry__id=industry, pubtime__gte=self.start, pubtime__lt=self.end, is_delete=False)
-        risk_keyword__ids = map(
-            lambda x: x['risk_keyword__id'], n_dimension.values('risk_keyword__id'))
+        risk_keyword_list = map(
+            lambda x: x['risk_keyword'], n_dimension.values('risk_keyword'))
 
-        risk_keywords_set = set(risk_keyword__ids)
+        risk_keywords_set = set(risk_keyword_list)
         time_interval = int(str(self.end.__sub__(
             self.start)).split(",")[0].split(' ')[0])
         risk_news_count = n_dimension.count()
@@ -128,9 +128,9 @@ class IndustryTrack(NewsQuerySet):
             risk_news_count = risk_news_count / 12
 
         n_score = 1
-        for risk_keyword_id in risk_keywords_set:
+        for risk_keyword in risk_keywords_set:
             # 得到每个风险关键词出现的次数
-            count = risk_keyword__ids.count(risk_keyword_id)
+            count = risk_keyword_list.count(risk_keyword)
             # 如果一个风险关键词出现次数过高, 就让其分值变大
             if count > 10:
                 n_score = 1.2
