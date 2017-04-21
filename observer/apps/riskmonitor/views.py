@@ -596,7 +596,7 @@ class NewsList(BaseView):
     def get(self, request):
         self.set_params(request)
 
-        queryset = NewsQuerySet(params=self.query_params).get_news_list()
+        queryset = NewsQuerySet(params=self.query_params).get_all_news_list()
 
         return Response(self.serialize(queryset))
 
@@ -705,8 +705,8 @@ class RiskNewsList(BaseView):
         results = self.paging(queryset)
         data = {
             "draw": self.query_params['draw'],
-            "recordsTotal": NewsQuerySet(params=self.query_params).get_all_news_list(self.query_params['search[value]'].strip()).count(),
-            "recordsFiltered": NewsQuerySet(params=self.query_params).get_all_news_list(self.query_params['search[value]'].strip()).count(),
+            "recordsTotal": NewsQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
+            "recordsFiltered": NewsQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
             "data": map(lambda r: {
                 'id': r['id'],
                 'titleAndurl': [r['title'], r['url']],
@@ -831,8 +831,8 @@ class RiskNewsRecycle(BaseView):
         results = self.paging(queryset)
         data = {
             "draw": self.query_params['draw'],
-            "recordsTotal": NewsQuerySet(params=self.query_params).get_all_news_list(self.query_params['search[value]'].strip()).count(),
-            "recordsFiltered": NewsQuerySet(params=self.query_params).get_all_news_list(self.query_params['search[value]'].strip()).count(),
+            "recordsTotal": NewsQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
+            "recordsFiltered": NewsQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
             "data": map(lambda r: {
                 'id': r['id'],
                 'titleAndurl': [r['title'], r['url']],
@@ -884,8 +884,8 @@ class RiskNewsRestore(BaseView):
         results = self.paging(queryset)
         data = {
             "draw": self.query_params['draw'],
-            "recordsTotal": NewsRecycleQuerySet(params=self.query_params).get_all_news_list(self.query_params['search[value]'].strip()).count(),
-            "recordsFiltered": NewsRecycleQuerySet(params=self.query_params).get_all_news_list(self.query_params['search[value]'].strip()).count(),
+            "recordsTotal": NewsRecycleQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
+            "recordsFiltered": NewsRecycleQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
             "data": map(lambda r: {
                 'id': r['id'],
                 'titleAndurl': [r['title'], r['url']],
@@ -937,8 +937,8 @@ class RiskNewsDelete(BaseView):
         results = self.paging(queryset)
         data = {
             "draw": self.query_params['draw'],
-            "recordsTotal": NewsRecycleQuerySet(params=self.query_params).get_all_news_list(self.query_params['search[value]'].strip()).count(),
-            "recordsFiltered": NewsRecycleQuerySet(params=self.query_params).get_all_news_list(self.query_params['search[value]'].strip()).count(),
+            "recordsTotal": NewsRecycleQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
+            "recordsFiltered": NewsRecycleQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
             "data": map(lambda r: {
                 'id': r['id'],
                 'titleAndurl': [r['title'], r['url']],

@@ -25,9 +25,9 @@ class NewsQuerySet(Abstract):
         }
 
         if search_value:
-            queryset = RiskNews.objects.search(search_value).filter(**args).values(*fields)
-        else:
-            queryset = RiskNews.objects.filter(**args).values(*fields)
+            args['title__contains'] = search_value
+            
+        queryset = RiskNews.objects.filter(**args).values(*fields)
 
         return queryset
 
@@ -42,9 +42,9 @@ class NewsQuerySet(Abstract):
         }
 
         if search_value:
-            queryset = RiskNews.objects.search(search_value).filter(**args)
-        else:
-            queryset = RiskNews.objects.filter(**args)
+            args['title__contains'] = search_value
+            
+        queryset = RiskNews.objects.filter(**args).values(*fields)
 
         return queryset
 
@@ -163,11 +163,11 @@ class NewsRecycleQuerySet(Abstract):
             'id__lte': max_id.get('id__max'),
             'is_delete': True,
         }
-
+        
         if search_value:
-            queryset = RiskNews.objects.search(search_value).filter(**args).values(*fields)
-        else:
-            queryset = RiskNews.objects.filter(**args).values(*fields)
+            args['title__contains'] = search_value
+            
+        queryset = RiskNews.objects.filter(**args).values(*fields)
 
         return queryset
 
@@ -182,9 +182,9 @@ class NewsRecycleQuerySet(Abstract):
         }
 
         if search_value:
-            queryset = RiskNews.objects.search(search_value).filter(**args)
-        else:
-            queryset = RiskNews.objects.filter(**args)
+            args['title__contains'] = search_value
+            
+        queryset = RiskNews.objects.filter(**args).values(*fields)
 
         return queryset
 
