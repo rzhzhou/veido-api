@@ -37,12 +37,11 @@ from observer.apps.riskmonitor.models import (Brand, Enterprise, Industry,
 #     list_filter = ('weight', 'metrics', 'product')
 
 class AreaIndustryAdmin(ForeignKeyAutocompleteAdmin):
-    related_search_fields = {'industry': ('name',)}
+    related_search_fields = {'industry': ('name',), 'area': ('name',)}
     fields = ('name', 'area', 'industry')
     list_display = ('name', 'area', 'industry')
-    search_fields = ('name', 'industry__name')
+    search_fields = ('name', 'industry__name', 'area__name')
     list_filter = ('area', 'industry__level')
-
 
 # class UserEnterpriseAdmin(admin.ModelAdmin):
 #     fields = ('user', 'enterprise')
