@@ -711,10 +711,10 @@ class RiskNewsList(BaseView):
                 'id': r['id'],
                 'titleAndurl': [r['title'], r['url']],
                 'time': utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d'),
-                'risk_keyword':r['risk_keyword'],
-                'invalid_keyword':r['invalid_keyword'],
+                'risk_keyword': r['risk_keyword'],
+                'invalid_keyword': r['invalid_keyword'],
                 'source': r['publisher__name'],
-                'industry':r['industry__name'],
+                'industry': r['industry__name'],
             }, results)
         }
 
@@ -758,10 +758,10 @@ class RiskNewsRecycleList(BaseView):
                 'id': r['id'],
                 'titleAndurl': [r['title'], r['url']],
                 'time': utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d'),
-                'risk_keyword':r['risk_keyword'],
-                'invalid_keyword':r['invalid_keyword'],
+                'risk_keyword': r['risk_keyword'],
+                'invalid_keyword': r['invalid_keyword'],
                 'source': r['publisher__name'],
-                'industry':r['industry__name'],
+                'industry': r['industry__name'],
             }, results)
         }
 
@@ -819,7 +819,8 @@ class RiskNewsRecycle(BaseView):
     def recycle(self):
         risk_news_ids = self.query_params['risk_news_ids']
         risk_news_ids_list = risk_news_ids.split(",")
-        RiskNews.objects.filter(id__in=risk_news_ids_list[0:len(risk_news_ids_list) - 1:1]).update(is_delete=True)
+        RiskNews.objects.filter(id__in=risk_news_ids_list[0:len(
+            risk_news_ids_list) - 1:1]).update(is_delete=True)
 
     def paging(self, queryset):
         self.recycle()
@@ -837,10 +838,10 @@ class RiskNewsRecycle(BaseView):
                 'id': r['id'],
                 'titleAndurl': [r['title'], r['url']],
                 'time': utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d'),
-                'risk_keyword':r['risk_keyword'],
-                'invalid_keyword':r['invalid_keyword'],
+                'risk_keyword': r['risk_keyword'],
+                'invalid_keyword': r['invalid_keyword'],
                 'source': r['publisher__name'],
-                'industry':r['industry__name'],
+                'industry': r['industry__name'],
             }, results)
         }
 
@@ -872,7 +873,8 @@ class RiskNewsRestore(BaseView):
     def restore(self):
         risk_news_ids = self.query_params['risk_news_ids']
         risk_news_ids_list = risk_news_ids.split(",")
-        RiskNews.objects.filter(id__in=risk_news_ids_list[0:len(risk_news_ids_list) - 1:1]).update(is_delete=False)
+        RiskNews.objects.filter(id__in=risk_news_ids_list[0:len(
+            risk_news_ids_list) - 1:1]).update(is_delete=False)
 
     def paging(self, queryset):
         self.restore()
@@ -890,10 +892,10 @@ class RiskNewsRestore(BaseView):
                 'id': r['id'],
                 'titleAndurl': [r['title'], r['url']],
                 'time': utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d'),
-                'risk_keyword':r['risk_keyword'],
-                'invalid_keyword':r['invalid_keyword'],
+                'risk_keyword': r['risk_keyword'],
+                'invalid_keyword': r['invalid_keyword'],
                 'source': r['publisher__name'],
-                'industry':r['industry__name'],
+                'industry': r['industry__name'],
             }, results)
         }
 
@@ -925,7 +927,8 @@ class RiskNewsDelete(BaseView):
     def delete(self):
         risk_news_ids = self.query_params['risk_news_ids']
         risk_news_ids_list = risk_news_ids.split(",")
-        RiskNews.objects.filter(id__in=risk_news_ids_list[0:len(risk_news_ids_list) - 1:1]).delete()
+        RiskNews.objects.filter(id__in=risk_news_ids_list[
+                                0:len(risk_news_ids_list) - 1:1]).delete()
 
     def paging(self, queryset):
         self.delete()
@@ -943,10 +946,10 @@ class RiskNewsDelete(BaseView):
                 'id': r['id'],
                 'titleAndurl': [r['title'], r['url']],
                 'time': utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d'),
-                'risk_keyword':r['risk_keyword'],
-                'invalid_keyword':r['invalid_keyword'],
+                'risk_keyword': r['risk_keyword'],
+                'invalid_keyword': r['invalid_keyword'],
                 'source': r['publisher__name'],
-                'industry':r['industry__name'],
+                'industry': r['industry__name'],
             }, results)
         }
 
@@ -1214,7 +1217,7 @@ class Search(BaseView):
         # Exclude $cond None Value
         args = dict([(k, v) for k, v in cond.iteritems() if v is not None])
         args['is_delete'] = False
-        
+
         if self.query_params['keyword']:
             queryset = RiskNews.objects.filter(
                 Q(title__contains=self.query_params['keyword']) |
@@ -1223,6 +1226,63 @@ class Search(BaseView):
             )
         else:
             queryset = RiskNews.objects.filter(**args)
+
+        queryset = queryset.distinct()
+
+        return Response(self.serialize(queryset))
+
+
+class SearchIndustry(BaseView):
+
+    def __init__(self):
+        super(SearchIndustry, self).__init__()
+
+    def set_params(self, request):
+        self.query_params['keyword'] = request.GET.get('keyword')
+
+    def serialize(self, queryset):
+        data = [{
+            'id': q.id,
+            'name': q.name,
+            'level': q.level,
+        } for q in queryset]
+
+        return data
+
+    def get(self, request):
+        self.set_params(request)
+
+        queryset = Industry.objects.filter(
+            Q(name__contains=self.query_params['keyword'])
+        )
+
+        queryset = queryset.distinct()
+
+        return Response(self.serialize(queryset))
+
+
+class SearchPublisher(BaseView):
+
+    def __init__(self):
+        super(SearchPublisher, self).__init__()
+
+    def set_params(self, request):
+        self.query_params['keyword'] = request.GET.get('keyword')
+
+    def serialize(self, queryset):
+        data = [{
+            'id': q.id,
+            'name': q.name,
+        } for q in queryset]
+
+        return data
+
+    def get(self, request):
+        self.set_params(request)
+
+        queryset = RiskNewsPublisher.objects.filter(
+            Q(name__contains=self.query_params['keyword'])
+        )
 
         queryset = queryset.distinct()
 
