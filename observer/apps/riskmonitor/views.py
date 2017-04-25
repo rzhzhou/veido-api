@@ -1238,7 +1238,7 @@ class SearchIndustry(BaseView):
         super(SearchIndustry, self).__init__()
 
     def set_params(self, request):
-        self.query_params['keyword'] = request.GET.get('keyword')
+        self.query_params['term'] = request.GET.get('term')
 
     def serialize(self, queryset):
         data = [{
@@ -1253,7 +1253,7 @@ class SearchIndustry(BaseView):
         self.set_params(request)
 
         queryset = Industry.objects.filter(
-            Q(name__contains=self.query_params['keyword'])
+            Q(name__contains=self.query_params['term'])
         )
 
         queryset = queryset.distinct()
@@ -1267,7 +1267,7 @@ class SearchPublisher(BaseView):
         super(SearchPublisher, self).__init__()
 
     def set_params(self, request):
-        self.query_params['keyword'] = request.GET.get('keyword')
+        self.query_params['term'] = request.GET.get('term')
 
     def serialize(self, queryset):
         data = [{
@@ -1281,7 +1281,7 @@ class SearchPublisher(BaseView):
         self.set_params(request)
 
         queryset = RiskNewsPublisher.objects.filter(
-            Q(name__contains=self.query_params['keyword'])
+            Q(name__contains=self.query_params['term'])
         )
 
         queryset = queryset.distinct()
