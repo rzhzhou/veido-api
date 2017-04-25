@@ -5,7 +5,8 @@ from import_export.admin import ImportExportActionModelAdmin
 from import_export.admin import ImportExportModelAdmin
 from daterange_filter.filter import DateRangeFilter
 from observer.apps.origin.models import (Area, Enterprise, Industry,
-                                         InspectionPublisher, Inspection)
+                                         InspectionPublisher, Inspection,
+                                         ProductBenchmark, IndustryScore)
 from observer.apps.origin.resource import (InspectionPublisherResources,
                                            InspectionResources, EnterpriseResources)
 
@@ -45,8 +46,22 @@ class InspectionAdmin(ImportExportActionModelAdmin):
     list_filter = (('pubtime', DateRangeFilter), 'industry', 'qualitied',)
 
 
+class ProductBenchmarkAdmin(admin.ModelAdmin):
+    search_fields = ('name', 'code', 'level', 'parent', )
+    list_display = ('name', 'code', 'level', 'parent', )
+    list_filter = ('level', )
+
+
+class IndustryScoreAdmin(admin.ModelAdmin):
+    search_fields = ('score', )
+    list_display = ('score', 'time',)
+    list_filter = ('score', ('time', DateRangeFilter),)
+
+
 admin.site.register(Area, AreaAdmin)
 admin.site.register(Enterprise, EnterpriseAdmin)
 admin.site.register(Industry, IndustryAdmin)
 admin.site.register(InspectionPublisher, InspectionPublisherAdmin)
 admin.site.register(Inspection, InspectionAdmin)
+admin.site.register(ProductBenchmark, ProductBenchmarkAdmin)
+admin.site.register(IndustryScore, IndustryScoreAdmin)

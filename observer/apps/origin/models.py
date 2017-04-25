@@ -21,7 +21,8 @@ class Enterprise(models.Model):
     name = models.CharField(max_length=255, verbose_name=u'企业名')
     product_name = models.CharField(
         max_length=255, null=False, blank=True, default=u'', verbose_name=u'风险产品名称')
-    issues = models.CharField(max_length=255, null=False, blank=True, default=u'', verbose_name=u'风险事项')
+    issues = models.CharField(
+        max_length=255, null=False, blank=True, default=u'', verbose_name=u'风险事项')
     area = models.ForeignKey(Area, verbose_name=u'地域')
 
     class Meta:
@@ -107,3 +108,35 @@ class Inspection(models.Model):
         db_table = 'origin_inspection'
         verbose_name_plural = u'风险抽检'
         ordering = ['-pubtime']
+
+
+class ProductBenchmark(models.Model):
+    name = models.CharField(max_length=255, verbose_name=u'名称')
+    code = models.CharField(max_length=255, verbose_name=u'编号')
+    level = models.BigIntegerField(null=False, verbose_name=u'等级')
+    parent = models.ForeignKey(
+        'self', null=True, blank=True, verbose_name=u'上一级')
+
+    class Meta:
+        app_label = 'origin'
+        verbose_name_plural = u'产品基准库'
+
+    def __unicode__(self):
+        return self.name
+
+
+class IndustryScore(models.Model):
+    score = models.BigIntegerField(verbose_name=u'分值')
+    time = models.DateField(verbose_name=u'日期')
+
+    industry = models.ForeignKey(
+        Industry, 
+        verbose_name=u'行业'
+    )
+
+    class Meta:
+        app_label = 'origin'
+        verbose_name_plural = u'行业分值'
+
+    def __unicode__(self):
+        return self.industry.name
