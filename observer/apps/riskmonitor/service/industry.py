@@ -18,8 +18,8 @@ class IndustryTrack(NewsQuerySet):
         try:
             self.area_name = self.area_name
         except Exception as e:
-            self.area_name = UserArea.objects.get(user__id=self.user_id).area.name
-
+            self.area_name = UserArea.objects.get(
+                user__id=self.user_id).area.name
 
     def trend_chart(self):
         self.days = (self.end - self.start).days
@@ -47,8 +47,10 @@ class IndustryTrack(NewsQuerySet):
         if industry == '':
             industry = self.industry
 
-        c = ConsumeIndex.objects.filter(industry__id=industry, area=UserArea.objects.get(user__id=self.user_id).area)
-        c = c if list(c) != list([]) else ConsumeIndex.objects.filter(industry__id=industry, area__name=u'全国')
+        c = ConsumeIndex.objects.filter(
+            industry__id=industry, area=UserArea.objects.get(user__id=self.user_id).area)
+        c = c if list(c) != list([]) else ConsumeIndex.objects.filter(
+            industry__id=industry, area__name=u'全国')
 
         c_dimension = (c[0].force, c[0].close, c[
                        0].consume) if c else (0, 1, 0)
@@ -66,8 +68,10 @@ class IndustryTrack(NewsQuerySet):
     def count_society_index_data(self, industry=''):
         if industry == '':
             industry = self.industry
-        s = SocietyIndex.objects.filter(industry__id=industry, area=UserArea.objects.get(user__id=self.user_id).area)
-        s = s if list(s) != list([]) else SocietyIndex.objects.filter(industry__id=industry, area__name=u'全国')
+        s = SocietyIndex.objects.filter(
+            industry__id=industry, area=UserArea.objects.get(user__id=self.user_id).area)
+        s = s if list(s) != list([]) else SocietyIndex.objects.filter(
+            industry__id=industry, area__name=u'全国')
 
         s_dimension = (s[0].trade, s[0].qualified, s[
                        0].accident) if s else (1, 1, 1)
@@ -93,8 +97,10 @@ class IndustryTrack(NewsQuerySet):
     def count_manage_index_data(self, industry=''):
         if industry == '':
             industry = self.industry
-        m = ManageIndex.objects.filter(industry__id=industry, area=UserArea.objects.get(user__id=self.user_id).area)
-        m = m if list(m) != list([]) else ManageIndex.objects.filter(industry__id=industry, area__name=u'全国')
+        m = ManageIndex.objects.filter(
+            industry__id=industry, area=UserArea.objects.get(user__id=self.user_id).area)
+        m = m if list(m) != list([]) else ManageIndex.objects.filter(
+            industry__id=industry, area__name=u'全国')
 
         m_dimension = (m[0].licence, m[0].productauth, m[0].encourage, m[
             0].limit, m[0].remove) if m else (0, 0, 0, 0, 0)
@@ -124,28 +130,26 @@ class IndustryTrack(NewsQuerySet):
 
         if time_interval > 170:
             risk_news_count = risk_news_count / 6
-        elif time_interval > 350:
+        elif time_interval > 360:
             risk_news_count = risk_news_count / 12
 
-        n_score = 1
+        n_weights = 1
         for risk_keyword in risk_keywords_set:
             # 得到每个风险关键词出现的次数
             count = risk_keyword_list.count(risk_keyword)
             # 如果一个风险关键词出现次数过高, 就让其分值变大
             if count > 10:
-                n_score = 1.2
+                n_weights = 1.2
             else:
-                n_score = 1
+                n_weights = 1
 
         if risk_news_count > 800:
-            risk_news_count = 60 - risk_news_count * 0.02
+            n_score = 60 - (risk_news_count * 0.02 * n_weights)
         elif risk_news_count > 60:
-            risk_news_count = risk_news_count - 60
-            risk_news_count = 60 - risk_news_count * 0.05
+            n_score = risk_news_count - 60
+            n_score = 60 - (risk_news_count * 0.05 * n_weights)
         else:
-            risk_news_count = 100 - risk_news_count * 0.5
-
-        n_score = risk_news_count * n_score
+            n_score = 100 - (risk_news_count * 0.5 * n_weights)
 
         if n_score < 30:
             n_color = '#bc3f2b'
