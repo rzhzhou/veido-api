@@ -695,6 +695,8 @@ class RiskNewsList(BaseView):
     def set_params(self, params):
         for k, v in params.iteritems():
             self.query_params[k] = v
+        self.industry =  self.query_params.get('industry')
+        self.publisher = self.query_params.get('publisher')
 
     def paging(self, queryset):
         page = (int(self.query_params['start']) /
@@ -705,8 +707,8 @@ class RiskNewsList(BaseView):
         results = self.paging(queryset)
         data = {
             "draw": self.query_params['draw'],
-            "recordsTotal": NewsQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
-            "recordsFiltered": NewsQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
+            "recordsTotal": NewsQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip(), self.industry, self.publisher).count(),
+            "recordsFiltered": NewsQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip(), self.industry, self.publisher).count(),
             "data": map(lambda r: {
                 'id': r['id'],
                 'titleAndurl': [r['title'], r['url']],
@@ -726,7 +728,7 @@ class RiskNewsList(BaseView):
         limit = int(self.query_params.get('limit', 0))
 
         queryset = NewsQuerySet(params=self.query_params).get_news_list(
-            self.query_params['search[value]'].strip()).order_by('-pubtime')
+            self.query_params['search[value]'].strip(), self.industry, self.publisher).order_by('-pubtime')
 
         if limit:
             queryset = queryset[:limit]
@@ -742,8 +744,8 @@ class RiskNewsRecycleList(BaseView):
     def set_params(self, params):
         for k, v in params.iteritems():
             self.query_params[k] = v
-        self.industry =  self.query_params['industry']
-        self.publisher = self.query_params['publisher']
+        self.industry =  self.query_params.get('industry')
+        self.publisher = self.query_params.get('publisher')
 
     def paging(self, queryset):
         page = (int(self.query_params['start']) /
