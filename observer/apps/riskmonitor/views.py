@@ -742,6 +742,8 @@ class RiskNewsRecycleList(BaseView):
     def set_params(self, params):
         for k, v in params.iteritems():
             self.query_params[k] = v
+        self.industry =  self.query_params['industry']
+        self.publisher = self.query_params['publisher']
 
     def paging(self, queryset):
         page = (int(self.query_params['start']) /
@@ -752,8 +754,8 @@ class RiskNewsRecycleList(BaseView):
         results = self.paging(queryset)
         data = {
             "draw": self.query_params['draw'],
-            "recordsTotal": NewsRecycleQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
-            "recordsFiltered": NewsRecycleQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
+            "recordsTotal": NewsRecycleQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip(), self.industry, self.publisher).count(),
+            "recordsFiltered": NewsRecycleQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip(), self.industry, self.publisher).count(),
             "data": map(lambda r: {
                 'id': r['id'],
                 'titleAndurl': [r['title'], r['url']],
@@ -773,7 +775,7 @@ class RiskNewsRecycleList(BaseView):
         limit = int(self.query_params.get('limit', 0))
 
         queryset = NewsRecycleQuerySet(params=self.query_params).get_news_list(
-            self.query_params['search[value]'].strip()).order_by('-pubtime')
+            self.query_params['search[value]'].strip(), self.industry, self.publisher).order_by('-pubtime')
 
         if limit:
             queryset = queryset[:limit]
@@ -985,7 +987,6 @@ class InspectionList(BaseView):
 
     def serialize(self, queryset):
         results = self.paging(queryset)
-        print self.query_params['search[value]'],
         data = {
             "draw": self.query_params['draw'],
             "recordsTotal": InspectionQuerySet(params=self.query_params).get_inspection_list(self.query_params['search[value]'].strip()).count(),
@@ -1238,14 +1239,14 @@ class SearchIndustry(BaseView):
         super(SearchIndustry, self).__init__()
 
     def set_params(self, request):
-        self.query_params['term'] = request.GET.get('term')
+        self.query_params['q'] = request.GET.get('q')
 
     def serialize(self, queryset):
-        data = [{
-            'id': q.id,
-            'name': q.name,
-            'level': q.level,
-        } for q in queryset]
+        data = {'total_count':queryset.count(),
+                'items':[{
+                    'id': q.id,
+                    'text': q.name,
+                } for q in queryset]}
 
         return data
 
@@ -1253,7 +1254,7 @@ class SearchIndustry(BaseView):
         self.set_params(request)
 
         queryset = Industry.objects.filter(
-            Q(name__contains=self.query_params['term'])
+            Q(name__contains=self.query_params['q'])
         )
 
         queryset = queryset.distinct()
@@ -1267,13 +1268,14 @@ class SearchPublisher(BaseView):
         super(SearchPublisher, self).__init__()
 
     def set_params(self, request):
-        self.query_params['term'] = request.GET.get('term')
+        self.query_params['q'] = request.GET.get('q')
 
     def serialize(self, queryset):
-        data = [{
-            'id': q.id,
-            'name': q.name,
-        } for q in queryset]
+        data = {'total_count':queryset.count(),
+                'items':[{
+                    'id': q.id,
+                    'text': q.name,
+                } for q in queryset]}
 
         return data
 
@@ -1281,7 +1283,7 @@ class SearchPublisher(BaseView):
         self.set_params(request)
 
         queryset = RiskNewsPublisher.objects.filter(
-            Q(name__contains=self.query_params['term'])
+            Q(name__contains=self.query_params['q'])
         )
 
         queryset = queryset.distinct()

@@ -28,8 +28,8 @@ urlpatterns = [
     url(r'^analytics$', Analytics.as_view()),
     url(r'^analytics/filters$', Filters.as_view()),
     url(r'^search$', Search.as_view()),
-    url(r'^search_industry$', SearchIndustry.as_view()),
-    url(r'^search_publisher$', SearchPublisher.as_view()),
+    url(r'^industries2$', SearchIndustry.as_view()),
+    url(r'^publishers$', SearchPublisher.as_view()),
 ]
 
 urlpatterns += [

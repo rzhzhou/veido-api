@@ -154,7 +154,7 @@ class NewsRecycleQuerySet(Abstract):
     def __init__(self, params={}):
         super(NewsRecycleQuerySet, self).__init__(params)
 
-    def get_news_list(self, search_value):
+    def get_news_list(self, search_value, industry, publisher):
         fields = ('id', 'title', 'pubtime', 'url', 'risk_keyword', 'invalid_keyword', 'publisher__name', 'industry__name')
 
         max_id = RiskNews.objects.all().aggregate(Max('id'))
@@ -167,6 +167,12 @@ class NewsRecycleQuerySet(Abstract):
         if search_value:
             args['title__contains'] = search_value
             
+        if publisher != "null" :
+            args['publisher__id'] = publisher
+
+        if industry != "null" :
+            args['industry'] = industry
+
         queryset = RiskNews.objects.filter(**args).values(*fields)
 
         return queryset
