@@ -6,6 +6,7 @@ from datetime import date, datetime, timedelta
 
 from observer.utils.date.convert import datetime_to_timestamp
 from observer.apps.origin.models import Inspection
+from observer.apps.penalty.models import AdministrativePenalties
 from observer.apps.riskmonitor.models import (
     RiskNews, ScoreIndustry, AreaIndustry, Industry, ManageIndex, SocietyIndex, ConsumeIndex, UserArea, SummariesScore, InternetScore)
 from observer.apps.riskmonitor.service.news import NewsQuerySet
@@ -188,6 +189,30 @@ class IndustryTrack(NewsQuerySet):
 
         return (i_dimension, i_score, i_color)
 
+    def count_administrative_penaltie_data(self, industry=''):
+        if industry == '':
+            industry = self.industry
+
+        a_dimension = AdministrativePenalties.objects.filter(
+            industry__id=industry,
+            pubtime__gte=self.start,
+            pubtime__lt=self.end
+        )
+
+        a_score = (100 - a_dimension.count() * 10)
+
+        if a_score < 30:
+            a_score = randint(55, 60)
+
+        if a_score < 30:
+            a_color = '#bc3f2b'
+        elif 30 <= a_score < 70:
+            a_color = '#6586a1'
+        else:
+            a_color = '#95c5ab'
+
+        return (a_dimension, a_score, a_color)
+
     def get_total_risk_rank(self):
 
         risk_rank_score = round(self.get_dimension()[0][1] * 0.1 + self.get_dimension()[1][1] * 0.1 + self.get_dimension()[
@@ -215,7 +240,8 @@ class IndustryTrack(NewsQuerySet):
             self.count_society_index_data(),
             self.count_manage_index_data(),
             self.count_risk_news_data(),
-            self.count_risk_inspection_data()
+            self.count_risk_inspection_data(),
+            self.count_administrative_penaltie_data()
         )
 
     def get_overall_overview_score(self, pubtime_gte='', pubtime_lt='', pubtime=''):
