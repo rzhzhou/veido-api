@@ -21,14 +21,14 @@ class CorpusAdmin(ForeignKeyAutocompleteAdmin):
 
     def save_model(self, request, obj, form, change):
         riskwords = list(set(obj.riskword.split()))
-        invalidwords = []
+        invalidwords = list(set(obj.invalidword.split()))
+
         if not change:
-            CrawlerTask(obj.uuid, obj.industry.name, riskwords,
-                invalidwords).build()
+            CrawlerTask(obj.uuid, obj.industry.name, riskwords, []).build()
         else:
             corpus = Corpus.objects.get(id=obj.id)
-            CrawlerTask(obj.uuid, obj.industry.name, riskwords,
-                invalidwords).update(corpus)
+            CrawlerTask(obj.uuid, obj.industry.name, riskwords, []).update(corpus)
+
         obj.riskword = " ".join(riskwords)
         obj.invalidword = " ".join(invalidwords)
         obj.save()
