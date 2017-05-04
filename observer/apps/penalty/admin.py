@@ -11,7 +11,7 @@ from observer.apps.penalty.resource import AdministrativePenaltiesResources
 class AdministrativePenaltiesAdmin(ImportExportActionModelAdmin):
     resource_class = AdministrativePenaltiesResources
     # related_search_fields = {'area': ('name',)}
-    search_fields = ('title', 'inspection_publisher__name',)
+    search_fields = ('title', 'publisher')
     list_display = ('title',  'pubtime', 'publisher',)
     list_filter = (('pubtime', DateRangeFilter), 'industry')
 

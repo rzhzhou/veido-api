@@ -22,6 +22,7 @@ class AdministrativePenaltiesResources(resources.ModelResource):
     illegal_behavior = fields.Field(attribute='illegal_behavior', column_name=u'违法行为')
     punishment_basis = fields.Field(attribute='punishment_basis', column_name=u'处罚依据')
     punishment_result = fields.Field(attribute='punishment_result', column_name=u'处罚结果')
+    penalty_organ = fields.Field(attribute='penalty_organ', column_name=u'处罚机关')
 
     area = fields.Field(
         column_name=u'地域',
@@ -35,11 +36,6 @@ class AdministrativePenaltiesResources(resources.ModelResource):
         column_name=u'处罚企业',
         attribute='enterprise',
         widget=ManyToManyWidget(Enterprise, ' ', 'name'))
-    inspection_publisher=fields.Field(
-        column_name=u'处罚机关',
-        attribute='inspection_publisher',
-        widget=ForeignKeyWidget(InspectionPublisher, 'name'))
-
 
     class Meta:
         model = AdministrativePenalties

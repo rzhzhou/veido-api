@@ -20,7 +20,7 @@ class AdministrativePenalties(models.Model):
         max_length=255, null=True, blank=True, verbose_name=u'处罚依据')
     punishment_result = models.CharField(
         max_length=255, null=True, blank=True, verbose_name=u'处罚结果')
-
+    penalty_organ = models.CharField(max_length=255, verbose_name=u'处罚机关')
     area = models.ManyToManyField(
         'origin.Area',
         verbose_name=u'地域'
@@ -36,10 +36,6 @@ class AdministrativePenalties(models.Model):
         verbose_name=u'行业'
     )
 
-    inspection_publisher = models.ForeignKey(
-        'origin.InspectionPublisher',
-        verbose_name=u'处罚机关'
-    )
 
     class Meta:
         app_label = 'penalty'
