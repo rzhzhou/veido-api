@@ -14,7 +14,7 @@ class NewsQuerySet(Abstract):
     def __init__(self, params={}):
         super(NewsQuerySet, self).__init__(params)
 
-    def get_news_list(self, search_value):
+    def get_news_list(self, search_value, industry=None, publisher=None):
         fields = ('id', 'title', 'pubtime', 'url', 'risk_keyword', 'invalid_keyword', 'publisher__name', 'industry__name')
 
         max_id = RiskNews.objects.all().aggregate(Max('id'))
@@ -27,6 +27,12 @@ class NewsQuerySet(Abstract):
         if search_value:
             args['title__contains'] = search_value
             
+        if publisher != "null" and publisher is not None:
+            args['publisher__id'] = publisher
+
+        if industry != "null" and industry is not None:
+            args['industry'] = industry
+
         queryset = RiskNews.objects.filter(**args).values(*fields)
 
         return queryset
@@ -154,7 +160,7 @@ class NewsRecycleQuerySet(Abstract):
     def __init__(self, params={}):
         super(NewsRecycleQuerySet, self).__init__(params)
 
-    def get_news_list(self, search_value, industry, publisher):
+    def get_news_list(self, search_value, industry=None, publisher=None):
         fields = ('id', 'title', 'pubtime', 'url', 'risk_keyword', 'invalid_keyword', 'publisher__name', 'industry__name')
 
         max_id = RiskNews.objects.all().aggregate(Max('id'))
@@ -167,10 +173,10 @@ class NewsRecycleQuerySet(Abstract):
         if search_value:
             args['title__contains'] = search_value
             
-        if publisher != "null" :
+        if publisher != "null" and publisher is not None:
             args['publisher__id'] = publisher
 
-        if industry != "null" :
+        if industry != "null" and industry is not None:
             args['industry'] = industry
 
         queryset = RiskNews.objects.filter(**args).values(*fields)

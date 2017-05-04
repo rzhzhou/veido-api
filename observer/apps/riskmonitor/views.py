@@ -26,8 +26,8 @@ from observer.apps.riskmonitor.service.dashboard import Dashboard
 from observer.apps.riskmonitor.service.enterprise import EnterpriseRank
 from observer.apps.riskmonitor.service.industry import IndustryTrack
 from observer.apps.riskmonitor.service.inspection import InspectionQuerySet
-from observer.apps.riskmonitor.service.news import (
-    NewsQuerySet, NewsRecycleQuerySet)
+from observer.apps.riskmonitor.service.news import (NewsQuerySet, NewsRecycleQuerySet)
+from observer.apps.riskmonitor.service.aps import APQuerySet
 from observer.apps.riskmonitor.jobs.hourly.dashboard import Job as DashboardJob
 from observer.apps.riskmonitor.jobs.hourly.industries import Job as IndustriesJob
 from observer.utils.date import pretty
@@ -551,6 +551,17 @@ class IndustryDetail(BaseView):
                         'url': q.url,
                         'qualitied': q.qualitied
                     } for q in queryset['indicators'][4][0]]
+                },
+                {
+                    'title': '行政处罚',
+                    'score': queryset['indicators'][5][1],
+                    'color': queryset['indicators'][5][2],
+                    'norms': [{
+                        'title': q.title,
+                        'source': q.publisher,
+                        'time': utc_to_local_time(q.pubtime).strftime('%Y-%m-%d'),
+                        'url': q.url,
+                    } for q in queryset['indicators'][5][0]]
                 }
             ],
             'trend': {
@@ -695,6 +706,8 @@ class RiskNewsList(BaseView):
     def set_params(self, params):
         for k, v in params.iteritems():
             self.query_params[k] = v
+        self.industry =  self.query_params.get('industry')
+        self.publisher = self.query_params.get('publisher')
 
     def paging(self, queryset):
         page = (int(self.query_params['start']) /
@@ -705,8 +718,8 @@ class RiskNewsList(BaseView):
         results = self.paging(queryset)
         data = {
             "draw": self.query_params['draw'],
-            "recordsTotal": NewsQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
-            "recordsFiltered": NewsQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
+            "recordsTotal": NewsQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip(), self.industry, self.publisher).count(),
+            "recordsFiltered": NewsQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip(), self.industry, self.publisher).count(),
             "data": map(lambda r: {
                 'id': r['id'],
                 'titleAndurl': [r['title'], r['url']],
@@ -726,7 +739,7 @@ class RiskNewsList(BaseView):
         limit = int(self.query_params.get('limit', 0))
 
         queryset = NewsQuerySet(params=self.query_params).get_news_list(
-            self.query_params['search[value]'].strip()).order_by('-pubtime')
+            self.query_params['search[value]'].strip(), self.industry, self.publisher).order_by('-pubtime')
 
         if limit:
             queryset = queryset[:limit]
@@ -742,8 +755,8 @@ class RiskNewsRecycleList(BaseView):
     def set_params(self, params):
         for k, v in params.iteritems():
             self.query_params[k] = v
-        self.industry =  self.query_params['industry']
-        self.publisher = self.query_params['publisher']
+        self.industry =  self.query_params.get('industry')
+        self.publisher = self.query_params.get('publisher')
 
     def paging(self, queryset):
         page = (int(self.query_params['start']) /
@@ -1287,6 +1300,37 @@ class SearchPublisher(BaseView):
         )
 
         queryset = queryset.distinct()
+
+        return Response(self.serialize(queryset))
+
+
+class AdministrativePenaltieList(BaseView):
+
+    def __init__(self):
+        super(AdministrativePenaltieList, self).__init__()
+
+    def set_params(self, request):
+        super(AdministrativePenaltieList, self).set_params(request.GET)
+
+    def paging(self, queryset):
+        return super(AdministrativePenaltieList, self).paging(queryset, self.query_params['page'], 10)
+
+    def serialize(self, queryset):
+        results = self.paging(queryset)
+        data = map(lambda r: {
+            'id': r['id'],
+            'url': r['url'],
+            'title': r['title'],
+            'time': utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d %H:%M'),
+            'source': r['publisher']
+        }, results)
+
+        return data
+
+    def get(self, request):
+        self.set_params(request)
+
+        queryset = APQuerySet(params=self.query_params).get_all_ap_list()
 
         return Response(self.serialize(queryset))
 
