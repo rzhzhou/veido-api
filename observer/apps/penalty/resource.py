@@ -39,8 +39,8 @@ class AdministrativePenaltiesResources(resources.ModelResource):
 
     class Meta:
         model = AdministrativePenalties
-        fields = ('id','title', 'url', 'publisher', 'pubtime','area','industry','enterprise','inspection_publisher','case_name','illegal_behavior','punishment_basis','punishment_result')
-        export_order = ('id','title', 'url', 'publisher', 'pubtime','area','industry','enterprise','inspection_publisher','case_name','illegal_behavior','punishment_basis','punishment_result')
+        fields = ('id','title', 'url', 'publisher', 'pubtime','area','industry','enterprise','penalty_organ','case_name','illegal_behavior','punishment_basis','punishment_result')
+        export_order = ('id','title', 'url', 'publisher', 'pubtime','area','industry','enterprise','penalty_organ','case_name','illegal_behavior','punishment_basis','punishment_result')
 
     def before_save_instance(self, instance, dry_run, temp=''):
         if not instance.pubtime:
