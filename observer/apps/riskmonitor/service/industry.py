@@ -125,8 +125,7 @@ class IndustryTrack(NewsQuerySet):
             lambda x: x['risk_keyword'], n_dimension.values('risk_keyword'))
 
         risk_keywords_set = set(risk_keyword_list)
-        time_interval = int(str(self.end.__sub__(
-            self.start)).split(",")[0].split(' ')[0])
+        time_interval = int(str(self.end.__sub__(self.start)).split(",")[0].split(' ')[0])
         risk_news_count = n_dimension.count()
 
         if time_interval > 170:

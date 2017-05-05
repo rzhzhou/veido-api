@@ -134,6 +134,11 @@ class IndustryScore(models.Model):
         verbose_name=u'行业'
     )
 
+    area = models.ForeignKey(
+        Area, 
+        verbose_name=u'地域'
+    )
+
     class Meta:
         app_label = 'origin'
         verbose_name_plural = u'行业分值'
