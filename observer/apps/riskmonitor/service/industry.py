@@ -205,29 +205,16 @@ class IndustryTrack(NewsQuerySet):
 
         return (i_dimension, i_score, i_color)
 
-    def count_administrative_penaltie_data(self, industry=''):
+    def penalty(self, industry=''):
         if industry == '':
             industry = self.industry
 
-        a_dimension = AdministrativePenalties.objects.filter(
+        return AdministrativePenalties.objects.filter(
             industry__id=industry,
             pubtime__gte=self.start,
             pubtime__lt=self.end
-        )
+        ).values('id', 'title', 'url', 'publisher', 'pubtime')
 
-        a_score = (100 - a_dimension.count() * 10)
-
-        if a_score < 30:
-            a_score = randint(55, 60)
-
-        if a_score < 30:
-            a_color = '#bc3f2b'
-        elif 30 <= a_score < 70:
-            a_color = '#6586a1'
-        else:
-            a_color = '#95c5ab'
-
-        return (a_dimension, a_score, a_color)
 
     def get_total_risk_rank(self):
 
@@ -257,7 +244,6 @@ class IndustryTrack(NewsQuerySet):
             self.count_manage_index_data(),
             self.count_risk_news_data(),
             self.count_risk_inspection_data(),
-            self.count_administrative_penaltie_data()
         )
 
     def get_overall_overview_score(self, pubtime_gte='', pubtime_lt='', pubtime=''):
@@ -385,6 +371,7 @@ class IndustryTrack(NewsQuerySet):
             'risk_rank': self.get_total_risk_rank(),
             'indicators': self.get_dimension(),
             'trend': self.trend_chart(),
-            'trend_chart_two': self.trend_chart_two()
+            'trend_chart_two': self.trend_chart_two(),
+            'penalty':self.penalty()
         }
         return data

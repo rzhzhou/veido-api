@@ -551,19 +551,9 @@ class IndustryDetail(BaseView):
                         'url': q.url,
                         'qualitied': q.qualitied
                     } for q in queryset['indicators'][4][0]]
-                },
-                {
-                    'title': '行政处罚',
-                    'score': queryset['indicators'][5][1],
-                    'color': queryset['indicators'][5][2],
-                    'norms': [{
-                        'title': q.title,
-                        'source': q.publisher,
-                        'time': utc_to_local_time(q.pubtime).strftime('%Y-%m-%d'),
-                        'url': q.url,
-                    } for q in queryset['indicators'][5][0]]
                 }
             ],
+            'penalty': queryset['penalty'],
             'trend': {
                 'categories': queryset['trend_chart_two']['categories'],
                 'data': queryset['trend_chart_two']['data']
