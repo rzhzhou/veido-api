@@ -565,8 +565,8 @@ class IndustryDetail(BaseView):
                 }
             ],
             'trend': {
-                'categories': queryset['trend']['categories'],
-                'data': queryset['trend']['data']
+                'categories': queryset['trend_chart_two']['categories'],
+                'data': queryset['trend_chart_two']['data']
             }
 
         }

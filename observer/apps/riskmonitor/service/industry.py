@@ -38,6 +38,23 @@ class IndustryTrack(NewsQuerySet):
 
         return result
 
+
+    def trend_chart_two(self):
+        self.days = (self.end - self.start).days
+
+        # less than equal 4 months (122 = 31 + 31 + 30 + 30)
+        if self.days > 0 and self.days <= 122:
+            result = self.cal_date_range_two('day')
+            result['categories'] = [i.strftime(
+                '%m-%d') for i in result['categories']]
+
+        elif self.days > 122:  # great than 4 months
+            result = self.cal_date_range_two('month')
+            result['categories'] = [i.strftime(
+                '%Y-%m') for i in result['categories']]
+
+        return result
+
     def compare_chart(self):
         return self.compare(self.start, self.end, self.industry)
 
@@ -367,6 +384,7 @@ class IndustryTrack(NewsQuerySet):
             'name': Industry.objects.get(pk=self.industry).name,
             'risk_rank': self.get_total_risk_rank(),
             'indicators': self.get_dimension(),
-            'trend': self.trend_chart()
+            'trend': self.trend_chart(),
+            'trend_chart_two': self.trend_chart_two()
         }
         return data

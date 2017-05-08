@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import time
+
 from datetime import date, datetime, timedelta
 from django_extensions.management.jobs import DailyJob
 
@@ -16,7 +18,7 @@ class Job(DailyJob):
                 yield start
                 start += step
 
-        for d in date_range(datetime(2014, 1, 1), datetime(2017, 5, 5), timedelta(hours=24)):
+        for d in date_range(datetime(2010, 1, 1), datetime(2017, 5, 8), timedelta(hours=24)):
             time_sequence_list.append(d)
 
         return time_sequence_list
@@ -32,6 +34,7 @@ class Job(DailyJob):
                         industry = Industry.objects.get(id=data[0])
                         score = data[3]
                         IndustryScore(score=score, time=str(end)[0:10], area=area, industry=industry).save()
+                        time.sleep(1)
                     print "EXCUTE { %s } < %s ~ %s > SUCCESS!" % (area_name, start, end)
 
 
