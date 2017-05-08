@@ -248,7 +248,6 @@ class NewsQuerySet(Abstract):
                 )
             ) for year, month in date_range])
 
-        print args
         queryset = IndustryScore.objects.filter(**args).values('score', 'time')
         if queryset:
             result = []
