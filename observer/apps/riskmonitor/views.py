@@ -553,7 +553,12 @@ class IndustryDetail(BaseView):
                     } for q in queryset['indicators'][4][0]]
                 }
             ],
-            'penalty': queryset['penalty'],
+            'penalty': [{
+                'title': q.get('title'),
+                'url':q.get('url'), 
+                'publisher':q.get('publisher'),
+                'pubtime':utc_to_local_time(q.get('pubtime')).strftime('%Y-%m-%d'),
+            } for q in queryset['penalty']],
             'trend': {
                 'categories': queryset['trend_chart_two']['categories'],
                 'data': queryset['trend_chart_two']['data']
