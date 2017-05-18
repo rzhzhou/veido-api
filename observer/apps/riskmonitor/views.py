@@ -409,7 +409,7 @@ class IndustryDetail(BaseView):
                     'norms': [
                         {
                             'name': u'国家强制性要求',
-                            'value':queryset['indicators'][0][0][0],
+                            'value':u'有' if queryset['indicators'][0][0][0] == 1 else u'无',
                             'options': [
                                 {'label': u'有', 'selected': queryset[
                                     'indicators'][0][0][0] == 1},
@@ -419,7 +419,7 @@ class IndustryDetail(BaseView):
                         },
                         {
                             'name': u'密切程度',
-                            'value':queryset['indicators'][0][0][1],
+                            'value':u'低' if queryset['indicators'][0][0][1] == 1 else (u'中' if queryset['indicators'][0][0][1] == 2 else u'高'),
                             'options': [
                                 {'label': u'高', 'selected': queryset[
                                     'indicators'][0][0][1] == 3},
@@ -431,7 +431,7 @@ class IndustryDetail(BaseView):
                         },
                         {
                             'name': u'涉及特定消费群体',
-                            'value':queryset['indicators'][0][0][2],
+                            'value':u'是' if queryset['indicators'][0][0][2] == 1 else u'否',
                             'options': [
                                 {'label': u'是', 'selected': queryset[
                                     'indicators'][0][0][2] == 1},
@@ -449,7 +449,7 @@ class IndustryDetail(BaseView):
                     'norms': [
                         {
                             'name': u'贸易量',
-                            'value':queryset['indicators'][1][0][0],
+                            'value':u'低' if queryset['indicators'][1][0][0] == 1 else (u'中' if queryset['indicators'][1][0][0] == 2 else u'高'),
                             'options': [
                                 {'label': u'高', 'selected': queryset[
                                     'indicators'][1][0][0] == 3},
@@ -461,7 +461,7 @@ class IndustryDetail(BaseView):
                         },
                         {
                             'name': u'抽检合格率',
-                            'value':queryset['indicators'][1][0][1],
+                            'value':u'低' if queryset['indicators'][1][0][1] == 1 else (u'中' if queryset['indicators'][1][0][1] == 2 else u'高'),
                             'options': [
                                 {'label': u'高', 'selected': queryset[
                                     'indicators'][1][0][1] == 3},
@@ -473,7 +473,7 @@ class IndustryDetail(BaseView):
                         },
                         {
                             'name': u'案例发生状况',
-                            'value':queryset['indicators'][1][0][2],
+                            'value':u'低' if queryset['indicators'][1][0][2] == 1 else (u'中' if queryset['indicators'][1][0][2] == 2 else u'高'),
                             'options': [
                                 {'label': u'高', 'selected': queryset[
                                     'indicators'][1][0][2] == 3},
@@ -493,7 +493,7 @@ class IndustryDetail(BaseView):
                     'norms': [
                         {
                             'name': u'列入许可证目录',
-                            'value':queryset['indicators'][2][0][0],
+                            'value': u'是' if queryset['indicators'][2][0][0] == 1 else u'否',
                             'options': [
                                 {'label': u'是', 'selected': queryset[
                                     'indicators'][2][0][0] == 1},
@@ -503,7 +503,7 @@ class IndustryDetail(BaseView):
                         },
                         {
                             'name': u'列入产品认证目录',
-                            'value':queryset['indicators'][2][0][1],
+                            'value':u'是' if queryset['indicators'][2][0][1] == 1 else u'否',
                             'options': [
                                 {'label': u'是', 'selected': queryset[
                                     'indicators'][2][0][1] == 1},
@@ -513,7 +513,7 @@ class IndustryDetail(BaseView):
                         },
                         {
                             'name': u'是否鼓励',
-                            'value':queryset['indicators'][2][0][2],
+                            'value':u'是' if queryset['indicators'][2][0][2] == 1 else u'否',
                             'options': [
                                 {'label': u'是', 'selected': queryset[
                                     'indicators'][2][0][2] == 1},
@@ -523,7 +523,7 @@ class IndustryDetail(BaseView):
                         },
                         {
                             'name': u'是否限制',
-                            'value':queryset['indicators'][2][0][3],
+                            'value':u'是' if queryset['indicators'][2][0][3] == 1 else u'否',
                             'options': [
                                 {'label': u'是', 'selected': queryset[
                                     'indicators'][2][0][3] == 1},
@@ -533,7 +533,7 @@ class IndustryDetail(BaseView):
                         },
                         {
                             'name': u'是否淘汰',
-                            'value':queryset['indicators'][2][0][4],
+                            'value':u'是' if queryset['indicators'][2][0][4] == 1 else u'否',
                             'options': [
                                 {'label': u'是', 'selected': queryset[
                                     'indicators'][2][0][4] == 1},
