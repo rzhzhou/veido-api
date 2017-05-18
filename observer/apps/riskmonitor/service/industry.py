@@ -141,6 +141,7 @@ class IndustryTrack(NewsQuerySet):
         else:
             m_color = '#95c5ab'
             m_class = 'bg-green-400'
+
         return (m_dimension, m_score, m_color, m_class)
 
     def count_risk_news_data(self, industry=''):
