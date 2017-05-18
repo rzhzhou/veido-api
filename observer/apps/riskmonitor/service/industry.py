@@ -76,12 +76,15 @@ class IndustryTrack(NewsQuerySet):
                          (c_dimension[1] - 1) + 100 * c_dimension[2]) / 3
         if 0 <= c_score < 34:
             c_color = '#bc3f2b'
+            c_class = 'bg-red-400'
         elif 34 <= c_score < 67:
             c_color = '#6586a1'
+            c_class = 'bg-orange-400'
         else:
             c_color = '#95c5ab'
+            c_class = 'bg-green-400'
 
-        return (c_dimension, c_score, c_color)
+        return (c_dimension, c_score, c_color, c_class)
 
     def count_society_index_data(self, industry=''):
         if industry == '':
@@ -98,19 +101,24 @@ class IndustryTrack(NewsQuerySet):
         if s_score <= 0:
             s_score = 0
             s_color = '#bc3f2b'
+            s_class = 'bg-red-400'
             s_dimension = (1, 1, 1)
         elif 0 < s_score < 34:
             s_color = '#bc3f2b'
+            s_class = 'bg-red-400'
         elif 34 <= s_score < 67:
             s_color = '#6586a1'
+            s_class = 'bg-orange-400'
         elif 67 <= s_score < 100:
             s_color = '#95c5ab'
+            s_class = 'bg-green-400'
         else:
             s_score = 100
             s_color = '#95c5ab'
+            s_class = 'bg-green-400'
             s_dimension = (0, 0, 0)
 
-        return (s_dimension, s_score, s_color)
+        return (s_dimension, s_score, s_color, s_class)
 
     def count_manage_index_data(self, industry=''):
         if industry == '':
@@ -126,11 +134,14 @@ class IndustryTrack(NewsQuerySet):
                          m_dimension[2] + 100 * m_dimension[3] + 100 * m_dimension[4]) / 5
         if 0 <= m_score < 34:
             m_color = '#bc3f2b'
+            m_class = 'bg-red-400'
         elif 34 <= m_score < 67:
             m_color = '#6586a1'
+            m_class = 'bg-orange-400'
         else:
             m_color = '#95c5ab'
-        return (m_dimension, m_score, m_color)
+            m_class = 'bg-green-400'
+        return (m_dimension, m_score, m_color, m_class)
 
     def count_risk_news_data(self, industry=''):
         if industry == '':
@@ -170,15 +181,18 @@ class IndustryTrack(NewsQuerySet):
 
         if n_score < 30:
             n_color = '#bc3f2b'
+            n_class = 'bg-red-400'
         elif 30 <= n_score < 70:
             n_color = '#6586a1'
+            n_class = 'bg-orange-400'
         else:
             n_color = '#95c5ab'
+            n_class = 'bg-green-400'
 
         if n_score > 100:
             n_score = 100
 
-        return (n_dimension, int(n_score), n_color)
+        return (n_dimension, int(n_score), n_color, n_class)
 
     def count_risk_inspection_data(self, industry=''):
         if industry == '':
@@ -198,12 +212,15 @@ class IndustryTrack(NewsQuerySet):
 
         if i_score < 30:
             i_color = '#bc3f2b'
+            i_class = 'bg-red-400'
         elif 30 <= i_score < 70:
             i_color = '#6586a1'
+            i_class = 'bg-orange-400'
         else:
             i_color = '#95c5ab'
+            i_class = 'bg-green-400'
 
-        return (i_dimension, i_score, i_color)
+        return (i_dimension, i_score, i_color, i_class)
 
     def penalty(self, industry=''):
         if industry == '':
@@ -223,10 +240,13 @@ class IndustryTrack(NewsQuerySet):
 
         if risk_rank_score < 30:
             risk_rank_color = '#bc3f2b'
+            risk_rank_class = 'bg-red-400'
         elif 30 <= risk_rank_score < 70:
             risk_rank_color = '#6586a1'
+            risk_rank_class = 'bg-orange-400'
         else:
             risk_rank_color = '#95c5ab'
+            risk_rank_class = 'bg-green-400'
 
         if risk_rank_score < 30:
             risk_rank_word = 'C'
@@ -235,7 +255,7 @@ class IndustryTrack(NewsQuerySet):
         else:
             risk_rank_word = 'A'
 
-        return (risk_rank_word, risk_rank_score, risk_rank_color)
+        return (risk_rank_word, risk_rank_score, risk_rank_color, risk_rank_class)
 
     def get_dimension(self):
         return (
