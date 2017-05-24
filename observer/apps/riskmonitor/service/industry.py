@@ -236,8 +236,8 @@ class IndustryTrack(NewsQuerySet):
 
     def get_total_risk_rank(self):
 
-        risk_rank_score = round(self.get_dimension()[0][1] * 0.1 + self.get_dimension()[1][1] * 0.1 + self.get_dimension()[
-            2][1] * 0.1 + self.get_dimension()[3][1] * 0.3 + self.get_dimension()[4][1] * 0.4)
+        risk_rank_score = round(self.get_dimension()[0][1] * 0.1853 + self.get_dimension()[1][1] * 0.0736 + self.get_dimension()[
+            2][1] * 0.0736 + self.get_dimension()[3][1] * 0.4546 + self.get_dimension()[4][1] * 0.2129)
 
         if risk_rank_score < 30:
             risk_rank_color = '#bc3f2b'
@@ -303,8 +303,7 @@ class IndustryTrack(NewsQuerySet):
         try:
             total_score = (SummariesScore.objects.get(pubtime=pubtime)).score
         except:
-            total_score = inspection_score * 0.4 + internet_score * \
-                0.3 + 100 * 0.1 + 100 * 0.1 + 100 * 0.1
+            total_score = inspection_score * 0.2129 + internet_score * 0.4546 + 100 * 0.1853 + 100 * 0.0736 + 100 * 0.0736
             total_score = round(total_score, 1)
 
         return (total_score, internet_score, inspection_score)
@@ -346,9 +345,9 @@ class IndustryTrack(NewsQuerySet):
             count_risk_inspection_score = self.count_risk_inspection_data(u.industry.id)[
                 1]
 
-            count_risk_rank_score = count_consume_index_score * 0.1 + count_society_index_score * 0.1 + \
-                count_manage_index_score * 0.1 + count_risk_news_score * \
-                0.3 + count_risk_inspection_score * 0.4
+            count_risk_rank_score = count_consume_index_score * 0.1853 + count_society_index_score * 0.0736 + \
+                count_manage_index_score * 0.0736 + count_risk_news_score * \
+                0.4546 + count_risk_inspection_score * 0.2129
 
             industries.append(
                 (u.industry.id, u.name, u.industry.level, round(count_risk_rank_score, 2)))
