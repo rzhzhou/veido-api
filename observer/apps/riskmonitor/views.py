@@ -460,7 +460,7 @@ class IndustryDetail(BaseView):
                             ]
                         },
                         {
-                            'name': u'抽检合格率',
+                            'name': u'苏州抽检合格率',
                             'value':u'低' if queryset['indicators'][1][0][1] == 1 else (u'中' if queryset['indicators'][1][0][1] == 2 else u'高'),
                             'options': [
                                 {'label': u'高', 'selected': queryset[
@@ -472,7 +472,7 @@ class IndustryDetail(BaseView):
                             ]
                         },
                         {
-                            'name': u'案例发生状况',
+                            'name': u'苏州案例发生状况',
                             'value':u'低' if queryset['indicators'][1][0][2] == 1 else (u'中' if queryset['indicators'][1][0][2] == 2 else u'高'),
                             'options': [
                                 {'label': u'高', 'selected': queryset[
@@ -572,7 +572,7 @@ class IndustryDetail(BaseView):
             ],
             'penalty': [{
                 'title': q.get('title'),
-                'url':q.get('url'), 
+                'url':q.get('url'),
                 'source':q.get('publisher'),
                 'time':utc_to_local_time(q.get('pubtime')).strftime('%Y-%m-%d'),
             } for q in queryset['penalty']],
