@@ -345,8 +345,8 @@ class IndustryTrack(NewsQuerySet):
             count_risk_inspection_score = self.count_risk_inspection_data(u.industry.id)[
                 1]
 
-            count_risk_rank_score = count_consume_index_score * 0.1853 + count_society_index_score * 0.0736 + \
-                count_manage_index_score * 0.0736 + count_risk_news_score * \
+            count_risk_rank_score = count_consume_index_score * 0.0736 + count_society_index_score * 0.0736 + \
+                count_manage_index_score * 0.1853 + count_risk_news_score * \
                 0.4546 + count_risk_inspection_score * 0.2129
 
             industries.append(
