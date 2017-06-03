@@ -30,7 +30,7 @@ class Job(DailyJob):
                 if index > 6:
                     start = time_sequence_list[index-7]
                     end = item
-                    for data in IndustryTrack(params={'start':start, 'end':end, 'area':area_name, 'user_id':9}).get_industries():
+                    for data in IndustryTrack(params={'start':start, 'end':end, 'area_name':area_name, 'user_id':9}).get_industries():
                         industry = Industry.objects.get(id=data[0])
                         score = data[3]
                         if not IndustryScore.objects.filter(score=score, time=str(start)[0:10], area=area, industry=industry):

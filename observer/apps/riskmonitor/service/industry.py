@@ -22,7 +22,7 @@ class IndustryTrack(NewsQuerySet):
             try:
                 self.area = self.area
             except Exception as e:
-                pass
+                self.area = u'常州'
             self.area_name = UserArea.objects.get(user__id=self.user_id).area.name
 
     def trend_chart(self):
