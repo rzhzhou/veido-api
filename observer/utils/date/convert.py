@@ -89,7 +89,7 @@ def get_start_end(days=60):
         current_year = int(current_y_m_d[0])
         current_month = int(current_y_m_d[1])
         current_day = int(current_y_m_d[2])
-        return '%s-%s-%s' % (current_year, current_month + 1, 1)
+        return '%s-%s-%s' % (current_year+1 if current_month is 12 else current_year, 1 if current_month is 12 else current_month + 1, 1)
 
     end_date = date_to_str(date.today())
 
