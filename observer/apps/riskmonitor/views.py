@@ -26,7 +26,7 @@ from observer.apps.riskmonitor.service.dashboard import Dashboard
 from observer.apps.riskmonitor.service.enterprise import EnterpriseRank
 from observer.apps.riskmonitor.service.industry import IndustryTrack
 from observer.apps.riskmonitor.service.inspection import InspectionQuerySet
-from observer.apps.riskmonitor.service.news import (NewsQuerySet, NewsRecycleQuerySet)
+from observer.apps.riskmonitor.service.news import (NewsQuerySet, NewsRecycleQuerySet, NewsValidQuerySet)
 from observer.apps.riskmonitor.service.aps import APQuerySet
 from observer.apps.riskmonitor.jobs.hourly.dashboard import Job as DashboardJob
 from observer.apps.riskmonitor.jobs.hourly.industries import Job as IndustriesJob
@@ -962,6 +962,107 @@ class RiskNewsDelete(BaseView):
         page = (int(self.query_params['start']) /
                 int(self.query_params['length'])) + 1
         return super(RiskNewsDelete, self).paging(queryset, page, self.query_params['length'])
+
+    def serialize(self, queryset):
+        results = self.paging(queryset)
+        data = {
+            "draw": self.query_params['draw'],
+            "recordsTotal": NewsRecycleQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
+            "recordsFiltered": NewsRecycleQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
+            "data": map(lambda r: {
+                'id': r['id'],
+                'titleAndurl': [r['title'], r['url']],
+                'time': utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d'),
+                'risk_keyword': r['risk_keyword'],
+                'invalid_keyword': r['invalid_keyword'],
+                'source': r['publisher__name'],
+                'industry': r['industry__name'],
+            }, results)
+        }
+
+        return data
+
+    def get(self, request):
+        self.set_params(request.GET)
+
+        limit = int(self.query_params.get('limit', 0))
+
+        queryset = NewsRecycleQuerySet(params=self.query_params).get_news_list(
+            self.query_params['search[value]'].strip()).order_by('-pubtime')
+
+        if limit:
+            queryset = queryset[:limit]
+
+        return Response(self.serialize(queryset))
+
+
+class ValidNews(BaseView):
+
+    def __init__(self):
+        super(ValidNews, self).__init__()
+
+    def set_params(self, params):
+        for k, v in params.iteritems():
+            self.query_params[k] = v
+
+    def paging(self, queryset):
+        page = (int(self.query_params['start']) /
+                int(self.query_params['length'])) + 1
+        return super(ValidNews, self).paging(queryset, page, self.query_params['length'])
+
+    def serialize(self, queryset):
+        results = self.paging(queryset)
+        data = {
+            "draw": self.query_params['draw'],
+            "recordsTotal": NewsValidQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
+            "recordsFiltered": NewsValidQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
+            "data": map(lambda r: {
+                'id': r['id'],
+                'titleAndurl': [r['title'], r['url']],
+                'time': utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d'),
+                'risk_keyword': r['risk_keyword'],
+                'invalid_keyword': r['invalid_keyword'],
+                'source': r['publisher__name'],
+                'industry': r['industry__name'],
+            }, results)
+        }
+
+        return data
+
+    def get(self, request):
+        self.set_params(request.GET)
+
+        limit = int(self.query_params.get('limit', 0))
+
+        queryset = NewsValidQuerySet(params=self.query_params).get_news_list(
+            self.query_params['search[value]'].strip()).order_by('-pubtime')
+
+        if limit:
+            queryset = queryset[:limit]
+
+        return Response(self.serialize(queryset))
+
+
+class RiskNewsValid(BaseView):
+
+    def __init__(self):
+        super(RiskNewsValid, self).__init__()
+
+    def set_params(self, params):
+        for k, v in params.iteritems():
+            self.query_params[k] = v
+
+    def valid(self):
+        risk_news_ids = self.query_params['risk_news_ids']
+        risk_news_ids_list = risk_news_ids.split(",")
+        RiskNews.objects.filter(id__in=risk_news_ids_list[0:len(
+            risk_news_ids_list) - 1:1]).update(is_delete=2)
+
+    def paging(self, queryset):
+        self.valid()
+        page = (int(self.query_params['start']) /
+                int(self.query_params['length'])) + 1
+        return super(RiskNewsValid, self).paging(queryset, page, self.query_params['length'])
 
     def serialize(self, queryset):
         results = self.paging(queryset)

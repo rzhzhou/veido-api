@@ -228,7 +228,7 @@ class RiskNews(models.Model):
     pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
     publisher = models.ForeignKey(RiskNewsPublisher, verbose_name=u'文章发布者')
     reprinted = models.IntegerField(verbose_name=u'转载数')
-    is_delete = models.BooleanField(default=0, verbose_name=u'是否删除')
+    is_delete = models.IntegerField(default=0, verbose_name=u'是否删除')
     risk_keyword = models.CharField(max_length=255, blank=True, default=u'', verbose_name=u'风险新闻关键词')
     invalid_keyword = models.CharField(max_length=255, blank=True, default=u'', verbose_name=u'无效关键词')
 
