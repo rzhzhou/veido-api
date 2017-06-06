@@ -1448,6 +1448,24 @@ class AdministrativePenaltieList(BaseView):
         return Response(self.serialize(queryset))
 
 
+
+class Products(BaseView):
+    def __init__(self):
+        super(Products, self).__init__()
+    
+    def get(self, request):
+        data = []
+        for i in Industry.objects.filter(level=1):
+            industry = {}
+            industry['level_one'] = i.name
+            industry_list = []
+            for indu in Industry.objects.filter(parent__in = Industry.objects.filter(parent=i)):
+                industry_list.append(indu.name)
+            industry['level_three'] = industry_list
+            data.append(industry)
+
+        return Response(data)
+
 def logout_view(request):
     auth = settings.JWT_AUTH
     secret_key = auth['JWT_SECRET_KEY']

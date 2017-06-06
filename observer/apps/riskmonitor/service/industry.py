@@ -69,10 +69,8 @@ class IndustryTrack(NewsQuerySet):
         if industry == '':
             industry = self.industry
 
-        c = ConsumeIndex.objects.filter(
-            industry__id=industry, area=UserArea.objects.get(user__id=self.user_id).area)
-        c = c if list(c) != list([]) else ConsumeIndex.objects.filter(
-            industry__id=industry, area__name=u'全国')
+        c = ConsumeIndex.objects.filter(industry__id=industry, area=UserArea.objects.get(user__id=self.user_id).area)
+        c = c if list(c) != list([]) else ConsumeIndex.objects.filter(industry__id=industry, area__name=u'全国')
 
         c_dimension = (c[0].force, c[0].close, c[
                        0].consume) if c else (0, 1, 0)
