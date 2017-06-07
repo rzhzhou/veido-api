@@ -75,7 +75,7 @@ class IndustryTrack(NewsQuerySet):
         c_dimension = (c[0].force, c[0].close, c[
                        0].consume) if c else (0, 1, 0)
         c_score = 100 - (50 * c_dimension[0] + 25 *
-                         (c_dimension[1] - 1) + 100 * c_dimension[2]) / 3
+                         (c_dimension[1] - 1) + 50 * c_dimension[2]) / 3
         if 0 <= c_score < 34:
             c_color = '#bc3f2b'
             c_class = 'bg-red-400'
