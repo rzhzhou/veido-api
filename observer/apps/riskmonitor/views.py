@@ -1068,8 +1068,8 @@ class RiskNewsValid(BaseView):
         results = self.paging(queryset)
         data = {
             "draw": self.query_params['draw'],
-            "recordsTotal": NewsRecycleQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
-            "recordsFiltered": NewsRecycleQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
+            "recordsTotal": NewsQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
+            "recordsFiltered": NewsQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
             "data": map(lambda r: {
                 'id': r['id'],
                 'titleAndurl': [r['title'], r['url']],
@@ -1088,7 +1088,7 @@ class RiskNewsValid(BaseView):
 
         limit = int(self.query_params.get('limit', 0))
 
-        queryset = NewsRecycleQuerySet(params=self.query_params).get_news_list(
+        queryset = NewsQuerySet(params=self.query_params).get_news_list(
             self.query_params['search[value]'].strip()).order_by('-pubtime')
 
         if limit:
