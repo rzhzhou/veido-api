@@ -151,7 +151,7 @@ class IndustryTrack(NewsQuerySet):
             industry = self.industry
 
         n_dimension = RiskNews.objects.filter(
-            industry__id=industry, pubtime__gte=self.start, pubtime__lt=self.end, is_delete=False)
+            industry__id=industry, pubtime__gte=self.start, pubtime__lt=self.end, is_delete=2)
         risk_keyword_list = map(
             lambda x: x['risk_keyword'], n_dimension.values('risk_keyword'))
 
