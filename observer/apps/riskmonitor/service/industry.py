@@ -74,7 +74,7 @@ class IndustryTrack(NewsQuerySet):
 
         c_dimension = (c[0].force, c[0].close, c[
                        0].consume) if c else (0, 1, 0)
-        c_score = 100 - (100 * c_dimension[0] + 50 *
+        c_score = 100 - (50 * c_dimension[0] + 25 *
                          (c_dimension[1] - 1) + 100 * c_dimension[2]) / 3
         if 0 <= c_score < 34:
             c_color = '#bc3f2b'
@@ -264,7 +264,7 @@ class IndustryTrack(NewsQuerySet):
         else:
             risk_rank_score = round(self.get_dimension()[0][1] * 0.1853 + self.get_dimension()[1][1] * 0.0736 + self.get_dimension()[
             2][1] * 0.0736 + self.get_dimension()[3][1] * 0.4546 + self.get_dimension()[4][4] * 0.1729 + self.get_dimension()[4][5] * 0.04)
-        
+
         if risk_rank_score < 30:
             risk_rank_color = '#bc3f2b'
             risk_rank_class = 'bg-red-400'
