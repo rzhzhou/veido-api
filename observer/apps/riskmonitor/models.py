@@ -191,7 +191,8 @@ class UserEnterprise(models.Model):
 
 class AreaIndustry(models.Model):
     name = models.CharField(max_length=255, verbose_name=u'名称')
-
+    status = models.IntegerField(default=0, verbose_name=u'状态')
+    
     area = models.ForeignKey(
         Area,
         verbose_name=u'地域'

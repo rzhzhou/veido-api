@@ -36,7 +36,9 @@ class Enterprise(models.Model):
 
 class Industry(models.Model):
     name = models.CharField(max_length=255, verbose_name=u'名称')
+    code = models.CharField(max_length=255, null=True, blank=True, unique=True, verbose_name=u'编码')
     level = models.BigIntegerField(null=False, verbose_name=u'行业层级')
+
     parent = models.ForeignKey(
         'self', null=True, blank=True, verbose_name=u'上一级')
 
