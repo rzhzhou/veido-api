@@ -842,6 +842,8 @@ class RiskNewsRecycle(BaseView):
     def set_params(self, params):
         for k, v in params.iteritems():
             self.query_params[k] = v
+        self.industry =  self.query_params.get('industry')
+        self.publisher = self.query_params.get('publisher')
 
     def recycle(self):
         risk_news_ids = self.query_params['risk_news_ids']
@@ -859,8 +861,8 @@ class RiskNewsRecycle(BaseView):
         results = self.paging(queryset)
         data = {
             "draw": self.query_params['draw'],
-            "recordsTotal": NewsQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
-            "recordsFiltered": NewsQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
+            "recordsTotal": NewsQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip(), self.industry, self.publisher).count(),
+            "recordsFiltered": NewsQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip(), self.industry, self.publisher).count(),
             "data": map(lambda r: {
                 'id': r['id'],
                 'titleAndurl': [r['title'], r['url']],
@@ -880,7 +882,7 @@ class RiskNewsRecycle(BaseView):
         limit = int(self.query_params.get('limit', 0))
 
         queryset = NewsQuerySet(params=self.query_params).get_news_list(
-            self.query_params['search[value]'].strip()).order_by('-pubtime')
+            self.query_params['search[value]'].strip(), self.industry, self.publisher).order_by('-pubtime')
 
         if limit:
             queryset = queryset[:limit]
@@ -896,6 +898,8 @@ class RiskNewsRestore(BaseView):
     def set_params(self, params):
         for k, v in params.iteritems():
             self.query_params[k] = v
+        self.industry =  self.query_params.get('industry')
+        self.publisher = self.query_params.get('publisher')
 
     def restore(self):
         risk_news_ids = self.query_params['risk_news_ids']
@@ -913,8 +917,8 @@ class RiskNewsRestore(BaseView):
         results = self.paging(queryset)
         data = {
             "draw": self.query_params['draw'],
-            "recordsTotal": NewsRecycleQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
-            "recordsFiltered": NewsRecycleQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
+            "recordsTotal": NewsRecycleQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip(), self.industry, self.publisher).count(),
+            "recordsFiltered": NewsRecycleQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip(), self.industry, self.publisher).count(),
             "data": map(lambda r: {
                 'id': r['id'],
                 'titleAndurl': [r['title'], r['url']],
@@ -934,7 +938,7 @@ class RiskNewsRestore(BaseView):
         limit = int(self.query_params.get('limit', 0))
 
         queryset = NewsRecycleQuerySet(params=self.query_params).get_news_list(
-            self.query_params['search[value]'].strip()).order_by('-pubtime')
+            self.query_params['search[value]'].strip(), self.industry, self.publisher).order_by('-pubtime')
 
         if limit:
             queryset = queryset[:limit]
@@ -950,6 +954,8 @@ class RiskNewsDelete(BaseView):
     def set_params(self, params):
         for k, v in params.iteritems():
             self.query_params[k] = v
+        self.industry =  self.query_params.get('industry')
+        self.publisher = self.query_params.get('publisher')
 
     def delete(self):
         risk_news_ids = self.query_params['risk_news_ids']
@@ -967,8 +973,8 @@ class RiskNewsDelete(BaseView):
         results = self.paging(queryset)
         data = {
             "draw": self.query_params['draw'],
-            "recordsTotal": NewsRecycleQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
-            "recordsFiltered": NewsRecycleQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
+            "recordsTotal": NewsRecycleQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip(), self.industry, self.publisher).count(),
+            "recordsFiltered": NewsRecycleQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip(), self.industry, self.publisher).count(),
             "data": map(lambda r: {
                 'id': r['id'],
                 'titleAndurl': [r['title'], r['url']],
@@ -988,7 +994,7 @@ class RiskNewsDelete(BaseView):
         limit = int(self.query_params.get('limit', 0))
 
         queryset = NewsRecycleQuerySet(params=self.query_params).get_news_list(
-            self.query_params['search[value]'].strip()).order_by('-pubtime')
+            self.query_params['search[value]'].strip(), self.industry, self.publisher).order_by('-pubtime')
 
         if limit:
             queryset = queryset[:limit]
@@ -1004,6 +1010,8 @@ class ValidNews(BaseView):
     def set_params(self, params):
         for k, v in params.iteritems():
             self.query_params[k] = v
+        self.industry =  self.query_params.get('industry')
+        self.publisher = self.query_params.get('publisher')
 
     def paging(self, queryset):
         page = (int(self.query_params['start']) /
@@ -1014,8 +1022,8 @@ class ValidNews(BaseView):
         results = self.paging(queryset)
         data = {
             "draw": self.query_params['draw'],
-            "recordsTotal": NewsValidQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
-            "recordsFiltered": NewsValidQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
+            "recordsTotal": NewsValidQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip(), self.industry, self.publisher).count(),
+            "recordsFiltered": NewsValidQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip(), self.industry, self.publisher).count(),
             "data": map(lambda r: {
                 'id': r['id'],
                 'titleAndurl': [r['title'], r['url']],
@@ -1035,7 +1043,7 @@ class ValidNews(BaseView):
         limit = int(self.query_params.get('limit', 0))
 
         queryset = NewsValidQuerySet(params=self.query_params).get_news_list(
-            self.query_params['search[value]'].strip()).order_by('-pubtime')
+            self.query_params['search[value]'].strip(), self.industry, self.publisher).order_by('-pubtime')
 
         if limit:
             queryset = queryset[:limit]
@@ -1051,6 +1059,8 @@ class RiskNewsValid(BaseView):
     def set_params(self, params):
         for k, v in params.iteritems():
             self.query_params[k] = v
+        self.industry =  self.query_params.get('industry')
+        self.publisher = self.query_params.get('publisher')
 
     def valid(self):
         risk_news_ids = self.query_params['risk_news_ids']
@@ -1068,8 +1078,8 @@ class RiskNewsValid(BaseView):
         results = self.paging(queryset)
         data = {
             "draw": self.query_params['draw'],
-            "recordsTotal": NewsQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
-            "recordsFiltered": NewsQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip()).count(),
+            "recordsTotal": NewsQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip(), self.industry, self.publisher).count(),
+            "recordsFiltered": NewsQuerySet(params=self.query_params).get_news_list(self.query_params['search[value]'].strip(), self.industry, self.publisher).count(),
             "data": map(lambda r: {
                 'id': r['id'],
                 'titleAndurl': [r['title'], r['url']],
@@ -1089,7 +1099,7 @@ class RiskNewsValid(BaseView):
         limit = int(self.query_params.get('limit', 0))
 
         queryset = NewsQuerySet(params=self.query_params).get_news_list(
-            self.query_params['search[value]'].strip()).order_by('-pubtime')
+            self.query_params['search[value]'].strip(), self.industry, self.publisher).order_by('-pubtime')
 
         if limit:
             queryset = queryset[:limit]
