@@ -21,8 +21,8 @@ class AreaAdmin(ForeignKeyAutocompleteAdmin):
 
 class IndustryAdmin(ForeignKeyAutocompleteAdmin):
     related_search_fields = {'parent': ('name',)}
-    fields = ('name', 'level', 'parent')
-    list_display = ('name', 'level', 'parent')
+    fields = ('name','code', 'level', 'parent')
+    list_display = ('name', 'code', 'level', 'parent')
     search_fields = ('name', 'level', 'parent__name')
     list_filter = ('level', )
 
