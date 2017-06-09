@@ -341,7 +341,7 @@ class IndustryList(BaseView):
             'score':q[3],
         } for q in queryset]
 
-        if queryset[0][2] == 1 and self.query_params.get('externalcall') is not None:
+        if self.query_params.get('externalcall') is not None:
 
             queryset2 = IndustryTrack(params=self.query_params).while_risk()
 
@@ -360,8 +360,7 @@ class IndustryList(BaseView):
 
     def generate_cache_name(self):
         self.query_params['cache_conf_name'] = 'industries'
-        self.query_params['days'] = (
-            self.query_params['end'] - self.query_params['start']).days
+        self.query_params['days'] = (self.query_params['end'] - self.query_params['start']).days
         return IndustriesJob().generate_cache_name(self.query_params)
 
     def get(self, request):

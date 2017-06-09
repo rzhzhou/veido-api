@@ -336,22 +336,20 @@ class IndustryTrack(NewsQuerySet):
 
     def get_industries(self):
         industries = []
-
         cond = {
+            'status': getattr(self, 'status', None),
             'area__name': getattr(
                 self,
                 'area',
-                self.area_name if self.area_name is not None else UserArea.objects.get(
-                    user__id=self.user_id).area.name
+                UserArea.objects.get(user__id=self.user_id).area.name
             ),
             'industry__name': getattr(self, 'name', None),
             'industry__level': getattr(self, 'level', None),
-            'industry__parent__id': getattr(self, 'parent', None)
+            'industry__parent__id': getattr(self, 'parent', None),
         }
 
         # Exclude $cond None Value
         args = dict([(k, v) for k, v in cond.iteritems() if v is not None])
-
         user_industries = AreaIndustry.objects.filter(**args)
 
         for u in user_industries:
