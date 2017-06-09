@@ -336,8 +336,9 @@ class IndustryTrack(NewsQuerySet):
 
     def get_industries(self):
         industries = []
+        status = getattr(self, 'status', None)
         cond = {
-            'status': getattr(self, 'status', None),
+            'status': None if status == u'' else status,
             'area__name': getattr(
                 self,
                 'area',
