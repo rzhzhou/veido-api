@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+import operator
+
 from random import randint
-from django.db.models import Avg
+from django.db.models import Avg, Q
 from django.shortcuts import get_object_or_404
 from datetime import date, datetime, timedelta
 
@@ -336,9 +338,7 @@ class IndustryTrack(NewsQuerySet):
 
     def get_industries(self):
         industries = []
-        status = getattr(self, 'status', None)
         cond = {
-            'status': None if status == u'' else status,
             'area__name': getattr(
                 self,
                 'area',
@@ -351,7 +351,13 @@ class IndustryTrack(NewsQuerySet):
 
         # Exclude $cond None Value
         args = dict([(k, v) for k, v in cond.iteritems() if v is not None])
-        user_industries = AreaIndustry.objects.filter(**args)
+
+        status = getattr(self, 'status', None)
+        if status is u'' or status is None:
+            user_industries = AreaIndustry.objects.filter(**args)
+        else:
+            query = reduce(operator.or_, (Q(status__contains=x) for x in status.split(',')))
+            user_industries = AreaIndustry.objects.filter(**args).filter(query)
 
         for u in user_industries:
             queryset = ScoreIndustry.objects.filter(
