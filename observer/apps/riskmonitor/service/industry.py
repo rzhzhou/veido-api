@@ -83,7 +83,7 @@ class IndustryTrack(NewsQuerySet):
             c_class = 'bg-red-400'
         elif 34 <= c_score < 67:
             c_color = '#6586a1'
-            c_class = 'bg-orange-400'
+            c_class = 'bg-yellow-400'
         else:
             c_color = '#95c5ab'
             c_class = 'bg-green-400'
@@ -112,7 +112,7 @@ class IndustryTrack(NewsQuerySet):
             s_class = 'bg-red-400'
         elif 34 <= s_score < 67:
             s_color = '#6586a1'
-            s_class = 'bg-orange-400'
+            s_class = 'bg-yellow-400'
         elif 67 <= s_score < 100:
             s_color = '#95c5ab'
             s_class = 'bg-green-400'
@@ -141,7 +141,7 @@ class IndustryTrack(NewsQuerySet):
             m_class = 'bg-red-400'
         elif 34 <= m_score < 67:
             m_color = '#6586a1'
-            m_class = 'bg-orange-400'
+            m_class = 'bg-yellow-400'
         else:
             m_color = '#95c5ab'
             m_class = 'bg-green-400'
@@ -189,7 +189,7 @@ class IndustryTrack(NewsQuerySet):
             n_class = 'bg-red-400'
         elif 30 <= n_score < 70:
             n_color = '#6586a1'
-            n_class = 'bg-orange-400'
+            n_class = 'bg-yellow-400'
         else:
             n_color = '#95c5ab'
             n_class = 'bg-green-400'
@@ -241,7 +241,7 @@ class IndustryTrack(NewsQuerySet):
             i_class = 'bg-red-400'
         elif 30 <= i_score < 70:
             i_color = '#6586a1'
-            i_class = 'bg-orange-400'
+            i_class = 'bg-yellow-400'
         else:
             i_color = '#95c5ab'
             i_class = 'bg-green-400'
@@ -272,7 +272,7 @@ class IndustryTrack(NewsQuerySet):
             risk_rank_class = 'bg-red-400'
         elif 30 <= risk_rank_score < 70:
             risk_rank_color = '#6586a1'
-            risk_rank_class = 'bg-orange-400'
+            risk_rank_class = 'bg-yellow-400'
         else:
             risk_rank_color = '#95c5ab'
             risk_rank_class = 'bg-green-400'
