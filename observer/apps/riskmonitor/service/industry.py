@@ -379,7 +379,7 @@ class IndustryTrack(NewsQuerySet):
             else:
                 count_risk_rank_score = count_consume_index_score * 0.0736 + count_society_index_score * 0.0736 +  count_manage_index_score * 0.1853 + count_risk_news_score * 0.4546 + risk_inspection_data[4] * 0.1729 + risk_inspection_data[5] * 0.04
 
-            industries.append((u.industry.id, u.name, u.industry.level, round(count_risk_rank_score, 2)))
+            industries.append((u.industry.id, u.name, u.industry.level, round(count_risk_rank_score, 2), u.status))
 
         return sorted(industries, key=lambda industry: industry[3])
 
