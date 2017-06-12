@@ -10,7 +10,7 @@ from observer.apps.riskmonitor.views import (Analytics, AnalyticsExport,
                                              RiskNewsRecycle, RiskNewsRestore, RiskNewsDelete, 
                                              InspectionList, Search, SearchIndustry, 
                                              SearchPublisher, AdministrativePenaltieList, 
-                                             Products)
+                                             Products, ProductUpdate)
 
 urlpatterns = [
     url(r'^dashboards$', DashboardList.as_view()),
@@ -35,6 +35,7 @@ urlpatterns = [
     url(r'^publishers$', SearchPublisher.as_view()),
     url(r'^administrativepenalties$', AdministrativePenaltieList.as_view()),
     url(r'^products$', Products.as_view()),
+    url(r'^productupdate$', ProductUpdate.as_view()),
 ]
 
 urlpatterns += [

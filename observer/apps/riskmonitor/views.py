@@ -1485,6 +1485,55 @@ class Products(BaseView):
 
         return Response(data)
 
+
+class ProductUpdate(BaseView):
+
+    def __init__(self):
+        super(ProductUpdate, self).__init__()
+
+    def set_params(self, request):
+        super(ProductUpdate, self).set_params(request.GET)
+
+    def update(self, params):
+        area_industry_ids = params.get('area_industry_ids')
+        if area_industry_ids is u'':
+            for area_industry in AreaIndustry.objects.filter(area=Area.objects.filter(name=u'苏州')[0]):
+                status_set = set(area_industry.status.split(','))
+                try:
+                    status_set.remove('1')
+                    status_set.remove('')
+                except Exception as e:
+                    pass
+                status_str = ""
+                for s in status_set:
+                    status_str += "%s," % s
+                if status_str.find(',') != -1:
+                    status_str = status_str[0:len(status_str)-1]
+
+                AreaIndustry.objects.filter(id=area_industry.id).update(status=status_str)
+        else:
+            for area_industry in AreaIndustry.objects.filter(id__in=area_industry_ids.split(',')):
+                status_set = set(area_industry.status.split(','))
+                try:
+                    status_set.add(params.get('status'))
+                    status_set.remove('')
+                except Exception as e:
+                    pass
+                status_str = ""
+                for s in status_set:
+                    status_str += "%s," % s
+                if status_str.find(',') != -1:
+                    status_str = status_str[0:len(status_str)-1]
+
+                AreaIndustry.objects.filter(id=area_industry.id).update(status=status_str)
+
+        return 1
+
+    def get(self, request):
+        self.set_params(request)
+        return Response(self.update(self.query_params))
+
+
 def logout_view(request):
     auth = settings.JWT_AUTH
     secret_key = auth['JWT_SECRET_KEY']
