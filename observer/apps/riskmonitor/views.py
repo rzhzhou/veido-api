@@ -1501,7 +1501,7 @@ class ProductUpdate(BaseView):
                 for area_industry in AreaIndustry.objects.filter(area=Area.objects.filter(name=u'苏州')[0]):
                     status_set = set(area_industry.status.split(','))
                     try:
-                        status_set.remove('1')
+                        status_set.remove(params.get('status'))
                         status_set.remove('')
                     except Exception as e:
                         pass
