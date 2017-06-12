@@ -16,6 +16,7 @@ class AdministrativePenalties(models.Model):
     punishment_basis = models.CharField(max_length=255, null=True, blank=True, verbose_name=u'处罚依据')
     punishment_result = models.CharField(max_length=255, null=True, blank=True, verbose_name=u'处罚结果')
     penalty_organ = models.CharField(max_length=255, verbose_name=u'处罚机关')
+    credit_code = models.CharField(max_length=255, default=u'', verbose_name=u'统一社会信用代码')
     
     area = models.ManyToManyField(
         'origin.Area',
