@@ -20,14 +20,17 @@ class AdministrativePenalties(models.Model):
     
     area = models.ManyToManyField(
         'origin.Area',
+        null=True, blank=True,
         verbose_name=u'地域'
     )
     enterprise = models.ManyToManyField(
         'origin.Enterprise',
+        null=True, blank=True,
         verbose_name=u'处罚企业'
     )
     industry = models.ManyToManyField(
         'origin.Industry',
+        null=True, blank=True,
         verbose_name=u'行业'
     )
 
