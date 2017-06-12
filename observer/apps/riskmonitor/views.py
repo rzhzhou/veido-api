@@ -1472,8 +1472,14 @@ class Products(BaseView):
             industry = {}
             industry['level_one'] = i.name
             industry_list = []
-            for indu in Industry.objects.filter(parent__in = Industry.objects.filter(parent=i)):
-                industry_list.append(indu.name)
+
+            for area_industry in AreaIndustry.objects.filter(industry__in=Industry.objects.filter(parent__in=Industry.objects.filter(parent=i)), area=Area.objects.filter(name=u'苏州')[0]):
+                industry_list.append({
+                    'id': area_industry.id, 
+                    'name': area_industry.name, 
+                    'status': area_industry.status
+                    })
+
             industry['level_three'] = industry_list
             data.append(industry)
 
