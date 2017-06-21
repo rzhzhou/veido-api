@@ -1494,39 +1494,46 @@ class ProductUpdate(BaseView):
     def set_params(self, request):
         super(ProductUpdate, self).set_params(request.GET)
 
+    def handle_remove(self, params, area_industry_list):
+        for area_industry in area_industry_list:
+            status_set = set(area_industry.status.split(','))
+            try:
+                status_set.remove(params.get('status'))
+                status_set.remove('')
+            except Exception as e:
+                pass
+            status_str = ""
+            for s in status_set:
+                status_str += "%s," % s
+            if status_str.find(',') != -1:
+                status_str = status_str[0:len(status_str)-1]
+
+            AreaIndustry.objects.filter(id=area_industry.id).update(status=status_str)
+
+    def handle_add(self, params, area_industry_list):
+        for area_industry in area_industry_list:
+            status_set = set(area_industry.status.split(','))
+            try:
+                status_set.add(params.get('status'))
+                status_set.remove('')
+            except Exception as e:
+                pass
+            status_str = ""
+            for s in status_set:
+                status_str += "%s," % s
+            if status_str.find(',') != -1:
+                status_str = status_str[0:len(status_str)-1]
+
+            AreaIndustry.objects.filter(id=area_industry.id).update(status=status_str)
+
     def update(self, params):
         try:
             area_industry_ids = params.get('area_industry_ids')
             if area_industry_ids is u'':
-                for area_industry in AreaIndustry.objects.filter(area=Area.objects.filter(name=u'苏州')[0]):
-                    status_set = set(area_industry.status.split(','))
-                    try:
-                        status_set.remove(params.get('status'))
-                        status_set.remove('')
-                    except Exception as e:
-                        pass
-                    status_str = ""
-                    for s in status_set:
-                        status_str += "%s," % s
-                    if status_str.find(',') != -1:
-                        status_str = status_str[0:len(status_str)-1]
-
-                    AreaIndustry.objects.filter(id=area_industry.id).update(status=status_str)
+                self.handle_remove(params, AreaIndustry.objects.filter(area=Area.objects.filter(name=u'苏州')[0]))
             else:
-                for area_industry in AreaIndustry.objects.filter(id__in=area_industry_ids.split(',')):
-                    status_set = set(area_industry.status.split(','))
-                    try:
-                        status_set.add(params.get('status'))
-                        status_set.remove('')
-                    except Exception as e:
-                        pass
-                    status_str = ""
-                    for s in status_set:
-                        status_str += "%s," % s
-                    if status_str.find(',') != -1:
-                        status_str = status_str[0:len(status_str)-1]
-
-                    AreaIndustry.objects.filter(id=area_industry.id).update(status=status_str)
+                self.handle_add(params, AreaIndustry.objects.filter(id__in=area_industry_ids.split(',')))
+                self.handle_remove(params, AreaIndustry.objects.exclude(id__in=area_industry_ids.split(',')))
 
             return 1
         except Exception as e:
