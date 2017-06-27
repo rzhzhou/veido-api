@@ -23,11 +23,6 @@ class IndustryTrack(NewsQuerySet):
         except Exception as e:
             self.area_name = UserArea.objects.get(user__id=self.user_id).area.name
 
-        try:
-            self.area = self.area
-        except Exception as e:
-            self.area = u'常州'
-
     def trend_chart(self):
         self.days = (self.end - self.start).days
 
@@ -212,13 +207,13 @@ class IndustryTrack(NewsQuerySet):
 
         this_score = 100
         other_score = 100
-        if self.area is not None:
+        if self.area_name is not None:
             this_dimension = Inspection.objects.filter(
                 industry__id=industry,
                 qualitied__lt=1,
                 pubtime__gte=self.start,
                 pubtime__lt=self.end,
-                area__name=self.area
+                area__name=self.area_name
             )
 
             other_dimension = Inspection.objects.filter(
@@ -226,7 +221,7 @@ class IndustryTrack(NewsQuerySet):
                 qualitied__lt=1,
                 pubtime__gte=self.start,
                 pubtime__lt=self.end
-            ).exclude(area__name=self.area)
+            ).exclude(area__name=self.area_name)
 
             this_score = (100 - this_dimension.count() * 10)
             other_score = (100 - other_dimension.count() * 10)
@@ -341,7 +336,7 @@ class IndustryTrack(NewsQuerySet):
         cond = {
             'area__name': getattr(
                 self,
-                'area',
+                'area_name',
                 UserArea.objects.get(user__id=self.user_id).area.name
             ),
             'industry__name': getattr(self, 'name', None),
