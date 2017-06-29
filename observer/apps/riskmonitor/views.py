@@ -370,7 +370,7 @@ class IndustryList(BaseView):
         limit = int(self.query_params.get('limit', 0))
 
         try:
-            if self.query_params.get('area_name') == u'苏州':
+            if self.query_params.get('status') is not None and self.query_params.get('status') is not u'':
                 raise Cache.DoesNotExist
             else:
                 cache = Cache.objects.get(k=self.generate_cache_name())

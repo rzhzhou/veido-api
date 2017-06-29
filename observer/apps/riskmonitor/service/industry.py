@@ -21,8 +21,11 @@ class IndustryTrack(NewsQuerySet):
         try:
             self.area_name = self.area_name
         except Exception as e:
-            self.area_name = UserArea.objects.get(user__id=self.user_id).area.name
-
+            try:
+                self.area_name = self.area
+            except Exception as e:
+                self.area_name = UserArea.objects.get(user__id=self.user_id).area.name
+            
     def trend_chart(self):
         self.days = (self.end - self.start).days
 

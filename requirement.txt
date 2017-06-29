@@ -1,6 +1,5 @@
 # Install with: `pip install -r requirements.txt`
 
-
 # Support libs
 jieba >= 0.37
 pytz >= 2015.7
@@ -19,7 +18,6 @@ djangorestframework-jwt >= 1.7.2
 django-extensions >= 1.5.6
 django-import-export >= 0.2.8
 django-tinymce >= 2.0.0
-django-daterange-filter == 1.3.0
 
 # MongoDB
 pymongo >= 3.0.0
