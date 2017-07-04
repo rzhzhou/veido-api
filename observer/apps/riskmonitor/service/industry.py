@@ -334,8 +334,16 @@ class IndustryTrack(NewsQuerySet):
 
         return (total_score, internet_score, inspection_score)
 
+    
+
+
     def get_industries(self):
         industries = []
+        industries2=[]
+        industriesm=[]
+        industriesm_nowname=[]
+        industries_lastname=[]
+        trendlist=[]
         cond = {
             'area__name': getattr(
                 self,
@@ -357,19 +365,13 @@ class IndustryTrack(NewsQuerySet):
             query = reduce(operator.or_, (Q(status__contains=x) for x in status.split(',')))
             user_industries = AreaIndustry.objects.filter(**args).filter(query)
 
-        for u in user_industries:
-            queryset = ScoreIndustry.objects.filter(
-                pubtime__gte=self.start,
-                pubtime__lt=self.end,
-                industry=u.industry.id
-            )
-
-            count_consume_index_score = self.count_consume_index_data(u.industry.id)[1]
-            count_society_index_score = self.count_society_index_data(u.industry.id)[1]
-            count_manage_index_score = self.count_manage_index_data(u.industry.id)[1]
-            count_risk_news_score = self.count_risk_news_data(u.industry.id)[1]
-
-            risk_inspection_data = self.count_risk_inspection_data(u.industry.id)
+##############################################
+        for um in user_industries:
+            count_consume_index_score = self.count_consume_index_data(um.industry.id)[1]
+            count_society_index_score = self.count_society_index_data(um.industry.id)[1]
+            count_manage_index_score = self.count_manage_index_data(um.industry.id)[1]
+            count_risk_news_score = self.count_risk_news_data(um.industry.id)[1]    ####
+            risk_inspection_data = self.count_risk_inspection_data(um.industry.id)   ######
 
             if risk_inspection_data[4] is 100 and risk_inspection_data[5] is 100:
                 count_risk_inspection_score = risk_inspection_data[1]
@@ -377,9 +379,49 @@ class IndustryTrack(NewsQuerySet):
             else:
                 count_risk_rank_score = count_consume_index_score * 0.0736 + count_society_index_score * 0.0736 +  count_manage_index_score * 0.1853 + count_risk_news_score * 0.4546 + risk_inspection_data[4] * 0.1729 + risk_inspection_data[5] * 0.04
 
-            industries.append((u.industry.id, u.name, u.industry.level, round(count_risk_rank_score, 2), u.status))
+            industriesm.append((um.industry.id, um.name, um.industry.level, round(count_risk_rank_score, 2), um.status))  
+            nowmonthsort=sorted(industriesm, key=lambda industry: industry[3])
+           
+        for im in nowmonthsort:
+            industriesm_nowname.append(im[1])
 
+        for u in user_industries:
+            count_consume_index_score = self.count_consume_index_data(u.industry.id)[1]
+            count_society_index_score = self.count_society_index_data(u.industry.id)[1]
+            count_manage_index_score = self.count_manage_index_data(u.industry.id)[1]
+            self.start=self.start-timedelta(days=30)
+            self.end=self.end-timedelta(days=30)
+            count_risk_news_score = self.count_risk_news_data(u.industry.id)[1]    ####
+            risk_inspection_data = self.count_risk_inspection_data(u.industry.id)   ######
+
+            if risk_inspection_data[4] is 100 and risk_inspection_data[5] is 100:
+                count_risk_inspection_score = risk_inspection_data[1]
+                count_risk_rank_score = count_consume_index_score * 0.0736 + count_society_index_score * 0.0736 +  count_manage_index_score * 0.1853 + count_risk_news_score * 0.4546 + count_risk_inspection_score * 0.2129
+            else:
+                count_risk_rank_score = count_consume_index_score * 0.0736 + count_society_index_score * 0.0736 +  count_manage_index_score * 0.1853 + count_risk_news_score * 0.4546 + risk_inspection_data[4] * 0.1729 + risk_inspection_data[5] * 0.04
+
+            industries.append([u.industry.id, u.name, u.industry.level, round(count_risk_rank_score, 2), u.status])
+            lastmonthsort=sorted(industries, key=lambda industry: industry[3])
+        
+        for i in lastmonthsort:
+            industries_lastname.append(i[1])
+
+        
+        for n in industriesm_nowname:
+                nowmonthindex = industriesm_nowname.index(n)
+                lastmonthindex = industries_lastname.index(n)
+                trend=nowmonthindex - lastmonthindex
+                trendlist.append(trend)
+
+        for index,x in enumerate(industries):
+            
+                industries[index].append(trendlist[index])
+               
+        
+        print sorted(industries, key=lambda industry: industry[3])  
         return sorted(industries, key=lambda industry: industry[3])
+            
+               
 
     def while_risk(self):
 
