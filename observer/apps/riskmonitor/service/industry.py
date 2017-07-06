@@ -334,8 +334,6 @@ class IndustryTrack(NewsQuerySet):
 
         return (total_score, internet_score, inspection_score)
 
-    
-
 
     def get_industries(self):
         industries = []
@@ -365,7 +363,6 @@ class IndustryTrack(NewsQuerySet):
             query = reduce(operator.or_, (Q(status__contains=x) for x in status.split(',')))
             user_industries = AreaIndustry.objects.filter(**args).filter(query)
 
-##############################################
         for um in user_industries:
             count_consume_index_score = self.count_consume_index_data(um.industry.id)[1]
             count_society_index_score = self.count_society_index_data(um.industry.id)[1]
@@ -408,23 +405,18 @@ class IndustryTrack(NewsQuerySet):
 
         
         for n in industriesm_nowname:
-                nowmonthindex = industriesm_nowname.index(n)
-                lastmonthindex = industries_lastname.index(n)
-                trend=nowmonthindex - lastmonthindex
-                trendlist.append(trend)
+            nowmonthindex = industriesm_nowname.index(n)
+            lastmonthindex = industries_lastname.index(n)
+            trend=nowmonthindex - lastmonthindex
+            trendlist.append(trend)
 
         for index,x in enumerate(industries):
-            
-                industries[index].append(trendlist[index])
+            industries[index].append(trendlist[index])
                
-        
-        print sorted(industries, key=lambda industry: industry[3])  
         return sorted(industries, key=lambda industry: industry[3])
-            
                
 
     def while_risk(self):
-
         result = self.trend_chart()
         categories = result.get("categories")
         lastTime = categories[len(categories) - 1]
