@@ -27,7 +27,7 @@ SECRET_KEY = 'fkf4xm9z$hx7_hy22@0#^x-s+tt#4zn_tlvkoazi04_0_l5is='
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['192.168.1.167']
 
 CORS_ORIGIN_ALLOW_ALL = True
 
@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'observer.apps.origin',
     'observer.apps.riskmonitor',
     'observer.apps.penalty',
+    'observer.apps.yqj',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -96,26 +97,26 @@ WSGI_APPLICATION = 'observer.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': '27.17.61.26',
-        'NAME': 'yqj2',
-        'USER': 'shendu',
-        'PASSWORD': 'P@55word',
+        'HOST': '192.168.1.167',
+        'NAME': 'observer',
+        'USER': 'root',
+        'PASSWORD': '123456',
         'PORT': 3306
-    },
+    }, 
     'master': {
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': '27.17.61.26',
-        'NAME': 'yqj2',
-        'USER': 'shendu',
-        'PASSWORD': 'P@55word',
+        'HOST': '192.168.1.167',
+        'NAME': 'observer',
+        'USER': 'root',
+        'PASSWORD': '123456',
         'PORT': 3306
-    },
+    }, 
     'crawler': {
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': '27.17.61.26',
-        'NAME': 'crawler',
-        'USER': 'shendu',
-        'PASSWORD': 'P@55word',
+        'HOST': '192.168.1.167',
+        'NAME': 'observer',
+        'USER': 'root',
+        'PASSWORD': '123456',
         'PORT': 3306
     }
 }

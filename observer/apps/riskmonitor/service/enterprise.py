@@ -3,7 +3,7 @@ from django.db.models import Count, Q
 
 from observer.apps.origin.models import Inspection
 from observer.apps.origin.models import Area
-from observer.apps.riskmonitor.models import ScoreEnterprise, AreaIndustry
+from observer.apps.riskmonitor.models import AreaIndustry
 from observer.apps.riskmonitor.service.abstract import Abstract
 
 

@@ -5,11 +5,9 @@ from datetime import datetime
 
 from django.conf import settings
 
-from import_export.widgets import DateWidget, ForeignKeyWidget, ManyToManyWidget
+from import_export.widgets import DateWidget, ForeignKeyWidget
 from import_export import widgets
 from import_export import resources, fields
-from observer.apps.base.models import Area
-from observer.apps.origin.models import Industry, Enterprise, InspectionPublisher
 from observer.apps.penalty.models import AdministrativePenalties
 
 class AdministrativePenaltiesResources(resources.ModelResource):
@@ -23,24 +21,15 @@ class AdministrativePenaltiesResources(resources.ModelResource):
     punishment_basis = fields.Field(attribute='punishment_basis', column_name=u'处罚依据')
     punishment_result = fields.Field(attribute='punishment_result', column_name=u'处罚结果')
     penalty_organ = fields.Field(attribute='penalty_organ', column_name=u'处罚机关')
-
-    area = fields.Field(
-        column_name=u'地域',
-        attribute='area',
-        widget=ManyToManyWidget(Area, ' ', 'name'))
-    industry = fields.Field(
-        column_name=u'行业',
-        attribute='industry',
-        widget=ManyToManyWidget(Industry, ' ', 'name'))
-    enterprise=fields.Field(
-        column_name=u'处罚企业',
-        attribute='enterprise',
-        widget=ManyToManyWidget(Enterprise, ' ', 'name'))
+    credit_code = fields.Field(attribute='credit_code', column_name=u'统一社会信用代码')
+    area = fields.Field(attribute='area', column_name=u'地域')
+    industry = fields.Field(attribute='industry', column_name=u'行业')
+    enterprise=fields.Field(attribute='enterprise', column_name=u'处罚企业')
 
     class Meta:
         model = AdministrativePenalties
-        fields = ('id','title', 'url', 'publisher', 'pubtime','area','industry','enterprise','penalty_organ','case_name','illegal_behavior','punishment_basis','punishment_result')
-        export_order = ('id','title', 'url', 'publisher', 'pubtime','area','industry','enterprise','penalty_organ','case_name','illegal_behavior','punishment_basis','punishment_result')
+        fields = ('id','title', 'url', 'publisher', 'pubtime', 'credit_code', 'area','industry','enterprise','penalty_organ','case_name','illegal_behavior','punishment_basis','punishment_result')
+        export_order = ('id','title', 'url', 'publisher', 'pubtime', 'credit_code', 'area','industry','enterprise','penalty_organ','case_name','illegal_behavior','punishment_basis','punishment_result')
 
     def before_save_instance(self, instance, dry_run, temp=''):
         if not instance.pubtime:

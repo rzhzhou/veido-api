@@ -8,8 +8,7 @@ from django.conf import settings
 from import_export.widgets import DateWidget, ForeignKeyWidget, ManyToManyWidget
 from import_export import widgets
 from import_export import resources, fields
-from observer.apps.base.models import Area
-from observer.apps.origin.models import Industry, Enterprise, InspectionPublisher, Inspection
+from observer.apps.origin.models import Area, Industry, Enterprise, InspectionPublisher, Inspection
 
 
 class EnterpriseResources(resources.ModelResource):

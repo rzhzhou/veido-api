@@ -3,7 +3,7 @@ from django.db.models import Count
 
 from observer.apps.riskmonitor.service.industry import IndustryTrack
 
-from observer.apps.riskmonitor.models import RiskNews, AreaIndustry, Enterprise, Product
+from observer.apps.riskmonitor.models import RiskNews, AreaIndustry, Enterprise
 
 
 class AnalyticsCal(IndustryTrack):

@@ -17,7 +17,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from observer.apps.origin.models import Inspection
-from observer.apps.riskmonitor.models import (Area, Cache, Enterprise, Industry, Product,
+from observer.apps.riskmonitor.models import (Area, Cache, Enterprise, Industry,
                                               RiskNews, RiskNewsPublisher,
                                               AreaIndustry, UserArea)
 from observer.apps.riskmonitor.service.abstract import Abstract
