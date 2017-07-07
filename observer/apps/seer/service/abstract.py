@@ -5,7 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, Q
 from django.http import Http404
 
-from observer.apps.riskmonitor.models import (Industry, RiskNews,
+from observer.apps.seer.models import (Industry, RiskNews,
                                               RiskNewsPublisher, AreaIndustry)
 
 

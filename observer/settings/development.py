@@ -53,7 +53,7 @@ INSTALLED_APPS = [
     'observer.apps.crawler',
     'observer.apps.inspection',
     'observer.apps.origin',
-    'observer.apps.riskmonitor',
+    'observer.apps.seer',
     'observer.apps.penalty',
     'observer.apps.yqj',
 ]

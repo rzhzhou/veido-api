@@ -5,7 +5,7 @@ from datetime import date, datetime, timedelta
 from django_extensions.management.jobs import DailyJob
 
 from observer.apps.origin.models import (Industry, IndustryScore, Area)
-from observer.apps.riskmonitor.service.industry import IndustryTrack
+from observer.apps.seer.service.industry import IndustryTrack
 
 
 class Job(DailyJob):

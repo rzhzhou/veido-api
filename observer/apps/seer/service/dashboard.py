@@ -5,8 +5,8 @@ from datetime import datetime, timedelta
 
 from django.db.models import Count, Q
 
-from observer.apps.riskmonitor.models import (Area, RiskNews)
-from observer.apps.riskmonitor.service.analytics import AnalyticsCal
+from observer.apps.seer.models import (Area, RiskNews)
+from observer.apps.seer.service.analytics import AnalyticsCal
 
 
 class Dashboard(AnalyticsCal):

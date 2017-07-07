@@ -10,7 +10,7 @@ from import_export.widgets import (DateTimeWidget, ForeignKeyWidget,
 from import_export import widgets
 from import_export import resources, fields
 from observer.apps.origin.models import Area, Enterprise, Industry
-from observer.apps.riskmonitor.models import (Area, ConsumeIndex, ManageIndex, SocietyIndex,
+from observer.apps.seer.models import (Area, ConsumeIndex, ManageIndex, SocietyIndex,
                                               RiskNews, RiskNewsPublisher)
 
 

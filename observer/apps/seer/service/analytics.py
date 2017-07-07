@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from django.db.models import Count
 
-from observer.apps.riskmonitor.service.industry import IndustryTrack
+from observer.apps.seer.service.industry import IndustryTrack
 
-from observer.apps.riskmonitor.models import RiskNews, AreaIndustry, Enterprise
+from observer.apps.seer.models import RiskNews, AreaIndustry, Enterprise
 
 
 class AnalyticsCal(IndustryTrack):

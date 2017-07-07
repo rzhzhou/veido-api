@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from django_extensions.management.jobs import HourlyJob
 
-from observer.apps.riskmonitor.service.dashboard import Dashboard
-from observer.apps.riskmonitor.models import Cache, CacheConf
+from observer.apps.seer.service.industry import IndustryTrack
+from observer.apps.seer.models import Cache, CacheConf
 from observer.utils.date.convert import utc_to_local_time, get_days, get_start_end
 
 
 class Job(HourlyJob):
-    help = "Get Dashboard job."
+    help = "Get Level 3 Industries job."
 
     def __init__(self):
         self.today = date.today() + timedelta(days=1)
@@ -20,11 +20,10 @@ class Job(HourlyJob):
 
         query_params = {
             'cache_conf_name': cache_conf.name,
-            'days': cache_conf.days,
             'level': cache_conf.params['level'],
             'area': cache_conf.params['area'],
             'user_id': cache_conf.params['user_id'],
-            'start': utc_to_local_time(self.today - timedelta(days=cache_conf.days)),
+            'start': utc_to_local_time(self.today - timedelta(days=days)),
             'end': utc_to_local_time(self.today)
         }
 
@@ -33,16 +32,17 @@ class Job(HourlyJob):
             query_params['start'] = utc_to_local_time(start_end[0])
             query_params['end'] = utc_to_local_time(start_end[1])
 
+
         return query_params
 
     def generate_cache_name(self, query_params):
         name = query_params['cache_conf_name']
         start = query_params['start'].strftime('%Y-%m-%d')
         end = query_params['end'].strftime('%Y-%m-%d')
-        level = query_params['level']
-        user = query_params['user_id']
-        area = query_params.get('area', u'常州')
-        return u'%s.%s.%s.%s.%s.%s' % (name, start, end, level, user, area)
+        level = query_params.get('level')
+        area = query_params.get('area')
+        area = area if area is not None else query_params.get('area_name', u'全国')
+        return u'%s.%s.%s.%s.%s' % (name, start, end, level, area)
 
     @property
     def cache_confs(self):
@@ -56,6 +56,6 @@ class Job(HourlyJob):
             Cache.objects.update_or_create(
                 k=cache_name,
                 defaults={
-                    'v': Dashboard(params=query_params).get_all()
+                    'v': IndustryTrack(params=query_params).get_industries()
                 }
             )

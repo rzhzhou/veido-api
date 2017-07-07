@@ -5,8 +5,8 @@ from django.db.models import Case, IntegerField, Sum, When, Max
 from django.db.models import Q
 
 from observer.apps.origin.models import IndustryScore
-from observer.apps.riskmonitor.models import RiskNews
-from observer.apps.riskmonitor.service.abstract import Abstract
+from observer.apps.seer.models import RiskNews
+from observer.apps.seer.service.abstract import Abstract
 from observer.utils.date.convert import utc_to_local_time
 
 

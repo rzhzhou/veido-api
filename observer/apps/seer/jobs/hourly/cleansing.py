@@ -3,7 +3,7 @@ from datetime import date, timedelta
 from django_extensions.management.jobs import HourlyJob
 
 from observer.apps.corpus.models import Corpus
-from observer.apps.riskmonitor.models import RiskNews
+from observer.apps.seer.models import RiskNews
 
 
 class Job(HourlyJob):

@@ -39,7 +39,7 @@ class AreaIndustry(models.Model):
     )
 
     class Meta:
-        app_label = 'riskmonitor'
+        app_label = 'seer'
         verbose_name_plural = u'地域行业'
 
     def __unicode__(self):
@@ -50,7 +50,7 @@ class RiskNewsPublisher(models.Model):
     name = models.CharField(max_length=255, verbose_name=u'发布者')
 
     class Meta:
-        app_label = 'riskmonitor'
+        app_label = 'seer'
         verbose_name_plural = u'风险新闻发布者'
 
     def __unicode__(self):
@@ -103,7 +103,7 @@ class UserArea(models.Model):
     area = models.ForeignKey(Area, verbose_name=u'地域')
 
     class Meta:
-        app_label = 'riskmonitor'
+        app_label = 'seer'
         verbose_name_plural = u'用户地域弱关联'
 
     def __unicode__(self):
@@ -146,7 +146,7 @@ class ConsumeIndex(models.Model):
     )
 
     class Meta:
-        app_label = 'riskmonitor'
+        app_label = 'seer'
         verbose_name_plural = u'消费指标(维)'
 
 
@@ -186,7 +186,7 @@ class SocietyIndex(models.Model):
     )
 
     class Meta:
-        app_label = 'riskmonitor'
+        app_label = 'seer'
         verbose_name_plural = u'社会性指标(维)'
 
 
@@ -238,7 +238,7 @@ class ManageIndex(models.Model):
     )
 
     class Meta:
-        app_label = 'riskmonitor'
+        app_label = 'seer'
         verbose_name_plural = u'管理指标(维)'
 
 
@@ -248,7 +248,7 @@ class Cache(models.Model):
     update_at = models.DateTimeField(auto_now=True, verbose_name=u'更新时间')
 
     class Meta:
-        app_label = 'riskmonitor'
+        app_label = 'seer'
         verbose_name_plural = u'缓存'
 
     def __unicode__(self):
@@ -261,7 +261,7 @@ class CacheConf(models.Model):
     params = models.TextField(blank=True, verbose_name=u'参数')
 
     class Meta:
-        app_label = 'riskmonitor'
+        app_label = 'seer'
         verbose_name_plural = u'缓存配置'
 
     def __unicode__(self):
@@ -273,7 +273,7 @@ class SummariesScore(models.Model):
     pubtime = models.DateField(default=date.today, verbose_name=u'创建时间')
 
     class Meta:
-        app_label = 'riskmonitor'
+        app_label = 'seer'
         verbose_name_plural = u'整体分数'
 
     def __unicode__(self):
@@ -285,7 +285,7 @@ class InternetScore(models.Model):
     pubtime = models.DateField(default=date.today, verbose_name=u'创建时间')
 
     class Meta:
-        app_label = 'riskmonitor'
+        app_label = 'seer'
         verbose_name_plural = u'互联网分数'
 
     def __unicode__(self):

@@ -9,9 +9,9 @@ from datetime import date, datetime, timedelta
 from observer.utils.date.convert import datetime_to_timestamp
 from observer.apps.origin.models import Inspection
 from observer.apps.penalty.models import AdministrativePenalties
-from observer.apps.riskmonitor.models import (
+from observer.apps.seer.models import (
     RiskNews, AreaIndustry, Industry, ManageIndex, SocietyIndex, ConsumeIndex, UserArea, SummariesScore, InternetScore)
-from observer.apps.riskmonitor.service.news import NewsQuerySet
+from observer.apps.seer.service.news import NewsQuerySet
 
 
 class IndustryTrack(NewsQuerySet):

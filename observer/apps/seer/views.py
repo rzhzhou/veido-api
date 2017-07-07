@@ -17,19 +17,19 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from observer.apps.origin.models import Inspection
-from observer.apps.riskmonitor.models import (Area, Cache, Enterprise, Industry,
+from observer.apps.seer.models import (Area, Cache, Enterprise, Industry,
                                               RiskNews, RiskNewsPublisher,
                                               AreaIndustry, UserArea)
-from observer.apps.riskmonitor.service.abstract import Abstract
-from observer.apps.riskmonitor.service.analytics import AnalyticsCal
-from observer.apps.riskmonitor.service.dashboard import Dashboard
-from observer.apps.riskmonitor.service.enterprise import EnterpriseRank
-from observer.apps.riskmonitor.service.industry import IndustryTrack
-from observer.apps.riskmonitor.service.inspection import InspectionQuerySet
-from observer.apps.riskmonitor.service.news import (NewsQuerySet, NewsRecycleQuerySet, NewsValidQuerySet)
-from observer.apps.riskmonitor.service.aps import APQuerySet
-from observer.apps.riskmonitor.jobs.hourly.dashboard import Job as DashboardJob
-from observer.apps.riskmonitor.jobs.hourly.industries import Job as IndustriesJob
+from observer.apps.seer.service.abstract import Abstract
+from observer.apps.seer.service.analytics import AnalyticsCal
+from observer.apps.seer.service.dashboard import Dashboard
+from observer.apps.seer.service.enterprise import EnterpriseRank
+from observer.apps.seer.service.industry import IndustryTrack
+from observer.apps.seer.service.inspection import InspectionQuerySet
+from observer.apps.seer.service.news import (NewsQuerySet, NewsRecycleQuerySet, NewsValidQuerySet)
+from observer.apps.seer.service.aps import APQuerySet
+from observer.apps.seer.jobs.hourly.dashboard import Job as DashboardJob
+from observer.apps.seer.jobs.hourly.industries import Job as IndustriesJob
 from observer.utils.date import pretty
 from observer.utils.date.convert import utc_to_local_time
 from observer.utils.excel import xls_to_response

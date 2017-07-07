@@ -3,9 +3,9 @@ from django.contrib import admin
 from django_extensions.admin import ForeignKeyAutocompleteAdmin
 from import_export.admin import ImportExportModelAdmin, ImportExportActionModelAdmin
 from daterange_filter.filter import DateRangeFilter
-from observer.apps.riskmonitor.resource import (
+from observer.apps.seer.resource import (
     ConsumeIndexResources, ManageIndexResources, SocietyIndexResources, RiskNewsResources)
-from observer.apps.riskmonitor.models import (Enterprise, Industry,
+from observer.apps.seer.models import (Enterprise, Industry,
                                               RiskNewsPublisher, RiskNews,
                                               UserArea, AreaIndustry,
                                               SocietyIndex, ConsumeIndex,

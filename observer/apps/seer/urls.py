@@ -1,7 +1,7 @@
 from django.conf.urls import url
 from rest_framework.urlpatterns import format_suffix_patterns
 
-from observer.apps.riskmonitor.views import (Analytics, AnalyticsExport,
+from observer.apps.seer.views import (Analytics, AnalyticsExport,
                                              DashboardList, EnterpriseList,
                                              EnterpriseDetail, Filters,
                                              IndustryDetail, IndustryList,

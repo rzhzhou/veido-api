@@ -1,33 +1,28 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime, timedelta
 
-from django.db.models import Case, IntegerField, Sum, When, Max
+from django.db.models import Case, IntegerField, Sum, When
 from django.db.models import Q
 
-from observer.apps.penalty.models import AdministrativePenalties
-from observer.apps.riskmonitor.service.abstract import Abstract
+from observer.apps.origin.models import Inspection
+from observer.apps.seer.service.abstract import Abstract
 from observer.utils.date.convert import utc_to_local_time
 
 
-class APQuerySet(Abstract):
+class InspectionQuerySet(Abstract):
 
     def __init__(self, params={}):
-        super(APQuerySet, self).__init__(params)
+        super(InspectionQuerySet, self).__init__(params)
 
-    def get_all_ap_list(self, search_value=None):
-        fields = ('id', 'title', 'pubtime', 'url', 'publisher')
+    def get_inspection_list(self,search_value):
+        fields = ('id', 'title', 'pubtime', 'url',
+                  'publisher__name', 'qualitied', 'product')
 
-        max_id = AdministrativePenalties.objects.all().aggregate(Max('id'))
-
-        args = {
-            'id__lte': max_id.get('id__max'),
-        }
-
-        if search_value:
-            args['title__contains'] = search_value
-            
-        queryset = AdministrativePenalties.objects.filter(**args).values(*fields)
-
+        args = {}
+        if not search_value:
+            queryset = Inspection.objects.filter(**args).values(*fields)
+        else:
+            queryset = Inspection.objects.filter(Q(publisher__name__contains=search_value) | Q(title__contains=search_value)).values(*fields)
         return queryset
 
     def cal_date_range(self, x_axis_units):
@@ -77,14 +72,14 @@ class APQuerySet(Abstract):
                     iterable = xrange(1, 13)
                     date_range += map(cal_date_func, iterable)
 
-        result = self.cal_ap_nums(date_range, x_axis_units)
+        result = self.cal_inspection_nums(date_range, x_axis_units)
 
         return {
             'categories': result[0],
             'data': result[1]
         }
 
-    def cal_ap_nums(self, date_range, x_axis_units):
+    def cal_inspection_nums(self, date_range, x_axis_units):
         args = self.set_args()
 
         if x_axis_units == 'day':
@@ -114,7 +109,8 @@ class APQuerySet(Abstract):
                 )
             ) for year, month in date_range])
 
-        queryset = AdministrativePenalties.objects.filter(**args).aggregate(**aggregate_args)
+        queryset = Inspection.objects.filter(
+            **args).aggregate(**aggregate_args)
 
         if queryset:
             # Convert $queryset
