@@ -5,10 +5,10 @@ from import_export.admin import ImportExportActionModelAdmin
 from import_export.admin import ImportExportModelAdmin
 from daterange_filter.filter import DateRangeFilter
 from observer.apps.origin.models import (Area, Enterprise, Industry,
-                                         InspectionPublisher, Inspection,
-                                         ProductBenchmark, IndustryScore)
+        InspectionPublisher, Inspection,
+        IndustryScore)
 from observer.apps.origin.resource import (InspectionPublisherResources,
-                                           InspectionResources, EnterpriseResources)
+        InspectionResources, EnterpriseResources)
 
 
 class AreaAdmin(ForeignKeyAutocompleteAdmin):
@@ -25,6 +25,13 @@ class IndustryAdmin(ForeignKeyAutocompleteAdmin):
     list_display = ('name', 'code', 'level', 'parent')
     search_fields = ('name', 'level', 'parent__name')
     list_filter = ('level', )
+    readonly_fields = ('code', )
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            return ['code']
+        else:
+            return []
 
 
 class EnterpriseAdmin(ImportExportModelAdmin, ImportExportActionModelAdmin):
@@ -46,12 +53,6 @@ class InspectionAdmin(ImportExportActionModelAdmin):
     list_filter = (('pubtime', DateRangeFilter), 'industry', 'qualitied',)
 
 
-class ProductBenchmarkAdmin(admin.ModelAdmin):
-    search_fields = ('name', 'code', 'level', 'parent', )
-    list_display = ('name', 'code', 'level', 'parent', )
-    list_filter = ('level', )
-
-
 class IndustryScoreAdmin(admin.ModelAdmin):
     search_fields = ('score', )
     list_display = ('score', 'time',)
@@ -63,5 +64,4 @@ admin.site.register(Enterprise, EnterpriseAdmin)
 admin.site.register(Industry, IndustryAdmin)
 admin.site.register(InspectionPublisher, InspectionPublisherAdmin)
 admin.site.register(Inspection, InspectionAdmin)
-admin.site.register(ProductBenchmark, ProductBenchmarkAdmin)
 admin.site.register(IndustryScore, IndustryScoreAdmin)
