@@ -12,12 +12,14 @@ from observer.apps.penalty.models import AdministrativePenalties
 from observer.apps.seer.models import (
     RiskNews, AreaIndustry, Industry, ManageIndex, SocietyIndex, ConsumeIndex, UserArea, SummariesScore, InternetScore)
 from observer.apps.seer.service.news import NewsQuerySet
+from observer.apps.seer.service.abstract import Abstract
 
 
-class IndustryTrack(NewsQuerySet):
+class IndustryTrack(Abstract):
 
     def __init__(self, params={}):
         super(IndustryTrack, self).__init__(params)
+        self.news_query_set = NewsQuerySet(params)
         try:
             self.area_name = self.area_name
         except Exception as e:
@@ -31,12 +33,12 @@ class IndustryTrack(NewsQuerySet):
 
         # less than equal 4 months (122 = 31 + 31 + 30 + 30)
         if self.days > 0 and self.days <= 122:
-            result = self.cal_date_range('day')
+            result = self.news_query_set.cal_date_range('day')
             result['categories'] = [i.strftime(
                 '%m-%d') for i in result['categories']]
 
         elif self.days > 122:  # great than 4 months
-            result = self.cal_date_range('month')
+            result = self.news_query_set.cal_date_range('month')
             result['categories'] = [i.strftime(
                 '%Y-%m') for i in result['categories']]
 
@@ -48,12 +50,12 @@ class IndustryTrack(NewsQuerySet):
 
         # less than equal 4 months (122 = 31 + 31 + 30 + 30)
         if self.days > 0 and self.days <= 122:
-            result = self.cal_date_range_two('day')
+            result = self.news_query_set.cal_date_range_two('day')
             result['categories'] = [i.strftime(
                 '%m-%d') for i in result['categories']]
 
         elif self.days > 122:  # great than 4 months
-            result = self.cal_date_range_two('month')
+            result = self.news_query_set.cal_date_range_two('month')
             result['categories'] = [i.strftime(
                 '%Y-%m') for i in result['categories']]
 

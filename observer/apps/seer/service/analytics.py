@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
 from django.db.models import Count
 
+
+from observer.apps.seer.service.abstract import Abstract
 from observer.apps.seer.service.industry import IndustryTrack
 
 from observer.apps.seer.models import RiskNews, AreaIndustry, Enterprise
 
 
-class AnalyticsCal(IndustryTrack):
+class AnalyticsCal(Abstract):
 
     def __init__(self, params={}):
         super(AnalyticsCal, self).__init__(params)
+        self.industry_track = IndustryTrack(params)
 
     def get_filters(self):
         args = self.set_args()
@@ -27,7 +30,7 @@ class AnalyticsCal(IndustryTrack):
         return (industries, enterprises, products, publishers)
 
     def industry_chart(self):
-        return self.trend_chart()
+        return self.industry_track.trend_chart()
 
     def cal_publisher_count(self):
         args = self.set_args()

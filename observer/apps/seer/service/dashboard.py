@@ -6,13 +6,16 @@ from datetime import datetime, timedelta
 from django.db.models import Count, Q
 
 from observer.apps.seer.models import (Area, RiskNews)
+from observer.apps.seer.service.abstract import Abstract
 from observer.apps.seer.service.analytics import AnalyticsCal
+from observer.apps.seer.service.industry import IndustryTrack
 
-
-class Dashboard(AnalyticsCal):
+class Dashboard(Abstract):
 
     def __init__(self, params={}):
         super(Dashboard, self).__init__(params)
+        self.analytics_cal = AnalyticsCal(params)
+        self.industry_track = IndustryTrack(params)
 
     @property
     def map(self):
@@ -98,16 +101,16 @@ class Dashboard(AnalyticsCal):
         area_score = []
         for index in area_days:
             pubtime = index[0].strftime('%Y-%m-%d')
-            total_score = self.get_overall_overview_score(pubtime=pubtime)[0]
+            total_score = self.industry_track.get_overall_overview_score(pubtime=pubtime)[0]
             area_score.append(total_score)
         last_datetime = (date_range[date_range_len-1][0]).strftime('20%y-%m-%d')
-        last_datetimescore = self.get_overall_overview_score(pubtime=last_datetime)[0]
+        last_datetimescore = self.industry_track.get_overall_overview_score(pubtime=last_datetime)[0]
         area_score.append(last_datetimescore)
         return (date, zip(date, area_score))
 
     @property
     def risk_product(self):
-        products = self.get_industries()
+        products = self.industry_track.get_industries()
 
         if len(products) >= 5:
             products = reversed(products[:5])
@@ -122,10 +125,10 @@ class Dashboard(AnalyticsCal):
     def get_all(self):
         data = {
             'map': self.map,
-            'risk': self.industry_chart(),
+            'risk': self.analytics_cal.industry_chart(),
             'risk_level': self.risk_level,
             'risk_product': self.risk_product,
             'risk_product_trend': self.risk_product_trend,
-            'summaries_score': self.get_overall_overview_score(),
+            'summaries_score': self.industry_track.get_overall_overview_score(),
         }
         return data
