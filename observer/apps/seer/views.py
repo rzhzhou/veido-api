@@ -1356,7 +1356,7 @@ class Search(BaseView):
 
         # Exclude $cond None Value
         args = dict([(k, v) for k, v in cond.iteritems() if v is not None])
-        args['is_delete'] = False
+        args['is_delete'] = 2
 
         if self.query_params['keyword']:
             queryset = RiskNews.objects.filter(
