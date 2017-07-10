@@ -95,28 +95,28 @@ WSGI_APPLICATION = 'observer.wsgi.application'
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 
 DATABASES = {
-        'default': {
+    'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': 'localhost',
+        'HOST': '27.17.61.26',
         'NAME': 'observer',
-        'USER': 'root',
-        'PASSWORD': '123456',
+        'USER': 'shendu',
+        'PASSWORD': 'P@55word',
         'PORT': 3306
     },
     'master': {
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': 'localhost',
+        'HOST': '27.17.61.26',
         'NAME': 'observer',
-        'USER': 'root',
-        'PASSWORD': '123456',
+        'USER': 'shendu',
+        'PASSWORD': 'P@55word',
         'PORT': 3306
     },
     'crawler': {
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': 'localhost',
+        'HOST': '27.17.61.26',
         'NAME': 'crawler',
-        'USER': 'root',
-        'PASSWORD': '123456',
+        'USER': 'shendu',
+        'PASSWORD': 'P@55word',
         'PORT': 3306
     }
 }
