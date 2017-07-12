@@ -388,7 +388,7 @@ class IndustryTrack(Abstract):
             compare_2 = map(lambda x: x[:3], self.industries_ranking(user_industries))
 
             for index, item in enumerate(industries):
-                item[5] = index + 1 - compare_2.index(compare_1[index])
+                item[5] = index - compare_2.index(compare_1[index])
 
             return industries
         else:
