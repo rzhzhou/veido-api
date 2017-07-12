@@ -340,6 +340,7 @@ class IndustryList(BaseView):
             'level': q[2],
             'score':q[3],
             'status':q[4],
+            'trend':q[5],
         } for q in queryset]
 
         if self.query_params.get('externalcall') is not None:
