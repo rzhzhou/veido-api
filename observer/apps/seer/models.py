@@ -27,7 +27,7 @@ C_CHOICES = (
 
 class AreaIndustry(models.Model):
     name = models.CharField(max_length=255, verbose_name=u'名称')
-    status = models.CharField(max_length=255, default=u'', verbose_name=u'状态')
+    status = models.CharField(max_length=255, blank=True, default=u'', verbose_name=u'状态')
 
     area = models.ForeignKey(
         Area,
