@@ -389,10 +389,8 @@ class IndustryTrack(Abstract):
 
             for index, item in enumerate(industries):
                 item[5] = index - compare_2.index(compare_1[index])
-
-            return industries
-        else:
-            return industries
+        
+        return industries
 
     def while_risk(self):
         result = self.trend_chart()
