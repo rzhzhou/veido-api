@@ -2,9 +2,7 @@
 import pytz
 import xlrd
 from datetime import datetime
-
 from django.conf import settings
-
 from import_export.widgets import DateWidget, ForeignKeyWidget, ManyToManyWidget
 from import_export import widgets
 from import_export import resources, fields
