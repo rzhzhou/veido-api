@@ -393,6 +393,7 @@ class IndustryTrack(Abstract):
             count_risk_news_score = self.count_risk_news_data(u.industry.id)[1]    ####
             risk_inspection_data = self.count_risk_inspection_data(u.industry.id)   ######
 
+<<<<<<< HEAD
             if risk_inspection_data[4] is 100 and risk_inspection_data[5] is 100:
                 count_risk_inspection_score = risk_inspection_data[1]
                 count_risk_rank_score = count_consume_index_score * 0.0736 + count_society_index_score * 0.0736 +  count_manage_index_score * 0.1853 + count_risk_news_score * 0.4546 + count_risk_inspection_score * 0.2129
@@ -417,6 +418,12 @@ class IndustryTrack(Abstract):
                
         return sorted(industries, key=lambda industry: industry[3])
                
+=======
+            for index, item in enumerate(industries):
+                item[5] = index - compare_2.index(compare_1[index])
+        
+        return industries
+>>>>>>> 67a1d7177ff7d72c83911e3d728539cb0f6ea468
 
     def while_risk(self):
         result = self.trend_chart()
