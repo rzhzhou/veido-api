@@ -82,6 +82,10 @@ class InspectionResources(resources.ModelResource):
                         'area', 'industry', 'enterprise_qualified', 'enterprise_unqualified')
 
     def before_save_instance(self, instance, dry_run, temp=''):
+
+        if instance.qualitied < 0 or instance.qualitied >1:
+            qualitied=str(instance.qualitied)
+            raise ValueError('当前合格率:'+qualitied+',合格率区间应在(0 ~ 1)!')
         if not instance.pubtime:
             instance.pubtime = datetime.now()
         elif isinstance(instance.pubtime, basestring):
@@ -91,3 +95,6 @@ class InspectionResources(resources.ModelResource):
         elif isinstance(instance.pubtime, float):
             instance.pubtime = xlrd.xldate.xldate_as_datetime(
                 instance.pubtime, 0)
+
+    
+        
