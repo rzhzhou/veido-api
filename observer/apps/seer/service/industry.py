@@ -337,13 +337,27 @@ class IndustryTrack(Abstract):
         return (total_score, internet_score, inspection_score)
 
 
-    def get_industries(self):
+    def industries_ranking(self, user_industries):
         industries = []
-        industries2=[]
-        industriesm=[]
-        industriesm_nowname=[]
-        industries_lastname=[]
-        trendlist=[]
+        for u in user_industries:
+            count_consume_index_score = self.count_consume_index_data(u.industry.id)[1]
+            count_society_index_score = self.count_society_index_data(u.industry.id)[1]
+            count_manage_index_score = self.count_manage_index_data(u.industry.id)[1]
+            count_risk_news_score = self.count_risk_news_data(u.industry.id)[1]
+
+            risk_inspection_data = self.count_risk_inspection_data(u.industry.id)
+
+            if risk_inspection_data[4] is 100 and risk_inspection_data[5] is 100:
+                count_risk_inspection_score = risk_inspection_data[1]
+                count_risk_rank_score = count_consume_index_score * 0.0736 + count_society_index_score * 0.0736 +  count_manage_index_score * 0.1853 + count_risk_news_score * 0.4546 + count_risk_inspection_score * 0.2129
+            else:
+                count_risk_rank_score = count_consume_index_score * 0.0736 + count_society_index_score * 0.0736 +  count_manage_index_score * 0.1853 + count_risk_news_score * 0.4546 + risk_inspection_data[4] * 0.1729 + risk_inspection_data[5] * 0.04
+
+            industries.append([u.industry.id, u.name, u.industry.level, round(count_risk_rank_score, 2), u.status, 0])
+
+        return sorted(industries, key=lambda industry: industry[3])
+
+    def get_industries(self):
         cond = {
             'area__name': getattr(
                 self,
@@ -364,66 +378,19 @@ class IndustryTrack(Abstract):
         else:
             query = reduce(operator.or_, (Q(status__contains=x) for x in status.split(',')))
             user_industries = AreaIndustry.objects.filter(**args).filter(query)
-
-        for um in user_industries:
-            count_consume_index_score = self.count_consume_index_data(um.industry.id)[1]
-            count_society_index_score = self.count_society_index_data(um.industry.id)[1]
-            count_manage_index_score = self.count_manage_index_data(um.industry.id)[1]
-            count_risk_news_score = self.count_risk_news_data(um.industry.id)[1]    ####
-            risk_inspection_data = self.count_risk_inspection_data(um.industry.id)   ######
-
-            if risk_inspection_data[4] is 100 and risk_inspection_data[5] is 100:
-                count_risk_inspection_score = risk_inspection_data[1]
-                count_risk_rank_score = count_consume_index_score * 0.0736 + count_society_index_score * 0.0736 +  count_manage_index_score * 0.1853 + count_risk_news_score * 0.4546 + count_risk_inspection_score * 0.2129
-            else:
-                count_risk_rank_score = count_consume_index_score * 0.0736 + count_society_index_score * 0.0736 +  count_manage_index_score * 0.1853 + count_risk_news_score * 0.4546 + risk_inspection_data[4] * 0.1729 + risk_inspection_data[5] * 0.04
-
-            industriesm.append((um.industry.id, um.name, um.industry.level, round(count_risk_rank_score, 2), um.status))  
-            nowmonthsort=sorted(industriesm, key=lambda industry: industry[3])
-           
-        for im in nowmonthsort:
-            industriesm_nowname.append(im[1])
-
-        for u in user_industries:
-            count_consume_index_score = self.count_consume_index_data(u.industry.id)[1]
-            count_society_index_score = self.count_society_index_data(u.industry.id)[1]
-            count_manage_index_score = self.count_manage_index_data(u.industry.id)[1]
-            self.start=self.start-timedelta(days=30)
-            self.end=self.end-timedelta(days=30)
-            count_risk_news_score = self.count_risk_news_data(u.industry.id)[1]    ####
-            risk_inspection_data = self.count_risk_inspection_data(u.industry.id)   ######
-
-<<<<<<< HEAD
-            if risk_inspection_data[4] is 100 and risk_inspection_data[5] is 100:
-                count_risk_inspection_score = risk_inspection_data[1]
-                count_risk_rank_score = count_consume_index_score * 0.0736 + count_society_index_score * 0.0736 +  count_manage_index_score * 0.1853 + count_risk_news_score * 0.4546 + count_risk_inspection_score * 0.2129
-            else:
-                count_risk_rank_score = count_consume_index_score * 0.0736 + count_society_index_score * 0.0736 +  count_manage_index_score * 0.1853 + count_risk_news_score * 0.4546 + risk_inspection_data[4] * 0.1729 + risk_inspection_data[5] * 0.04
-
-            industries.append([u.industry.id, u.name, u.industry.level, round(count_risk_rank_score, 2), u.status])
-            lastmonthsort=sorted(industries, key=lambda industry: industry[3])
         
-        for i in lastmonthsort:
-            industries_lastname.append(i[1])
+        industries = self.industries_ranking(user_industries)
+        if self.area_name == u'苏州':
+            compare_1 = map(lambda x: x[:3], industries)
 
-        
-        for n in industriesm_nowname:
-            nowmonthindex = industriesm_nowname.index(n)
-            lastmonthindex = industries_lastname.index(n)
-            trend=nowmonthindex - lastmonthindex
-            trendlist.append(trend)
+            self.start = self.start - timedelta(days=30)
+            self.end = self.end - timedelta(days=30)
 
-        for index,x in enumerate(industries):
-            industries[index].append(trendlist[index])
-               
-        return sorted(industries, key=lambda industry: industry[3])
-               
-=======
+            compare_2 = map(lambda x: x[:3], self.industries_ranking(user_industries))
+
             for index, item in enumerate(industries):
                 item[5] = index - compare_2.index(compare_1[index])
-        
-        return industries
->>>>>>> 67a1d7177ff7d72c83911e3d728539cb0f6ea468
+        return industries        
 
     def while_risk(self):
         result = self.trend_chart()
