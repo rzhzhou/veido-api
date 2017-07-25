@@ -4,13 +4,16 @@ import operator
 from random import randint
 from django.db.models import Avg, Q
 from django.shortcuts import get_object_or_404
+from itertools import chain
 from datetime import date, datetime, timedelta
 
 from observer.utils.date.convert import datetime_to_timestamp
 from observer.apps.origin.models import Inspection
 from observer.apps.penalty.models import AdministrativePenalties
-from observer.apps.seer.models import (
-    RiskNews, AreaIndustry, Industry, ManageIndex, SocietyIndex, ConsumeIndex, UserArea, SummariesScore, InternetScore)
+from observer.apps.seer.models import (RiskNews, AreaIndustry, Industry,
+                                    ManageIndex, SocietyIndex, ConsumeIndex,
+                                    UserArea, SummariesScore, InternetScore, 
+                                    ModelWeight)
 from observer.apps.seer.service.news import NewsQuerySet
 from observer.apps.seer.service.abstract import Abstract
 
@@ -27,18 +30,19 @@ class IndustryTrack(Abstract):
                 self.area_name = self.area
             except Exception as e:
                 self.area_name = UserArea.objects.get(user__id=self.user_id).area.name
+        self.model_weight = ModelWeight.objects.get(area__name=self.area_name, industry__isnull=True)
             
     def trend_chart(self):
         self.days = (self.end - self.start).days
 
         # less than equal 4 months (122 = 31 + 31 + 30 + 30)
         if self.days > 0 and self.days <= 122:
-            result = self.news_query_set.cal_date_range('day')
+            result = self.news_query_set.cal_date_range('day', self.days)
             result['categories'] = [i.strftime(
                 '%m-%d') for i in result['categories']]
 
         elif self.days > 122:  # great than 4 months
-            result = self.news_query_set.cal_date_range('month')
+            result = self.news_query_set.cal_date_range('month', self.days)
             result['categories'] = [i.strftime(
                 '%Y-%m') for i in result['categories']]
 
@@ -50,12 +54,12 @@ class IndustryTrack(Abstract):
 
         # less than equal 4 months (122 = 31 + 31 + 30 + 30)
         if self.days > 0 and self.days <= 122:
-            result = self.news_query_set.cal_date_range_two('day')
+            result = self.news_query_set.cal_date_range_two('day', self.days)
             result['categories'] = [i.strftime(
                 '%m-%d') for i in result['categories']]
 
         elif self.days > 122:  # great than 4 months
-            result = self.news_query_set.cal_date_range_two('month')
+            result = self.news_query_set.cal_date_range_two('month', self.days)
             result['categories'] = [i.strftime(
                 '%Y-%m') for i in result['categories']]
 
@@ -67,17 +71,18 @@ class IndustryTrack(Abstract):
     def get_chart(self):
         return (self.trend_chart(), self.compare_chart())
 
-    def count_consume_index_data(self, industry=''):
-        if industry == '':
-            industry = self.industry
+    def count_consume_index_data(self, industry=None):
+        c = ConsumeIndex.objects.filter(
+            industry__id=industry if industry else self.industry, 
+            area__name=self.area_name
+        )
 
-        c = ConsumeIndex.objects.filter(industry__id=industry, area=UserArea.objects.get(user__id=self.user_id).area)
-        c = c if list(c) != list([]) else ConsumeIndex.objects.filter(industry__id=industry, area__name=u'全国')
+        c_dimension = (c[0].force, c[0].close, c[0].consume) if c else (0, 1, 0)
+        
+        c_score = 100 - (50 * c_dimension[0] 
+                        + 25 * (c_dimension[1] - 1) 
+                        + 50 * c_dimension[2]) / 3
 
-        c_dimension = (c[0].force, c[0].close, c[
-                       0].consume) if c else (0, 1, 0)
-        c_score = 100 - (50 * c_dimension[0] + 25 *
-                         (c_dimension[1] - 1) + 50 * c_dimension[2]) / 3
         if 0 <= c_score < 34:
             c_color = '#bc3f2b'
             c_class = 'bg-red-400'
@@ -90,18 +95,19 @@ class IndustryTrack(Abstract):
 
         return (c_dimension, c_score, c_color, c_class)
 
-    def count_society_index_data(self, industry=''):
-        if industry == '':
-            industry = self.industry
+    def count_society_index_data(self, industry=None):
         s = SocietyIndex.objects.filter(
-            industry__id=industry, area=UserArea.objects.get(user__id=self.user_id).area)
-        s = s if list(s) != list([]) else SocietyIndex.objects.filter(
-            industry__id=industry, area__name=u'全国')
+            industry__id=industry if industry else self.industry, 
+            area__name=self.area_name
+        )
 
-        s_dimension = (s[0].trade, s[0].qualified, s[
-                       0].accident) if s else (1, 1, 1)
-        s_score = 100 - ((50 * (s_dimension[0] - 1)) + (
-            50 * (s_dimension[1] - 1)) + (50 * (s_dimension[2] - 1))) / 3
+        s_dimension = (s[0].trade, 
+                    s[0].qualified, 
+                    s[0].accident) if s else (1, 1, 1)
+
+        s_score = 100 - ((50 * (s_dimension[0] - 1)) 
+                        + (50 * (s_dimension[1] - 1)) 
+                        + (50 * (s_dimension[2] - 1))) / 3
         if s_score <= 0:
             s_score = 0
             s_color = '#bc3f2b'
@@ -124,18 +130,24 @@ class IndustryTrack(Abstract):
 
         return (s_dimension, s_score, s_color, s_class)
 
-    def count_manage_index_data(self, industry=''):
-        if industry == '':
-            industry = self.industry
+    def count_manage_index_data(self, industry=None):
         m = ManageIndex.objects.filter(
-            industry__id=industry, area=UserArea.objects.get(user__id=self.user_id).area)
-        m = m if list(m) != list([]) else ManageIndex.objects.filter(
-            industry__id=industry, area__name=u'全国')
+            industry__id=industry if industry else self.industry, 
+            area__name=self.area_name
+        )
 
-        m_dimension = (m[0].licence, m[0].productauth, m[0].encourage, m[
-            0].limit, m[0].remove) if m else (0, 0, 0, 0, 0)
-        m_score = 100 - (100 * m_dimension[0] + 100 * m_dimension[1] + 100 *
-                         m_dimension[2] + 100 * m_dimension[3] + 100 * m_dimension[4]) / 5
+        m_dimension = (m[0].licence, 
+                    m[0].productauth, 
+                    m[0].encourage, 
+                    m[0].limit, 
+                    m[0].remove) if m else (0, 0, 0, 0, 0)
+
+        m_score = 100 - (100 * m_dimension[0] 
+                        + 100 * m_dimension[1] 
+                        + 100 * m_dimension[2] 
+                        + 100 * m_dimension[3] 
+                        + 100 * m_dimension[4]) / 5
+
         if 0 <= m_score < 34:
             m_color = '#bc3f2b'
             m_class = 'bg-red-400'
@@ -148,16 +160,16 @@ class IndustryTrack(Abstract):
 
         return (m_dimension, m_score, m_color, m_class)
 
-    def count_risk_news_data(self, industry=''):
-        if industry == '':
-            industry = self.industry
-
+    def count_risk_news_data(self, industry=None):
         n_dimension = RiskNews.objects.filter(
-            industry__id=industry, pubtime__gte=self.start, pubtime__lt=self.end, is_delete=2)
-        risk_keyword_list = map(
-            lambda x: x['risk_keyword'], n_dimension.values('risk_keyword'))
+            industry__id=industry if industry else self.industry,
+            pubtime__gte=self.start,
+            pubtime__lt=self.end,
+            status=1
+        )
 
-        risk_keywords_set = set(risk_keyword_list)
+        risk_keyword_list = map(lambda x: x['risk_keyword'], n_dimension.values('risk_keyword'))
+
         time_interval = int(str(self.end.__sub__(self.start)).split(",")[0].split(' ')[0])
         risk_news_count = n_dimension.count()
 
@@ -167,7 +179,7 @@ class IndustryTrack(Abstract):
             risk_news_count = risk_news_count / 12
 
         n_weights = 1
-        for risk_keyword in risk_keywords_set:
+        for risk_keyword in set(risk_keyword_list):
             # 得到每个风险关键词出现的次数
             count = risk_keyword_list.count(risk_keyword)
             # 如果一个风险关键词出现次数过高, 就让其分值变大
@@ -199,39 +211,26 @@ class IndustryTrack(Abstract):
 
         return (n_dimension, int(n_score), n_color, n_class)
 
-    def count_risk_inspection_data(self, industry=''):
-        if industry == '':
-            industry = self.industry
+    def count_risk_inspection_data(self, industry=None):
+        this_dimension = Inspection.objects.filter(
+            industry__id=industry if industry else self.industry,
+            qualitied__lt=1,
+            pubtime__gte=self.start,
+            pubtime__lt=self.end,
+            area__name=self.area_name
+        )
 
-        i_dimension = Inspection.objects.filter(
-            industry__id=industry,
+        other_dimension = Inspection.objects.filter(
+            industry__id=industry if industry else self.industry,
             qualitied__lt=1,
             pubtime__gte=self.start,
             pubtime__lt=self.end
-        )
+        ).exclude(area__name=self.area_name)
 
-        this_score = 100
-        other_score = 100
-        if self.area_name is not None:
-            this_dimension = Inspection.objects.filter(
-                industry__id=industry,
-                qualitied__lt=1,
-                pubtime__gte=self.start,
-                pubtime__lt=self.end,
-                area__name=self.area_name
-            )
+        this_score = (100 - this_dimension.count() * 10)
+        other_score = (100 - other_dimension.count() * 10)
 
-            other_dimension = Inspection.objects.filter(
-                industry__id=industry,
-                qualitied__lt=1,
-                pubtime__gte=self.start,
-                pubtime__lt=self.end
-            ).exclude(area__name=self.area_name)
-
-            this_score = (100 - this_dimension.count() * 10)
-            other_score = (100 - other_dimension.count() * 10)
-
-        i_score = (100 - i_dimension.count() * 10)
+        i_score = (this_score + other_score) * 0.5
 
         if i_score < 30:
             i_score = randint(55, 60)
@@ -246,26 +245,25 @@ class IndustryTrack(Abstract):
             i_color = '#95c5ab'
             i_class = 'bg-green-400'
 
-        return (i_dimension, i_score, i_color, i_class, this_score, other_score)
+        return (list(chain(this_dimension, other_dimension)), i_score, i_color, i_class, this_score, other_score)
 
-    def penalty(self, industry=''):
-        if industry == '':
-            industry = self.industry
-
+    def penalty(self):
         return AdministrativePenalties.objects.filter(
-            industry__id=industry,
+            industry=Industry.objects.get(id=self.industry).name,
             pubtime__gte=self.start,
             pubtime__lt=self.end
         ).values('id', 'title', 'url', 'publisher', 'pubtime')
 
 
     def get_total_risk_rank(self):
-        if self.get_dimension()[4][4] is 100 and self.get_dimension()[4][5] is 100:
-            risk_rank_score = round(self.get_dimension()[0][1] * 0.1853 + self.get_dimension()[1][1] * 0.0736 + self.get_dimension()[
-                2][1] * 0.0736 + self.get_dimension()[3][1] * 0.4546 + self.get_dimension()[4][1] * 0.2129)
-        else:
-            risk_rank_score = round(self.get_dimension()[0][1] * 0.1853 + self.get_dimension()[1][1] * 0.0736 + self.get_dimension()[
-            2][1] * 0.0736 + self.get_dimension()[3][1] * 0.4546 + self.get_dimension()[4][4] * 0.1729 + self.get_dimension()[4][5] * 0.04)
+        all_dimensions = self.get_dimension()
+
+        risk_rank_score = round(all_dimensions[0][1] * self.model_weight.consume_index
+                                + all_dimensions[1][1] * self.model_weight.society_index 
+                                + all_dimensions[2][1] * self.model_weight.manage_index 
+                                + all_dimensions[3][1] * self.model_weight.risk_news_index 
+                                + all_dimensions[4][4] * (self.model_weight.inspection_index - 0.04)
+                                + all_dimensions[4][5] * 0.04)
 
         if risk_rank_score < 70:
             risk_rank_color = '#bc3f2b'
@@ -295,19 +293,14 @@ class IndustryTrack(Abstract):
             self.count_risk_inspection_data(),
         )
 
-    def get_overall_overview_score(self, pubtime_gte='', pubtime_lt='', pubtime=''):
-        if pubtime_gte == '' and pubtime_lt == '':
-            pubtime_gte = self.start
-            pubtime_lt = self.end
-
-        if pubtime == '':
-            pubtime = date.today()
-
+    def get_overall_overview_score(self, pubtime=None):
         insepction_count = Inspection.objects.filter(
-            pubtime__gte=self.start, pubtime__lt=self.end, ).count()
+            pubtime__gte=self.start,
+            pubtime__lt=self.end
+        ).count()
 
         area_industry_count = AreaIndustry.objects.filter(
-            area__name=self.area_name if self.area_name is not None else u'常州').count()
+            area__name=self.area_name).count()
 
         inspection_score = (insepction_count * 10) / area_industry_count
 
@@ -319,20 +312,29 @@ class IndustryTrack(Abstract):
             inspection_score = randint(30, 60)
 
         try:
-            internet_score = (
-                InternetScore.objects.get(pubtime=pubtime)).score
+            internet_score = InternetScore.objects.get(
+                pubtime=pubtime if pubtime else date.today()
+            ).score
         except:
             n_dimension = RiskNews.objects.filter(
-                pubtime__gte=self.start, pubtime__lt=self.end, is_delete=False).count()
+                pubtime__gte=self.start, 
+                pubtime__lt=self.end, 
+                status=2
+            ).count()
             internet_score = 100 - n_dimension / area_industry_count * 0.5
             if (100 - n_dimension / area_industry_count * 0.5) < 60:
                 internet_score = randint(30, 60)
 
         try:
-            total_score = (SummariesScore.objects.get(pubtime=pubtime)).score
+            total_score = SummariesScore.objects.get(
+                pubtime=pubtime if pubtime else date.today()
+            ).score
         except:
-            total_score = inspection_score * 0.2129 + internet_score * 0.4546 + 100 * 0.1853 + 100 * 0.0736 + 100 * 0.0736
-            total_score = round(total_score, 1)
+            total_score = round(inspection_score * self.model_weight.inspection_index
+                                + internet_score * self.model_weight.risk_news_index
+                                + 100 * self.model_weight.consume_index
+                                + 100 * self.model_weight.society_index
+                                + 100 * self.model_weight.manage_index, 1)
 
         return (total_score, internet_score, inspection_score)
 
@@ -340,20 +342,16 @@ class IndustryTrack(Abstract):
     def industries_ranking(self, user_industries):
         industries = []
         for u in user_industries:
-            count_consume_index_score = self.count_consume_index_data(u.industry.id)[1]
-            count_society_index_score = self.count_society_index_data(u.industry.id)[1]
-            count_manage_index_score = self.count_manage_index_data(u.industry.id)[1]
-            count_risk_news_score = self.count_risk_news_data(u.industry.id)[1]
 
             risk_inspection_data = self.count_risk_inspection_data(u.industry.id)
 
-            if risk_inspection_data[4] is 100 and risk_inspection_data[5] is 100:
-                count_risk_inspection_score = risk_inspection_data[1]
-                count_risk_rank_score = count_consume_index_score * 0.0736 + count_society_index_score * 0.0736 +  count_manage_index_score * 0.1853 + count_risk_news_score * 0.4546 + count_risk_inspection_score * 0.2129
-            else:
-                count_risk_rank_score = count_consume_index_score * 0.0736 + count_society_index_score * 0.0736 +  count_manage_index_score * 0.1853 + count_risk_news_score * 0.4546 + risk_inspection_data[4] * 0.1729 + risk_inspection_data[5] * 0.04
-
-            industries.append([u.industry.id, u.name, u.industry.level, round(count_risk_rank_score, 2), u.status, 0])
+            industries.append([u.industry.id, u.name, u.industry.level,
+                 round(self.count_consume_index_data(u.industry.id)[1] * self.model_weight.consume_index 
+                        + self.count_society_index_data(u.industry.id)[1] * self.model_weight.society_index 
+                        +  self.count_manage_index_data(u.industry.id)[1] * self.model_weight.manage_index
+                        + self.count_risk_news_data(u.industry.id)[1] * self.model_weight.risk_news_index
+                        + risk_inspection_data[4] * (self.model_weight.inspection_index - 0.04)
+                        + risk_inspection_data[5] * 0.04,2), u.status, 0])
 
         return sorted(industries, key=lambda industry: industry[3])
 

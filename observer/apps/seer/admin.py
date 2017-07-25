@@ -10,7 +10,8 @@ from observer.apps.seer.models import (Enterprise, Industry,
                                               UserArea, AreaIndustry,
                                               SocietyIndex, ConsumeIndex,
                                               ManageIndex, Cache, CacheConf,
-                                              SummariesScore, InternetScore)
+                                              SummariesScore, InternetScore, ModelWeight
+                                              )
 
 
 
@@ -135,6 +136,9 @@ class InternetScoreAdmin(admin.ModelAdmin):
     list_filter = ('score', 'pubtime')
     search_fields = ('pubtime',)
 
+class ModelWeightAdmin(ForeignKeyAutocompleteAdmin):
+    related_search_fields = {'industry': ('name',), 'area': ('name',)}
+
 admin.site.register(AreaIndustry, AreaIndustryAdmin)
 admin.site.register(RiskNewsPublisher)
 admin.site.register(RiskNews, RiskNewsAdmin)
@@ -146,3 +150,4 @@ admin.site.register(Cache, CacheAdmin)
 admin.site.register(CacheConf, CacheConfAdmin)
 admin.site.register(SummariesScore, SummariesScoreAdmin)
 admin.site.register(InternetScore, InternetScoreAdmin)
+admin.site.register(ModelWeight, ModelWeightAdmin)

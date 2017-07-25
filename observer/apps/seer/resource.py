@@ -36,8 +36,8 @@ class RiskNewsResources(resources.ModelResource):
         column_name=u'转载数',
         widget=IntegerWidget()
     )
-    is_delete = fields.Field(
-        attribute='is_delete',
+    status = fields.Field(
+        attribute='status',
         column_name=u'是否删除',
     )
     risk_keyword = fields.Field(
@@ -72,9 +72,9 @@ class RiskNewsResources(resources.ModelResource):
     class Meta:
         model = RiskNews
         fields = ('id', 'title', 'url', 'content', 'pubtime', 'reprinted',
-                  'publisher', 'area', 'industry', 'enterprise', 'is_delete', 'risk_keyword', 'invalid_keyword',)
+                  'publisher', 'area', 'industry', 'enterprise', 'status', 'risk_keyword', 'invalid_keyword',)
         export_order = ('id', 'title', 'url', 'content', 'pubtime', 'reprinted',
-                        'publisher', 'area', 'industry', 'enterprise', 'is_delete', 'risk_keyword', 'invalid_keyword',)
+                        'publisher', 'area', 'industry', 'enterprise', 'status', 'risk_keyword', 'invalid_keyword',)
 
     def before_save_instance(self, instance, dry_run, temp=''):
         if not instance.pubtime:

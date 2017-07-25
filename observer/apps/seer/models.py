@@ -63,7 +63,7 @@ class RiskNews(models.Model):
     content = HTMLField(blank=True, verbose_name=u'正文')
     pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
     reprinted = models.IntegerField(verbose_name=u'转载数')
-    is_delete = models.IntegerField(default=0, verbose_name=u'是否删除')
+    status = models.IntegerField(default=0, verbose_name=u'状态') # 0, 默认值 -1, 无效新闻 1 有效新闻
     risk_keyword = models.CharField(max_length=255, blank=True, verbose_name=u'风险新闻关键词')
     invalid_keyword = models.CharField(max_length=255, blank=True, verbose_name=u'无效关键词')
 
@@ -314,4 +314,4 @@ class ModelWeight(models.Model):
         verbose_name_plural = u'模型权重'
 
     def __unicode__(self):
-        return str(self.score)
+        return self.area.name

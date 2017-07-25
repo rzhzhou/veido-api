@@ -22,7 +22,7 @@ class NewsQuerySet(Abstract):
 
         args = {
             'id__lte': max_id.get('id__max'),
-            'is_delete': False,
+            'status': False,
         }
 
         if search_value:
@@ -45,7 +45,7 @@ class NewsQuerySet(Abstract):
 
         args = {
             'id__lte': max_id.get('id__max'),
-            'is_delete': False,
+            'status': False,
         }
 
         if search_value:
@@ -55,14 +55,14 @@ class NewsQuerySet(Abstract):
 
         return queryset
 
-    def cal_date_range(self, x_axis_units):
+    def cal_date_range(self, x_axis_units, days):
         if x_axis_units == 'day':
             cal_date_func = lambda x: (
                 self.start + timedelta(days=x),
                 self.start + timedelta(days=x + 1)
             )
 
-            date_range = map(cal_date_func, xrange(self.days))
+            date_range = map(cal_date_func, xrange(days))
 
         elif x_axis_units == 'month':
             cal_date_func = lambda month: (year, month)
@@ -156,14 +156,14 @@ class NewsQuerySet(Abstract):
         return [[], []]
 
 
-    def cal_date_range_two(self, x_axis_units):
+    def cal_date_range_two(self, x_axis_units, days):
         if x_axis_units == 'day':
             cal_date_func = lambda x: (
                 self.start + timedelta(days=x),
                 self.start + timedelta(days=x + 1)
             )
 
-            date_range = map(cal_date_func, xrange(self.days))
+            date_range = map(cal_date_func, xrange(days))
 
         elif x_axis_units == 'month':
             cal_date_func = lambda month: (year, month)
@@ -272,7 +272,7 @@ class NewsRecycleQuerySet(Abstract):
 
         args = {
             'id__lte': max_id.get('id__max'),
-            'is_delete': True,
+            'status': True,
         }
         
         if search_value:
@@ -295,7 +295,7 @@ class NewsRecycleQuerySet(Abstract):
 
         args = {
             'id__lte': max_id.get('id__max'),
-            'is_delete': True,
+            'status': True,
         }
 
         if search_value:
@@ -305,14 +305,14 @@ class NewsRecycleQuerySet(Abstract):
 
         return queryset
 
-    def cal_date_range(self, x_axis_units):
+    def cal_date_range(self, x_axis_units, days):
         if x_axis_units == 'day':
             cal_date_func = lambda x: (
                 self.start + timedelta(days=x),
                 self.start + timedelta(days=x + 1)
             )
 
-            date_range = map(cal_date_func, xrange(self.days))
+            date_range = map(cal_date_func, xrange(days))
 
         elif x_axis_units == 'month':
             cal_date_func = lambda month: (year, month)
@@ -419,7 +419,7 @@ class NewsValidQuerySet(Abstract):
 
         args = {
             'id__lte': max_id.get('id__max'),
-            'is_delete': 2,
+            'status': 2,
         }
         
         if search_value:
@@ -442,7 +442,7 @@ class NewsValidQuerySet(Abstract):
 
         args = {
             'id__lte': max_id.get('id__max'),
-            'is_delete': 2,
+            'status': 2,
         }
 
         if search_value:
@@ -452,14 +452,14 @@ class NewsValidQuerySet(Abstract):
 
         return queryset
 
-    def cal_date_range(self, x_axis_units):
+    def cal_date_range(self, x_axis_units, days):
         if x_axis_units == 'day':
             cal_date_func = lambda x: (
                 self.start + timedelta(days=x),
                 self.start + timedelta(days=x + 1)
             )
 
-            date_range = map(cal_date_func, xrange(self.days))
+            date_range = map(cal_date_func, xrange(days))
 
         elif x_axis_units == 'month':
             cal_date_func = lambda month: (year, month)

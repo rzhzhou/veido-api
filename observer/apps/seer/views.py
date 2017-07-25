@@ -853,7 +853,7 @@ class RiskNewsRecycle(BaseView):
         risk_news_ids = self.query_params['risk_news_ids']
         risk_news_ids_list = risk_news_ids.split(",")
         RiskNews.objects.filter(id__in=risk_news_ids_list[0:len(
-            risk_news_ids_list) - 1:1]).update(is_delete=True)
+            risk_news_ids_list) - 1:1]).update(status=True)
 
     def paging(self, queryset):
         self.recycle()
@@ -909,7 +909,7 @@ class RiskNewsRestore(BaseView):
         risk_news_ids = self.query_params['risk_news_ids']
         risk_news_ids_list = risk_news_ids.split(",")
         RiskNews.objects.filter(id__in=risk_news_ids_list[0:len(
-            risk_news_ids_list) - 1:1]).update(is_delete=False)
+            risk_news_ids_list) - 1:1]).update(status=False)
 
     def paging(self, queryset):
         self.restore()
@@ -1070,7 +1070,7 @@ class RiskNewsValid(BaseView):
         risk_news_ids = self.query_params['risk_news_ids']
         risk_news_ids_list = risk_news_ids.split(",")
         RiskNews.objects.filter(id__in=risk_news_ids_list[0:len(
-            risk_news_ids_list) - 1:1]).update(is_delete=2)
+            risk_news_ids_list) - 1:1]).update(status=2)
 
     def paging(self, queryset):
         self.valid()
@@ -1357,7 +1357,7 @@ class Search(BaseView):
 
         # Exclude $cond None Value
         args = dict([(k, v) for k, v in cond.iteritems() if v is not None])
-        args['is_delete'] = 2
+        args['status'] = 2
 
         if self.query_params['keyword']:
             queryset = RiskNews.objects.filter(
