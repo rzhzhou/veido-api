@@ -290,3 +290,28 @@ class InternetScore(models.Model):
 
     def __unicode__(self):
         return str(self.score)
+
+
+class ModelWeight(models.Model):
+    consume_index = models.FloatField(verbose_name=u'消费指标(维)')
+    society_index = models.FloatField(verbose_name=u'社会性指标(维)')
+    manage_index = models.FloatField(verbose_name=u'管理指标(维)')
+    risk_news_index = models.FloatField(verbose_name=u'新闻指标(维)')
+    inspection_index = models.FloatField(verbose_name=u'抽检指标(维)')
+
+    industry = models.ForeignKey(
+        Industry, 
+        null=True, blank=True,
+        verbose_name=u'行业'
+    )
+    area = models.ForeignKey(
+        Area,
+        verbose_name=u'地域'
+    )
+
+    class Meta:
+        app_label = 'seer'
+        verbose_name_plural = u'模型权重'
+
+    def __unicode__(self):
+        return str(self.score)
