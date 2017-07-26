@@ -268,30 +268,6 @@ class CacheConf(models.Model):
         return self.name
 
 
-class SummariesScore(models.Model):
-    score = models.IntegerField(verbose_name=u'整体分数')
-    pubtime = models.DateField(default=date.today, verbose_name=u'创建时间')
-
-    class Meta:
-        app_label = 'seer'
-        verbose_name_plural = u'整体分数'
-
-    def __unicode__(self):
-        return str(self.score)
-
-
-class InternetScore(models.Model):
-    score = models.IntegerField(verbose_name=u'互联网分数')
-    pubtime = models.DateField(default=date.today, verbose_name=u'创建时间')
-
-    class Meta:
-        app_label = 'seer'
-        verbose_name_plural = u'互联网分数'
-
-    def __unicode__(self):
-        return str(self.score)
-
-
 class ModelWeight(models.Model):
     consume_index = models.FloatField(verbose_name=u'消费指标(维)')
     society_index = models.FloatField(verbose_name=u'社会性指标(维)')
