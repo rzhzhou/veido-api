@@ -399,17 +399,12 @@ class IndustryDetail(BaseView):
         data = {
             'name': queryset['name'],
             'total': {
-                'level': queryset['risk_rank'][0],
-                'score': queryset['risk_rank'][1],
-                'color': queryset['risk_rank'][2],
-                'class': queryset['risk_rank'][3],
+                'score': queryset['risk_rank'][0],
             },
             'indicators': [
                 {
                     'title': u'消费指标',
                     'score': queryset['indicators'][0][1],
-                    'color': queryset['indicators'][0][2],
-                    'class': queryset['indicators'][0][3],
                     'norms': [
                         {
                             'name': u'国家强制性要求',
@@ -448,8 +443,6 @@ class IndustryDetail(BaseView):
                 {
                     'title': u'社会性指标',
                     'score': queryset['indicators'][1][1],
-                    'color': queryset['indicators'][1][2],
-                    'class': queryset['indicators'][1][3],
                     'norms': [
                         {
                             'name': u'贸易量',
@@ -492,8 +485,6 @@ class IndustryDetail(BaseView):
                 {
                     'title': '管理指标',
                     'score': queryset['indicators'][2][1],
-                    'color': queryset['indicators'][2][2],
-                    'class': queryset['indicators'][2][3],
                     'norms': [
                         {
                             'name': u'列入许可证目录',
@@ -551,8 +542,6 @@ class IndustryDetail(BaseView):
                     'title': '风险新闻',
                     # 'score': random.randint(85, 95),
                     'score': queryset['indicators'][3][1],
-                    'color': queryset['indicators'][3][2],
-                    'class': queryset['indicators'][3][3],
                     'norms': [{
                         'title': q.title,
                         'source': q.publisher.name,
@@ -563,8 +552,6 @@ class IndustryDetail(BaseView):
                 {
                     'title': '风险抽检',
                     'score': queryset['indicators'][4][1],
-                    'color': queryset['indicators'][4][2],
-                    'class': queryset['indicators'][4][3],
                     'norms': [{
                         'title': q.title,
                         'source': q.publisher.name,
