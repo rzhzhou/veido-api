@@ -568,8 +568,8 @@ class IndustryDetail(BaseView):
                 'time':utc_to_local_time(q.get('pubtime')).strftime('%Y-%m-%d'),
             } for q in queryset['penalty']],
             'trend': {
-                'categories': queryset['trend_chart_two']['categories'],
-                'data': queryset['trend_chart_two']['data']
+                'categories': queryset['industry_everyday_score'][0],
+                'data': queryset['industry_everyday_score'][1]
             }
 
         }

@@ -8,8 +8,8 @@ from itertools import chain
 from collections import Counter
 from datetime import date, datetime, timedelta
 
-from observer.utils.date.convert import datetime_to_timestamp
-from observer.apps.origin.models import Inspection
+from observer.utils.date.convert import (datetime_to_timestamp, utc_to_local_time)
+from observer.apps.origin.models import (Inspection, IndustryScore)
 from observer.apps.penalty.models import AdministrativePenalties
 from observer.apps.seer.models import (RiskNews, AreaIndustry, Industry,
                                     ManageIndex, SocietyIndex, ConsumeIndex,
@@ -30,11 +30,10 @@ class IndustryTrack(Abstract):
                 self.area_name = self.area
             except Exception as e:
                 self.area_name = UserArea.objects.get(user__id=self.user_id).area.name
+        self.days = (self.end - self.start).days
         self.model_weight = ModelWeight.objects.get(area__name=self.area_name, industry__isnull=True)
             
     def trend_chart(self):
-        self.days = (self.end - self.start).days
-
         # less than equal 4 months (122 = 31 + 31 + 30 + 30)
         if self.days > 0 and self.days <= 122:
             result = self.news_query_set.cal_date_range('day', self.days)
@@ -48,22 +47,6 @@ class IndustryTrack(Abstract):
 
         return result
 
-    def trend_chart_two(self):
-        self.days = (self.end - self.start).days
-
-        # less than equal 4 months (122 = 31 + 31 + 30 + 30)
-        if self.days > 0 and self.days <= 122:
-            result = self.news_query_set.cal_date_range_two('day', self.days)
-            result['categories'] = [i.strftime(
-                '%m-%d') for i in result['categories']]
-
-        elif self.days > 122:  # great than 4 months
-            result = self.news_query_set.cal_date_range_two('month', self.days)
-            result['categories'] = [i.strftime(
-                '%Y-%m') for i in result['categories']]
-
-        return result
-
     def compare_chart(self):
         return self.compare(self.start, self.end, self.industry)
 
@@ -71,7 +54,10 @@ class IndustryTrack(Abstract):
         return (self.trend_chart(), self.compare_chart())
 
     def get_dimension(self, industry=None):
-        industry = industry if industry else self.industry
+        try:
+            industry = industry if industry else self.industry
+        except:
+            industry = industry if industry else None
 
         c = ConsumeIndex.objects.filter(
             industry__id=industry, 
@@ -143,11 +129,12 @@ class IndustryTrack(Abstract):
             ) else 1
 
         n_count = n_dimension.count()
-        if self.end - timedelta(days=360) > self.start:
+
+        if self.days > 360:
             n_count = n_count / 12
-        elif self.end - timedelta(days=180) > self.start:
+        elif self.days > 180:
             n_count = n_count / 6
-        elif self.end - timedelta(days=90) > self.start:
+        elif self.days > 90:
             n_count = n_count / 3
 
         if n_count > 800:
@@ -190,7 +177,7 @@ class IndustryTrack(Abstract):
                 lambda u:[u.industry.id,
                          u.name,
                          u.industry.level,
-                         self.get_total_risk_rank(u.industry.id),
+                         self.get_overall_overview_score(industry=u.industry.id)[0],
                          u.status,
                          0],
                     user_industries),
@@ -235,29 +222,20 @@ class IndustryTrack(Abstract):
         return industries        
 
     def while_risk(self):
-        result = self.trend_chart()
-        categories = result.get("categories")
-        lastTime = categories[len(categories) - 1]
-
-        cal_date_func = lambda x: (
-            self.start + timedelta(days=x),
-            self.start + timedelta(days=x + 1)
-        )
-
-        date_range = map(cal_date_func, xrange(self.days))
-
-        date_range = date_range[::-1]
-        date_range = date_range[:7:]
-
         while_risk_data = []
         while_risk_datetime = []
         total_score = []
-        for date in date_range:
+        for date in map(
+            lambda x: (
+                self.start + timedelta(days=x),
+                self.start + timedelta(days=x + 1)
+                ), 
+            xrange(self.days))[::-1][:7:]:
             self.start = date[0]
             self.end = date[1]
             total_score.append(self.get_overall_overview_score()[0])
             while_risk_datetime.append(datetime.strftime(self.end, "%m-%d"))
-            while_risk_data.append(sorted(self.get_industries()))
+            while_risk_data.append(self.get_industries())
 
         while_risk_data.append(while_risk_datetime)
         while_risk_data.append(total_score)
@@ -271,13 +249,28 @@ class IndustryTrack(Abstract):
             pubtime__lt=self.end
         ).values('id', 'title', 'url', 'publisher', 'pubtime')
 
+    def industry_everyday_score(self):
+        queryset = IndustryScore.objects.filter(
+            time__gte=self.start, 
+            time__lt=self.end, 
+            industry__id=getattr(self, 'industry', None)
+        ).values('score', 'time')
+        
+        if queryset:
+            return zip(*sorted([(
+                utc_to_local_time(q.get('time')).strftime('%m-%d'),
+                q.get('score') if q.get('score') is not None else 0
+            ) for q in queryset], key=lambda data: data[0]))
+        else:
+            return [[], []]
+
     def get_all(self):
         data = {
             'name': Industry.objects.get(pk=self.industry).name,
             'risk_rank': self.get_overall_overview_score(),
             'indicators': self.get_dimension(),
             'trend': self.trend_chart(),
-            'trend_chart_two': self.trend_chart_two(),
+            'industry_everyday_score': self.industry_everyday_score(),
             'penalty':self.penalty()
         }
         return data
