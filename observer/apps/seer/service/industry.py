@@ -192,7 +192,7 @@ class IndustryTrack(Abstract):
         status = getattr(self, 'status', None)
         area_industries = AreaIndustry.objects.filter(**args) 
         opt = reduce(operator.or_,(Q(status__contains=x) for x in status.split(',')))
-        industries = self.industries_ranking(area_industries if status is u'' or status is None else area_industries.filter(opt))
+        industries = self.industries_ranking(area_industries if not status else area_industries.filter(opt))
 
         if self.area_name == u'苏州':
             compare_1 = map(lambda x: x[:3], industries)
