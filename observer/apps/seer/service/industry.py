@@ -23,15 +23,9 @@ class IndustryTrack(Abstract):
     def __init__(self, params={}):
         super(IndustryTrack, self).__init__(params)
         self.news_query_set = NewsQuerySet(params)
-        try:
-            self.area_name = self.area_name
-        except Exception as e:
-            try:
-                self.area_name = self.area
-            except Exception as e:
-                self.area_name = UserArea.objects.get(user__id=self.user_id).area.name
         self.days = (self.end - self.start).days
-        self.model_weight = ModelWeight.objects.get(area__name=self.area_name, industry__isnull=True)
+        self.area_name = getattr(self, 'area_name', 
+            getattr(self, 'area', UserArea.objects.get(user__id=self.user_id).area.name))
             
     def trend_chart(self):
         # less than equal 4 months (122 = 31 + 31 + 30 + 30)
@@ -54,10 +48,7 @@ class IndustryTrack(Abstract):
         return (self.trend_chart(), self.compare_chart())
 
     def get_dimension(self, industry=None):
-        try:
-            industry = industry if industry else self.industry
-        except:
-            industry = industry if industry else None
+        industry = industry if industry else getattr(self, 'industry', None)
 
         c = ConsumeIndex.objects.filter(
             industry__id=industry, 
@@ -160,13 +151,13 @@ class IndustryTrack(Abstract):
 
     def get_overall_overview_score(self, industry=None):
         all_dimensions = self.get_dimension(industry)
-
+        model_weight = ModelWeight.objects.get(area__name=self.area_name, industry__isnull=True)
         return (round(
-            all_dimensions[0][1] * self.model_weight.consume_index
-            + all_dimensions[1][1] * self.model_weight.society_index 
-            + all_dimensions[2][1] * self.model_weight.manage_index 
-            + all_dimensions[3][1] * self.model_weight.risk_news_index 
-            + all_dimensions[4][2] * (self.model_weight.inspection_index - 0.04)
+            all_dimensions[0][1] * model_weight.consume_index
+            + all_dimensions[1][1] * model_weight.society_index 
+            + all_dimensions[2][1] * model_weight.manage_index 
+            + all_dimensions[3][1] * model_weight.risk_news_index 
+            + all_dimensions[4][2] * (model_weight.inspection_index - 0.04)
             + all_dimensions[4][3] * 0.04, 2), 
             all_dimensions[3][1], 
             all_dimensions[4][1])
@@ -199,16 +190,9 @@ class IndustryTrack(Abstract):
         # Exclude $cond None Value
         args = dict([(k, v) for k, v in cond.iteritems() if v is not None])
         status = getattr(self, 'status', None)
-
-        industries = self.industries_ranking(
-            AreaIndustry.objects.filter(**args) 
-            if status is u'' or status is None 
-            else AreaIndustry.objects.filter(**args).filter(
-                reduce(operator.or_, 
-                    (Q(status__contains=x) for x in status.split(','))
-                    )
-                )
-            )
+        area_industries = AreaIndustry.objects.filter(**args) 
+        opt = reduce(operator.or_,(Q(status__contains=x) for x in status.split(',')))
+        industries = self.industries_ranking(area_industries if status is u'' or status is None else area_industries.filter(opt))
 
         if self.area_name == u'苏州':
             compare_1 = map(lambda x: x[:3], industries)
@@ -225,14 +209,15 @@ class IndustryTrack(Abstract):
         while_risk_data = []
         while_risk_datetime = []
         total_score = []
-        for date in map(
-            lambda x: (
-                self.start + timedelta(days=x),
-                self.start + timedelta(days=x + 1)
-                ), 
-            xrange(self.days))[::-1][:7:]:
-            self.start = date[0]
-            self.end = date[1]
+        date_list = map(
+                    lambda x: (
+                        self.start + timedelta(days=x),
+                        self.start + timedelta(days=x + 1)
+                        ), 
+                    xrange(self.days))[::-1][:7:]
+        for d in date_list:
+            self.start = d[0]
+            self.end = d[1]
             total_score.append(self.get_overall_overview_score()[0])
             while_risk_datetime.append(datetime.strftime(self.end, "%m-%d"))
             while_risk_data.append(self.get_industries())
