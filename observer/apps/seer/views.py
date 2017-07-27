@@ -26,7 +26,7 @@ from observer.apps.seer.service.dashboard import Dashboard
 from observer.apps.seer.service.enterprise import EnterpriseRank
 from observer.apps.seer.service.industry import IndustryTrack
 from observer.apps.seer.service.inspection import InspectionQuerySet
-from observer.apps.seer.service.news import NewsQuerySet
+from observer.apps.seer.service.news import (NewsQuerySet, NewsUpdate)
 from observer.apps.seer.service.administrativepenalties import AdministrativePenaltiesQuerySet
 from observer.apps.seer.jobs.hourly.dashboard import Job as DashboardJob
 from observer.apps.seer.jobs.hourly.industries import Job as IndustriesJob
@@ -590,7 +590,6 @@ class NewsList(BaseView):
 
     def set_params(self, request):
         super(NewsList, self).set_params(request.GET)
-        self.query_params['industry'] = int(self.query_params['id'])
 
     def paging(self, queryset):
         return super(NewsList, self).paging(queryset, self.query_params['page'], 10)
@@ -621,7 +620,8 @@ class RiskNewsList(BaseView):
         super(RiskNewsList, self).__init__()
 
     def set_params(self, params):
-        super(RiskNewsList, self).set_params(request.GET)
+        for k, v in params.iteritems():
+            self.query_params[k] = v
 
     def paging(self, queryset):
         page = (int(self.query_params['start']) /
@@ -632,8 +632,8 @@ class RiskNewsList(BaseView):
         results = self.paging(queryset)
         data = {
             "draw": self.query_params['draw'],
-            "recordsTotal": len(results),
-            "recordsFiltered": len(results),
+            "recordsTotal": NewsQuerySet(params=self.query_params).get_news_list().count(), 
+            "recordsFiltered": NewsQuerySet(params=self.query_params).get_news_list().count(),
             "data": map(lambda r: {
                 'id': r['id'],
                 'titleAndurl': [r['title'], r['url']],
@@ -658,6 +658,20 @@ class RiskNewsList(BaseView):
             queryset = queryset[:limit]
 
         return Response(self.serialize(queryset))
+
+
+class RiskNewsUpdate(BaseView):
+
+    def __init__(self):
+        super(RiskNewsUpdate, self).__init__()
+
+    def set_params(self, params):
+        for k, v in params.iteritems():
+            self.query_params[k] = v
+
+    def get(self, request):
+        self.set_params(request.GET)
+        return Response(NewsUpdate(params=self.query_params).update_news())
 
 
 class NewsDetail(BaseView):
@@ -1026,7 +1040,6 @@ class SearchIndustry(BaseView):
 
     def get(self, request):
         self.set_params(request)
-
         queryset = Industry.objects.filter(
             Q(name__contains=self.query_params['q'])
         )
