@@ -17,8 +17,7 @@ class NewsQuerySet(Abstract):
 
     def get_news_list(self):
         cond = {
-            'id__lte': 10000,
-            # 'id__lte': RiskNews.objects.aggregate(Max('id')).get('id__max'),
+            'id__lte': RiskNews.objects.aggregate(Max('id')).get('id__max'),
             'status': getattr(self, 'status', 1),
             'title__contains': getattr(self, 'search[value]', None), 
             'publisher__id': getattr(self, 'publisher_id', None),
