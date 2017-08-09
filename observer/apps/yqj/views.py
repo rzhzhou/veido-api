@@ -32,7 +32,6 @@ from observer.apps.yqj.service.inspection import InspectionQuerySet
 from observer.apps.yqj.service.article import ArticleQuerySet
 
 
-# Create your views here.
 class BaseView(APIView):
 
     def __init__(self):
@@ -59,12 +58,12 @@ class BaseView(APIView):
         paginator = Paginator(queryset, num)  # Show $num <QuerySet> per page
 
         try:
-            results = paginator.page(page)   # 获取某页对应的记录
+            results = paginator.page(page)   
         except PageNotAnInteger:
-            # If page is not an integer, deliver first page.   # 如果页码不是个整数 取第一页的记录
+            # If page is not an integer, deliver first page.   
             results = paginator.page(1)
         except EmptyPage:
-            # If page is out of range (e.g. 9999), deliver last page of  # 如果页码太大，没有相应的记录 取最后一页的记录
+            # If page is out of range (e.g. 9999), deliver last page of  
             # results.
             results = paginator.page(paginator.num_pages)
 
@@ -208,9 +207,12 @@ class InspectionTableView(BaseView):
     def get(self, request):
         self.set_params(request)
 
-        queryset =InspectionQuerySet(params =self.query_params).get_all_news_list(starttime =self.query_params['start'], endtime=self.query_params['end'],).order_by('-pubtime')
+        queryset =InspectionQuerySet(params=self.query_params).get_all_news_list(starttime=self.query_params['start'], endtime=self.query_params['end']).order_by('-pubtime')
 
         return Response(self.serialize(queryset))
+        
+
+
 
 
 

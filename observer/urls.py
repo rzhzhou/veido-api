@@ -12,3 +12,4 @@ urlpatterns = [
     url(r'^tinymce/', include('tinymce.urls')),
     url(r'^api/', include('observer.apps.base.urls')),
 ]
+
