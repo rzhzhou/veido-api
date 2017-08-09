@@ -4,7 +4,7 @@ from rest_framework_jwt import views
 from observer.apps.seer.views import logout_view
 
 urlpatterns = [
-    url(r'^yqj/', include('observer.apps.yqj.urls')),
+    # url(r'^yqj/$', include('observer.apps.yqj.urls')),
     url(r'^seer/', include('observer.apps.seer.urls'))
 ]
 
