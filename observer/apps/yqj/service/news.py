@@ -37,8 +37,5 @@ class NewsQuerySet(Abstract):
             args['category__name'] ='质监热点'
             queryset = Article.objects.filter(**args).values(*fields)
         
-        # category = CategoryTwo.objects.get(name='信息参考')
-        # queryset = category.articletwos.filter(**args).values(*fields)
-
         return queryset
         
