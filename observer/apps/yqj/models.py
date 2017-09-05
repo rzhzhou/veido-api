@@ -8,7 +8,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils.crypto import get_random_string
 
-from observer.apps.origin.models import Area
+from observer.apps.origin.models import Area, Inspection, InspectionPublisher
 
 
 class WeixinPublisher(models.Model):
@@ -121,7 +121,9 @@ class Article(models.Model):
         return self.title
 
 
-class Topic(models.Model):
+
+
+class Event(models.Model):
     title = models.CharField(max_length=255, blank=True, verbose_name=u'标题')
     abstract = models.CharField(max_length=255, blank=True, verbose_name=u'正文')
     source = models.CharField(max_length=255, blank=True, verbose_name=u'首发媒体')
@@ -283,8 +285,8 @@ class Collection(models.Model):
         related_query_name='collection', through='ArticleCollection',
         verbose_name=u'文章')
     events = models.ManyToManyField(
-        Topic, related_name='collections',
-        related_query_name='collection', through='TopicCollection',
+        Event, related_name='collections',
+        related_query_name='collection', through='EventCollection',
         verbose_name=u'质量事件')
 
     class Meta:
@@ -311,8 +313,8 @@ class ArticleCollection(models.Model):
         return self.category
 
 
-class TopicCollection(models.Model):
-    topic = models.ForeignKey(Topic, verbose_name=u'质量事件')
+class EventCollection(models.Model):
+    topic = models.ForeignKey(Event, verbose_name=u'质量事件')
     collection = models.ForeignKey(Collection, verbose_name=u'收藏')
 
     create_time = models.DateTimeField(auto_now=True, verbose_name=u'创建时间')
@@ -331,25 +333,25 @@ class AnonymousUser(User):
         app_label = 'yqj'
 
 
-class Inspection(models.Model):
-    url = models.URLField(max_length=255, verbose_name=u'网站链接')
-    name = models.CharField(max_length=255, verbose_name=u'标题')
-    manufacturer = models.CharField(max_length=255, null=True, blank=True, verbose_name=u'转载次数')
-    qualitied = models.FloatField(verbose_name=u'关注度', null=True, blank=True)
-    pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
-    product = models.CharField(max_length=255, verbose_name=u'名称')
-    source = models.CharField(max_length=255, verbose_name=u'信息来源')
-    province = models.CharField(max_length=255, verbose_name=u'省')
-    city = models.CharField(max_length=255, null=True, blank=True, verbose_name=u'市')
-    district = models.CharField(max_length=255, null=True, blank=True, verbose_name=u'地区')
+# class Inspection(models.Model):
+#     url = models.URLField(max_length=255, verbose_name=u'网站链接')
+#     name = models.CharField(max_length=255, verbose_name=u'标题')
+#     manufacturer = models.CharField(max_length=255, null=True, blank=True, verbose_name=u'转载次数')
+#     qualitied = models.FloatField(verbose_name=u'关注度', null=True, blank=True)
+#     pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
+#     product = models.CharField(max_length=255, verbose_name=u'名称')
+#     source = models.CharField(max_length=255, verbose_name=u'信息来源')
+#     province = models.CharField(max_length=255, verbose_name=u'省')
+#     city = models.CharField(max_length=255, null=True, blank=True, verbose_name=u'市')
+#     district = models.CharField(max_length=255, null=True, blank=True, verbose_name=u'地区')
 
-    class Meta:
-        app_label = 'yqj'
-        verbose_name_plural = u'抽检'
-        ordering = ['-pubtime']
+#     class Meta:
+#         app_label = 'yqj'
+#         verbose_name_plural = u'抽检'
+#         ordering = ['-pubtime']
 
-    def __unicode__(self):
-        return self.name
+#     def __unicode__(self):
+#         return self.name
 
 
 class GroupAuthUser(models.Model):

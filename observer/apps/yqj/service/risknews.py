@@ -20,13 +20,12 @@ class RiskNewsQuerySet(Abstract):
         fields = ('id', 'title', 'pubtime', 'source')
 
         args = {
+            'pubtime__gte': self.starttime,
+            'pubtime__lt': self.endtime,
         }
-
-        if (starttime != "null" and starttime is not None) or \
-            (endtime !="null" and endtime is not None):
-            args['pubtime__range'] = (starttime,endtime)
 
             
         queryset = Risk.objects.filter(**args).values(*fields)
 
         return queryset
+        

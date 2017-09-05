@@ -5,7 +5,7 @@ from django.db.models import Case, IntegerField, Sum, When, Max
 from django.db.models import Q
 
 from observer.apps.origin.models import IndustryScore
-from observer.apps.yqj.models import Article, Risk, Topic
+from observer.apps.yqj.models import Article, Risk, Event
 from observer.apps.seer.service.abstract import Abstract
 from observer.utils.date.convert import utc_to_local_time
 
@@ -23,14 +23,15 @@ class EventQuerySet(Abstract):
 
 
         args = {
-
+            'pubtime__gte': self.starttime,
+            'pubtime__lt': self.endtime,
         }
 
-        if (starttime != "null" and starttime is not None) or \
-            (endtime !="null" and endtime is not None):
-            args['pubtime__range'] = (starttime,endtime)
+        # if (starttime != "null" and starttime is not None) or \
+        #     (endtime !="null" and endtime is not None):
+        #     args['pubtime__range'] = (starttime,endtime)
 
             
-        queryset = Topic.objects.filter(**args).values(*fields)
+        queryset = Event.objects.filter(**args).values(*fields)
 
         return queryset
