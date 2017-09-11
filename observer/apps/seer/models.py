@@ -46,58 +46,6 @@ class AreaIndustry(models.Model):
         return self.name
 
 
-class RiskNewsPublisher(models.Model):
-    name = models.CharField(max_length=255, verbose_name=u'发布者')
-
-    class Meta:
-        app_label = 'seer'
-        verbose_name_plural = u'风险新闻发布者'
-
-    def __unicode__(self):
-        return self.name
-
-
-class RiskNews(models.Model):
-    title = models.CharField(max_length=255, blank=True, verbose_name=u'标题')
-    url = models.URLField(verbose_name=u'网站链接')
-    content = HTMLField(blank=True, verbose_name=u'正文')
-    pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
-    reprinted = models.IntegerField(verbose_name=u'转载数')
-    status = models.IntegerField(default=0, verbose_name=u'状态') # 0, 默认值 -1, 无效新闻 1 有效新闻
-    risk_keyword = models.CharField(max_length=255, blank=True, verbose_name=u'风险新闻关键词')
-    invalid_keyword = models.CharField(max_length=255, blank=True, verbose_name=u'无效关键词')
-
-    publisher = models.ForeignKey(
-        RiskNewsPublisher, 
-        verbose_name=u'文章发布者'
-    )
-    area = models.ManyToManyField(
-        Area,
-        related_name='rareas',
-        related_query_name='rarea',
-        verbose_name=u'地域'
-    )
-    industry = models.ManyToManyField(
-        Industry,
-        related_name='industrys',
-        related_query_name='industry',
-        verbose_name=u'行业'
-    )
-    enterprise = models.ManyToManyField(
-        Enterprise,
-        related_name='enterprises',
-        related_query_name='enterprise',
-        verbose_name=u'企业'
-    )
-
-    class Meta:
-        verbose_name_plural = u'风险新闻'
-        ordering = ['-pubtime']
-
-    def __unicode__(self):
-        return self.title
-
-
 class UserArea(models.Model):
     user = models.ForeignKey(User, verbose_name=u'用户')
     area = models.ForeignKey(Area, verbose_name=u'地域')
@@ -291,3 +239,20 @@ class ModelWeight(models.Model):
 
     def __unicode__(self):
         return self.area.name
+
+
+class RiskEnterprise(models.Model):
+    product_name = models.CharField(max_length=255, blank=True, verbose_name=u'风险产品名称')
+    issues = models.CharField(max_length=255, blank=True, verbose_name=u'风险事项')
+
+    enterprise = models.ForeignKey(
+        Enterprise,
+        verbose_name=u'企业名称'
+    )
+
+    class Meta:
+        app_label = 'seer'
+        verbose_name_plural = u'企业风险'
+
+    def __unicode__(self):
+        return self.enterprise.name + ' , ' + product_name

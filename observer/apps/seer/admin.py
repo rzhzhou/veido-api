@@ -126,6 +126,13 @@ class CacheConfAdmin(admin.ModelAdmin):
 class ModelWeightAdmin(ForeignKeyAutocompleteAdmin):
     related_search_fields = {'industry': ('name',), 'area': ('name',)}
 
+
+class IndustryScoreAdmin(admin.ModelAdmin):
+    search_fields = ('score', )
+    list_display = ('score', 'time',)
+    list_filter = ('score', ('time', DateRangeFilter),)
+
+
 admin.site.register(AreaIndustry, AreaIndustryAdmin)
 admin.site.register(RiskNewsPublisher)
 admin.site.register(RiskNews, RiskNewsAdmin)
@@ -136,3 +143,4 @@ admin.site.register(ManageIndex, ManageIndexAdmin)
 admin.site.register(Cache, CacheAdmin)
 admin.site.register(CacheConf, CacheConfAdmin)
 admin.site.register(ModelWeight, ModelWeightAdmin)
+admin.site.register(IndustryScore, IndustryScoreAdmin)
