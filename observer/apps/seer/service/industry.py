@@ -9,9 +9,9 @@ from collections import Counter
 from datetime import date, datetime, timedelta
 
 from observer.utils.date.convert import (datetime_to_timestamp, utc_to_local_time)
-from observer.apps.origin.models import (Inspection, IndustryScore)
-from observer.apps.penalty.models import AdministrativePenalties
-from observer.apps.seer.models import (RiskNews, AreaIndustry, Industry,
+from observer.apps.seer.models import IndustryScore
+from observer.apps.base.models import Inspection, Industry
+from observer.apps.seer.models import (AreaIndustry,
                                     ManageIndex, SocietyIndex, ConsumeIndex,
                                     UserArea, ModelWeight)
 from observer.apps.seer.service.news import NewsQuerySet

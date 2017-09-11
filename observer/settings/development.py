@@ -27,7 +27,7 @@ SECRET_KEY = 'fkf4xm9z$hx7_hy22@0#^x-s+tt#4zn_tlvkoazi04_0_l5is='
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.1.167']
+ALLOWED_HOSTS = ['*']
 
 CORS_ORIGIN_ALLOW_ALL = True
 
@@ -49,12 +49,12 @@ INSTALLED_APPS = [
     'tinymce',
 
     'observer.apps.base',
-    'observer.apps.corpus',
+    # 'observer.apps.corpus',
     'observer.apps.crawler',
-    'observer.apps.inspection',
-    'observer.apps.origin',
+    # 'observer.apps.inspection',
+    # 'observer.apps.origin',
     'observer.apps.seer',
-    'observer.apps.penalty',
+    # 'observer.apps.penalty',
     'observer.apps.yqj',
 ]
 

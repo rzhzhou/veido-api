@@ -6,7 +6,7 @@ from django.db import models
 from django.utils import timezone
 from tinymce.models import HTMLField
 
-from observer.apps.origin.models import Area, Enterprise, Industry
+from observer.apps.base.models import Area, Enterprise, Industry
 from observer.utils.fulltext import SearchManager
 
 A_CHOICES = (
@@ -256,3 +256,24 @@ class RiskEnterprise(models.Model):
 
     def __unicode__(self):
         return self.enterprise.name + ' , ' + product_name
+
+class IndustryScore(models.Model):
+    score = models.BigIntegerField(verbose_name=u'分值')
+    time = models.DateField(verbose_name=u'日期')
+
+    industry = models.ForeignKey(
+        Industry, 
+        verbose_name=u'行业'
+    )
+    area = models.ForeignKey(
+        Area, 
+        verbose_name=u'地域'
+    )
+
+    class Meta:
+        app_label = 'origin'
+        verbose_name_plural = u'行业分值'
+
+    def __unicode__(self):
+        return self.industry.name 
+

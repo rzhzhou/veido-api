@@ -4,9 +4,7 @@ from datetime import datetime, timedelta
 from django.db.models import Case, IntegerField, Sum, When, Max
 from django.db.models import Q
 
-from observer.apps.origin.models import IndustryScore
-from observer.apps.yqj.models import Website
-from observer.apps.seer.models import Area
+from observer.apps.base.models import Article
 from observer.apps.seer.service.abstract import Abstract
 from observer.utils.date.convert import utc_to_local_time
 
@@ -25,6 +23,6 @@ class WebsiteQuerySet(Abstract):
         }
         args = dict([k, v] for k, v in cond.iteritems() if v)
 
-        queryset = Website.objects.filter(**args).values(*fields)
+        queryset = Article.objects.filter(**args).values(*fields)
         return queryset
         

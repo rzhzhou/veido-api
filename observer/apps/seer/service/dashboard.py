@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 
 from django.db.models import Count, Q
 
-from observer.apps.seer.models import (Area, RiskNews)
+from observer.apps.base.models import Area
 from observer.apps.seer.service.abstract import Abstract
 from observer.apps.seer.service.analytics import AnalyticsCal
 from observer.apps.seer.service.industry import IndustryTrack

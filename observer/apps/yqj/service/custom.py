@@ -4,7 +4,6 @@ from datetime import datetime, timedelta
 from django.db.models import Case, IntegerField, Sum, When, Max
 from django.db.models import Q
 
-from observer.apps.origin.models import IndustryScore
 from observer.apps.yqj.models import CustomKeyword, Custom
 from observer.apps.seer.models import Area
 from observer.apps.seer.service.abstract import Abstract

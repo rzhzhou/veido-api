@@ -4,9 +4,7 @@ from datetime import datetime, timedelta
 from django.db.models import Case, IntegerField, Sum, When, Max
 from django.db.models import Q
 
-from observer.apps.origin.models import IndustryScore
-from observer.apps.yqj.models import ArticleTwo, CategoryTwo
-from observer.apps.seer.models import Area
+from observer.apps.yqj.models import Article
 from observer.apps.seer.service.abstract import Abstract
 from observer.utils.date.convert import utc_to_local_time
 

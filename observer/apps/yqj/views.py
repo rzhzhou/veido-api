@@ -18,14 +18,11 @@ from observer.utils.excel import xls_to_response
 from observer.utils.excel.briefing import article
 from observer.utils.decorators.cache import token
 from observer.utils.connector.redisconnector import RedisQueryApi
-from observer.apps.yqj.models import (WeixinPublisher, Weixin, WeiboPublisher, Weibo,
-                                              ArticlePublisher, Article,
-                                              Event, Risk, RelatedData, Category, 
-                                              Group, User, Custom, CustomKeyword, Collection,
-                                              ArticleCollection, EventCollection, GroupAuthUser, 
-                                              LocaltionScore, RiskScore, Area)
-
-from observer.apps.origin.models import Area, Inspection, InspectionPublisher
+from observer.apps.yqj.models import (
+        Group, User, Custom, CustomKeyword,
+        ArticleCollection, GroupAuthUser, 
+        LocaltionScore)
+from observer.apps.base.models import Area, Article
 from observer.apps.yqj.service.news import NewsQuerySet
 from observer.apps.yqj.service.risknews import RiskNewsQuerySet
 from observer.apps.yqj.service.event import EventQuerySet

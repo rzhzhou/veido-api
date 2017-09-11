@@ -8,7 +8,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils.crypto import get_random_string
 
-from observer.apps.origin.models import Area, Inspection, InspectionPublisher
+# from observer.apps.origin.models import Area, Inspection, InspectionPublisher
+from observer.apps.base.models import Article, Area
 
 def make_random_string(
         length=10,

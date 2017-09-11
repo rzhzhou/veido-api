@@ -96,12 +96,14 @@ class Inspection(models.Model):
 
     enterprise_qualified = models.ForeignKey(
         Enterprise,
+        related_name='qualitieds',
         null=True, blank=True,
         verbose_name=u'合格企业'
     )
 
     enterprise_unqualified = models.ForeignKey(
         Enterprise,
+        related_name='unqualifieds', 
         null=True, blank=True,
         verbose_name=u'不合格企业'
     )
@@ -136,6 +138,18 @@ class AdministrativePenalties(models.Model):
 
     def __unicode__(self):
         return self.title
+
+
+class ArticleCategory(models.Model):
+    name = models.CharField(max_length=255, verbose_name=u'名称')
+    remark = models.CharField(max_length=255, blank=True, verbose_name=u'备注')
+
+    class Meta:
+        app_label = 'base'
+        verbose_name_plural = u'文章分类'
+
+    def __unicode__(self):
+        return self.name
 
 
 class Article(models.Model):
@@ -178,13 +192,3 @@ class Article(models.Model):
         return self.title
 
 
-class ArticleCategory(models.Model):
-    name = models.CharField(max_length=255, verbose_name=u'名称')
-    remark = models.CharField(max_length=255, blank=True, verbose_name=u'备注')
-
-    class Meta:
-        app_label = 'base'
-        verbose_name_plural = u'文章分类'
-
-    def __unicode__(self):
-        return self.name

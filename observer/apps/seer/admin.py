@@ -4,9 +4,8 @@ from django_extensions.admin import ForeignKeyAutocompleteAdmin
 from import_export.admin import ImportExportModelAdmin, ImportExportActionModelAdmin
 from daterange_filter.filter import DateRangeFilter
 from observer.apps.seer.resource import (
-    ConsumeIndexResources, ManageIndexResources, SocietyIndexResources, RiskNewsResources)
+    ConsumeIndexResources, ManageIndexResources, SocietyIndexResources)
 from observer.apps.seer.models import (Enterprise, Industry,
-                                              RiskNewsPublisher, RiskNews,
                                               UserArea, AreaIndustry,
                                               SocietyIndex, ConsumeIndex,
                                               ManageIndex, Cache, CacheConf,
@@ -20,50 +19,6 @@ class AreaIndustryAdmin(ForeignKeyAutocompleteAdmin):
     list_display = ('name','status', 'area', 'industry')
     search_fields = ('name', 'industry__name', 'area__name')
     list_filter = ('area', 'industry__level')
-
-
-class RiskNewsAdmin(ImportExportModelAdmin, ImportExportActionModelAdmin, ForeignKeyAutocompleteAdmin):
-    resource_class = RiskNewsResources
-
-    list_display = ('title', 'url', 'publisher', 'reprinted', 'pubtime')
-    search_fields = ('title', 'content', 'url', 'reprinted', 'publisher__name',
-                     'industry__name', 'enterprise__name', 'area__name')
-    list_filter = (('pubtime', DateRangeFilter), 'industry__name')
-    actions = ['delete_selected']
-
-    def reduce_score(self, obj):
-        industrys = obj.industry.all()
-        enterprises = obj.enterprise.all()
-        for industry in industrys:
-            items = ScoreIndustry.objects.filter(industry=industry)
-            for item in items:
-                if item.score < 100:
-                    score = int(item.score) + 1
-                    ScoreIndustry.objects.filter(
-                        id=item.id).update(score=score)
-                else:
-                    continue
-
-        for enterprise in enterprises:
-            items = ScoreEnterprise.objects.filter(enterprise=enterprise)
-            for item in items:
-                if item.score < 100:
-                    score = int(item.score) + 1
-                    ScoreEnterprise.objects.filter(
-                        id=item.id).update(score=score)
-                else:
-                    continue
-        return
-
-    def delete_model(self, request, obj):
-        self.reduce_score(obj)
-        obj.delete()
-
-    def delete_selected(self, request, objs):
-        for obj in objs:
-            self.reduce_score(obj)
-            obj.delete()
-
 
 class UserAreaAdmin(ForeignKeyAutocompleteAdmin):
     related_search_fields = {'area': ('name',)}
@@ -134,8 +89,6 @@ class IndustryScoreAdmin(admin.ModelAdmin):
 
 
 admin.site.register(AreaIndustry, AreaIndustryAdmin)
-admin.site.register(RiskNewsPublisher)
-admin.site.register(RiskNews, RiskNewsAdmin)
 admin.site.register(UserArea, UserAreaAdmin)
 admin.site.register(SocietyIndex, SocietyIndexAdmin)
 admin.site.register(ConsumeIndex, ConsumeIndexAdmin)
@@ -143,4 +96,4 @@ admin.site.register(ManageIndex, ManageIndexAdmin)
 admin.site.register(Cache, CacheAdmin)
 admin.site.register(CacheConf, CacheConfAdmin)
 admin.site.register(ModelWeight, ModelWeightAdmin)
-admin.site.register(IndustryScore, IndustryScoreAdmin)
+# admin.site.register(IndustryScore, IndustryScoreAdmin)

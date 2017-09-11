@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from django.db.models import Case, IntegerField, Sum, When
 from django.db.models import Q
 
-from observer.apps.origin.models import Inspection
+from observer.apps.base.models import Inspection
 from observer.apps.seer.service.abstract import Abstract
 from observer.utils.date.convert import utc_to_local_time
 

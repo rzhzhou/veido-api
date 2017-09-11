@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db.models import Count, Q
 
-from observer.apps.origin.models import Inspection
-from observer.apps.origin.models import Area
+from observer.apps.base.models import Area, Inspection
 from observer.apps.seer.models import AreaIndustry
 from observer.apps.seer.service.abstract import Abstract
 

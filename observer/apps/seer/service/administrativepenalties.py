@@ -4,7 +4,6 @@ from datetime import datetime, timedelta
 from django.db.models import Case, IntegerField, Sum, When, Max
 from django.db.models import Q
 
-from observer.apps.penalty.models import AdministrativePenalties
 from observer.apps.seer.service.abstract import Abstract
 from observer.utils.date.convert import utc_to_local_time
 

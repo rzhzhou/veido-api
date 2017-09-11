@@ -3,10 +3,10 @@ import pytz
 import xlrd
 from datetime import datetime
 from django.conf import settings
-from import_export.widgets import DateWidget, ForeignKeyWidget, ManyToManyWidget
+from import_export.widgets import DateWidget, ForeignKeyWidget, ManyToManyWidget, IntegerWidget
 from import_export import widgets
 from import_export import resources, fields
-from observer.apps.base.models import Area, Industry, Enterprise, InspectionPublisher, Inspection
+from observer.apps.base.models import Area, Industry, Enterprise, Inspection, AdministrativePenalties #InspectionPublisher, 
 
 
 class EnterpriseResources(resources.ModelResource):
@@ -28,18 +28,6 @@ class EnterpriseResources(resources.ModelResource):
             instance.save()
 
 
-class InspectionPublisherResources(resources.ModelResource):
-    name = fields.Field(attribute='name', column_name=u'抽检单位')
-
-    class Meta:
-        model = InspectionPublisher
-        fields = ('id', 'name')
-        export_order = ('id', 'name')
-
-    def save_instance(self, instance, dry_run, temp=""):
-        queryset = InspectionPublisher.objects.filter(name=instance.name)
-        if not queryset:
-            instance.save()
 
 
 class InspectionResources(resources.ModelResource):
@@ -51,10 +39,7 @@ class InspectionResources(resources.ModelResource):
     unitem = fields.Field(attribute='unitem', column_name=u'不合格项')
     brand = fields.Field(attribute='brand', column_name=u'商标')
     product = fields.Field(attribute='product', column_name=u'产品种类')
-    publisher = fields.Field(
-        column_name=u'抽检单位',
-        attribute='publisher',
-        widget=ForeignKeyWidget(InspectionPublisher, 'name'))
+    publisher = fields.Field(attribute='publisher', column_name=u'抽检单位')
     area = fields.Field(
         column_name=u'地域',
         attribute='area',
@@ -129,75 +114,5 @@ class AdministrativePenaltiesResources(resources.ModelResource):
     
         
 
-class RiskNewsResources(resources.ModelResource):
-    title = fields.Field(
-        attribute='title',
-        column_name=u'标题'
-    )
-    url = fields.Field(
-        attribute='url',
-        column_name=u'网站链接'
-    )
-    content = fields.Field(
-        attribute='content',
-        column_name=u'正文'
-    )
-    pubtime = fields.Field(
-        attribute='pubtime',
-        column_name=u'发布时间'
-    )
-    reprinted = fields.Field(
-        attribute='reprinted',
-        column_name=u'转载数',
-        widget=IntegerWidget()
-    )
-    status = fields.Field(
-        attribute='status',
-        column_name=u'是否删除',
-    )
-    risk_keyword = fields.Field(
-        attribute='risk_keyword',
-        column_name=u'风险新闻关键词',
-    )
-    invalid_keyword = fields.Field(
-        attribute='invalid_keyword',
-        column_name=u'无效关键词',
-    )
-    publisher = fields.Field(
-        attribute='publisher',
-        column_name=u'文章发布者',
-        widget=ForeignKeyWidget(RiskNewsPublisher, 'name')
-    )
-    area = fields.Field(
-        attribute='area',
-        column_name=u'地域',
-        widget=ManyToManyWidget(Area, ' ', 'name')
-    )
-    industry = fields.Field(
-        attribute='industry',
-        column_name=u'行业',
-        widget=ManyToManyWidget(Industry, ' ', 'name')
-    )
-    enterprise = fields.Field(
-        attribute='enterprise',
-        column_name=u'企业',
-        widget=ManyToManyWidget(Enterprise, ' ', 'name')
-    )
 
-    class Meta:
-        model = RiskNews
-        fields = ('id', 'title', 'url', 'content', 'pubtime', 'reprinted',
-                  'publisher', 'area', 'industry', 'enterprise', 'status', 'risk_keyword', 'invalid_keyword',)
-        export_order = ('id', 'title', 'url', 'content', 'pubtime', 'reprinted',
-                        'publisher', 'area', 'industry', 'enterprise', 'status', 'risk_keyword', 'invalid_keyword',)
-
-    def before_save_instance(self, instance, dry_run, temp=''):
-        if not instance.pubtime:
-            instance.pubtime = datetime.now()
-        elif isinstance(instance.pubtime, basestring):
-            instance.pubtime = datetime.strptime(
-                instance.pubtime, '%Y-%m-%d %H:%M:%S')
-        elif isinstance(instance.pubtime, float):
-            instance.pubtime = xlrd.xldate.xldate_as_datetime(
-                instance.pubtime, 0)
 

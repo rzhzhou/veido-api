@@ -5,7 +5,8 @@ from django.db.models import Count
 from observer.apps.seer.service.abstract import Abstract
 from observer.apps.seer.service.industry import IndustryTrack
 
-from observer.apps.seer.models import RiskNews, AreaIndustry, Enterprise
+from observer.apps.seer.models import AreaIndustry
+from observer.apps.base.models import Enterprise
 
 
 class AnalyticsCal(Abstract):
