@@ -20,10 +20,12 @@ class InspectionQuerySet(Abstract):
         fields = ('id', 'title', 'product', 'qualitied', 'publisher', 'pubtime', 'url')
 
 
-        args = {
-            'pubtime__gte': self.starttime,
-            'pubtime__lt': self.endtime,
+        cond = {
+            'pubtime__gte': getattr(self, 'starttime', None),
+            'pubtime__lt': getattr(self, 'endtime', None),
+            'title__contains' : getattr(self, 'search[value]', None)
         }
+        args =dict([k,v] for k, v in cond.iteritems() if v)
 
         queryset = Inspection.objects.filter(**args).values(*fields)
         return queryset

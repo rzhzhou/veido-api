@@ -18,15 +18,17 @@ class EventQuerySet(Abstract):
 
 
 
-    def get_all_news_list(self, starttime=None, endtime=None):
+    def get_all_news_list(self):
         fields = ('id', 'title', 'pubtime', 'source', 'area')
 
 
-        args = {
-            'pubtime__gte': self.starttime,
-            'pubtime__lt': self.endtime,
+        cond = {
+            'pubtime__gte': getattr(self, 'starttime', None),
+            'pubtime__lt': getattr(self, 'endtime', None),
+            'title__contains' : getattr(self, 'search[value]', None)
         }
 
+        args = dict([k,v] for k, v in cond.iteritems() if v)
         # if (starttime != "null" and starttime is not None) or \
         #     (endtime !="null" and endtime is not None):
         #     args['pubtime__range'] = (starttime,endtime)
