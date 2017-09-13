@@ -98,27 +98,27 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'HOST': '192.168.1.187',
-        'NAME': 'observer',
-        'USER': 'root',
-        'PASSWORD': '123456',
-        'PORT': 3306
-    },
-    'master': {
-        'ENGINE': 'django.db.backends.mysql',
-        'HOST': '192.168.1.187',
-        'NAME': 'observer',
-        'USER': 'root',
-        'PASSWORD': '123456',
-        'PORT': 3306
-    },
-    'crawler': {
-        'ENGINE': 'django.db.backends.mysql',
-        'HOST': '192.168.1.187',
-        'NAME': 'crawler',
+        'NAME': 'observertest',
         'USER': 'root',
         'PASSWORD': '123456',
         'PORT': 3306
     }
+#     'master': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'HOST': '192.168.1.187',
+#         'NAME': 'observertest',
+#         'USER': 'root',
+#         'PASSWORD': '123456',
+#         'PORT': 3306
+#     },
+#     'crawler': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'HOST': '192.168.1.187test',
+#         'NAME': 'crawler',
+#         'USER': 'root',
+#         'PASSWORD': '123456',
+#         'PORT': 3306
+#     }
 }
 
 

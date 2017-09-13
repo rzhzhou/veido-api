@@ -16,33 +16,12 @@ class NewsQuerySet(Abstract):
         super(NewsQuerySet, self).__init__(params)
 
     def get_all_news_list(self):
-        fields = ('id', 'title', 'pubtime', 'publisher_id','area', 'url')
-        '''
-        args={
-            'pubtime__gte': starttime,
-            'pubtime__lt': endtime,
-        }
-
-        queryset =''
-
-        if category_id != 'null' and category_id is not None:
-            # args['category__id'] = category_id
-            # category = Category.objects.get(pk =category_id)
-            # queryset = category.articles.filter(**args).values(*fields)
-            queryset = Article.objects.filter(category__id = category_id).filter(**args).values(*fields)
-        elif area_id != 'null' and area_id is not None:
-            args['area'] =Area.objects.filter(pk =area_id)
-            queryset = Article.objects.filter(**args).values(*fields)
-        else:
-            args['category__name'] ='质监热点'
-            queryset = Article.objects.filter(**args).values(*fields)
-        '''
-        # area_id = 
+        fields = ('id', 'title', 'pubtime', 'source','area', 'url')
+       
         cond = {
             'pubtime__gte': getattr(self, 'starttime', None),
             'pubtime__lt': getattr(self, 'endtime', None),
             'category__id': getattr(self, 'category_id', None),
-            # 'category__name':'质监热点',
             'title__contains': getattr(self, 'search[value]', None),
             'area': Area.objects.filter(pk =getattr(self, 'area_id', None))
         }
