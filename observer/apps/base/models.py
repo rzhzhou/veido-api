@@ -142,8 +142,14 @@ class AdministrativePenalties(models.Model):
 
 class ArticleCategory(models.Model):
     name = models.CharField(max_length=255, verbose_name=u'名称')
+    level = models.BigIntegerField(null=False, verbose_name=u'等级')
     remark = models.CharField(max_length=255, blank=True, verbose_name=u'备注')
 
+    parent = models.ForeignKey(
+        'self', 
+        null=True, blank=True, 
+        verbose_name=u'上一级'
+    )
     class Meta:
         app_label = 'base'
         verbose_name_plural = u'文章分类'

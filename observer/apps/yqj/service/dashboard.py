@@ -22,6 +22,7 @@ class DashboardQuerySet(Abstract):
     def zjnews(self):
         self.args['category__name']='质监热点'
         return Article.objects.filter(**self.args).values(*self.fields).order_by('-pubtime')[:10]
+        # return Article.objects.filter(**self.args).title.order_by('-pubtime')[:10]
 
     def zlnews(self):
         self.args['category__name']='质量事件'

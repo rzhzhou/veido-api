@@ -17,21 +17,16 @@ class NewsQuerySet(Abstract):
 
     def get_all_news_list(self):
         fields = ('id', 'title', 'pubtime', 'source','area', 'url')
-       
         cond = {
             'pubtime__gte': getattr(self, 'starttime', None),
             'pubtime__lt': getattr(self, 'endtime', None),
-            'category__id': getattr(self, 'category_id', None),
+            'category__level': getattr(self, 'level', None),
+            'category__name': getattr(self, 'category_name', None),
             'title__contains': getattr(self, 'search[value]', None),
-            'area': Area.objects.filter(pk =getattr(self, 'area_id', None))
+            'area__name__contains': getattr(self, 'area_name', None)
         }
 
         args = dict([k,v] for k, v in cond.iteritems() if v)
-        if cond['category__id'] or cond['area']:
-            queryset =Article.objects.filter(**args).values(*fields)
-        else:
-            args['category__name'] = '质监热点'
-            print args
-            queryset =Article.objects.filter(**args).values(*fields)
+        queryset =Article.objects.filter(**args).values(*fields).order_by('-pubtime')
         return queryset
         

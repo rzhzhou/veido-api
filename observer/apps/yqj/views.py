@@ -32,6 +32,7 @@ from observer.apps.yqj.service.insight import InsightQuerySet
 from observer.apps.yqj.service.website import WebsiteQuerySet
 from observer.apps.yqj.service.custom import CustomQuerySet
 from observer.apps.yqj.service.dashboard import DashboardQuerySet
+from observer.apps.yqj.service.analytics import AnalyticsViewQuerySet
 
 
 class BaseView(APIView):
@@ -96,13 +97,13 @@ class NewsView(BaseView):
 
         data={
             "draw": self.query_params['draw'],
-            "recordsTotal": NewsQuerySet(params=self.query_params).get_all_news_list().count(),
-            "recordsFiltered": NewsQuerySet(params=self.query_params).get_all_news_list().count(),
+            "recordsTotal": len(results),
+            "recordsFiltered": len(results),
             "data":map(lambda r:{
                 'id':r['id'],
                 'TitleAndUrl':(r['title'],r['url']),
                 'source':r['source'],
-                'area': Area.objects.get(pk = r['area']).name,
+                'area':Area.objects.get(pk = r['area']).name,
                 'pubtime':utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d'),
             },results)
         }   
@@ -110,82 +111,10 @@ class NewsView(BaseView):
 
     def get(self, request):
         self.set_params(request)
-        queryset = NewsQuerySet(params=self.query_params).get_all_news_list().order_by('-pubtime')
+        queryset = NewsQuerySet(params=self.query_params).get_all_news_list()
 
         return Response(self.serialize(queryset))
 
-
-
-class RiskView(BaseView):
-    def __init__(self):
-        super(RiskView, self).__init__()
-
-    def set_params(self, request):
-        super(RiskView, self).set_params(request.GET)
-
-    def paging(self, queryset):
-        page = (int(self.query_params['start']) /
-                int(self.query_params['length'])) + 1
-        return super(RiskView, self).paging(queryset, page, self.query_params.get('length'))
-
-    def serialize(self,queryset):
-        results = self.paging(queryset)
-        data={
-            "draw": self.query_params['draw'],
-            "recordsFiltered": len(results),
-            "recordsTotal": RiskNewsQuerySet(params=self.query_params).get_all_news_list(starttime =self.query_params['starttime'], endtime=self.query_params['endtime'],).count(),
-            "data":map(lambda r:{
-                "riskScore": r['score'],
-                'relevance': Article.objects.get(pk=r['id']).localtionscore_set.all()[0].score,
-                'id':r['id'],
-                'title':r['title'],
-                'source': r['source'],
-                'pubtime':utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d'),
-            },results)
-        }
-
-        return data
-        
-
-    def get(self, request):
-        self.set_params(request)
-        queryset =RiskNewsQuerySet(params = self.query_params).get_all_news_list(starttime =self.query_params['starttime'], endtime=self.query_params['endtime'],).order_by('-pubtime')
-        return Response(self.serialize(queryset))
-
-
-class EventView(BaseView):
-    def __init(self):
-        super(EventView,self).__init__()
-
-
-    def set_params(self,request):
-        super(EventView,self).set_params(request.GET)
-
-    def paging(self,queryset):
-        page = (int(self.query_params['start']) /
-                int(self.query_params['length'])) + 1
-        return super(EventView,self).paging(queryset, page, self.query_params.get('length'))
-
-    def serialize(self,queryset):
-        results =self.paging(queryset)
-
-        data={
-            "recordsTotal": EventQuerySet(params=self.query_params).get_all_news_list().count(),
-            "data":map(lambda r:{
-                'id':r['id'],
-                'title':r['title'],
-                'source': r['source'],
-                'area':Area.objects.get(pk=r['area']).name,
-                'pubtime':utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d'),
-            },results)
-        }
-        return data
-
-    def get(self, request):
-        self.set_params(request)
-
-        queryset =EventQuerySet(params=self.query_params).get_all_news_list().order_by('-pubtime')
-        return Response(self.serialize(queryset))
 
 
 class InspectionTableView(BaseView):
@@ -226,149 +155,104 @@ class InspectionTableView(BaseView):
         return Response(self.serialize(queryset))
 
 
-class ReferenceView(BaseView):
+class AnalyticsView(BaseView):
     def __init__(self):
-        super(ReferenceView,self).__init__()
+        super(AnalyticsView,self).__init__()
 
     def set_params(self, request):
-        super(ReferenceView,self).set_params(request.GET)
-
-    def paging(self, queryset):
-        page = (int(self.query_params['start']) /
-                int(self.query_params['length'])) + 1
-        return super(ReferenceView, self).paging(queryset, page, self.query_params.get('length'))
-
+        super(AnalyticsView,self).set_params(request.GET)
 
     def serialize(self, queryset):
-        results = self.paging(queryset)
+
         data={
             "draw": self.query_params['draw'],
-            "recordsFiltered": len(results),
-            "recordsTotal": ReferenceQuerySet(params=self.query_params).get_all_news_list().count(),
-            "data":map(lambda r:{
-                'id':r['id'],
-                'TitleAndUrl':(r['title'],r['url']),
-                'publisher':ArticlePublisher.objects.get(pk=r['publisher']).publisher,
-                'pubtime':utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d %H:%M'),
-            },results)
+            "data": [{
+               'date' : queryset['datetime'],
+               'newscount' : queryset['news_count']
+               }
+            ]  
         }
         return data
 
     def get(self, request):
         self.set_params(request)
 
-        queryset =ReferenceQuerySet(params=self.query_params).get_all_news_list().order_by('-pubtime')
+        queryset =AnalyticsViewQuerySet(params=self.query_params).get_all_news_list()
 
         return Response(self.serialize(queryset))
 
 
-class InsightView(BaseView):
-    def __init__(self):
-        super(InsightView,self).__init__()
+# class WebsiteView(BaseView):
+#     def __init__(self):
+#         super(WebsiteView,self).__init__()
 
-    def set_params(self, request):
-        super(InsightView,self).set_params(request.GET)
+#     def set_params(self, request):
+#         super(WebsiteView,self).set_params(request.GET)
+#         # self.keyword =
 
-    def paging(self, queryset):
-        page = (int(self.query_params['start']) /
-                int(self.query_params['length'])) + 1
-        return super(InsightView, self).paging(queryset, page, self.query_params.get('length'))
-
-
-    def serialize(self, queryset):
-        results = self.paging(queryset)
-        data={
-            "draw": self.query_params['draw'],
-            "recordsFiltered": len(results),
-            "recordsTotal": InsightQuerySet(params=self.query_params).get_all_news_list().count(),
-            "data":map(lambda r:{
-                'id':r['id'],
-                'TitleAndUrl':(r['title'],r['url']),
-                'publisher':ArticlePublisher.objects.get(pk=r['publisher']).publisher,
-                'pubtime':utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d %H:%M'),
-            },results)
-        }
-        return data
-
-    def get(self, request):
-        self.set_params(request)
-
-        queryset =InsightQuerySet(params=self.query_params).get_all_news_list().order_by('-pubtime')
-
-        return Response(self.serialize(queryset))
+#     def paging(self, queryset):
+#         page = (int(self.query_params['start']) /
+#                 int(self.query_params['length'])) + 1
+#         return super(WebsiteView, self).paging(queryset, page, self.query_params.get('length'))
 
 
-class WebsiteView(BaseView):
-    def __init__(self):
-        super(WebsiteView,self).__init__()
+#     def serialize(self, queryset):
+#         results = self.paging(queryset)
+#         data={
+#             "draw": self.query_params['draw'],
+#             "recordsFiltered": len(results),
+#             "recordsTotal": WebsiteQuerySet(params=self.query_params).get_all_news_list().count(),
+#             "data":map(lambda r:{
+#                 'id':r['id'],
+#                 'TitleAndUrl':(r['title'],r['url']),
+#                 'source':r['source'],
+#                 'pubtime':utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d %H:%M'),
+#             },results)
+#         }
+#         return data
 
-    def set_params(self, request):
-        super(WebsiteView,self).set_params(request.GET)
-        # self.keyword =
+#     def get(self, request):
+#         self.set_params(request)
 
-    def paging(self, queryset):
-        page = (int(self.query_params['start']) /
-                int(self.query_params['length'])) + 1
-        return super(WebsiteView, self).paging(queryset, page, self.query_params.get('length'))
+#         queryset =WebsiteQuerySet(params=self.query_params).get_all_news_list().order_by('-pubtime')
 
+#         return Response(self.serialize(queryset))
 
-    def serialize(self, queryset):
-        results = self.paging(queryset)
-        data={
-            "draw": self.query_params['draw'],
-            "recordsFiltered": len(results),
-            "recordsTotal": WebsiteQuerySet(params=self.query_params).get_all_news_list().count(),
-            "data":map(lambda r:{
-                'id':r['id'],
-                'TitleAndUrl':(r['title'],r['url']),
-                'source':r['source'],
-                'pubtime':utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d %H:%M'),
-            },results)
-        }
-        return data
+# class CustomNewsView(BaseView):
+#     def __init__(self):
+#         super(CustomNewsView,self).__init__()
 
-    def get(self, request):
-        self.set_params(request)
+#     def set_params(self, request):
+#         super(CustomNewsView,self).set_params(request.GET)
+#         self.custom_id = int(self.query_params['custom_id'])
 
-        queryset =WebsiteQuerySet(params=self.query_params).get_all_news_list().order_by('-pubtime')
-
-        return Response(self.serialize(queryset))
-
-class CustomNewsView(BaseView):
-    def __init__(self):
-        super(CustomNewsView,self).__init__()
-
-    def set_params(self, request):
-        super(CustomNewsView,self).set_params(request.GET)
-        self.custom_id = int(self.query_params['custom_id'])
-
-    def paging(self, queryset):
-        page = (int(self.query_params['start']) /
-                int(self.query_params['length'])) + 1
-        return super(CustomNewsView, self).paging(queryset, page, self.query_params.get('length'))
+#     def paging(self, queryset):
+#         page = (int(self.query_params['start']) /
+#                 int(self.query_params['length'])) + 1
+#         return super(CustomNewsView, self).paging(queryset, page, self.query_params.get('length'))
 
 
-    def serialize(self, queryset):
-        results = self.paging(queryset)
-        data={
-            "draw": self.query_params['draw'],
-            "recordsFiltered": len(results),
-            "recordsTotal": CustomQuerySet(params=self.query_params).get_all_news_list(custom_id=self.custom_id ,starttime=self.query_params['starttime'], endtime=self.query_params['endtime'],).count(),
-            "data":map(lambda r:{
-                'id':r['id'],
-                'TitleAndUrl':(r['title'],r['url']),
-                'publisher':ArticlePublisher.objects.get(pk= r['publisher']).publisher,
-                'pubtime':utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d %H:%M'),
-            },results)
-        }
-        return data
+#     def serialize(self, queryset):
+#         results = self.paging(queryset)
+#         data={
+#             "draw": self.query_params['draw'],
+#             "recordsFiltered": len(results),
+#             "recordsTotal": CustomQuerySet(params=self.query_params).get_all_news_list(custom_id=self.custom_id ,starttime=self.query_params['starttime'], endtime=self.query_params['endtime'],).count(),
+#             "data":map(lambda r:{
+#                 'id':r['id'],
+#                 'TitleAndUrl':(r['title'],r['url']),
+#                 'publisher':ArticlePublisher.objects.get(pk= r['publisher']).publisher,
+#                 'pubtime':utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d %H:%M'),
+#             },results)
+#         }
+#         return data
 
-    def get(self, request):
-        self.set_params(request)
+#     def get(self, request):
+#         self.set_params(request)
 
-        queryset =CustomQuerySet(params=self.query_params).get_all_news_list(custom_id=self.custom_id ,starttime=self.query_params['starttime'], endtime=self.query_params['endtime']).order_by('-pubtime')
+#         queryset =CustomQuerySet(params=self.query_params).get_all_news_list(custom_id=self.custom_id ,starttime=self.query_params['starttime'], endtime=self.query_params['endtime']).order_by('-pubtime')
 
-        return Response(self.serialize(queryset))
+#         return Response(self.serialize(queryset))
 
 
 class DashboardView(BaseView):
