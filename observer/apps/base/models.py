@@ -77,40 +77,20 @@ class Inspection(models.Model):
     title = models.CharField(max_length=255, verbose_name=u'标题')
     url = models.URLField(blank=True, null=True, verbose_name=u'网站链接')
     pubtime = models.DateTimeField(blank=True, null=True, verbose_name=u'发布时间')
-    qualitied = models.FloatField(default=1.0, verbose_name=u'合格率')
     unitem = models.TextField(default=u'', verbose_name=u'不合格项')
     brand = models.CharField(max_length=255, default=u'', verbose_name=u'商标')
     product = models.CharField(max_length=255, default=u'', verbose_name=u'产品种类')
-    publisher = models.CharField(max_length=255, verbose_name=u'抽检单位')
+    source = models.CharField(max_length=255, verbose_name=u'信息来源')
+    status = models.IntegerField(default=0, verbose_name=u'状态') # 0, 默认值 -1, 无效 1 有效
 
     area = models.ForeignKey(
         Area,
         verbose_name=u'抽检地域'
     )
 
-    industry = models.ForeignKey(
-        Industry,
-        null=True, blank=True,
-        verbose_name=u'行业'
-    )
-
-    enterprise_qualified = models.ForeignKey(
-        Enterprise,
-        related_name='qualitieds',
-        null=True, blank=True,
-        verbose_name=u'合格企业'
-    )
-
-    enterprise_unqualified = models.ForeignKey(
-        Enterprise,
-        related_name='unqualifieds', 
-        null=True, blank=True,
-        verbose_name=u'不合格企业'
-    )
-
     class Meta:
         app_label = 'base'
-        verbose_name_plural = u'风险抽检'
+        verbose_name_plural = u'抽检信息'
         ordering = ['-pubtime']
 
     def __unicode__(self):
@@ -168,25 +148,11 @@ class Article(models.Model):
     score = models.IntegerField(default=0, verbose_name=u'评分')
     risk_keyword = models.CharField(max_length=255, blank=True, verbose_name=u'关键词')
     invalid_keyword = models.CharField(max_length=255, blank=True, verbose_name=u'无效关键词')
-    status = models.IntegerField(default=0, verbose_name=u'状态') # 0, 默认值 -1, 无效新闻 1 有效新闻
+    status = models.IntegerField(default=0, verbose_name=u'状态') # 0, 默认值 -1, 无效 1 有效
 
-    category = models.ForeignKey(
-        ArticleCategory,
-        verbose_name=u'文章类别'
-    )
     area = models.ForeignKey(
         Area,
         verbose_name=u'地域'
-    )
-    industry = models.ForeignKey(
-        Industry,
-        null=True, blank=True,
-        verbose_name=u'行业'
-    )
-    enterprise = models.ForeignKey(
-        Enterprise,
-        null=True, blank=True,
-        verbose_name=u'企业'
     )
 
     class Meta:

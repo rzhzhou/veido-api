@@ -257,6 +257,7 @@ class RiskEnterprise(models.Model):
     def __unicode__(self):
         return self.enterprise.name + ' , ' + product_name
 
+
 class IndustryScore(models.Model):
     score = models.BigIntegerField(verbose_name=u'分值')
     time = models.DateField(verbose_name=u'日期')
@@ -277,3 +278,64 @@ class IndustryScore(models.Model):
     def __unicode__(self):
         return self.industry.name 
 
+
+
+class Inspection(models.Model):
+    qualitied = models.FloatField(default=1.0, verbose_name=u'合格率')
+
+    inspection = models.ForeignKey(
+        'base.Inspection',
+        verbose_name=u'抽检信息'
+    )
+    industry = models.ForeignKey(
+        Industry,
+        null=True, blank=True,
+        verbose_name=u'行业'
+    )
+    enterprise_qualified = models.ForeignKey(
+        Enterprise,
+        related_name='qualitieds',
+        null=True, blank=True,
+        verbose_name=u'合格企业'
+    )
+    enterprise_unqualified = models.ForeignKey(
+        Enterprise,
+        related_name='unqualifieds', 
+        null=True, blank=True,
+        verbose_name=u'不合格企业'
+    )
+
+    class Meta:
+        app_label = 'seer'
+        verbose_name_plural = u'抽检信息'
+
+    def __unicode__(self):
+        return self.inspection.title
+
+
+class Article(models.Model):
+    article = models.ForeignKey(
+        'base.Article',
+        verbose_name=u'文章'
+    )
+    category = models.ForeignKey(
+        'base.ArticleCategory',
+        verbose_name=u'文章类别'
+    )
+    industry = models.ForeignKey(
+        Industry,
+        null=True, blank=True,
+        verbose_name=u'行业'
+    )
+    enterprise = models.ForeignKey(
+        Enterprise,
+        null=True, blank=True,
+        verbose_name=u'企业'
+    )
+
+    class Meta:
+        app_label = 'seer'
+        verbose_name_plural = u'文章'
+
+    def __unicode__(self):
+        return self.article.title   

@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.utils.crypto import get_random_string
 
 # from observer.apps.origin.models import Area, Inspection, InspectionPublisher
-from observer.apps.base.models import Article, Area
+from observer.apps.base.models import Article, Area, Inspection, Article, ArticleCategory
 
 def make_random_string(
         length=10,
@@ -140,3 +140,37 @@ class GroupAuthUser(models.Model):
 
     def __unicode__(self):
         return self.auth
+
+
+class Inspection(models.Model):
+    qualitied = models.FloatField(default=1.0, verbose_name=u'关注度')
+
+    inspection = models.ForeignKey(
+        'base.Inspection',
+        verbose_name=u'抽检信息'
+    )
+
+    class Meta:
+        app_label = 'yqj'
+        verbose_name_plural = u'抽检信息'
+
+    def __unicode__(self):
+        return self.inspection.title
+
+
+class Article(models.Model):
+    article = models.ForeignKey(
+        'base.Article',
+        verbose_name=u'文章'
+    )
+    category = models.ForeignKey(
+        'base.ArticleCategory',
+        verbose_name=u'文章类别'
+    )
+
+    class Meta:
+        app_label = 'yqj'
+        verbose_name_plural = u'文章'
+
+    def __unicode__(self):
+        return self.article.title   
