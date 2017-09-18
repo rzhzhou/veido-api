@@ -76,6 +76,7 @@ class Corpus(models.Model):
 class Inspection(models.Model):
     title = models.CharField(max_length=255, verbose_name=u'标题')
     url = models.URLField(blank=True, null=True, verbose_name=u'网站链接')
+    content = models.TextField(default=u'', verbose_name=u'正文')
     pubtime = models.DateTimeField(blank=True, null=True, verbose_name=u'发布时间')
     unitem = models.TextField(default=u'', verbose_name=u'不合格项')
     brand = models.CharField(max_length=255, default=u'', verbose_name=u'商标')
@@ -141,6 +142,7 @@ class ArticleCategory(models.Model):
 class Article(models.Model):
     title = models.CharField(max_length=255, blank=True, verbose_name=u'标题')
     url = models.URLField(verbose_name=u'网站链接')
+    content = models.TextField(default=u'', verbose_name=u'正文')
     pubtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间')
     source = models.CharField(max_length=255, blank=True, verbose_name=u'信息来源')
     reprinted = models.IntegerField(verbose_name=u'转载数')
