@@ -49,14 +49,10 @@ class BaseView(APIView):
             self.query_params[k] = v
         # self.start=self.query_params.get('start')
 
-
         #start, end convert to local datetime
-        # print self.query_params['start'] , self.query_params['end']
         self.query_params['starttime'], self.query_params['endtime'] = utc_to_local_time(
             [self.query_params['starttime'], self.query_params['endtime']]
         )
-
-        
 
         #end add 1 day
         self.query_params['endtime'] = self.query_params['endtime'] + timedelta(days=1)
@@ -182,79 +178,6 @@ class AnalyticsView(BaseView):
         return Response(self.serialize(queryset))
 
 
-# class WebsiteView(BaseView):
-#     def __init__(self):
-#         super(WebsiteView,self).__init__()
-
-#     def set_params(self, request):
-#         super(WebsiteView,self).set_params(request.GET)
-#         # self.keyword =
-
-#     def paging(self, queryset):
-#         page = (int(self.query_params['start']) /
-#                 int(self.query_params['length'])) + 1
-#         return super(WebsiteView, self).paging(queryset, page, self.query_params.get('length'))
-
-
-#     def serialize(self, queryset):
-#         results = self.paging(queryset)
-#         data={
-#             "draw": self.query_params['draw'],
-#             "recordsFiltered": len(results),
-#             "recordsTotal": WebsiteQuerySet(params=self.query_params).get_all_news_list().count(),
-#             "data":map(lambda r:{
-#                 'id':r['id'],
-#                 'TitleAndUrl':(r['title'],r['url']),
-#                 'source':r['source'],
-#                 'pubtime':utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d %H:%M'),
-#             },results)
-#         }
-#         return data
-
-#     def get(self, request):
-#         self.set_params(request)
-
-#         queryset =WebsiteQuerySet(params=self.query_params).get_all_news_list().order_by('-pubtime')
-
-#         return Response(self.serialize(queryset))
-
-# class CustomNewsView(BaseView):
-#     def __init__(self):
-#         super(CustomNewsView,self).__init__()
-
-#     def set_params(self, request):
-#         super(CustomNewsView,self).set_params(request.GET)
-#         self.custom_id = int(self.query_params['custom_id'])
-
-#     def paging(self, queryset):
-#         page = (int(self.query_params['start']) /
-#                 int(self.query_params['length'])) + 1
-#         return super(CustomNewsView, self).paging(queryset, page, self.query_params.get('length'))
-
-
-#     def serialize(self, queryset):
-#         results = self.paging(queryset)
-#         data={
-#             "draw": self.query_params['draw'],
-#             "recordsFiltered": len(results),
-#             "recordsTotal": CustomQuerySet(params=self.query_params).get_all_news_list(custom_id=self.custom_id ,starttime=self.query_params['starttime'], endtime=self.query_params['endtime'],).count(),
-#             "data":map(lambda r:{
-#                 'id':r['id'],
-#                 'TitleAndUrl':(r['title'],r['url']),
-#                 'publisher':ArticlePublisher.objects.get(pk= r['publisher']).publisher,
-#                 'pubtime':utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d %H:%M'),
-#             },results)
-#         }
-#         return data
-
-#     def get(self, request):
-#         self.set_params(request)
-
-#         queryset =CustomQuerySet(params=self.query_params).get_all_news_list(custom_id=self.custom_id ,starttime=self.query_params['starttime'], endtime=self.query_params['endtime']).order_by('-pubtime')
-
-#         return Response(self.serialize(queryset))
-
-
 class DashboardView(BaseView):
     def __init__(self):
         super(DashboardView,self).__init__()
@@ -265,9 +188,6 @@ class DashboardView(BaseView):
 
     def serialize(self, queryset):
         data={
-            # "draw": self.query_params['draw'],
-            # "recordsFiltered": len(results),
-            # "recordsTotal": DashboardQuerySet(params=self.query_params).get_all_news_list().count(),
             'zjnews':[
             	{
             		'name' : '质监热点',
