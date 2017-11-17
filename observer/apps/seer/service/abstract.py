@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ObjectDoesNotExist
@@ -12,7 +12,7 @@ from observer.apps.base.models import Industry
 class Abstract(object):
 
     def __init__(self, params):
-        for k, v in params.iteritems():
+        for k, v in params.items():
             setattr(self, k, v)
 
     def set_args(self):

@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 import uuid
 from datetime import date
 from django.contrib.auth.models import User
@@ -26,16 +26,16 @@ C_CHOICES = (
 )
 
 class AreaIndustry(models.Model):
-    name = models.CharField(max_length=255, verbose_name=u'名称')
-    status = models.CharField(max_length=255, default=u'', verbose_name=u'状态')
+    name = models.CharField(max_length=255, verbose_name='名称')
+    status = models.CharField(max_length=255, default='', verbose_name='状态')
 
     area = models.ForeignKey(
         Area,
-        verbose_name=u'地域'
+        verbose_name='地域'
     )
     industry = models.ForeignKey(
         Industry,
-        verbose_name=u'行业'
+        verbose_name='行业'
     )
 
     class Meta:
@@ -47,8 +47,8 @@ class AreaIndustry(models.Model):
 
 
 class UserArea(models.Model):
-    user = models.ForeignKey(User, verbose_name=u'用户')
-    area = models.ForeignKey(Area, verbose_name=u'地域')
+    user = models.ForeignKey(User, verbose_name='用户')
+    area = models.ForeignKey(Area, verbose_name='地域')
 
     class Meta:
         app_label = 'seer'
@@ -63,34 +63,34 @@ class ConsumeIndex(models.Model):
         choices=C_CHOICES,
         blank=True,
         null=True,
-        verbose_name=u'国家强制性要求'
+        verbose_name='国家强制性要求'
     )
     close = models.IntegerField(
         choices=A_CHOICES,
         blank=True,
         null=True,
-        verbose_name=u'密切程度'
+        verbose_name='密切程度'
     )
     consume = models.IntegerField(
         choices=B_CHOICES,
         blank=True,
         null=True,
-        verbose_name=u'涉及特定消费群体和特殊要求'
+        verbose_name='涉及特定消费群体和特殊要求'
     )
     year = models.IntegerField(
         blank=True,
         null=True,
-        verbose_name=u'年度'
+        verbose_name='年度'
     )
 
     industry = models.ForeignKey(
         Industry,
-        verbose_name=u'行业'
+        verbose_name='行业'
     )
     area = models.ForeignKey(
         Area,
         default=1,
-        verbose_name=u'地域'
+        verbose_name='地域'
     )
 
     class Meta:
@@ -103,34 +103,34 @@ class SocietyIndex(models.Model):
         choices=A_CHOICES,
         blank=True,
         null=True,
-        verbose_name=u'贸易量'
+        verbose_name='贸易量'
     )
     qualified = models.IntegerField(
         choices=A_CHOICES,
         blank=True,
         null=True,
-        verbose_name=u'抽检合格率'
+        verbose_name='抽检合格率'
     )
     accident = models.IntegerField(
         choices=A_CHOICES,
         blank=True,
         null=True,
-        verbose_name=u'案例发生状况'
+        verbose_name='案例发生状况'
     )
     year = models.IntegerField(
         blank=True,
         null=True,
-        verbose_name=u'年度'
+        verbose_name='年度'
     )
 
     industry = models.ForeignKey(
         Industry,
-        verbose_name=u'行业'
+        verbose_name='行业'
     )
     area = models.ForeignKey(
         Area,
         default=1,
-        verbose_name=u'地域'
+        verbose_name='地域'
     )
 
     class Meta:
@@ -143,46 +143,46 @@ class ManageIndex(models.Model):
         choices=B_CHOICES,
         blank=True,
         null=True,
-        verbose_name=u'列入许可证目录'
+        verbose_name='列入许可证目录'
     )
     productauth = models.IntegerField(
         choices=B_CHOICES,
         blank=True,
         null=True,
-        verbose_name=u'列入产品认证目录'
+        verbose_name='列入产品认证目录'
     )
     encourage = models.IntegerField(
         choices=B_CHOICES,
         blank=True,
         null=True,
-        verbose_name=u'是否鼓励'
+        verbose_name='是否鼓励'
     )
     limit = models.IntegerField(
         choices=B_CHOICES,
         blank=True,
         null=True,
-        verbose_name=u'是否限制'
+        verbose_name='是否限制'
     )
     remove = models.IntegerField(
         choices=B_CHOICES,
         blank=True,
         null=True,
-        verbose_name=u'是否淘汰'
+        verbose_name='是否淘汰'
     )
     year = models.IntegerField(
         blank=True,
         null=True,
-        verbose_name=u'年度'
+        verbose_name='年度'
     )
 
     industry = models.ForeignKey(
         Industry,
-        verbose_name=u'行业'
+        verbose_name='行业'
     )
     area = models.ForeignKey(
         Area,
         default=1, 
-        verbose_name=u'地域'
+        verbose_name='地域'
     )
 
     class Meta:
@@ -191,9 +191,9 @@ class ManageIndex(models.Model):
 
 
 class Cache(models.Model):
-    k = models.CharField(max_length=255, verbose_name=u'键')
-    v = models.TextField(blank=True, verbose_name=u'值')
-    update_at = models.DateTimeField(auto_now=True, verbose_name=u'更新时间')
+    k = models.CharField(max_length=255, verbose_name='键')
+    v = models.TextField(blank=True, verbose_name='值')
+    update_at = models.DateTimeField(auto_now=True, verbose_name='更新时间')
 
     class Meta:
         app_label = 'seer'
@@ -204,9 +204,9 @@ class Cache(models.Model):
 
 
 class CacheConf(models.Model):
-    name = models.CharField(max_length=255, verbose_name=u'名称')
-    days = models.IntegerField(verbose_name=u'间隔天数')
-    params = models.TextField(blank=True, verbose_name=u'参数')
+    name = models.CharField(max_length=255, verbose_name='名称')
+    days = models.IntegerField(verbose_name='间隔天数')
+    params = models.TextField(blank=True, verbose_name='参数')
 
     class Meta:
         app_label = 'seer'
@@ -217,20 +217,20 @@ class CacheConf(models.Model):
 
 
 class ModelWeight(models.Model):
-    consume_index = models.FloatField(verbose_name=u'消费指标(维)')
-    society_index = models.FloatField(verbose_name=u'社会性指标(维)')
-    manage_index = models.FloatField(verbose_name=u'管理指标(维)')
-    risk_news_index = models.FloatField(verbose_name=u'新闻指标(维)')
-    inspection_index = models.FloatField(verbose_name=u'抽检指标(维)')
+    consume_index = models.FloatField(verbose_name='消费指标(维)')
+    society_index = models.FloatField(verbose_name='社会性指标(维)')
+    manage_index = models.FloatField(verbose_name='管理指标(维)')
+    risk_news_index = models.FloatField(verbose_name='新闻指标(维)')
+    inspection_index = models.FloatField(verbose_name='抽检指标(维)')
 
     industry = models.ForeignKey(
         Industry, 
         null=True, blank=True,
-        verbose_name=u'行业'
+        verbose_name='行业'
     )
     area = models.ForeignKey(
         Area,
-        verbose_name=u'地域'
+        verbose_name='地域'
     )
 
     class Meta:
@@ -242,12 +242,12 @@ class ModelWeight(models.Model):
 
 
 class RiskEnterprise(models.Model):
-    product_name = models.CharField(max_length=255, blank=True, verbose_name=u'风险产品名称')
-    issues = models.CharField(max_length=255, blank=True, verbose_name=u'风险事项')
+    product_name = models.CharField(max_length=255, blank=True, verbose_name='风险产品名称')
+    issues = models.CharField(max_length=255, blank=True, verbose_name='风险事项')
 
     enterprise = models.ForeignKey(
         Enterprise,
-        verbose_name=u'企业名称'
+        verbose_name='企业名称'
     )
 
     class Meta:
@@ -259,16 +259,16 @@ class RiskEnterprise(models.Model):
 
 
 class IndustryScore(models.Model):
-    score = models.BigIntegerField(verbose_name=u'分值')
-    time = models.DateField(verbose_name=u'日期')
+    score = models.BigIntegerField(verbose_name='分值')
+    time = models.DateField(verbose_name='日期')
 
     industry = models.ForeignKey(
         Industry, 
-        verbose_name=u'行业'
+        verbose_name='行业'
     )
     area = models.ForeignKey(
         Area, 
-        verbose_name=u'地域'
+        verbose_name='地域'
     )
 
     class Meta:
@@ -281,28 +281,29 @@ class IndustryScore(models.Model):
 
 
 class Inspection(models.Model):
-    qualitied = models.FloatField(default=1.0, verbose_name=u'合格率')
+    qualitied = models.FloatField(default=1.0, verbose_name='合格率')
 
     inspection = models.ForeignKey(
         'base.Inspection',
-        verbose_name=u'抽检信息'
+        related_name='seer_inspection',
+        verbose_name='抽检信息'
     )
     industry = models.ForeignKey(
         Industry,
         null=True, blank=True,
-        verbose_name=u'行业'
+        verbose_name='行业'
     )
     enterprise_qualified = models.ForeignKey(
         Enterprise,
         related_name='qualitieds',
         null=True, blank=True,
-        verbose_name=u'合格企业'
+        verbose_name='合格企业'
     )
     enterprise_unqualified = models.ForeignKey(
         Enterprise,
         related_name='unqualifieds', 
         null=True, blank=True,
-        verbose_name=u'不合格企业'
+        verbose_name='不合格企业'
     )
 
     class Meta:
@@ -316,21 +317,23 @@ class Inspection(models.Model):
 class Article(models.Model):
     article = models.ForeignKey(
         'base.Article',
-        verbose_name=u'文章'
+        related_name='seer_article',
+        verbose_name='文章'
     )
     category = models.ForeignKey(
         'base.ArticleCategory',
-        verbose_name=u'文章类别'
+        related_name='seer_category',
+        verbose_name='文章类别'
     )
     industry = models.ForeignKey(
         Industry,
         null=True, blank=True,
-        verbose_name=u'行业'
+        verbose_name='行业'
     )
     enterprise = models.ForeignKey(
         Enterprise,
         null=True, blank=True,
-        verbose_name=u'企业'
+        verbose_name='企业'
     )
 
     class Meta:

@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 from datetime import date, timedelta
 from django_extensions.management.jobs import HourlyJob
 

@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 from datetime import datetime, timedelta
 
 from django.db.models import Case, IntegerField, Sum, When, Max
@@ -24,7 +24,7 @@ class InspectionQuerySet(Abstract):
             'pubtime__lt': getattr(self, 'endtime', None),
             'title__contains' : getattr(self, 'search[value]', None)
         }
-        args =dict([k,v] for k, v in cond.iteritems() if v)
+        args =dict([k,v] for k, v in cond.items() if v)
 
         queryset = Inspection.objects.filter(**args).values(*fields)
         return queryset

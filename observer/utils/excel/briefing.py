@@ -4,6 +4,7 @@ import os
 import time
 import datetime, calendar
 import random
+import importlib
 # import StringIO
 
 import xlsxwriter
@@ -12,10 +13,10 @@ import xlsxwriter
 try:
     import cStringIO as StringIO
 except ImportError:
-    import StringIO
+    import io as StringIO
 
-reload(sys)
-sys.setdefaultencoding("utf-8")
+importlib.reload(sys)
+#sys.setdefaultencoding("utf-8")
 
 class article():
     def get_output(self, data):

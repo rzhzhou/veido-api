@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 from django.db.models import Count, Q
 
 from observer.apps.base.models import Area, Inspection

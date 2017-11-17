@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 import time
 import uuid
 import random
@@ -45,7 +45,7 @@ class BaseView(APIView):
         }
 
     def set_params(self, params):
-        for k, v in params.iteritems():
+        for k, v in params.items():
             self.query_params[k] = v
         # self.start=self.query_params.get('start')
 
@@ -84,15 +84,15 @@ class NewsView(BaseView):
         self.area_id = self.query_params.get('area_id')
 
     def paging(self, queryset):
-        page = (int(self.query_params['start']) /
-                int(self.query_params['length'])) + 1
+        page = (int(self.query_params.get('start')) /
+                int(self.query_params.get('length'))) + 1
         return super(NewsView, self).paging(queryset, page, self.query_params.get('length'))
 
     def serialize(self, queryset):
         results = self.paging(queryset)
 
         data={
-            "draw": self.query_params['draw'],
+            "draw": self.query_params.get('draw'),
             "recordsTotal": len(results),
             "recordsFiltered": len(results),
             "data":map(lambda r:{
@@ -137,7 +137,6 @@ class InspectionTableView(BaseView):
                 'TitleAndUrl':(r['title'],r['url']),
                 'publisher':r['publisher'],
                 'product': r['product'],
-                'qualitied':"%.2f%%" % (r['qualitied'] * 100),
                 'pubtime':utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d %H:%M'),
             },results)
         }

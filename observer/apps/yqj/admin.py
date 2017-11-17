@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 import jieba.analyse
 
 from django import forms
@@ -51,9 +51,6 @@ class WeixinAdmin(ForeignKeyAutocompleteAdmin):
 class ArticleAdmin(ForeignKeyAutocompleteAdmin):
     related_search_fields = {'area': ('name',)} 
     # fields = ('title', 'source', 'area', 'feeling_factor', 'pubtime', 'website_type')
-    list_display = ('title', 'source', 'area', 'feeling_factor', 'pubtime')
-    list_editable = ('source', 'feeling_factor', 'pubtime')
-    list_filter = ('pubtime',)
     search_fields = ('title', 'source', 'content')
     # raw_id_fields = ('area', 'source')
 

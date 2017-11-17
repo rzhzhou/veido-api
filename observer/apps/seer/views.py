@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 import time
 import uuid
 import random
@@ -1115,7 +1115,7 @@ class Products(BaseView):
             industry['level_one'] = i.name
             industry_list = []
 
-            for area_industry in AreaIndustry.objects.filter(industry__in=Industry.objects.filter(parent__in=Industry.objects.filter(parent=i)), area=Area.objects.filter(name=u'苏州')[0]):
+            for area_industry in AreaIndustry.objects.filter(industry__in=Industry.objects.filter(parent__in=Industry.objects.filter(parent=i)), area=Area.objects.filter(name='苏州')[0]):
                 industry_list.append({
                     'id': area_industry.id, 
                     'name': area_industry.name, 
@@ -1172,7 +1172,7 @@ class ProductUpdate(BaseView):
         try:
             area_industry_ids = params.get('area_industry_ids')
             if area_industry_ids is u'':
-                self.handle_remove(params, AreaIndustry.objects.filter(area=Area.objects.filter(name=u'苏州')[0]))
+                self.handle_remove(params, AreaIndustry.objects.filter(area=Area.objects.filter(name='苏州')[0]))
             else:
                 self.handle_add(params, AreaIndustry.objects.filter(id__in=area_industry_ids.split(',')))
                 self.handle_remove(params, AreaIndustry.objects.exclude(id__in=area_industry_ids.split(',')))

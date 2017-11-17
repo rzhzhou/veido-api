@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 import pytz
 
 from calendar import monthrange
@@ -17,7 +17,7 @@ def utc_to_local_time(dt):
 
     utc_to_local = lambda x: x.astimezone(tz) if x.tzinfo else tz.localize(x)
 
-    if isinstance(dt, (str, unicode)):
+    if isinstance(dt, (str, )):
         for fmt in ('%Y-%m-%d', '%Y-%m-%d %H:%M:%S'):
             try:
                 dt = datetime.strptime(dt, fmt)

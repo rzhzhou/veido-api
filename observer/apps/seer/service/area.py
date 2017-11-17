@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 from random import randint
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404

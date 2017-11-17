@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 import pytz
 import xlrd
 from datetime import datetime
@@ -10,10 +10,10 @@ from observer.apps.base.models import Area, Industry, Enterprise, Inspection, Ad
 
 
 class EnterpriseResources(resources.ModelResource):
-    name = fields.Field(attribute='name', column_name=u'企业名')
+    name = fields.Field(attribute='name', column_name='企业名')
 
     area = fields.Field(
-        column_name=u'地域',
+        column_name='地域',
         attribute='area',
         widget=ForeignKeyWidget(Area, 'name'))
 
@@ -31,29 +31,29 @@ class EnterpriseResources(resources.ModelResource):
 
 
 class InspectionResources(resources.ModelResource):
-    pubtime = fields.Field(attribute='pubtime', column_name=u'发布日期')
-    title = fields.Field(attribute='title', column_name=u'标题')
-    url = fields.Field(attribute='url', column_name=u'链接')
-    qualitied = fields.Field(attribute='qualitied', column_name=u'合格率')
-    content = fields.Field(attribute='content', column_name=u'正文')
-    unitem = fields.Field(attribute='unitem', column_name=u'不合格项')
-    brand = fields.Field(attribute='brand', column_name=u'商标')
-    product = fields.Field(attribute='product', column_name=u'产品种类')
-    publisher = fields.Field(attribute='publisher', column_name=u'抽检单位')
+    pubtime = fields.Field(attribute='pubtime', column_name='发布日期')
+    title = fields.Field(attribute='title', column_name='标题')
+    url = fields.Field(attribute='url', column_name='链接')
+    qualitied = fields.Field(attribute='qualitied', column_name='合格率')
+    content = fields.Field(attribute='content', column_name='正文')
+    unitem = fields.Field(attribute='unitem', column_name='不合格项')
+    brand = fields.Field(attribute='brand', column_name='商标')
+    product = fields.Field(attribute='product', column_name='产品种类')
+    publisher = fields.Field(attribute='publisher', column_name='抽检单位')
     area = fields.Field(
-        column_name=u'地域',
+        column_name='地域',
         attribute='area',
         widget=ManyToManyWidget(Area, ' ', 'name'))
     industry = fields.Field(
-        column_name=u'行业',
+        column_name='行业',
         attribute='industry',
         widget=ManyToManyWidget(Industry, ' ', 'name'))
     enterprise_qualified = fields.Field(
-        column_name=u'合格企业',
+        column_name='合格企业',
         attribute='enterprise_qualified',
         widget=ManyToManyWidget(Enterprise, ' ', 'name'))
     enterprise_unqualified = fields.Field(
-        column_name=u'不合格企业',
+        column_name='不合格企业',
         attribute='enterprise_unqualified',
         widget=ManyToManyWidget(Enterprise, ' ', 'name'))
 
@@ -81,20 +81,20 @@ class InspectionResources(resources.ModelResource):
 
 
 class AdministrativePenaltiesResources(resources.ModelResource):
-    pubtime = fields.Field(attribute='pubtime', column_name=u'发布日期')
-    title = fields.Field(attribute='title', column_name=u'标题')
-    url = fields.Field(attribute='url', column_name=u'链接')
-    content = fields.Field(attribute='content', column_name=u'正文')
-    publisher = fields.Field(attribute='publisher', column_name=u'发布者')
-    case_name = fields.Field(attribute='case_name', column_name=u'案件名称')
-    illegal_behavior = fields.Field(attribute='illegal_behavior', column_name=u'违法行为')
-    punishment_basis = fields.Field(attribute='punishment_basis', column_name=u'处罚依据')
-    punishment_result = fields.Field(attribute='punishment_result', column_name=u'处罚结果')
-    penalty_organ = fields.Field(attribute='penalty_organ', column_name=u'处罚机关')
-    credit_code = fields.Field(attribute='credit_code', column_name=u'统一社会信用代码')
-    area = fields.Field(attribute='area', column_name=u'地域')
-    industry = fields.Field(attribute='industry', column_name=u'行业')
-    enterprise=fields.Field(attribute='enterprise', column_name=u'处罚企业')
+    pubtime = fields.Field(attribute='pubtime', column_name='发布日期')
+    title = fields.Field(attribute='title', column_name='标题')
+    url = fields.Field(attribute='url', column_name='链接')
+    content = fields.Field(attribute='content', column_name='正文')
+    publisher = fields.Field(attribute='publisher', column_name='发布者')
+    case_name = fields.Field(attribute='case_name', column_name='案件名称')
+    illegal_behavior = fields.Field(attribute='illegal_behavior', column_name='违法行为')
+    punishment_basis = fields.Field(attribute='punishment_basis', column_name='处罚依据')
+    punishment_result = fields.Field(attribute='punishment_result', column_name='处罚结果')
+    penalty_organ = fields.Field(attribute='penalty_organ', column_name='处罚机关')
+    credit_code = fields.Field(attribute='credit_code', column_name='统一社会信用代码')
+    area = fields.Field(attribute='area', column_name='地域')
+    industry = fields.Field(attribute='industry', column_name='行业')
+    enterprise=fields.Field(attribute='enterprise', column_name='处罚企业')
 
     class Meta:
         model = AdministrativePenalties

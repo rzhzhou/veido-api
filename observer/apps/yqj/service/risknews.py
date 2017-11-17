@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 from datetime import datetime, timedelta
 
 from django.db.models import Case, IntegerField, Sum, When, Max

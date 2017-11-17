@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 from datetime import datetime, timedelta
 
 from django.db.models import Case, IntegerField, Sum, When, Max
@@ -26,7 +26,7 @@ class NewsQuerySet(Abstract):
             'area__name__contains': getattr(self, 'area_name', None)
         }
 
-        args = dict([k,v] for k, v in cond.iteritems() if v)
+        args = dict([k,v] for k, v in cond.items() if v)
         queryset =Article.objects.filter(**args).values(*fields).order_by('-pubtime')
         return queryset
         

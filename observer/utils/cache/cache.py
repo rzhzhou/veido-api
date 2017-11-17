@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "observer.settings.development")
 import requests
@@ -41,4 +41,4 @@ class BaseCatch(BaseJob):
     
 
 if __name__ == '__main__':
-    BaseCatch().get(name=u'dashboard', url=u'%s/api/dashboard?cache=0')
+    BaseCatch().get(name='dashboard', url='%s/api/dashboard?cache=0')

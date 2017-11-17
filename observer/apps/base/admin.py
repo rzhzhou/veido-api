@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 import os
 import uuid
 from django.contrib import admin
@@ -50,8 +50,8 @@ class EnterpriseAdmin(ImportExportModelAdmin, ImportExportActionModelAdmin):
 class InspectionAdmin(ImportExportActionModelAdmin):
     resource_class = InspectionResources
     search_fields = ('title', 'publisher__name',)
-    list_display = ('title', 'qualitied', 'pubtime', 'publisher',)
-    list_filter = (('pubtime', DateRangeFilter), 'industry', 'qualitied',)
+    list_display = ('title','pubtime',)
+    list_filter = (('pubtime', DateRangeFilter),)
 
 
 class AdministrativePenaltiesAdmin(ImportExportActionModelAdmin):

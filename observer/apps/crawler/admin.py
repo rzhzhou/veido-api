@@ -1,6 +1,5 @@
-# -*- conding: utf-8 -*-
 from django.contrib import admin
-from models import Task, TaskConf
+from observer.apps.crawler.models import Task, TaskConf
 
 
 class MultiDBModelAdmin(admin.ModelAdmin):

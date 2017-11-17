@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 import operator
 
 from random import randint

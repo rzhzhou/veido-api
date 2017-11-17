@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import hmac
 import hashlib
 
@@ -9,7 +8,7 @@ from django.contrib.auth.models import User
 from django.utils.crypto import get_random_string
 
 # from observer.apps.origin.models import Area, Inspection, InspectionPublisher
-from observer.apps.base.models import Article, Area, Inspection, Article, ArticleCategory
+from observer.apps.base.models import Article, Area, Inspection, ArticleCategory
 
 def make_random_string(
         length=10,
@@ -44,15 +43,15 @@ class Group(models.Model):
 
     class Meta:
         app_label = 'yqj'
-        verbose_name_plural = u'舆情机用户组'
+        verbose_name_plural = '舆情机用户组'
 
     def __unicode__(self):
         return self.company
 
 
 class User(models.Model):
-    username = models.CharField(max_length=20, unique=True, verbose_name=u'登录名')
-    password = models.CharField(max_length=255, verbose_name=u'密码')
+    username = models.CharField(max_length=20, unique=True, verbose_name='登录名')
+    password = models.CharField(max_length=255, verbose_name='密码')
     salt = models.CharField(max_length=255)
     area = models.ForeignKey(Area)
     isAdmin = models.IntegerField(default=0)
@@ -60,7 +59,7 @@ class User(models.Model):
 
     class Meta:
         app_label = 'yqj'
-        verbose_name_plural = u'舆情机用户'
+        verbose_name_plural = '舆情机用户'
 
     def __unicode__(self):
         return self.username
@@ -70,53 +69,53 @@ class User(models.Model):
 
 
 class Custom(models.Model):
-    searchkeyword = models.CharField(max_length=255, verbose_name=u'关键词')
+    searchkeyword = models.CharField(max_length=255, verbose_name='关键词')
 
     class Meta:
         app_label = 'yqj'
-        verbose_name_plural = u'指定监测'
+        verbose_name_plural = '指定监测'
 
     def __unicode__(self):
         return self.searchkeyword
 
 
 class CustomKeyword(models.Model):
-    newkeyword = models.CharField(max_length=255, verbose_name=u'关键词')
-    review = models.CharField(max_length=255, default=u'', verbose_name=u'审核')
+    newkeyword = models.CharField(max_length=255, verbose_name='关键词')
+    review = models.CharField(max_length=255, default='', verbose_name='审核')
     group = models.ForeignKey(Group)
-    custom = models.ForeignKey(Custom, null=True, blank=True, default=u'')
+    custom = models.ForeignKey(Custom, null=True, blank=True, default='')
 
     class Meta:
         app_label = 'yqj'
-        verbose_name_plural = u'指定监测关键词'
+        verbose_name_plural = '指定监测关键词'
 
     def __unicode__(self):
         return self.newkeyword
 
 
 class ArticleCollection(models.Model):
-    create_time = models.DateTimeField(auto_now=True, verbose_name=u'创建时间')
+    create_time = models.DateTimeField(auto_now=True, verbose_name='创建时间')
 
-    user = models.OneToOneField(User, verbose_name=u'用户')
-    article = models.ForeignKey(Article, verbose_name=u'文章')
+    user = models.OneToOneField(User, verbose_name='用户')
+    article = models.ForeignKey(Article, verbose_name='文章')
 
     class Meta:
         app_label = 'yqj'
-        verbose_name_plural = u'文章收藏'
+        verbose_name_plural = '文章收藏'
 
     def __unicode__(self):
         return self.category
 
 
 class LocaltionScore(models.Model):
-    score = models.IntegerField(default=0, verbose_name=u'分数')
+    score = models.IntegerField(default=0, verbose_name='分数')
     
-    group = models.ForeignKey(Group, verbose_name=u'分组')
-    article = models.ForeignKey(Article, verbose_name=u'文章')
+    group = models.ForeignKey(Group, verbose_name='分组')
+    article = models.ForeignKey(Article, verbose_name='文章')
 
     class Meta:
         app_label = 'yqj'
-        verbose_name_plural = u'本地相关度'
+        verbose_name_plural = '本地相关度'
 
     def __unicode__(self):
         return str(self.score)
@@ -131,28 +130,29 @@ class AnonymousUser(User):
 
 
 class GroupAuthUser(models.Model):
-    auth = models.CharField(max_length=255, verbose_name=u'用户名')
-    group = models.ForeignKey(Group, verbose_name=u'分组')
+    auth = models.CharField(max_length=255, verbose_name='用户名')
+    group = models.ForeignKey(Group, verbose_name='分组')
 
     class Meta:
         app_label = 'yqj'
-        verbose_name_plural = u'用户绑定'
+        verbose_name_plural = '用户绑定'
 
     def __unicode__(self):
         return self.auth
 
 
 class Inspection(models.Model):
-    qualitied = models.FloatField(default=1.0, verbose_name=u'关注度')
+    qualitied = models.FloatField(default=1.0, verbose_name='关注度')
 
     inspection = models.ForeignKey(
         'base.Inspection',
-        verbose_name=u'抽检信息'
+        related_name='yqj_inspection',
+        verbose_name='抽检信息'
     )
 
     class Meta:
         app_label = 'yqj'
-        verbose_name_plural = u'抽检信息'
+        verbose_name_plural = '抽检信息'
 
     def __unicode__(self):
         return self.inspection.title
@@ -161,16 +161,18 @@ class Inspection(models.Model):
 class Article(models.Model):
     article = models.ForeignKey(
         'base.Article',
-        verbose_name=u'文章'
+        related_name='yqj_article',
+        verbose_name='文章'
     )
     category = models.ForeignKey(
         'base.ArticleCategory',
-        verbose_name=u'文章类别'
+        related_name='yqj_category',
+        verbose_name='文章类别'
     )
 
     class Meta:
         app_label = 'yqj'
-        verbose_name_plural = u'文章'
+        verbose_name_plural = '文章'
 
     def __unicode__(self):
         return self.article.title   
