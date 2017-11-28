@@ -2,3 +2,4 @@
 node_modules
 *.pyc
 #0*.py
+VENV
