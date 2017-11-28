@@ -280,13 +280,9 @@ class IndustryScore(models.Model):
 
 
 class Inspection(models.Model):
+    base_inspection = models.CharField(max_length=32, verbose_name='基础抽检库')
     qualitied = models.FloatField(default=1.0, verbose_name='合格率')
 
-    inspection = models.ForeignKey(
-        'base.Inspection',
-        related_name='seer_inspection',
-        verbose_name='抽检信息'
-    )
     industry = models.ForeignKey(
         Industry,
         null=True, blank=True,
@@ -310,15 +306,12 @@ class Inspection(models.Model):
         verbose_name_plural = u'抽检信息'
 
     def __unicode__(self):
-        return self.inspection.title
+        return self.base_inspection
 
 
 class Article(models.Model):
-    article = models.ForeignKey(
-        'base.Article',
-        related_name='seer_article',
-        verbose_name='文章'
-    )
+    base_article = models.CharField(max_length=32, verbose_name='基础文章库')
+
     category = models.ForeignKey(
         'base.ArticleCategory',
         related_name='seer_category',
@@ -340,4 +333,4 @@ class Article(models.Model):
         verbose_name_plural = u'文章'
 
     def __unicode__(self):
-        return self.article.title   
+        return self.base_article
