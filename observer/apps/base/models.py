@@ -73,6 +73,7 @@ class Corpus(models.Model):
 
 
 class Inspection(models.Model):
+    guid = models.CharField(max_length=32, primary_key=True, verbose_name='主键')
     title = models.CharField(max_length=255, verbose_name='标题')
     url = models.URLField(blank=True, null=True, verbose_name='网站链接')
     content = models.TextField(default='', verbose_name='正文')
@@ -98,6 +99,7 @@ class Inspection(models.Model):
 
 
 class AdministrativePenalties(models.Model):
+    guid = models.CharField(max_length=32, primary_key=True, verbose_name='主键')
     title = models.CharField(max_length=255, blank=True, verbose_name='标题')
     url = models.URLField(verbose_name='网站链接')
     pubtime = models.DateTimeField(blank=True, null=True, auto_now=False, verbose_name='发布时间')
@@ -139,6 +141,7 @@ class ArticleCategory(models.Model):
 
 
 class Article(models.Model):
+    guid = models.CharField(max_length=32, primary_key=True, verbose_name='主键')
     title = models.CharField(max_length=255, blank=True, verbose_name='标题')
     url = models.URLField(verbose_name='网站链接')
     content = models.TextField(default='', verbose_name='正文')
