@@ -1,4 +1,3 @@
-
 import uuid
 from datetime import date
 from django.contrib.auth.models import User

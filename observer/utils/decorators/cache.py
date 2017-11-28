@@ -1,4 +1,3 @@
-
 from rest_framework.response import Response
 from observer.utils.connector.redisconnector import RedisQueryApi
 

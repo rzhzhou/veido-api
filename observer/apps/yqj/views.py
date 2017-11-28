@@ -1,4 +1,3 @@
-
 import time
 import uuid
 import random
@@ -120,33 +119,24 @@ class InspectionTableView(BaseView):
     def set_params(self, request):
         super(InspectionTableView,self).set_params(request.GET)
 
-    def paging(self, queryset):
-        page = (int(self.query_params['start']) /
-                int(self.query_params['length'])) + 1
-        return super(InspectionTableView, self).paging(queryset, page, self.query_params.get('length'))
-
 
     def serialize(self, queryset):
-        results = self.paging(queryset)
         data={
-            "draw": self.query_params['draw'],
-            "recordsFiltered": len(results),
-            "recordsTotal": InspectionQuerySet(params=self.query_params).get_all_news_list().count(),
             "data":map(lambda r:{
                 'id':r['id'],
                 'TitleAndUrl':(r['title'],r['url']),
                 'publisher':r['publisher'],
                 'product': r['product'],
+                'qualitied':"%.2f%%" % (r['qualitied'] * 100),
                 'pubtime':utc_to_local_time(r['pubtime']).strftime('%Y-%m-%d %H:%M'),
-            },results)
+            },queryset)
         }
         return data
 
     def get(self, request):
         self.set_params(request)
 
-        queryset =InspectionQuerySet(params=self.query_params).get_all_news_list().order_by('-pubtime')
-
+        queryset =InspectionQuerySet(params=self.query_params).get_all_news_list().order_by('-inspection__pubtime')
         return Response(self.serialize(queryset))
 
 

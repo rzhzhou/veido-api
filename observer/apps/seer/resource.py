@@ -1,4 +1,3 @@
-
 import pytz
 import xlrd
 from datetime import datetime

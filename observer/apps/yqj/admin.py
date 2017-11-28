@@ -1,4 +1,3 @@
-
 import jieba.analyse
 
 from django import forms

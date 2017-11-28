@@ -1,4 +1,3 @@
-
 from datetime import date, datetime, timedelta
 from django_extensions.management.jobs import HourlyJob
 
