@@ -6,11 +6,11 @@ from import_export.admin import ImportExportActionModelAdmin
 from import_export.admin import ImportExportModelAdmin
 from daterange_filter.filter import DateRangeFilter
 from observer.apps.base.models import (Area, Corpus, Enterprise, Industry,
-        Inspection,ArticleCategory,
-        AdministrativePenalties) 
+                                       Inspection, Article, ArticleCategory,
+                                       AdministrativePenalties)
 from observer.apps.seer.models import IndustryScore
 from observer.apps.base.resource import (
-        InspectionResources, EnterpriseResources, AdministrativePenaltiesResources) 
+    InspectionResources, EnterpriseResources, AdministrativePenaltiesResources)
 
 
 class AreaAdmin(ForeignKeyAutocompleteAdmin):
@@ -23,7 +23,7 @@ class AreaAdmin(ForeignKeyAutocompleteAdmin):
 
 class IndustryAdmin(ForeignKeyAutocompleteAdmin):
     related_search_fields = {'parent': ('name',)}
-    fields = ('name','code', 'level', 'parent')
+    fields = ('name', 'code', 'level', 'parent')
     list_display = ('name', 'code', 'level', 'parent')
     search_fields = ('name', 'level', 'parent__name')
     list_filter = ('level', )
@@ -44,12 +44,10 @@ class EnterpriseAdmin(ImportExportModelAdmin, ImportExportActionModelAdmin):
     list_filter = ('area', )
 
 
-
-
 class InspectionAdmin(ImportExportActionModelAdmin):
     resource_class = InspectionResources
     search_fields = ('title', 'publisher__name',)
-    list_display = ('title','pubtime',)
+    list_display = ('title', 'pubtime',)
     list_filter = (('pubtime', DateRangeFilter),)
 
 
@@ -81,7 +79,8 @@ class CorpusAdmin(ForeignKeyAutocompleteAdmin):
             CrawlerTask(obj.uuid, obj.industry.name, riskwords, []).build()
         else:
             corpus = Corpus.objects.get(id=obj.id)
-            CrawlerTask(obj.uuid, obj.industry.name, riskwords, []).update(corpus)
+            CrawlerTask(obj.uuid, obj.industry.name,
+                        riskwords, []).update(corpus)
 
         obj.riskword = " ".join(riskwords)
         obj.invalidword = " ".join(invalidwords)
@@ -89,20 +88,21 @@ class CorpusAdmin(ForeignKeyAutocompleteAdmin):
 
     def delete_model(self, request, obj):
         CrawlerTask(obj.uuid, obj.industry.name, list(set(obj.riskword.split())),
-            list(set(obj.invalidword.split()))).remove(obj)
+                    list(set(obj.invalidword.split()))).remove(obj)
         obj.delete()
 
     def delete_selected(self, request, objs):
         for obj in objs:
             CrawlerTask(obj.uuid, obj.industry.name, list(set(obj.riskword.split())),
-                list(set(obj.invalidword.split()))).remove(obj)
+                        list(set(obj.invalidword.split()))).remove(obj)
             obj.delete()
 
 
 admin.site.register(Area, AreaAdmin)
-admin.site.register(ArticleCategory)
 admin.site.register(Corpus, CorpusAdmin)
 admin.site.register(Enterprise, EnterpriseAdmin)
 admin.site.register(Industry, IndustryAdmin)
 admin.site.register(Inspection, InspectionAdmin)
 admin.site.register(AdministrativePenalties, AdministrativePenaltiesAdmin)
+admin.site.register(Article)
+admin.site.register(ArticleCategory)

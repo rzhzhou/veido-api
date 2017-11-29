@@ -158,7 +158,6 @@ class Article(models.Model):
 
     category = models.ForeignKey(
         'base.ArticleCategory',
-        related_name='yqj_category',
         verbose_name='文章类别'
     )
 
