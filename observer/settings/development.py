@@ -49,12 +49,8 @@ INSTALLED_APPS = [
     'tinymce',
 
     'observer.apps.base',
-    # 'observer.apps.corpus',
     'observer.apps.crawler',
-    # 'observer.apps.inspection',
-    # 'observer.apps.origin',
     'observer.apps.seer',
-    # 'observer.apps.penalty',
     'observer.apps.yqj',
 ]
 
@@ -98,27 +94,11 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'HOST': '192.168.1.187',
-        'NAME': 'observertest',
+        'NAME': 'observer',
         'USER': 'root',
         'PASSWORD': '123456',
         'PORT': 3306
     }
-#     'master': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'HOST': '192.168.1.187',
-#         'NAME': 'observertest',
-#         'USER': 'root',
-#         'PASSWORD': '123456',
-#         'PORT': 3306
-#     },
-#     'crawler': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'HOST': '192.168.1.187test',
-#         'NAME': 'crawler',
-#         'USER': 'root',
-#         'PASSWORD': '123456',
-#         'PORT': 3306
-#     }
 }
 
 
