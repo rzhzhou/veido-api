@@ -123,7 +123,7 @@ class AdministrativePenalties(models.Model):
 
 
 class ArticleCategory(models.Model):
-    name = models.CharField(max_length=255, verbose_name='名称')
+    name = models.CharField(max_length=255, verbose_name='名称')# 质检热点 质量事件 信息参考 专家十点
     level = models.BigIntegerField(null=False, verbose_name='等级')
     remark = models.CharField(max_length=255, blank=True, verbose_name='备注')
 
