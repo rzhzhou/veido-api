@@ -5,7 +5,7 @@ from observer.apps.base.models import (ArticleCategory, )
 
 class Inspection(models.Model):
     base_inspection = models.CharField(max_length=32, verbose_name='基础抽检库')
-    qualitied = models.FloatField(default=1.0, verbose_name='关注度')
+    qualitied = models.FloatField(default=1.0, verbose_name='合格率')
 
     class Meta:
         app_label = 'yqj'
