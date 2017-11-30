@@ -2,13 +2,13 @@ from observer.apps.base.models import Article as BaseArticle
 from observer.apps.yqj.models import Article as YqjArticle
 from observer.apps.seer.service.abstract import Abstract
 
-
-class ArticlesQuerySet(Abstract):
+# 质监热点
+class NewsQuerySet(Abstract):
 
     def __init__(self, params={}):
-        super(ArticlesQuerySet, self).__init__(params)
+        super(NewsQuerySet, self).__init__(params)
 
-    def get_all_article_list(self):
+    def get_all_new_list(self):
 
         # yqj article query
         fields = ('base_article', )

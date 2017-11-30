@@ -9,8 +9,10 @@ from observer.utils.date.convert import utc_to_local_time
 from observer.apps.yqj.models import (Article, )
 from observer.apps.base.models import (Area, Article, )
 
-from observer.apps.yqj.service.articles import ArticlesQuerySet,EventsQuerySet,\
-ReferencesQuerySet,InsightsQuerySet,RisksQuerySet,CategoryQuerySet,AreaQuerySet
+from observer.apps.yqj.service.articles import (NewsQuerySet, EventsQuerySet, 
+                                                ReferencesQuerySet, InsightsQuerySet, 
+                                                RisksQuerySet, CategoryQuerySet,
+                                                AreaQuerySet, )
 
 from observer.apps.yqj.service.inspection import InspectionQuerySet
 
@@ -55,19 +57,19 @@ class BaseView(APIView):
         return results
 
 
-class ArticleView(BaseView):
+class NewsView(BaseView):
 
     def __init__(self):
-        super(ArticleView, self).__init__()
+        super(NewsView, self).__init__()
 
     def set_params(self, request):
-        super(ArticleView, self).set_params(request.GET)
+        super(NewsView, self).set_params(request.GET)
 
     def paging(self, queryset):
         page = (int(self.query_params.get('start')) /
                 int(self.query_params.get('length'))) + 1
 
-        return super(ArticleView, self).paging(queryset, page, self.query_params.get('length'))
+        return super(NewsView, self).paging(queryset, page, self.query_params.get('length'))
 
     def serialize(self, queryset):
         results = self.paging(queryset)
@@ -85,7 +87,7 @@ class ArticleView(BaseView):
 
     def get(self, request):
         self.set_params(request)
-        queryset = ArticlesQuerySet(params=self.query_params).get_all_article_list()
+        queryset = NewsQuerySet(params=self.query_params).get_all_news_list()
 
         return Response(self.serialize(queryset))
 
