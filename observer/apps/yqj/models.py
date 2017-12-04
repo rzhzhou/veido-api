@@ -20,6 +20,7 @@ class Article(models.Model):
     
     category = models.ForeignKey(
         'base.ArticleCategory',
+        on_delete=models.CASCADE,
         verbose_name='文章类别'
     )
 

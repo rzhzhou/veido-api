@@ -30,10 +30,12 @@ class AreaIndustry(models.Model):
 
     area = models.ForeignKey(
         Area,
+        on_delete=models.CASCADE,
         verbose_name='地域'
     )
     industry = models.ForeignKey(
         Industry,
+        on_delete=models.CASCADE,
         verbose_name='行业'
     )
 
@@ -46,8 +48,16 @@ class AreaIndustry(models.Model):
 
 
 class UserArea(models.Model):
-    user = models.ForeignKey(User, verbose_name='用户')
-    area = models.ForeignKey(Area, verbose_name='地域')
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE, 
+        verbose_name='用户'
+    )
+    area = models.ForeignKey(
+        Area,
+        on_delete=models.CASCADE, 
+        verbose_name='地域'
+    )
 
     class Meta:
         app_label = 'seer'
@@ -84,10 +94,12 @@ class ConsumeIndex(models.Model):
 
     industry = models.ForeignKey(
         Industry,
+        on_delete=models.CASCADE,
         verbose_name='行业'
     )
     area = models.ForeignKey(
         Area,
+        on_delete=models.CASCADE,
         default=1,
         verbose_name='地域'
     )
@@ -124,10 +136,12 @@ class SocietyIndex(models.Model):
 
     industry = models.ForeignKey(
         Industry,
+        on_delete=models.CASCADE,
         verbose_name='行业'
     )
     area = models.ForeignKey(
         Area,
+        on_delete=models.CASCADE,
         default=1,
         verbose_name='地域'
     )
@@ -176,10 +190,12 @@ class ManageIndex(models.Model):
 
     industry = models.ForeignKey(
         Industry,
+        on_delete=models.CASCADE,
         verbose_name='行业'
     )
     area = models.ForeignKey(
         Area,
+        on_delete=models.CASCADE,
         default=1, 
         verbose_name='地域'
     )
@@ -224,11 +240,13 @@ class ModelWeight(models.Model):
 
     industry = models.ForeignKey(
         Industry, 
+        on_delete=models.CASCADE,
         null=True, blank=True,
         verbose_name='行业'
     )
     area = models.ForeignKey(
         Area,
+        on_delete=models.CASCADE,
         verbose_name='地域'
     )
 
@@ -246,6 +264,7 @@ class RiskEnterprise(models.Model):
 
     enterprise = models.ForeignKey(
         Enterprise,
+        on_delete=models.CASCADE,
         verbose_name='企业名称'
     )
 
@@ -263,10 +282,12 @@ class IndustryScore(models.Model):
 
     industry = models.ForeignKey(
         Industry, 
+        on_delete=models.CASCADE,
         verbose_name='行业'
     )
     area = models.ForeignKey(
         Area, 
+        on_delete=models.CASCADE,
         verbose_name='地域'
     )
 
@@ -285,17 +306,20 @@ class Inspection(models.Model):
 
     industry = models.ForeignKey(
         Industry,
+        on_delete=models.CASCADE,
         null=True, blank=True,
         verbose_name='行业'
     )
     enterprise_qualified = models.ForeignKey(
         Enterprise,
+        on_delete=models.CASCADE,
         related_name='qualitieds',
         null=True, blank=True,
         verbose_name='合格企业'
     )
     enterprise_unqualified = models.ForeignKey(
         Enterprise,
+        on_delete=models.CASCADE,
         related_name='unqualifieds', 
         null=True, blank=True,
         verbose_name='不合格企业'
@@ -314,16 +338,19 @@ class Article(models.Model):
 
     category = models.ForeignKey(
         'base.ArticleCategory',
+        on_delete=models.CASCADE,
         related_name='seer_category',
         verbose_name='文章类别'
     )
     industry = models.ForeignKey(
         Industry,
+        on_delete=models.CASCADE,
         null=True, blank=True,
         verbose_name='行业'
     )
     enterprise = models.ForeignKey(
         Enterprise,
+        on_delete=models.CASCADE,
         null=True, blank=True,
         verbose_name='企业'
     )

@@ -8,6 +8,7 @@ class Area(models.Model):
     
     parent = models.ForeignKey(
         'self', 
+        on_delete=models.CASCADE,
         null=True, blank=True, 
         verbose_name='上一级'
     )
@@ -25,6 +26,7 @@ class Enterprise(models.Model):
     
     area = models.ForeignKey(
         Area, 
+        on_delete=models.CASCADE,
         verbose_name='地域'
     )
 
@@ -43,6 +45,7 @@ class Industry(models.Model):
 
     parent = models.ForeignKey(
         'self', 
+        on_delete=models.CASCADE,
         null=True, blank=True, 
         verbose_name='上一级'
     )
@@ -61,6 +64,7 @@ class Corpus(models.Model):
 
     industry = models.ForeignKey(
         Industry,
+        on_delete=models.CASCADE,
         verbose_name='行业'
     )
 
@@ -86,6 +90,7 @@ class Inspection(models.Model):
 
     area = models.ForeignKey(
         Area,
+        on_delete=models.CASCADE,
         verbose_name='抽检地域'
     )
 
@@ -129,6 +134,7 @@ class ArticleCategory(models.Model):
 
     parent = models.ForeignKey(
         'self', 
+        on_delete=models.CASCADE,
         null=True, blank=True, 
         verbose_name='上一级'
     )
@@ -156,6 +162,7 @@ class Article(models.Model):
 
     area = models.ForeignKey(
         Area,
+        on_delete=models.CASCADE,
         verbose_name='地域'
     )
 

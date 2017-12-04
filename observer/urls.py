@@ -8,7 +8,6 @@ from django.views.static import serve
 
 
 urlpatterns = [
-    url(r'^admin/', include(admin.site.urls)),
     url(r'^tinymce/', include('tinymce.urls')),
     url(r'^api/', include('observer.apps.base.urls')),
 ]
