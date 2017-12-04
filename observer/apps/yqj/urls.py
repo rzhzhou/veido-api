@@ -1,11 +1,11 @@
 from django.conf.urls import url
 
-from observer.apps.yqj.views import (ArticleView, EventView,ReferenceView,InsightView,RiskView,
+from observer.apps.yqj.views import (NewsView, EventView,ReferenceView,InsightView,RiskView,
 	                                 InspectionView,CategoryView,HomeView)
 
 
 urlpatterns = [
-    url(r'^article$', ArticleView.as_view()),#质监热点
+    url(r'^article$', NewsView.as_view()),#质监热点
     url(r'^event$', EventView.as_view()),#质量事件
     url(r'^reference$', ReferenceView.as_view()),#信息参考
     url(r'^insight$', ReferenceView.as_view()),#专家视点

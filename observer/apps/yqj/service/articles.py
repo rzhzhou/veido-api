@@ -8,7 +8,7 @@ class NewsQuerySet(Abstract):#质监热点
     def __init__(self, params={}):
         super(NewsQuerySet, self).__init__(params)
 
-    def get_all_new_list(self):
+    def get_all_news_list(self):
 
         # yqj article query
         fields = ('base_article', )
