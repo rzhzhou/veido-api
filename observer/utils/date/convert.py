@@ -95,3 +95,7 @@ def get_start_end(days=60):
     start_date = date_to_str(date.today() - timedelta(days=get_days(days)))
 
     return (start_date, end_date)
+
+
+def data_format(time):
+    return utc_to_local_time(time).strftime('%Y-%m-%d')

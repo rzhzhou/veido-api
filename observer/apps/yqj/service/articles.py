@@ -3,7 +3,7 @@ from observer.apps.yqj.models import Article as YqjArticle
 from observer.apps.seer.service.abstract import Abstract
 
 
-class ArticlesQuerySet(Abstract):
+class ArticlesQuerySet(Abstract):#质监热点
 
     def __init__(self, params={}):
         super(ArticlesQuerySet, self).__init__(params)
@@ -32,7 +32,7 @@ class ArticlesQuerySet(Abstract):
         return queryset
 
 
-class EventsQuerySet(Abstract):
+class EventsQuerySet(Abstract):#质量事件
 
     def __init__(self, params={}):
         super(EventsQuerySet, self).__init__(params)
@@ -61,7 +61,7 @@ class EventsQuerySet(Abstract):
         return queryset
 
 
-class ReferencesQuerySet(Abstract):
+class ReferencesQuerySet(Abstract):#信息参考
 
     def __init__(self, params={}):
         super(ReferencesQuerySet, self).__init__(params)
@@ -90,7 +90,7 @@ class ReferencesQuerySet(Abstract):
         return queryset
 
 
-class InsightsQuerySet(Abstract):
+class InsightsQuerySet(Abstract):#专家视点
 
     def __init__(self, params={}):
         super(InsightsQuerySet, self).__init__(params)
@@ -119,7 +119,7 @@ class InsightsQuerySet(Abstract):
         return queryset
 
 
-class RisksQuerySet(Abstract):
+class RisksQuerySet(Abstract):#风险快讯
 
     def __init__(self, params={}):
         super(RisksQuerySet, self).__init__(params)
@@ -147,7 +147,7 @@ class RisksQuerySet(Abstract):
         return queryset
 
 
-class CategoryQuerySet(Abstract):
+class CategoryQuerySet(Abstract):#业务信息
 
     def __init__(self, params={}):
         super(CategoryQuerySet, self).__init__(params)
@@ -174,7 +174,7 @@ class CategoryQuerySet(Abstract):
         return queryset
 
 
-class AreaQuerySet(Abstract):
+class AreaQuerySet(Abstract):#区域状况
 
     def __init__(self, params={}):
         super(AreaQuerySet, self).__init__(params)
