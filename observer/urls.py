@@ -1,14 +1,10 @@
-# import os
-
-from django.conf import settings
-from django.conf.urls import include, url
-from django.conf.urls.static import static
+from django.conf.urls import include
 from django.contrib import admin
-from django.views.static import serve
+from django.urls import re_path, path
 
 
 urlpatterns = [
-    url(r'^tinymce/', include('tinymce.urls')),
-    url(r'^api/', include('observer.apps.base.urls')),
+    re_path(r'^admin/', admin.site.urls),
+    re_path(r'^tinymce/', include('tinymce.urls')),
+    re_path(r'^api/', include('observer.apps.base.urls')),
 ]
-
