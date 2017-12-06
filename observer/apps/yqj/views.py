@@ -57,6 +57,33 @@ class BaseView(APIView):
         return results
 
 
+class DashboardView(BaseView):#主页
+
+    def __init__(self):
+        super(DashboardView, self).__init__()
+
+    def serialize(self, q1,q2,q3,q4,q5,q6):
+        #print(q1,',||',q2,',||',q3,',||',q4,',||',q5,',||',q6)
+        data1=map(lambda i: {'title': i['title'],'pubtime': data_format(i['pubtime']),'url': i['url']}, q1[0:10])
+        data2=map(lambda i: {'title': i['title'],'pubtime': data_format(i['pubtime']),'url': i['url']}, q2[0:10])
+        data3=map(lambda i: {'title': i['title'],'pubtime': data_format(i['pubtime']),'url': i['url']}, q3[0:10])
+        data4=map(lambda i: {'title': i['title'],'pubtime': data_format(i['pubtime']),'url': i['url']}, q4[0:10])
+        data5=map(lambda i: {'title': i['title'],'pubtime': data_format(i['pubtime']),'url': i['url']}, q5[0:10])
+        data6=map(lambda i: {'title': i['title'],'pubtime': data_format(i['pubtime']),'url': i['url']}, q6[0:10])
+        data={"article":data1,"event":data2,"reference":data3,"insight":data4,"risk":data5,"inspection":data6}
+        return data
+
+    def get(self, request):
+        q1 = ArticlesQuerySet(params=self.query_params).get_all_article_list()#质监热点
+        q2 = EventsQuerySet(params=self.query_params).get_all_event_list()#质量事件
+        q3 = ReferencesQuerySet(params=self.query_params).get_all_reference_list()#信息参考
+        q4 = InsightsQuerySet(params=self.query_params).get_all_insight_list()#专家视点
+        q5 = RisksQuerySet(params=self.query_params).get_all_risk_list()#风险快讯
+        q6 = InspectionQuerySet(params=self.query_params).get_all_inspection_list()#抽检信息
+
+        return Response(self.serialize(q1,q2,q3,q4,q5,q6))
+
+
 class NewsView(BaseView):#质监热点
 
     def __init__(self):
@@ -330,30 +357,4 @@ class AreaView(BaseView):#区域信息
         queryset = AreaQuerySet(params=self.query_params).get_all_area_list(id)
 
         return Response(self.serialize(queryset))
-
-
-class HomeView(BaseView):#主页
-
-    def __init__(self):
-        super(HomeView, self).__init__()
-
-    def serialize(self, q1,q2,q3,q4,q5,q6):
-        #print(q1,',||',q2,',||',q3,',||',q4,',||',q5,',||',q6)
-        data1=map(lambda i: {'title': i['title'],'pubtime': data_format(i['pubtime']),'url': i['url']}, q1[0:10])
-        data2=map(lambda i: {'title': i['title'],'pubtime': data_format(i['pubtime']),'url': i['url']}, q2[0:10])
-        data3=map(lambda i: {'title': i['title'],'pubtime': data_format(i['pubtime']),'url': i['url']}, q3[0:10])
-        data4=map(lambda i: {'title': i['title'],'pubtime': data_format(i['pubtime']),'url': i['url']}, q4[0:10])
-        data5=map(lambda i: {'title': i['title'],'pubtime': data_format(i['pubtime']),'url': i['url']}, q5[0:10])
-        data6=map(lambda i: {'title': i['title'],'pubtime': data_format(i['pubtime']),'url': i['url']}, q6[0:10])
-        data={"article":data1,"event":data2,"reference":data3,"insight":data4,"risk":data5,"inspection":data6}
-        return data
-
-    def get(self, request):
-        q1 = ArticlesQuerySet(params=self.query_params).get_all_article_list()#质监热点
-        q2 = EventsQuerySet(params=self.query_params).get_all_event_list()#质量事件
-        q3 = ReferencesQuerySet(params=self.query_params).get_all_reference_list()#信息参考
-        q4 = InsightsQuerySet(params=self.query_params).get_all_insight_list()#专家视点
-        q5 = RisksQuerySet(params=self.query_params).get_all_risk_list()#风险快讯
-        q6 = InspectionQuerySet(params=self.query_params).get_all_inspection_list()#抽检信息
-
-        return Response(self.serialize(q1,q2,q3,q4,q5,q6))
+        
