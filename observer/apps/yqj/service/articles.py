@@ -191,3 +191,35 @@ class AreaQuerySet(Abstract):#区域状况
         queryset = BaseArticle.objects.filter(**args).values(*fields).order_by('-pubtime')
 
         return queryset
+
+
+class NewsCount(Abstract):  # 质监热点占比
+
+    def __init__(self, params={}):
+        super(NewsCount, self).__init__(params)
+
+    def get_NewsCount(self, id):
+        cond = {
+            'category__level': 1,
+            'category__name': '质监热点',
+        }
+        newsCount = YqjArticle.objects.filter(**cond).count()
+        articleCount = BaseArticle.objects.all().count()
+        data = {'newsCount': newsCount, 'articleCount': articleCount}
+        return data
+
+
+class EventCount(Abstract):  # 质量事件占比
+
+    def __init__(self, params={}):
+        super(EventCount, self).__init__(params)
+
+    def get_EventCount(self, id):
+        cond = {
+            'category__level': 1,
+            'category__name': '质量事件',
+        }
+        newsCount = YqjArticle.objects.filter(**cond).count()
+        articleCount = BaseArticle.objects.all().count()
+        data = {'newsCount': newsCount, 'articleCount': articleCount}
+        return data
