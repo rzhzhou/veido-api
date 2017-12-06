@@ -17,7 +17,7 @@ class Inspection(models.Model):
 
 class Article(models.Model):
     base_article = models.CharField(max_length=32, verbose_name='基础文章库')
-    
+
     category = models.ForeignKey(
         'base.ArticleCategory',
         on_delete=models.CASCADE,
