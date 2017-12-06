@@ -4,15 +4,15 @@ from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from observer.utils.date.convert import utc_to_local_time,data_format
+from observer.utils.date.convert import utc_to_local_time, data_format
 
 from observer.apps.yqj.models import (Article, )
 from observer.apps.base.models import (Area, Article, )
 
-from observer.apps.yqj.service.articles import (NewsQuerySet, EventsQuerySet, 
-                                                ReferencesQuerySet, InsightsQuerySet, 
+from observer.apps.yqj.service.articles import (NewsQuerySet, EventsQuerySet,
+                                                ReferencesQuerySet, InsightsQuerySet,
                                                 RisksQuerySet, CategoryQuerySet,
-                                                AreaQuerySet, )
+                                                AreaQuerySet, NewsCount, EventCount,)
 
 from observer.apps.yqj.service.inspection import InspectionQuerySet
 
@@ -39,7 +39,8 @@ class BaseView(APIView):
         )
 
         # end add 1 day
-        self.query_params['endtime'] = self.query_params['endtime'] + timedelta(days=1)
+        self.query_params['endtime'] = self.query_params[
+            'endtime'] + timedelta(days=1)
 
     def paging(self, queryset, page, num):
         paginator = Paginator(queryset, num)  # Show $num <QuerySet> per page
@@ -57,34 +58,46 @@ class BaseView(APIView):
         return results
 
 
-class DashboardView(BaseView):#主页
+class DashboardView(BaseView):  # 主页
 
     def __init__(self):
         super(DashboardView, self).__init__()
 
-    def serialize(self, q1,q2,q3,q4,q5,q6):
-        #print(q1,',||',q2,',||',q3,',||',q4,',||',q5,',||',q6)
-        data1=map(lambda i: {'title': i['title'],'pubtime': data_format(i['pubtime']),'url': i['url']}, q1[0:10])
-        data2=map(lambda i: {'title': i['title'],'pubtime': data_format(i['pubtime']),'url': i['url']}, q2[0:10])
-        data3=map(lambda i: {'title': i['title'],'pubtime': data_format(i['pubtime']),'url': i['url']}, q3[0:10])
-        data4=map(lambda i: {'title': i['title'],'pubtime': data_format(i['pubtime']),'url': i['url']}, q4[0:10])
-        data5=map(lambda i: {'title': i['title'],'pubtime': data_format(i['pubtime']),'url': i['url']}, q5[0:10])
-        data6=map(lambda i: {'title': i['title'],'pubtime': data_format(i['pubtime']),'url': i['url']}, q6[0:10])
-        data={"article":data1,"event":data2,"reference":data3,"insight":data4,"risk":data5,"inspection":data6}
+    def serialize(self, q1, q2, q3, q4, q5, q6, count1, count2):
+        data1 = map(lambda i: {'title': i['title'], 'pubtime': data_format(
+            i['pubtime']), 'url': i['url']}, q1[0:10])
+        data2 = map(lambda i: {'title': i['title'], 'pubtime': data_format(
+            i['pubtime']), 'url': i['url']}, q2[0:10])
+        data3 = map(lambda i: {'title': i['title'], 'pubtime': data_format(
+            i['pubtime']), 'url': i['url']}, q3[0:10])
+        data4 = map(lambda i: {'title': i['title'], 'pubtime': data_format(
+            i['pubtime']), 'url': i['url']}, q4[0:10])
+        data5 = map(lambda i: {'title': i['title'], 'pubtime': data_format(
+            i['pubtime']), 'url': i['url']}, q5[0:10])
+        data6 = map(lambda i: {'title': i['title'], 'pubtime': data_format(
+            i['pubtime']), 'url': i['url']}, q6[0:10])
+        data = {"article": data1, "event": data2, "reference": data3, "insight": data4,
+                "risk": data5, "inspection": data6, 'newsCount': count1, 'eventCount': count2, }
         return data
 
     def get(self, request):
-        q1 = ArticlesQuerySet(params=self.query_params).get_all_article_list()#质监热点
-        q2 = EventsQuerySet(params=self.query_params).get_all_event_list()#质量事件
-        q3 = ReferencesQuerySet(params=self.query_params).get_all_reference_list()#信息参考
-        q4 = InsightsQuerySet(params=self.query_params).get_all_insight_list()#专家视点
-        q5 = RisksQuerySet(params=self.query_params).get_all_risk_list()#风险快讯
-        q6 = InspectionQuerySet(params=self.query_params).get_all_inspection_list()#抽检信息
+        q1 = NewsQuerySet(params=self.query_params).get_all_news_list()  # 质监热点
+        q2 = EventsQuerySet(
+            params=self.query_params).get_all_event_list()  # 质量事件
+        q3 = ReferencesQuerySet(
+            params=self.query_params).get_all_reference_list()  # 信息参考
+        q4 = InsightsQuerySet(
+            params=self.query_params).get_all_insight_list()  # 专家视点
+        q5 = RisksQuerySet(
+            params=self.query_params).get_all_risk_list()  # 风险快讯
+        q6 = InspectionQuerySet(
+            params=self.query_params).get_all_inspection_list()  # 抽检信息
+        count1 = NewsCount.get_NewsCount()
+        count2 = EventCount.get_EventCount()
+        return Response(self.serialize(q1, q2, q3, q4, q5, q6, count1, count2))
 
-        return Response(self.serialize(q1,q2,q3,q4,q5,q6))
 
-
-class NewsView(BaseView):#质监热点
+class NewsView(BaseView):  # 质监热点
 
     def __init__(self):
         super(NewsView, self).__init__()
@@ -119,7 +132,7 @@ class NewsView(BaseView):#质监热点
         return Response(self.serialize(queryset))
 
 
-class EventView(BaseView):#质量事件
+class EventView(BaseView):  # 质量事件
 
     def __init__(self):
         super(EventView, self).__init__()
@@ -149,12 +162,13 @@ class EventView(BaseView):#质量事件
 
     def get(self, request):
         self.set_params(request)
-        queryset = EventsQuerySet(params=self.query_params).get_all_event_list()
+        queryset = EventsQuerySet(
+            params=self.query_params).get_all_event_list()
 
-        return Response(self.serialize(queryset))        
+        return Response(self.serialize(queryset))
 
 
-class ReferenceView(BaseView):#信息参考
+class ReferenceView(BaseView):  # 信息参考
 
     def __init__(self):
         super(ReferenceView, self).__init__()
@@ -182,12 +196,13 @@ class ReferenceView(BaseView):#信息参考
 
     def get(self, request):
         self.set_params(request)
-        queryset = ReferencesQuerySet(params=self.query_params).get_all_reference_list()
+        queryset = ReferencesQuerySet(
+            params=self.query_params).get_all_reference_list()
 
-        return Response(self.serialize(queryset)) 
+        return Response(self.serialize(queryset))
 
 
-class InsightView(BaseView):#专家视点
+class InsightView(BaseView):  # 专家视点
 
     def __init__(self):
         super(InsightView, self).__init__()
@@ -215,12 +230,13 @@ class InsightView(BaseView):#专家视点
 
     def get(self, request):
         self.set_params(request)
-        queryset = InsightsQuerySet(params=self.query_params).get_all_insight_list()
+        queryset = InsightsQuerySet(
+            params=self.query_params).get_all_insight_list()
 
-        return Response(self.serialize(queryset)) 
+        return Response(self.serialize(queryset))
 
 
-class RiskView(BaseView):#风险快讯
+class RiskView(BaseView):  # 风险快讯
 
     def __init__(self):
         super(RiskView, self).__init__()
@@ -242,8 +258,8 @@ class RiskView(BaseView):#风险快讯
             'title': r['title'],
             'source': r['source'],
             'pubtime': data_format(r['pubtime']),
-            'score':r['score'],
-            'relevancy':0,
+            'score': r['score'],
+            'relevancy': 0,
         }, results)
 
         return data
@@ -252,10 +268,10 @@ class RiskView(BaseView):#风险快讯
         self.set_params(request)
         queryset = RisksQuerySet(params=self.query_params).get_all_risk_list()
 
-        return Response(self.serialize(queryset)) 
+        return Response(self.serialize(queryset))
 
 
-class InspectionView(BaseView):#抽检信息
+class InspectionView(BaseView):  # 抽检信息
 
     def __init__(self):
         super(InspectionView, self).__init__()
@@ -276,20 +292,21 @@ class InspectionView(BaseView):#抽检信息
             'title': r['title'],
             'product': r['product'],
             'pubtime': data_format(r['pubtime']),
-            'source':r['source'],
-            'qualitied':YqjInspection.objects.filter(base_inspection=r['guid']).values('qualitied'),
+            'source': r['source'],
+            'qualitied': YqjInspection.objects.filter(base_inspection=r['guid']).values('qualitied'),
         }, results)
 
         return data
 
     def get(self, request):
         self.set_params(request)
-        queryset = InspectionQuerySet(params=self.query_params).get_all_inspection_list()
+        queryset = InspectionQuerySet(
+            params=self.query_params).get_all_inspection_list()
 
-        return Response(self.serialize(queryset)) 
+        return Response(self.serialize(queryset))
 
 
-class CategoryView(BaseView):#业务信息
+class CategoryView(BaseView):  # 业务信息
 
     def __init__(self):
         super(CategoryView, self).__init__()
@@ -317,14 +334,15 @@ class CategoryView(BaseView):#业务信息
 
         return data
 
-    def get(self, request,id):
+    def get(self, request, id):
         self.set_params(request)
-        queryset = CategoryQuerySet(params=self.query_params).get_all_category_list(id)
+        queryset = CategoryQuerySet(
+            params=self.query_params).get_all_category_list(id)
 
-        return Response(self.serialize(queryset)) 
+        return Response(self.serialize(queryset))
 
 
-class AreaView(BaseView):#区域信息
+class AreaView(BaseView):  # 区域信息
 
     def __init__(self):
         super(AreaView, self).__init__()
@@ -352,9 +370,8 @@ class AreaView(BaseView):#区域信息
 
         return data
 
-    def get(self, request,id):
+    def get(self, request, id):
         self.set_params(request)
         queryset = AreaQuerySet(params=self.query_params).get_all_area_list(id)
 
         return Response(self.serialize(queryset))
-        

@@ -3,7 +3,7 @@ from observer.apps.yqj.models import Article as YqjArticle
 from observer.apps.seer.service.abstract import Abstract
 
 
-class NewsQuerySet(Abstract):#质监热点
+class NewsQuerySet(Abstract):  # 质监热点
 
     def __init__(self, params={}):
         super(NewsQuerySet, self).__init__(params)
@@ -27,12 +27,13 @@ class NewsQuerySet(Abstract):#质监热点
             'pubtime__lt': getattr(self, 'endtime', None),
         }
         args = dict([k, v] for k, v in cond.items() if v)
-        queryset = BaseArticle.objects.filter(**args).values(*fields).order_by('-pubtime')
+        queryset = BaseArticle.objects.filter(
+            **args).values(*fields).order_by('-pubtime')
 
         return queryset
 
 
-class EventsQuerySet(Abstract):#质量事件
+class EventsQuerySet(Abstract):  # 质量事件
 
     def __init__(self, params={}):
         super(EventsQuerySet, self).__init__(params)
@@ -56,12 +57,13 @@ class EventsQuerySet(Abstract):#质量事件
             'pubtime__lt': getattr(self, 'endtime', None),
         }
         args = dict([k, v] for k, v in cond.items() if v)
-        queryset = BaseArticle.objects.filter(**args).values(*fields).order_by('-pubtime')
+        queryset = BaseArticle.objects.filter(
+            **args).values(*fields).order_by('-pubtime')
 
         return queryset
 
 
-class ReferencesQuerySet(Abstract):#信息参考
+class ReferencesQuerySet(Abstract):  # 信息参考
 
     def __init__(self, params={}):
         super(ReferencesQuerySet, self).__init__(params)
@@ -85,12 +87,13 @@ class ReferencesQuerySet(Abstract):#信息参考
             'pubtime__lt': getattr(self, 'endtime', None),
         }
         args = dict([k, v] for k, v in cond.items() if v)
-        queryset = BaseArticle.objects.filter(**args).values(*fields).order_by('-pubtime')
+        queryset = BaseArticle.objects.filter(
+            **args).values(*fields).order_by('-pubtime')
 
         return queryset
 
 
-class InsightsQuerySet(Abstract):#专家视点
+class InsightsQuerySet(Abstract):  # 专家视点
 
     def __init__(self, params={}):
         super(InsightsQuerySet, self).__init__(params)
@@ -114,12 +117,13 @@ class InsightsQuerySet(Abstract):#专家视点
             'pubtime__lt': getattr(self, 'endtime', None),
         }
         args = dict([k, v] for k, v in cond.items() if v)
-        queryset = BaseArticle.objects.filter(**args).values(*fields).order_by('-pubtime')
+        queryset = BaseArticle.objects.filter(
+            **args).values(*fields).order_by('-pubtime')
 
         return queryset
 
 
-class RisksQuerySet(Abstract):#风险快讯
+class RisksQuerySet(Abstract):  # 风险快讯
 
     def __init__(self, params={}):
         super(RisksQuerySet, self).__init__(params)
@@ -135,24 +139,25 @@ class RisksQuerySet(Abstract):#风险快讯
         uuids = YqjArticle.objects.filter(**args).values(*fields)
 
         # base article query
-        fields = ('url', 'title', 'pubtime', 'source','score',)
+        fields = ('url', 'title', 'pubtime', 'source', 'score',)
         cond = {
             'guid__in': uuids,
             'pubtime__gte': getattr(self, 'starttime', None),
             'pubtime__lt': getattr(self, 'endtime', None),
         }
         args = dict([k, v] for k, v in cond.items() if v)
-        queryset = BaseArticle.objects.filter(**args).values(*fields).order_by('-pubtime')
+        queryset = BaseArticle.objects.filter(
+            **args).values(*fields).order_by('-pubtime')
 
         return queryset
 
 
-class CategoryQuerySet(Abstract):#业务信息
+class CategoryQuerySet(Abstract):  # 业务信息
 
     def __init__(self, params={}):
         super(CategoryQuerySet, self).__init__(params)
 
-    def get_all_category_list(self,id):
+    def get_all_category_list(self, id):
         # yqj article query
         fields = ('base_article', )
         cond = {
@@ -162,33 +167,35 @@ class CategoryQuerySet(Abstract):#业务信息
         uuids = YqjArticle.objects.filter(**args).values(*fields)
 
         # base article query
-        fields = ('url', 'title', 'pubtime', 'source','reprinted','area')
+        fields = ('url', 'title', 'pubtime', 'source', 'reprinted', 'area')
         cond = {
             'guid__in': uuids,
             'pubtime__gte': getattr(self, 'starttime', None),
             'pubtime__lt': getattr(self, 'endtime', None),
         }
         args = dict([k, v] for k, v in cond.items() if v)
-        queryset = BaseArticle.objects.filter(**args).values(*fields).order_by('-pubtime')
+        queryset = BaseArticle.objects.filter(
+            **args).values(*fields).order_by('-pubtime')
 
         return queryset
 
 
-class AreaQuerySet(Abstract):#区域状况
+class AreaQuerySet(Abstract):  # 区域状况
 
     def __init__(self, params={}):
         super(AreaQuerySet, self).__init__(params)
 
-    def get_all_area_list(self,id):
+    def get_all_area_list(self, id):
         # base article query
-        fields = ('url', 'title', 'pubtime', 'source','reprinted','area')
+        fields = ('url', 'title', 'pubtime', 'source', 'reprinted', 'area')
         cond = {
             'area__id': id,
             'pubtime__gte': getattr(self, 'starttime', None),
             'pubtime__lt': getattr(self, 'endtime', None),
         }
         args = dict([k, v] for k, v in cond.items() if v)
-        queryset = BaseArticle.objects.filter(**args).values(*fields).order_by('-pubtime')
+        queryset = BaseArticle.objects.filter(
+            **args).values(*fields).order_by('-pubtime')
 
         return queryset
 
@@ -198,7 +205,7 @@ class NewsCount(Abstract):  # 质监热点占比
     def __init__(self, params={}):
         super(NewsCount, self).__init__(params)
 
-    def get_NewsCount(self, id):
+    def get_NewsCount():
         cond = {
             'category__level': 1,
             'category__name': '质监热点',
@@ -214,12 +221,12 @@ class EventCount(Abstract):  # 质量事件占比
     def __init__(self, params={}):
         super(EventCount, self).__init__(params)
 
-    def get_EventCount(self, id):
+    def get_EventCount():
         cond = {
             'category__level': 1,
             'category__name': '质量事件',
         }
-        newsCount = YqjArticle.objects.filter(**cond).count()
+        eventCount = YqjArticle.objects.filter(**cond).count()
         articleCount = BaseArticle.objects.all().count()
-        data = {'newsCount': newsCount, 'articleCount': articleCount}
+        data = {'eventCount': eventCount, 'articleCount': articleCount}
         return data
