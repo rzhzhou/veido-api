@@ -12,7 +12,7 @@ from observer.apps.base.models import (Area, Article, )
 from observer.apps.yqj.service.articles import (NewsQuerySet, EventsQuerySet,
                                                 ReferencesQuerySet, InsightsQuerySet,
                                                 RisksQuerySet, CategoryQuerySet,
-                                                AreaQuerySet, NewsCount, EventCount,)
+                                                AreaQuerySet, NewsCount, EventCount, LineData, PieData)
 
 from observer.apps.yqj.service.inspection import InspectionQuerySet
 
@@ -63,7 +63,10 @@ class DashboardView(BaseView):  # 主页
     def __init__(self):
         super(DashboardView, self).__init__()
 
-    def serialize(self, q1, q2, q3, q4, q5, q6, count1, count2):
+    def set_params(self, request):
+        super(DashboardView, self).set_params(request.GET)
+
+    def serialize(self, q1, q2, q3, q4, q5, q6, count1, count2, line, pie):
         data1 = map(lambda i: {'title': i['title'], 'pubtime': data_format(
             i['pubtime']), 'url': i['url']}, q1[0:10])
         data2 = map(lambda i: {'title': i['title'], 'pubtime': data_format(
@@ -77,10 +80,11 @@ class DashboardView(BaseView):  # 主页
         data6 = map(lambda i: {'title': i['title'], 'pubtime': data_format(
             i['pubtime']), 'url': i['url']}, q6[0:10])
         data = {"article": data1, "event": data2, "reference": data3, "insight": data4,
-                "risk": data5, "inspection": data6, 'newsCount': count1, 'eventCount': count2, }
+                "risk": data5, "inspection": data6, 'newsCount': count1, 'eventCount': count2, 'line': line, 'pie':pie}
         return data
 
     def get(self, request):
+        self.set_params(request)
         q1 = NewsQuerySet(params=self.query_params).get_all_news_list()  # 质监热点
         q2 = EventsQuerySet(
             params=self.query_params).get_all_event_list()  # 质量事件
@@ -94,7 +98,8 @@ class DashboardView(BaseView):  # 主页
             params=self.query_params).get_all_inspection_list()  # 抽检信息
         count1 = NewsCount.get_NewsCount()
         count2 = EventCount.get_EventCount()
-        return Response(self.serialize(q1, q2, q3, q4, q5, q6, count1, count2))
+        return Response(self.serialize(q1, q2, q3, q4, q5, q6, count1, count2, LineData(params=self.query_params).show(),\
+         PieData(params=self.query_params).pieCount()))
 
 
 class NewsView(BaseView):  # 质监热点

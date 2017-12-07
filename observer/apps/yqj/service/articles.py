@@ -1,6 +1,9 @@
-from observer.apps.base.models import Article as BaseArticle
+from observer.apps.base.models import Article as BaseArticle, Area
 from observer.apps.yqj.models import Article as YqjArticle
 from observer.apps.seer.service.abstract import Abstract
+from datetime import datetime, timedelta
+from django.db.models import Count
+from observer.utils.date.convert import data_format
 
 
 class NewsQuerySet(Abstract):  # 质监热点
@@ -229,4 +232,83 @@ class EventCount(Abstract):  # 质量事件占比
         eventCount = YqjArticle.objects.filter(**cond).count()
         articleCount = BaseArticle.objects.all().count()
         data = {'eventCount': eventCount, 'articleCount': articleCount}
+        return data
+
+
+class LineData(Abstract):  # 数据概览
+
+    def __init__(self, params={}):
+        super(LineData, self).__init__(params)
+
+    def show(self):
+        def getCount(feeling_type, starttime, endtime):
+            fields = ('pubtime',)
+            cond = {
+                'pubtime__gte': starttime,
+                'pubtime__lt': endtime,
+            }
+
+            if feeling_type == 'positive':  # 正面的
+                cond['feeling_factor__gt'] = 0
+            elif feeling_type == 'negative':  # 负面的
+                cond['feeling_factor__lt'] = 0
+            else:  # 中立的
+                cond['feeling_factor'] = 0
+            queryset = BaseArticle.objects.filter(
+                **cond).values_list('pubtime').annotate(num_pubtime=Count('pubtime'))
+            return queryset
+        count1 = getCount('positive', getattr(
+            self, 'starttime', None), getattr(self, 'endtime', None))
+        count2 = getCount('netrual', getattr(
+            self, 'starttime', None), getattr(self, 'endtime', None))
+        count3 = getCount('negative', getattr(
+            self, 'starttime', None), getattr(self, 'endtime', None))
+        data = {}
+
+        data['time'] = {'starttime': self.starttime.strftime(
+            "%m-%d"), 'endtime': self.endtime.strftime("%m-%d")}
+        if len(count1) != 0:
+            data['positive'] = map(lambda i: {'pubtime': data_format(
+                i[0]), 'count': i[1]}, count1)
+        if len(count2) != 0:
+            data['netrual'] = map(lambda i: {'pubtime': data_format(
+                i[0]), 'count': i[1]}, count2)
+        if len(count3) != 0:
+            data['negative'] = map(lambda i: {'pubtime': data_format(
+                i[0]), 'count': i[1]}, count3)
+        return data
+
+
+class PieData(Abstract):  # 区域状况
+
+    def __init__(self, params={}):
+        super(PieData, self).__init__(params)
+
+    def pieCount(self):
+        # base article query
+        area_parentId = Area.objects.filter(
+            name=self.area).values('id')
+        area_result = Area.objects.filter(
+            parent=area_parentId[0].get('id')).values('id','name')
+        area_sonId=[]
+        area_sonName=[]
+        for a in area_result:
+            area_sonId.append(a.get('id'))
+            area_sonName.append(a.get('name'))
+        cond = {
+            'area__id__in': area_sonId,
+            'pubtime__gte': getattr(self, 'starttime', None),
+            'pubtime__lt': getattr(self, 'endtime', None),
+        }
+        data1={}
+        i=0;
+        length=len(area_sonId);
+        data={}
+        while i<length:
+            cond['area__id']=area_sonId[i]
+            args = dict([k, v] for k, v in cond.items() if v)
+            queryset = BaseArticle.objects.filter(
+                **args).count()
+            data[area_sonName[i]]=queryset
+            i=i+1
         return data
