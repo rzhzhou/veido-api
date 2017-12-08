@@ -5,18 +5,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from observer.utils.date.convert import utc_to_local_time, data_format
-
-from observer.apps.yqj.models import (Article, )
-from observer.apps.base.models import (Area, Article, )
-
 from observer.apps.yqj.service.articles import (NewsQuerySet, EventsQuerySet,
                                                 ReferencesQuerySet, InsightsQuerySet,
                                                 RisksQuerySet, CategoryQuerySet,
-                                                AreaQuerySet, NewsCount, EventCount, LineData, PieData)
-
+                                                AreaQuerySet, )
+from observer.apps.yqj.service.dashboard import DashboardQuerySet
 from observer.apps.yqj.service.inspection import InspectionQuerySet
-
-from observer.apps.yqj.models import Inspection as YqjInspection
 
 
 class BaseView(APIView):
@@ -66,40 +60,60 @@ class DashboardView(BaseView):  # 主页
     def set_params(self, request):
         super(DashboardView, self).set_params(request.GET)
 
-    def serialize(self, q1, q2, q3, q4, q5, q6, count1, count2, line, pie):
-        data1 = map(lambda i: {'title': i['title'], 'pubtime': data_format(
-            i['pubtime']), 'url': i['url']}, q1[0:10])
-        data2 = map(lambda i: {'title': i['title'], 'pubtime': data_format(
-            i['pubtime']), 'url': i['url']}, q2[0:10])
-        data3 = map(lambda i: {'title': i['title'], 'pubtime': data_format(
-            i['pubtime']), 'url': i['url']}, q3[0:10])
-        data4 = map(lambda i: {'title': i['title'], 'pubtime': data_format(
-            i['pubtime']), 'url': i['url']}, q4[0:10])
-        data5 = map(lambda i: {'title': i['title'], 'pubtime': data_format(
-            i['pubtime']), 'url': i['url']}, q5[0:10])
-        data6 = map(lambda i: {'title': i['title'], 'pubtime': data_format(
-            i['pubtime']), 'url': i['url']}, q6[0:10])
-        data = {"article": data1, "event": data2, "reference": data3, "insight": data4,
-                "risk": data5, "inspection": data6, 'newsCount': count1, 'eventCount': count2, 'line': line, 'pie':pie}
+    def serialize(self, queryset):
+        data = {'total':queryset[0], 
+                'zjrd_count': queryset[1], 
+                'zjrd_proportion': queryset[2], 
+                'zlsj_count': queryset[3], 
+                'zlsj_proportion': queryset[4], 
+                'fxkx_count': queryset[5], 
+                'fxkx_proportion': queryset[6], 
+                'inspection_count': queryset[7], 
+                'inspection_proportion': queryset[8], 
+                'zjrd_list': map(lambda r: {
+                                'guid': r['guid'],
+                                'title': r['title'],
+                                'reprinted': r['reprinted'],
+                                }, queryset[9]), 
+                'zlsj_list': map(lambda r: {
+                                'guid': r['guid'],
+                                'title': r['title'],
+                                'reprinted': r['reprinted'],
+                                }, queryset[10]), 
+                'xxck_list': map(lambda r: {
+                                'guid': r['guid'],
+                                'title': r['title'],
+                                'pubtime': r['pubtime'],
+                                }, queryset[11]), 
+                'zjsd_list': map(lambda r: {
+                                'guid': r['guid'],
+                                'title': r['title'],
+                                'pubtime': r['pubtime'],
+                                }, queryset[12]),
+                'fxkx_list': map(lambda r: {
+                                'title': r['title'],
+                                'url': r['url'],
+                                'source': r['source'],
+                                'pubtime': r['pubtime'],
+                                'score': r['score'],
+                                }, queryset[13]),
+                'inspection_list': map(lambda r: {
+                                'product': r['product'],
+                                'title': r['title'],
+                                'url': r['url'],
+                                'qualitied': r['qualitied'],
+                                'source': r['source'],
+                                'pubtime': r['pubtime'],
+                                }, queryset[14]),
+                }
+
         return data
 
     def get(self, request):
         self.set_params(request)
-        q1 = NewsQuerySet(params=self.query_params).get_all_news_list()  # 质监热点
-        q2 = EventsQuerySet(
-            params=self.query_params).get_all_event_list()  # 质量事件
-        q3 = ReferencesQuerySet(
-            params=self.query_params).get_all_reference_list()  # 信息参考
-        q4 = InsightsQuerySet(
-            params=self.query_params).get_all_insight_list()  # 专家视点
-        q5 = RisksQuerySet(
-            params=self.query_params).get_all_risk_list()  # 风险快讯
-        q6 = InspectionQuerySet(
-            params=self.query_params).get_all_inspection_list()  # 抽检信息
-        count1 = NewsCount.get_NewsCount()
-        count2 = EventCount.get_EventCount()
-        return Response(self.serialize(q1, q2, q3, q4, q5, q6, count1, count2, LineData(params=self.query_params).show(),\
-         PieData(params=self.query_params).pieCount()))
+        queryset = DashboardQuerySet(params=self.query_params).get_data()
+
+        return Response(self.serialize(queryset))
 
 
 class NewsView(BaseView):  # 质监热点
@@ -298,15 +312,14 @@ class InspectionView(BaseView):  # 抽检信息
             'product': r['product'],
             'pubtime': data_format(r['pubtime']),
             'source': r['source'],
-            'qualitied': YqjInspection.objects.filter(base_inspection=r['guid']).values('qualitied'),
+            'qualitied': r['qualitied'],
         }, results)
 
         return data
 
     def get(self, request):
         self.set_params(request)
-        queryset = InspectionQuerySet(
-            params=self.query_params).get_all_inspection_list()
+        queryset = InspectionQuerySet(params=self.query_params).get_all_inspection_list()
 
         return Response(self.serialize(queryset))
 

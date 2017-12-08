@@ -302,7 +302,6 @@ class IndustryScore(models.Model):
 
 class Inspection(models.Model):
     base_inspection = models.CharField(max_length=32, verbose_name='基础抽检库')
-    qualitied = models.FloatField(default=1.0, verbose_name='合格率')
 
     industry = models.ForeignKey(
         Industry,
