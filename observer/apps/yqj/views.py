@@ -308,11 +308,13 @@ class InspectionView(BaseView):  # 抽检信息
         results = self.paging(queryset)
 
         data = map(lambda r: {
-            'title': r['title'],
             'product': r['product'],
-            'pubtime': data_format(r['pubtime']),
-            'source': r['source'],
+            'title': r['title'],
+            'url': r['url'],
             'qualitied': r['qualitied'],
+            'source': r['source'],
+            'level': r['level'],
+            'pubtime': data_format(r['pubtime']),
         }, results)
 
         return data

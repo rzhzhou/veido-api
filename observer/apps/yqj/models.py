@@ -21,6 +21,26 @@ class Article(models.Model):
         return self.base_article
 
 
+class ArticleCollection(models.Model):
+    article = models.ForeignKey(
+        Article,
+        on_delete=models.CASCADE,
+        verbose_name='文章'
+    )
+    collector = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name='收藏者'
+    )
+
+    class Meta:
+        app_label = 'yqj'
+        verbose_name_plural = '文章收藏'
+
+    def __unicode__(self):
+        return self.article.base_article
+
+
 class DesignatedMonitoringKeywords(models.Model):
     keywords = models.CharField(max_length=255, verbose_name='关键词')
     remarks = models.TextField(verbose_name='备注信息')
@@ -37,6 +57,9 @@ class DesignatedMonitoringKeywords(models.Model):
     class Meta:
         app_label = 'yqj'
         verbose_name_plural = '指定监测关键词'
+
+    def __unicode__(self):
+        return self.keywords
 
 
 class DesignatedMonitoringLink(models.Model):
@@ -55,3 +78,6 @@ class DesignatedMonitoringLink(models.Model):
     class Meta:
         app_label = 'yqj'
         verbose_name_plural = '指定监测链接'
+
+    def __unicode__(self):
+        return self.keywords
