@@ -3,7 +3,6 @@ from observer.apps.base.models import Inspection, Article as BaseArticle
 from observer.apps.yqj.models import Article as YqjArticle
 
 
-
 class DashboardQuerySet(Abstract):
 
     def __init__(self, params={}):
