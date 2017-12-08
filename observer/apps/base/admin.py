@@ -13,12 +13,12 @@ from observer.apps.base.resource import (
     InspectionResources, EnterpriseResources, AdministrativePenaltiesResources)
 
 
-class AreaAdmin(ForeignKeyAutocompleteAdmin):
-    related_search_fields = {'parent': ('name',)}
-    fields = ('name', 'level', 'parent')
-    list_display = ('name', 'level', 'parent')
-    search_fields = ('name', 'level', 'parent__name')
-    list_filter = ('level', )
+# class AreaAdmin(ForeignKeyAutocompleteAdmin):
+#     related_search_fields = {'parent': ('name',)}
+#     fields = ('name', 'level', 'parent')
+#     list_display = ('name', 'level', 'parent')
+#     search_fields = ('name', 'level', 'parent__name')
+#     list_filter = ('level', )
 
 
 class IndustryAdmin(ForeignKeyAutocompleteAdmin):
@@ -98,7 +98,8 @@ class CorpusAdmin(ForeignKeyAutocompleteAdmin):
             obj.delete()
 
 
-admin.site.register(Area, AreaAdmin)
+# admin.site.register(Area, AreaAdmin)
+admin.site.register(Area)
 admin.site.register(Corpus, CorpusAdmin)
 admin.site.register(Enterprise, EnterpriseAdmin)
 admin.site.register(Industry, IndustryAdmin)

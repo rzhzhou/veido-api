@@ -5,7 +5,7 @@ from uuid import uuid4
 
 class Area(models.Model):
     name = models.CharField(max_length=255, verbose_name='名称')
-    level = models.BigIntegerField(null=False, verbose_name='等级')
+    level = models.IntegerField(verbose_name='等级')
 
     parent = models.ForeignKey(
         'self',
@@ -41,9 +41,8 @@ class Enterprise(models.Model):
 
 class Industry(models.Model):
     name = models.CharField(max_length=255, verbose_name='名称')
-    code = models.CharField(max_length=5, null=True,
-                            blank=True, unique=True, verbose_name='编码')
-    level = models.BigIntegerField(null=False, verbose_name='行业层级')
+    code = models.CharField(max_length=5, null=True, blank=True, unique=True, verbose_name='编码')
+    level = models.IntegerField(verbose_name='行业层级')
 
     parent = models.ForeignKey(
         'self',

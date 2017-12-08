@@ -9,6 +9,7 @@ from observer.apps.yqj.service.articles import (NewsQuerySet, EventsQuerySet,
                                                 ReferencesQuerySet, InsightsQuerySet,
                                                 RisksQuerySet, CategoryQuerySet,
                                                 AreaQuerySet, )
+from observer.apps.yqj.service.article_utils import (is_collection, get_area, )
 from observer.apps.yqj.service.dashboard import DashboardQuerySet
 from observer.apps.yqj.service.inspection import InspectionQuerySet
 
@@ -137,7 +138,7 @@ class NewsView(BaseView):  # 质监热点
             'url': r['url'],
             'title': r['title'],
             'source': r['source'],
-            'area': Area.objects.get(id=r['area']).name,
+            'area': get_area(r['area']),
             'pubtime': data_format(r['pubtime']),
             'reprinted': r['reprinted'],
         }, results)
@@ -172,7 +173,7 @@ class EventView(BaseView):  # 质量事件
             'url': r['url'],
             'title': r['title'],
             'source': r['source'],
-            'area': Area.objects.get(id=r['area']).name,
+            'area': get_area(r['area']),
             'pubtime': data_format(r['pubtime']),
             'reprinted': r['reprinted'],
         }, results)
@@ -346,7 +347,7 @@ class CategoryView(BaseView):  # 业务信息
         data = map(lambda r: {
             'title': r['title'],
             'pubtime': data_format(r['pubtime']),
-            'area': Area.objects.get(id=r['area']).name,
+            'area': get_area(r['area']),
             'source': r['source'],
             'url': r['url'],
             'reprinted': r['reprinted'],
@@ -382,7 +383,7 @@ class AreaView(BaseView):  # 区域信息
         data = map(lambda r: {
             'title': r['title'],
             'pubtime': data_format(r['pubtime']),
-            'area': Area.objects.get(id=r['area']).name,
+            'area': get_area(r['area']),
             'source': r['source'],
             'url': r['url'],
             'reprinted': r['reprinted'],

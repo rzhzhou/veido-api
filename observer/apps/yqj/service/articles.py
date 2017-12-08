@@ -201,3 +201,16 @@ class AreaQuerySet(Abstract):  # 区域状况
             **args).values(*fields).order_by('-pubtime')
 
         return queryset
+
+
+class ArticleUtils(object): # 工具方法
+
+    # 判断文章是否收藏
+    def is_collection(self):
+        pass
+
+    # 获取地域名字
+    def get_area(self, area_id):
+        return Area.objects.get(id=area_id).name
+
+
