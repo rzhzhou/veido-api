@@ -21,18 +21,17 @@ class BaseView(APIView):
         self.query_params = {
             'starttime': self.today - timedelta(days=30),
             'endtime': self.today,
+            'start': 0,
+            'length': 15,
         }
 
     def set_params(self, params):
         for k, v in params.items():
             self.query_params[k] = v
-        # self.start=self.query_params.get('start')
-
         # start, end convert to local datetime
         self.query_params['starttime'], self.query_params['endtime'] = utc_to_local_time(
             [self.query_params['starttime'], self.query_params['endtime']]
         )
-
         # end add 1 day
         self.query_params['endtime'] = self.query_params[
             'endtime'] + timedelta(days=1)
@@ -62,50 +61,50 @@ class DashboardView(BaseView):  # 主页
         super(DashboardView, self).set_params(request.GET)
 
     def serialize(self, queryset):
-        data = {'total':queryset[0], 
-                'zjrd_count': queryset[1], 
-                'zjrd_proportion': queryset[2], 
-                'zlsj_count': queryset[3], 
-                'zlsj_proportion': queryset[4], 
-                'fxkx_count': queryset[5], 
-                'fxkx_proportion': queryset[6], 
-                'inspection_count': queryset[7], 
-                'inspection_proportion': queryset[8], 
+        data = {'total': queryset[0],
+                'zjrd_count': queryset[1],
+                'zjrd_proportion': queryset[2],
+                'zlsj_count': queryset[3],
+                'zlsj_proportion': queryset[4],
+                'fxkx_count': queryset[5],
+                'fxkx_proportion': queryset[6],
+                'inspection_count': queryset[7],
+                'inspection_proportion': queryset[8],
                 'zjrd_list': map(lambda r: {
-                                'guid': r['guid'],
-                                'title': r['title'],
-                                'reprinted': r['reprinted'],
-                                }, queryset[9]), 
+                    'guid': r['guid'],
+                    'title': r['title'],
+                    'reprinted': r['reprinted'],
+                }, queryset[9]),
                 'zlsj_list': map(lambda r: {
-                                'guid': r['guid'],
-                                'title': r['title'],
-                                'reprinted': r['reprinted'],
-                                }, queryset[10]), 
+                    'guid': r['guid'],
+                    'title': r['title'],
+                    'reprinted': r['reprinted'],
+                }, queryset[10]),
                 'xxck_list': map(lambda r: {
-                                'guid': r['guid'],
-                                'title': r['title'],
-                                'pubtime': r['pubtime'],
-                                }, queryset[11]), 
+                    'guid': r['guid'],
+                    'title': r['title'],
+                    'pubtime': r['pubtime'],
+                }, queryset[11]),
                 'zjsd_list': map(lambda r: {
-                                'guid': r['guid'],
-                                'title': r['title'],
-                                'pubtime': r['pubtime'],
-                                }, queryset[12]),
+                    'guid': r['guid'],
+                    'title': r['title'],
+                    'pubtime': r['pubtime'],
+                }, queryset[12]),
                 'fxkx_list': map(lambda r: {
-                                'title': r['title'],
-                                'url': r['url'],
-                                'source': r['source'],
-                                'pubtime': r['pubtime'],
-                                'score': r['score'],
-                                }, queryset[13]),
+                    'title': r['title'],
+                    'url': r['url'],
+                    'source': r['source'],
+                    'pubtime': r['pubtime'],
+                    'score': r['score'],
+                }, queryset[13]),
                 'inspection_list': map(lambda r: {
-                                'product': r['product'],
-                                'title': r['title'],
-                                'url': r['url'],
-                                'qualitied': r['qualitied'],
-                                'source': r['source'],
-                                'pubtime': r['pubtime'],
-                                }, queryset[14]),
+                    'product': r['product'],
+                    'title': r['title'],
+                    'url': r['url'],
+                    'qualitied': r['qualitied'],
+                    'source': r['source'],
+                    'pubtime': r['pubtime'],
+                }, queryset[14]),
                 }
 
         return data
@@ -132,16 +131,20 @@ class NewsView(BaseView):  # 质监热点
         return super(NewsView, self).paging(queryset, page, self.query_params.get('length'))
 
     def serialize(self, queryset):
+        total = queryset.count()
         results = self.paging(queryset)
 
-        data = map(lambda r: {
-            'url': r['url'],
-            'title': r['title'],
-            'source': r['source'],
-            'area': get_area(r['area']),
-            'pubtime': data_format(r['pubtime']),
-            'reprinted': r['reprinted'],
-        }, results)
+        data = {'total': total,
+                'list': map(lambda r: {
+                    'url': r['url'],
+                    'is_collection': is_collection(r['guid']),
+                    'title': r['title'],
+                    'source': r['source'],
+                    'area': get_area(r['area']),
+                    'pubtime': data_format(r['pubtime']),
+                    'reprinted': r['reprinted'],
+                }, results)
+                }
 
         return data
 
@@ -167,16 +170,20 @@ class EventView(BaseView):  # 质量事件
         return super(EventView, self).paging(queryset, page, self.query_params.get('length'))
 
     def serialize(self, queryset):
+        total = queryset.count()
         results = self.paging(queryset)
 
-        data = map(lambda r: {
-            'url': r['url'],
-            'title': r['title'],
-            'source': r['source'],
-            'area': get_area(r['area']),
-            'pubtime': data_format(r['pubtime']),
-            'reprinted': r['reprinted'],
-        }, results)
+        data = {'total': total,
+                'list': map(lambda r: {
+                    'url': r['url'],
+                    'is_collection': is_collection(r['guid']),
+                    'title': r['title'],
+                    'source': r['source'],
+                    'area': get_area(r['area']),
+                    'pubtime': data_format(r['pubtime']),
+                    'reprinted': r['reprinted'],
+                }, results)
+                }
 
         return data
 
@@ -203,14 +210,18 @@ class ReferenceView(BaseView):  # 信息参考
         return super(ReferenceView, self).paging(queryset, page, self.query_params.get('length'))
 
     def serialize(self, queryset):
+        total = queryset.count()
         results = self.paging(queryset)
 
-        data = map(lambda r: {
-            'url': r['url'],
-            'title': r['title'],
-            'source': r['source'],
-            'pubtime': data_format(r['pubtime']),
-        }, results)
+        data = {'total': total,
+                'list': map(lambda r: {
+                    'url': r['url'],
+                    'is_collection': is_collection(r['guid']),
+                    'title': r['title'],
+                    'source': r['source'],
+                    'pubtime': data_format(r['pubtime']),
+                }, results)
+                }
 
         return data
 
@@ -237,14 +248,18 @@ class InsightView(BaseView):  # 专家视点
         return super(InsightView, self).paging(queryset, page, self.query_params.get('length'))
 
     def serialize(self, queryset):
+        total = queryset.count()
         results = self.paging(queryset)
 
-        data = map(lambda r: {
-            'url': r['url'],
-            'title': r['title'],
-            'source': r['source'],
-            'pubtime': data_format(r['pubtime']),
-        }, results)
+        data = {'total': total,
+                'list': map(lambda r: {
+                    'url': r['url'],
+                    'is_collection': is_collection(r['guid']),
+                    'title': r['title'],
+                    'source': r['source'],
+                    'pubtime': data_format(r['pubtime']),
+                }, results)
+                }
 
         return data
 
@@ -271,16 +286,20 @@ class RiskView(BaseView):  # 风险快讯
         return super(RiskView, self).paging(queryset, page, self.query_params.get('length'))
 
     def serialize(self, queryset):
+        total = queryset.count()
         results = self.paging(queryset)
 
-        data = map(lambda r: {
-            'url': r['url'],
-            'title': r['title'],
-            'source': r['source'],
-            'pubtime': data_format(r['pubtime']),
-            'score': r['score'],
-            'relevancy': 0,
-        }, results)
+        data = {'total': total,
+                'list': map(lambda r: {
+                    'url': r['url'],
+                    'is_collection': is_collection(r['guid']),
+                    'title': r['title'],
+                    'source': r['source'],
+                    'pubtime': data_format(r['pubtime']),
+                    'score': r['score'],
+                    'relevancy': 0,
+                }, results)
+                }
 
         return data
 
@@ -306,23 +325,28 @@ class InspectionView(BaseView):  # 抽检信息
         return super(InspectionView, self).paging(queryset, page, self.query_params.get('length'))
 
     def serialize(self, queryset):
+        total = queryset.count()
         results = self.paging(queryset)
 
-        data = map(lambda r: {
-            'product': r['product'],
-            'title': r['title'],
-            'url': r['url'],
-            'qualitied': r['qualitied'],
-            'source': r['source'],
-            'level': r['level'],
-            'pubtime': data_format(r['pubtime']),
-        }, results)
+        data = {'total': total,
+                'list': map(lambda r: {
+                    'product': r['product'],
+                    'title': r['title'],
+                    'url': r['url'],
+                    'is_collection': is_collection(r['guid']),
+                    'qualitied': r['qualitied'],
+                    'source': r['source'],
+                    'level': r['level'],
+                    'pubtime': data_format(r['pubtime']),
+                }, results)
+                }
 
         return data
 
     def get(self, request):
         self.set_params(request)
-        queryset = InspectionQuerySet(params=self.query_params).get_all_inspection_list()
+        queryset = InspectionQuerySet(
+            params=self.query_params).get_all_inspection_list()
 
         return Response(self.serialize(queryset))
 
@@ -342,16 +366,20 @@ class CategoryView(BaseView):  # 业务信息
         return super(CategoryView, self).paging(queryset, page, self.query_params.get('length'))
 
     def serialize(self, queryset):
+        total = queryset.count()
         results = self.paging(queryset)
 
-        data = map(lambda r: {
-            'title': r['title'],
-            'pubtime': data_format(r['pubtime']),
-            'area': get_area(r['area']),
-            'source': r['source'],
-            'url': r['url'],
-            'reprinted': r['reprinted'],
-        }, results)
+        data = {'total': total,
+                'list': map(lambda r: {
+                    'title': r['title'],
+                    'pubtime': data_format(r['pubtime']),
+                    'area': get_area(r['area']),
+                    'source': r['source'],
+                    'url': r['url'],
+                    'is_collection': is_collection(r['guid']),
+                    'reprinted': r['reprinted'],
+                }, results)
+                }
 
         return data
 
@@ -378,16 +406,20 @@ class AreaView(BaseView):  # 区域信息
         return super(AreaView, self).paging(queryset, page, self.query_params.get('length'))
 
     def serialize(self, queryset):
+        total = queryset.count()
         results = self.paging(queryset)
 
-        data = map(lambda r: {
-            'title': r['title'],
-            'pubtime': data_format(r['pubtime']),
-            'area': get_area(r['area']),
-            'source': r['source'],
-            'url': r['url'],
-            'reprinted': r['reprinted'],
-        }, results)
+        data = {'total': total,
+                'list': map(lambda r: {
+                    'title': r['title'],
+                    'pubtime': data_format(r['pubtime']),
+                    'area': get_area(r['area']),
+                    'source': r['source'],
+                    'url': r['url'],
+                    'is_collection': is_collection(r['guid']),
+                    'reprinted': r['reprinted'],
+                }, results)
+                }
 
         return data
 

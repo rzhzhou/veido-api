@@ -4,9 +4,9 @@ from observer.apps.base.models import Area
 """
 
 # 判断文章是否收藏
-def is_collection(self, guid):
+def is_collection(guid):
     pass
 
 # 获取地域名字
-def get_area(self, area_id):
+def get_area(area_id):
     return Area.objects.get(id=area_id).name

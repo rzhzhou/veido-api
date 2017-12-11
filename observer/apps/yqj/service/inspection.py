@@ -8,7 +8,7 @@ class InspectionQuerySet(Abstract):  # 抽检信息
         super(InspectionQuerySet, self).__init__(params)
 
     def get_all_inspection_list(self):
-        fields = ('product', 'title', 'pubtime', 'source', 'qualitied', 'url', 'level', )
+        fields = ('guid', 'product', 'title', 'pubtime', 'source', 'qualitied', 'url', 'level', )
         cond = {
             'pubtime__gte': getattr(self, 'starttime', None),
             'pubtime__lt': getattr(self, 'endtime', None),

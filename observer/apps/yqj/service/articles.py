@@ -23,7 +23,8 @@ class NewsQuerySet(Abstract):  # 质监热点
         uuids = YqjArticle.objects.filter(**args).values(*fields)
 
         # base article query
-        fields = ('url', 'title', 'pubtime', 'source', 'reprinted', 'area', )
+        fields = ('guid', 'url', 'title', 'pubtime',
+                  'source', 'reprinted', 'area', )
         cond = {
             'guid__in': uuids,
             'pubtime__gte': getattr(self, 'starttime', None),
@@ -53,7 +54,8 @@ class EventsQuerySet(Abstract):  # 质量事件
         uuids = YqjArticle.objects.filter(**args).values(*fields)
 
         # base article query
-        fields = ('url', 'title', 'pubtime', 'source', 'reprinted', 'area', )
+        fields = ('guid', 'url', 'title', 'pubtime',
+                  'source', 'reprinted', 'area', )
         cond = {
             'guid__in': uuids,
             'pubtime__gte': getattr(self, 'starttime', None),
@@ -83,7 +85,7 @@ class ReferencesQuerySet(Abstract):  # 信息参考
         uuids = YqjArticle.objects.filter(**args).values(*fields)
 
         # base article query
-        fields = ('url', 'title', 'pubtime', 'source',)
+        fields = ('guid', 'url', 'title', 'pubtime', 'source',)
         cond = {
             'guid__in': uuids,
             'pubtime__gte': getattr(self, 'starttime', None),
@@ -113,7 +115,7 @@ class InsightsQuerySet(Abstract):  # 专家视点
         uuids = YqjArticle.objects.filter(**args).values(*fields)
 
         # base article query
-        fields = ('url', 'title', 'pubtime', 'source',)
+        fields = ('guid', 'url', 'title', 'pubtime', 'source',)
         cond = {
             'guid__in': uuids,
             'pubtime__gte': getattr(self, 'starttime', None),
@@ -142,7 +144,7 @@ class RisksQuerySet(Abstract):  # 风险快讯
         uuids = YqjArticle.objects.filter(**args).values(*fields)
 
         # base article query
-        fields = ('url', 'title', 'pubtime', 'source', 'score',)
+        fields = ('guid', 'url', 'title', 'pubtime', 'source', 'score',)
         cond = {
             'guid__in': uuids,
             'pubtime__gte': getattr(self, 'starttime', None),
@@ -170,7 +172,8 @@ class CategoryQuerySet(Abstract):  # 业务信息
         uuids = YqjArticle.objects.filter(**args).values(*fields)
 
         # base article query
-        fields = ('url', 'title', 'pubtime', 'source', 'reprinted', 'area')
+        fields = ('guid', 'url', 'title', 'pubtime',
+                  'source', 'reprinted', 'area')
         cond = {
             'guid__in': uuids,
             'pubtime__gte': getattr(self, 'starttime', None),
@@ -190,7 +193,8 @@ class AreaQuerySet(Abstract):  # 区域状况
 
     def get_all_area_list(self, id):
         # base article query
-        fields = ('url', 'title', 'pubtime', 'source', 'reprinted', 'area')
+        fields = ('guid', 'url', 'title', 'pubtime',
+                  'source', 'reprinted', 'area')
         cond = {
             'area__id': id,
             'pubtime__gte': getattr(self, 'starttime', None),
@@ -201,16 +205,3 @@ class AreaQuerySet(Abstract):  # 区域状况
             **args).values(*fields).order_by('-pubtime')
 
         return queryset
-
-
-class ArticleUtils(object): # 工具方法
-
-    # 判断文章是否收藏
-    def is_collection(self):
-        pass
-
-    # 获取地域名字
-    def get_area(self, area_id):
-        return Area.objects.get(id=area_id).name
-
-
