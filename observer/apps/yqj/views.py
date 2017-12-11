@@ -23,15 +23,21 @@ class BaseView(APIView):
             'endtime': self.today,
             'start': 0,
             'length': 15,
+            'user_id': 1,
         }
 
-    def set_params(self, params):
-        for k, v in params.items():
+    def set_params(self, request):
+        for k, v in request.GET.items():
             self.query_params[k] = v
+        
+        # set user id
+        self.user_id = request.user.id
+
         # start, end convert to local datetime
         self.query_params['starttime'], self.query_params['endtime'] = utc_to_local_time(
             [self.query_params['starttime'], self.query_params['endtime']]
         )
+
         # end add 1 day
         self.query_params['endtime'] = self.query_params[
             'endtime'] + timedelta(days=1)
@@ -58,7 +64,7 @@ class DashboardView(BaseView):  # 主页
         super(DashboardView, self).__init__()
 
     def set_params(self, request):
-        super(DashboardView, self).set_params(request.GET)
+        super(DashboardView, self).set_params(request)
 
     def serialize(self, queryset):
         data = {'total': queryset[0],
@@ -122,7 +128,7 @@ class NewsView(BaseView):  # 质监热点
         super(NewsView, self).__init__()
 
     def set_params(self, request):
-        super(NewsView, self).set_params(request.GET)
+        super(NewsView, self).set_params(request)
 
     def paging(self, queryset):
         page = (int(self.query_params.get('start')) /
@@ -133,11 +139,10 @@ class NewsView(BaseView):  # 质监热点
     def serialize(self, queryset):
         total = queryset.count()
         results = self.paging(queryset)
-
         data = {'total': total,
                 'list': map(lambda r: {
                     'url': r['url'],
-                    'is_collection': is_collection(r['guid']),
+                    'is_collection': is_collection(self.user_id, r['guid']),
                     'title': r['title'],
                     'source': r['source'],
                     'area': get_area(r['area']),
@@ -161,7 +166,7 @@ class EventView(BaseView):  # 质量事件
         super(EventView, self).__init__()
 
     def set_params(self, request):
-        super(EventView, self).set_params(request.GET)
+        super(EventView, self).set_params(request)
 
     def paging(self, queryset):
         page = (int(self.query_params.get('start')) /
@@ -176,7 +181,7 @@ class EventView(BaseView):  # 质量事件
         data = {'total': total,
                 'list': map(lambda r: {
                     'url': r['url'],
-                    'is_collection': is_collection(r['guid']),
+                    'is_collection': is_collection(self.user_id, r['guid']),
                     'title': r['title'],
                     'source': r['source'],
                     'area': get_area(r['area']),
@@ -201,7 +206,7 @@ class ReferenceView(BaseView):  # 信息参考
         super(ReferenceView, self).__init__()
 
     def set_params(self, request):
-        super(ReferenceView, self).set_params(request.GET)
+        super(ReferenceView, self).set_params(request)
 
     def paging(self, queryset):
         page = (int(self.query_params.get('start')) /
@@ -216,7 +221,7 @@ class ReferenceView(BaseView):  # 信息参考
         data = {'total': total,
                 'list': map(lambda r: {
                     'url': r['url'],
-                    'is_collection': is_collection(r['guid']),
+                    'is_collection': is_collection(self.user_id, r['guid']),
                     'title': r['title'],
                     'source': r['source'],
                     'pubtime': data_format(r['pubtime']),
@@ -239,7 +244,7 @@ class InsightView(BaseView):  # 专家视点
         super(InsightView, self).__init__()
 
     def set_params(self, request):
-        super(InsightView, self).set_params(request.GET)
+        super(InsightView, self).set_params(request)
 
     def paging(self, queryset):
         page = (int(self.query_params.get('start')) /
@@ -254,7 +259,7 @@ class InsightView(BaseView):  # 专家视点
         data = {'total': total,
                 'list': map(lambda r: {
                     'url': r['url'],
-                    'is_collection': is_collection(r['guid']),
+                    'is_collection': is_collection(self.user_id, r['guid']),
                     'title': r['title'],
                     'source': r['source'],
                     'pubtime': data_format(r['pubtime']),
@@ -277,7 +282,7 @@ class RiskView(BaseView):  # 风险快讯
         super(RiskView, self).__init__()
 
     def set_params(self, request):
-        super(RiskView, self).set_params(request.GET)
+        super(RiskView, self).set_params(request)
 
     def paging(self, queryset):
         page = (int(self.query_params.get('start')) /
@@ -292,7 +297,7 @@ class RiskView(BaseView):  # 风险快讯
         data = {'total': total,
                 'list': map(lambda r: {
                     'url': r['url'],
-                    'is_collection': is_collection(r['guid']),
+                    'is_collection': is_collection(self.user_id, r['guid']),
                     'title': r['title'],
                     'source': r['source'],
                     'pubtime': data_format(r['pubtime']),
@@ -316,7 +321,7 @@ class InspectionView(BaseView):  # 抽检信息
         super(InspectionView, self).__init__()
 
     def set_params(self, request):
-        super(InspectionView, self).set_params(request.GET)
+        super(InspectionView, self).set_params(request)
 
     def paging(self, queryset):
         page = (int(self.query_params.get('start')) /
@@ -333,7 +338,7 @@ class InspectionView(BaseView):  # 抽检信息
                     'product': r['product'],
                     'title': r['title'],
                     'url': r['url'],
-                    'is_collection': is_collection(r['guid']),
+                    'is_collection': is_collection(self.user_id, r['guid']),
                     'qualitied': r['qualitied'],
                     'source': r['source'],
                     'level': r['level'],
@@ -357,7 +362,7 @@ class CategoryView(BaseView):  # 业务信息
         super(CategoryView, self).__init__()
 
     def set_params(self, request):
-        super(CategoryView, self).set_params(request.GET)
+        super(CategoryView, self).set_params(request)
 
     def paging(self, queryset):
         page = (int(self.query_params.get('start')) /
@@ -376,7 +381,7 @@ class CategoryView(BaseView):  # 业务信息
                     'area': get_area(r['area']),
                     'source': r['source'],
                     'url': r['url'],
-                    'is_collection': is_collection(r['guid']),
+                    'is_collection': is_collection(self.user_id, r['guid']),
                     'reprinted': r['reprinted'],
                 }, results)
                 }
@@ -397,7 +402,7 @@ class AreaView(BaseView):  # 区域信息
         super(AreaView, self).__init__()
 
     def set_params(self, request):
-        super(AreaView, self).set_params(request.GET)
+        super(AreaView, self).set_params(request)
 
     def paging(self, queryset):
         page = (int(self.query_params.get('start')) /
@@ -416,7 +421,7 @@ class AreaView(BaseView):  # 区域信息
                     'area': get_area(r['area']),
                     'source': r['source'],
                     'url': r['url'],
-                    'is_collection': is_collection(r['guid']),
+                    'is_collection': is_collection(self.user_id, r['guid']),
                     'reprinted': r['reprinted'],
                 }, results)
                 }
