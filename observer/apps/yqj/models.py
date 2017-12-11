@@ -1,14 +1,14 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-from observer.apps.base.models import ArticleCategory
+from observer.apps.base.models import (Area, ArticleCategory, )
 
 
 class Article(models.Model):
     base_article = models.CharField(max_length=32, verbose_name='基础文章库')
 
     category = models.ForeignKey(
-        'base.ArticleCategory',
+        ArticleCategory,
         on_delete=models.CASCADE,
         verbose_name='文章类别'
     )
@@ -80,4 +80,29 @@ class DesignatedMonitoringLink(models.Model):
         verbose_name_plural = '指定监测链接'
 
     def __unicode__(self):
-        return self.keywords
+        return self.link
+
+
+class UserExpand(models.Model):
+    avatar = models.FileField(verbose_name='头像')
+    is_vip = models.BooleanField(verbose_name='是否vip')# 1 vip; -1 not vip
+    logins = models.BigIntegerField(verbose_name='登陆次数')
+    status = models.IntegerField(verbose_name='状态') # 1 正常; -1 禁用
+    
+    area = models.ForeignKey(
+        Area,
+        on_delete=models.CASCADE,
+        verbose_name='所属地'
+    )
+    basic_user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name='基础用户'
+    )
+
+    class Meta:
+        app_label = 'yqj'
+        verbose_name_plural = '用户扩展'
+
+    def __unicode__(self):
+        return self.basic_user.username
