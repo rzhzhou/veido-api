@@ -5,7 +5,8 @@ from observer.apps.seer.views import logout_view
 
 urlpatterns = [
     re_path(r'^yqj/', include('observer.apps.yqj.urls')),
-    re_path(r'^seer/', include('observer.apps.seer.urls'))
+    re_path(r'^seer/', include('observer.apps.seer.urls')),
+    re_path(r'^postprocess/',include('observer.apps.postprocess.urls'))
 ]
 
 urlpatterns += [

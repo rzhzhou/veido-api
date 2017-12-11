@@ -292,7 +292,7 @@ class IndustryScore(models.Model):
     )
 
     class Meta:
-        app_label = 'origin'
+        app_label = 'seer'
         verbose_name_plural = u'行业分值'
 
     def __unicode__(self):
