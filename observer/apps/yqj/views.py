@@ -9,7 +9,7 @@ from observer.apps.yqj.service.articles import (NewsQuerySet, EventsQuerySet,
                                                 ReferencesQuerySet, InsightsQuerySet,
                                                 RisksQuerySet, CategoryQuerySet,
                                                 AreaQuerySet, )
-from observer.apps.yqj.service.article_utils import (is_collection, get_area, )
+from observer.apps.yqj.service.yqj import (is_collection, get_area, )
 from observer.apps.yqj.service.dashboard import DashboardQuerySet
 from observer.apps.yqj.service.inspection import InspectionQuerySet
 
