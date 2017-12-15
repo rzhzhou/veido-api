@@ -12,7 +12,7 @@ class DashboardQuerySet(Abstract):
         # lambda -> return: uuids
         article_uuids = lambda x, y : YqjArticle.objects.filter(category__name=x, category__level=y).values('base_article')
         # lambda -> return: article first10
-        queryset_first10 = lambda x, y : BaseArticle.objects.filter(guid__in=x).values(**y).order_by('-pubtime')[0:10]
+        queryset_first10 = lambda x, y : BaseArticle.objects.filter(guid__in=x).values(*y).order_by('-pubtime')[0:10]
         # lambda -> return: xx.xx%
         proportion = lambda x, y : '%.2f%%' % (float(x) / float(y) * 100, )
 
@@ -41,7 +41,7 @@ class DashboardQuerySet(Abstract):
         fxkx_count = fxkx_queryset.count()
         fxkx_proportion = proportion(fxkx_count, total) 
         #抽检信息 数量 and 占比
-        inspection_count = inspection_total
+        inspection_count = inspection_queryset.count()
         inspection_proportion = proportion(inspection_count, total) 
 
         #质监热点 first10
@@ -55,7 +55,7 @@ class DashboardQuerySet(Abstract):
         #风险快讯 first10
         fxkx_list = queryset_first10(fxkx_queryset, ('title', 'url', 'source', 'pubtime', 'score', ))
         #抽检信息 first10
-        inspection_list = queryset_first10(inspection_queryset, ('product', 'title', 'url', 'qualitied', 'source', 'pubtime', ))
+        inspection_list = inspection_queryset.values('product', 'title', 'url', 'qualitied', 'source', 'pubtime', ).order_by('-pubtime')[0:10]
 
         return (total, zjrd_count, zjrd_proportion, zlsj_count, zlsj_proportion, 
                 fxkx_count, fxkx_proportion, inspection_count, inspection_proportion, 
