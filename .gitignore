@@ -1,5 +1,5 @@
 .DS_Store
 node_modules
 *.pyc
-#0*.py
 VENV
+ENV
