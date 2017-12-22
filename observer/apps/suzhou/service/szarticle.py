@@ -26,7 +26,6 @@ class RiskProductData(Abstract):  # 风险产品
             industry__id=industry, 
             area__name='全国'
         )
-        print ('c:',c);print ('m:',m);print ('s:',s)
         cond1 = {
             'category__level': getattr(self, 'level', None),
             'category__name': getattr(self, 'category_name', None),
@@ -38,7 +37,6 @@ class RiskProductData(Abstract):  # 风险产品
             'pubtime__lt': getattr(self, 'endtime', None),
         }
         n_dimension = BaseArticle.objects.filter(**cond2).order_by('-pubtime')  
-        print('1',n_dimension)
         cond3 = {
             'guid__in': SeerInspection.objects.filter(industry__id=industry).values('base_inspection'),
             'pubtime__gte': getattr(self, 'starttime', None),
@@ -46,8 +44,7 @@ class RiskProductData(Abstract):  # 风险产品
             'qualitied__lt':1,
             'area__name':'全国'
         }
-        i1_dimension = BaseInspection.objects.filter(**cond3).order_by('-pubtime') 
-        print('2',i1_dimension)      
+        i1_dimension = BaseInspection.objects.filter(**cond3).order_by('-pubtime')      
         cond4 = {
             'guid__in': SeerInspection.objects.filter(industry__id=industry).values('base_inspection'),
             'pubtime__gte': getattr(self, 'starttime', None),
@@ -55,7 +52,6 @@ class RiskProductData(Abstract):  # 风险产品
             'qualitied__lt':1,
         }
         i2_dimension = BaseInspection.objects.filter(**cond4).order_by('-pubtime').exclude(area__name='全国')
-        print('3',i2_dimension) 
         c_dimension = (c[0].force,
                      c[0].close,
                      c[0].consume) if c else (0, 1, 0)
@@ -148,7 +144,6 @@ class RiskProductData(Abstract):  # 风险产品
                     user_industries),
                   key=lambda industry: industry[3])
 
-
     def get_industries(self):
         cond = {
             'area__name': self.area_name,
@@ -163,3 +158,29 @@ class RiskProductData(Abstract):  # 风险产品
         industries = self.industries_ranking(area_industries)
 
         return industries 
+
+
+class RiskEnterprisesData(Abstract):  # 风险企业
+
+    def __init__(self, params={}):
+        super(RiskEnterprisesData, self).__init__(params)
+
+    def get_enterprises(self):
+        fields = ('enterprise_unqualified__id', 'enterprise_unqualified__name',
+                  'enterprise_unqualified__area__name', 'enterprise_unqualified__product_name',)
+
+        cond = {
+            'pubtime__gte': self.start,
+            'pubtime__lt': self.end,
+            'enterprise_unqualified__area__id__in': Area.objects.filter(
+                Q(parent__name=self.focus) |
+                Q(name=self.focus)
+            ).values_list('id', flat=True)
+        }
+
+        args = dict([(k, v) for k, v in cond.iteritems() if v is not None])
+
+        queryset = SeerInspection.objects.filter(
+            **args).values_list(*fields).distinct().order_by('enterprise_unqualified__id')
+
+        return queryset

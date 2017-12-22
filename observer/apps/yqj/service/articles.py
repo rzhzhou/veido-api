@@ -29,6 +29,9 @@ class NewsQuerySet(Abstract):  # 质监热点
             'guid__in': uuids,
             'pubtime__gte': getattr(self, 'starttime', None),
             'pubtime__lt': getattr(self, 'endtime', None),
+            'area__name': getattr(self, 'area', None),
+            'title__contains': getattr(self, 'title', None),
+            'source__contains': getattr(self, 'source', None),
         }
         args = dict([k, v] for k, v in cond.items() if v)
         queryset = BaseArticle.objects.filter(
@@ -60,6 +63,9 @@ class EventsQuerySet(Abstract):  # 质量事件
             'guid__in': uuids,
             'pubtime__gte': getattr(self, 'starttime', None),
             'pubtime__lt': getattr(self, 'endtime', None),
+            'area__name': getattr(self, 'area', None),
+            'title__contains': getattr(self, 'title', None),
+            'source__contains': getattr(self, 'source', None),
         }
         args = dict([k, v] for k, v in cond.items() if v)
         queryset = BaseArticle.objects.filter(
@@ -90,6 +96,8 @@ class ReferencesQuerySet(Abstract):  # 信息参考
             'guid__in': uuids,
             'pubtime__gte': getattr(self, 'starttime', None),
             'pubtime__lt': getattr(self, 'endtime', None),
+            'title__contains': getattr(self, 'title', None),
+            'source__contains': getattr(self, 'source', None),
         }
         args = dict([k, v] for k, v in cond.items() if v)
         queryset = BaseArticle.objects.filter(
@@ -120,6 +128,8 @@ class InsightsQuerySet(Abstract):  # 专家视点
             'guid__in': uuids,
             'pubtime__gte': getattr(self, 'starttime', None),
             'pubtime__lt': getattr(self, 'endtime', None),
+            'title__contains': getattr(self, 'title', None),
+            'source__contains': getattr(self, 'source', None),
         }
         args = dict([k, v] for k, v in cond.items() if v)
         queryset = BaseArticle.objects.filter(
@@ -149,6 +159,8 @@ class RisksQuerySet(Abstract):  # 风险快讯
             'guid__in': uuids,
             'pubtime__gte': getattr(self, 'starttime', None),
             'pubtime__lt': getattr(self, 'endtime', None),
+            'title__contains': getattr(self, 'title', None),
+            'source__contains': getattr(self, 'source', None),
         }
         args = dict([k, v] for k, v in cond.items() if v)
         queryset = BaseArticle.objects.filter(
@@ -178,6 +190,9 @@ class CategoryQuerySet(Abstract):  # 业务信息
             'guid__in': uuids,
             'pubtime__gte': getattr(self, 'starttime', None),
             'pubtime__lt': getattr(self, 'endtime', None),
+            'area__name': getattr(self, 'area', None),
+            'title__contains': getattr(self, 'title', None),
+            'source__contains': getattr(self, 'source', None),
         }
         args = dict([k, v] for k, v in cond.items() if v)
         queryset = BaseArticle.objects.filter(

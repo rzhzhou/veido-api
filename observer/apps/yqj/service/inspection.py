@@ -12,6 +12,9 @@ class InspectionQuerySet(Abstract):  # 抽检信息
         cond = {
             'pubtime__gte': getattr(self, 'starttime', None),
             'pubtime__lt': getattr(self, 'endtime', None),
+            'product__contains': getattr(self, 'product', None),
+            'title__contains': getattr(self, 'title', None),
+            'source__contains': getattr(self, 'source', None),
         }
 
         args = dict([k, v] for k, v in cond.items() if v)
