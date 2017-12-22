@@ -3,7 +3,7 @@ from observer.apps.seer.models import AreaIndustry,Article as SeerArticle,Inspec
                                       ConsumeIndex,SocietyIndex,ManageIndex,ModelWeight
 from observer.apps.seer.service.abstract import Abstract
 from datetime import datetime, timedelta
-from django.db.models import Count
+from django.db.models import Count,Q
 from observer.utils.date.convert import data_format
 import collections,itertools
 
@@ -167,20 +167,24 @@ class RiskEnterprisesData(Abstract):  # 风险企业
 
     def get_enterprises(self):
         fields = ('enterprise_unqualified__id', 'enterprise_unqualified__name',
-                  'enterprise_unqualified__area__name', 'enterprise_unqualified__product_name',)
-
+                  'enterprise_unqualified__area__name', 'base_inspection')
         cond = {
             'pubtime__gte': self.start,
-            'pubtime__lt': self.end,
+            'pubtime__lt': self.end,}
+        args = dict([(k, v) for k, v in cond.items() if v is not None])
+        uuids=BaseInspection.objects.filter(**args).values("base_inspection")
+
+        cond = {
+            'base_inspection__in':uuids,
             'enterprise_unqualified__area__id__in': Area.objects.filter(
                 Q(parent__name=self.focus) |
                 Q(name=self.focus)
             ).values_list('id', flat=True)
         }
 
-        args = dict([(k, v) for k, v in cond.iteritems() if v is not None])
+        args = dict([(k, v) for k, v in cond.items() if v is not None])
 
         queryset = SeerInspection.objects.filter(
             **args).values_list(*fields).distinct().order_by('enterprise_unqualified__id')
-
+        
         return queryset

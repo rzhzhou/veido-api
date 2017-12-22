@@ -3,9 +3,9 @@ from datetime import date, datetime, timedelta
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from observer.apps.seer.models import Inspection as SeerInspection
 from observer.utils.date.convert import utc_to_local_time, data_format
-from observer.apps.suzhou.service.szarticle import (RiskProductData,)
+from observer.apps.suzhou.service.szarticle import (RiskProductData,RiskEnterprisesData)
 
 class BaseView(APIView):
 
@@ -78,7 +78,29 @@ class RiskProductView(BaseView):  # 风险产品
 
 class RiskEnterprisesView(BaseView):  # 风险企业
 
-    pass
+    def __init__(self):
+        super(RiskEnterprisesView, self).__init__()
+
+    def set_params(self, request):
+        super(RiskEnterprisesView, self).set_params(request.GET)
+
+    def serialize(self, queryset):
+        data = [{
+            'id': q[0],
+            'name': q[1],
+            'focus': (self.query_params['user_area'] == q[2] or u'溧阳' == q[2] or u'金坛' == q[2]),
+            'area': q[2],
+            'total': SeerInspection.objects.filter(enterprise_unqualified__id=q[0]).count()
+        } for q in queryset]
+
+    def get(self, request):
+        self.set_params(request)
+        limit = int(self.query_params.get('limit', 0))
+        queryset = RiskEnterprisesData(params=self.query_params).get_enterprises()
+        if limit:
+            queryset = queryset[:limit]
+
+        return Response(self.serialize(queryset))
 
 
 class RiskNewsView(BaseView):  # 风险新闻

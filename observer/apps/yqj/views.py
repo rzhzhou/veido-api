@@ -89,18 +89,18 @@ class DashboardView(BaseView):  # 主页
                 'xxck_list': map(lambda r: {
                     'guid': r['guid'],
                     'title': r['title'],
-                    'pubtime': r['pubtime'],
+                    'pubtime': data_format(r['pubtime']),
                 }, queryset[11]),
                 'zjsd_list': map(lambda r: {
                     'guid': r['guid'],
                     'title': r['title'],
-                    'pubtime': r['pubtime'],
+                    'pubtime': data_format(r['pubtime']),
                 }, queryset[12]),
                 'fxkx_list': map(lambda r: {
                     'title': r['title'],
                     'url': r['url'],
                     'source': r['source'],
-                    'pubtime': r['pubtime'],
+                    'pubtime': data_format(r['pubtime']),
                     'score': r['score'],
                 }, queryset[13]),
                 'inspection_list': map(lambda r: {
@@ -109,7 +109,7 @@ class DashboardView(BaseView):  # 主页
                     'url': r['url'],
                     'qualitied': r['qualitied'],
                     'source': r['source'],
-                    'pubtime': r['pubtime'],
+                    'pubtime': data_format(r['pubtime']),
                 }, queryset[14]),
                 }
 
@@ -131,9 +131,7 @@ class NewsView(BaseView):  # 质监热点
         super(NewsView, self).set_params(request)
 
     def paging(self, queryset):
-        page = (int(self.query_params.get('start')) /
-                int(self.query_params.get('length'))) + 1
-
+        page = int(self.query_params.get('start'))+1
         return super(NewsView, self).paging(queryset, page, self.query_params.get('length'))
 
     def serialize(self, queryset):
@@ -169,9 +167,7 @@ class EventView(BaseView):  # 质量事件
         super(EventView, self).set_params(request)
 
     def paging(self, queryset):
-        page = (int(self.query_params.get('start')) /
-                int(self.query_params.get('length'))) + 1
-
+        page = int(self.query_params.get('start'))+1
         return super(EventView, self).paging(queryset, page, self.query_params.get('length'))
 
     def serialize(self, queryset):
@@ -209,9 +205,7 @@ class ReferenceView(BaseView):  # 信息参考
         super(ReferenceView, self).set_params(request)
 
     def paging(self, queryset):
-        page = (int(self.query_params.get('start')) /
-                int(self.query_params.get('length'))) + 1
-
+        page = int(self.query_params.get('start'))+1
         return super(ReferenceView, self).paging(queryset, page, self.query_params.get('length'))
 
     def serialize(self, queryset):
@@ -247,9 +241,7 @@ class InsightView(BaseView):  # 专家视点
         super(InsightView, self).set_params(request)
 
     def paging(self, queryset):
-        page = (int(self.query_params.get('start')) /
-                int(self.query_params.get('length'))) + 1
-
+        page = int(self.query_params.get('start'))+1
         return super(InsightView, self).paging(queryset, page, self.query_params.get('length'))
 
     def serialize(self, queryset):
@@ -285,9 +277,7 @@ class RiskView(BaseView):  # 风险快讯
         super(RiskView, self).set_params(request)
 
     def paging(self, queryset):
-        page = (int(self.query_params.get('start')) /
-                int(self.query_params.get('length'))) + 1
-
+        page = int(self.query_params.get('start'))+1
         return super(RiskView, self).paging(queryset, page, self.query_params.get('length'))
 
     def serialize(self, queryset):
@@ -324,9 +314,7 @@ class InspectionView(BaseView):  # 抽检信息
         super(InspectionView, self).set_params(request)
 
     def paging(self, queryset):
-        page = (int(self.query_params.get('start')) /
-                int(self.query_params.get('length'))) + 1
-
+        page = int(self.query_params.get('start'))+1
         return super(InspectionView, self).paging(queryset, page, self.query_params.get('length'))
 
     def serialize(self, queryset):
@@ -352,7 +340,6 @@ class InspectionView(BaseView):  # 抽检信息
         self.set_params(request)
         queryset = InspectionQuerySet(
             params=self.query_params).get_all_inspection_list()
-
         return Response(self.serialize(queryset))
 
 
@@ -365,9 +352,7 @@ class CategoryView(BaseView):  # 业务信息
         super(CategoryView, self).set_params(request)
 
     def paging(self, queryset):
-        page = (int(self.query_params.get('start')) /
-                int(self.query_params.get('length'))) + 1
-
+        page = int(self.query_params.get('start'))+1
         return super(CategoryView, self).paging(queryset, page, self.query_params.get('length'))
 
     def serialize(self, queryset):
@@ -405,9 +390,7 @@ class AreaView(BaseView):  # 区域信息
         super(AreaView, self).set_params(request)
 
     def paging(self, queryset):
-        page = (int(self.query_params.get('start')) /
-                int(self.query_params.get('length'))) + 1
-
+        page = int(self.query_params.get('start'))+1
         return super(AreaView, self).paging(queryset, page, self.query_params.get('length'))
 
     def serialize(self, queryset):
