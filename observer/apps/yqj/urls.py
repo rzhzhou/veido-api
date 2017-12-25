@@ -13,6 +13,6 @@ urlpatterns = [
     path('insight', ReferenceView.as_view()),  # 专家视点
     path('risk', RiskView.as_view()),  # 风险快讯
     path('inspection', InspectionView.as_view()),  # 抽检信息
-    path('category/<int:id>', CategoryView.as_view()),  # 业务信息
+    path('category/<str:name>', CategoryView.as_view()),  # 业务信息
     path('area/<int:id>', CategoryView.as_view()),  # 区域状况
 ]

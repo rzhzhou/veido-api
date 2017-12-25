@@ -174,14 +174,9 @@ class CategoryQuerySet(Abstract):  # 业务信息
     def __init__(self, params={}):
         super(CategoryQuerySet, self).__init__(params)
 
-    def get_all_category_list(self, id):
+    def get_all_category_list(self, name):
         # yqj article query
-        fields = ('base_article', )
-        cond = {
-            'category__id': id,
-        }
-        args = dict([k, v] for k, v in cond.items() if v)
-        uuids = YqjArticle.objects.filter(**args).values(*fields)
+        uuids = YqjArticle.objects.filter(category__name=name).values('base_article')
 
         # base article query
         fields = ('guid', 'url', 'title', 'pubtime',

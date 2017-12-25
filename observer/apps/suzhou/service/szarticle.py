@@ -166,14 +166,14 @@ class RiskEnterprisesData(Abstract):  # 风险企业
         super(RiskEnterprisesData, self).__init__(params)
 
     def get_enterprises(self):
-        fields = ('enterprise_unqualified__id', 'enterprise_unqualified__name',
-                  'enterprise_unqualified__area__name', 'base_inspection')
         cond = {
-            'pubtime__gte': self.start,
-            'pubtime__lt': self.end,}
+            'pubtime__gte': getattr(self, 'start', self.starttime),
+            'pubtime__lt': getattr(self, 'end', self.endtime),}
         args = dict([(k, v) for k, v in cond.items() if v is not None])
-        uuids=BaseInspection.objects.filter(**args).values("base_inspection")
+        uuids=BaseInspection.objects.filter(**args).values("guid")
 
+        fields = ('enterprise_unqualified__id', 'enterprise_unqualified__name',
+                  'enterprise_unqualified__area__name')
         cond = {
             'base_inspection__in':uuids,
             'enterprise_unqualified__area__id__in': Area.objects.filter(
@@ -186,5 +186,4 @@ class RiskEnterprisesData(Abstract):  # 风险企业
 
         queryset = SeerInspection.objects.filter(
             **args).values_list(*fields).distinct().order_by('enterprise_unqualified__id')
-        
         return queryset

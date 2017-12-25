@@ -88,10 +88,11 @@ class RiskEnterprisesView(BaseView):  # 风险企业
         data = [{
             'id': q[0],
             'name': q[1],
-            'focus': (self.query_params['user_area'] == q[2] or u'溧阳' == q[2] or u'金坛' == q[2]),
+            'focus': 'focus',
             'area': q[2],
             'total': SeerInspection.objects.filter(enterprise_unqualified__id=q[0]).count()
         } for q in queryset]
+        return data
 
     def get(self, request):
         self.set_params(request)

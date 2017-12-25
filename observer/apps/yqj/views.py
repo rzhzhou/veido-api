@@ -373,10 +373,10 @@ class CategoryView(BaseView):  # 业务信息
 
         return data
 
-    def get(self, request, id):
+    def get(self, request, name):
         self.set_params(request)
         queryset = CategoryQuerySet(
-            params=self.query_params).get_all_category_list(id)
+            params=self.query_params).get_all_category_list(name)
 
         return Response(self.serialize(queryset))
 
