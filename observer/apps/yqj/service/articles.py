@@ -24,7 +24,7 @@ class NewsQuerySet(Abstract):  # 质监热点
 
         # base article query
         fields = ('guid', 'url', 'title', 'pubtime',
-                  'source', 'reprinted', 'area', )
+                  'source', 'reprinted', 'area__name', )
         cond = {
             'guid__in': uuids,
             'pubtime__gte': getattr(self, 'starttime', None),
@@ -58,7 +58,7 @@ class EventsQuerySet(Abstract):  # 质量事件
 
         # base article query
         fields = ('guid', 'url', 'title', 'pubtime',
-                  'source', 'reprinted', 'area', )
+                  'source', 'reprinted', 'area__name', )
         cond = {
             'guid__in': uuids,
             'pubtime__gte': getattr(self, 'starttime', None),
