@@ -4,7 +4,7 @@ from uuid import uuid4
 
 
 class Area(models.Model):
-    name = models.CharField(max_length=255, verbose_name='名称')
+    name = models.CharField(max_length=50, verbose_name='名称')
     level = models.IntegerField(verbose_name='等级')
 
     parent = models.ForeignKey(
@@ -88,7 +88,7 @@ class Inspection(models.Model):
     unitem = models.TextField(verbose_name='不合格项')
     brand = models.CharField(max_length=255, verbose_name='商标')
     product = models.CharField(max_length=255, verbose_name='产品种类')
-    source = models.CharField(max_length=255, verbose_name='信息来源')
+    source = models.CharField(max_length=80, verbose_name='信息来源')
     status = models.IntegerField(default=0, verbose_name='状态')  # 0, 默认值 -1, 无效 1 有效
 
     area = models.ForeignKey(
@@ -111,7 +111,7 @@ class AdministrativePenalties(models.Model):
     title = models.CharField(max_length=255, blank=True, verbose_name='标题')
     url = models.URLField(verbose_name='网站链接')
     pubtime = models.DateTimeField(blank=True, null=True, auto_now=False, verbose_name='发布时间')
-    publisher = models.CharField(max_length=255, verbose_name='发布者')
+    publisher = models.CharField(max_length=80, verbose_name='发布者')
     case_name = models.CharField(max_length=255, verbose_name='案件名称')
     illegal_behavior = models.CharField(max_length=255, verbose_name='违法行为')
     punishment_basis = models.CharField(max_length=255, verbose_name='处罚依据')
@@ -131,7 +131,7 @@ class AdministrativePenalties(models.Model):
 
 
 class ArticleCategory(models.Model):
-    name = models.CharField(max_length=255, verbose_name='名称')# 质检热点 质量事件 信息参考 ...
+    name = models.CharField(max_length=25, verbose_name='名称')# 质检热点 质量事件 信息参考 ...
     level = models.BigIntegerField(null=False, verbose_name='等级')
     remark = models.CharField(max_length=255, blank=True, verbose_name='备注')
 
@@ -156,7 +156,7 @@ class Article(models.Model):
     url = models.URLField(verbose_name='网站链接')
     content = models.TextField(blank=True, verbose_name='正文')
     pubtime = models.DateTimeField(auto_now=False, verbose_name='发布时间')
-    source = models.CharField(max_length=255, blank=True, verbose_name='信息来源')
+    source = models.CharField(max_length=80, blank=True, verbose_name='信息来源')
     reprinted = models.IntegerField(verbose_name='转载数')
     feeling_factor = models.FloatField(default=-1, verbose_name='正负面')
     score = models.IntegerField(default=0, verbose_name='评分')
