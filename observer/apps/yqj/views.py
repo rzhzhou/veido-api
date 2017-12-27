@@ -144,7 +144,7 @@ class NewsView(BaseView):  # 质监热点
                     'is_collection': is_collection(self.user_id, r['guid']),
                     'title': r['title'],
                     'source': r['source'],
-                    'area': get_area(r['area']),
+                    'area': r['area__name'],
                     'pubtime': data_format(r['pubtime']),
                     'reprinted': r['reprinted'],
                 }, results)
@@ -181,7 +181,7 @@ class EventView(BaseView):  # 质量事件
                     'is_collection': is_collection(self.user_id, r['guid']),
                     'title': r['title'],
                     'source': r['source'],
-                    'area': get_area(r['area']),
+                    'area': r['area__name'],
                     'pubtime': data_format(r['pubtime']),
                     'reprinted': r['reprinted'],
                 }, results)
@@ -364,7 +364,7 @@ class CategoryView(BaseView):  # 业务信息
                 'list': map(lambda r: {
                     'title': r['title'],
                     'pubtime': data_format(r['pubtime']),
-                    'area': get_area(r['area']),
+                    'area': r['area__name'],
                     'source': r['source'],
                     'url': r['url'],
                     'is_collection': is_collection(self.user_id, r['guid']),
@@ -402,7 +402,7 @@ class AreaView(BaseView):  # 区域信息
                 'list': map(lambda r: {
                     'title': r['title'],
                     'pubtime': data_format(r['pubtime']),
-                    'area': get_area(r['area']),
+                    'area': r['area__name'],
                     'source': r['source'],
                     'url': r['url'],
                     'is_collection': is_collection(self.user_id, r['guid']),
