@@ -8,7 +8,7 @@ from observer.utils.date.convert import utc_to_local_time, data_format
 from observer.apps.yqj.service.articles import (NewsQuerySet, EventsQuerySet,
                                                 ReferencesQuerySet, InsightsQuerySet,
                                                 RisksQuerySet, CategoryQuerySet,
-                                                AreaQuerySet, )
+                                                AreaQuerySet,ArticleById )
 from observer.apps.yqj.service.yqj import (is_collection, get_area, )
 from observer.apps.yqj.service.dashboard import DashboardQuerySet
 from observer.apps.yqj.service.inspection import InspectionQuerySet
@@ -415,4 +415,29 @@ class AreaView(BaseView):  # 区域信息
         self.set_params(request)
         queryset = AreaQuerySet(params=self.query_params).get_all_area_list(id)
 
+        return Response(self.serialize(queryset))
+
+
+class ArticleByIdView(BaseView):#文章详细信息
+
+    def __init__(self):
+        super(ArticleByIdView, self).__init__()
+
+    def set_params(self, request):
+        super(ArticleByIdView, self).set_params(request)
+
+
+    def serialize(self, queryset):
+
+        data = {'title': queryset.title,
+                'content':queryset.content,
+                'pubtime':queryset.pubtime,
+                'source':queryset.source}
+
+        return data
+
+    def get(self, request, guid):
+        self.set_params(request)
+        queryset = ArticleById(
+            params=self.query_params).get_detail_info(guid)
         return Response(self.serialize(queryset))

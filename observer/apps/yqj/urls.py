@@ -2,11 +2,12 @@ from django.urls import path
 
 from observer.apps.yqj.views import (NewsView, EventView, ReferenceView,
                                      InsightView, RiskView, InspectionView,
-                                     CategoryView, DashboardView)
+                                     CategoryView, DashboardView,ArticleByIdView)
 
 
 urlpatterns = [
     path('dashboard', DashboardView.as_view()),  # 主页
+    path('article/<str:guid>', ArticleByIdView.as_view()),  # 质监热点
     path('article', NewsView.as_view()),  # 质监热点
     path('event', EventView.as_view()),  # 质量事件
     path('reference', ReferenceView.as_view()),  # 信息参考

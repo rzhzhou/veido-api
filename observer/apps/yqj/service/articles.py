@@ -215,3 +215,13 @@ class AreaQuerySet(Abstract):  # 区域状况
             **args).values(*fields).order_by('-pubtime')
 
         return queryset
+
+class ArticleById(Abstract):
+    def __init__(self, params={}):
+        super(ArticleById, self).__init__(params)
+
+    def get_detail_info(self, guid):
+        # base article query
+        fields = ('content', 'title', 'pubtime','source')
+        #return BaseArticle.objects.filter(guid=guid).values(*fields)
+        return BaseArticle.objects.get(guid=guid)
