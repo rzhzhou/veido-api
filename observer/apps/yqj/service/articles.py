@@ -14,19 +14,17 @@ class NewsQuerySet(Abstract):  # 质监热点
     def get_all_news_list(self):
 
         # yqj article query
-        fields = ('base_article', )
         cond = {
             'category__level': getattr(self, 'level', None),
             'category__name': getattr(self, 'category_name', None),
         }
         args = dict([k, v] for k, v in cond.items() if v)
-        uuids = YqjArticle.objects.filter(**args).values(*fields)
+        uuids = YqjArticle.objects.filter(**args).values_list('base_article', flat=True)
 
         # base article query
         fields = ('guid', 'url', 'title', 'pubtime',
-                  'source', 'reprinted', 'area', )
+                  'source', 'reprinted', 'area__name', )
         cond = {
-            'guid__in': uuids,
             'pubtime__gte': getattr(self, 'starttime', None),
             'pubtime__lt': getattr(self, 'endtime', None),
             'area__name': getattr(self, 'area', None),
@@ -34,8 +32,10 @@ class NewsQuerySet(Abstract):  # 质监热点
             'source__contains': getattr(self, 'source', None),
         }
         args = dict([k, v] for k, v in cond.items() if v)
-        queryset = BaseArticle.objects.filter(
-            **args).values(*fields).order_by('-pubtime')
+
+        queryset = BaseArticle.objects.filter(**args).values(*fields).order_by('-pubtime')
+
+        queryset = queryset.filter(guid__in=uuids) if uuids.exists() else queryset
 
         return queryset
 
@@ -48,19 +48,17 @@ class EventsQuerySet(Abstract):  # 质量事件
     def get_all_event_list(self):
 
         # yqj article query
-        fields = ('base_article', )
         cond = {
             'category__level': getattr(self, 'level', None),
             'category__name': getattr(self, 'category_name', None),
         }
         args = dict([k, v] for k, v in cond.items() if v)
-        uuids = YqjArticle.objects.filter(**args).values(*fields)
+        uuids = YqjArticle.objects.filter(**args).values_list('base_article', flat=True)
 
         # base article query
         fields = ('guid', 'url', 'title', 'pubtime',
-                  'source', 'reprinted', 'area', )
+                  'source', 'reprinted', 'area__name', )
         cond = {
-            'guid__in': uuids,
             'pubtime__gte': getattr(self, 'starttime', None),
             'pubtime__lt': getattr(self, 'endtime', None),
             'area__name': getattr(self, 'area', None),
@@ -68,8 +66,10 @@ class EventsQuerySet(Abstract):  # 质量事件
             'source__contains': getattr(self, 'source', None),
         }
         args = dict([k, v] for k, v in cond.items() if v)
-        queryset = BaseArticle.objects.filter(
-            **args).values(*fields).order_by('-pubtime')
+
+        queryset = BaseArticle.objects.filter(**args).values(*fields).order_by('-pubtime')
+
+        queryset = queryset.filter(guid__in=uuids) if uuids.exists() else queryset
 
         return queryset
 
@@ -82,26 +82,26 @@ class ReferencesQuerySet(Abstract):  # 信息参考
     def get_all_reference_list(self):
 
         # yqj article query
-        fields = ('base_article', )
         cond = {
             'category__level': getattr(self, 'level', None),
             'category__name': getattr(self, 'category_name', None),
         }
         args = dict([k, v] for k, v in cond.items() if v)
-        uuids = YqjArticle.objects.filter(**args).values(*fields)
+        uuids = YqjArticle.objects.filter(**args).values_list('base_article', flat=True)
 
         # base article query
         fields = ('guid', 'url', 'title', 'pubtime', 'source',)
         cond = {
-            'guid__in': uuids,
             'pubtime__gte': getattr(self, 'starttime', None),
             'pubtime__lt': getattr(self, 'endtime', None),
             'title__contains': getattr(self, 'title', None),
             'source__contains': getattr(self, 'source', None),
         }
         args = dict([k, v] for k, v in cond.items() if v)
-        queryset = BaseArticle.objects.filter(
-            **args).values(*fields).order_by('-pubtime')
+
+        queryset = BaseArticle.objects.filter(**args).values(*fields).order_by('-pubtime')
+
+        queryset = queryset.filter(guid__in=uuids) if uuids.exists() else queryset
 
         return queryset
 
@@ -114,26 +114,26 @@ class InsightsQuerySet(Abstract):  # 专家视点
     def get_all_insight_list(self):
 
         # yqj article query
-        fields = ('base_article', )
         cond = {
             'category__level': getattr(self, 'level', None),
             'category__name': getattr(self, 'category_name', None),
         }
         args = dict([k, v] for k, v in cond.items() if v)
-        uuids = YqjArticle.objects.filter(**args).values(*fields)
+        uuids = YqjArticle.objects.filter(**args).values_list('base_article', flat=True)
 
         # base article query
         fields = ('guid', 'url', 'title', 'pubtime', 'source',)
         cond = {
-            'guid__in': uuids,
             'pubtime__gte': getattr(self, 'starttime', None),
             'pubtime__lt': getattr(self, 'endtime', None),
             'title__contains': getattr(self, 'title', None),
             'source__contains': getattr(self, 'source', None),
         }
         args = dict([k, v] for k, v in cond.items() if v)
-        queryset = BaseArticle.objects.filter(
-            **args).values(*fields).order_by('-pubtime')
+
+        queryset = BaseArticle.objects.filter(**args).values(*fields).order_by('-pubtime')
+
+        queryset = queryset.filter(guid__in=uuids) if uuids.exists() else queryset
 
         return queryset
 
@@ -145,26 +145,26 @@ class RisksQuerySet(Abstract):  # 风险快讯
 
     def get_all_risk_list(self):
         # yqj article query
-        fields = ('base_article', )
         cond = {
             'category__level': getattr(self, 'level', None),
             'category__name': getattr(self, 'category_name', None),
         }
         args = dict([k, v] for k, v in cond.items() if v)
-        uuids = YqjArticle.objects.filter(**args).values(*fields)
+        uuids = YqjArticle.objects.filter(**args).values_list('base_article', flat=True)
 
         # base article query
         fields = ('guid', 'url', 'title', 'pubtime', 'source', 'score',)
         cond = {
-            'guid__in': uuids,
             'pubtime__gte': getattr(self, 'starttime', None),
             'pubtime__lt': getattr(self, 'endtime', None),
             'title__contains': getattr(self, 'title', None),
             'source__contains': getattr(self, 'source', None),
         }
         args = dict([k, v] for k, v in cond.items() if v)
-        queryset = BaseArticle.objects.filter(
-            **args).values(*fields).order_by('-pubtime')
+
+        queryset = BaseArticle.objects.filter(**args).values(*fields).order_by('-pubtime')
+
+        queryset = queryset.filter(guid__in=uuids) if uuids.exists() else queryset
 
         return queryset
 
@@ -176,13 +176,11 @@ class CategoryQuerySet(Abstract):  # 业务信息
 
     def get_all_category_list(self, name):
         # yqj article query
-        uuids = YqjArticle.objects.filter(category__name=name).values('base_article')
 
         # base article query
         fields = ('guid', 'url', 'title', 'pubtime',
                   'source', 'reprinted', 'area')
         cond = {
-            'guid__in': uuids,
             'pubtime__gte': getattr(self, 'starttime', None),
             'pubtime__lt': getattr(self, 'endtime', None),
             'area__name': getattr(self, 'area', None),
@@ -190,8 +188,8 @@ class CategoryQuerySet(Abstract):  # 业务信息
             'source__contains': getattr(self, 'source', None),
         }
         args = dict([k, v] for k, v in cond.items() if v)
-        queryset = BaseArticle.objects.filter(
-            **args).values(*fields).order_by('-pubtime')
+
+        queryset = BaseArticle.objects.filter(**args).values(*fields).order_by('-pubtime')
 
         return queryset
 
@@ -211,8 +209,8 @@ class AreaQuerySet(Abstract):  # 区域状况
             'pubtime__lt': getattr(self, 'endtime', None),
         }
         args = dict([k, v] for k, v in cond.items() if v)
-        queryset = BaseArticle.objects.filter(
-            **args).values(*fields).order_by('-pubtime')
+
+        queryset = BaseArticle.objects.filter(**args).values(*fields).order_by('-pubtime')
 
         return queryset
 

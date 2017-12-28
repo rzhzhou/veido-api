@@ -1,3 +1,4 @@
+from time import time
 from datetime import date, datetime, timedelta
 
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
@@ -29,7 +30,7 @@ class BaseView(APIView):
     def set_params(self, request):
         for k, v in request.GET.items():
             self.query_params[k] = v
-        
+
         # set user id
         self.user_id = request.user.id
 
@@ -131,8 +132,8 @@ class NewsView(BaseView):  # 质监热点
         super(NewsView, self).set_params(request)
 
     def paging(self, queryset):
-        page = int(self.query_params.get('start'))+1
-        return super(NewsView, self).paging(queryset, page, self.query_params.get('length'))
+        page = int(self.query_params['start']) + 1
+        return super(NewsView, self).paging(queryset, page, self.query_params['length'])
 
     def serialize(self, queryset):
         total = queryset.count()
@@ -143,7 +144,7 @@ class NewsView(BaseView):  # 质监热点
                     'is_collection': is_collection(self.user_id, r['guid']),
                     'title': r['title'],
                     'source': r['source'],
-                    'area': get_area(r['area']),
+                    'area': r['area__name'],
                     'pubtime': data_format(r['pubtime']),
                     'reprinted': r['reprinted'],
                 }, results)
@@ -167,8 +168,8 @@ class EventView(BaseView):  # 质量事件
         super(EventView, self).set_params(request)
 
     def paging(self, queryset):
-        page = int(self.query_params.get('start'))+1
-        return super(EventView, self).paging(queryset, page, self.query_params.get('length'))
+        page = int(self.query_params['start']) + 1
+        return super(EventView, self).paging(queryset, page, self.query_params['length'])
 
     def serialize(self, queryset):
         total = queryset.count()
@@ -180,7 +181,7 @@ class EventView(BaseView):  # 质量事件
                     'is_collection': is_collection(self.user_id, r['guid']),
                     'title': r['title'],
                     'source': r['source'],
-                    'area': get_area(r['area']),
+                    'area': r['area__name'],
                     'pubtime': data_format(r['pubtime']),
                     'reprinted': r['reprinted'],
                 }, results)
@@ -205,8 +206,8 @@ class ReferenceView(BaseView):  # 信息参考
         super(ReferenceView, self).set_params(request)
 
     def paging(self, queryset):
-        page = int(self.query_params.get('start'))+1
-        return super(ReferenceView, self).paging(queryset, page, self.query_params.get('length'))
+        page = int(self.query_params['start']) + 1
+        return super(ReferenceView, self).paging(queryset, page, self.query_params['length'])
 
     def serialize(self, queryset):
         total = queryset.count()
@@ -241,8 +242,8 @@ class InsightView(BaseView):  # 专家视点
         super(InsightView, self).set_params(request)
 
     def paging(self, queryset):
-        page = int(self.query_params.get('start'))+1
-        return super(InsightView, self).paging(queryset, page, self.query_params.get('length'))
+        page = int(self.query_params['start']) + 1
+        return super(InsightView, self).paging(queryset, page, self.query_params['length'])
 
     def serialize(self, queryset):
         total = queryset.count()
@@ -277,8 +278,8 @@ class RiskView(BaseView):  # 风险快讯
         super(RiskView, self).set_params(request)
 
     def paging(self, queryset):
-        page = int(self.query_params.get('start'))+1
-        return super(RiskView, self).paging(queryset, page, self.query_params.get('length'))
+        page = int(self.query_params['start']) + 1
+        return super(RiskView, self).paging(queryset, page, self.query_params['length'])
 
     def serialize(self, queryset):
         total = queryset.count()
@@ -314,8 +315,8 @@ class InspectionView(BaseView):  # 抽检信息
         super(InspectionView, self).set_params(request)
 
     def paging(self, queryset):
-        page = int(self.query_params.get('start'))+1
-        return super(InspectionView, self).paging(queryset, page, self.query_params.get('length'))
+        page = int(self.query_params['start']) + 1
+        return super(InspectionView, self).paging(queryset, page, self.query_params['length'])
 
     def serialize(self, queryset):
         total = queryset.count()
@@ -352,8 +353,8 @@ class CategoryView(BaseView):  # 业务信息
         super(CategoryView, self).set_params(request)
 
     def paging(self, queryset):
-        page = int(self.query_params.get('start'))+1
-        return super(CategoryView, self).paging(queryset, page, self.query_params.get('length'))
+        page = int(self.query_params['start']) + 1
+        return super(CategoryView, self).paging(queryset, page, self.query_params['length'])
 
     def serialize(self, queryset):
         total = queryset.count()
@@ -363,7 +364,7 @@ class CategoryView(BaseView):  # 业务信息
                 'list': map(lambda r: {
                     'title': r['title'],
                     'pubtime': data_format(r['pubtime']),
-                    'area': get_area(r['area']),
+                    'area': r['area__name'],
                     'source': r['source'],
                     'url': r['url'],
                     'is_collection': is_collection(self.user_id, r['guid']),
@@ -390,8 +391,8 @@ class AreaView(BaseView):  # 区域信息
         super(AreaView, self).set_params(request)
 
     def paging(self, queryset):
-        page = int(self.query_params.get('start'))+1
-        return super(AreaView, self).paging(queryset, page, self.query_params.get('length'))
+        page = int(self.query_params['start']) + 1
+        return super(AreaView, self).paging(queryset, page, self.query_params['length'])
 
     def serialize(self, queryset):
         total = queryset.count()
@@ -401,7 +402,7 @@ class AreaView(BaseView):  # 区域信息
                 'list': map(lambda r: {
                     'title': r['title'],
                     'pubtime': data_format(r['pubtime']),
-                    'area': get_area(r['area']),
+                    'area': r['area__name'],
                     'source': r['source'],
                     'url': r['url'],
                     'is_collection': is_collection(self.user_id, r['guid']),
