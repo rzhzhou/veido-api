@@ -45,7 +45,39 @@ class ArticleView(BaseView):
     def paging(self, queryset):
         return super(ArticleView, self).paging(queryset, self.query_params.get('page', 1), self.query_params.get('length', 15))
 
-    def serialize(self, queryset):
+    def serialize0001(self, queryset):
+        total = queryset.count()
+        result = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda x: {
+                    'url': x['url'],
+                    'title': x['title'],
+                    'source': x['source'],
+                    'area': area(x['area_id']),
+                    'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
+                }, result),
+        }
+            
+        return data
+
+    def serialize0002(self, queryset):
+        total = queryset.count()
+        result = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda x: {
+                    'url': x['url'],
+                    'title': x['title'],
+                    'source': x['source'],
+                    'area': area(x['area_id']),
+                    'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
+                }, result),
+        }
+            
+        return data
+
+    def serialize0003(self, queryset):
         total = queryset.count()
         result = self.paging(queryset)
         data = {
@@ -66,7 +98,7 @@ class ArticleView(BaseView):
 
         queryset = ArticleData(params=self.query_params, category=category).get_all()
 
-        return Response(self.serialize(queryset))
+        return Response(eval('self.serialize%s' % category)(queryset))
 
 
 class IndustryView(BaseView):
