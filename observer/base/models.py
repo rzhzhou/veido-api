@@ -167,25 +167,17 @@ class Article(models.Model):
         return self.title
 
 
-class Category(models.Model):
-    guid = models.CharField(max_length=4, primary_key=True, editable=True, verbose_name='主键')
-    name = models.CharField(max_length=32, verbose_name='名称')
-
-    class Meta:
-        app_label = 'base'
-        verbose_name_plural = '类别'
-
-    def __str__(self):
-        return self.name
-
-
 class ArticleCategory(models.Model):
     article_id = models.CharField(max_length=32, verbose_name='文章GUID')
-    category_id = models.IntegerField(verbose_name='类别ID')
+    category = models.CharField(
+        max_length=4,
+        choices=(('0001', '质监热点'), ('0002', '风险快讯'), ('0003', '业务信息'), ),
+        verbose_name='信息类别'
+    )
 
     class Meta:
         app_label = 'base'
         verbose_name_plural = '文章类别'
 
     def __str__(self):
-        return self.article_id + ' - ' + self.category_id
+        return self.category

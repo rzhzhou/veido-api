@@ -55,10 +55,6 @@ class ArticleAdmin(ImportExportActionModelAdmin):
     pass
 
 
-class CategoryAdmin(ImportExportActionModelAdmin):
-    pass
-
-
 class ArticleCategoryAdmin(ImportExportActionModelAdmin):
     pass
 
@@ -72,5 +68,4 @@ admin.site.register(Inspection, InspectionAdmin)
 admin.site.register(Enterprise, EnterpriseAdmin)
 admin.site.register(InspectionEnterprise, InspectionEnterpriseAdmin)
 admin.site.register(Article, ArticleAdmin)
-admin.site.register(Category, CategoryAdmin)
 admin.site.register(ArticleCategory, ArticleCategoryAdmin)
