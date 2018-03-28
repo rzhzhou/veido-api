@@ -6,7 +6,7 @@ from observer.base.models import Industry, AliasIndustry
 from observer.base.service.industry import (IndustryData, CCCIndustryData, LicenseIndustryData, 
                                             Select2IndustryData, )
 from observer.base.service.article import (ArticleData, )
-from observer.base.service.base import (area, )
+from observer.base.service.base import (area, category, )
 
 
 class BaseView(APIView):
@@ -54,7 +54,7 @@ class ArticleView(BaseView):
                     'url': x['url'],
                     'title': x['title'],
                     'source': x['source'],
-                    'area': area(x['area_id']),
+                    'area': area(x['guid']),
                     'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
                 }, result),
         }
@@ -70,8 +70,10 @@ class ArticleView(BaseView):
                     'url': x['url'],
                     'title': x['title'],
                     'source': x['source'],
-                    'area': area(x['area_id']),
+                    'area': area(x['guid']),
                     'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
+                    'score': x['score'],
+                    'local_related': 1, # 本地风险相关度
                 }, result),
         }
             
@@ -83,10 +85,11 @@ class ArticleView(BaseView):
         data = {
             'total': total,
             'list': map(lambda x: {
+                    'category': category(x['guid']),
                     'url': x['url'],
                     'title': x['title'],
                     'source': x['source'],
-                    'area': area(x['area_id']),
+                    'area': area(x['guid']),
                     'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
                 }, result),
         }
