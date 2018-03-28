@@ -7,6 +7,7 @@ from observer.base.service.industry import (IndustryData, CCCIndustryData, Licen
                                             Select2IndustryData, )
 from observer.base.service.article import (ArticleData, )
 from observer.base.service.base import (area, category, )
+from observer.utils.date_format import date_format
 
 
 class BaseView(APIView):

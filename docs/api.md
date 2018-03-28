@@ -269,7 +269,7 @@ http://192.168.0.103:8001/api/license/1000/
 | url | String | 网址 |
 | title | String | 标题 |
 | source | String | 来源 |
-| area | String | 地域 |
+| area | List | 地域的列表 |
 | pubtime | String | 发布时间 |
 
 **4. 实例**
@@ -283,9 +283,144 @@ http://192.168.0.103:8001/api/articles/0001/
 输出
 ```
 {
-    "total": 1,
+    "total": 61,
     "list": [
-        
+        {
+            "area": [
+                "咸宁"
+            ],
+            "source": "中国质量新闻网",
+            "url": "http://www.cqn.com.cn/cj/content/2018-03/26/content_5592714.htm",
+            "pubtime": "2018-03-26",
+            "title": "梁朝伟代言的丸美IPO:3年砸10亿做广告 产品屡上质检黑榜"
+        },
+        ...
+    ]
+}
+```
+
+
+*****
+### **0007**
+
+**1. 接口描述**
+
+本接口 (articles/0002/) 用于获取风险快讯数据.
+
+**2. 输入参数**
+
+| 参数名称 |    类型   | 是否必选 |  描述       |
+| :------| :-------- | :------ |:----------|
+| page | Int        |  是     | 页码. 值范围(1~+&). 默认值: 1|
+| length | Int        |  是     | 页长度. 值范围(15~+&). 默认值: 15|
+| starttime| Date        |  否     | 开始时间. |
+| endtime| Date        |  否     | 结束时间 |
+| starttime| Date        |  否     | 开始时间. |
+| title| String        |  否     | 标题。注：模糊匹配 |
+| source| String        |  否     | 来源。注：模糊匹配 |
+| areas | Int        |  否     | 地域ID。注：精确匹配。select2 |
+
+
+**3. 输出参数**
+
+| 参数名称 |    类型   |     描述   |
+| :------| :-------- | :-------- |
+| total| Int | 符合条件的信息数量。 |
+| list | List | 符合条件的详细信息列表。 |
+| url | String | 网址 |
+| title | String | 标题 |
+| source | String | 来源 |
+| area | List | 地域的列表 |
+| pubtime | String | 发布时间 |
+| score | Int | 风险程度 |
+| local_related | Int | 本地相关 |
+
+**4. 实例**
+
+输入
+
+```
+http://192.168.0.103:8001/api/articles/0002/
+```
+
+输出
+```
+{
+    "total": 52,
+    "list": [
+        {
+            "url": "http://www.cqn.com.cn/cj/content/2018-03/26/content_5592714.htm",
+            "area": [
+                "咸宁"
+            ],
+            "score": 0,
+            "local_related": 1,
+            "pubtime": "2018-03-26",
+            "title": "梁朝伟代言的丸美IPO:3年砸10亿做广告 产品屡上质检黑榜",
+            "source": "中国质量新闻网"
+        },
+        ...
+    ]
+}
+```
+
+
+*****
+### **0008**
+
+**1. 接口描述**
+
+本接口 (articles/0003/) 用于获取业务信息数据.
+
+**2. 输入参数**
+
+| 参数名称 |    类型   | 是否必选 |  描述       |
+| :------| :-------- | :------ |:----------|
+| page | Int        |  是     | 页码. 值范围(1~+&). 默认值: 1|
+| length | Int        |  是     | 页长度. 值范围(15~+&). 默认值: 15|
+| starttime| Date        |  否     | 开始时间. |
+| endtime| Date        |  否     | 结束时间 |
+| starttime| Date        |  否     | 开始时间. |
+| title| String        |  否     | 标题。注：模糊匹配 |
+| source| String        |  否     | 来源。注：模糊匹配 |
+| areas | Int        |  否     | 地域ID。注：精确匹配。select2 |
+
+
+**3. 输出参数**
+
+| 参数名称 |    类型   |     描述   |
+| :------| :-------- | :-------- |
+| total| Int | 符合条件的信息数量。 |
+| list | List | 符合条件的详细信息列表。 |
+| url | String | 网址 |
+| title | String | 标题 |
+| source | String | 来源 |
+| area | List | 地域的列表 |
+| pubtime | String | 发布时间 |
+
+**4. 实例**
+
+输入
+
+```
+http://192.168.0.103:8001/api/articles/0001/
+```
+
+输出
+```
+{
+    "total": 61,
+    "list": [
+        {
+            "area": [
+                "咸宁"
+            ],
+            "source": "中国质量新闻网",
+            "url": "http://www.cqn.com.cn/cj/content/2018-03/26/content_5592714.htm",
+            "pubtime": "2018-03-26",
+            "title": "梁朝伟代言的丸美IPO:3年砸10亿做广告 产品屡上质检黑榜"
+        },
+        ...
     ]
 }
 ```
