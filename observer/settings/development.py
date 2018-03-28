@@ -89,7 +89,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'HOST': 'gz-cdb-ko3zdkzs.sql.tencentcdb.com',
-        'NAME': 'observer_admin',
+        'NAME': 'observer',
         'USER': 'shendu',
         'PASSWORD': 'P@55word',
         'PORT': 63440,
