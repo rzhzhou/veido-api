@@ -42,6 +42,11 @@ class AreaAdmin(ImportExportActionModelAdmin, ForeignKeyAutocompleteAdmin):
     list_display = ('id', 'name', 'level', 'parent', )
 
 
+class UserAreaAdmin(ImportExportActionModelAdmin, ForeignKeyAutocompleteAdmin):
+    autocomplete_fields = ('user', 'area', )
+    list_display = ('user', 'area', )
+
+
 class InspectionAdmin(ImportExportActionModelAdmin):
     pass
 
@@ -67,6 +72,7 @@ admin.site.register(CCCIndustry, CCCIndustryAdmin)
 admin.site.register(LicenseIndustry, LicenseIndustryAdmin)
 admin.site.register(AliasIndustry, AliasIndustryAdmin)
 admin.site.register(Area, AreaAdmin)
+admin.site.register(UserArea, UserAreaAdmin)
 admin.site.register(Inspection, InspectionAdmin)
 admin.site.register(Enterprise, EnterpriseAdmin)
 admin.site.register(InspectionEnterprise, InspectionEnterpriseAdmin)

@@ -177,8 +177,6 @@ class Article(models.Model):
     invalid_keyword = models.CharField(max_length=255, blank=True, verbose_name='无效关键词')
     status = models.IntegerField(default=0, verbose_name='状态')# 0, 默认值 -1, 无效 1 有效
 
-    area_id = models.IntegerField(verbose_name='地域ID')
-
     class Meta:
         app_label = 'base'
         verbose_name_plural = '文章'
@@ -186,6 +184,15 @@ class Article(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class ArticleArea(models.Model):
+    article_id = models.CharField(max_length=32, verbose_name='文章GUID')
+    area_id = models.IntegerField(verbose_name='地域ID')
+    
+    class Meta:
+        app_label = 'base'
+        verbose_name_plural = '文章地域'
 
 
 class ArticleCategory(models.Model):
