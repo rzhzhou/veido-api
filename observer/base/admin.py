@@ -63,6 +63,13 @@ class ArticleAdmin(ImportExportActionModelAdmin):
     pass
 
 
+class CategoryAdmin(ImportExportActionModelAdmin):
+    resource_class = CategoryResources
+    autocomplete_fields = ('parent', )
+    search_fields = ('id', 'name', )
+    list_display = ('id', 'name', 'level', 'parent', )
+
+
 class ArticleCategoryAdmin(ImportExportActionModelAdmin):
     pass
 
@@ -77,4 +84,5 @@ admin.site.register(Inspection, InspectionAdmin)
 admin.site.register(Enterprise, EnterpriseAdmin)
 admin.site.register(InspectionEnterprise, InspectionEnterpriseAdmin)
 admin.site.register(Article, ArticleAdmin)
+admin.site.register(Category, CategoryAdmin)
 admin.site.register(ArticleCategory, ArticleCategoryAdmin)

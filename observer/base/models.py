@@ -195,13 +195,29 @@ class ArticleArea(models.Model):
         verbose_name_plural = '文章地域'
 
 
+class Category(models.Model):
+    id = models.CharField(max_length=5, primary_key=True, editable=True, verbose_name='类别ID')
+    name = models.CharField(max_length=10, verbose_name='名称')
+    level = models.IntegerField(verbose_name='等级')
+
+    parent = models.ForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        null=True, blank=True,
+        verbose_name='上一级'
+    )
+
+    class Meta:
+        app_label = 'base'
+        verbose_name_plural = '类别'
+
+    def __str__(self):
+        return self.name
+
+
 class ArticleCategory(models.Model):
     article_id = models.CharField(max_length=32, verbose_name='文章GUID')
-    category = models.CharField(
-        max_length=4,
-        choices=(('0001', '质监热点'), ('0002', '风险快讯'), ('0003', '业务信息'), ),
-        verbose_name='信息类别'
-    )
+    category_id = models.CharField(max_length=5, verbose_name='信息类别')
 
     class Meta:
         app_label = 'base'
