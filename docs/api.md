@@ -244,7 +244,7 @@ http://192.168.0.103:8001/api/license/1000/
 
 **1. 接口描述**
 
-本接口 (articles/0001/) 用于获取许可证行业数据.
+本接口 (articles/0001/) 用于获取质监热点数据.
 
 **2. 输入参数**
 
@@ -257,7 +257,7 @@ http://192.168.0.103:8001/api/license/1000/
 | starttime| Date        |  否     | 开始时间. |
 | title| String        |  否     | 标题。注：模糊匹配 |
 | source| String        |  否     | 来源。注：模糊匹配 |
-| area | Int        |  否     | 地域ID。注：精确匹配 |
+| areas | Int        |  否     | 地域ID。注：精确匹配。select2 |
 
 
 **3. 输出参数**

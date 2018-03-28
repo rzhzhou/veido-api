@@ -60,7 +60,9 @@ class InspectionEnterpriseAdmin(ImportExportActionModelAdmin):
 
 
 class ArticleAdmin(ImportExportActionModelAdmin):
-    pass
+    resource_class = ArticleResources
+    search_fields = ('title', 'source', )
+    list_display = ('title', 'url', 'pubtime', 'source', 'score', )
 
 
 class CategoryAdmin(ImportExportActionModelAdmin):

@@ -222,6 +222,3 @@ class ArticleCategory(models.Model):
     class Meta:
         app_label = 'base'
         verbose_name_plural = '文章类别'
-
-    def __str__(self):
-        return self.category

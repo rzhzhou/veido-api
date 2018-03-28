@@ -4,8 +4,9 @@ from import_export.widgets import (DateWidget, ForeignKeyWidget,
 from import_export import widgets
 from import_export import resources, fields
 
-from observer.base.models import (Industry, Area, Category, )
+from observer.base.models import *
 from observer.utils.str_format import str_to_md5str
+from observer.utils.date_format import date_format
 
 
 class IndustryResources(resources.ModelResource):
@@ -73,3 +74,47 @@ class CategoryResources(resources.ModelResource):
                 instance.parent = category
             except ObjectDoesNotExist:
                 pass
+
+
+class ArticleResources(resources.ModelResource):
+    guid = fields.Field(attribute='guid', column_name='GUID')
+    title = fields.Field(attribute='title', column_name='标题')
+    url = fields.Field(attribute='url', column_name='URL')
+    pubtime = fields.Field(attribute='pubtime', column_name='发布时间')
+    source = fields.Field(attribute='source', column_name='发布媒体')
+    score = fields.Field(attribute='score', column_name='风险程度')
+    area = fields.Field(attribute='area', column_name='地域')
+    category = fields.Field(attribute='category', column_name='类别')
+
+    class Meta:
+        model = Article
+        import_id_fields = ('guid',)
+        fields = ('guid', 'title', 'url', 'pubtime', 'source', 'score', )
+        export_order = ('guid', 'title', 'url', 'pubtime', 'source', 'score', )
+
+    def before_save_instance(self, instance, using_transactions, dry_run):
+        a_guid = str_to_md5str(instance.url)
+        instance.guid = a_guid
+
+        if Article.objects.filter(guid=a_guid).exists():
+            return
+
+        areas = instance.area.split(' ')
+        a_ids = Area.objects.filter(name__in=areas).values_list('id', flat=True)
+        categorys = instance.category.split(' ')
+        c_ids = Category.objects.filter(name__in=categorys).values_list('id', flat=True)
+
+        for a_id in a_ids:
+            if not ArticleArea.objects.filter(article_id=a_guid, area_id=a_id).exists():
+                ArticleArea(
+                    article_id=a_guid,
+                    area_id=a_id,
+                ).save()
+
+        for c_id in c_ids:
+            if not ArticleCategory.objects.filter(article_id=a_guid, category_id=c_id).exists():
+                ArticleCategory(
+                    article_id=a_guid,
+                    category_id=c_id,
+                ).save()
+
