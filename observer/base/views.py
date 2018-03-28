@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from observer.base.models import Industry, AliasIndustry
-from observer.base.service.base import (
+from observer.base.service.industry import (
                                         IndustryData, CCCIndustryData, LicenseIndustryData, 
                                         Select2IndustryData, 
                                         )

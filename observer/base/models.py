@@ -168,6 +168,7 @@ class Article(models.Model):
 
 
 class Category(models.Model):
+    guid = models.CharField(max_length=4, primary_key=True, editable=True, verbose_name='主键')
     name = models.CharField(max_length=32, verbose_name='名称')
 
     class Meta:
