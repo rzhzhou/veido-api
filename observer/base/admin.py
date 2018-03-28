@@ -4,7 +4,7 @@ from import_export.admin import ImportExportActionModelAdmin
 from django.core.exceptions import ObjectDoesNotExist
 
 from observer.base.models import *
-from observer.base.resource import IndustryResources
+from observer.base.resource import *
 from observer.utils.str_format import str_to_md5str
 
 
@@ -35,8 +35,11 @@ class AliasIndustryAdmin(ImportExportActionModelAdmin):
     list_display = ('name', 'industry_id', 'ccc_id', 'license_id', )
 
 
-class AreaAdmin(ImportExportActionModelAdmin):
-    pass
+class AreaAdmin(ImportExportActionModelAdmin, ForeignKeyAutocompleteAdmin):
+    resource_class = AreaResources
+    autocomplete_fields = ('parent', )
+    search_fields = ('id', 'name', )
+    list_display = ('id', 'name', 'level', 'parent', )
 
 
 class InspectionAdmin(ImportExportActionModelAdmin):

@@ -4,7 +4,7 @@ from import_export.widgets import (DateWidget, ForeignKeyWidget,
 from import_export import widgets
 from import_export import resources, fields
 
-from observer.base.models import Industry
+from observer.base.models import (Industry, Area, )
 from observer.utils.str_format import str_to_md5str
 
 
@@ -29,5 +29,26 @@ class IndustryResources(resources.ModelResource):
             try:
                 industry = Industry.objects.get(id=pre)
                 instance.parent = industry
+            except ObjectDoesNotExist:
+                pass
+
+
+class AreaResources(resources.ModelResource):
+    id = fields.Field(attribute='id', column_name='ID')
+    name = fields.Field(attribute='name', column_name='地域名称')
+    level = fields.Field(attribute='level', column_name='地域等级')
+    pre = fields.Field(attribute='pre', column_name='上一级ID')
+
+    class Meta:
+        model = Area
+        fields = ('id', 'name', 'level',)
+        export_order = ('id', 'name', 'level',)
+
+    def before_save_instance(self, instance, dry_run, temp=''):
+        pre = instance.pre
+        if pre:
+            try:
+                area = Area.objects.get(id=pre)
+                instance.parent = area
             except ObjectDoesNotExist:
                 pass

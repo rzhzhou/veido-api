@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 
 
@@ -18,6 +19,26 @@ class Area(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class UserArea(models.Model):
+    user = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE,
+        verbose_name='用户'
+    )
+    area = models.ForeignKey(
+        Area, 
+        on_delete=models.CASCADE,
+        verbose_name='地域'
+    )
+
+    class Meta:
+        app_label = 'base'
+        verbose_name_plural = '用户地域'
+
+    def __str__(self):
+        return self.user.username
 
 
 class Industry(models.Model):
@@ -99,7 +120,7 @@ class AliasIndustry(models.Model):
 
 
 class Inspection(models.Model):
-    guid = models.CharField(max_length=32, primary_key=True, verbose_name='主键')
+    guid = models.CharField(max_length=32, primary_key=True, editable=False, verbose_name='主键')
     title = models.CharField(max_length=255, verbose_name='标题')
     url = models.URLField(blank=True, null=True, verbose_name='网站链接')
     pubtime = models.DateTimeField(blank=True, null=True, verbose_name='发布时间')
@@ -146,7 +167,7 @@ class InspectionEnterprise(models.Model):
 
 
 class Article(models.Model):
-    guid = models.CharField(max_length=32, primary_key=True, verbose_name='主键')
+    guid = models.CharField(max_length=32, primary_key=True, editable=False, verbose_name='主键')
     title = models.CharField(max_length=255, blank=True, verbose_name='标题')
     url = models.URLField(verbose_name='网站链接')
     pubtime = models.DateTimeField(auto_now=False, verbose_name='发布时间')
