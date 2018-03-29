@@ -123,10 +123,11 @@ class Inspection(models.Model):
     guid = models.CharField(max_length=32, primary_key=True, editable=False, verbose_name='主键')
     title = models.CharField(max_length=255, verbose_name='标题')
     url = models.URLField(blank=True, null=True, verbose_name='网站链接')
-    pubtime = models.DateTimeField(blank=True, null=True, verbose_name='发布时间')
+    pubtime = models.DateField(verbose_name='发布时间')
     source = models.CharField(max_length=80, verbose_name='信息来源')
-    unitem = models.TextField(verbose_name='不合格项')
+    unitem = models.CharField(max_length=255, verbose_name='不合格项')
     qualitied = models.FloatField(default=1.0, verbose_name='合格率')
+    category = models.CharField(max_length=32, verbose_name='抽查类别')
     level = models.CharField(max_length=2, verbose_name='检验等级') # 国、省、市
 
     industry_id = models.IntegerField(verbose_name='行业/产品ID')

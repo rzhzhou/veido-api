@@ -4,10 +4,11 @@ from rest_framework.views import APIView
 
 from observer.base.models import Industry, AliasIndustry
 from observer.base.service.industry import (IndustryData, CCCIndustryData, LicenseIndustryData, 
-                                            Select2IndustryData,)
+                                            Select2IndustryData, )
 from observer.base.service.article import (ArticleData, )
+from observer.base.service.inspection import (InspectionData, )
 from observer.base.service.area import (Select2AreaData, )
-from observer.base.service.base import (areas, categories, local_related, )
+from observer.base.service.base import (areas, categories, local_related, area, industry, )
 from observer.utils.date_format import date_format
 
 
@@ -105,6 +106,44 @@ class ArticleView(BaseView):
         queryset = ArticleData(params=self.query_params, category=category).get_all()
 
         return Response(eval('self.serialize%s' % category)(queryset))
+
+
+class InspectionView(BaseView):
+
+    def __init__(self):
+        super(InspectionView, self).__init__()
+
+    def set_params(self, request):
+        super(InspectionView, self).set_params(request.GET)
+
+    def paging(self, queryset):
+        return super(InspectionView, self).paging(queryset, self.query_params.get('page', 1), self.query_params.get('length', 15))
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        result = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda x: {
+                    'industry': industry(x['industry_id']),
+                    'url': x['url'],
+                    'level': x['level'],
+                    'area': area(x['area_id']),
+                    'source': x['source'],
+                    'qualitied': x['qualitied'],
+                    'category': x['category'],
+                    'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
+                }, result),
+        }
+            
+        return data
+
+    def get(self, request):
+        self.set_params(request)
+
+        queryset = InspectionData(params=self.query_params).get_all()
+
+        return Response(self.serialize(queryset))
 
 
 class IndustryView(BaseView):

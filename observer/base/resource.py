@@ -118,3 +118,29 @@ class ArticleResources(resources.ModelResource):
                     category_id=c_id,
                 ).save()
 
+
+class InspectionResources(resources.ModelResource):
+    guid = fields.Field(attribute='guid', column_name='GUID')
+    title = fields.Field(attribute='title', column_name='标题')
+    url = fields.Field(attribute='url', column_name='URL')
+    pubtime = fields.Field(attribute='pubtime', column_name='发布时间')
+    source = fields.Field(attribute='source', column_name='抽检单位')
+    unitem = fields.Field(attribute='unitem', column_name='不合格项')
+    qualitied = fields.Field(attribute='qualitied', column_name='合格率')
+    category = fields.Field(attribute='category', column_name='抽查类别')
+    level = fields.Field(attribute='level', column_name='抽查级别')
+    industry_id = fields.Field(attribute='industry_id', column_name='行业ID')
+    area_id = fields.Field(attribute='area_id', column_name='地域ID')
+
+    class Meta:
+        model = Inspection
+        import_id_fields = ('guid',)
+        fields = ('guid', 'title', 'url', 'pubtime', 'source', 'unitem', 'qualitied', 'category', 'level', 'industry_id', 'area_id', )
+        export_order = ('guid', 'title', 'url', 'pubtime', 'source', 'unitem', 'qualitied', 'category', 'level', 'industry_id', 'area_id', )
+
+    def before_save_instance(self, instance, using_transactions, dry_run):
+        i_guid = str_to_md5str(instance.url)
+        instance.guid = i_guid
+
+        if Article.objects.filter(guid=i_guid).exists():
+            return

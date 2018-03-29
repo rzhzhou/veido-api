@@ -12,6 +12,7 @@
 | **0006** | articles/0001/ | 质监热点列表 | GET |
 | **0007** | articles/0002/ | 风险快讯列表 | GET |
 | **0008** | articles/0003/ | 业务信息列表 | GET |
+| **0009** | inspections | 抽检信息列表 | GET |
 | **2001** | select2/industries | 查询行业 | GET |
 | **2002** | select2/areas | 查询地域 | GET |
 
@@ -430,6 +431,73 @@ http://192.168.0.103:8001/api/articles/0003/
             ],
             "url": "http://dw.chinanews.com/chinanews/content.jsp?id=8467281&classify=zw&pageSize=6&language=chs",
             "pubtime": "2018-03-14"
+        },
+        ...
+    ]
+}
+```
+
+*****
+### **0009**
+
+**1. 接口描述**
+
+本接口 (inspections) 用于获取业务信息数据.
+
+**2. 输入参数**
+
+| 参数名称 |    类型   | 是否必选 |  描述       |
+| :------| :-------- | :------ |:----------|
+| page | Int        |  是     | 页码. 值范围(1~+&). 默认值: 1|
+| length | Int        |  是     | 页长度. 值范围(15~+&). 默认值: 15|
+| starttime| Date        |  否     | 开始时间. |
+| endtime| Date        |  否     | 结束时间 |
+| starttime| Date        |  否     | 开始时间. |
+| title| String        |  否     | 标题。注：模糊匹配 |
+| source| String        |  否     | 行政单位。 注：模糊匹配 |
+| category| String        |  否     | 抽查类别。 注：模糊匹配 |
+| level | Int        |  否     | 抽查级别。 值范围(国 省 市)。 注：精确匹配(单选)。select2 |
+| area | Int        |  否     | 地域ID。注：精确匹配(单选)。select2 |
+
+
+**3. 输出参数**
+
+| 参数名称 |    类型   |     描述   |
+| :------| :-------- | :-------- |
+| total| Int | 符合条件的信息数量。 |
+| list | List | 符合条件的详细信息列表。 |
+| category | String | 抽查类别 |
+| qualitied | Double | 抽查合格率 |
+| url | String | 网址 |
+| industry | String | 产品类别 |
+| pubtime | Date | 发布时间 |
+| area | String | 抽查地区 |
+| level | String | 抽查级别 |
+| source | String | 行政单位 |
+
+
+**4. 实例**
+
+输入
+
+```
+http://192.168.0.103:8001/api/inspections
+```
+
+输出
+```
+{
+    "total": 18,
+    "list": [
+        {
+            "category": "监督抽查",
+            "qualitied": 1.0,
+            "url": "http://www.zjbts.gov.cn/HTML/cctg/201803/bca33649-bb42-4046-a529-6b68e27d4aaa.html",
+            "industry": "电线电缆 - 许可证",
+            "pubtime": "2018-03-26",
+            "area": "浙江",
+            "level": "省",
+            "source": "浙江省质监局"
         },
         ...
     ]

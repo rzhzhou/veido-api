@@ -1,7 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 
 from observer.base.models import (Area, ArticleArea, ArticleCategory, 
-                                Category, UserArea, )
+                                Category, UserArea, AliasIndustry, )
 from observer.utils.date_format import date_format
 
 
@@ -44,3 +44,12 @@ def local_related(article_id, user):
 
     # 不符合上述所有情况
     return 1
+
+
+def area(area_id):
+    return Area.objects.get(id=area_id).name
+
+
+def industry(industry_id):
+    return AliasIndustry.objects.get(id=industry_id).name
+    

@@ -48,7 +48,9 @@ class UserAreaAdmin(ImportExportActionModelAdmin, ForeignKeyAutocompleteAdmin):
 
 
 class InspectionAdmin(ImportExportActionModelAdmin):
-    pass
+    resource_class = InspectionResources
+    search_fields = ('title', )
+    list_display = ('title', 'pubtime', 'source', 'unitem', 'qualitied', 'category', 'level', )
 
 
 class EnterpriseAdmin(ImportExportActionModelAdmin):
