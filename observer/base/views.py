@@ -4,8 +4,9 @@ from rest_framework.views import APIView
 
 from observer.base.models import Industry, AliasIndustry
 from observer.base.service.industry import (IndustryData, CCCIndustryData, LicenseIndustryData, 
-                                            Select2IndustryData, )
+                                            Select2IndustryData,)
 from observer.base.service.article import (ArticleData, )
+from observer.base.service.area import (Select2AreaData, )
 from observer.base.service.base import (areas, categories, )
 from observer.utils.date_format import date_format
 
@@ -293,5 +294,29 @@ class Select2IndustryView(BaseView):
         self.set_params(request)
 
         queryset = Select2IndustryData(params=self.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+
+class Select2AreaView(BaseView):
+
+    def __init__(self):
+        super(Select2AreaView, self).__init__()
+
+    def set_params(self, request):
+        super(Select2AreaView, self).set_params(request.GET)
+
+    def serialize(self, queryset):
+        data = map(lambda q: {
+            'id': q['id'],
+            'text': q['name'],
+        }, queryset)
+
+        return data
+
+    def get(self, request):
+        self.set_params(request)
+
+        queryset = Select2AreaData(params=self.query_params).get_all()
 
         return Response(self.serialize(queryset))
