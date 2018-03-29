@@ -5,16 +5,15 @@ from observer.base.models import (Area, ArticleArea, ArticleCategory,
 from observer.utils.date_format import date_format
 
 
-def area(article_id):
+def areas(article_id):
     a_ids = ArticleArea.objects.filter(article_id=article_id).values_list('area_id', flat=True)
     a_names = Area.objects.filter(id__in=a_ids).values_list('name', flat=True)
 
     return a_names if a_names else '未知'
 
 
-def category(article_id):
+def categories(article_id):
     a_ids = ArticleCategory.objects.filter(article_id=article_id).values_list('category_id', flat=True)
-    try:
-        return Category.objects.get(level=2, id=a_ids).name
-    except ObjectDoesNotExist:
-        return '未知'
+    c_names = Category.objects.filter(level=2, id__in=a_ids).values_list('name', flat=True)
+
+    return c_names if c_names else '未知'

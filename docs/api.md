@@ -257,7 +257,7 @@ http://192.168.0.103:8001/api/license/1000/
 | starttime| Date        |  否     | 开始时间. |
 | title| String        |  否     | 标题。注：模糊匹配 |
 | source| String        |  否     | 来源。注：模糊匹配 |
-| areas | Int        |  否     | 地域ID。注：精确匹配。select2 |
+| areas | Int        |  否     | 地域ID列表。注：精确匹配(多选)。select2 |
 
 
 **3. 输出参数**
@@ -269,7 +269,7 @@ http://192.168.0.103:8001/api/license/1000/
 | url | String | 网址 |
 | title | String | 标题 |
 | source | String | 来源 |
-| area | List | 地域的列表 |
+| areas | List | 地域的列表 |
 | pubtime | String | 发布时间 |
 
 **4. 实例**
@@ -286,7 +286,7 @@ http://192.168.0.103:8001/api/articles/0001/
     "total": 61,
     "list": [
         {
-            "area": [
+            "areas": [
                 "咸宁"
             ],
             "source": "中国质量新闻网",
@@ -318,7 +318,8 @@ http://192.168.0.103:8001/api/articles/0001/
 | starttime| Date        |  否     | 开始时间. |
 | title| String        |  否     | 标题。注：模糊匹配 |
 | source| String        |  否     | 来源。注：模糊匹配 |
-| areas | Int        |  否     | 地域ID。注：精确匹配。select2 |
+| areas | Int        |  否     | 地域ID列表。注：精确匹配(多选)。select2 |
+| score | Int        |  否     | 风险程度。注：精确匹配(单选)。select2：1-低，2-中，3-高|
 
 
 **3. 输出参数**
@@ -330,10 +331,10 @@ http://192.168.0.103:8001/api/articles/0001/
 | url | String | 网址 |
 | title | String | 标题 |
 | source | String | 来源 |
-| area | List | 地域的列表 |
+| areas | List | 地域的列表 |
 | pubtime | String | 发布时间 |
-| score | Int | 风险程度 |
-| local_related | Int | 本地相关 |
+| score | Int | 风险程度。注：0-无，1-低，2-中，3-高 |
+| local_related | Int | 本地相关。注：1-低，2-中，3-高  |
 
 **4. 实例**
 
@@ -350,7 +351,7 @@ http://192.168.0.103:8001/api/articles/0002/
     "list": [
         {
             "url": "http://www.cqn.com.cn/cj/content/2018-03/26/content_5592714.htm",
-            "area": [
+            "areas": [
                 "咸宁"
             ],
             "score": 0,
@@ -383,7 +384,8 @@ http://192.168.0.103:8001/api/articles/0002/
 | starttime| Date        |  否     | 开始时间. |
 | title| String        |  否     | 标题。注：模糊匹配 |
 | source| String        |  否     | 来源。注：模糊匹配 |
-| areas | Int        |  否     | 地域ID。注：精确匹配。select2 |
+| areas | Int        |  否     | 地域ID列表。注：精确匹配(多选)。select2 |
+| categories | String        |  否     | 业务类别ID。注：精确匹配(单选)。select2：00039-质量管理，00038-认证监管，00037-计量，00036-特种设备，00035-科技兴检，00034-质量监管，00033-稽查打假，00032-标准化，00031-综合 |
 
 
 **3. 输出参数**
@@ -397,13 +399,15 @@ http://192.168.0.103:8001/api/articles/0002/
 | source | String | 来源 |
 | area | List | 地域的列表 |
 | pubtime | String | 发布时间 |
+| areas | List | 地域的列表 |
+| categories | List | 类别的列表 |
 
 **4. 实例**
 
 输入
 
 ```
-http://192.168.0.103:8001/api/articles/0001/
+http://192.168.0.103:8001/api/articles/0003/
 ```
 
 输出
@@ -412,13 +416,19 @@ http://192.168.0.103:8001/api/articles/0001/
     "total": 61,
     "list": [
         {
-            "area": [
-                "咸宁"
+            "source": "中国新闻网",
+            "categories": [
+                "特种设备",
+                "认证监管",
+                "质量管理"
             ],
-            "source": "中国质量新闻网",
-            "url": "http://www.cqn.com.cn/cj/content/2018-03/26/content_5592714.htm",
-            "pubtime": "2018-03-26",
-            "title": "梁朝伟代言的丸美IPO:3年砸10亿做广告 产品屡上质检黑榜"
+            "title": "对儿童安全构成威胁 指尖陀螺被欧盟列为危险品",
+            "areas": [
+                "北京",
+                "上海"
+            ],
+            "url": "http://dw.chinanews.com/chinanews/content.jsp?id=8467281&classify=zw&pageSize=6&language=chs",
+            "pubtime": "2018-03-14"
         },
         ...
     ]
