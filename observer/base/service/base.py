@@ -35,7 +35,7 @@ def local_related(article_id, user):
         if u_level == 2:
             if f(Area.objects.filter(parent=u_area).values_list('id', flat=True), a_ids):
                 return 3
-        # 当前用户的地域是省份城市
+        # 当前用户的地域是市级城市
         elif u_level == 3:
             if u_area.parent.id in a_ids:
                 return 2
