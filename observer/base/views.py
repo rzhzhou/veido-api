@@ -7,7 +7,7 @@ from observer.base.service.industry import (IndustryData, CCCIndustryData, Licen
                                             Select2IndustryData,)
 from observer.base.service.article import (ArticleData, )
 from observer.base.service.area import (Select2AreaData, )
-from observer.base.service.base import (areas, categories, )
+from observer.base.service.base import (areas, categories, local_related, )
 from observer.utils.date_format import date_format
 
 
@@ -42,6 +42,7 @@ class ArticleView(BaseView):
         super(ArticleView, self).__init__()
 
     def set_params(self, request):
+        self.user = request.user
         super(ArticleView, self).set_params(request.GET)
 
     def paging(self, queryset):
@@ -75,7 +76,7 @@ class ArticleView(BaseView):
                     'areas': areas(x['guid']),
                     'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
                     'score': x['score'],
-                    'local_related': 1, # 本地风险相关度
+                    'local_related': local_related(x['guid'], self.user), # 本地风险相关度
                 }, result),
         }
             
