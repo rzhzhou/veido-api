@@ -38,7 +38,7 @@ class ArticleData(Abstract):
             queryset = queryset.filter(guid__in=a_ids)
 
         if area_ids:
-            a_ids = ArticleArea.objects.filter(area_id__in=area_ids).values_list('article_id', flat=True)
+            a_ids = ArticleArea.objects.filter(area_id__in=area_ids.split(',')).values_list('article_id', flat=True)
             queryset = queryset.filter(guid__in=a_ids)
 
 
