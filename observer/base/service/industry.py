@@ -76,14 +76,14 @@ class Select2IndustryData(Abstract):  # 获取行业名称
         fields = ('id', 'name',)
 
         cond = {
-            'id__istartswith': getattr(self, 'text', None),
-            'name__istartswith': getattr(self, 'text', None),
             'level': getattr(self, 'level'),
             'parent': getattr(self, 'parent', None),
         }
+
+        text = getattr(self, 'text', None)
 
         args = dict([k, v] for k, v in cond.items() if v)
         
         queryset = Industry.objects.filter(**args).values(*fields)
 
-        return queryset
+        return queryset.filter(Q(id__istartswith=text) | Q(name__istartswith=text)) if text else queryset
