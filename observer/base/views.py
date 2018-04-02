@@ -328,20 +328,15 @@ class DMLinkView(BaseView):
         return super(DMLinkView, self).paging(queryset, self.query_params.get('page', 1), self.query_params.get('length', 15))
 
     def serialize(self, queryset):
-        count = len(queryset)
+        total = queryset.count()
         results = self.paging(queryset)
-        data = {'total': count,
+        data = {'total': total,
                 'list': map(lambda r: {
-                    'id': r['id'],
-                    'DMLinkname': r['DMLinkname'],
-                    'first_name': r['first_name'],
-                    'last_name': r['last_name'],
-                    'email': r['email'],
-                    'is_active': r['is_active'],
-                    'is_superDMLink': r['is_superDMLink'],
-                    'last_login': date_format(r['last_login'], '%Y-%m-%d %H:%M:%S'),
-                    'date_joined': date_format(r['date_joined'], '%Y-%m-%d %H:%M:%S'),
-                    'flag': r['flag'],
+                    'name': r['name'], 
+                    'link': r['link'], 
+                    'kwords': r['kwords'], 
+                    'fwords': r['fwords'], 
+                    'status': r['status'], 
                 }, results)
                 }
 

@@ -14,23 +14,9 @@ class DMLinkData():  # 获取系统用户
         self.user = user
 
     def get_all(self):
-        fields = ('id', 'username', 'first_name', 'last_name', 'email',
-                  'is_active', 'is_superuser', 'last_login', 'date_joined')
+        fields = ('id', 'name', 'link', 'kwords', 'fwords', 'status',)
 
-        queryset = DMLink.objects.values(*fields)
-
-        if self.user.is_active:
-            if self.user.is_superuser:
-                list(map(lambda x: x.update({'flag': 1}), queryset))
-            else:
-                q1 = queryset.exclude(id=self.user.id)
-                list(map(lambda x: x.update({'flag': 0}), q1))
-
-                q2 = queryset.filter(id=self.user.id)
-                list(map(lambda x: x.update({'flag': 1}), q2))
-                queryset = list(chain(q1, q2))
-        else:
-            list(map(lambda x: x.update({'flag': 0}), queryset))
+        queryset = DMLink.objects.filter(create_by=self.user).values(*fields).order_by('-update_at')
 
         return queryset
 

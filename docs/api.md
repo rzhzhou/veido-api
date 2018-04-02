@@ -13,6 +13,7 @@
 | **0007** | articles/0002/ | 风险快讯列表 | GET |
 | **0008** | articles/0003/ | 业务信息列表 | GET |
 | **0009** | inspections | 抽检信息列表 | GET |
+| **1000** | dmlinks | 指定网站监测列表 | GET |
 | **1001** | dmlink/add | 指定网站监测 添加 | POST |
 | **1002** | dmlink/edit/<int:id>/ | 指定网站监测 修改 | POST |
 | **1002** | dmlink/delete/<int:id>/ | 指定网站监测 删除 | DELETE |
@@ -510,6 +511,58 @@ http://192.168.0.103:8001/api/inspections
 
 
 *****
+#### **1000**
+
+**1. 接口描述**
+
+本接口 (dmlinks) 获取当前用户所有指定监测。
+
+**2. 输入参数**
+
+| 参数名称 |    类型   | 是否必选 |  描述       |
+| :------| :-------- | :------ |:----------|
+| page | Int        |  是     | 页数。值范围 1~+∞|
+| length | Int       |  是     | 列表长度。值范围 15~+∞|
+
+**3. 输出参数**
+
+| 参数名称 |    类型   |     描述   | 
+| :------| :-------- | :-------- | 
+| total| Int | 符合条件的信息数量。 |
+| list | List | 符合条件的详细信息列表。 |
+| name | String | 网站名。 |
+| link | String | 网址。 |
+| kwords | String | 关键词 |
+| fwords | String | 过滤关键词 |
+| status | String | 状态。 值范围：(0：待执行；1：执行中；2：完成) |
+
+**4. 实例**
+
+输入
+
+```
+http://192.168.0.103:8001/api/dmlinks
+```
+
+输出
+```
+{
+    "total": 2,
+    "list": [
+        {
+            "name": "test",
+            "kwords": "test1 test2 test3",
+            "status": 0,
+            "fwords": "test4 test5",
+            "link": "http://localhost:8000/admin/base/dmlink/add/"
+        }
+        ...
+    ]
+}
+```
+
+
+*****
 ### **1001**
 
 **1. 接口描述**
@@ -596,7 +649,7 @@ Tips:
 
 **1. 接口描述**
 
-本接口 (user/delete/<int:id>/) 用于删除指定监测. 
+本接口 (dmlink/delete/<int:id>/) 用于删除指定监测. 
 
 Tips: 
 - <int:id>: 需要删除的指定监测ID
