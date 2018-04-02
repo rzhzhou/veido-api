@@ -5,9 +5,10 @@ from rest_framework.views import APIView
 from observer.base.models import Industry, AliasIndustry
 from observer.base.service.industry import (IndustryData, CCCIndustryData, LicenseIndustryData, 
                                             Select2IndustryData, )
-from observer.base.service.article import (ArticleData, )
-from observer.base.service.inspection import (InspectionData, )
-from observer.base.service.area import (Select2AreaData, )
+from observer.base.service.article import ArticleData
+from observer.base.service.inspection import InspectionData
+from observer.base.service.area import Select2AreaData
+from observer.base.service.dmlink import DMLinkAdd
 from observer.base.service.base import (areas, categories, local_related, area, industry, )
 from observer.utils.date_format import date_format
 
@@ -312,6 +313,22 @@ class LicenseIndustryView(BaseView):
         else:
             queryset = LicenseIndustryData(params=self.query_params).get_by_id(lid)
             return Response(self.serialize2(queryset))
+
+
+class DMLinkAddView(BaseView):
+
+    def __init__(self):
+        super(DMLinkAddView, self).__init__()
+
+    def set_params(self, request):
+        super(DMLinkAddView, self).set_params(request.POST)
+
+    def post(self, request):
+        self.set_params(request)
+
+        queryset = DMLinkAdd(user=request.user, params=self.query_params).add_dmlink()
+
+        return Response(queryset)
 
 
 class Select2IndustryView(BaseView):
