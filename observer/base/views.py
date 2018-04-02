@@ -8,7 +8,8 @@ from observer.base.service.industry import (IndustryData, CCCIndustryData, Licen
 from observer.base.service.article import ArticleData
 from observer.base.service.inspection import InspectionData
 from observer.base.service.area import Select2AreaData
-from observer.base.service.dmlink import DMLinkAdd
+from observer.base.service.dmlink import (DMLinkData, DMLinkAdd, DMLinkEdit, DMLinkDelete, 
+                                            )
 from observer.base.service.base import (areas, categories, local_related, area, industry, )
 from observer.utils.date_format import date_format
 
@@ -315,6 +316,45 @@ class LicenseIndustryView(BaseView):
             return Response(self.serialize2(queryset))
 
 
+class DMLinkView(BaseView):
+
+    def __init__(self):
+        super(DMLinkView, self).__init__()
+
+    def set_params(self, request):
+        super(DMLinkView, self).set_params(request.GET)
+
+    def paging(self, queryset):
+        return super(DMLinkView, self).paging(queryset, self.query_params.get('page', 1), self.query_params.get('length', 15))
+
+    def serialize(self, queryset):
+        count = len(queryset)
+        results = self.paging(queryset)
+        data = {'total': count,
+                'list': map(lambda r: {
+                    'id': r['id'],
+                    'DMLinkname': r['DMLinkname'],
+                    'first_name': r['first_name'],
+                    'last_name': r['last_name'],
+                    'email': r['email'],
+                    'is_active': r['is_active'],
+                    'is_superDMLink': r['is_superDMLink'],
+                    'last_login': date_format(r['last_login'], '%Y-%m-%d %H:%M:%S'),
+                    'date_joined': date_format(r['date_joined'], '%Y-%m-%d %H:%M:%S'),
+                    'flag': r['flag'],
+                }, results)
+                }
+
+        return data
+
+    def get(self, request):
+        self.set_params(request)
+
+        queryset = DMLinkData(user=request.user).get_all()
+
+        return Response(self.serialize(queryset))
+
+
 class DMLinkAddView(BaseView):
 
     def __init__(self):
@@ -327,6 +367,32 @@ class DMLinkAddView(BaseView):
         self.set_params(request)
 
         queryset = DMLinkAdd(user=request.user, params=self.query_params).add_dmlink()
+
+        return Response(queryset)
+
+
+class DMLinkEditView(BaseView):
+
+    def __init__(self):
+        super(DMLinkEditView, self).__init__()
+
+    def set_params(self, request):
+        super(DMLinkEditView, self).set_params(request.POST)
+
+    def post(self, request, did):
+        self.set_params(request)
+        queryset = DMLinkEdit(params=self.query_params).edit_dmlink(did=did)
+
+        return Response(queryset)
+
+
+class DMLinkDeleteView(BaseView):
+
+    def __init__(self):
+        super(DMLinkDeleteView, self).__init__()
+
+    def delete(self, request, did):
+        queryset = DMLinkDelete(user=request.user).del_dmlink(did=did)
 
         return Response(queryset)
 
