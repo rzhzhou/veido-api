@@ -38,7 +38,8 @@ class DMLinkAdd(Abstract):
                 status=0,
                 create_by=self.user,
             ).save()
+            return 1
         except Exception as e:
             print(e)
-            return -3
+            return 0
 
