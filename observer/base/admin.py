@@ -83,6 +83,11 @@ class DMLinkAdmin(ImportExportActionModelAdmin, ForeignKeyAutocompleteAdmin):
     list_display = ('name', 'link', 'kwords', 'fwords', 'create_at', 'create_by', 'status', )
 
 
+class CorpusAdmin(ImportExportActionModelAdmin):
+    autocomplete_fields = ('industry', )
+    list_display = ('riskword', 'invalidword', 'industry', )
+
+
 admin.site.register(Industry, IndustryAdmin)
 admin.site.register(CCCIndustry, CCCIndustryAdmin)
 admin.site.register(LicenseIndustry, LicenseIndustryAdmin)
@@ -96,3 +101,4 @@ admin.site.register(Article, ArticleAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(ArticleCategory, ArticleCategoryAdmin)
 admin.site.register(DMLink, DMLinkAdmin)
+admin.site.register(Corpus, CorpusAdmin)

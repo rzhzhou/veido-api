@@ -119,6 +119,24 @@ class AliasIndustry(models.Model):
         return self.name
 
 
+class Corpus(models.Model):
+    riskword = models.CharField(max_length=255, verbose_name='风险语料词')
+    invalidword = models.CharField(max_length=255, verbose_name='无效词')
+
+    industry = models.ForeignKey(
+        AliasIndustry,
+        on_delete=models.CASCADE,
+        verbose_name='行业别名'
+    )
+
+    class Meta:
+        app_label = 'base'
+        verbose_name_plural = '语料库'
+
+    def __str__(self):
+        return industry_id
+
+
 class Inspection(models.Model):
     guid = models.CharField(max_length=32, primary_key=True, editable=False, verbose_name='主键')
     title = models.CharField(max_length=255, verbose_name='标题')
