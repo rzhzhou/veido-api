@@ -16,8 +16,7 @@
 | **1000** | dmlinks | 指定网站监测列表 | GET |
 | **1001** | dmlink/add | 指定网站监测 添加 | POST |
 | **1002** | dmlink/edit/<int:id>/ | 指定网站监测 修改 | POST |
-| **1002** | dmlink/delete/<int:id>/ | 指定网站监测 删除 | DELETE |
-| **1003** | dmlink/add | 指定网站监测 添加 | POST |
+| **1003** | dmlink/delete/<int:id>/ | 指定网站监测 删除 | DELETE |
 | **2001** | select2/industries | 查询行业 | GET |
 | **2002** | select2/areas | 查询地域 | GET |
 
