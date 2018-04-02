@@ -7,4 +7,4 @@ logger = Logger(ln='test')
 msg = """Scripts: <scripts/test.py>"""
 
 def run():
-    pass
+	print(str_to_md5str('wuhan'))

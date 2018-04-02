@@ -223,3 +223,27 @@ class ArticleCategory(models.Model):
     class Meta:
         app_label = 'base'
         verbose_name_plural = '文章类别'
+
+
+class DMLink(models.Model):
+    name = models.CharField(max_length=32, verbose_name='网站名')
+    link = models.URLField(verbose_name='网站链接')
+    kwords = models.CharField(max_length=255, verbose_name='关键词')
+    fwords = models.CharField(max_length=255, verbose_name='过滤词')
+    remarks = models.CharField(max_length=255, verbose_name='备注信息')
+    create_at = models.DateTimeField(verbose_name='创建时间')
+    update_at = models.DateTimeField(verbose_name='更新时间')
+    status = models.IntegerField(verbose_name='状态') # 0：待执行；1：执行中；2：完成
+
+    create_by = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name='创建者'
+    )
+
+    class Meta:
+        app_label = 'base'
+        verbose_name_plural = '指定监测-链接'
+
+    def __unicode__(self):
+        return self.link
