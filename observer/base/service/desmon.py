@@ -27,7 +27,7 @@ class DMLinkAdd(Abstract):
         super(DMLinkAdd, self).__init__(params)
         self.user = user
 
-    def add_user(self):
+    def add_dmlink(self):
         name = getattr(self, 'name')
         link = getattr(self, 'link')
         kwords = getattr(self, 'kwords', '')
@@ -62,7 +62,7 @@ class DMLinkEdit(Abstract):
     def __init__(self, params={}):
         super(DMLinkEdit, self).__init__(params)
 
-    def edit_user(self, did):
+    def edit_dmlink(self, did):
         edit_id = did
         name = getattr(self, 'name')
         link = getattr(self, 'link')
@@ -96,7 +96,7 @@ class DMLinkDelete(Abstract):
     def __init__(self, user):
         self.user = user
 
-    def del_user(self, did):
+    def del_dmlink(self, did):
         del_id = did
 
         try:
