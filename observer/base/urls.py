@@ -5,7 +5,7 @@ from observer.base.views import (
 								IndustryView, CCCIndustryView, LicenseIndustryView, 
 								Select2IndustryView, ArticleView, Select2AreaView,
                                 InspectionView, DMLinkView, DMLinkAddView, 
-                                DMLinkEditView, DMLinkDeleteView, 
+                                DMLinkEditView, DMLinkDeleteView, DMWordsView, 
 								)
 
 
@@ -20,6 +20,7 @@ urlpatterns = [
     path('dmlink/add', DMLinkAddView.as_view()),  # 添加指定监测-链接
     path('dmlink/edit/<int:did>/', DMLinkEditView.as_view()),  # 修改指定监测-链接
     path('dmlink/delete/<int:did>/', DMLinkDeleteView.as_view()),  # 删除指定监测-链接
+    path('dmwords', DMWordsView.as_view()),  # 指定监测-关键词 列表
 
     path('select2/industries', Select2IndustryView.as_view()),  # 行业名称
     path('select2/areas', Select2AreaView.as_view()),  # 地域名称

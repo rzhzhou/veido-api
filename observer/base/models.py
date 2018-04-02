@@ -133,9 +133,6 @@ class Corpus(models.Model):
         app_label = 'base'
         verbose_name_plural = '语料库'
 
-    def __str__(self):
-        return industry_id
-
 
 class Inspection(models.Model):
     guid = models.CharField(max_length=32, primary_key=True, editable=False, verbose_name='主键')

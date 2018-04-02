@@ -3,12 +3,12 @@ from datetime import datetime
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, Q, F
 
-from observer.base.models import DMLink
+from observer.base.models import (DMLink, Corpus, )
 from observer.base.service.abstract import Abstract
 from observer.utils.date_format import date_format
 
 
-class DMLinkData():  # 获取系统用户
+class DMLinkData():
 
     def __init__(self, user):
         self.user = user
@@ -57,7 +57,7 @@ class DMLinkAdd(Abstract):
             return 0
 
 
-class DMLinkEdit(Abstract):  # 修改用户
+class DMLinkEdit(Abstract): 
 
     def __init__(self, params={}):
         super(DMLinkEdit, self).__init__(params)
@@ -91,7 +91,7 @@ class DMLinkEdit(Abstract):  # 修改用户
             return 0
 
 
-class DMLinkDelete(Abstract):  # 删除用户
+class DMLinkDelete(Abstract): 
 
     def __init__(self, user):
         self.user = user
@@ -107,3 +107,11 @@ class DMLinkDelete(Abstract):  # 删除用户
             return 0
 
 
+class DMWordsData(): 
+
+    def get_all(self):
+        fields = ('id', 'riskword', 'invalidword', 'industry__name', )
+
+        queryset = Corpus.objects.all().values(*fields)
+
+        return queryset

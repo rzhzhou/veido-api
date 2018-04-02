@@ -8,7 +8,8 @@ from observer.base.service.industry import (IndustryData, CCCIndustryData, Licen
 from observer.base.service.article import ArticleData
 from observer.base.service.inspection import InspectionData
 from observer.base.service.area import Select2AreaData
-from observer.base.service.dmlink import (DMLinkData, DMLinkAdd, DMLinkEdit, DMLinkDelete, 
+from observer.base.service.desmon import (DMLinkData, DMLinkAdd, DMLinkEdit, DMLinkDelete, 
+                                        DMWordsData, 
                                             )
 from observer.base.service.base import (areas, categories, local_related, area, industry, )
 from observer.utils.date_format import date_format
@@ -390,6 +391,38 @@ class DMLinkDeleteView(BaseView):
         queryset = DMLinkDelete(user=request.user).del_dmlink(did=did)
 
         return Response(queryset)
+
+
+class DMWordsView(BaseView):
+
+    def __init__(self):
+        super(DMWordsView, self).__init__()
+
+    def set_params(self, request):
+        super(DMWordsView, self).set_params(request.GET)
+
+    def paging(self, queryset):
+        return super(DMWordsView, self).paging(queryset, self.query_params.get('page', 1), self.query_params.get('length', 15))
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        results = self.paging(queryset)
+        data = {'total': total,
+                'list': map(lambda r: {
+                    'industry': r['industry__name'], 
+                    'riskword': r['riskword'], 
+                    'invalidword': r['invalidword'], 
+                }, results)
+                }
+
+        return data
+
+    def get(self, request):
+        self.set_params(request)
+
+        queryset = DMWordsData().get_all()
+
+        return Response(self.serialize(queryset))
 
 
 class Select2IndustryView(BaseView):
