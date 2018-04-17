@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from observer.base.models import Industry, AliasIndustry
 from observer.base.service.industry import (IndustryData, CCCIndustryData, LicenseIndustryData, 
                                             Select2IndustryData, )
-from observer.base.service.article import ArticleData
+from observer.base.service.article import (ArticleData, RiskData, )
 from observer.base.service.inspection import InspectionData
 from observer.base.service.area import Select2AreaData
 from observer.base.service.desmon import (DMLinkData, DMLinkAdd, DMLinkEdit, DMLinkDelete, 
@@ -469,5 +469,43 @@ class Select2AreaView(BaseView):
         self.set_params(request)
 
         queryset = Select2AreaData(params=self.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+
+class RiskDataView(BaseView):
+
+    def __init__(self):
+        super(RiskDataView, self).__init__()
+
+    def set_params(self, request):
+        super(RiskDataView, self).set_params(request.GET)
+
+    def paging(self, queryset):
+        return super(RiskDataView, self).paging(queryset, self.query_params.get('page', 1), self.query_params.get('length', 15))
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        result = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda x: {
+                    'guid': x['guid'],
+                    'url': x['url'],
+                    'title': x['title'],
+                    'score': x['score'],
+                    'source': x['source'],
+                    'areas': areas(x['guid']),
+                    'categories': categories(x['guid']),
+                    'pubtime': date_format(x['pubtime'], '%Y-%m-%d %H:%M:%S'),
+                }, result),
+        }
+
+        return data
+
+    def get(self, request):
+        self.set_params(request)
+
+        queryset = RiskData(params=self.query_params).get_all()
 
         return Response(self.serialize(queryset))

@@ -20,6 +20,7 @@
 | **1004** | dmwords | 指定关键词监测列表 | GET |
 | **2001** | select2/industries | 查询行业 | GET |
 | **2002** | select2/areas | 查询地域 | GET |
+| **3001** | risk_data | 风险数据列表 | GET |
 
 *****
 ### API 详细信息
@@ -261,7 +262,6 @@ http://192.168.0.103:8001/api/license/1000/
 | length | Int        |  是     | 页长度. 值范围(15~+&). 默认值: 15|
 | starttime| Date        |  否     | 开始时间. |
 | endtime| Date        |  否     | 结束时间 |
-| starttime| Date        |  否     | 开始时间. |
 | title| String        |  否     | 标题。注：模糊匹配 |
 | source| String        |  否     | 来源。注：模糊匹配 |
 | areas | Int        |  否     | 地域ID列表。注：精确匹配(多选)。select2 |
@@ -322,7 +322,6 @@ http://192.168.0.103:8001/api/articles/0001/
 | length | Int        |  是     | 页长度. 值范围(15~+&). 默认值: 15|
 | starttime| Date        |  否     | 开始时间. |
 | endtime| Date        |  否     | 结束时间 |
-| starttime| Date        |  否     | 开始时间. |
 | title| String        |  否     | 标题。注：模糊匹配 |
 | source| String        |  否     | 来源。注：模糊匹配 |
 | areas | Int        |  否     | 地域ID列表。注：精确匹配(多选)。select2 |
@@ -388,7 +387,6 @@ http://192.168.0.103:8001/api/articles/0002/
 | length | Int        |  是     | 页长度. 值范围(15~+&). 默认值: 15|
 | starttime| Date        |  否     | 开始时间. |
 | endtime| Date        |  否     | 结束时间 |
-| starttime| Date        |  否     | 开始时间. |
 | title| String        |  否     | 标题。注：模糊匹配 |
 | source| String        |  否     | 来源。注：模糊匹配 |
 | areas | Int        |  否     | 地域ID列表。注：精确匹配(多选)。select2 |
@@ -457,7 +455,6 @@ http://192.168.0.103:8001/api/articles/0003/
 | length | Int        |  是     | 页长度. 值范围(15~+&). 默认值: 15|
 | starttime| Date        |  否     | 开始时间. |
 | endtime| Date        |  否     | 结束时间 |
-| starttime| Date        |  否     | 开始时间. |
 | title| String        |  否     | 标题。注：模糊匹配 |
 | source| String        |  否     | 行政单位。 注：模糊匹配 |
 | category| String        |  否     | 抽查类别。 注：模糊匹配 |
@@ -814,3 +811,75 @@ http://192.168.0.103:8001/api/select2/areas?
     ...
 ]
 ```
+
+
+*****
+### **3001**
+
+**1. 接口描述**
+
+本接口 (risk_data) 用于获取风险数据.
+
+**2. 输入参数**
+
+| 参数名称 |    类型   | 是否必选 |  描述       |
+| :------| :-------- | :------ |:----------|
+| page | Int        |  是     | 页码. 值范围(1~+&). 默认值: 1|
+| length | Int        |  是     | 页长度. 值范围(15~+&). 默认值: 15|
+| starttime| Date        |  否     | 开始时间. |
+| endtime| Date        |  否     | 结束时间 |
+| title| String        |  否     | 标题。注：模糊匹配 |
+| source| String        |  否     | 来源。注：模糊匹配 |
+| areas | Int        |  否     | 地域ID列表。注：精确匹配(多选)；多个值之间用逗号分割。select2 |
+
+
+**3. 输出参数**
+
+| 参数名称 |    类型   |     描述   |
+| :------| :-------- | :-------- |
+| total| Int | 符合条件的信息数量。 |
+| list | List | 符合条件的详细信息列表。 |
+| guid | String | GUID |
+| url | String | 网址 |
+| title | String | 标题 |
+| source | String | 来源 |
+| score | Int | 风险程度 |
+| pubtime | String | 发布时间 |
+| areas | List | 地域的列表 |
+| categories | List | 类别的列表 |
+
+**4. 实例**
+
+输入
+
+```
+http://192.168.0.103:8001/api/risk_data
+```
+
+输出
+```
+{
+    "total": 61,
+    "list": [
+        {
+            "source": "中国新闻网",
+            "title": "对儿童安全构成威胁 指尖陀螺被欧盟列为危险品",
+            "pubtime": "2018-03-14 00:00:00",
+            "url": "http://dw.chinanews.com/chinanews/content.jsp?id=8467281&classify=zw&pageSize=6&language=chs",
+            "guid": "528eb39855e876852c1f6371a82ea634",
+            "categories": [
+                "特种设备",
+                "认证监管",
+                "质量管理"
+            ],
+            "score": 2,
+            "areas": [
+                "北京",
+                "上海"
+            ]
+        },
+        ...
+    ]
+}
+```
+
