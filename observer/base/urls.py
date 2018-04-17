@@ -2,12 +2,13 @@ from django.urls import path, re_path
 from rest_framework_jwt import views
 
 from observer.base.views import (
-								IndustryView, CCCIndustryView, LicenseIndustryView, 
-								Select2IndustryView, ArticleView, Select2AreaView,
+                                IndustryView, CCCIndustryView, LicenseIndustryView, 
+                                Select2IndustryView, ArticleView, Select2AreaView,
                                 InspectionView, DMLinkView, DMLinkAddView, 
                                 DMLinkEditView, DMLinkDeleteView, DMWordsView, 
-                                RiskDataView, 
-								)
+                                RiskDataView, RiskDataAddView, RiskDataEditView, 
+                                RiskDataDeleteView,
+                                )
 
 
 urlpatterns = [
@@ -25,7 +26,9 @@ urlpatterns = [
 
     # ADMIN 
     path('risk_data', RiskDataView.as_view()),  # 风险数据
-    path('risk_data/add', RiskDataView.as_view()),  # 风险数据添加
+    path('risk_data/add', RiskDataAddView.as_view()),  # 风险数据添加
+    path('risk_data/edit/<int:aid>/', RiskDataEditView.as_view()),  # 风险数据修改
+    path('risk_data/delete/<int:aid>/', RiskDataDeleteView.as_view()),  # 风险数据删除
 
     path('select2/industries', Select2IndustryView.as_view()),  # 行业名称
     path('select2/areas', Select2AreaView.as_view()),  # 地域名称
@@ -36,4 +39,3 @@ urlpatterns += [
     re_path(r'^token-verify$', views.verify_jwt_token),
     re_path(r'^token-refresh$', views.refresh_jwt_token),
 ]
-

@@ -21,9 +21,9 @@
 | **2001** | select2/industries | 查询行业 | GET |
 | **2002** | select2/areas | 查询地域 | GET |
 | **3001** | risk_data | 风险数据列表 | GET |
-| **3002** | risk_data/add | 风险数据添加 | GET |
-| **3003** | risk_data/edit/<str:guid>/ | 风险数据修改 | GET |
-| **3004** | risk_data/delete/<str:guid>/ | 风险数据删除 | GET |
+| **3002** | risk_data/add | 风险数据添加 | POST |
+| **3003** | risk_data/edit/<str:guid>/ | 风险数据修改 | POST |
+| **3004** | risk_data/delete/<str:guid>/ | 风险数据删除 | DELETE |
 
 *****
 ### API 详细信息
@@ -933,11 +933,11 @@ http://192.168.0.103:8001/api/risk_data
 
 
 *****
-#### **1002**
+#### **3003**
 
 **1. 接口描述**
 
-本接口 (dmlink/edit/<int:id>/) 用于编辑指定监测. 
+本接口 (risk_data/edit/<int:id>/) 用于编辑风险数据. 
 
 Tips: 
 - <int:id>: 需要修改的指定监测ID
@@ -946,20 +946,23 @@ Tips:
 
 | 参数名称 |    类型   | 是否必选 |  描述       |
 | :------| :-------- | :------ |:----------|
-| name | String        |  是     | 网站名. |
-| link | String        |  是     | 网址. |
-| kwords | String        |  否     | 关键词. |
-| fwords | String        |  否     | 过滤词. |
-| remarks | String        |  否     | 备注信息. |
+| title | String | 否 | 标题.|
+| pubtime | String | 是 | 发布时间.|
+| score | String | 否 | 风险程度.|
+| source | String | 是 | 来源.|
+| areas | String | 是 | 地区. 注：多个地域ID之间以逗号分割.|
+| categories | String | 是 | 类别. 注：多个类别ID之间以逗号分割.|
 
 **3. 输出参数**
 
-| 参数名称 |    类型   |     描述   | 
-| :------| :-------- | :-------- | 
+| 参数名称 |    类型   |     描述   |
+| :------| :-------- | :-------- |
+| 2 | Int | 数据重复。注：根据 URL 去重。 |
 | 1 | Int | 成功 |
-| 0 | Int | 服务器异常 |
-| -1 | Int | name 为必填项 |
-| -2 | Int | link 为必填项 |
+| -2 | Int | 发布时间不能为空 |
+| -3 | Int | 来源不能为空 |
+| -4 | Int | 地域不能为空 |
+| -5 | Int | 类别不能为空 |
 
 **4. 实例**
 
@@ -975,11 +978,11 @@ Tips:
 ```
 
 *****
-#### **1003**
+#### **3004**
 
 **1. 接口描述**
 
-本接口 (dmlink/delete/<int:id>/) 用于删除指定监测. 
+本接口 (risk_data/delete/<int:id>/) 用于删除风险数据. 
 
 Tips: 
 - <int:id>: 需要删除的指定监测ID
@@ -993,7 +996,6 @@ Tips:
 | 参数名称 |    类型   |     描述   | 
 | :------| :-------- | :-------- | 
 | 1 | Int | 成功 |
-| 0 | Int | 服务器异常 |
 
 **4. 实例**
 

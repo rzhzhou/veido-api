@@ -537,9 +537,9 @@ class RiskDataEditView(BaseView):
     def set_params(self, request):
         super(RiskDataEditView, self).set_params(request.POST)
 
-    def post(self, request, did):
+    def post(self, request, aid):
         self.set_params(request)
-        queryset = RiskDataEdit(params=self.query_params).edit_riskdata(did=did)
+        queryset = RiskDataEdit(params=self.query_params).edit_riskdata(aid=aid)
 
         return Response(queryset)
 
@@ -549,8 +549,7 @@ class RiskDataDeleteView(BaseView):
     def __init__(self):
         super(RiskDataDeleteView, self).__init__()
 
-    def delete(self, request, did):
-        queryset = RiskDataDelete(user=request.user).del_riskdata(did=did)
+    def delete(self, request, aid):
+        queryset = RiskDataDelete(user=request.user).del_riskdata(aid=aid)
 
         return Response(queryset)
-

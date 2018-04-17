@@ -80,7 +80,7 @@ class RiskDataAdd(Abstract):
         super(RiskDataAdd, self).__init__(params)
         self.user = user
 
-    def add_dmlink(self):
+    def add_riskdata(self):
         url = getattr(self, 'url', '')
         title = getattr(self, 'title', '')
         pubtime = getattr(self, 'pubtime', '')
@@ -146,33 +146,52 @@ class RiskDataEdit(Abstract):
     def __init__(self, params={}):
         super(RiskDataEdit, self).__init__(params)
 
-    def edit_dmlink(self, did):
-        edit_id = did
-        name = getattr(self, 'name')
-        link = getattr(self, 'link')
-        kwords = getattr(self, 'kwords', '')
-        fwords = getattr(self, 'fwords', '')
-        remarks = getattr(self, 'remarks', '')
+    def edit_riskdata(self, aid):
+        edit_id = aid
+        title = getattr(self, 'title', '')
+        pubtime = getattr(self, 'pubtime', '')
+        score = getattr(self, 'score', 0)
+        source = getattr(self, 'source', '')
+        areas = getattr(self, 'areas', '')
+        categories = getattr(self, 'categories', '')
 
-        if not name:
-            return -1
-
-        if not link:
+        if not pubtime:
             return -2
 
-        try:
-            dmlink = Article.objects.get(id=edit_id)
-            dmlink.name = name
-            dmlink.link = link
-            dmlink.kwords = kwords
-            dmlink.fwords = fwords
-            dmlink.update_at = datetime.now()
-            dmlink.status = 0
-            dmlink.save()
-            return 1
-        except Exception as e:
-            print(e)
-            return 0
+        if not source:
+            return -3
+
+        if not areas:
+            return -4
+
+        if not categories:
+            return -5
+        
+        article = Article.objects.get(guid=edit_id)
+        article.title = title
+        article.pubtime = pubtime
+        article.score = score
+        article.source = source
+        article.save()
+
+        a_ids = areas.split(',')
+        c_ids = categories.split(',')
+
+        for a_id in a_ids:
+            if not ArticleArea.objects.filter(article_id=guid, area_id=a_id).exists():
+                ArticleArea(
+                    article_id=guid,
+                    area_id=a_id,
+                ).save()
+
+        for c_id in c_ids:
+            if not ArticleCategory.objects.filter(article_id=guid, category_id=c_id).exists():
+                ArticleCategory(
+                    article_id=guid,
+                    category_id=c_id,
+                ).save()
+
+        return 1
 
 
 class RiskDataDelete(Abstract): 
@@ -180,22 +199,7 @@ class RiskDataDelete(Abstract):
     def __init__(self, user):
         self.user = user
 
-    def del_dmlink(self, did):
-        del_id = did
-
-        try:
-            Article.objects.get(id=del_id).delete()
-            return 1
-        except Exception as e:
-            print(e)
-            return 0
-
-
-class DMWordsData(): 
-
-    def get_all(self):
-        fields = ('id', 'riskword', 'invalidword', 'industry__name', )
-
-        queryset = Corpus.objects.all().values(*fields)
-
-        return queryset
+    def del_riskdata(self, aid):
+        del_id = aid
+        Article.objects.get(guid=del_id).delete()
+        return 1
