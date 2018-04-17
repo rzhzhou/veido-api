@@ -5,7 +5,8 @@ from rest_framework.views import APIView
 from observer.base.models import Industry, AliasIndustry
 from observer.base.service.industry import (IndustryData, CCCIndustryData, LicenseIndustryData, 
                                             Select2IndustryData, )
-from observer.base.service.article import (ArticleData, RiskData, )
+from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd, RiskDataEdit, 
+                                            RiskDataDelete, )
 from observer.base.service.inspection import InspectionData
 from observer.base.service.area import Select2AreaData
 from observer.base.service.desmon import (DMLinkData, DMLinkAdd, DMLinkEdit, DMLinkDelete, 
@@ -509,3 +510,47 @@ class RiskDataView(BaseView):
         queryset = RiskData(params=self.query_params).get_all()
 
         return Response(self.serialize(queryset))
+
+
+
+class RiskDataAddView(BaseView):
+
+    def __init__(self):
+        super(RiskDataAddView, self).__init__()
+
+    def set_params(self, request):
+        super(RiskDataAddView, self).set_params(request.POST)
+
+    def post(self, request):
+        self.set_params(request)
+
+        queryset = RiskDataAdd(user=request.user, params=self.query_params).add_riskdata()
+
+        return Response(queryset)
+
+
+class RiskDataEditView(BaseView):
+
+    def __init__(self):
+        super(RiskDataEditView, self).__init__()
+
+    def set_params(self, request):
+        super(RiskDataEditView, self).set_params(request.POST)
+
+    def post(self, request, did):
+        self.set_params(request)
+        queryset = RiskDataEdit(params=self.query_params).edit_riskdata(did=did)
+
+        return Response(queryset)
+
+
+class RiskDataDeleteView(BaseView):
+
+    def __init__(self):
+        super(RiskDataDeleteView, self).__init__()
+
+    def delete(self, request, did):
+        queryset = RiskDataDelete(user=request.user).del_riskdata(did=did)
+
+        return Response(queryset)
+

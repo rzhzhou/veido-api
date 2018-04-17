@@ -25,6 +25,7 @@ urlpatterns = [
 
     # ADMIN 
     path('risk_data', RiskDataView.as_view()),  # 风险数据
+    path('risk_data/add', RiskDataView.as_view()),  # 风险数据添加
 
     path('select2/industries', Select2IndustryView.as_view()),  # 行业名称
     path('select2/areas', Select2AreaView.as_view()),  # 地域名称
