@@ -190,8 +190,7 @@ class RiskDataUpload(Abstract):
     def __init__(self, user):
         self.user = user
 
-    def upload_riskdata(self, filename, file_obj):
-        print(filename)
+    def upload_riskdata(self, file_obj):
         print(file_obj)
 
         return 200
