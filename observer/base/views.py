@@ -1,12 +1,13 @@
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.parsers import FileUploadParser
 
 from observer.base.models import Industry, AliasIndustry
 from observer.base.service.industry import (IndustryData, CCCIndustryData, LicenseIndustryData, 
                                             Select2IndustryData, )
 from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd, RiskDataEdit, 
-                                            RiskDataDelete, )
+                                            RiskDataDelete, RiskDataUpload, )
 from observer.base.service.inspection import InspectionData
 from observer.base.service.area import Select2AreaData
 from observer.base.service.desmon import (DMLinkData, DMLinkAdd, DMLinkEdit, DMLinkDelete, 
@@ -526,7 +527,7 @@ class RiskDataAddView(BaseView):
 
         queryset = RiskDataAdd(user=request.user, params=self.query_params).add_riskdata()
 
-        return Response(queryset)
+        return Response(status=queryset)
 
 
 class RiskDataEditView(BaseView):
@@ -541,7 +542,7 @@ class RiskDataEditView(BaseView):
         self.set_params(request)
         queryset = RiskDataEdit(params=self.query_params).edit_riskdata(aid=aid)
 
-        return Response(queryset)
+        return Response(status=queryset)
 
 
 class RiskDataDeleteView(BaseView):
@@ -552,4 +553,17 @@ class RiskDataDeleteView(BaseView):
     def delete(self, request, aid):
         queryset = RiskDataDelete(user=request.user).del_riskdata(aid=aid)
 
-        return Response(queryset)
+        return Response(status=queryset)
+
+
+class RiskDataUploadView(BaseView):
+    parser_classes = (FileUploadParser,)
+
+    def __init__(self):
+        super(RiskDataUploadView, self).__init__()
+
+    def put(self, request, filename):
+        file_obj = request.data['file']
+        queryset = RiskDataUpload(user=request.user).upload_riskdata(filename, file_obj)
+
+        return Response(status=queryset)

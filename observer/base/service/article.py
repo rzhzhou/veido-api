@@ -89,25 +89,13 @@ class RiskDataAdd(Abstract):
         areas = getattr(self, 'areas', '')
         categories = getattr(self, 'categories', '')
 
-        if not url:
-            return -1
-
-        if not pubtime:
-            return -2
-
-        if not source:
-            return -3
-
-        if not areas:
-            return -4
-
-        if not categories:
-            return -5
+        if not url or not pubtime or not source or not areas or not categories:
+            return 400
 
         guid = str_to_md5str(url)
 
         if Article.objects.filter(guid=guid).exists():
-            return 2
+            return 202
 
         Article(
             guid=guid,
@@ -138,7 +126,7 @@ class RiskDataAdd(Abstract):
                     category_id=c_id,
                 ).save()
 
-        return 1
+        return 200
 
 
 class RiskDataEdit(Abstract): 
@@ -155,18 +143,9 @@ class RiskDataEdit(Abstract):
         areas = getattr(self, 'areas', '')
         categories = getattr(self, 'categories', '')
 
-        if not pubtime:
-            return -2
+        if not pubtime or not source or not areas or not categories:
+            return 400
 
-        if not source:
-            return -3
-
-        if not areas:
-            return -4
-
-        if not categories:
-            return -5
-        
         article = Article.objects.get(guid=edit_id)
         article.title = title
         article.pubtime = pubtime
@@ -191,7 +170,7 @@ class RiskDataEdit(Abstract):
                     category_id=c_id,
                 ).save()
 
-        return 1
+        return 200
 
 
 class RiskDataDelete(Abstract): 
@@ -202,4 +181,17 @@ class RiskDataDelete(Abstract):
     def del_riskdata(self, aid):
         del_id = aid
         Article.objects.get(guid=del_id).delete()
-        return 1
+        
+        return 200
+
+
+class RiskDataUpload(Abstract): 
+
+    def __init__(self, user):
+        self.user = user
+
+    def upload_riskdata(self, filename, file_obj):
+        print(filename)
+        print(file_obj)
+
+        return 200
