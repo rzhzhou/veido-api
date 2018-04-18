@@ -8,7 +8,8 @@ from observer.base.service.industry import (IndustryData, CCCIndustryData, Licen
                                             Select2IndustryData, )
 from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd, RiskDataEdit, 
                                             RiskDataDelete, RiskDataUpload, )
-from observer.base.service.inspection import InspectionData
+from observer.base.service.inspection import (InspectionData, InspectionDataAdd, InspectionDataEdit, 
+                                            InspectionDataDelete, InspectionDataUpload, )
 from observer.base.service.area import Select2AreaData
 from observer.base.service.desmon import (DMLinkData, DMLinkAdd, DMLinkEdit, DMLinkDelete, 
                                         DMWordsData, 
@@ -525,7 +526,7 @@ class RiskDataAddView(BaseView):
     def post(self, request):
         self.set_params(request)
 
-        queryset = RiskDataAdd(user=request.user, params=self.query_params).add_riskdata()
+        queryset = RiskDataAdd(user=request.user, params=self.query_params).add()
 
         return Response(status=queryset)
 
@@ -540,7 +541,7 @@ class RiskDataEditView(BaseView):
 
     def post(self, request, aid):
         self.set_params(request)
-        queryset = RiskDataEdit(params=self.query_params).edit_riskdata(aid=aid)
+        queryset = RiskDataEdit(params=self.query_params).edit(aid=aid)
 
         return Response(status=queryset)
 
@@ -551,7 +552,7 @@ class RiskDataDeleteView(BaseView):
         super(RiskDataDeleteView, self).__init__()
 
     def delete(self, request, aid):
-        queryset = RiskDataDelete(user=request.user).del_riskdata(aid=aid)
+        queryset = RiskDataDelete(user=request.user).delete(aid=aid)
 
         return Response(status=queryset)
 
@@ -564,6 +565,99 @@ class RiskDataUploadView(BaseView):
 
     def put(self, request):
         file_obj = request.data['file']
-        queryset = RiskDataUpload(user=request.user).upload_riskdata(file_obj)
+        queryset = RiskDataUpload(user=request.user).upload(file_obj)
+
+        return Response(status=queryset)
+
+
+class InspectionDataView(BaseView):
+
+    def __init__(self):
+        super(InspectionDataView, self).__init__()
+
+    def set_params(self, request):
+        super(InspectionDataView, self).set_params(request.GET)
+
+    def paging(self, queryset):
+        return super(InspectionDataView, self).paging(queryset, self.query_params.get('page', 1), self.query_params.get('length', 15))
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        result = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda x: {
+                    'industry': industry(x['industry_id']),
+                    'url': x['url'],
+                    'level': x['level'],
+                    'area': area(x['area_id']),
+                    'source': x['source'],
+                    'qualitied': x['qualitied'],
+                    'category': x['category'],
+                    'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
+                }, result),
+        }
+            
+        return data
+
+    def get(self, request):
+        self.set_params(request)
+
+        queryset = InspectionData(params=self.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+
+class InspectionDataAddView(BaseView):
+
+    def __init__(self):
+        super(InspectionDataAddView, self).__init__()
+
+    def set_params(self, request):
+        super(InspectionDataAddView, self).set_params(request.POST)
+
+    def post(self, request):
+        self.set_params(request)
+
+        queryset = InspectionDataAdd(user=request.user, params=self.query_params).add()
+
+        return Response(status=queryset)
+
+
+class InspectionDataEditView(BaseView):
+
+    def __init__(self):
+        super(InspectionDataEditView, self).__init__()
+
+    def set_params(self, request):
+        super(InspectionDataEditView, self).set_params(request.POST)
+
+    def post(self, request, aid):
+        self.set_params(request)
+        queryset = InspectionDataEdit(params=self.query_params).edit(aid=aid)
+
+        return Response(status=queryset)
+
+
+class InspectionDataDeleteView(BaseView):
+
+    def __init__(self):
+        super(InspectionDataDeleteView, self).__init__()
+
+    def delete(self, request, aid):
+        queryset = InspectionDataDelete(user=request.user).delete(aid=aid)
+
+        return Response(status=queryset)
+
+
+class InspectionDataUploadView(BaseView):
+    parser_classes = (FileUploadParser,)
+
+    def __init__(self):
+        super(InspectionDataUploadView, self).__init__()
+
+    def put(self, request):
+        file_obj = request.data['file']
+        queryset = InspectionDataUpload(user=request.user).upload(file_obj)
 
         return Response(status=queryset)

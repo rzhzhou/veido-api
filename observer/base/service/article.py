@@ -80,7 +80,7 @@ class RiskDataAdd(Abstract):
         super(RiskDataAdd, self).__init__(params)
         self.user = user
 
-    def add_riskdata(self):
+    def add(self):
         url = getattr(self, 'url', '')
         title = getattr(self, 'title', '')
         pubtime = getattr(self, 'pubtime', '')
@@ -134,7 +134,7 @@ class RiskDataEdit(Abstract):
     def __init__(self, params={}):
         super(RiskDataEdit, self).__init__(params)
 
-    def edit_riskdata(self, aid):
+    def edit(self, aid):
         edit_id = aid
         title = getattr(self, 'title', '')
         pubtime = getattr(self, 'pubtime', '')
@@ -178,7 +178,7 @@ class RiskDataDelete(Abstract):
     def __init__(self, user):
         self.user = user
 
-    def del_riskdata(self, aid):
+    def delete(self, aid):
         del_id = aid
         Article.objects.filter(guid=del_id).update(status=-1)
         
@@ -190,7 +190,7 @@ class RiskDataUpload(Abstract):
     def __init__(self, user):
         self.user = user
 
-    def upload_riskdata(self, file_obj):
+    def upload(self, file_obj):
         print(file_obj)
 
         return 200

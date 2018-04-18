@@ -7,7 +7,9 @@ from observer.base.views import (
                                 InspectionView, DMLinkView, DMLinkAddView, 
                                 DMLinkEditView, DMLinkDeleteView, DMWordsView, 
                                 RiskDataView, RiskDataAddView, RiskDataEditView, 
-                                RiskDataDeleteView, RiskDataUploadView, 
+                                RiskDataDeleteView, RiskDataUploadView, InspectionDataView, 
+                                InspectionDataAddView, InspectionDataEditView, 
+                                InspectionDataDeleteView, InspectionDataUploadView, 
                                 )
 
 
@@ -30,6 +32,11 @@ urlpatterns = [
     path('risk_data/edit/<int:aid>/', RiskDataEditView.as_view()),  # 风险数据修改
     path('risk_data/delete/<int:aid>/', RiskDataDeleteView.as_view()),  # 风险数据删除
     path('risk_data/upload', RiskDataUploadView.as_view()),  # 风险数据上传
+    path('inspection_data', InspectionDataView.as_view()),  # 抽检数据
+    path('inspection_data/add', InspectionDataAddView.as_view()),  # 抽检数据添加
+    path('inspection_data/edit/<int:aid>/', InspectionDataEditView.as_view()),  # 抽检数据修改
+    path('inspection_data/delete/<int:aid>/', InspectionDataDeleteView.as_view()),  # 抽检数据删除
+    path('inspection_data/upload', InspectionDataUploadView.as_view()),  # 抽检数据上传
 
     path('select2/industries', Select2IndustryView.as_view()),  # 行业名称
     path('select2/areas', Select2AreaView.as_view()),  # 地域名称

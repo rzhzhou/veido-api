@@ -135,7 +135,7 @@ class Corpus(models.Model):
 
 
 class Inspection(models.Model):
-    guid = models.CharField(max_length=32, primary_key=True, editable=False, verbose_name='主键')
+    guid = models.CharField(max_length=32, primary_key=True, editable=False, verbose_name='主键') # url + industry_id -> md5
     title = models.CharField(max_length=255, verbose_name='标题')
     url = models.URLField(blank=True, null=True, verbose_name='网站链接')
     pubtime = models.DateField(verbose_name='发布时间')
@@ -144,6 +144,7 @@ class Inspection(models.Model):
     qualitied = models.FloatField(default=1.0, verbose_name='合格率')
     category = models.CharField(max_length=32, verbose_name='抽查类别')
     level = models.CharField(max_length=2, verbose_name='检验等级') # 国、省、市
+    status = models.IntegerField(default=0, verbose_name='状态')# 0, 默认值 -1, 无效 1 有效
 
     industry_id = models.IntegerField(verbose_name='行业/产品ID')
     area_id = models.IntegerField(verbose_name='地域ID')
