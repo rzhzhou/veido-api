@@ -53,3 +53,6 @@ def area(area_id):
 def industry(industry_id):
     return AliasIndustry.objects.get(id=industry_id).name
     
+
+def qualitied(q):
+    return '{0}%'.format('%.2f' % float(100.00 if not q else q * 100))

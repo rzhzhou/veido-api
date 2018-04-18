@@ -25,6 +25,11 @@
 | **30012** | risk_data/edit/<str:guid>/ | 风险数据修改 | POST |
 | **30013** | risk_data/delete/<str:guid>/ | 风险数据删除 | DELETE |
 | **30014** | risk_data/upload | 风险数据上传 | PUT |
+| **3002** | inspection_data | 抽检数据列表 | GET |
+| **30021** | inspection_data/add | 抽检数据添加 | POST |
+| **30022** | inspection_data/edit/<str:guid>/ | 抽检数据修改 | POST |
+| **30023** | inspection_data/delete/<str:guid>/ | 抽检数据删除 | DELETE |
+| **30024** | inspection_data/upload | 抽检数据上传 | PUT |
 
 *****
 ### API 详细信息
@@ -938,7 +943,7 @@ http://192.168.0.103:8001/api/risk_data
 本接口 (risk_data/edit/<int:id>/) 用于编辑风险数据. 
 
 Tips: 
-- <int:id>: 需要修改的指定监测ID
+- <int:id>: 需要修改的风险数据ID
 
 **2. 输入参数**
 
@@ -980,7 +985,7 @@ Tips:
 本接口 (risk_data/delete/<int:id>/) 用于删除风险数据. 
 
 Tips: 
-- <int:id>: 需要删除的指定监测ID
+- <int:id>: 需要删除的风险数据ID
 
 **2. 输入参数**
 
@@ -1013,6 +1018,235 @@ Tips:
 **1. 接口描述**
 
 本接口 (risk_data/upload) 用于上传风险数据. 
+
+Tips: 
+- 文件格式：xlsx
+
+**2. 输入参数**
+
+无
+
+**3. 输出参数**
+
+| 参数名称 |    类型   |     描述   | 
+| :------| :-------- | :-------- | 
+| 200 | HTTP Status Code | 请求已成功 |
+| 500 | HTTP Status Code | 服务器异常 |
+
+**4. 实例**
+
+输入
+
+```
+略
+```
+
+输出
+```
+略
+```
+
+
+
+*****
+### **3002**
+
+**1. 接口描述**
+
+本接口 (inspection_data) 用于获取抽检数据.
+
+**2. 输入参数**
+
+| 参数名称 |    类型   | 是否必选 |  描述       |
+| :------| :-------- | :------ |:----------|
+| page | Int        |  是     | 页码. 值范围(1~+&). 默认值: 1|
+| length | Int        |  是     | 页长度. 值范围(15~+&). 默认值: 15|
+| starttime| Date        |  否     | 开始时间. |
+| endtime| Date        |  否     | 结束时间 |
+| title| String        |  否     | 标题。注：模糊匹配 |
+| source| String        |  否     | 行政单位。 注：模糊匹配 |
+| category| String        |  否     | 抽查类别。 注：模糊匹配 |
+| level | Int        |  否     | 抽查级别。 值范围(国 省 市)。 注：精确匹配(单选)。select2 |
+| area | Int        |  否     | 地域ID。注：精确匹配(单选)。select2 |
+
+
+**3. 输出参数**
+
+| 参数名称 |    类型   |     描述   |
+| :------| :-------- | :-------- |
+| total| Int | 符合条件的信息数量。 |
+| list | List | 符合条件的详细信息列表。 |
+| category | String | 抽查类别 |
+| qualitied | Double | 抽查合格率 |
+| url | String | 网址 |
+| industry | String | 产品类别 |
+| pubtime | Date | 发布时间 |
+| area | String | 抽查地区 |
+| level | String | 抽查级别 |
+| source | String | 行政单位 |
+
+
+**4. 实例**
+
+输入
+
+```
+http://192.168.0.103:8001/api/inspection_data
+```
+
+输出
+```
+{
+    "total": 18,
+    "list": [
+        {
+            "area": "浙江",
+            "qualitied": "96.30%",
+            "category": "监督抽查",
+            "level": "省",
+            "pubtime": "2018-03-26",
+            "url": "http://www.zjbts.gov.cn/HTML/cctg/201803/2ec25119-699a-4b66-91dc-033cb1242383.html",
+            "source": "浙江省质监局",
+            "industry": "电线电缆"
+        },
+        ...
+    ]
+}
+```
+
+
+*****
+### **30021**
+
+**1. 接口描述**
+
+本接口 (inspection_data/add) 用于新增抽检数据.
+
+**2. 输入参数**
+
+| 参数名称 |    类型   | 是否必选 |  描述       |
+| :------| :-------- | :------ |:----------|
+| title | String | 否 | 标题 |
+| url | String | 是 | 链接 |
+| pubtime | String | 是 | 发布时间 |
+| source | String | 是 | 来源 |
+| qualitied | Float | 是 | 合格率 |
+| category | String | 否 | 类别 |
+| level | String | 是 | 检验等级。 注：值范围(国 省 市) |
+| unitem | String | 否 | 不合格项 |
+| industry_id | Int | 是 | 行业别名ID。 注: 单选。对应select2 api -> select2/alias_industries |
+| area_id | Int | 是 | 地域ID。 注：单选。 对应 select2 api -> select2/areas |
+
+**3. 输出参数**
+
+| 参数名称 |    类型   |     描述   |
+| :------| :-------- | :-------- |
+| 200 | HTTP Status Code | 请求已成功 |
+| 202 | HTTP Status Code | 服务器已接受请求, 但尚未处理.（该信息已存在，判断依据：URL+行业别名ID） |
+| 400 | HTTP Status Code | 非空字段为空 |
+| 500 | HTTP Status Code | 服务器异常 |
+
+**4. 实例**
+
+输入
+
+```
+略
+```
+
+输出
+```
+略
+```
+
+
+*****
+#### **30022**
+
+**1. 接口描述**
+
+本接口 (inspection_data/edit/<int:id>/) 用于编辑抽检数据. 
+
+Tips: 
+- <int:id>: 需要修改的抽检数据ID
+
+**2. 输入参数**
+
+| 参数名称 |    类型   | 是否必选 |  描述       |
+| :------| :-------- | :------ |:----------|
+| title | String | 否 | 标题 |
+| url | String | 是 | 链接 |
+| pubtime | String | 是 | 发布时间 |
+| source | String | 是 | 来源 |
+| qualitied | Float | 是 | 合格率 |
+| category | String | 否 | 类别 |
+| level | String | 是 | 检验等级。 注：值范围(国 省 市) |
+| unitem | String | 否 | 不合格项 |
+| industry_id | Int | 是 | 行业别名ID。 注: 单选。对应select2 api -> select2/alias_industries |
+| area_id | Int | 是 | 地域ID。 注：单选。 对应 select2 api -> select2/areas |
+
+**3. 输出参数**
+
+| 参数名称 |    类型   |     描述   |
+| :------| :-------- | :-------- |
+| 200 | HTTP Status Code | 请求已成功 |
+| 400 | HTTP Status Code | 非空字段为空 |
+| 500 | HTTP Status Code | 服务器异常 |
+
+**4. 实例**
+
+输入
+
+```
+略
+```
+
+输出
+```
+略
+```
+
+*****
+#### **30023**
+
+**1. 接口描述**
+
+本接口 (inspection_data/delete/<int:id>/) 用于删除抽检数据. 
+
+Tips: 
+- <int:id>: 需要删除的抽检数据ID
+
+**2. 输入参数**
+
+无
+
+**3. 输出参数**
+
+| 参数名称 |    类型   |     描述   | 
+| :------| :-------- | :-------- | 
+| 200 | HTTP Status Code | 请求已成功 |
+| 500 | HTTP Status Code | 服务器异常 |
+
+**4. 实例**
+
+输入
+
+```
+略
+```
+
+输出
+```
+略
+```
+
+
+*****
+#### **30024**
+
+**1. 接口描述**
+
+本接口 (inspection_data/upload) 用于上传抽检数据. 
 
 Tips: 
 - 文件格式：xlsx

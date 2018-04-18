@@ -14,7 +14,7 @@ from observer.base.service.area import Select2AreaData
 from observer.base.service.desmon import (DMLinkData, DMLinkAdd, DMLinkEdit, DMLinkDelete, 
                                         DMWordsData, 
                                             )
-from observer.base.service.base import (areas, categories, local_related, area, industry, )
+from observer.base.service.base import (areas, categories, local_related, area, industry, qualitied, )
 from observer.utils.date_format import date_format
 
 
@@ -136,7 +136,7 @@ class InspectionView(BaseView):
                     'level': x['level'],
                     'area': area(x['area_id']),
                     'source': x['source'],
-                    'qualitied': x['qualitied'],
+                    'qualitied': qualitied(x['qualitied']),
                     'category': x['category'],
                     'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
                 }, result),
@@ -592,7 +592,7 @@ class InspectionDataView(BaseView):
                     'level': x['level'],
                     'area': area(x['area_id']),
                     'source': x['source'],
-                    'qualitied': x['qualitied'],
+                    'qualitied': qualitied(x['qualitied']),
                     'category': x['category'],
                     'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
                 }, result),
@@ -634,6 +634,7 @@ class InspectionDataEditView(BaseView):
 
     def post(self, request, aid):
         self.set_params(request)
+        
         queryset = InspectionDataEdit(params=self.query_params).edit(aid=aid)
 
         return Response(status=queryset)
