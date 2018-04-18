@@ -21,10 +21,10 @@
 | **2001** | select2/industries | 查询行业 | GET |
 | **2002** | select2/areas | 查询地域 | GET |
 | **3001** | risk_data | 风险数据列表 | GET |
-| **3002** | risk_data/add | 风险数据添加 | POST |
-| **3003** | risk_data/edit/<str:guid>/ | 风险数据修改 | POST |
-| **3004** | risk_data/delete/<str:guid>/ | 风险数据删除 | DELETE |
-| **3005** | risk_data/upload | 风险数据上传 | PUT |
+| **30011** | risk_data/add | 风险数据添加 | POST |
+| **30012** | risk_data/edit/<str:guid>/ | 风险数据修改 | POST |
+| **30013** | risk_data/delete/<str:guid>/ | 风险数据删除 | DELETE |
+| **30014** | risk_data/upload | 风险数据上传 | PUT |
 
 *****
 ### API 详细信息
@@ -889,7 +889,7 @@ http://192.168.0.103:8001/api/risk_data
 
 
 *****
-### **3002**
+### **30011**
 
 **1. 接口描述**
 
@@ -931,7 +931,7 @@ http://192.168.0.103:8001/api/risk_data
 
 
 *****
-#### **3003**
+#### **30012**
 
 **1. 接口描述**
 
@@ -973,7 +973,7 @@ Tips:
 ```
 
 *****
-#### **3004**
+#### **30013**
 
 **1. 接口描述**
 
@@ -1008,7 +1008,7 @@ Tips:
 
 
 *****
-#### **3005**
+#### **30014**
 
 **1. 接口描述**
 
