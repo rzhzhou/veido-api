@@ -64,7 +64,7 @@ class RiskData(Abstract):
         area_ids = getattr(self, 'areas', None)
 
         args = dict([k, v] for k, v in cond.items() if v)
-        queryset = Article.objects.filter(**args)
+        queryset = Article.objects.exclude(status=-1).filter(**args)
 
         if area_ids:
             a_ids = ArticleArea.objects.filter(area_id__in=area_ids[:-1:].split(',')).values_list('article_id', flat=True)
@@ -180,7 +180,7 @@ class RiskDataDelete(Abstract):
 
     def del_riskdata(self, aid):
         del_id = aid
-        Article.objects.get(guid=del_id).delete()
+        Article.objects.filter(guid=del_id).update(status=-1)
         
         return 200
 
