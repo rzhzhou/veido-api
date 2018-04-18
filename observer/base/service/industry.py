@@ -1,7 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, Q, F
 
-from observer.base.models import Industry, CCCIndustry, LicenseIndustry
+from observer.base.models import Industry, CCCIndustry, LicenseIndustry, AliasIndustry
 from observer.base.service.abstract import Abstract
 from observer.utils.date_format import date_format
 
@@ -85,5 +85,27 @@ class Select2IndustryData(Abstract):  # 获取行业名称
         args = dict([k, v] for k, v in cond.items() if v)
         
         queryset = Industry.objects.filter(**args).values(*fields)
+
+        return queryset.filter(Q(id__istartswith=text) | Q(name__istartswith=text)) if text else queryset
+
+
+class Select2AliasIndustryData(Abstract):  # 获取行业名称
+
+    def __init__(self, params):
+        super(Select2AliasIndustryData, self).__init__(params)
+
+    def get_all(self):
+        fields = ('id', 'name',)
+
+        cond = {
+            'level': getattr(self, 'level'),
+            'parent': getattr(self, 'parent', None),
+        }
+
+        text = getattr(self, 'text', None)
+
+        args = dict([k, v] for k, v in cond.items() if v)
+        
+        queryset = AliasIndustry.objects.filter(**args).values(*fields)
 
         return queryset.filter(Q(id__istartswith=text) | Q(name__istartswith=text)) if text else queryset
