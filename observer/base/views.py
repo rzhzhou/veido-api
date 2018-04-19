@@ -5,7 +5,8 @@ from rest_framework.parsers import FileUploadParser
 
 from observer.base.models import Industry, AliasIndustry
 from observer.base.service.industry import (IndustryData, CCCIndustryData, LicenseIndustryData, 
-                                            Select2IndustryData, Select2AliasIndustryData, )
+                                            Select2IndustryData, Select2AliasIndustryData, 
+                                            AliasIndustryAdd, )
 from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd, RiskDataEdit, 
                                             RiskDataDelete, RiskDataUpload, )
 from observer.base.service.inspection import (InspectionData, InspectionDataAdd, InspectionDataEdit, 
@@ -538,7 +539,6 @@ class RiskDataView(BaseView):
         return Response(self.serialize(queryset))
 
 
-
 class RiskDataAddView(BaseView):
 
     def __init__(self):
@@ -684,5 +684,21 @@ class InspectionDataUploadView(BaseView):
     def put(self, request):
         file_obj = request.data['file']
         queryset = InspectionDataUpload(user=request.user).upload(file_obj)
+
+        return Response(status=queryset)
+
+
+class AliasIndustryAddView(BaseView):
+
+    def __init__(self):
+        super(AliasIndustryAddView, self).__init__()
+
+    def set_params(self, request):
+        super(AliasIndustryAddView, self).set_params(request.POST)
+
+    def post(self, request):
+        self.set_params(request)
+
+        queryset = AliasIndustryAdd(user=request.user, params=self.query_params).add()
 
         return Response(status=queryset)

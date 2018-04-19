@@ -10,7 +10,7 @@ from observer.base.views import (
                                 RiskDataDeleteView, RiskDataUploadView, InspectionDataView, 
                                 InspectionDataAddView, InspectionDataEditView, 
                                 InspectionDataDeleteView, InspectionDataUploadView, 
-                                Select2AliasIndustryView, 
+                                Select2AliasIndustryView, AliasIndustryAddView,
                                 )
 
 
@@ -38,6 +38,7 @@ urlpatterns = [
     path('inspection_data/edit/<int:aid>/', InspectionDataEditView.as_view()),  # 抽检数据修改
     path('inspection_data/delete/<int:aid>/', InspectionDataDeleteView.as_view()),  # 抽检数据删除
     path('inspection_data/upload', InspectionDataUploadView.as_view()),  # 抽检数据上传
+    path('alias_industry/add', AliasIndustryAddView.as_view()),  # 行业别名添加
 
     path('select2/industries', Select2IndustryView.as_view()),  # 行业名称
     path('select2/alias_industries', Select2AliasIndustryView.as_view()),  # 行业别名

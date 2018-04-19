@@ -109,3 +109,27 @@ class Select2AliasIndustryData(Abstract):  # 获取行业名称
         queryset = AliasIndustry.objects.filter(**args).values(*fields)
 
         return queryset.filter(Q(id__istartswith=text) | Q(name__istartswith=text)) if text else queryset
+
+
+class AliasIndustryAdd(Abstract):
+
+    def __init__(self, user, params={}):
+        super(AliasIndustryAdd, self).__init__(params)
+        self.user = user
+
+    def add(self):
+        name = getattr(self, 'name', '')
+        industry_id = getattr(self, 'industry_id', '')
+
+        if not name or not industry_id:
+            return 400
+
+        if not AliasIndustry.objects.filter(name=name, industry_id=industry_id).exists():
+            AliasIndustry(
+                name=name,
+                industry_id=industry_id,
+                ccc_id=0,
+                license_id=0,
+            ).save()
+
+        return 200

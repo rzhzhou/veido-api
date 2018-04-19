@@ -31,6 +31,7 @@
 | **30022** | inspection_data/edit/<str:guid>/ | 抽检数据修改 | POST |
 | **30023** | inspection_data/delete/<str:guid>/ | 抽检数据删除 | DELETE |
 | **30024** | inspection_data/upload | 抽检数据上传 | PUT |
+| **3003** | alias_industry/add | 产品(行业别名添加) | POST |
 
 *****
 ### API 详细信息
@@ -1304,6 +1305,43 @@ Tips:
 | 参数名称 |    类型   |     描述   | 
 | :------| :-------- | :-------- | 
 | 200 | HTTP Status Code | 请求已成功 |
+| 500 | HTTP Status Code | 服务器异常 |
+
+**4. 实例**
+
+输入
+
+```
+略
+```
+
+输出
+```
+略
+```
+
+
+*****
+### **3003**
+
+**1. 接口描述**
+
+本接口 (alias_industry/add) 用于新增产品(行业别名).
+
+**2. 输入参数**
+
+| 参数名称 |    类型   | 是否必选 |  描述       |
+| :------| :-------- | :------ |:----------|
+| name | String | 是 | 产品名称 |
+| industry_id | Int | 是 | 行业ID。 注: 对应小类的行业ID。 |
+
+**3. 输出参数**
+
+| 参数名称 |    类型   |     描述   |
+| :------| :-------- | :-------- |
+| 200 | HTTP Status Code | 请求已成功 |
+| 202 | HTTP Status Code | 服务器已接受请求, 但尚未处理.（该信息已存在，判断依据：name+industry_id） |
+| 400 | HTTP Status Code | 非空字段为空 |
 | 500 | HTTP Status Code | 服务器异常 |
 
 **4. 实例**
