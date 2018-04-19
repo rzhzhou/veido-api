@@ -1205,6 +1205,7 @@ Tips:
 | :------| :-------- | :-------- |
 | total| Int | 符合条件的信息数量。 |
 | list | List | 符合条件的详细信息列表。 |
+| guid | String | GUID |
 | category | String | 抽查类别 |
 | qualitied | Double | 抽查合格率 |
 | url | String | 网址 |
@@ -1229,14 +1230,15 @@ http://192.168.0.103:8001/api/inspection_data
     "total": 18,
     "list": [
         {
-            "area": "浙江",
-            "qualitied": "96.30%",
-            "category": "监督抽查",
-            "level": "省",
-            "pubtime": "2018-03-26",
-            "url": "http://www.zjbts.gov.cn/HTML/cctg/201803/2ec25119-699a-4b66-91dc-033cb1242383.html",
-            "source": "浙江省质监局",
-            "industry": "电线电缆"
+            "area": "河南",
+            "url": "http://192.168.0.123:8080/samplingInfo",
+            "pubtime": "2018-04-19",
+            "level": "国",
+            "qualitied": "100.00%",
+            "guid": "67a2f2790ba377735a2124387b4c195e",
+            "category": "0005",
+            "source": "淘宝",
+            "industry": "面包"
         },
         ...
     ]
