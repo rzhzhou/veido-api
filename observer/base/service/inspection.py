@@ -76,8 +76,9 @@ class InspectionDataAdd(Abstract):
 
 class InspectionDataEdit(Abstract): 
 
-    def __init__(self, params={}):
+    def __init__(self, user, params={}):
         super(InspectionDataEdit, self).__init__(params)
+        self.user = user
 
     def edit(self, aid):
         edit_id = aid

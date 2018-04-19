@@ -12,6 +12,8 @@ from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd, R
 from observer.base.service.inspection import (InspectionData, InspectionDataAdd, InspectionDataEdit, 
                                             InspectionDataDelete, InspectionDataUpload, )
 from observer.base.service.area import Select2AreaData
+from observer.base.service.corpus import (CorpusData, CorpusAdd, CorpusEdit, CorpusDelete, 
+                                            )
 from observer.base.service.desmon import (DMLinkData, DMLinkAdd, DMLinkEdit, DMLinkDelete, 
                                         DMWordsData, 
                                             )
@@ -659,7 +661,7 @@ class InspectionDataEditView(BaseView):
     def post(self, request, aid):
         self.set_params(request)
 
-        queryset = InspectionDataEdit(params=self.query_params).edit(aid=aid)
+        queryset = InspectionDataEdit(user=request.user, params=self.query_params).edit(aid=aid)
 
         return Response(status=queryset)
 
@@ -748,5 +750,32 @@ class CorpusAddView(BaseView):
         self.set_params(request)
 
         queryset = CorpusAdd(user=request.user, params=self.query_params).add()
+
+        return Response(status=queryset)
+
+
+class CorpusEditView(BaseView):
+
+    def __init__(self):
+        super(CorpusEditView, self).__init__()
+
+    def set_params(self, request):
+        super(CorpusEditView, self).set_params(request.POST)
+
+    def post(self, request, cid):
+        self.set_params(request)
+
+        queryset = CorpusEdit(user=request.user, params=self.query_params).edit(cid=cid)
+
+        return Response(status=queryset)
+
+
+class CorpusDeleteView(BaseView):
+
+    def __init__(self):
+        super(CorpusDeleteView, self).__init__()
+
+    def delete(self, request, cid):
+        queryset = CorpusDelete(user=request.user).delete(cid=cid)
 
         return Response(status=queryset)
