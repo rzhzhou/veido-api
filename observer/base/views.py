@@ -524,7 +524,7 @@ class RiskDataView(BaseView):
                     'score': x['score'],
                     'source': x['source'],
                     'areas': areas(x['guid']),
-                    'categories': categories(x['guid']),
+                    'categories': categories(x['guid'], admin=True),
                     'pubtime': date_format(x['pubtime'], '%Y-%m-%d %H:%M:%S'),
                 }, result),
         }

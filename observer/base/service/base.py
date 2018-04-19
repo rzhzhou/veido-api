@@ -12,9 +12,14 @@ def areas(article_id):
     return a_names if a_names else ['未知']
 
 
-def categories(article_id):
+def categories(article_id, admin=False):
     a_ids = ArticleCategory.objects.filter(article_id=article_id).values_list('category_id', flat=True)
-    c_names = Category.objects.filter(level=2, id__in=a_ids).values_list('name', flat=True)
+    c_names = Category.objects.filter(id__in=a_ids)
+    
+    if not admin:
+        c_names = c_names.filter(level=2)
+
+    c_names = c_names.values_list('name', flat=True)
 
     return c_names if c_names else ['未知']
 
