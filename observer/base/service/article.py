@@ -157,16 +157,16 @@ class RiskDataEdit(Abstract):
         c_ids = categories.split(',')[:-1:]
 
         for a_id in a_ids:
-            if not ArticleArea.objects.filter(article_id=guid, area_id=a_id).exists():
+            if not ArticleArea.objects.filter(article_id=edit_id, area_id=a_id).exists():
                 ArticleArea(
-                    article_id=guid,
+                    article_id=edit_id,
                     area_id=a_id,
                 ).save()
 
         for c_id in c_ids:
-            if not ArticleCategory.objects.filter(article_id=guid, category_id=c_id).exists():
+            if not ArticleCategory.objects.filter(article_id=edit_id, category_id=c_id).exists():
                 ArticleCategory(
-                    article_id=guid,
+                    article_id=edit_id,
                     category_id=c_id,
                 ).save()
 
