@@ -1416,6 +1416,8 @@ Tips:
 | :------| :-------- | :------ |:----------|
 | name | String | 是 | 产品名称 |
 | industry_id | Int | 是 | 行业ID。 注: 对应小类的行业ID。 |
+| ccc_id | Int | 否 | 3C行业ID。 注: 用户若标识该产品为3C，则通过 select2/ccc_industries 选择一个产品，传递ID到后台。 若无需标识，则传递 空值 或 0 到后台即可。|
+| license_id | Int | 否 | 许可证行业ID。 注: 用户若标识该产品为许可证，则通过 select2/license_industries 选择一个产品，传递ID到后台。 若无需标识，则传递 空值 或 0 到后台即可。|
 
 **3. 输出参数**
 

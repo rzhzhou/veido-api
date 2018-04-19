@@ -148,6 +148,8 @@ class AliasIndustryAdd(Abstract):
     def add(self):
         name = getattr(self, 'name', '')
         industry_id = getattr(self, 'industry_id', '')
+        ccc_id = getattr(self, 'ccc_id', 0)
+        license_id = getattr(self, 'license_id', 0)
 
         if not name or not industry_id:
             return 400
@@ -156,8 +158,8 @@ class AliasIndustryAdd(Abstract):
             AliasIndustry(
                 name=name,
                 industry_id=industry_id,
-                ccc_id=0,
-                license_id=0,
+                ccc_id=ccc_id,
+                license_id=license_id,
             ).save()
 
         return 200
