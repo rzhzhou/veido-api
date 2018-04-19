@@ -663,6 +663,7 @@ class InspectionDataView(BaseView):
         data = {
             'total': total,
             'list': map(lambda x: {
+                    'guid': x['guid'],
                     'industry': industry(x['industry_id']),
                     'url': x['url'],
                     'level': x['level'],

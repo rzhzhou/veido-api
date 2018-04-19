@@ -12,7 +12,7 @@ class InspectionData(Abstract):
 
     def get_all(self):
 
-        fields = ('title', 'url', 'pubtime', 'source', 'unitem', 'qualitied', 'category', 'level', 'industry_id', 'area_id', )
+        fields = ('guid', 'title', 'url', 'pubtime', 'source', 'unitem', 'qualitied', 'category', 'level', 'industry_id', 'area_id', )
 
         cond = {
             'pubtime__gte': getattr(self, 'starttime', None),
