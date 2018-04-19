@@ -2,6 +2,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from observer.base.models import(Inspection, )
 from observer.base.service.abstract import Abstract
+from observer.utils.str_format import str_to_md5str
 
 
 class InspectionData(Abstract):
