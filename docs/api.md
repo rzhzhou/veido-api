@@ -34,6 +34,8 @@
 | **30023** | inspection_data/delete/<str:guid>/ | 抽检数据删除 | DELETE |
 | **30024** | inspection_data/upload | 抽检数据上传 | PUT |
 | **3003** | alias_industry/add | 产品(行业别名添加) | POST |
+| **30031** | ccc_industry/add | 3C行业添加 | POST |
+| **30032** | license_industry/add | 许可证行业添加 | POST |
 | **3004** | corpus | 语料词列表 | GET |
 | **30041** | corpus/add | 语料词添加 | POST |
 | **30042** | corpus/edit | 语料词修改 | POST |
