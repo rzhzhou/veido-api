@@ -97,7 +97,7 @@ class InspectionDataEdit(Abstract):
         if not url or not pubtime or not source or not qualitied or not category or not level or not industry_id or not area_id:
             return 400
 
-        guid = str_to_md5str('{0}{1}'.format(url, industry))
+        guid = str_to_md5str('{0}{1}'.format(url, industry_id))
 
         inspection = Inspection.objects.get(guid=edit_id)
         inspection.title = title
