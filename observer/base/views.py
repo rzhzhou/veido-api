@@ -6,7 +6,8 @@ from rest_framework.parsers import FileUploadParser
 from observer.base.models import Industry, AliasIndustry
 from observer.base.service.industry import (IndustryData, CCCIndustryData, LicenseIndustryData, 
                                             Select2IndustryData, Select2AliasIndustryData, 
-                                            AliasIndustryAdd, )
+                                            AliasIndustryAdd, Select2CCCIndustryData, 
+                                            Select2LicenseIndustryData, )
 from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd, RiskDataEdit, 
                                             RiskDataDelete, RiskDataUpload, )
 from observer.base.service.inspection import (InspectionData, InspectionDataAdd, InspectionDataEdit, 
@@ -475,6 +476,54 @@ class Select2AliasIndustryView(BaseView):
         self.set_params(request)
 
         queryset = Select2AliasIndustryData(params=self.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+
+class Select2CCCIndustryView(BaseView):
+
+    def __init__(self):
+        super(Select2CCCIndustryView, self).__init__()
+
+    def set_params(self, request):
+        super(Select2CCCIndustryView, self).set_params(request.GET)
+
+    def serialize(self, queryset):
+        data = map(lambda q: {
+            'id': q['id'],
+            'text': q['name'],
+        }, queryset)
+
+        return data
+
+    def get(self, request):
+        self.set_params(request)
+
+        queryset = Select2CCCIndustryData(params=self.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+
+class Select2LicenseIndustryView(BaseView):
+
+    def __init__(self):
+        super(Select2LicenseIndustryView, self).__init__()
+
+    def set_params(self, request):
+        super(Select2LicenseIndustryView, self).set_params(request.GET)
+
+    def serialize(self, queryset):
+        data = map(lambda q: {
+            'id': q['id'],
+            'text': q['name'],
+        }, queryset)
+
+        return data
+
+    def get(self, request):
+        self.set_params(request)
+
+        queryset = Select2LicenseIndustryData(params=self.query_params).get_all()
 
         return Response(self.serialize(queryset))
 

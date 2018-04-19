@@ -12,7 +12,8 @@ from observer.base.views import (
                                 InspectionDataDeleteView, InspectionDataUploadView, 
                                 Select2AliasIndustryView, AliasIndustryAddView,
                                 CorpusView, CorpusAddView, CorpusEditView, 
-                                CorpusDeleteView,
+                                CorpusDeleteView, Select2CCCIndustryView, 
+                                Select2LicenseIndustryView, 
                                 )
 
 
@@ -48,6 +49,8 @@ urlpatterns = [
 
     path('select2/industries', Select2IndustryView.as_view()),  # 行业名称
     path('select2/alias_industries', Select2AliasIndustryView.as_view()),  # 行业别名
+    path('select2/ccc_industries', Select2CCCIndustryView.as_view()),  # 3C行业
+    path('select2/license_industries', Select2LicenseIndustryView.as_view()),  # License行业
     path('select2/areas', Select2AreaView.as_view()),  # 地域名称
 ]
 

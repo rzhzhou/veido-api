@@ -6,7 +6,7 @@ from observer.base.service.abstract import Abstract
 from observer.utils.date_format import date_format
 
 
-class IndustryData(Abstract):  # 行业列表
+class IndustryData(Abstract):  
 
     def __init__(self, params):
         super(IndustryData, self).__init__(params)
@@ -67,7 +67,7 @@ class LicenseIndustryData(Abstract):
                 )
 
 
-class Select2IndustryData(Abstract):  # 获取行业名称
+class Select2IndustryData(Abstract):  
 
     def __init__(self, params):
         super(Select2IndustryData, self).__init__(params)
@@ -89,26 +89,54 @@ class Select2IndustryData(Abstract):  # 获取行业名称
         return queryset.filter(Q(id__istartswith=text) | Q(name__istartswith=text)) if text else queryset
 
 
-class Select2AliasIndustryData(Abstract):  # 获取行业名称
+class Select2AliasIndustryData(Abstract):  
 
     def __init__(self, params):
         super(Select2AliasIndustryData, self).__init__(params)
 
     def get_all(self):
-        fields = ('id', 'name',)
 
-        cond = {
-            'level': getattr(self, 'level'),
-            'parent': getattr(self, 'parent', None),
-        }
+        fields = ('id', 'name',)
 
         text = getattr(self, 'text', None)
 
-        args = dict([k, v] for k, v in cond.items() if v)
-        
-        queryset = AliasIndustry.objects.filter(**args).values(*fields)
+        queryset = AliasIndustry.objects.all().values(*fields)
 
         return queryset.filter(Q(id__istartswith=text) | Q(name__istartswith=text)) if text else queryset
+
+
+class Select2CCCIndustryData(Abstract):  
+
+    def __init__(self, params):
+        super(Select2CCCIndustryData, self).__init__(params)
+
+    def get_all(self):
+
+        fields = ('id', 'name',)
+
+        text = getattr(self, 'text', None)
+
+        queryset = AliasIndustry.objects.all().values(*fields)
+
+        return queryset.filter(Q(id__istartswith=text) | Q(name__istartswith=text)) if text else queryset
+
+
+
+class Select2LicenseIndustryData(Abstract):  
+
+    def __init__(self, params):
+        super(Select2LicenseIndustryData, self).__init__(params)
+
+    def get_all(self):
+
+        fields = ('id', 'name',)
+
+        text = getattr(self, 'text', None)
+
+        queryset = AliasIndustry.objects.all().values(*fields)
+
+        return queryset.filter(Q(id__istartswith=text) | Q(name__istartswith=text)) if text else queryset
+
 
 
 class AliasIndustryAdd(Abstract):
