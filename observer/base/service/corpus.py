@@ -14,7 +14,7 @@ class CorpusData(Abstract):
         super(CorpusData, self).__init__(params)
 
     def get_all(self):
-        fields = ('id', 'riskword', 'invalidword', 'industry__name', )
+        fields = ('id', 'riskword', 'invalidword', 'industry__id', 'industry__name', )
 
         cond = {
             'industry__id': getattr(self, 'industry_id', None),
