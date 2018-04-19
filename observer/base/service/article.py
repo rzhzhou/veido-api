@@ -155,6 +155,9 @@ class RiskDataEdit(Abstract):
 
         a_ids = areas.split(',')[:-1:]
         c_ids = categories.split(',')[:-1:]
+        
+        ArticleArea.objects.filter(article_id=edit_id).delete()
+        ArticleCategory.objects.filter(article_id=edit_id).delete()
 
         for a_id in a_ids:
             if not ArticleArea.objects.filter(article_id=edit_id, area_id=a_id).exists():
