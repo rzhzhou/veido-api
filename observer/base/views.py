@@ -702,3 +702,51 @@ class AliasIndustryAddView(BaseView):
         queryset = AliasIndustryAdd(user=request.user, params=self.query_params).add()
 
         return Response(status=queryset)
+
+
+class CorpusView(BaseView):
+
+    def __init__(self):
+        super(CorpusView, self).__init__()
+
+    def set_params(self, request):
+        super(CorpusView, self).set_params(request.GET)
+
+    def paging(self, queryset):
+        return super(CorpusView, self).paging(queryset, self.query_params.get('page', 1), self.query_params.get('length', 15))
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        results = self.paging(queryset)
+        data = {'total': total,
+                'list': map(lambda r: {
+                    'industry': r['industry__name'], 
+                    'riskword': r['riskword'], 
+                    'invalidword': r['invalidword'], 
+                }, results)
+                }
+
+        return data
+
+    def get(self, request):
+        self.set_params(request)
+
+        queryset = CorpusData(params=self.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+
+class CorpusAddView(BaseView):
+
+    def __init__(self):
+        super(CorpusAddView, self).__init__()
+
+    def set_params(self, request):
+        super(CorpusAddView, self).set_params(request.POST)
+
+    def post(self, request):
+        self.set_params(request)
+
+        queryset = CorpusAdd(user=request.user, params=self.query_params).add()
+
+        return Response(status=queryset)

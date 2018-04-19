@@ -67,7 +67,7 @@ class RiskData(Abstract):
         queryset = Article.objects.exclude(status=-1).filter(**args)
 
         if area_ids:
-            a_ids = ArticleArea.objects.filter(area_id__in=area_ids[:-1:].split(',')).values_list('article_id', flat=True)
+            a_ids = ArticleArea.objects.filter(area_id__in=area_ids[:-1:].split(',')[:-1:]).values_list('article_id', flat=True)
             queryset = queryset.filter(guid__in=a_ids)
 
 
@@ -109,8 +109,8 @@ class RiskDataAdd(Abstract):
             status=1,
         ).save()
 
-        a_ids = areas.split(',')
-        c_ids = categories.split(',')
+        a_ids = areas.split(',')[:-1:]
+        c_ids = categories.split(',')[:-1:]
 
         for a_id in a_ids:
             if not ArticleArea.objects.filter(article_id=guid, area_id=a_id).exists():
@@ -153,8 +153,8 @@ class RiskDataEdit(Abstract):
         article.source = source
         article.save()
 
-        a_ids = areas.split(',')
-        c_ids = categories.split(',')
+        a_ids = areas.split(',')[:-1:]
+        c_ids = categories.split(',')[:-1:]
 
         for a_id in a_ids:
             if not ArticleArea.objects.filter(article_id=guid, area_id=a_id).exists():
