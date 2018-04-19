@@ -138,7 +138,6 @@ class Select2LicenseIndustryData(Abstract):
         return queryset.filter(Q(id__istartswith=text) | Q(name__istartswith=text)) if text else queryset
 
 
-
 class AliasIndustryAdd(Abstract):
 
     def __init__(self, user, params={}):
@@ -160,6 +159,62 @@ class AliasIndustryAdd(Abstract):
                 industry_id=industry_id,
                 ccc_id=ccc_id,
                 license_id=license_id,
+            ).save()
+
+        return 200
+
+
+class CCCIndustryAdd(Abstract):
+
+    def __init__(self, user, params={}):
+        super(CCCIndustryAdd, self).__init__(params)
+        self.user = user
+
+    def add(self):
+        number = getattr(self, 'number', '')
+        name = getattr(self, 'name', '')
+        desc = getattr(self, 'desc', '')
+        level = getattr(self, 'level', 1)
+        parent = getattr(self, 'parent', None)
+
+        if not number or not name:
+            return 400
+
+        if not CCCIndustry.objects.filter(id=number).exists():
+            CCCIndustry(
+                id=number,
+                name=name,
+                level=level,
+                desc=desc,
+                parent=CCCIndustry.objects.get(id=parent),
+            ).save()
+
+        return 200
+
+
+class LicenseIndustryAdd(Abstract):
+
+    def __init__(self, user, params={}):
+        super(LicenseIndustryAdd, self).__init__(params)
+        self.user = user
+
+    def add(self):
+        number = getattr(self, 'number', '')
+        name = getattr(self, 'name', '')
+        desc = getattr(self, 'desc', '')
+        level = getattr(self, 'level', 1)
+        parent = getattr(self, 'parent', None)
+
+        if not number or not name:
+            return 400
+
+        if not LicenseIndustry.objects.filter(id=number).exists():
+            LicenseIndustry(
+                id=number,
+                name=name,
+                level=level,
+                desc=desc,
+                parent=LicenseIndustry.objects.get(id=parent),
             ).save()
 
         return 200

@@ -13,7 +13,8 @@ from observer.base.views import (
                                 Select2AliasIndustryView, AliasIndustryAddView,
                                 CorpusView, CorpusAddView, CorpusEditView, 
                                 CorpusDeleteView, Select2CCCIndustryView, 
-                                Select2LicenseIndustryView, 
+                                Select2LicenseIndustryView, CCCIndustryAddView,
+                                LicenseIndustryAddView, 
                                 )
 
 
@@ -42,6 +43,8 @@ urlpatterns = [
     path('inspection_data/delete/<str:aid>/', InspectionDataDeleteView.as_view()),  # 抽检数据删除
     path('inspection_data/upload', InspectionDataUploadView.as_view()),  # 抽检数据上传
     path('alias_industry/add', AliasIndustryAddView.as_view()),  # 行业别名添加
+    path('ccc_industry/add', CCCIndustryAddView.as_view()),  # CCC行业添加
+    path('license_industry/add', LicenseIndustryAddView.as_view()),  # 许可证行业添加
     path('corpus', CorpusView.as_view()),  # 语料词列表
     path('corpus/add', CorpusAddView.as_view()),  # 语料词添加
     path('corpus/edit', CorpusEditView.as_view()),  # 语料词编辑

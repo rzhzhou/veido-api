@@ -7,7 +7,8 @@ from observer.base.models import Industry, AliasIndustry
 from observer.base.service.industry import (IndustryData, CCCIndustryData, LicenseIndustryData, 
                                             Select2IndustryData, Select2AliasIndustryData, 
                                             AliasIndustryAdd, Select2CCCIndustryData, 
-                                            Select2LicenseIndustryData, )
+                                            Select2LicenseIndustryData, CCCIndustryAdd, 
+                                            LicenseIndustryAdd, )
 from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd, RiskDataEdit, 
                                             RiskDataDelete, RiskDataUpload, )
 from observer.base.service.inspection import (InspectionData, InspectionDataAdd, InspectionDataEdit, 
@@ -751,6 +752,38 @@ class AliasIndustryAddView(BaseView):
         self.set_params(request)
 
         queryset = AliasIndustryAdd(user=request.user, params=self.query_params).add()
+
+        return Response(status=queryset)
+
+
+class CCCIndustryAddView(BaseView):
+
+    def __init__(self):
+        super(CCCIndustryAddView, self).__init__()
+
+    def set_params(self, request):
+        super(CCCIndustryAddView, self).set_params(request.POST)
+
+    def post(self, request):
+        self.set_params(request)
+
+        queryset = CCCIndustryAdd(user=request.user, params=self.query_params).add()
+
+        return Response(status=queryset)
+
+
+class LicenseIndustryAddView(BaseView):
+
+    def __init__(self):
+        super(LicenseIndustryAddView, self).__init__()
+
+    def set_params(self, request):
+        super(LicenseIndustryAddView, self).set_params(request.POST)
+
+    def post(self, request):
+        self.set_params(request)
+
+        queryset = LicenseIndustryAdd(user=request.user, params=self.query_params).add()
 
         return Response(status=queryset)
 
