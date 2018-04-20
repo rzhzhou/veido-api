@@ -805,6 +805,7 @@ class CorpusView(BaseView):
         results = self.paging(queryset)
         data = {'total': total,
                 'list': map(lambda r: {
+                    'id': r['id'],
                     'industry_id': r['industry__id'], 
                     'industry_name': r['industry__name'], 
                     'riskword': r['riskword'], 
