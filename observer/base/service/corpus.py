@@ -79,6 +79,6 @@ class CorpusDelete(Abstract):
 
     def delete(self, cid):
         del_id = cid
-        Corpus.objects.filter(guid=del_id).delete()
+        Corpus.objects.filter(id=del_id).delete()
         
         return 200
