@@ -1548,6 +1548,7 @@ Tips:
 | :------| :-------- | :-------- |
 | total| Int | 符合条件的信息数量。 |
 | list | List | 符合条件的详细信息列表。 |
+| id | Int | ID |
 | riskword | String | 风险词 |
 | invalidword | String | 无效词 |
 | industry_id | String | 行业ID |
@@ -1567,6 +1568,7 @@ http://192.168.0.103:8001/api/corpus
     "total": 18,
     "list": [
          {
+            "id": 1,
             "invalidword": "绿帽 戴帽 如何 贫困 笔 穷 高帽 摘",
             "riskword": "风险 劣质 假冒 PH值 褪色 抽查 违规 致癌 防腐剂 产品质量 召回 不安全 纤维含量 造假 质监 污染 甲醛含量 不合格 投诉 抽检 三无 超标 不达标 伤害 整改 预警 异物 色素 异味 隐患",
             "industry_name": "电线电缆",
