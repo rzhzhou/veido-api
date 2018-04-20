@@ -157,8 +157,8 @@ class AliasIndustryAdd(Abstract):
             AliasIndustry(
                 name=name,
                 industry_id=industry_id,
-                ccc_id=ccc_id,
-                license_id=license_id,
+                ccc_id=0 if not license_id else license_id,
+                license_id=0 if not license_id else license_id,
             ).save()
 
         return 200
