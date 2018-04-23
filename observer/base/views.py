@@ -639,7 +639,7 @@ class RiskDataUploadView(BaseView):
     def __init__(self):
         super(RiskDataUploadView, self).__init__()
 
-    def put(self, request):
+    def put(self, request, filename, format=None):
         file_obj = request.data['file']
         queryset = RiskDataUpload(user=request.user).upload(file_obj)
 
@@ -734,7 +734,7 @@ class InspectionDataUploadView(BaseView):
     def __init__(self):
         super(InspectionDataUploadView, self).__init__()
 
-    def put(self, request):
+    def put(self, request, filename, format=None):
         file_obj = request.data['file']
         queryset = InspectionDataUpload(user=request.user).upload(file_obj)
 

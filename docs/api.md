@@ -27,12 +27,12 @@
 | **30011** | risk_data/add | 风险数据添加 | POST |
 | **30012** | risk_data/edit/<str:guid>/ | 风险数据修改 | POST |
 | **30013** | risk_data/delete/<str:guid>/ | 风险数据删除 | DELETE |
-| **30014** | risk_data/upload | 风险数据上传 | PUT |
+| **30014** | risk_data/upload/<str:filename>/ | 风险数据上传 | PUT |
 | **3002** | inspection_data | 抽检数据列表 | GET |
 | **30021** | inspection_data/add | 抽检数据添加 | POST |
 | **30022** | inspection_data/edit/<str:guid>/ | 抽检数据修改 | POST |
 | **30023** | inspection_data/delete/<str:guid>/ | 抽检数据删除 | DELETE |
-| **30024** | inspection_data/upload | 抽检数据上传 | PUT |
+| **30024** | inspection_data/upload/<str:filename>/ | 抽检数据上传 | PUT |
 | **3003** | alias_industry/add | 产品(行业别名添加) | POST |
 | **30031** | ccc_industry/add | 3C行业添加 | POST |
 | **30032** | license_industry/add | 许可证行业添加 | POST |
@@ -1147,14 +1147,14 @@ Tips:
 
 **1. 接口描述**
 
-本接口 (risk_data/upload) 用于上传风险数据. 
+本接口 (risk_data/upload/<str:filename>/) 用于上传风险数据. 
 
 Tips: 
 - 文件格式：xlsx
 
 **2. 输入参数**
 
-无
+- filename: 文件名称
 
 **3. 输出参数**
 
@@ -1377,14 +1377,14 @@ Tips:
 
 **1. 接口描述**
 
-本接口 (inspection_data/upload) 用于上传抽检数据. 
+本接口 (inspection_data/upload/<str:filename>/) 用于上传抽检数据. 
 
 Tips: 
 - 文件格式：xlsx
 
 **2. 输入参数**
 
-无
+- filename: 文件名称
 
 **3. 输出参数**
 
