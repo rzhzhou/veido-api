@@ -1,3 +1,7 @@
+import xlrd
+
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, Q, F
 
@@ -193,7 +197,11 @@ class RiskDataUpload(Abstract):
     def __init__(self, user):
         self.user = user
 
-    def upload(self, file_obj):
-        print(file_obj)
+    def upload(self, filename, file_obj):
+        default_storage.save('files/{0}.xlsx'.format(filename), ContentFile(file_obj.read()))
+        # wb = xlrd.open_workbook(filename=None, file_contents=file_obj.read())
+        # table = wb.sheets()[0]
+        # row = table.nrows
+        # print(row)
 
         return 200
