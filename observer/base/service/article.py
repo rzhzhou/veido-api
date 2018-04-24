@@ -198,8 +198,13 @@ class RiskDataUpload(Abstract):
         self.user = user
 
     def upload(self, filename, file_obj):
+        #Model weight
         model = {'GUID': 0, '标题': 0, 'URL': 0, '发布时间': 0, '发布媒体': 0, '风险程度': 0, '地域': 0, '类别': 0}
-
+        #sheet value
+        sv = lambda x, y, z : z.cell(row=x, column=y).value
+        # datetime format
+        df = lambda x : openpyxl.utils.datetime.from_excel(x)
+        
         try:
             xlsx_book = openpyxl.load_workbook(BytesIO(file_obj.read()), read_only=True)
             sheet = xlsx_book.active
@@ -207,7 +212,7 @@ class RiskDataUpload(Abstract):
         except Exception as e:
             return {
                     'status': 0, 
-                    'message': '操作失败！请检查文件是否有误，错误信息：%s！' % e
+                    'message': '操作失败！请检查文件是否有误。详细错误信息：%s！' % e
                 }
         
         total = 0
@@ -220,15 +225,20 @@ class RiskDataUpload(Abstract):
                 for k in model.keys():
                     model[k] = line.index(k) + 1
             else:
-                total += 1
+                
                 try:
-                    title = sheet.cell(row=i, column=model['标题']).value
-                    url = sheet.cell(row=i, column=model['URL']).value
-                    pubtime = sheet.cell(row=i, column=model['发布时间']).value
-                    source = sheet.cell(row=i, column=model['发布媒体']).value
-                    score = sheet.cell(row=i, column=model['风险程度']).value
-                    area = sheet.cell(row=i, column=model['地域']).value
-                    category = sheet.cell(row=i, column=model['类别']).value
+                    title = sv(i, model['标题'], sheet)
+                    url = sv(i, model['URL'], sheet)
+                    pubtime = df(sv(i, model['发布时间'], sheet))
+                    source = sv(i, model['发布媒体'], sheet)
+                    score = sv(i, model['风险程度'], sheet)
+                    area = sv(i, model['地域'], sheet)
+                    category = sv(i, model['类别'], sheet)
+
+                    if not url and not pubtime and not source:
+                        continue
+                    
+                    total += 1
 
                     a_guid = str_to_md5str(url)
 
@@ -269,7 +279,7 @@ class RiskDataUpload(Abstract):
                 except Exception as e:
                     return {
                         'status': 0, 
-                        'message': '操作失败！Excel %s 行存在问题，错误信息：%s！' % (i + 1, e)
+                        'message': '操作失败！Excel %s 行存在问题。详细错误信息：%s！' % (i + 1, e)
                     }
 
         return {

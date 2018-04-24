@@ -173,7 +173,7 @@ class Enterprise(models.Model):
 
 class InspectionEnterprise(models.Model):
     inspection_id = models.CharField(max_length=32, verbose_name='抽检信息GUID')
-    enterpise_id = models.IntegerField(verbose_name='地域ID')
+    enterprise_id = models.IntegerField(verbose_name='地域ID')
 
     class Meta:
         app_label = 'base'

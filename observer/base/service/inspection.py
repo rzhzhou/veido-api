@@ -1,6 +1,11 @@
+import openpyxl
+from io import BytesIO
+
 from django.core.exceptions import ObjectDoesNotExist
 
-from observer.base.models import(Inspection, )
+from observer.base.models import(Area, Inspection, Industry, 
+                                Enterprise, InspectionEnterprise, 
+                                AliasIndustry)
 from observer.base.service.abstract import Abstract
 from observer.utils.str_format import str_to_md5str
 
@@ -135,7 +140,145 @@ class InspectionDataUpload(Abstract):
     def __init__(self, user):
         self.user = user
 
-    def upload(self, file_obj):
-        print(file_obj)
+    def upload(self, filename, file_obj):
+        # ModelWeight
+        model = {'标题': 0, '链接': 0, '发布日期': 0, '抽查类别': 0, '抽查等级': 0, '抽检单位': 0, '地域': 0, '行业编号': 0, '产品名称': 0, '不合格企业': 0, '不合格企业地域': 0, '不合格项': 0, '抽查批次': 0, '合格批次': 0, '不合格批次': 0 }
+        # qualification rate
+        qr = lambda x , y : float(1) if not x else float(x) / float(y)  
+        # sheet values
+        sv = lambda x, y, z : z.cell(row=x, column=y).value
+        # datetime format
+        df = lambda x : openpyxl.utils.datetime.from_excel(x)
 
-        return 200
+        try:
+            xlsx_book = openpyxl.load_workbook(BytesIO(file_obj.read()), read_only=True)
+            sheet = xlsx_book.active
+            rows = sheet.rows
+        except Exception as e:
+            return {
+                    'status': 0, 
+                    'message': '操作失败！请检查文件是否有误。详细错误信息：%s！' % e
+                }
+        
+        total = 0
+        dupli = 0
+
+        for i, row in enumerate(rows):
+            i += 1
+            if i == 1:
+                line = [cell.value for cell in row]
+                for k in model.keys():
+                    model[k] = line.index(k) + 1
+            else:
+                try:
+                    title = sv(i, model['标题'], sheet)
+                    url = sv(i, model['链接'], sheet)
+                    pubtime = df(sv(i, model['发布日期'], sheet))
+                    category = sv(i, model['抽查类别'], sheet)
+                    level = sv(i, model['抽查等级'], sheet)
+                    source = sv(i, model['抽检单位'], sheet)
+                    area_name = sv(i, model['地域'], sheet)
+                    industry_number = sv(i, model['行业编号'], sheet)
+                    product_name = sv(i, model['产品名称'], sheet)
+                    enterprise_name = sv(i, model['不合格企业'], sheet)
+                    enterprise_area = sv(i, model['不合格企业地域'], sheet)
+                    unitem = sv(i, model['不合格项'], sheet)
+                    inspect_patch = sv(i, model['抽查批次'], sheet)
+                    qualitied_patch = sv(i, model['合格批次'], sheet)
+                    unqualitied_patch = sv(i, model['不合格批次'], sheet)
+
+                    if not url and not pubtime and not source:
+                        continue
+
+                    total += 1
+
+                    # 处理行业
+                    try:
+                        Industry.objects.get(id=industry_number)
+                    except Exception as e:
+                        return {
+                                'status': 0, 
+                                'message': '操作失败！Excel第%s行,行业编号不存在。详细错误信息：%s！' % (i, e, )
+                            }
+
+                    if not AliasIndustry.objects.filter(name=product_name, industry_id=industry_number).exists():
+                        AliasIndustry(
+                            name=product_name,
+                            industry_id=industry_number,
+                            ccc_id=0,
+                            license_id=0,
+                        ).save()
+
+                    industry_id = AliasIndustry.objects.get(name=product_name, industry_id=industry_number).id
+
+                    # 处理抽检地域
+                    area = Area.objects.filter(name=area_name)
+                    print(area[0].id)
+                    if not area.exists():
+                        return {
+                                    'status': 0, 
+                                    'message': '操作失败！Excel第%s行，地域（%s）不存在！' % (i, area_name, )
+                                }
+
+                    guid = str_to_md5str('{0}{1}'.format(url, industry_id))
+
+                    # 处理企业
+                    if enterprise_name:
+                        enterprises = enterprise_name.split(' ')
+                        areas = enterprise_area.split(' ')
+                        for ei, e in enumerate(enterprises):
+                            areaname = areas[ei]
+                            enterprise_area = Area.objects.filter(name=areaname)
+                            if not enterprise_area.exists():
+                                return {
+                                    'status': 0, 
+                                    'message': '操作失败！Excel第%s行，企业地域（%s）不存在！' % (i, areaname, )
+                                }
+                            enterprise_area_id =enterprise_area[0].id
+                            enterprise = Enterprise.objects.filter(name=e, area_id=enterprise_area_id)
+                            if not enterprise.exists():
+                                Enterprise(
+                                    name=e, 
+                                    area_id=enterprise_area_id,
+                                ).save()
+
+                            # 处理抽检企业关联
+                            enterprise_id = Enterprise.objects.filter(name=e, area_id=enterprise_area_id)[0].id
+                            inspection_enterprise = InspectionEnterprise.objects.filter(inspection_id=guid, enterprise_id=enterprise_id)            
+                            if not inspection_enterprise.exists():
+                                InspectionEnterprise(
+                                    inspection_id=guid,
+                                    enterprise_id=enterprise_id,
+                                ).save()
+             
+                    # 处理抽检信息
+                    inspection = Inspection.objects.filter(guid=guid)
+                    if not inspection.exists():
+                        Inspection(
+                            guid=guid,
+                            title=title,
+                            url=url,
+                            pubtime=pubtime,
+                            source=source,
+                            unitem= '' if not unitem else unitem,
+                            qualitied=qr(inspect_patch, qualitied_patch),
+                            category=category,
+                            level=level,
+                            industry_id=industry_id,
+                            area_id=area[0].id,
+                            status=1,
+                        ).save()
+                    else:
+                        dupli += 1
+
+                except Exception as e:
+                    return {
+                        'status': 0, 
+                        'message': '操作失败！Excel %s 行存在问题。详细错误信息：%s！' % (i + 1, e)
+                    }
+
+        return {
+                    'status': 1, 
+                    'message': '操作成功！共处理%s条数据，成功导入%s条数据，重复数据%s条！' % (total, total - dupli, dupli, )
+                }
+        

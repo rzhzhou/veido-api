@@ -734,10 +734,10 @@ class InspectionDataUploadView(BaseView):
         super(InspectionDataUploadView, self).__init__()
 
     def put(self, request, filename, format=None):
-        file_obj = request.data['file']
-        queryset = InspectionDataUpload(user=request.user).upload(file_obj)
 
-        return Response(status=queryset)
+        queryset = InspectionDataUpload(user=request.user).upload(filename, request.FILES['file'])
+
+        return Response(queryset)
 
 
 class AliasIndustryAddView(BaseView):
