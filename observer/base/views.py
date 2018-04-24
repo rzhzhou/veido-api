@@ -643,7 +643,7 @@ class RiskDataUploadView(BaseView):
 
         queryset = RiskDataUpload(user=request.user).upload(filename, request.data['file'])
 
-        return Response(status=queryset)
+        return Response(queryset)
 
 
 class InspectionDataView(BaseView):

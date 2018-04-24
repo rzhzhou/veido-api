@@ -203,8 +203,15 @@ class RiskDataUpload(Abstract):
             '风险程度': 0, 
             '地域': 0, 
             '类别': 0, }
+            
+        try:
+            data = read(file_contents=file_obj.read(), title=title)
+        except Exception as e:
+            return {
+                    'status': 0, 
+                    'message': '操作失败！请检查文件是否有误，错误信息：%s！' % e
+                }
 
-        data = read(file_contents=file_obj.read(), title=title)
         total = len(data)
         dupli = 0
 
