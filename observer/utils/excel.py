@@ -1,8 +1,44 @@
+import openpyxl
+from io import BytesIO
 from xlrd import open_workbook, xldate_as_tuple
 from datetime import datetime
 
 
-def read(filename=None, file_contents=None, title={}):
+def read_by_openpyxl(filename=None, file_contents=None, title={}):
+    '''
+    title like this:
+    {
+        'GUID': 0, 
+        '标题': 0, 
+        'URL': 0, 
+        '发布时间': 0, 
+        '发布媒体': 0, 
+        '风险程度': 0, 
+        '地域': 0, 
+        '类别': 0, 
+    }
+    '''
+    # xlsx_book = openpyxl.load_workbook(BytesIO(file_obj.read()), read_only=True)
+    xlsx_book = openpyxl.load_workbook(filename=filename, read_only=True)
+    sheet = xlsx_book.active
+    rows = sheet.rows
+
+    data = []
+    for index, row in enumerate(rows):
+        if index == 0:
+            line = [cell.value for cell in row]
+            for k in title.keys():
+                title[k] = line.index(k)
+        else:
+            data2 = {}
+            for k, v in title.items():
+                data2[k] = sheet.cell(row=index, column=v).value
+            data.append(data2)
+
+    return data
+
+
+def read_by_xlrd(filename=None, file_contents=None, title={}):
     '''
     title like this:
     {

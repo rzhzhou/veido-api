@@ -640,8 +640,7 @@ class RiskDataUploadView(BaseView):
         super(RiskDataUploadView, self).__init__()
 
     def put(self, request, filename, format=None):
-
-        queryset = RiskDataUpload(user=request.user).upload(filename, request.data['file'])
+        queryset = RiskDataUpload(user=request.user).upload(filename, request.FILES['file'])
 
         return Response(queryset)
 
