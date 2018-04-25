@@ -442,15 +442,22 @@ http://192.168.0.103:8001/api/articles/0003/
         {
             "source": "中国新闻网",
             "categories": [
-                "特种设备",
-                "认证监管",
-                "质量管理"
+                {
+                    "id": "0001",
+                    "text": "质监热点"
+                },
+                {
+                    "id": "0002",
+                    "text": "风险快讯"
+                }
+            ],
+            "areas": [
+                {
+                    "id": 269,
+                    "text": "咸宁"
+                }
             ],
             "title": "对儿童安全构成威胁 指尖陀螺被欧盟列为危险品",
-            "areas": [
-                "北京",
-                "上海"
-            ],
             "url": "http://dw.chinanews.com/chinanews/content.jsp?id=8467281&classify=zw&pageSize=6&language=chs",
             "pubtime": "2018-03-14"
         },
@@ -1006,16 +1013,23 @@ http://192.168.0.103:8001/api/risk_data
             "pubtime": "2018-03-14 00:00:00",
             "url": "http://dw.chinanews.com/chinanews/content.jsp?id=8467281&classify=zw&pageSize=6&language=chs",
             "guid": "528eb39855e876852c1f6371a82ea634",
-            "categories": [
-                "特种设备",
-                "认证监管",
-                "质量管理"
-            ],
             "score": 2,
+            "categories": [
+                {
+                    "id": "0001",
+                    "text": "质监热点"
+                },
+                {
+                    "id": "0002",
+                    "text": "风险快讯"
+                }
+            ],
             "areas": [
-                "北京",
-                "上海"
-            ]
+                {
+                    "id": 269,
+                    "text": "咸宁"
+                }
+            ],
         },
         ...
     ]
