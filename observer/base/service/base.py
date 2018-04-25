@@ -7,21 +7,26 @@ from observer.utils.date_format import date_format
 
 def areas(article_id):
     a_ids = ArticleArea.objects.filter(article_id=article_id).values_list('area_id', flat=True)
-    a_names = Area.objects.filter(id__in=a_ids).values_list('name', flat=True)
+    queryset = Area.objects.filter(id__in=a_ids)
 
-    return a_names if a_names else ['未知']
+    if not queryset.exists():
+        queryset = Area.objects.filter(name='全国')
+
+    return list(map(lambda x: {'id': x['id'], 'text': x['name']}, queryset.values('id', 'name')))
 
 
 def categories(article_id, admin=False):
     a_ids = ArticleCategory.objects.filter(article_id=article_id).values_list('category_id', flat=True)
-    c_names = Category.objects.filter(id__in=a_ids)
+    queryset = Category.objects.filter(id__in=a_ids)
     
     if not admin:
-        c_names = c_names.filter(level=2)
+        queryset = queryset.filter(level=2)
 
-    c_names = c_names.values_list('name', flat=True)
+    if not queryset.exists():
+        queryset = Category.objects.filter(name='其它')
+    
+    return list(map(lambda x: {'id': x['id'], 'text': x['name']}, queryset.values('id', 'name')))
 
-    return c_names if c_names else ['未知']
 
 # 本地相关度算法
 def local_related(article_id, user):
