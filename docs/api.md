@@ -313,7 +313,10 @@ http://192.168.0.103:8001/api/articles/0001/
     "list": [
         {
             "areas": [
-                "咸宁"
+                {
+                    "id": 269,
+                    "text": "咸宁"
+                }
             ],
             "source": "中国质量新闻网",
             "url": "http://www.cqn.com.cn/cj/content/2018-03/26/content_5592714.htm",
@@ -377,7 +380,10 @@ http://192.168.0.103:8001/api/articles/0002/
         {
             "url": "http://www.cqn.com.cn/cj/content/2018-03/26/content_5592714.htm",
             "areas": [
-                "咸宁"
+                {
+                    "id": 269,
+                    "text": "咸宁"
+                }
             ],
             "score": 0,
             "local_related": 1,
@@ -521,9 +527,15 @@ http://192.168.0.103:8001/api/inspections
             "category": "监督抽查",
             "qualitied": 1.0,
             "url": "http://www.zjbts.gov.cn/HTML/cctg/201803/bca33649-bb42-4046-a529-6b68e27d4aaa.html",
-            "industry": "电线电缆 - 许可证",
             "pubtime": "2018-03-26",
-            "area": "浙江",
+            "area": {
+                "id": 5,
+                "text": "二七"
+            },
+            "industry": {
+                "id": 12,
+                "text": "卫生洁具用软管"
+            },
             "level": "省",
             "source": "浙江省质监局"
         },
@@ -1247,7 +1259,6 @@ http://192.168.0.103:8001/api/inspection_data
     "total": 18,
     "list": [
         {
-            "area": "河南",
             "url": "http://192.168.0.123:8080/samplingInfo",
             "pubtime": "2018-04-19",
             "level": "国",
@@ -1255,7 +1266,14 @@ http://192.168.0.103:8001/api/inspection_data
             "guid": "67a2f2790ba377735a2124387b4c195e",
             "category": "0005",
             "source": "淘宝",
-            "industry": "面包"
+            "area": {
+                "id": 5,
+                "text": "二七"
+            },
+            "industry": {
+                "id": 12,
+                "text": "卫生洁具用软管"
+            },
         },
         ...
     ]
@@ -1278,7 +1296,9 @@ http://192.168.0.103:8001/api/inspection_data
 | url | String | 是 | 链接 |
 | pubtime | String | 是 | 发布时间 |
 | source | String | 是 | 来源 |
-| qualitied | Float | 是 | 合格率 |
+| inspect_patch | Int | 是 | 抽查总批次 |
+| qualitied_patch | Int | 是 | 合格批次 |
+| unqualitied_patch | Int | 否 | 不合格批次 |
 | category | String | 否 | 类别 |
 | level | String | 是 | 检验等级。 注：值范围(国 省 市) |
 | unitem | String | 否 | 不合格项 |
@@ -1326,7 +1346,9 @@ Tips:
 | url | String | 是 | 链接 |
 | pubtime | String | 是 | 发布时间 |
 | source | String | 是 | 来源 |
-| qualitied | Float | 是 | 合格率 |
+| inspect_patch | Int | 是 | 抽查总批次 |
+| qualitied_patch | Int | 是 | 合格批次 |
+| unqualitied_patch | Int | 否 | 不合格批次 |
 | category | String | 否 | 类别 |
 | level | String | 是 | 检验等级。 注：值范围(国 省 市) |
 | unitem | String | 否 | 不合格项 |

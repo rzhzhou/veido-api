@@ -43,18 +43,25 @@ class InspectionDataAdd(Abstract):
         self.user = user
 
     def add(self):
+        # qualification rate
+        qr = lambda x , y : float(1) if not x else float(x) / float(y)  
+
         title = getattr(self, 'title', '')
         url = getattr(self, 'url', '')
         pubtime = getattr(self, 'pubtime', '')
         source = getattr(self, 'source', '')
-        qualitied = getattr(self, 'qualitied', '')
+
+        inspect_patch = etattr(self, 'inspect_patch', 0)
+        qualitied_patch = etattr(self, 'qualitied_patch', 0)
+        unqualitied_patch = etattr(self, 'unqualitied_patch', 0)
+
         category = getattr(self, 'category', '')
         level = getattr(self, 'level', '')
         unitem = getattr(self, 'unitem', '')
         industry_id = getattr(self, 'industry_id', '')
         area_id = getattr(self, 'area_id', '')
 
-        if not url or not pubtime or not source or not qualitied or not category or not level or not industry_id or not area_id:
+        if not url or not pubtime or not source or not inspect_patch or not qualitied_patch or not category or not level or not industry_id or not area_id:
             return 400
 
         guid = str_to_md5str('{0}{1}'.format(url, industry_id))
@@ -69,7 +76,7 @@ class InspectionDataAdd(Abstract):
             pubtime=pubtime,
             source=source,
             unitem=unitem,
-            qualitied=qualitied,
+            qualitied=qr(qualitied_patch, inspect_patch),
             category=category,
             level=level,
             industry_id=industry_id,
@@ -87,19 +94,26 @@ class InspectionDataEdit(Abstract):
         self.user = user
 
     def edit(self, aid):
+        # qualification rate
+        qr = lambda x , y : float(1) if not x else float(x) / float(y)  
+
         edit_id = aid
         title = getattr(self, 'title', '')
         url = getattr(self, 'url', '')
         pubtime = getattr(self, 'pubtime', '')
         source = getattr(self, 'source', '')
-        qualitied = getattr(self, 'qualitied', '')
+        
+        inspect_patch = etattr(self, 'inspect_patch', 0)
+        qualitied_patch = etattr(self, 'qualitied_patch', 0)
+        unqualitied_patch = etattr(self, 'unqualitied_patch', 0)
+
         category = getattr(self, 'category', '')
         level = getattr(self, 'level', '')
         unitem = getattr(self, 'unitem', '')
         industry_id = getattr(self, 'industry_id', '')
         area_id = getattr(self, 'area_id', '')
 
-        if not url or not pubtime or not source or not qualitied or not category or not level or not industry_id or not area_id:
+        if not url or not pubtime or not source or not inspect_patch or not qualitied_patch or not category or not level or not industry_id or not area_id:
             return 400
 
         guid = str_to_md5str('{0}{1}'.format(url, industry_id))
@@ -109,7 +123,7 @@ class InspectionDataEdit(Abstract):
         inspection.url = url
         inspection.pubtime = pubtime
         inspection.source = source
-        inspection.qualitied = qualitied
+        inspection.qualitied = qr(qualitied_patch, inspect_patch),
         inspection.category = category
         inspection.level = level
         inspection.unitem = unitem

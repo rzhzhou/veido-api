@@ -57,11 +57,17 @@ def local_related(article_id, user):
 
 
 def area(area_id):
-    return Area.objects.get(id=area_id).name
+    queryset = Area.objects.get(id=area_id)
+
+    return {'id': queryset.id, 'text': queryset.name}
+
 
 
 def industry(industry_id):
-    return AliasIndustry.objects.get(id=industry_id).name
+    queryset = AliasIndustry.objects.get(id=industry_id)
+    
+    return {'id': queryset.id, 'text': queryset.name}
+    
     
 
 def qualitied(q):
