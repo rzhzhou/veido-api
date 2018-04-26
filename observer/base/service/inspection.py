@@ -51,9 +51,9 @@ class InspectionDataAdd(Abstract):
         pubtime = getattr(self, 'pubtime', '')
         source = getattr(self, 'source', '')
 
-        inspect_patch = etattr(self, 'inspect_patch', 0)
-        qualitied_patch = etattr(self, 'qualitied_patch', 0)
-        unqualitied_patch = etattr(self, 'unqualitied_patch', 0)
+        inspect_patch = getattr(self, 'inspect_patch', 0)
+        qualitied_patch = getattr(self, 'qualitied_patch', 0)
+        unqualitied_patch = getattr(self, 'unqualitied_patch', 0)
 
         category = getattr(self, 'category', '')
         level = getattr(self, 'level', '')
@@ -103,9 +103,9 @@ class InspectionDataEdit(Abstract):
         pubtime = getattr(self, 'pubtime', '')
         source = getattr(self, 'source', '')
         
-        inspect_patch = etattr(self, 'inspect_patch', 0)
-        qualitied_patch = etattr(self, 'qualitied_patch', 0)
-        unqualitied_patch = etattr(self, 'unqualitied_patch', 0)
+        inspect_patch = getattr(self, 'inspect_patch', 0)
+        qualitied_patch = getattr(self, 'qualitied_patch', 0)
+        unqualitied_patch = getattr(self, 'unqualitied_patch', 0)
 
         category = getattr(self, 'category', '')
         level = getattr(self, 'level', '')
