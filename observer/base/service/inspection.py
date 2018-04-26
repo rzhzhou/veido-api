@@ -123,7 +123,7 @@ class InspectionDataEdit(Abstract):
         inspection.url = url
         inspection.pubtime = pubtime
         inspection.source = source
-        inspection.qualitied = qr(inspect_patch, qualitied_patch),
+        inspection.qualitied = qr(inspect_patch, qualitied_patch)
         inspection.category = category
         inspection.level = level
         inspection.unitem = unitem
