@@ -8,15 +8,15 @@ echo '
         "url" : "jdbc:mysql://gz-cdb-ko3zdkzs.sql.tencentcdb.com:63440/test",
         "user" : "shendu",
         "password" : "P@55word",
-        "sql" : "select \"myindex\" as _index, \"myparents\" as _type, id as _id, message from parent_table",
+        "sql": "select * from parent_table",
         "elasticsearch" : {
-            "autodiscover" : true,
+            "autodiscover" : "true",
             "cluster" : "my-application",
             "host" : "localhost",
             "port" : 9300
         },
-        "index" : "myindex",
-        "type" : "myparents"
+        "index" : "myindex2",
+        "type" : "myparents2"
     }
 }
 ' | java \
@@ -25,3 +25,4 @@ echo '
     org.xbib.tools.Runner \
     org.xbib.tools.JDBCImporter
 
+# "sql" : "select \"myindex\" as _index, \"myparents\" as _type, id as _id, message from parent_table",

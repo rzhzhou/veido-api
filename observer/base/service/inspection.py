@@ -76,7 +76,7 @@ class InspectionDataAdd(Abstract):
             pubtime=pubtime,
             source=source,
             unitem=unitem,
-            qualitied=qr(qualitied_patch, inspect_patch),
+            qualitied=qr(inspect_patch, qualitied_patch),
             category=category,
             level=level,
             industry_id=industry_id,
@@ -123,7 +123,7 @@ class InspectionDataEdit(Abstract):
         inspection.url = url
         inspection.pubtime = pubtime
         inspection.source = source
-        inspection.qualitied = qr(qualitied_patch, inspect_patch),
+        inspection.qualitied = qr(inspect_patch, qualitied_patch),
         inspection.category = category
         inspection.level = level
         inspection.unitem = unitem
