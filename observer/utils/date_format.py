@@ -38,3 +38,12 @@ def utc_to_local_time(dt):
 
 def date_format(time, pattern):
     return utc_to_local_time(time).strftime(pattern)
+
+
+def str_to_date(date_str):
+    if date_str.find('/') != -1:
+        year_s, mon_s, day_s = date_str.split('/')
+        return datetime(int(year_s), int(mon_s), int(day_s))
+    elif date_str.find('-') != -1:
+        year_s, mon_s, day_s = date_str.split('-')
+        return datetime(int(year_s), int(mon_s), int(day_s))

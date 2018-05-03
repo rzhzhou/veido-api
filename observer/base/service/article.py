@@ -4,10 +4,10 @@ from io import BytesIO
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, Q, F
 
-from observer.base.models import(Article, ArticleArea, Category,
-                                ArticleCategory, )
+from observer.base.models import(Area, Article, ArticleArea, 
+                                Category, ArticleCategory, )
 from observer.base.service.abstract import Abstract
-from observer.utils.date_format import date_format
+from observer.utils.date_format import str_to_date
 from observer.utils.str_format import str_to_md5str
 from observer.utils.excel import (read_by_openpyxl, )
 
@@ -202,9 +202,13 @@ class RiskDataUpload(Abstract):
         model = {'GUID': 0, '标题': 0, 'URL': 0, '发布时间': 0, '发布媒体': 0, '风险程度': 0, '地域': 0, '类别': 0}
         #sheet value
         sv = lambda x, y, z : z.cell(row=x, column=y).value
-        # datetime format
-        df = lambda x : openpyxl.utils.datetime.from_excel(x)
-        
+        #date format
+        def date_format(df):
+            try:
+                return openpyxl.utils.datetime.from_excel(df)
+            except Exception:
+                return str_to_date(df)
+
         try:
             xlsx_book = openpyxl.load_workbook(BytesIO(file_obj.read()), read_only=True)
             sheet = xlsx_book.active
@@ -229,15 +233,22 @@ class RiskDataUpload(Abstract):
                 try:
                     title = sv(i, model['标题'], sheet)
                     url = sv(i, model['URL'], sheet)
-                    pubtime = df(sv(i, model['发布时间'], sheet))
+
+                    if not url:
+                        continue
+
+                    pubtime = date_format(sv(i, model['发布时间'], sheet))
+                    if not pubtime:
+                        return {
+                            'status': 0, 
+                            'message': '操作失败！Excel %s 行时间格式有误！' % (i + 1, )
+                        }
+                        
                     source = sv(i, model['发布媒体'], sheet)
                     score = sv(i, model['风险程度'], sheet)
                     area = sv(i, model['地域'], sheet)
                     category = sv(i, model['类别'], sheet)
 
-                    if not url and not pubtime and not source:
-                        continue
-                    
                     total += 1
 
                     a_guid = str_to_md5str(url)

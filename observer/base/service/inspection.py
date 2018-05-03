@@ -7,6 +7,7 @@ from observer.base.models import(Area, Inspection, Industry,
                                 Enterprise, InspectionEnterprise, 
                                 AliasIndustry)
 from observer.base.service.abstract import Abstract
+from observer.utils.date_format import str_to_date
 from observer.utils.str_format import str_to_md5str
 
 
@@ -161,8 +162,12 @@ class InspectionDataUpload(Abstract):
         qr = lambda x , y : float(1) if not x else float(x) / float(y)  
         # sheet values
         sv = lambda x, y, z : z.cell(row=x, column=y).value
-        # datetime format
-        df = lambda x : openpyxl.utils.datetime.from_excel(x)
+        #date format
+        def date_format(df):
+            try:
+                return openpyxl.utils.datetime.from_excel(df)
+            except Exception:
+                return str_to_date(df)
 
         try:
             xlsx_book = openpyxl.load_workbook(BytesIO(file_obj.read()), read_only=True)
@@ -187,7 +192,17 @@ class InspectionDataUpload(Abstract):
                 try:
                     title = sv(i, model['标题'], sheet)
                     url = sv(i, model['链接'], sheet)
-                    pubtime = df(sv(i, model['发布日期'], sheet))
+    
+                    if not url:
+                        continue
+
+                    pubtime = date_format(sv(i, model['发布日期'], sheet))
+                    if not pubtime:
+                        return {
+                            'status': 0, 
+                            'message': '操作失败！Excel %s 行时间格式有误！' % (i + 1, )
+                        }
+                        
                     category = sv(i, model['抽查类别'], sheet)
                     level = sv(i, model['抽查等级'], sheet)
                     source = sv(i, model['抽检单位'], sheet)
@@ -200,9 +215,6 @@ class InspectionDataUpload(Abstract):
                     inspect_patch = sv(i, model['抽查批次'], sheet)
                     qualitied_patch = sv(i, model['合格批次'], sheet)
                     unqualitied_patch = sv(i, model['不合格批次'], sheet)
-
-                    if not url and not pubtime and not source:
-                        continue
 
                     total += 1
 
@@ -227,7 +239,6 @@ class InspectionDataUpload(Abstract):
 
                     # 处理抽检地域
                     area = Area.objects.filter(name=area_name)
-                    print(area[0].id)
                     if not area.exists():
                         return {
                                     'status': 0, 
