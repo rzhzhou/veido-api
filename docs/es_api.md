@@ -46,7 +46,7 @@
 输入
 
 ```
-POST /observer/article/_search
+http://192.168.0.104:9200/observer/article/_search
 {
     "query" : {
       "match" : {
