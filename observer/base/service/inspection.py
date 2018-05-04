@@ -167,7 +167,10 @@ class InspectionDataUpload(Abstract):
             try:
                 return openpyxl.utils.datetime.from_excel(df)
             except Exception:
-                return str_to_date(df)
+                try:
+                    return str_to_date(df)
+                except Exception:
+                    return df
 
         try:
             xlsx_book = openpyxl.load_workbook(BytesIO(file_obj.read()), read_only=True)

@@ -207,7 +207,10 @@ class RiskDataUpload(Abstract):
             try:
                 return openpyxl.utils.datetime.from_excel(df)
             except Exception:
-                return str_to_date(df)
+                try:
+                    return str_to_date(df)
+                except Exception:
+                    return df
 
         try:
             xlsx_book = openpyxl.load_workbook(BytesIO(file_obj.read()), read_only=True)
@@ -230,68 +233,62 @@ class RiskDataUpload(Abstract):
                     model[k] = line.index(k) + 1
             else:
                 
-                try:
-                    title = sv(i, model['标题'], sheet)
-                    url = sv(i, model['URL'], sheet)
+                title = sv(i, model['标题'], sheet)
+                url = sv(i, model['URL'], sheet)
 
-                    if not url:
-                        continue
+                if not url:
+                    continue
 
-                    pubtime = date_format(sv(i, model['发布时间'], sheet))
-                    if not pubtime:
-                        return {
-                            'status': 0, 
-                            'message': '操作失败！Excel %s 行时间格式有误！' % (i + 1, )
-                        }
-                        
-                    source = sv(i, model['发布媒体'], sheet)
-                    score = sv(i, model['风险程度'], sheet)
-                    area = sv(i, model['地域'], sheet)
-                    category = sv(i, model['类别'], sheet)
-
-                    total += 1
-
-                    a_guid = str_to_md5str(url)
-
-                    if Article.objects.filter(guid=a_guid).exists():
-                        dupli += 1
-                        continue
-
-                    areas = area.split(' ')
-                    a_ids = Area.objects.filter(name__in=areas).values_list('id', flat=True)
-                    categories = category.split(' ')
-                    c_ids = Category.objects.filter(name__in=categories).values_list('id', flat=True)
-                    for a_id in a_ids:
-                        if not ArticleArea.objects.filter(article_id=a_guid, area_id=a_id).exists():
-                            ArticleArea(
-                                article_id=a_guid,
-                                area_id=a_id,
-                            ).save()
-
-                    for c_id in c_ids:
-                        if not ArticleCategory.objects.filter(article_id=a_guid, category_id=c_id).exists():
-                            ArticleCategory(
-                                article_id=a_guid,
-                                category_id=c_id,
-                            ).save()
-                    
-                    Article(
-                        guid=a_guid,
-                        title=title,
-                        url=url,
-                        pubtime=pubtime,
-                        source=source,
-                        score=score,
-                        risk_keyword='',
-                        invalid_keyword='',
-                        status=1,
-                    ).save()
-
-                except Exception as e:
+                pubtime = date_format(sv(i, model['发布时间'], sheet))
+                if not pubtime:
                     return {
                         'status': 0, 
-                        'message': '操作失败！Excel %s 行存在问题。详细错误信息：%s！' % (i + 1, e)
+                        'message': '操作失败！Excel %s 行时间格式有误！' % (i + 1, )
                     }
+                    
+                source = sv(i, model['发布媒体'], sheet)
+                score = sv(i, model['风险程度'], sheet)
+                area = sv(i, model['地域'], sheet)
+                category = sv(i, model['类别'], sheet)
+
+                total += 1
+
+                a_guid = str_to_md5str(url)
+
+                if Article.objects.filter(guid=a_guid).exists():
+                    dupli += 1
+                    continue
+
+                areas = area.split(' ')
+                a_ids = Area.objects.filter(name__in=areas).values_list('id', flat=True)
+                categories = category.split(' ')
+                c_ids = Category.objects.filter(name__in=categories).values_list('id', flat=True)
+                for a_id in a_ids:
+                    if not ArticleArea.objects.filter(article_id=a_guid, area_id=a_id).exists():
+                        ArticleArea(
+                            article_id=a_guid,
+                            area_id=a_id,
+                        ).save()
+
+                for c_id in c_ids:
+                    if not ArticleCategory.objects.filter(article_id=a_guid, category_id=c_id).exists():
+                        ArticleCategory(
+                            article_id=a_guid,
+                            category_id=c_id,
+                        ).save()
+                
+                Article(
+                    guid=a_guid,
+                    title=title,
+                    url=url,
+                    pubtime=pubtime,
+                    source=source,
+                    score=score,
+                    risk_keyword='',
+                    invalid_keyword='',
+                    status=1,
+                ).save()
+
 
         return {
                     'status': 1, 
