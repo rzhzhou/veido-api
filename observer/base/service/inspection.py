@@ -7,8 +7,12 @@ from observer.base.models import(Area, Inspection, Industry,
                                 Enterprise, InspectionEnterprise, 
                                 AliasIndustry)
 from observer.base.service.abstract import Abstract
-from observer.utils.date_format import str_to_date
+from observer.base.service.base import (area, alias_industry, qualitied, 
+                                        industry_number, enterprise, enterprise_name, )
+from observer.utils.date_format import (date_format, str_to_date, get_months)
 from observer.utils.str_format import str_to_md5str
+from observer.utils.excel import (read_by_openpyxl, write_by_openpyxl, )
+
 
 
 class InspectionData(Abstract):
@@ -310,3 +314,44 @@ class InspectionDataUpload(Abstract):
                     'message': '操作成功！共处理%s条数据，成功导入%s条数据，重复数据%s条！' % (total, total - dupli, dupli, )
                 }
         
+
+class InspectionDataExport(Abstract): 
+
+    def __init__(self, user):
+        self.user = user
+
+    def export(self):
+        filename = "inspections.xlsx"
+
+        # process data
+        data = [
+            ['GUID', '标题', '链接', '发布日期', '抽查类别', '抽查等级', '抽检单位', '地域', '行业编号', '产品名称', '不合格企业', '不合格企业地域', '不合格项', '合格率', ],
+        ]
+        months = get_months()[-1::][0]
+        start = months[0].strftime('%Y-%m-%d')
+        end = months[1].strftime('%Y-%m-%d')
+
+        queryset = Inspection.objects.filter(pubtime__gte=start, pubtime__lt=end).values('guid', 'title', 'url', 'pubtime', 'category', 'level', 'source', 'area_id', 'industry_id', 'unitem', 'qualitied',)
+
+        for q in queryset:
+            data.append([
+                q['guid'],
+                q['title'],
+                q['url'],
+                date_format(q['pubtime'], '%Y-%m-%d'),
+                q['category'],
+                q['level'],
+                q['source'],
+                area(q['area_id'], flat=True),
+                industry_number(q['industry_id']),
+                alias_industry(q['industry_id'], flat=True),
+                enterprise(q['guid'], flat=True),
+                enterprise_name(q['guid'], flat=True),
+                q['unitem'],
+                qualitied(q['qualitied']),
+                ])
+
+        # write file
+        write_by_openpyxl(filename, data)
+
+        return open(filename, 'rb')

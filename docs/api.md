@@ -28,11 +28,13 @@
 | **30012** | risk_data/edit/<str:guid>/ | 风险数据修改 | POST |
 | **30013** | risk_data/delete/<str:guid>/ | 风险数据删除 | DELETE |
 | **30014** | risk_data/upload/<str:filename>/ | 风险数据上传 | PUT |
+| **30015** | risk_data/export | 风险数据导出 | GET |
 | **3002** | inspection_data | 抽检数据列表 | GET |
 | **30021** | inspection_data/add | 抽检数据添加 | POST |
 | **30022** | inspection_data/edit/<str:guid>/ | 抽检数据修改 | POST |
 | **30023** | inspection_data/delete/<str:guid>/ | 抽检数据删除 | DELETE |
 | **30024** | inspection_data/upload/<str:filename>/ | 抽检数据上传 | PUT |
+| **30025** | inspection_data/export | 抽检数据导出 | GET |
 | **3003** | alias_industry/add | 产品(行业别名添加) | POST |
 | **30031** | ccc_industry/add | 3C行业添加 | POST |
 | **30032** | license_industry/add | 许可证行业添加 | POST |
@@ -1207,6 +1209,35 @@ Tips:
 
 
 *****
+### **30015**
+
+**1. 接口描述**
+
+本接口 (risk_data/export) 用于导出风险数据.
+
+**2. 输入参数**
+
+无
+
+**3. 输出参数**
+
+无
+
+**4. 实例**
+
+输入
+
+```
+http://192.168.0.103:8001/api/risk_data/export
+```
+
+输出
+```
+articles.xlsx（默认当前月份的数据）
+```
+
+
+*****
 ### **3002**
 
 **1. 接口描述**
@@ -1446,6 +1477,35 @@ Tips:
     'status': 1,
     'message': '操作成功！共处理2条数据，成功导入0条数据，重复数据2条！',
 }
+```
+
+
+*****
+### **30015**
+
+**1. 接口描述**
+
+本接口 (inspection_data/export) 用于导出风险数据.
+
+**2. 输入参数**
+
+无
+
+**3. 输出参数**
+
+无
+
+**4. 实例**
+
+输入
+
+```
+http://192.168.0.103:8001/api/inspection_data/export
+```
+
+输出
+```
+inspections.xlsx（默认当前月份的数据）
 ```
 
 

@@ -2,6 +2,7 @@ import pytz
 
 from calendar import monthrange
 from datetime import date, datetime, timedelta
+from dateutil.relativedelta import relativedelta
 from time import mktime
 
 from django.conf import settings
@@ -47,3 +48,9 @@ def str_to_date(date_str):
     elif date_str.find('-') != -1:
         year_s, mon_s, day_s = date_str.split('-')
         return datetime(int(year_s), int(mon_s), int(day_s))
+
+
+def get_months():
+    minus = lambda x, y: (x + relativedelta(months=y))
+    today = datetime.now().replace(day=1)
+    return list(map(lambda x: [minus(today, x-11), minus(today, x-10)], range(0, 12)))

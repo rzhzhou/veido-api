@@ -14,7 +14,8 @@ from observer.base.views import (
                                 CorpusView, CorpusAddView, CorpusEditView, 
                                 CorpusDeleteView, Select2CCCIndustryView, 
                                 Select2LicenseIndustryView, CCCIndustryAddView,
-                                LicenseIndustryAddView, 
+                                LicenseIndustryAddView, RiskDataExportView, 
+                                InspectionDataExportView, 
                                 )
 
 
@@ -37,11 +38,13 @@ urlpatterns = [
     path('risk_data/edit/<str:aid>/', RiskDataEditView.as_view()),  # 风险数据修改
     path('risk_data/delete/<str:aid>/', RiskDataDeleteView.as_view()),  # 风险数据删除
     path('risk_data/upload/<str:filename>/', RiskDataUploadView.as_view()),  # 风险数据上传
+    path('risk_data/export', RiskDataExportView.as_view()),  # 风险数据导出
     path('inspection_data', InspectionDataView.as_view()),  # 抽检数据
     path('inspection_data/add', InspectionDataAddView.as_view()),  # 抽检数据添加
     path('inspection_data/edit/<str:aid>/', InspectionDataEditView.as_view()),  # 抽检数据修改
     path('inspection_data/delete/<str:aid>/', InspectionDataDeleteView.as_view()),  # 抽检数据删除
     path('inspection_data/upload/<str:filename>/', InspectionDataUploadView.as_view()),  # 抽检数据上传
+    path('inspection_data/export', InspectionDataExportView.as_view()),  # 抽检数据导出
     path('alias_industry/add', AliasIndustryAddView.as_view()),  # 行业别名添加
     path('ccc_industry/add', CCCIndustryAddView.as_view()),  # CCC行业添加
     path('license_industry/add', LicenseIndustryAddView.as_view()),  # 许可证行业添加

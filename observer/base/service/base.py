@@ -1,21 +1,25 @@
 from django.core.exceptions import ObjectDoesNotExist
 
 from observer.base.models import (Area, ArticleArea, ArticleCategory, 
-                                Category, UserArea, AliasIndustry, )
+                                Category, UserArea, AliasIndustry, 
+                                InspectionEnterprise, Enterprise, )
 from observer.utils.date_format import date_format
 
 
-def areas(article_id):
+def areas(article_id, flat=False):
     a_ids = ArticleArea.objects.filter(article_id=article_id).values_list('area_id', flat=True)
     queryset = Area.objects.filter(id__in=a_ids)
 
     if not queryset.exists():
         queryset = Area.objects.filter(name='全国')
 
-    return list(map(lambda x: {'id': x['id'], 'text': x['name']}, queryset.values('id', 'name')))
+    if not flat:
+        return list(map(lambda x: {'id': x['id'], 'text': x['name']}, queryset.values('id', 'name')))
+    else:
+        return ' '.join(queryset.values_list('name', flat=True))
 
 
-def categories(article_id, admin=False):
+def categories(article_id, admin=False, flat=False):
     a_ids = ArticleCategory.objects.filter(article_id=article_id).values_list('category_id', flat=True)
     queryset = Category.objects.filter(id__in=a_ids)
     
@@ -25,7 +29,10 @@ def categories(article_id, admin=False):
     if not queryset.exists():
         queryset = Category.objects.filter(name='其它')
     
-    return list(map(lambda x: {'id': x['id'], 'text': x['name']}, queryset.values('id', 'name')))
+    if not flat:
+        return list(map(lambda x: {'id': x['id'], 'text': x['name']}, queryset.values('id', 'name')))
+    else:
+        return ' '.join(queryset.values_list('name', flat=True))
 
 
 # 本地相关度算法
@@ -56,19 +63,50 @@ def local_related(article_id, user):
     return 1
 
 
-def area(area_id):
+def area(area_id, flat=False):
     queryset = Area.objects.get(id=area_id)
 
-    return {'id': queryset.id, 'text': queryset.name}
+    if not flat:
+        return {'id': queryset.id, 'text': queryset.name}
+    else:
+        return queryset.name
 
 
+def alias_industry(alias_industry_id, flat=False):
+    queryset = AliasIndustry.objects.get(id=alias_industry_id)
+    
+    if not flat:
+        return {'id': queryset.id, 'text': queryset.name}
+    else:
+        return queryset.name
+    
 
-def industry(industry_id):
-    queryset = AliasIndustry.objects.get(id=industry_id)
-    
-    return {'id': queryset.id, 'text': queryset.name}
-    
-    
+def industry_number(alias_industry_id):
+    queryset = AliasIndustry.objects.get(id=alias_industry_id)
+
+    return queryset.industry_id
+
 
 def qualitied(q):
     return '{0}%'.format('%.2f' % float(100.00 if not q else q * 100))
+
+
+def enterprise(inspection_id, flat=False):
+    enterprise_ids = InspectionEnterprise.objects.filter(inspection_id=inspection_id).values_list('enterprise_id', flat=True)
+    queryset = Enterprise.objects.filter(id__in=enterprise_ids)
+
+    if not flat:
+        return list(map(lambda x: {'id': x['id'], 'text': x['name']}, queryset.values('id', 'name')))
+    else:
+        return ' '.join(queryset.values_list('name', flat=True))
+
+
+def enterprise_name(inspection_id, flat=False):
+    enterprise_ids = InspectionEnterprise.objects.filter(inspection_id=inspection_id).values_list('enterprise_id', flat=True)
+    area_ids = Enterprise.objects.filter(id__in=enterprise_ids).values_list('area_id', flat=True)
+    queryset = Area.objects.filter(id__in=area_ids)
+    
+    if not flat:
+        return list(map(lambda x: {'id': x['id'], 'text': x['name']}, queryset.values('id', 'name')))
+    else:
+        return ' '.join(queryset.values_list('name', flat=True))

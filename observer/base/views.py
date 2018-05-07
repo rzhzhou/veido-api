@@ -1,4 +1,5 @@
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.http import FileResponse
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.parsers import FileUploadParser
@@ -10,17 +11,19 @@ from observer.base.service.industry import (IndustryData, CCCIndustryData, Licen
                                             Select2LicenseIndustryData, CCCIndustryAdd, 
                                             LicenseIndustryAdd, )
 from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd, RiskDataEdit, 
-                                            RiskDataDelete, RiskDataUpload, )
+                                            RiskDataDelete, RiskDataUpload, RiskDataExport, )
 from observer.base.service.inspection import (InspectionData, InspectionDataAdd, InspectionDataEdit, 
-                                            InspectionDataDelete, InspectionDataUpload, )
+                                            InspectionDataDelete, InspectionDataUpload, InspectionDataUpload, 
+                                            InspectionDataExport, )
 from observer.base.service.area import Select2AreaData
 from observer.base.service.corpus import (CorpusData, CorpusAdd, CorpusEdit, CorpusDelete, 
                                             )
 from observer.base.service.desmon import (DMLinkData, DMLinkAdd, DMLinkEdit, DMLinkDelete, 
                                         DMWordsData, 
                                             )
-from observer.base.service.base import (areas, categories, local_related, area, industry, qualitied, )
+from observer.base.service.base import (areas, categories, local_related, area, alias_industry, qualitied, )
 from observer.utils.date_format import date_format
+from observer.utils.excel import write_by_openpyxl
 
 
 class BaseView(APIView):
@@ -136,7 +139,7 @@ class InspectionView(BaseView):
         data = {
             'total': total,
             'list': map(lambda x: {
-                    'industry': industry(x['industry_id']),
+                    'industry': alias_industry(x['industry_id']),
                     'url': x['url'],
                     'level': x['level'],
                     'area': area(x['area_id']),
@@ -645,6 +648,18 @@ class RiskDataUploadView(BaseView):
         return Response(queryset)
 
 
+class RiskDataExportView(BaseView):
+
+    def __init__(self):
+        super(RiskDataExportView, self).__init__()
+
+    def get(self, request):
+        response = FileResponse(RiskDataExport(user=request.user).export(), content_type='application/vnd.ms-excel')
+        response["Content-Disposition"] = 'attachment; filename=articles.xlsx'
+
+        return response
+
+
 class InspectionDataView(BaseView):
 
     def __init__(self):
@@ -663,7 +678,7 @@ class InspectionDataView(BaseView):
             'total': total,
             'list': map(lambda x: {
                     'guid': x['guid'],
-                    'industry': industry(x['industry_id']),
+                    'industry': alias_industry(x['industry_id']),
                     'url': x['url'],
                     'level': x['level'],
                     'area': area(x['area_id']),
@@ -738,6 +753,18 @@ class InspectionDataUploadView(BaseView):
         queryset = InspectionDataUpload(user=request.user).upload(filename, request.FILES['file'])
 
         return Response(queryset)
+
+
+class InspectionDataExportView(BaseView):
+
+    def __init__(self):
+        super(InspectionDataExportView, self).__init__()
+
+    def get(self, request):
+        response = FileResponse(InspectionDataExport(user=request.user).export(), content_type='application/vnd.ms-excel')
+        response["Content-Disposition"] = 'attachment; filename=inspections.xlsx'
+
+        return response
 
 
 class AliasIndustryAddView(BaseView):
