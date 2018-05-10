@@ -1959,7 +1959,7 @@ title=国
 ```
 {
     "total": 13,
-    "lists": [
+    "list": [
         {
             "_type": "article",
             "_index": "observer",
