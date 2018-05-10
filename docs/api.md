@@ -43,6 +43,7 @@
 | **30041** | corpus/add | 语料词添加 | POST |
 | **30042** | corpus/edit | 语料词修改 | POST |
 | **30043** | corpus/delete | 语料词删除 | DELETE |
+| **5000** | search | 搜素 | GET |
 
 *****
 ### API 详细信息
@@ -61,17 +62,17 @@
 
 **3. 输出参数**
 
-- 0001 : 质量热点（panel 1）
-- 0002 : 风险快讯（panel 2）
-- 0003 : 业务信息（panel 3）
-- 0004 : 抽检信息（panel 4）
-- 0005 : 热点信息（panel 5）
-- 0006 : 风险快讯（panel 6）
-- 0007 : 业务信息-特种（panel 7）
-- 0008 : 业务信息-标准（panel 7）
-- 0009 : 业务信息-计量（panel 7）
-- 0010 : 业务信息-全国（panel 8）
-- 0011 : 业务信息-本地（panel 8）
+- i0001 : 质量热点（panel 1）
+- i0002 : 风险快讯（panel 2）
+- i0003 : 业务信息（panel 3）
+- i0004 : 抽检信息（panel 4）
+- i0005 : 热点信息（panel 5）
+- i0006 : 风险快讯（panel 6）
+- i0007 : 业务信息-特种（panel 7）
+- i0008 : 业务信息-标准（panel 7）
+- i0009 : 业务信息-计量（panel 7）
+- i0010 : 业务信息-全国（panel 8）
+- i0011 : 业务信息-本地（panel 8）
 
 **4. 实例**
 
@@ -85,65 +86,65 @@ http://192.168.0.103:8001/api/dashboard
 输出
 ```
 {
-    "0007": [
+    "i0007": [
         {
             "pubtime": "2018-05-03",
             "title": "安装电梯时钢丝绳突然断裂 电梯轿厢失控下坠将工人撞入电梯井",
             "url": "http://news.ifeng.com/a/20180503/58065968_0.shtml"
         }
     ],
-    "0006": [
+    "i0006": [
         {
             "pubtime": "2018-03-26",
             "title": "震惊！儿童安全座椅抽检近三成不合格！忽视这些还有致命风险",
             "url": "http://news.sina.com.cn/o/2018-03-26/doc-ifysriyp5695988.shtml"
         }
     ],
-    "0005": [
+    "i0005": [
         {
             "pubtime": "2018-03-26",
             "title": "震惊！儿童安全座椅抽检近三成不合格！忽视这些还有致命风险",
             "url": "http://news.sina.com.cn/o/2018-03-26/doc-ifysriyp5695988.shtml"
         }
     ],
-    "0001": [
+    "i0001": [
         0,
         "Nan%"
     ],
-    "0011": [
+    "i0011": [
         {
             "pubtime": "2018-05-08",
             "title": "云南腾冲市市场监管局\n开展高速公路施工单位计量器具专项监督检查",
             "url": "http://epaper.cqn.com.cn/article/463904.html"
         }
     ],
-    "0009": [
+    "i0009": [
         {
             "pubtime": "2018-05-08",
             "title": "云南腾冲市市场监管局\n开展高速公路施工单位计量器具专项监督检查",
             "url": "http://epaper.cqn.com.cn/article/463904.html"
         }
     ],
-    "0008": [
+    "i0008": [
         {
             "pubtime": "2018-05-08",
             "title": "为什么有的食品没有国家标准",
             "url": "http://www.cqn.com.cn/zj/content/2018-05/08/content_5749229.htm"
         }
     ],
-    "0003": [
+    "i0003": [
         21,
         "Nan%"
     ],
-    "0002": [
+    "i0002": [
         0,
         "Nan%"
     ],
-    "0004": [
+    "i0004": [
         1,
         "-83.33%"
     ],
-    "0010": [
+    "i0010": [
         {
             "pubtime": "2018-05-08",
             "title": "云南腾冲市市场监管局\n开展高速公路施工单位计量器具专项监督检查",
@@ -1900,3 +1901,92 @@ Tips:
 ```
 略
 ```
+
+
+*****
+### **5000**
+
+**1. 接口描述**
+
+本接口 (search) 用于搜素数据.
+
+**2. 输入参数**
+
+| 参数名称 |    类型   | 是否必选 |  描述       |
+| :------| :-------- | :------ |:----------|
+| page | Int        |  是     | 页码. 值范围(1~+&). 默认值: 1|
+| length | Int        |  是     | 页长度. 值范围(15~+&). 默认值: 15|
+| title| String        |  否     | 标题。注：模糊匹配 |
+
+
+**3. 输出参数**
+
+| 参数名称 |    类型   |     描述   |
+| :------| :-------- | :-------- |
+| total| Int | 符合条件的信息数量。 |
+| list | List | 符合条件的详细信息列表。 |
+| \_type | String | 文档类型。 |
+| \_index | String | 文档索引。 |
+| \_score | String | 匹配度得分。 |
+| \_id | Int | 文档ID。 |
+| \_source | List | 文档内容。 |
+| invalid_keyword | String | 无效关键词 |
+| pubtime | String | 发布时间 |
+| risk_keyword | String | 风险关键词 |
+| score | String | 风险程度 |
+| source | String | 信息来源 |
+| status | String | 状态. 1：有效，0：默认，-1：无效 |
+| title | String | 标题 |
+| url | String | URL |
+| category | List | 类别列表 |
+| name | String | 类别名称  |
+| area | List | 地域列表 |
+| name | String | 地域名称  |
+
+
+**4. 实例**
+
+输入
+
+```
+http://192.168.0.103:8001/api/search?
+title=国
+&start=0
+&length=15
+```
+
+输出
+```
+{
+    "total": 13,
+    "lists": [
+        {
+            "_type": "article",
+            "_index": "observer",
+            "_score": 3.1149967,
+            "_id": "ad77603f11155194024a91f751686975",
+            "_source": {
+                "pubtime": "2018-03-06 00:00:00",
+                "invalid_keyword": "",
+                "url": "http://www.cqn.com.cn/zj/content/2018-03/06/content_5509105.htm",
+                "score": 3,
+                "title": "中国主导制定的国际标准数量位居世界前列",
+                "source": "中国质量新闻网",
+                "category": [
+                    {
+                        "name": "质监热点"
+                    }
+                ],
+                "area": [
+                    {
+                        "name": "武汉"
+                    }
+                ],
+                "risk_keyword": ""
+            }
+        },
+        ...
+    ]
+}
+```
+
