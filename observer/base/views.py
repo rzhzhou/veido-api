@@ -916,7 +916,7 @@ class SearchView(BaseView):
 
         data = {
             'total': results['total'],
-            'lists': results['hits']
+            'list': results['hits']
         }
         return data
 
