@@ -29,6 +29,7 @@ class ArticleData(Abstract):
             'title__contains': getattr(self, 'title', None),
             'source__contains': getattr(self, 'source', None),
             'score': getattr(self, 'score', None),
+            'status': 1, 
         }
         area_ids = getattr(self, 'areas', None)
         category_ids = getattr(self, 'categorys', None)

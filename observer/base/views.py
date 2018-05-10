@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.parsers import FileUploadParser
 
 from observer.base.models import Industry, AliasIndustry
+from observer.base.service.dashboard import (DashboardData, )
 from observer.base.service.industry import (IndustryData, CCCIndustryData, LicenseIndustryData, 
                                             Select2IndustryData, Select2AliasIndustryData, 
                                             AliasIndustryAdd, Select2CCCIndustryData, 
@@ -49,6 +50,15 @@ class BaseView(APIView):
             results = paginator.page(paginator.num_pages)
 
         return results
+
+
+class DashboardView(BaseView):
+
+    def __init__(self):
+        super(DashboardView, self).__init__()
+
+    def get(self, request):
+        return Response(DashboardData(user=request.user).get_all())
 
 
 class ArticleView(BaseView):

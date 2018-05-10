@@ -15,11 +15,12 @@ from observer.base.views import (
                                 CorpusDeleteView, Select2CCCIndustryView, 
                                 Select2LicenseIndustryView, CCCIndustryAddView,
                                 LicenseIndustryAddView, RiskDataExportView, 
-                                InspectionDataExportView, 
+                                InspectionDataExportView, DashboardView, 
                                 )
 
 
 urlpatterns = [
+    path('dashboard', DashboardView.as_view()),  # 整体概览
     path('industries', IndustryView.as_view()),  # 行业列表
     path('articles/<str:category>/', ArticleView.as_view()),  # 文章列表
     path('inspections', InspectionView.as_view()),  # 抽检列表
