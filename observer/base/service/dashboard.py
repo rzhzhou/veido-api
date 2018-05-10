@@ -17,29 +17,29 @@ class DashboardData():
 
     def get_all(self):
         months = get_months()[-2::]
-        # 0001 : 质量热点（panel 1）
-        # 0002 : 风险快讯（panel 2）
-        # 0003 : 业务信息（panel 3）
-        # 0004 : 抽检信息（panel 4）
-        # 0005 : 热点信息（panel 5）
-        # 0006 : 风险快讯（panel 6）
-        # 0007 : 业务信息-特种（panel 7）
-        # 0008 : 业务信息-标准（panel 7）
-        # 0009 : 业务信息-计量（panel 7）
-        # 0010 : 业务信息-全国（panel 8）
-        # 0011 : 业务信息-本地（panel 8）
+        # i0001 : 质量热点（panel 1）
+        # i0002 : 风险快讯（panel 2）
+        # i0003 : 业务信息（panel 3）
+        # i0004 : 抽检信息（panel 4）
+        # i0005 : 热点信息（panel 5）
+        # i0006 : 风险快讯（panel 6）
+        # i0007 : 业务信息-特种（panel 7）
+        # i0008 : 业务信息-标准（panel 7）
+        # i0009 : 业务信息-计量（panel 7）
+        # i0010 : 业务信息-全国（panel 8）
+        # i0011 : 业务信息-本地（panel 8）
         return {
-            '0001' : self.get_0001(months),
-            '0002' : self.get_0002(months),
-            '0003' : self.get_0003(months),
-            '0004' : self.get_0004(months),
-            '0005' : self.get_0005(),
-            '0006' : self.get_0006(),
-            '0007' : self.get_0007(),
-            '0008' : self.get_0008(),
-            '0009' : self.get_0009(),
-            '0010' : self.get_0010(),
-            '0011' : self.get_0011(),
+            'i0001' : self.get_0001(months),
+            'i0002' : self.get_0002(months),
+            'i0003' : self.get_0003(months),
+            'i0004' : self.get_0004(months),
+            'i0005' : self.get_0005(),
+            'i0006' : self.get_0006(),
+            'i0007' : self.get_0007(),
+            'i0008' : self.get_0008(),
+            'i0009' : self.get_0009(),
+            'i0010' : self.get_0010(),
+            'i0011' : self.get_0011(),
         }
 
     #环比计算
