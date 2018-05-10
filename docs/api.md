@@ -1935,7 +1935,6 @@ Tips:
 | risk_keyword | String | 风险关键词 |
 | score | String | 风险程度 |
 | source | String | 信息来源 |
-| status | String | 状态. 1：有效，0：默认，-1：无效 |
 | title | String | 标题 |
 | url | String | URL |
 | category | List | 类别列表 |
