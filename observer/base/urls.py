@@ -16,6 +16,7 @@ from observer.base.views import (
                                 Select2LicenseIndustryView, CCCIndustryAddView,
                                 LicenseIndustryAddView, RiskDataExportView, 
                                 InspectionDataExportView, DashboardView, SearchView,
+                                SearchAdvancedView,
                                 )
 
 
@@ -61,6 +62,7 @@ urlpatterns = [
     path('select2/areas', Select2AreaView.as_view()),  # 地域名称
 
     path('search', SearchView.as_view()),  # 搜索
+    path('search/advanced', SearchAdvancedView.as_view()),  # 高级搜索
 ]
 
 urlpatterns += [

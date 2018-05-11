@@ -6,7 +6,7 @@ from rest_framework.parsers import FileUploadParser
 
 from observer.base.models import Industry, AliasIndustry
 from observer.base.service.dashboard import (DashboardData, )
-from observer.base.service.search import (SearchData, )
+from observer.base.service.search import (SearchData, SearchAdvancedData, )
 from observer.base.service.industry import (IndustryData, CCCIndustryData, LicenseIndustryData, 
                                             Select2IndustryData, Select2AliasIndustryData, 
                                             AliasIndustryAdd, Select2CCCIndustryData, 
@@ -924,6 +924,31 @@ class SearchView(BaseView):
         self.set_params(request)
 
         queryset = SearchData(params=self.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+        
+
+class SearchAdvancedView(BaseView):
+
+    def __init__(self):
+        super(SearchAdvancedView, self).__init__()
+
+    def set_params(self, request):
+        super(SearchAdvancedView, self).set_params(request.GET)
+
+    def serialize(self, queryset):
+        results = queryset['hits']
+
+        data = {
+            'total': results['total'],
+            'list': results['hits']
+        }
+        return data
+
+    def get(self, request):
+        self.set_params(request)
+
+        queryset = SearchAdvancedData(params=self.query_params).get_all()
 
         return Response(self.serialize(queryset))
         

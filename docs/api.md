@@ -44,6 +44,7 @@
 | **30042** | corpus/edit | 语料词修改 | POST |
 | **30043** | corpus/delete | 语料词删除 | DELETE |
 | **5000** | search | 搜素 | GET |
+| **5001** | search/advanced | 高级搜素 | GET |
 
 *****
 ### API 详细信息
@@ -1902,7 +1903,6 @@ Tips:
 略
 ```
 
-
 *****
 ### **5000**
 
@@ -1983,6 +1983,98 @@ title=国
                 ],
                 "risk_keyword": ""
             }
+        },
+        ...
+    ]
+}
+```
+
+*****
+### **5000**
+
+**1. 接口描述**
+
+本接口 (search) 用于搜素数据.
+
+**2. 输入参数**
+
+| 参数名称 |    类型   | 是否必选 |  描述       |
+| :------| :-------- | :------ |:----------|
+| page | Int        |  是     | 页码. 值范围(1~+&). 默认值: 1|
+| length | Int        |  是     | 页长度. 值范围(15~+&). 默认值: 15|
+| q1| String        |  否     | 以下所有字词 |
+| q2| String        |  否     | 与以下字词完全匹配 |
+| q3| String        |  否     | 以下任意字词 |
+| q4| String        |  否     | 不含以下任意字词 |
+| q5| String        |  否     | 来源搜索 |
+
+
+**3. 输出参数**
+
+| 参数名称 |    类型   |     描述   |
+| :------| :-------- | :-------- |
+| total| Int | 符合条件的信息数量。 |
+| list | List | 符合条件的详细信息列表。 |
+| \_type | String | 文档类型。 |
+| \_index | String | 文档索引。 |
+| \_score | String | 匹配度得分。 |
+| \_id | Int | 文档ID。 |
+| \_source | List | 文档内容。 |
+| invalid_keyword | String | 无效关键词 |
+| pubtime | String | 发布时间 |
+| risk_keyword | String | 风险关键词 |
+| score | String | 风险程度 |
+| source | String | 信息来源 |
+| title | String | 标题 |
+| url | String | URL |
+| category | List | 类别列表 |
+| name | String | 类别名称  |
+| area | List | 地域列表 |
+| name | String | 地域名称  |
+
+
+**4. 实例**
+
+输入
+
+```
+http://192.168.0.103:8001/api/search/advanced?
+q1=儿童
+&q2=网购
+&q3=网购
+&q4=查
+&q5=中
+```
+
+输出
+```
+{
+    "total": 13,
+    "list": [
+        {
+            "_source": {
+                "pubtime": "2018-03-12 00:00:00",
+                "invalid_keyword": "",
+                "title": "315维权在行动：网络销售儿童服装、玩具等抽检近半不合格",
+                "url": "http://ah.anhuinews.com/system/2018/03/12/007824321.shtml",
+                "category": [
+                    {
+                        "name": "风险快讯"
+                    }
+                ],
+                "area": [
+                    {
+                        "name": "武汉"
+                    }
+                ],
+                "risk_keyword": "",
+                "score": 3,
+                "source": "中安在线"
+            },
+            "_index": "observer",
+            "_id": "4d96750d281c5161ed5d5cd24859e487",
+            "_score": 8.614649,
+            "_type": "article"
         },
         ...
     ]
