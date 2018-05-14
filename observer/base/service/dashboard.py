@@ -60,7 +60,7 @@ class DashboardData():
 
     def get_0001(self, months):
         a_ids = ArticleCategory.objects.filter(category_id='0001').values_list('article_id', flat=True)
-        c = lambda x, y, z : y.objects.filter(pubtime__gte=x[0], pubtime__lt=x[1], guid__in=z).count()
+        c = lambda x, y, z : y.objects.filter(pubtime__gte=x[0], pubtime__lt=x[1], status=1, guid__in=z).count()
         
         pre = c(months[0], Article, a_ids)
         cur = c(months[1], Article, a_ids)
@@ -69,7 +69,7 @@ class DashboardData():
 
     def get_0002(self, months):
         a_ids = ArticleCategory.objects.filter(category_id='0002').values_list('article_id', flat=True)
-        c = lambda x, y, z : y.objects.filter(pubtime__gte=x[0], pubtime__lt=x[1], guid__in=z).count()
+        c = lambda x, y, z : y.objects.filter(pubtime__gte=x[0], pubtime__lt=x[1], status=1, guid__in=z).count()
         
         pre = c(months[0], Article, a_ids)
         cur = c(months[1], Article, a_ids)
@@ -78,7 +78,7 @@ class DashboardData():
 
     def get_0003(self, months):
         a_ids = ArticleCategory.objects.filter(category_id='0003').values_list('article_id', flat=True)
-        c = lambda x, y, z : y.objects.filter(pubtime__gte=x[0], pubtime__lt=x[1], guid__in=z).count()
+        c = lambda x, y, z : y.objects.filter(pubtime__gte=x[0], pubtime__lt=x[1], status=1, guid__in=z).count()
         
         pre = c(months[0], Article, a_ids)
         cur = c(months[1], Article, a_ids)
@@ -95,7 +95,7 @@ class DashboardData():
 
     def get_0005(self):
         a_ids = ArticleCategory.objects.filter(category_id='0001').values_list('article_id', flat=True)
-        queryset = Article.objects.filter(guid__in=a_ids).values('url', 'title', 'pubtime')[0:15]
+        queryset = Article.objects.filter(status=1, guid__in=a_ids).values('url', 'title', 'pubtime')[0:15]
 
         return map(lambda x : {
                 'url': x['url'],
@@ -105,7 +105,7 @@ class DashboardData():
 
     def get_0006(self):
         a_ids = ArticleCategory.objects.filter(category_id='0002').values_list('article_id', flat=True)
-        queryset = Article.objects.filter(guid__in=a_ids).values('url', 'title', 'pubtime')[0:15]
+        queryset = Article.objects.filter(status=1, guid__in=a_ids).values('url', 'title', 'pubtime')[0:15]
         
         return map(lambda x : {
                 'url': x['url'],
@@ -115,7 +115,7 @@ class DashboardData():
 
     def get_0007(self):
         a_ids = ArticleCategory.objects.filter(category_id='00036').values_list('article_id', flat=True)
-        queryset = Article.objects.filter(guid__in=a_ids).values('url', 'title', 'pubtime')[0:15]
+        queryset = Article.objects.filter(status=1, guid__in=a_ids).values('url', 'title', 'pubtime')[0:15]
         
         return map(lambda x : {
                 'url': x['url'],
@@ -125,7 +125,7 @@ class DashboardData():
 
     def get_0008(self):
         a_ids = ArticleCategory.objects.filter(category_id='00032').values_list('article_id', flat=True)
-        queryset = Article.objects.filter(guid__in=a_ids).values('url', 'title', 'pubtime')[0:15]
+        queryset = Article.objects.filter(status=1, guid__in=a_ids).values('url', 'title', 'pubtime')[0:15]
         
         return map(lambda x : {
                 'url': x['url'],
@@ -135,7 +135,7 @@ class DashboardData():
 
     def get_0009(self):
         a_ids = ArticleCategory.objects.filter(category_id='00037').values_list('article_id', flat=True)
-        queryset = Article.objects.filter(guid__in=a_ids).values('url', 'title', 'pubtime')[0:15]
+        queryset = Article.objects.filter(status=1, guid__in=a_ids).values('url', 'title', 'pubtime')[0:15]
         
         return map(lambda x : {
                 'url': x['url'],
@@ -146,7 +146,7 @@ class DashboardData():
     def get_0010(self):
         c_ids = Category.objects.filter(parent__id='0003').values_list('id', flat=True)
         a_ids = ArticleCategory.objects.filter(category_id__in=c_ids).values_list('article_id', flat=True)
-        queryset = Article.objects.filter(guid__in=a_ids).values('url', 'title', 'pubtime')[0:15]
+        queryset = Article.objects.filter(status=1, guid__in=a_ids).values('url', 'title', 'pubtime')[0:15]
         
         return map(lambda x : {
                 'url': x['url'],
@@ -160,7 +160,7 @@ class DashboardData():
 
         c_ids = Category.objects.filter(parent__id='0003').values_list('id', flat=True)
         a_ids = ArticleCategory.objects.filter(category_id__in=c_ids).values_list('article_id', flat=True)
-        queryset = Article.objects.filter(guid__in=set(tuple(aa_ids) + tuple(a_ids))).values('url', 'title', 'pubtime')[0:15]
+        queryset = Article.objects.filter(status=1, guid__in=set(tuple(aa_ids) + tuple(a_ids))).values('url', 'title', 'pubtime')[0:15]
         
         return map(lambda x : {
                 'url': x['url'],
