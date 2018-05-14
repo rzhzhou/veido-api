@@ -55,14 +55,14 @@ class SearchAdvancedData(Abstract):
 
         start = getattr(self, 'start', 1)
         length = getattr(self, 'length', 15)
-        q1 = getattr(self, 'q1', None)
-        q2 = getattr(self, 'q2', None)
-        q3 = getattr(self, 'q3', None)
-        q4 = getattr(self, 'q4', None)
-        q5 = getattr(self, 'q5', None)
-        category = getattr(self, 'category', None)
-        order = getattr(self, 'order', None)
-        area = getattr(self, 'area', None)
+        q1 = getattr(self, 'q1', '')
+        q2 = getattr(self, 'q2', '')
+        q3 = getattr(self, 'q3', '')
+        q4 = getattr(self, 'q4', '')
+        q5 = getattr(self, 'q5', '')
+        category = getattr(self, 'category', '')
+        order = getattr(self, 'order', '')
+        area = getattr(self, 'area', '')
 
         body = {
                 "query" : {},
@@ -105,6 +105,35 @@ class SearchAdvancedData(Abstract):
             if q5:
                 query_string = ' source:(%s)' % q5
 
+        cl = category.split(',')[:-1:]
+        if cl:
+            if query_string:
+                query_string = '%s AND category.name:(%s)' % (query_string, 'OR'.join(cl), )
+            else:
+                query_string = 'AND category.name:(%s)' % 'OR'.join(cl)
+
+        al = area.split(',')[:-1:]
+        if al:
+            if query_string:
+                query_string = '%s AND area.name:(%s)' % (query_string, 'OR'.join(al), )
+            else:
+                query_string = 'AND area.name:(%s)' % 'OR'.join(al)
+
+        # sorted
+        sort_list = []
+        ol = order.split(',')[:-1:]
+        if 'pubtime_desc' in ol:
+            sort_list.append({'pubtime': {"order": "desc"}})
+
+        if 'pubtime_asc' in ol:
+            sort_list.append({'pubtime': {"order": "asc"}})
+
+        if 'score_desc' in ol:
+            sort_list.append({'_score': {"order": "desc"}})
+
+        if 'score_asc' in ol:
+            sort_list.append({'_score': {"order": "asc"}})
+
 
 
         if not query_string:
@@ -112,7 +141,8 @@ class SearchAdvancedData(Abstract):
         else:
             body['query']['query_string'] = {'query': query_string}
 
-        print(query_string)
+        body['sort'] = sort_list
+
         return esclient.search(
             index=conf['index'],
             doc_type=conf['type'],
