@@ -119,6 +119,8 @@ class DashboardData():
         q = lambda x, y, z : x.objects.filter(status=1, guid__in=y.objects.filter(category_id=z).values_list('article_id', flat=True)).values('guid', 'url', 'title', 'source', 'pubtime').order_by('-pubtime')[0:1]
 
         return map(lambda c : {
+                'id': c.id,
+                'name': c.name,
                 'i%s' % c.id : map(lambda x :{
                     'url': x['url'],
                     'title': x['title'],
