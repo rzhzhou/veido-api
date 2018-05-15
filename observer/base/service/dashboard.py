@@ -121,7 +121,7 @@ class DashboardData():
         return map(lambda c : {
                 'id': c.id,
                 'name': c.name,
-                'i%s' % c.id : map(lambda x :{
+                'list' % c.id : map(lambda x :{
                     'url': x['url'],
                     'title': x['title'],
                     'source': x['source'],
