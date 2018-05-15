@@ -4,8 +4,9 @@ from django.db.models import Count, Q, F
 from observer.base.models import(Area, UserArea, Article, ArticleArea, 
                                 Category, ArticleCategory, Inspection, 
                                 )
-from observer.base.service.base import (areas, categories, )
-from observer.utils.date_format import (date_format, str_to_date, get_months)
+from observer.base.service.base import (areas, categories, local_related, 
+                                        alias_industry, area, qualitied, )
+from observer.utils.date_format import (date_format, str_to_date, get_months, )
 from observer.utils.str_format import str_to_md5str
 
 
@@ -21,13 +22,13 @@ class DashboardData():
         # i0002 : 风险快讯（panel 2）
         # i0003 : 业务信息（panel 3）
         # i0004 : 抽检信息（panel 4）
-        # i0005 : 热点信息（panel 5）
-        # i0006 : 风险快讯（panel 6）
-        # i0007 : 业务信息-特种（panel 7）
-        # i0008 : 业务信息-标准（panel 7）
-        # i0009 : 业务信息-计量（panel 7）
-        # i0010 : 业务信息-全国（panel 8）
-        # i0011 : 业务信息-本地（panel 8）
+
+        # i0005 : 质量热点（panel 5）
+        # i0006 : 专家视点（panel 6）
+        # i0007 : 业务信息（panel 7）
+        # i0008 : 风险快讯（panel 8）
+        # i0009 : 抽检信息（panel 9）
+
         return {
             'i0001' : self.get_0001(months),
             'i0002' : self.get_0002(months),
@@ -38,8 +39,6 @@ class DashboardData():
             'i0007' : self.get_0007(),
             'i0008' : self.get_0008(),
             'i0009' : self.get_0009(),
-            'i0010' : self.get_0010(),
-            'i0011' : self.get_0011(),
         }
 
     #环比计算
@@ -94,8 +93,9 @@ class DashboardData():
         return self.mom(pre, cur)
 
     def get_0005(self):
-        a_ids = ArticleCategory.objects.filter(category_id='0001').values_list('article_id', flat=True)
-        queryset = Article.objects.filter(status=1, guid__in=a_ids).values('url', 'title', 'pubtime')[0:15]
+        ac_id = Category.objects.get(name='质量热点').id
+        a_ids = ArticleCategory.objects.filter(category_id=ac_id).values_list('article_id', flat=True)
+        queryset = Article.objects.filter(status=1, guid__in=a_ids).values('url', 'title', 'pubtime').order_by('-pubtime')[0:15]
 
         return map(lambda x : {
                 'url': x['url'],
@@ -104,67 +104,58 @@ class DashboardData():
             }, queryset)
 
     def get_0006(self):
-        a_ids = ArticleCategory.objects.filter(category_id='0002').values_list('article_id', flat=True)
-        queryset = Article.objects.filter(status=1, guid__in=a_ids).values('url', 'title', 'pubtime')[0:15]
+        ac_id = Category.objects.get(name='专家视点').id
+        a_ids = ArticleCategory.objects.filter(category_id=ac_id).values_list('article_id', flat=True)
+        queryset = Article.objects.filter(status=1, guid__in=a_ids).values('url', 'title', 'source', 'pubtime').order_by('-pubtime')[0:15]
         
         return map(lambda x : {
                 'url': x['url'],
                 'title': x['title'],
+                'source': x['source'],
                 'pubtime': date_format(x['pubtime'], '%Y-%m-%d'), 
             }, queryset)
 
     def get_0007(self):
-        a_ids = ArticleCategory.objects.filter(category_id='00036').values_list('article_id', flat=True)
-        queryset = Article.objects.filter(status=1, guid__in=a_ids).values('url', 'title', 'pubtime')[0:15]
-        
-        return map(lambda x : {
-                'url': x['url'],
-                'title': x['title'],
-                'pubtime': date_format(x['pubtime'], '%Y-%m-%d'), 
-            }, queryset)
+        q = lambda x, y, z : x.objects.filter(status=1, guid__in=y.objects.filter(category_id=z).values_list('article_id', flat=True)).values('guid', 'url', 'title', 'source', 'pubtime').order_by('-pubtime')[0:15]
+
+        return map(lambda c : {
+                'id': c.id,
+                'name': c.name,
+                'list': map(lambda x :{
+                    'url': x['url'],
+                    'title': x['title'],
+                    'source': x['source'],
+                    'areas': areas(x['guid']),
+                    'pubtime': date_format(x['pubtime'], '%Y-%m-%d'), 
+                    }, q(Article, ArticleCategory, c.id))
+            }, Category.objects.filter(parent__name='业务信息'))
 
     def get_0008(self):
-        a_ids = ArticleCategory.objects.filter(category_id='00032').values_list('article_id', flat=True)
-        queryset = Article.objects.filter(status=1, guid__in=a_ids).values('url', 'title', 'pubtime')[0:15]
+        ac_id = Category.objects.get(name='风险快讯').id
+        a_ids = ArticleCategory.objects.filter(category_id=ac_id).values_list('article_id', flat=True)
+        queryset = Article.objects.filter(status=1, guid__in=a_ids).values('guid', 'url', 'source', 'score', 'title', 'pubtime').order_by('-pubtime')[0:15]
         
         return map(lambda x : {
                 'url': x['url'],
                 'title': x['title'],
-                'pubtime': date_format(x['pubtime'], '%Y-%m-%d'), 
+                'source': x['source'],
+                'areas': areas(x['guid']),
+                'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
+                'score': x['score'],
+                'local_related': local_related(x['guid'], self.user), # 本地风险相关度
             }, queryset)
 
+    
     def get_0009(self):
-        a_ids = ArticleCategory.objects.filter(category_id='00037').values_list('article_id', flat=True)
-        queryset = Article.objects.filter(status=1, guid__in=a_ids).values('url', 'title', 'pubtime')[0:15]
-        
-        return map(lambda x : {
+        queryset = Inspection.objects.all().values('guid', 'title', 'url', 'pubtime', 'source', 'unitem', 'qualitied', 'category', 'level', 'industry_id', 'area_id', ).order_by('-pubtime')[0:15]
+
+        return map(lambda x: {
+                'industry': alias_industry(x['industry_id']),
                 'url': x['url'],
-                'title': x['title'],
-                'pubtime': date_format(x['pubtime'], '%Y-%m-%d'), 
+                'level': x['level'],
+                'area': area(x['area_id']),
+                'source': x['source'],
+                'qualitied': qualitied(x['qualitied']),
+                'category': x['category'],
+                'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
             }, queryset)
-
-    def get_0010(self):
-        c_ids = Category.objects.filter(parent__id='0003').values_list('id', flat=True)
-        a_ids = ArticleCategory.objects.filter(category_id__in=c_ids).values_list('article_id', flat=True)
-        queryset = Article.objects.filter(status=1, guid__in=a_ids).values('url', 'title', 'pubtime')[0:15]
-        
-        return map(lambda x : {
-                'url': x['url'],
-                'title': x['title'],
-                'pubtime': date_format(x['pubtime'], '%Y-%m-%d'), 
-            }, queryset)
-
-    def get_0011(self):
-        current_area = UserArea.objects.filter(user=self.user).values_list('area__id', flat=True)
-        aa_ids = ArticleArea.objects.filter(area_id__in=current_area).values_list('article_id', flat=True)
-
-        c_ids = Category.objects.filter(parent__id='0003').values_list('id', flat=True)
-        a_ids = ArticleCategory.objects.filter(category_id__in=c_ids).values_list('article_id', flat=True)
-        queryset = Article.objects.filter(status=1, guid__in=set(tuple(aa_ids) + tuple(a_ids))).values('url', 'title', 'pubtime')[0:15]
-        
-        return map(lambda x : {
-                'url': x['url'],
-                'title': x['title'],
-                'pubtime': date_format(x['pubtime'], '%Y-%m-%d'), 
-            }, queryset)
-
