@@ -189,6 +189,7 @@ class Article(models.Model):
     url = models.URLField(verbose_name='网站链接')
     pubtime = models.DateTimeField(auto_now=False, verbose_name='发布时间')
     source = models.CharField(max_length=80, blank=True, verbose_name='信息来源')
+    publisher = models.CharField(max_length=80, blank=True, verbose_name='发布者')
     score = models.IntegerField(default=0, verbose_name='风险程度')# 0, 默认值
     risk_keyword = models.CharField(max_length=255, blank=True, verbose_name='关键词')
     invalid_keyword = models.CharField(max_length=255, blank=True, verbose_name='无效关键词')

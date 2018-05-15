@@ -4,17 +4,18 @@ from django.db.models import Count, Q, F
 from observer.base.models import(Area, UserArea, Article, ArticleArea, 
                                 Category, ArticleCategory, Inspection, 
                                 )
+from observer.base.service.abstract import Abstract
 from observer.base.service.base import (areas, categories, local_related, 
                                         alias_industry, area, qualitied, )
 from observer.utils.date_format import (date_format, str_to_date, get_months, )
 from observer.utils.str_format import str_to_md5str
 
 
-class DashboardData():
+class DashboardData(Abstract):
 
-    def __init__(self, user):
+    def __init__(self, params, user):
         self.user = user
-        super(DashboardData, self).__init__()
+        super(DashboardData, self).__init__(params)
 
     def get_all(self):
         months = get_months()[-2::]
@@ -28,6 +29,8 @@ class DashboardData():
         # i0007 : 业务信息（panel 7）
         # i0008 : 风险快讯（panel 8）
         # i0009 : 抽检信息（panel 9）
+        
+        self.length = int(getattr(self, 'length', 15))
 
         return {
             'i0001' : self.get_0001(months),
@@ -95,7 +98,7 @@ class DashboardData():
     def get_0005(self):
         ac_id = Category.objects.get(name='质量热点').id
         a_ids = ArticleCategory.objects.filter(category_id=ac_id).values_list('article_id', flat=True)
-        queryset = Article.objects.filter(status=1, guid__in=a_ids).values('url', 'title', 'pubtime').order_by('-pubtime')[0:15]
+        queryset = Article.objects.filter(status=1, guid__in=a_ids).values('url', 'title', 'pubtime').order_by('-pubtime')[0:self.length]
 
         return map(lambda x : {
                 'url': x['url'],
@@ -106,17 +109,18 @@ class DashboardData():
     def get_0006(self):
         ac_id = Category.objects.get(name='专家视点').id
         a_ids = ArticleCategory.objects.filter(category_id=ac_id).values_list('article_id', flat=True)
-        queryset = Article.objects.filter(status=1, guid__in=a_ids).values('url', 'title', 'source', 'pubtime').order_by('-pubtime')[0:15]
+        queryset = Article.objects.filter(status=1, guid__in=a_ids).values('url', 'title', 'source', 'publisher', 'pubtime').order_by('-pubtime')[0:self.length]
         
         return map(lambda x : {
                 'url': x['url'],
                 'title': x['title'],
                 'source': x['source'],
+                'publisher': x['publisher'],
                 'pubtime': date_format(x['pubtime'], '%Y-%m-%d'), 
             }, queryset)
 
     def get_0007(self):
-        q = lambda x, y, z : x.objects.filter(status=1, guid__in=y.objects.filter(category_id=z).values_list('article_id', flat=True)).values('guid', 'url', 'title', 'source', 'pubtime').order_by('-pubtime')[0:15]
+        q = lambda x, y, z : x.objects.filter(status=1, guid__in=y.objects.filter(category_id=z).values_list('article_id', flat=True)).values('guid', 'url', 'title', 'source', 'pubtime').order_by('-pubtime')[0:self.length]
 
         return map(lambda c : {
                 'id': c.id,
@@ -133,7 +137,7 @@ class DashboardData():
     def get_0008(self):
         ac_id = Category.objects.get(name='风险快讯').id
         a_ids = ArticleCategory.objects.filter(category_id=ac_id).values_list('article_id', flat=True)
-        queryset = Article.objects.filter(status=1, guid__in=a_ids).values('guid', 'url', 'source', 'score', 'title', 'pubtime').order_by('-pubtime')[0:15]
+        queryset = Article.objects.filter(status=1, guid__in=a_ids).values('guid', 'url', 'source', 'score', 'title', 'pubtime').order_by('-pubtime')[0:self.length]
         
         return map(lambda x : {
                 'url': x['url'],
@@ -147,7 +151,7 @@ class DashboardData():
 
     
     def get_0009(self):
-        q = lambda x: x.values('guid', 'title', 'url', 'pubtime', 'source', 'unitem', 'qualitied', 'category', 'level', 'industry_id', 'area_id', ).order_by('-pubtime')[0:15]
+        q = lambda x: x.values('guid', 'title', 'url', 'pubtime', 'source', 'unitem', 'qualitied', 'category', 'level', 'industry_id', 'area_id', ).order_by('-pubtime')[0:self.length]
 
         return {'local': map(lambda x: {
                         'industry': alias_industry(x['industry_id']),

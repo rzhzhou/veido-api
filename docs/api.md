@@ -60,7 +60,9 @@
 
 **2. 输入参数**
 
-无
+| 参数名称 |    类型   | 是否必选 |  描述       |
+| :------| :-------- | :------ |:----------|
+| length | Int        |  否     | 页长度. 值范围(0~+&). 默认值: 15|
 
 **3. 输出参数**
 
@@ -87,74 +89,80 @@ http://192.168.0.103:8001/api/dashboard
 输出
 ```
 {
-    "i0006": [
-        {
-            "source": "中国青年报",
-            "pubtime": "2018-03-11",
-            "title": "海淘“爆款”化妆品竟然产自小作坊",
-            "url": "http://epaper.ynet.com/html/2018-03/11/content_281010.htm?div=-1"
-        }
-    ],
     "i0002": [
         0,
         "Nan%"
+    ],
+    "i0006": [
+        {
+            "url": "http://epaper.ynet.com/html/2018-03/11/content_281010.htm?div=-1",
+            "title": "海淘“爆款”化妆品竟然产自小作坊",
+            "pubtime": "2018-03-11",
+            "source": "中国青年报",
+            "publisher": ""
+        }
     ],
     "i0004": [
         1,
         "-83.33%"
     ],
+    "i0001": [
+        0,
+        "Nan%"
+    ],
     "i0005": [
         {
-            "pubtime": "2018-03-26",
+            "url": "http://www.cqn.com.cn/cj/content/2018-03/26/content_5592714.htm",
             "title": "梁朝伟代言的丸美IPO:3年砸10亿做广告 产品屡上质检黑榜",
-            "url": "http://www.cqn.com.cn/cj/content/2018-03/26/content_5592714.htm"
+            "pubtime": "2018-03-26"
         }
     ],
     "i0007": [
         {
-            "id": "00031",
             "list": [],
+            "id": "00031",
             "name": "综合"
         },
         {
-            "id": "00032",
             "list": [],
+            "id": "00032",
             "name": "标准化"
         },
         {
-            "id": "00033",
             "list": [],
+            "id": "00033",
             "name": "稽查打假"
         },
         {
-            "id": "00034",
             "list": [],
+            "id": "00034",
             "name": "质量监管"
         },
         {
-            "id": "00035",
             "list": [
                 {
-                    "source": "亲贝网",
+                    "url": "http://news.qinbei.com/20180314/1851957.shtml",
+                    "title": "1批次雅乐婴儿童浴巾因PH值超标不合格",
                     "pubtime": "2018-03-14",
+                    "source": "亲贝网",
                     "areas": [
                         {
                             "id": 2557,
                             "text": "青岛"
                         }
-                    ],
-                    "title": "1批次雅乐婴儿童浴巾因PH值超标不合格",
-                    "url": "http://news.qinbei.com/20180314/1851957.shtml"
+                    ]
                 }
             ],
+            "id": "00035",
             "name": "科技兴检"
         },
         {
-            "id": "00036",
             "list": [
                 {
-                    "source": "中国新闻网",
+                    "url": "http://dw.chinanews.com/chinanews/content.jsp?id=8467281&classify=zw&pageSize=6&language=chs",
+                    "title": "对儿童安全构成威胁 指尖陀螺被欧盟列为危险品",
                     "pubtime": "2018-03-14",
+                    "source": "中国新闻网",
                     "areas": [
                         {
                             "id": 1742,
@@ -164,24 +172,24 @@ http://192.168.0.103:8001/api/dashboard
                             "id": 2180,
                             "text": "上海"
                         }
-                    ],
-                    "title": "对儿童安全构成威胁 指尖陀螺被欧盟列为危险品",
-                    "url": "http://dw.chinanews.com/chinanews/content.jsp?id=8467281&classify=zw&pageSize=6&language=chs"
+                    ]
                 }
             ],
+            "id": "00036",
             "name": "特种设备"
         },
         {
-            "id": "00037",
             "list": [],
+            "id": "00037",
             "name": "计量"
         },
         {
-            "id": "00038",
             "list": [
                 {
-                    "source": "中国新闻网",
+                    "url": "http://dw.chinanews.com/chinanews/content.jsp?id=8467281&classify=zw&pageSize=6&language=chs",
+                    "title": "对儿童安全构成威胁 指尖陀螺被欧盟列为危险品",
                     "pubtime": "2018-03-14",
+                    "source": "中国新闻网",
                     "areas": [
                         {
                             "id": 1742,
@@ -191,19 +199,19 @@ http://192.168.0.103:8001/api/dashboard
                             "id": 2180,
                             "text": "上海"
                         }
-                    ],
-                    "title": "对儿童安全构成威胁 指尖陀螺被欧盟列为危险品",
-                    "url": "http://dw.chinanews.com/chinanews/content.jsp?id=8467281&classify=zw&pageSize=6&language=chs"
+                    ]
                 }
             ],
+            "id": "00038",
             "name": "认证监管"
         },
         {
-            "id": "00039",
             "list": [
                 {
-                    "source": "中国新闻网",
+                    "url": "http://dw.chinanews.com/chinanews/content.jsp?id=8467281&classify=zw&pageSize=6&language=chs",
+                    "title": "对儿童安全构成威胁 指尖陀螺被欧盟列为危险品",
                     "pubtime": "2018-03-14",
+                    "source": "中国新闻网",
                     "areas": [
                         {
                             "id": 1742,
@@ -213,58 +221,53 @@ http://192.168.0.103:8001/api/dashboard
                             "id": 2180,
                             "text": "上海"
                         }
-                    ],
-                    "title": "对儿童安全构成威胁 指尖陀螺被欧盟列为危险品",
-                    "url": "http://dw.chinanews.com/chinanews/content.jsp?id=8467281&classify=zw&pageSize=6&language=chs"
+                    ]
                 }
             ],
+            "id": "00039",
             "name": "质量管理"
         }
     ],
+    "i0003": [
+        0,
+        "Nan%"
+    ],
+    "i0009": {
+        "local": [],
+        "all": [
+            {
+                "pubtime": "2018-05-07",
+                "source": "django",
+                "category": "监督抽查",
+                "qualitied": "127.27%",
+                "url": "https://docs.djangoproject.com/en/dev/topics/i18n/timezones/",
+                "area": {
+                    "id": 1,
+                    "text": "全国"
+                },
+                "level": "省",
+                "industry": {
+                    "id": 12,
+                    "text": "卫生洁具用软管"
+                }
+            }
+        ]
+    },
     "i0008": [
         {
             "title": "梁朝伟代言的丸美IPO:3年砸10亿做广告 产品屡上质检黑榜",
-            "local_related": 2,
-            "source": "中国质量新闻网",
             "pubtime": "2018-03-26",
+            "url": "http://www.cqn.com.cn/cj/content/2018-03/26/content_5592714.htm",
+            "source": "中国质量新闻网",
             "score": 0,
+            "local_related": 2,
             "areas": [
                 {
                     "id": 269,
                     "text": "咸宁"
                 }
-            ],
-            "url": "http://www.cqn.com.cn/cj/content/2018-03/26/content_5592714.htm"
+            ]
         }
-    ],
-    "i0009": {
-        "all": [
-            {
-                "industry": {
-                    "id": 12,
-                    "text": "卫生洁具用软管"
-                },
-                "category": "监督抽查",
-                "level": "省",
-                "qualitied": "127.27%",
-                "source": "django",
-                "area": {
-                    "id": 1,
-                    "text": "全国"
-                },
-                "pubtime": "2018-05-07",
-                "url": "https://docs.djangoproject.com/en/dev/topics/i18n/timezones/"
-            }
-        ],
-        "local": []
-    },
-    "i0001": [
-        0,
-        "Nan%"
-    ],
-    "i0003": [
-        0,
-        "Nan%"
     ]
 }
 ```
@@ -715,6 +718,7 @@ http://192.168.0.103:8001/api/articles/0003/
 | endtime| Date        |  否     | 结束时间 |
 | title| String        |  否     | 标题。注：模糊匹配 |
 | source| String        |  否     | 来源。注：模糊匹配 |
+| publisher| String        |  否     | 发布者。注：模糊匹配 |
 | areas | Int        |  否     | 地域ID列表。注：精确匹配(多选)。select2 |
 
 
@@ -727,6 +731,7 @@ http://192.168.0.103:8001/api/articles/0003/
 | url | String | 网址 |
 | title | String | 标题 |
 | source | String | 来源 |
+| publisher | String | 发布者 |
 | area | List | 地域的列表 |
 | pubtime | String | 发布时间 |
 | areas | List | 地域的列表 |
@@ -745,16 +750,17 @@ http://192.168.0.103:8001/api/articles/0004/
     "total": 61,
     "list": [
         {
-            "source": "中国新闻网",
+            "title": "海淘“爆款”化妆品竟然产自小作坊",
+            "publisher": "",
+            "pubtime": "2018-03-11",
+            "url": "http://epaper.ynet.com/html/2018-03/11/content_281010.htm?div=-1",
+            "source": "中国青年报",
             "areas": [
                 {
-                    "id": 269,
-                    "text": "咸宁"
+                    "id": 178,
+                    "text": "武汉"
                 }
-            ],
-            "title": "对儿童安全构成威胁 指尖陀螺被欧盟列为危险品",
-            "url": "http://dw.chinanews.com/chinanews/content.jsp?id=8467281&classify=zw&pageSize=6&language=chs",
-            "pubtime": "2018-03-14"
+            ]
         },
         ...
     ]

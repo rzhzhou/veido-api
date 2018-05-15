@@ -58,8 +58,13 @@ class DashboardView(BaseView):
     def __init__(self):
         super(DashboardView, self).__init__()
 
+    def set_params(self, request):
+        super(DashboardView, self).set_params(request.GET)
+    
     def get(self, request):
-        return Response(DashboardData(user=request.user).get_all())
+        self.set_params(request)
+        
+        return Response(DashboardData(params=self.query_params, user=request.user).get_all())
 
 
 class ArticleView(BaseView):
@@ -132,6 +137,7 @@ class ArticleView(BaseView):
                     'url': x['url'],
                     'title': x['title'],
                     'source': x['source'],
+                    'publisher': x['publisher'],
                     'areas': areas(x['guid']),
                     'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
                 }, result),

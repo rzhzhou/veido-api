@@ -21,13 +21,14 @@ class ArticleData(Abstract):
         super(ArticleData, self).__init__(params)
 
     def get_all(self):
-        fields = ('guid', 'url', 'title', 'source', 'pubtime', 'score', )
+        fields = ('guid', 'url', 'title', 'source', 'publisher', 'pubtime', 'score', )
 
         cond = {
             'pubtime__gte': getattr(self, 'starttime', None),
             'pubtime__lt': getattr(self, 'endtime', None),
             'title__contains': getattr(self, 'title', None),
             'source__contains': getattr(self, 'source', None),
+            'publisher__contains': getattr(self, 'publisher', None),
             'score': getattr(self, 'score', None),
             'status': 1, 
         }
@@ -202,7 +203,7 @@ class RiskDataUpload(Abstract):
 
     def upload(self, filename, file_obj):
         #Model weight
-        model = {'GUID': 0, '标题': 0, 'URL': 0, '发布时间': 0, '发布媒体': 0, '风险程度': 0, '地域': 0, '类别': 0}
+        model = {'GUID': 0, '标题': 0, 'URL': 0, '发布时间': 0, '来源': 0, '发布者': 0, '风险程度': 0, '地域': 0, '类别': 0}
         #sheet value
         sv = lambda x, y, z : z.cell(row=x, column=y).value
         #date format
@@ -249,7 +250,8 @@ class RiskDataUpload(Abstract):
                             'message': '操作失败！Excel %s 行时间格式有误！' % (i + 1, )
                         }
                         
-                    source = sv(i, model['发布媒体'], sheet)
+                    source = sv(i, model['来源'], sheet)
+                    source = sv(i, model['发布者'], sheet)
                     score = sv(i, model['风险程度'], sheet)
                     area = sv(i, model['地域'], sheet)
                     category = sv(i, model['类别'], sheet)
@@ -286,6 +288,7 @@ class RiskDataUpload(Abstract):
                         url=url,
                         pubtime=pubtime,
                         source=source,
+                        publisher=publisher,
                         score=score,
                         risk_keyword='',
                         invalid_keyword='',
@@ -314,13 +317,13 @@ class RiskDataExport(Abstract):
 
         # process data
         data = [
-            ['GUID', '标题', 'URL', '发布时间', '发布媒体', '风险程度', '地域', '类别', ],
+            ['GUID', '标题', 'URL', '发布时间', '来源', '发布者', '风险程度', '地域', '类别', ],
         ]
         months = get_months()[-1::][0]
         start = months[0].strftime('%Y-%m-%d')
         end = months[1].strftime('%Y-%m-%d')
 
-        queryset = Article.objects.filter(pubtime__gte=start, pubtime__lt=end).values('guid', 'title', 'url', 'pubtime', 'source', 'score')
+        queryset = Article.objects.filter(pubtime__gte=start, pubtime__lt=end).values('guid', 'title', 'url', 'pubtime', 'source', 'publisher', 'score')
 
         for q in queryset:
             data.append([q['guid'],
@@ -328,6 +331,7 @@ class RiskDataExport(Abstract):
                          q['url'],
                          date_format(q['pubtime'], '%Y-%m-%d'),
                          q['source'],
+                         q['publisher'],
                          q['score'],
                          areas(q['guid'], flat=True),
                          categories(q['guid'], flat=True)])
