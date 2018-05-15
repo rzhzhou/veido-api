@@ -122,6 +122,20 @@ class ArticleView(BaseView):
                     'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
                 }, result),
         }
+
+    def serialize0004(self, queryset):
+        total = queryset.count()
+        result = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda x: {
+                    'url': x['url'],
+                    'title': x['title'],
+                    'source': x['source'],
+                    'areas': areas(x['guid']),
+                    'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
+                }, result),
+        }
             
         return data
 
