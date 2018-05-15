@@ -95,7 +95,7 @@ class DashboardData():
     def get_0005(self):
         ac_id = Category.objects.get(name='质量热点').id
         a_ids = ArticleCategory.objects.filter(category_id=ac_id).values_list('article_id', flat=True)
-        queryset = Article.objects.filter(status=1, guid__in=a_ids).values('url', 'title', 'pubtime').order_by('-pubtime')[0:1]
+        queryset = Article.objects.filter(status=1, guid__in=a_ids).values('url', 'title', 'pubtime').order_by('-pubtime')[0:15]
 
         return map(lambda x : {
                 'url': x['url'],
@@ -106,7 +106,7 @@ class DashboardData():
     def get_0006(self):
         ac_id = Category.objects.get(name='专家视点').id
         a_ids = ArticleCategory.objects.filter(category_id=ac_id).values_list('article_id', flat=True)
-        queryset = Article.objects.filter(status=1, guid__in=a_ids).values('url', 'title', 'source', 'pubtime').order_by('-pubtime')[0:1]
+        queryset = Article.objects.filter(status=1, guid__in=a_ids).values('url', 'title', 'source', 'pubtime').order_by('-pubtime')[0:15]
         
         return map(lambda x : {
                 'url': x['url'],
@@ -116,7 +116,7 @@ class DashboardData():
             }, queryset)
 
     def get_0007(self):
-        q = lambda x, y, z : x.objects.filter(status=1, guid__in=y.objects.filter(category_id=z).values_list('article_id', flat=True)).values('guid', 'url', 'title', 'source', 'pubtime').order_by('-pubtime')[0:1]
+        q = lambda x, y, z : x.objects.filter(status=1, guid__in=y.objects.filter(category_id=z).values_list('article_id', flat=True)).values('guid', 'url', 'title', 'source', 'pubtime').order_by('-pubtime')[0:15]
 
         return map(lambda c : {
                 'id': c.id,
@@ -133,7 +133,7 @@ class DashboardData():
     def get_0008(self):
         ac_id = Category.objects.get(name='风险快讯').id
         a_ids = ArticleCategory.objects.filter(category_id=ac_id).values_list('article_id', flat=True)
-        queryset = Article.objects.filter(status=1, guid__in=a_ids).values('guid', 'url', 'source', 'score', 'title', 'pubtime').order_by('-pubtime')[0:1]
+        queryset = Article.objects.filter(status=1, guid__in=a_ids).values('guid', 'url', 'source', 'score', 'title', 'pubtime').order_by('-pubtime')[0:15]
         
         return map(lambda x : {
                 'url': x['url'],
@@ -147,7 +147,7 @@ class DashboardData():
 
     
     def get_0009(self):
-        q = lambda x: x.values('guid', 'title', 'url', 'pubtime', 'source', 'unitem', 'qualitied', 'category', 'level', 'industry_id', 'area_id', ).order_by('-pubtime')[0:1]
+        q = lambda x: x.values('guid', 'title', 'url', 'pubtime', 'source', 'unitem', 'qualitied', 'category', 'level', 'industry_id', 'area_id', ).order_by('-pubtime')[0:15]
 
         return {'local': map(lambda x: {
                         'industry': alias_industry(x['industry_id']),
