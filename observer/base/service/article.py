@@ -43,7 +43,12 @@ class ArticleData(Abstract):
             a_ids = ArticleCategory.objects.filter(category_id__in=c_ids).values_list('article_id', flat=True)
             queryset = queryset.filter(guid__in=a_ids)
         else:
-            a_ids = ArticleCategory.objects.filter(category_id=self.category).values_list('article_id', flat=True)
+            c_ids = Category.objects.filter(parent=self.category).values_list('id', flat=True)
+            if not c_ids:
+                a_ids = ArticleCategory.objects.filter(category_id=self.category).values_list('article_id', flat=True)
+            else:
+                a_ids = ArticleCategory.objects.filter(category_id__in=c_ids).values_list('article_id', flat=True)
+            
             queryset = queryset.filter(guid__in=a_ids)
 
         if area_ids:
