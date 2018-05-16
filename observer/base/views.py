@@ -128,6 +128,8 @@ class ArticleView(BaseView):
                 }, result),
         }
 
+        return data
+
     def serialize0004(self, queryset):
         total = queryset.count()
         result = self.paging(queryset)
