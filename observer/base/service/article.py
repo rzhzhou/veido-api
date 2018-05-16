@@ -288,7 +288,7 @@ class RiskDataUpload(Abstract):
                         url=url,
                         pubtime=pubtime,
                         source=source,
-                        publisher=publisher,
+                        publisher='' if not publisher else publisher,
                         score=score,
                         risk_keyword='',
                         invalid_keyword='',
