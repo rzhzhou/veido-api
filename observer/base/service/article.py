@@ -251,7 +251,7 @@ class RiskDataUpload(Abstract):
                         }
                         
                     source = sv(i, model['来源'], sheet)
-                    source = sv(i, model['发布者'], sheet)
+                    publisher = sv(i, model['发布者'], sheet)
                     score = sv(i, model['风险程度'], sheet)
                     area = sv(i, model['地域'], sheet)
                     category = sv(i, model['类别'], sheet)
