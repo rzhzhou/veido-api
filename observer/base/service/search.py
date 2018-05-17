@@ -17,13 +17,13 @@ class SearchData(Abstract):
         }
         esclient = Elasticsearch([conf])
 
-        start = getattr(self, 'start', 1)
+        page = getattr(self, 'page', 1)
         length = getattr(self, 'length', 15)
         title = getattr(self, 'title', None)
 
         body = {
                 "query" : {},
-                "from": start - 1,
+                "from": page - 1,
                 "size": length,
             }
 
@@ -53,7 +53,7 @@ class SearchAdvancedData(Abstract):
         }
         esclient = Elasticsearch([conf])
 
-        start = getattr(self, 'start', 1)
+        page = getattr(self, 'page', 1)
         length = getattr(self, 'length', 15)
         q1 = getattr(self, 'q1', '')
         q2 = getattr(self, 'q2', '')
@@ -66,7 +66,7 @@ class SearchAdvancedData(Abstract):
 
         body = {
                 "query" : {},
-                "from": start - 1,
+                "from": page - 1,
                 "size": length,
             }
 
