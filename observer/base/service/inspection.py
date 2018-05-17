@@ -256,8 +256,14 @@ class InspectionDataUpload(Abstract):
 
                     # 处理企业
                     if enterprise_name:
-                        enterprises = enterprise_name.split(' ')
-                        areas = enterprise_area.split(' ')
+                        enterprises = enterprise_name.split(',')
+                        areas = enterprise_area.split(',')
+                        if len(enterprises) != len(areas):
+                            return {
+                                        'status': 0, 
+                                        'message': '操作失败！Excel第%s行，企业与企业地域数量不一致！' % (i, )
+                                    }
+
                         for ei, e in enumerate(enterprises):
                             areaname = areas[ei]
                             enterprise_area = Area.objects.filter(name=areaname)

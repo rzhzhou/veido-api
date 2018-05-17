@@ -269,9 +269,9 @@ class RiskDataUpload(Abstract):
                         dupli += 1
                         continue
 
-                    areas = area.split(' ')
+                    areas = area.split(',')
                     a_ids = Area.objects.filter(name__in=areas).values_list('id', flat=True)
-                    categories = category.split(' ')
+                    categories = category.split(',')
                     c_ids = Category.objects.filter(name__in=categories).values_list('id', flat=True)
                     for a_id in a_ids:
                         if not ArticleArea.objects.filter(article_id=a_guid, area_id=a_id).exists():
