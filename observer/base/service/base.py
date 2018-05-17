@@ -16,7 +16,7 @@ def areas(article_id, flat=False):
     if not flat:
         return list(map(lambda x: {'id': x['id'], 'text': x['name']}, queryset.values('id', 'name')))
     else:
-        return ' '.join(queryset.values_list('name', flat=True))
+        return ','.join(queryset.values_list('name', flat=True))
 
 
 def categories(article_id, admin=False, flat=False):
@@ -32,7 +32,7 @@ def categories(article_id, admin=False, flat=False):
     if not flat:
         return list(map(lambda x: {'id': x['id'], 'text': x['name']}, queryset.values('id', 'name')))
     else:
-        return ' '.join(queryset.values_list('name', flat=True))
+        return ','.join(queryset.values_list('name', flat=True))
 
 
 # 本地相关度算法
@@ -98,7 +98,7 @@ def enterprise(inspection_id, flat=False):
     if not flat:
         return list(map(lambda x: {'id': x['id'], 'text': x['name']}, queryset.values('id', 'name')))
     else:
-        return ' '.join(queryset.values_list('name', flat=True))
+        return ','.join(queryset.values_list('name', flat=True))
 
 
 def enterprise_name(inspection_id, flat=False):
@@ -109,4 +109,4 @@ def enterprise_name(inspection_id, flat=False):
     if not flat:
         return list(map(lambda x: {'id': x['id'], 'text': x['name']}, queryset.values('id', 'name')))
     else:
-        return ' '.join(queryset.values_list('name', flat=True))
+        return ','.join(queryset.values_list('name', flat=True))

@@ -1629,6 +1629,8 @@ http://192.168.0.103:8001/api/inspection_data
 | unitem | String | 否 | 不合格项 |
 | industry_id | Int | 是 | 行业别名ID。 注: 单选。对应select2 api -> select2/alias_industries |
 | area_id | Int | 是 | 地域ID。 注：单选。 对应 select2 api -> select2/areas |
+| enterprises | String | 是 | 企业名称，多个名称之间以逗号分隔。|
+| enterprise_areas | String | 是 | 企业地域ID，多个ID之间以逗号分隔。 注：多选。 对应 select2 api -> select2/areas |
 
 **3. 输出参数**
 
