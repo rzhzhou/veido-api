@@ -23,6 +23,13 @@ class SearchData(Abstract):
 
         body = {
                 "query" : {},
+                "highlight" : {
+                    "pre_tags" : ["<span class='highlight'>"],
+                    "post_tags" : ["</span>"],
+                    "fields":{
+                      "title":{}
+                    }
+                },
                 "from": page - 1,
                 "size": length,
             }
@@ -66,6 +73,13 @@ class SearchAdvancedData(Abstract):
 
         body = {
                 "query" : {},
+                "highlight" : {
+                    "pre_tags" : ["<span class='highlight'>"],
+                    "post_tags" : ["</span>"],
+                    "fields":{
+                      "title":{}
+                    }
+                },
                 "from": page - 1,
                 "size": length,
             }

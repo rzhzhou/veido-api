@@ -23,7 +23,8 @@ from observer.base.service.corpus import (CorpusData, CorpusAdd, CorpusEdit, Cor
 from observer.base.service.desmon import (DMLinkData, DMLinkAdd, DMLinkEdit, DMLinkDelete, 
                                         DMWordsData, 
                                             )
-from observer.base.service.base import (areas, categories, local_related, area, alias_industry, qualitied, )
+from observer.base.service.base import (areas, categories, local_related, area, 
+                                        alias_industry, qualitied, risk_injury, )
 from observer.utils.date_format import date_format
 from observer.utils.excel import write_by_openpyxl
 
@@ -108,6 +109,7 @@ class ArticleView(BaseView):
                     'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
                     'score': x['score'],
                     'local_related': local_related(x['guid'], self.user), # 本地风险相关度
+                    'risk_injury': risk_injury(x['guid']),
                 }, result),
         }
             
@@ -963,7 +965,8 @@ class SearchAdvancedView(BaseView):
 
         data = {
             'total': results['total'],
-            'list': results['hits']
+            # 'list': results['hits']
+            'list': results
         }
         return data
 

@@ -110,3 +110,12 @@ def enterprise_name(inspection_id, flat=False):
         return list(map(lambda x: {'id': x['id'], 'text': x['name']}, queryset.values('id', 'name')))
     else:
         return ','.join(queryset.values_list('name', flat=True))
+
+
+def risk_injury(article_id):
+    c_ids = ArticleCategory.objects.filter(article_id=article_id).values_list('category_id', flat=True)
+    c_id = Category.objects.get(name="风险伤害").id
+    
+    if c_id in c_ids:
+        return 1
+    return 0

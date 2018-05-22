@@ -592,6 +592,7 @@ http://192.168.0.103:8001/api/articles/0001/
 | pubtime | String | 发布时间 |
 | score | Int | 风险程度。注：0-无，1-低，2-中，3-高 |
 | local_related | Int | 本地相关。注：1-低，2-中，3-高  |
+| risk_injury | Int | 风险伤害。注：0-无，1-有  |
 
 **4. 实例**
 
@@ -618,7 +619,8 @@ http://192.168.0.103:8001/api/articles/0002/
             "local_related": 1,
             "pubtime": "2018-03-26",
             "title": "梁朝伟代言的丸美IPO:3年砸10亿做广告 产品屡上质检黑榜",
-            "source": "中国质量新闻网"
+            "source": "中国质量新闻网",
+            "risk_injury": 1,
         },
         ...
     ]
@@ -2145,30 +2147,35 @@ title=国
 {
     "total": 13,
     "list": [
-        {
+         {
             "_type": "article",
             "_index": "observer",
-            "_score": 3.1149967,
-            "_id": "ad77603f11155194024a91f751686975",
+            "_id": "a632e2d45c2d1111eeb6e3f6cc9342c4",
             "_source": {
-                "pubtime": "2018-03-06 00:00:00",
-                "invalid_keyword": "",
-                "url": "http://www.cqn.com.cn/zj/content/2018-03/06/content_5509105.htm",
-                "score": 3,
-                "title": "中国主导制定的国际标准数量位居世界前列",
-                "source": "中国质量新闻网",
+                "source": "国家质量监督检验检疫总局",
                 "category": [
                     {
-                        "name": "质监热点"
+                        "name": "认证监管"
                     }
                 ],
+                "title": "中国贸促会与国家认监委签署合作备忘录充分发挥认证认可作用 务实推进对外贸易发展-国家质量监督检验检疫总局",
+                "risk_keyword": "",
+                "pubtime": "2018-02-07 00:00:00",
+                "invalid_keyword": "",
+                "score": 0,
+                "url": "http://www.aqsiq.gov.cn/zjxw/zjxw/zjftpxw/201802/t20180207_512625.htm",
                 "area": [
                     {
-                        "name": "武汉"
+                        "name": "全国"
                     }
-                ],
-                "risk_keyword": ""
-            }
+                ]
+            },
+            "highlight": {
+                "title": [
+                    "中<span class='highlight'>国</span>贸促会与<span class='highlight'>国</span><span class='highlight'>家</span>认监委签署合作备忘录充分发挥认证认可作用 务实推进对外贸易发展-<span class='highlight'>国</span><span class='highlight'>家</span>质量监督检验检疫总局"
+                ]
+            },
+            "_score": 4.7886777
         },
         ...
     ]
@@ -2241,30 +2248,35 @@ q1=儿童
 {
     "total": 13,
     "list": [
-        {
+         {
+            "_type": "article",
+            "_index": "observer",
+            "_id": "a632e2d45c2d1111eeb6e3f6cc9342c4",
             "_source": {
-                "pubtime": "2018-03-12 00:00:00",
-                "invalid_keyword": "",
-                "title": "315维权在行动：网络销售儿童服装、玩具等抽检近半不合格",
-                "url": "http://ah.anhuinews.com/system/2018/03/12/007824321.shtml",
+                "source": "国家质量监督检验检疫总局",
                 "category": [
                     {
-                        "name": "风险快讯"
+                        "name": "认证监管"
                     }
                 ],
+                "title": "中国贸促会与国家认监委签署合作备忘录充分发挥认证认可作用 务实推进对外贸易发展-国家质量监督检验检疫总局",
+                "risk_keyword": "",
+                "pubtime": "2018-02-07 00:00:00",
+                "invalid_keyword": "",
+                "score": 0,
+                "url": "http://www.aqsiq.gov.cn/zjxw/zjxw/zjftpxw/201802/t20180207_512625.htm",
                 "area": [
                     {
-                        "name": "武汉"
+                        "name": "全国"
                     }
-                ],
-                "risk_keyword": "",
-                "score": 3,
-                "source": "中安在线"
+                ]
             },
-            "_index": "observer",
-            "_id": "4d96750d281c5161ed5d5cd24859e487",
-            "_score": 8.614649,
-            "_type": "article"
+            "highlight": {
+                "title": [
+                    "中<span class='highlight'>国</span>贸促会与<span class='highlight'>国</span><span class='highlight'>家</span>认监委签署合作备忘录充分发挥认证认可作用 务实推进对外贸易发展-<span class='highlight'>国</span><span class='highlight'>家</span>质量监督检验检疫总局"
+                ]
+            },
+            "_score": 4.7886777
         },
         ...
     ]
