@@ -2237,35 +2237,24 @@ q1=儿童
 {
     "total": 13,
     "list": [
-         {
-            "_type": "article",
-            "_index": "observer",
-            "_id": "a632e2d45c2d1111eeb6e3f6cc9342c4",
-            "_source": {
-                "source": "国家质量监督检验检疫总局",
-                "category": [
-                    {
-                        "name": "认证监管"
-                    }
-                ],
-                "title": "中国贸促会与国家认监委签署合作备忘录充分发挥认证认可作用 务实推进对外贸易发展-国家质量监督检验检疫总局",
-                "risk_keyword": "",
-                "pubtime": "2018-02-07 00:00:00",
-                "invalid_keyword": "",
-                "score": 0,
-                "url": "http://www.aqsiq.gov.cn/zjxw/zjxw/zjftpxw/201802/t20180207_512625.htm",
-                "area": [
-                    {
-                        "name": "全国"
-                    }
-                ]
-            },
-            "highlight": {
-                "title": [
-                    "中<span class='highlight'>国</span>贸促会与<span class='highlight'>国</span><span class='highlight'>家</span>认监委签署合作备忘录充分发挥认证认可作用 务实推进对外贸易发展-<span class='highlight'>国</span><span class='highlight'>家</span>质量监督检验检疫总局"
-                ]
-            },
-            "_score": 4.7886777
+        {
+            "category": [
+                {
+                    "name": "认证监管"
+                }
+            ],
+            "pubtime": "2018-02-07 00:00:00",
+            "title": "中<span class='highlight'>国</span>贸促会与<span class='highlight'>国</span><span class='highlight'>家</span>认监委签署合作备忘录充分发挥认证认可作用 务实推进对外贸易发展-<span class='highlight'>国</span><span class='highlight'>家</span>质量监督检验检疫总局",
+            "invalid_keyword": "",
+            "risk_keyword": "",
+            "score": 0,
+            "area": [
+                {
+                    "name": "全国"
+                }
+            ],
+            "source": "国家质量监督检验检疫总局",
+            "url": "http://www.aqsiq.gov.cn/zjxw/zjxw/zjftpxw/201802/t20180207_512625.htm"
         },
         ...
     ]
