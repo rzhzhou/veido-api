@@ -943,7 +943,7 @@ class SearchView(BaseView):
             'list': map(lambda x:{
                 'source': x['_source']['source'],
                 'category': x['_source']['category'],
-                'title': x['highlight']['title'][0],
+                'title': x['_source']['title'] if not x.get('highlight') else x['highlight']['title'][0],
                 'risk_keyword': x['_source']['risk_keyword'],
                 'pubtime': x['_source']['pubtime'],
                 'invalid_keyword': x['_source']['invalid_keyword'],
@@ -971,6 +971,8 @@ class SearchAdvancedView(BaseView):
         super(SearchAdvancedView, self).set_params(request.GET)
 
     def serialize(self, queryset):
+        return queryset
+
         results = queryset['hits']
 
         data = {
@@ -978,7 +980,7 @@ class SearchAdvancedView(BaseView):
             'list': map(lambda x:{
                 'source': x['_source']['source'],
                 'category': x['_source']['category'],
-                'title': x['highlight']['title'][0],
+                'title': x['_source']['title'] if not x.get('highlight') else x['highlight']['title'][0],
                 'risk_keyword': x['_source']['risk_keyword'],
                 'pubtime': x['_source']['pubtime'],
                 'invalid_keyword': x['_source']['invalid_keyword'],
