@@ -940,7 +940,17 @@ class SearchView(BaseView):
 
         data = {
             'total': results['total'],
-            'list': results['hits']
+            'list': map(lambda x:{
+                'source': x['_source']['source'],
+                'category': x['_source']['category'],
+                'title': x['highlight']['title'][0],
+                'risk_keyword': x['_source']['risk_keyword'],
+                'pubtime': x['_source']['pubtime'],
+                'invalid_keyword': x['_source']['invalid_keyword'],
+                'score': x['_source']['score'],
+                'url': x['_source']['url'],
+                'area': x['_source']['area'],
+                }, results['hits']),
         }
         return data
 
@@ -965,8 +975,17 @@ class SearchAdvancedView(BaseView):
 
         data = {
             'total': results['total'],
-            # 'list': results['hits']
-            'list': results
+            'list': map(lambda x:{
+                'source': x['_source']['source'],
+                'category': x['_source']['category'],
+                'title': x['highlight']['title'][0],
+                'risk_keyword': x['_source']['risk_keyword'],
+                'pubtime': x['_source']['pubtime'],
+                'invalid_keyword': x['_source']['invalid_keyword'],
+                'score': x['_source']['score'],
+                'url': x['_source']['url'],
+                'area': x['_source']['area'],
+                }, results['hits']),
         }
         return data
 
