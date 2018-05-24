@@ -22,7 +22,7 @@ class InspectionData(Abstract):
 
     def get_all(self):
 
-        fields = ('guid', 'title', 'url', 'pubtime', 'source', 'unitem', 'qualitied', 'category', 'level', 'industry_id', 'area_id', )
+        fields = ('guid', 'title', 'url', 'pubtime', 'source', 'qualitied', 'category', 'level', 'industry_id', 'area_id', )
 
         cond = {
             'pubtime__gte': getattr(self, 'starttime', None),
@@ -62,7 +62,6 @@ class InspectionDataAdd(Abstract):
 
         category = getattr(self, 'category', '')
         level = getattr(self, 'level', '')
-        unitem = getattr(self, 'unitem', '')
         industry_id = getattr(self, 'industry_id', '')
         area_id = getattr(self, 'area_id', '')
 
@@ -80,7 +79,6 @@ class InspectionDataAdd(Abstract):
             url=url,
             pubtime=pubtime,
             source=source,
-            unitem=unitem,
             qualitied=qr(qualitied_patch, inspect_patch),
             category=category,
             level=level,
@@ -114,7 +112,6 @@ class InspectionDataEdit(Abstract):
 
         category = getattr(self, 'category', '')
         level = getattr(self, 'level', '')
-        unitem = getattr(self, 'unitem', '')
         industry_id = getattr(self, 'industry_id', '')
         area_id = getattr(self, 'area_id', '')
 
@@ -131,7 +128,6 @@ class InspectionDataEdit(Abstract):
         inspection.qualitied = qr(inspect_patch, qualitied_patch)
         inspection.category = category
         inspection.level = level
-        inspection.unitem = unitem
         inspection.industry_id = industry_id
         inspection.area_id = area_id
         inspection.save()
@@ -260,7 +256,6 @@ class InspectionDataUpload(Abstract):
                             url=url,
                             pubtime=pubtime,
                             source=source,
-                            unitem= '' if not unitem else unitem,
                             qualitied=qr(qualitied_patch, inspect_patch),
                             category=category,
                             level=level,
@@ -372,7 +367,7 @@ class InspectionDataUnEnterpriseUpload(Abstract):
                     inspection_enterprise = InspectionEnterprise.objects.filter(inspection_id=guid, enterprise_id=enterprise_id)
                     if not inspection_enterprise.exists():
                         InspectionEnterprise(
-                            inspection_id=inspection_id,
+                            inspection_id=guid,
                             enterprise_id=enterprise_id,
                         ).save()
                     else:

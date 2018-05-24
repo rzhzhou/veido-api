@@ -36,7 +36,7 @@
 | **30022** | inspection_data/edit/<str:guid>/ | 抽检数据修改 | POST |
 | **30023** | inspection_data/delete/<str:guid>/ | 抽检数据删除 | DELETE |
 | **30024** | inspection_data/upload/<str:filename>/ | 抽检数据上传 | PUT |
-| **30025** | inspection_data/unenterprise/upload/<str:filename>/ | 抽检数据不合格企业上传 | PUT |
+| **30025** | inspection_data/un_enterprise/upload/<str:filename>/ | 抽检数据不合格企业上传 | PUT |
 | **30026** | inspection_data/export | 抽检数据导出 | GET |
 | **3003** | alias_industry/add | 产品(行业别名添加) | POST |
 | **30031** | ccc_industry/add | 3C行业添加 | POST |
@@ -1629,7 +1629,6 @@ http://192.168.0.103:8001/api/inspection_data
 | unqualitied_patch | Int | 否 | 不合格批次 |
 | category | String | 否 | 类别 |
 | level | String | 是 | 检验等级。 注：值范围(国 省 市) |
-| unitem | String | 否 | 不合格项 |
 | industry_id | Int | 是 | 行业别名ID。 注: 单选。对应select2 api -> select2/alias_industries |
 | area_id | Int | 是 | 地域ID。 注：单选。 对应 select2 api -> select2/areas |
 | enterprises | String | 是 | 企业名称，多个名称之间以逗号分隔。|
@@ -1681,7 +1680,6 @@ Tips:
 | unqualitied_patch | Int | 否 | 不合格批次 |
 | category | String | 否 | 类别 |
 | level | String | 是 | 检验等级。 注：值范围(国 省 市) |
-| unitem | String | 否 | 不合格项 |
 | industry_id | Int | 是 | 行业别名ID。 注: 单选。对应select2 api -> select2/alias_industries |
 | area_id | Int | 是 | 地域ID。 注：单选。 对应 select2 api -> select2/areas |
 
@@ -1783,7 +1781,7 @@ Tips:
 
 **1. 接口描述**
 
-本接口 (inspection_data/unenterprise/upload/<str:filename>/) 用于上传抽检数据不合格企业. 
+本接口 (inspection_data/un_enterprise/upload/<str:filename>/) 用于上传抽检数据不合格企业. 
 
 Tips: 
 - 文件格式：xlsx
