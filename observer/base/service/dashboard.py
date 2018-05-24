@@ -154,7 +154,7 @@ class DashboardData(Abstract):
 
     
     def get_0009(self):
-        q = lambda x: x.values('guid', 'title', 'url', 'pubtime', 'source', 'unitem', 'qualitied', 'category', 'level', 'industry_id', 'area_id', ).order_by('-pubtime')[0:self.length]
+        q = lambda x: x.values('guid', 'title', 'url', 'pubtime', 'source', 'qualitied', 'category', 'level', 'industry_id', 'area_id', ).order_by('-pubtime')[0:self.length]
 
         return {'local': map(lambda x: {
                         'industry': alias_industry(x['industry_id']),
