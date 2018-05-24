@@ -36,7 +36,8 @@
 | **30022** | inspection_data/edit/<str:guid>/ | 抽检数据修改 | POST |
 | **30023** | inspection_data/delete/<str:guid>/ | 抽检数据删除 | DELETE |
 | **30024** | inspection_data/upload/<str:filename>/ | 抽检数据上传 | PUT |
-| **30025** | inspection_data/export | 抽检数据导出 | GET |
+| **30025** | inspection_data/unenterprise/upload/<str:filename>/ | 抽检数据不合格企业上传 | PUT |
+| **30026** | inspection_data/export | 抽检数据导出 | GET |
 | **3003** | alias_industry/add | 产品(行业别名添加) | POST |
 | **30031** | ccc_industry/add | 3C行业添加 | POST |
 | **30032** | license_industry/add | 许可证行业添加 | POST |
@@ -1777,13 +1778,49 @@ Tips:
 }
 ```
 
-
 *****
-### **30015**
+#### **30025**
 
 **1. 接口描述**
 
-本接口 (inspection_data/export) 用于导出风险数据.
+本接口 (inspection_data/unenterprise/upload/<str:filename>/) 用于上传抽检数据不合格企业. 
+
+Tips: 
+- 文件格式：xlsx
+
+**2. 输入参数**
+
+- filename: 文件名称
+
+**3. 输出参数**
+
+| 参数名称 |    类型   |     描述   | 
+| :------| :-------- | :-------- | 
+| status | Int | 响应状态。注：0->失败，1->成功 |
+| message | String | 响应信息。 |
+
+**4. 实例**
+
+输入
+
+```
+略
+```
+
+输出
+```
+{  
+    'status': 1,
+    'message': '操作成功！共处理2条数据，成功导入0条数据，重复数据2条！',
+}
+```
+
+*****
+### **30026**
+
+**1. 接口描述**
+
+本接口 (inspection_data/export) 用于导出抽检数据.
 
 **2. 输入参数**
 

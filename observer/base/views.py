@@ -15,8 +15,8 @@ from observer.base.service.industry import (IndustryData, CCCIndustryData, Licen
 from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd, RiskDataEdit, 
                                             RiskDataDelete, RiskDataUpload, RiskDataExport, )
 from observer.base.service.inspection import (InspectionData, InspectionDataAdd, InspectionDataEdit, 
-                                            InspectionDataDelete, InspectionDataUpload, InspectionDataUpload, 
-                                            InspectionDataExport, )
+                                            InspectionDataDelete, InspectionDataUpload, InspectionDataExport,
+                                            InspectionDataUnEnterpriseUpload, )
 from observer.base.service.area import Select2AreaData
 from observer.base.service.corpus import (CorpusData, CorpusAdd, CorpusEdit, CorpusDelete, 
                                             )
@@ -786,6 +786,19 @@ class InspectionDataUploadView(BaseView):
     def put(self, request, filename, format=None):
 
         queryset = InspectionDataUpload(user=request.user).upload(filename, request.FILES['file'])
+
+        return Response(queryset)
+
+
+class InspectionDataUnEnterpriseUploadView(BaseView):
+    parser_classes = (FileUploadParser,)
+
+    def __init__(self):
+        super(InspectionDataUnEnterpriseUploadView, self).__init__()
+
+    def put(self, request, filename, format=None):
+
+        queryset = InspectionDataUnEnterpriseUpload(user=request.user).upload(filename, request.FILES['file'])
 
         return Response(queryset)
 

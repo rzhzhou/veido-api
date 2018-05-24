@@ -140,7 +140,6 @@ class Inspection(models.Model):
     url = models.URLField(blank=True, null=True, verbose_name='网站链接')
     pubtime = models.DateField(verbose_name='发布时间')
     source = models.CharField(max_length=80, verbose_name='信息来源')
-    unitem = models.CharField(max_length=255, verbose_name='不合格项')
     qualitied = models.FloatField(default=1.0, verbose_name='合格率')
     category = models.CharField(max_length=32, verbose_name='抽查类别')
     level = models.CharField(max_length=2, verbose_name='检验等级') # 国、省、市
@@ -160,7 +159,8 @@ class Inspection(models.Model):
 
 class Enterprise(models.Model):
     name = models.CharField(max_length=255, verbose_name='名称')
-
+    unitem = models.CharField(max_length=255, verbose_name='不合格项')
+    
     area_id = models.IntegerField(verbose_name='地域ID')
 
     class Meta:

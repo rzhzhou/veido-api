@@ -16,7 +16,7 @@ from observer.base.views import (
                                 Select2LicenseIndustryView, CCCIndustryAddView,
                                 LicenseIndustryAddView, RiskDataExportView, 
                                 InspectionDataExportView, DashboardView, SearchView,
-                                SearchAdvancedView,
+                                SearchAdvancedView, InspectionDataUnEnterpriseUploadView, 
                                 )
 
 
@@ -46,6 +46,7 @@ urlpatterns = [
     path('inspection_data/edit/<str:aid>/', InspectionDataEditView.as_view()),  # 抽检数据修改
     path('inspection_data/delete/<str:aid>/', InspectionDataDeleteView.as_view()),  # 抽检数据删除
     path('inspection_data/upload/<str:filename>/', InspectionDataUploadView.as_view()),  # 抽检数据上传
+    path('inspection_data/un_enterprise/upload/<str:filename>/', InspectionDataUnEnterpriseUploadView.as_view()),  # 抽检数据不合格企业上传
     path('inspection_data/export', InspectionDataExportView.as_view()),  # 抽检数据导出
     path('alias_industry/add', AliasIndustryAddView.as_view()),  # 行业别名添加
     path('ccc_industry/add', CCCIndustryAddView.as_view()),  # CCC行业添加
