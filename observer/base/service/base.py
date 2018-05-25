@@ -91,7 +91,7 @@ def qualitied(q):
     return '{0}%'.format('%.2f' % float(100.00 if not q else q * 100))
 
 
-def enterprise(inspection_id, flat=False):
+def enterprise_name(inspection_id, flat=False):
     enterprise_ids = InspectionEnterprise.objects.filter(inspection_id=inspection_id).values_list('enterprise_id', flat=True)
     queryset = Enterprise.objects.filter(id__in=enterprise_ids)
 
@@ -101,7 +101,17 @@ def enterprise(inspection_id, flat=False):
         return ','.join(queryset.values_list('name', flat=True))
 
 
-def enterprise_name(inspection_id, flat=False):
+def enterprise_unitem(inspection_id, flat=False):
+    enterprise_ids = InspectionEnterprise.objects.filter(inspection_id=inspection_id).values_list('enterprise_id', flat=True)
+    queryset = Enterprise.objects.filter(id__in=enterprise_ids)
+
+    if not flat:
+        return list(map(lambda x: {'id': x['id'], 'text': x['unitem']}, queryset.values('id', 'unitem')))
+    else:
+        return ','.join(queryset.values_list('unitem', flat=True))
+
+
+def enterprise_area_name(inspection_id, flat=False):
     enterprise_ids = InspectionEnterprise.objects.filter(inspection_id=inspection_id).values_list('enterprise_id', flat=True)
     area_ids = Enterprise.objects.filter(id__in=enterprise_ids).values_list('area_id', flat=True)
     queryset = Area.objects.filter(id__in=area_ids)

@@ -8,7 +8,8 @@ from observer.base.models import(Area, Inspection, Industry,
                                 AliasIndustry)
 from observer.base.service.abstract import Abstract
 from observer.base.service.base import (area, alias_industry, qualitied, 
-                                        industry_number, enterprise, enterprise_name, )
+                                        industry_number, enterprise_name, enterprise_area_name, 
+                                        enterprise_unitem, )
 from observer.utils.date_format import (date_format, str_to_date, get_months)
 from observer.utils.str_format import str_to_md5str
 from observer.utils.excel import (read_by_openpyxl, write_by_openpyxl, )
@@ -401,7 +402,7 @@ class InspectionDataExport(Abstract):
         start = months[0].strftime('%Y-%m-%d')
         end = months[1].strftime('%Y-%m-%d')
 
-        queryset = Inspection.objects.filter(pubtime__gte=start, pubtime__lt=end).values('guid', 'title', 'url', 'pubtime', 'category', 'level', 'source', 'area_id', 'industry_id', 'unitem', 'qualitied',)
+        queryset = Inspection.objects.filter(pubtime__gte=start, pubtime__lt=end).values('guid', 'title', 'url', 'pubtime', 'category', 'level', 'source', 'area_id', 'industry_id', 'qualitied',)
 
         for q in queryset:
             data.append([
@@ -415,9 +416,9 @@ class InspectionDataExport(Abstract):
                 area(q['area_id'], flat=True),
                 industry_number(q['industry_id']),
                 alias_industry(q['industry_id'], flat=True),
-                enterprise(q['guid'], flat=True),
                 enterprise_name(q['guid'], flat=True),
-                q['unitem'],
+                enterprise_area_name(q['guid'], flat=True),
+                enterprise_unitem(q['guid'], flat=True),
                 qualitied(q['qualitied']),
                 ])
 
