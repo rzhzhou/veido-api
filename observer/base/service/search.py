@@ -22,6 +22,9 @@ class SearchData(Abstract):
         title = getattr(self, 'title', None)
 
         body = {
+                "from": page - 1,
+                "size": length,
+                "sort": [{'_score': {"order": "desc"}}],
                 "query" : {},
                 "highlight" : {
                     "pre_tags" : ["<span class='highlight'>"],
@@ -30,10 +33,7 @@ class SearchData(Abstract):
                       "title":{}
                     }
                 },
-                "from": page - 1,
-                "size": length,
             }
-
         if not title:
             body['query']['match_all'] = {}
         else:
@@ -42,7 +42,7 @@ class SearchData(Abstract):
         return esclient.search(
             index=conf['index'],
             doc_type=conf['type'],
-            body=body,
+            body=body
         )
 
 
@@ -72,6 +72,8 @@ class SearchAdvancedData(Abstract):
         area = getattr(self, 'area', '')
 
         body = {
+                "from": page - 1,
+                "size": length,
                 "query" : {},
                 "highlight" : {
                     "pre_tags" : ["<span class='highlight'>"],
@@ -80,8 +82,6 @@ class SearchAdvancedData(Abstract):
                       "title":{}
                     }
                 },
-                "from": page - 1,
-                "size": length,
             }
 
         query_string = ""
@@ -155,10 +155,10 @@ class SearchAdvancedData(Abstract):
         else:
             body['query']['query_string'] = {'query': query_string}
 
-        body['sort'] = sort_list
+        body['sort'] = [{'_score': {"order": "desc"}}, ] if not sort_list else sort_list
 
         return esclient.search(
             index=conf['index'],
             doc_type=conf['type'],
-            body=body,
+            body=body
         )
