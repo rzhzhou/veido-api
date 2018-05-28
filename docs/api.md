@@ -791,7 +791,9 @@ http://192.168.0.103:8001/api/articles/0004/
 | category| String        |  否     | 抽查类别。 注：模糊匹配 |
 | level | Int        |  否     | 抽查级别。 值范围(国 省 市)。 注：精确匹配(单选)。select2 |
 | area | Int        |  否     | 地域ID。注：精确匹配(单选)。select2 |
-
+| industry | Int        |  否     | 产品类别ID。注：精确匹配(单选)。select2（对应 2003 API） |
+| qualitied_gte | Float | 否 | 抽检合格率大于。举例：70%以下，qualitied_gte:0.0|
+| qualitied_lt | Float | 否 | 抽检合格率小于。 举例：70%以下，qualitied_lt:0.7|
 
 **3. 输出参数**
 
