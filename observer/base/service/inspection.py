@@ -31,6 +31,7 @@ class InspectionData(Abstract):
             'qualitied__gte': getattr(self, 'qualitied_gte', None),
             'qualitied__lt': getattr(self, 'qualitied_lt', None),
             'category__contains': getattr(self, 'category', None),
+            'source__contains': getattr(self, 'source', None),
             'level': getattr(self, 'level', None),
             'industry_id': getattr(self, 'industry', None),
             'area_id': getattr(self, 'area', None),
