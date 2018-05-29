@@ -184,7 +184,7 @@ class InspectionEnterprise(models.Model):
 
 
 class Article(models.Model):
-    guid = models.CharField(max_length=32, primary_key=True, editable=False, verbose_name='主键')
+    guid = models.CharField(max_length=32, primary_key=True, editable=False, verbose_name='主键')# url -> md5
     title = models.CharField(max_length=255, blank=True, verbose_name='标题')
     url = models.URLField(verbose_name='网站链接')
     pubtime = models.DateTimeField(auto_now=False, verbose_name='发布时间')

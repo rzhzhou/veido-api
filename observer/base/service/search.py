@@ -24,7 +24,7 @@ class SearchData(Abstract):
         body = {
                 "from": page - 1,
                 "size": length,
-                "sort": [{'_score': {"order": "desc"}}],
+                "sort": [{'pubtime': {"order": "desc"}}],
                 "query" : {},
                 "highlight" : {
                     "pre_tags" : ["<span class='highlight'>"],
@@ -155,7 +155,7 @@ class SearchAdvancedData(Abstract):
         else:
             body['query']['query_string'] = {'query': query_string}
 
-        body['sort'] = [{'_score': {"order": "desc"}}, ] if not sort_list else sort_list
+        body['sort'] = [{'pubtime': {"order": "desc"}}, ] if not sort_list else sort_list
 
         return esclient.search(
             index=conf['index'],
