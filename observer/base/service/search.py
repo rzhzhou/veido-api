@@ -91,7 +91,7 @@ class SearchAdvancedData(Abstract):
                 query_string += ' AND '
                 q3l = q3.split(' ')
                 if len(q3l) > 1:
-                    query_string += '( %s )' % ' OR '.join(q31)
+                    query_string += '( %s )' % ' OR '.join(q3l)
                 else:
                     query_string += '( %s )' % q3
 
