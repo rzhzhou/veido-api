@@ -52,5 +52,6 @@ def str_to_date(date_str):
 
 def get_months():
     minus = lambda x, y: (x + relativedelta(months=y))
-    today = datetime.now().replace(day=1)
-    return list(map(lambda x: [minus(today, x-11), minus(today, x-10)], range(0, 12)))
+    today = date.today()
+    first_day = datetime(today.year, today.month, 1)
+    return list(map(lambda x: [minus(first_day, x-11), minus(first_day, x-10)], range(0, 12)))
