@@ -7,23 +7,23 @@ from rest_framework.parsers import FileUploadParser
 from observer.base.models import Industry, AliasIndustry
 from observer.base.service.dashboard import (DashboardData, )
 from observer.base.service.search import (SearchData, SearchAdvancedData, )
-from observer.base.service.industry import (IndustryData, CCCIndustryData, LicenseIndustryData, 
-                                            Select2IndustryData, Select2AliasIndustryData, 
-                                            AliasIndustryAdd, Select2CCCIndustryData, 
-                                            Select2LicenseIndustryData, CCCIndustryAdd, 
+from observer.base.service.industry import (IndustryData, CCCIndustryData, LicenseIndustryData,
+                                            Select2IndustryData, Select2AliasIndustryData,
+                                            AliasIndustryAdd, Select2CCCIndustryData,
+                                            Select2LicenseIndustryData, CCCIndustryAdd,
                                             LicenseIndustryAdd, )
-from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd, RiskDataEdit, 
+from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd, RiskDataEdit,
                                             RiskDataDelete, RiskDataUpload, RiskDataExport, )
-from observer.base.service.inspection import (InspectionData, InspectionDataAdd, InspectionDataEdit, 
+from observer.base.service.inspection import (InspectionData, InspectionDataAdd, InspectionDataEdit,
                                             InspectionDataDelete, InspectionDataUpload, InspectionDataExport,
                                             InspectionDataUnEnterpriseUpload, )
 from observer.base.service.area import Select2AreaData
-from observer.base.service.corpus import (CorpusData, CorpusAdd, CorpusEdit, CorpusDelete, 
+from observer.base.service.corpus import (CorpusData, CorpusAdd, CorpusEdit, CorpusDelete,
                                             )
-from observer.base.service.desmon import (DMLinkData, DMLinkAdd, DMLinkEdit, DMLinkDelete, 
-                                        DMWordsData, 
+from observer.base.service.desmon import (DMLinkData, DMLinkAdd, DMLinkEdit, DMLinkDelete,
+                                        DMWordsData,
                                             )
-from observer.base.service.base import (areas, categories, local_related, area, 
+from observer.base.service.base import (areas, categories, local_related, area,
                                         alias_industry, qualitied, risk_injury, )
 from observer.utils.date_format import date_format
 from observer.utils.excel import write_by_openpyxl
@@ -32,11 +32,10 @@ from observer.utils.excel import write_by_openpyxl
 class BaseView(APIView):
 
     def __init__(self):
-        self.query_params = {}
+        self.request = None
 
-    def set_params(self, params):
-        for k, v in params.items():
-            self.query_params[k] = v
+    def set_request(self, request):
+        self.request = request
 
     def paging(self, queryset, page, num):
         paginator = Paginator(queryset, num)  # Show $num <QuerySet> per page
@@ -59,13 +58,13 @@ class DashboardView(BaseView):
     def __init__(self):
         super(DashboardView, self).__init__()
 
-    def set_params(self, request):
-        super(DashboardView, self).set_params(request.GET)
-    
+    def set_request(self, request):
+        super(DashboardView, self).set_request(request)
+
     def get(self, request):
-        self.set_params(request)
-        
-        return Response(DashboardData(params=self.query_params, user=request.user).get_all())
+        self.set_request(request)
+
+        return Response(DashboardData(params=request.query_params, user=request.user).get_all())
 
 
 class ArticleView(BaseView):
@@ -73,12 +72,12 @@ class ArticleView(BaseView):
     def __init__(self):
         super(ArticleView, self).__init__()
 
-    def set_params(self, request):
+    def set_request(self, request):
         self.user = request.user
-        super(ArticleView, self).set_params(request.GET)
+        super(ArticleView, self).set_request(request)
 
     def paging(self, queryset):
-        return super(ArticleView, self).paging(queryset, self.query_params.get('page', 1), self.query_params.get('length', 15))
+        return super(ArticleView, self).paging(queryset, request.query_params.get('page', 1), request.query_params.get('length', 15))
 
     def serialize0001(self, queryset):
         total = queryset.count()
@@ -93,7 +92,7 @@ class ArticleView(BaseView):
                     'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
                 }, result),
         }
-            
+
         return data
 
     def serialize0002(self, queryset):
@@ -112,7 +111,7 @@ class ArticleView(BaseView):
                     'risk_injury': risk_injury(x['guid']),
                 }, result),
         }
-            
+
         return data
 
     def serialize0003(self, queryset):
@@ -146,13 +145,13 @@ class ArticleView(BaseView):
                     'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
                 }, result),
         }
-            
+
         return data
 
     def get(self, request, category):
-        self.set_params(request)
+        self.set_request(request)
 
-        queryset = ArticleData(params=self.query_params, category=category).get_all()
+        queryset = ArticleData(params=request.query_params, category=category).get_all()
 
         return Response(eval('self.serialize%s' % category)(queryset))
 
@@ -162,11 +161,11 @@ class InspectionView(BaseView):
     def __init__(self):
         super(InspectionView, self).__init__()
 
-    def set_params(self, request):
-        super(InspectionView, self).set_params(request.GET)
+    def set_request(self, request):
+        super(InspectionView, self).set_request(request)
 
     def paging(self, queryset):
-        return super(InspectionView, self).paging(queryset, self.query_params.get('page', 1), self.query_params.get('length', 15))
+        return super(InspectionView, self).paging(queryset, request.query_params.get('page', 1), request.query_params.get('length', 15))
 
     def serialize(self, queryset):
         total = queryset.count()
@@ -184,13 +183,13 @@ class InspectionView(BaseView):
                     'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
                 }, result),
         }
-            
+
         return data
 
     def get(self, request):
-        self.set_params(request)
+        self.set_request(request)
 
-        queryset = InspectionData(params=self.query_params).get_all()
+        queryset = InspectionData(params=request.query_params).get_all()
 
         return Response(self.serialize(queryset))
 
@@ -200,11 +199,11 @@ class IndustryView(BaseView):
     def __init__(self):
         super(IndustryView, self).__init__()
 
-    def set_params(self, request):
-        super(IndustryView, self).set_params(request.GET)
+    def set_request(self, request):
+        super(IndustryView, self).set_request(request)
 
     def paging(self, queryset):
-        return super(IndustryView, self).paging(queryset, self.query_params.get('page', 1), self.query_params.get('length', 15))
+        return super(IndustryView, self).paging(queryset, request.query_params.get('page', 1), request.query_params.get('length', 15))
 
     def serialize(self, queryset):
         total = queryset.count()
@@ -235,20 +234,20 @@ class IndustryView(BaseView):
                     'id': l1.id,
                     'name': l1.name,
                     'desc': l1.desc,
-                }, 
+                },
             })
 
         data = {
             'total': total,
             'list': temp,
         }
-            
+
         return data
 
     def get(self, request):
-        self.set_params(request)
+        self.set_request(request)
 
-        queryset = IndustryData(params=self.query_params).get_all()
+        queryset = IndustryData(params=request.query_params).get_all()
 
         return Response(self.serialize(queryset))
 
@@ -258,11 +257,11 @@ class CCCIndustryView(BaseView):
     def __init__(self):
         super(CCCIndustryView, self).__init__()
 
-    def set_params(self, request):
-        super(CCCIndustryView, self).set_params(request.GET)
+    def set_request(self, request):
+        super(CCCIndustryView, self).set_request(request)
 
     def paging(self, queryset):
-        return super(CCCIndustryView, self).paging(queryset, self.query_params.get('page', 1), self.query_params.get('length', 15))
+        return super(CCCIndustryView, self).paging(queryset, request.query_params.get('page', 1), request.query_params.get('length', 15))
 
     def serialize2(self, queryset):
         total = queryset.count()
@@ -287,24 +286,24 @@ class CCCIndustryView(BaseView):
                     'id': l1.id,
                     'name': l1.name,
                     'desc': l1.desc,
-                }, 
+                },
             })
 
         data = {
             'total': total,
             'list': temp,
         }
-            
+
         return data
 
     def get(self, request, cid=None):
-        self.set_params(request)
+        self.set_request(request)
 
         if not cid:
-            queryset = CCCIndustryData(params=self.query_params).get_all()
+            queryset = CCCIndustryData(params=request.query_params).get_all()
             return Response(self.serialize(queryset))
         else:
-            queryset = CCCIndustryData(params=self.query_params).get_by_id(cid)
+            queryset = CCCIndustryData(params=request.query_params).get_by_id(cid)
             return Response(self.serialize2(queryset))
 
 
@@ -313,11 +312,11 @@ class LicenseIndustryView(BaseView):
     def __init__(self):
         super(LicenseIndustryView, self).__init__()
 
-    def set_params(self, request):
-        super(LicenseIndustryView, self).set_params(request.GET)
+    def set_request(self, request):
+        super(LicenseIndustryView, self).set_request(request)
 
     def paging(self, queryset):
-        return super(LicenseIndustryView, self).paging(queryset, self.query_params.get('page', 1), self.query_params.get('length', 15))
+        return super(LicenseIndustryView, self).paging(queryset, request.query_params.get('page', 1), request.query_params.get('length', 15))
 
     def serialize2(self, queryset):
         total = queryset.count()
@@ -342,24 +341,24 @@ class LicenseIndustryView(BaseView):
                     'id': l1.id,
                     'name': l1.name,
                     'desc': l1.desc,
-                }, 
+                },
             })
 
         data = {
             'total': total,
             'list': temp,
         }
-            
+
         return data
 
     def get(self, request, lid=None):
-        self.set_params(request)
+        self.set_request(request)
 
         if not lid:
-            queryset = LicenseIndustryData(params=self.query_params).get_all()
+            queryset = LicenseIndustryData(params=request.query_params).get_all()
             return Response(self.serialize(queryset))
         else:
-            queryset = LicenseIndustryData(params=self.query_params).get_by_id(lid)
+            queryset = LicenseIndustryData(params=request.query_params).get_by_id(lid)
             return Response(self.serialize2(queryset))
 
 
@@ -368,29 +367,29 @@ class DMLinkView(BaseView):
     def __init__(self):
         super(DMLinkView, self).__init__()
 
-    def set_params(self, request):
-        super(DMLinkView, self).set_params(request.GET)
+    def set_request(self, request):
+        super(DMLinkView, self).set_request(request)
 
     def paging(self, queryset):
-        return super(DMLinkView, self).paging(queryset, self.query_params.get('page', 1), self.query_params.get('length', 15))
+        return super(DMLinkView, self).paging(queryset, request.query_params.get('page', 1), request.query_params.get('length', 15))
 
     def serialize(self, queryset):
         total = queryset.count()
         results = self.paging(queryset)
         data = {'total': total,
                 'list': map(lambda r: {
-                    'name': r['name'], 
-                    'link': r['link'], 
-                    'kwords': r['kwords'], 
-                    'fwords': r['fwords'], 
-                    'status': r['status'], 
+                    'name': r['name'],
+                    'link': r['link'],
+                    'kwords': r['kwords'],
+                    'fwords': r['fwords'],
+                    'status': r['status'],
                 }, results)
                 }
 
         return data
 
     def get(self, request):
-        self.set_params(request)
+        self.set_request(request)
 
         queryset = DMLinkData(user=request.user).get_all()
 
@@ -402,13 +401,13 @@ class DMLinkAddView(BaseView):
     def __init__(self):
         super(DMLinkAddView, self).__init__()
 
-    def set_params(self, request):
-        super(DMLinkAddView, self).set_params(request.POST)
+    def set_request(self, request):
+        super(DMLinkAddView, self).set_request(request)
 
     def post(self, request):
-        self.set_params(request)
+        self.set_request(request)
 
-        queryset = DMLinkAdd(user=request.user, params=self.query_params).add_dmlink()
+        queryset = DMLinkAdd(user=request.user, params=request.data).add_dmlink()
 
         return Response(queryset)
 
@@ -418,12 +417,12 @@ class DMLinkEditView(BaseView):
     def __init__(self):
         super(DMLinkEditView, self).__init__()
 
-    def set_params(self, request):
-        super(DMLinkEditView, self).set_params(request.POST)
+    def set_request(self, request):
+        super(DMLinkEditView, self).set_request(request)
 
     def post(self, request, did):
-        self.set_params(request)
-        queryset = DMLinkEdit(params=self.query_params).edit_dmlink(did=did)
+        self.set_request(request)
+        queryset = DMLinkEdit(params=request.data).edit_dmlink(did=did)
 
         return Response(queryset)
 
@@ -444,27 +443,27 @@ class DMWordsView(BaseView):
     def __init__(self):
         super(DMWordsView, self).__init__()
 
-    def set_params(self, request):
-        super(DMWordsView, self).set_params(request.GET)
+    def set_request(self, request):
+        super(DMWordsView, self).set_request(request)
 
     def paging(self, queryset):
-        return super(DMWordsView, self).paging(queryset, self.query_params.get('page', 1), self.query_params.get('length', 15))
+        return super(DMWordsView, self).paging(queryset, request.query_params.get('page', 1), request.query_params.get('length', 15))
 
     def serialize(self, queryset):
         total = queryset.count()
         results = self.paging(queryset)
         data = {'total': total,
                 'list': map(lambda r: {
-                    'industry': r['industry__name'], 
-                    'riskword': r['riskword'], 
-                    'invalidword': r['invalidword'], 
+                    'industry': r['industry__name'],
+                    'riskword': r['riskword'],
+                    'invalidword': r['invalidword'],
                 }, results)
                 }
 
         return data
 
     def get(self, request):
-        self.set_params(request)
+        self.set_request(request)
 
         queryset = DMWordsData().get_all()
 
@@ -476,8 +475,8 @@ class Select2IndustryView(BaseView):
     def __init__(self):
         super(Select2IndustryView, self).__init__()
 
-    def set_params(self, request):
-        super(Select2IndustryView, self).set_params(request.GET)
+    def set_request(self, request):
+        super(Select2IndustryView, self).set_request(request)
 
     def serialize(self, queryset):
         data = map(lambda q: {
@@ -488,9 +487,9 @@ class Select2IndustryView(BaseView):
         return data
 
     def get(self, request):
-        self.set_params(request)
+        self.set_request(request)
 
-        queryset = Select2IndustryData(params=self.query_params).get_all()
+        queryset = Select2IndustryData(params=request.query_params).get_all()
 
         return Response(self.serialize(queryset))
 
@@ -500,8 +499,8 @@ class Select2AliasIndustryView(BaseView):
     def __init__(self):
         super(Select2AliasIndustryView, self).__init__()
 
-    def set_params(self, request):
-        super(Select2AliasIndustryView, self).set_params(request.GET)
+    def set_request(self, request):
+        super(Select2AliasIndustryView, self).set_request(request)
 
     def serialize(self, queryset):
         data = map(lambda q: {
@@ -512,9 +511,9 @@ class Select2AliasIndustryView(BaseView):
         return data
 
     def get(self, request):
-        self.set_params(request)
+        self.set_request(request)
 
-        queryset = Select2AliasIndustryData(params=self.query_params).get_all()
+        queryset = Select2AliasIndustryData(params=request.query_params).get_all()
 
         return Response(self.serialize(queryset))
 
@@ -524,8 +523,8 @@ class Select2CCCIndustryView(BaseView):
     def __init__(self):
         super(Select2CCCIndustryView, self).__init__()
 
-    def set_params(self, request):
-        super(Select2CCCIndustryView, self).set_params(request.GET)
+    def set_request(self, request):
+        super(Select2CCCIndustryView, self).set_request(request)
 
     def serialize(self, queryset):
         data = map(lambda q: {
@@ -536,9 +535,9 @@ class Select2CCCIndustryView(BaseView):
         return data
 
     def get(self, request):
-        self.set_params(request)
+        self.set_request(request)
 
-        queryset = Select2CCCIndustryData(params=self.query_params).get_all()
+        queryset = Select2CCCIndustryData(params=request.query_params).get_all()
 
         return Response(self.serialize(queryset))
 
@@ -548,8 +547,8 @@ class Select2LicenseIndustryView(BaseView):
     def __init__(self):
         super(Select2LicenseIndustryView, self).__init__()
 
-    def set_params(self, request):
-        super(Select2LicenseIndustryView, self).set_params(request.GET)
+    def set_request(self, request):
+        super(Select2LicenseIndustryView, self).set_request(request)
 
     def serialize(self, queryset):
         data = map(lambda q: {
@@ -560,9 +559,9 @@ class Select2LicenseIndustryView(BaseView):
         return data
 
     def get(self, request):
-        self.set_params(request)
+        self.set_request(request)
 
-        queryset = Select2LicenseIndustryData(params=self.query_params).get_all()
+        queryset = Select2LicenseIndustryData(params=request.query_params).get_all()
 
         return Response(self.serialize(queryset))
 
@@ -572,8 +571,8 @@ class Select2AreaView(BaseView):
     def __init__(self):
         super(Select2AreaView, self).__init__()
 
-    def set_params(self, request):
-        super(Select2AreaView, self).set_params(request.GET)
+    def set_request(self, request):
+        super(Select2AreaView, self).set_request(request)
 
     def serialize(self, queryset):
         data = map(lambda q: {
@@ -584,9 +583,9 @@ class Select2AreaView(BaseView):
         return data
 
     def get(self, request):
-        self.set_params(request)
+        self.set_request(request)
 
-        queryset = Select2AreaData(params=self.query_params).get_all()
+        queryset = Select2AreaData(params=request.query_params).get_all()
 
         return Response(self.serialize(queryset))
 
@@ -596,11 +595,11 @@ class RiskDataView(BaseView):
     def __init__(self):
         super(RiskDataView, self).__init__()
 
-    def set_params(self, request):
-        super(RiskDataView, self).set_params(request.GET)
+    def set_request(self, request):
+        super(RiskDataView, self).set_request(request)
 
     def paging(self, queryset):
-        return super(RiskDataView, self).paging(queryset, self.query_params.get('page', 1), self.query_params.get('length', 15))
+        return super(RiskDataView, self).paging(queryset, request.query_params.get('page', 1), request.query_params.get('length', 15))
 
     def serialize(self, queryset):
         total = queryset.count()
@@ -622,9 +621,9 @@ class RiskDataView(BaseView):
         return data
 
     def get(self, request):
-        self.set_params(request)
+        self.set_request(request)
 
-        queryset = RiskData(params=self.query_params).get_all()
+        queryset = RiskData(params=request.query_params).get_all()
 
         return Response(self.serialize(queryset))
 
@@ -634,13 +633,13 @@ class RiskDataAddView(BaseView):
     def __init__(self):
         super(RiskDataAddView, self).__init__()
 
-    def set_params(self, request):
-        super(RiskDataAddView, self).set_params(request.POST)
+    def set_request(self, request):
+        super(RiskDataAddView, self).set_request(request)
 
     def post(self, request):
-        self.set_params(request)
+        self.set_request(request)
 
-        queryset = RiskDataAdd(user=request.user, params=self.query_params).add()
+        queryset = RiskDataAdd(user=request.user, params=request.data).add()
 
         return Response(status=queryset)
 
@@ -650,12 +649,12 @@ class RiskDataEditView(BaseView):
     def __init__(self):
         super(RiskDataEditView, self).__init__()
 
-    def set_params(self, request):
-        super(RiskDataEditView, self).set_params(request.POST)
+    def set_request(self, request):
+        super(RiskDataEditView, self).set_request(request)
 
     def post(self, request, aid):
-        self.set_params(request)
-        queryset = RiskDataEdit(params=self.query_params).edit(aid=aid)
+        self.set_request(request)
+        queryset = RiskDataEdit(params=request.data).edit(aid=aid)
 
         return Response(status=queryset)
 
@@ -700,11 +699,11 @@ class InspectionDataView(BaseView):
     def __init__(self):
         super(InspectionDataView, self).__init__()
 
-    def set_params(self, request):
-        super(InspectionDataView, self).set_params(request.GET)
+    def set_request(self, request):
+        super(InspectionDataView, self).set_request(request)
 
     def paging(self, queryset):
-        return super(InspectionDataView, self).paging(queryset, self.query_params.get('page', 1), self.query_params.get('length', 15))
+        return super(InspectionDataView, self).paging(queryset, request.query_params.get('page', 1), request.query_params.get('length', 15))
 
     def serialize(self, queryset):
         total = queryset.count()
@@ -723,13 +722,13 @@ class InspectionDataView(BaseView):
                     'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
                 }, result),
         }
-            
+
         return data
 
     def get(self, request):
-        self.set_params(request)
+        self.set_request(request)
 
-        queryset = InspectionData(params=self.query_params).get_all()
+        queryset = InspectionData(params=request.query_params).get_all()
 
         return Response(self.serialize(queryset))
 
@@ -739,13 +738,13 @@ class InspectionDataAddView(BaseView):
     def __init__(self):
         super(InspectionDataAddView, self).__init__()
 
-    def set_params(self, request):
-        super(InspectionDataAddView, self).set_params(request.POST)
+    def set_request(self, request):
+        super(InspectionDataAddView, self).set_request(request)
 
     def post(self, request):
-        self.set_params(request)
+        self.set_request(request)
 
-        queryset = InspectionDataAdd(user=request.user, params=self.query_params).add()
+        queryset = InspectionDataAdd(user=request.user, params=request.data).add()
 
         return Response(status=queryset)
 
@@ -755,13 +754,13 @@ class InspectionDataEditView(BaseView):
     def __init__(self):
         super(InspectionDataEditView, self).__init__()
 
-    def set_params(self, request):
-        super(InspectionDataEditView, self).set_params(request.POST)
+    def set_request(self, request):
+        super(InspectionDataEditView, self).set_request(request)
 
     def post(self, request, aid):
-        self.set_params(request)
+        self.set_request(request)
 
-        queryset = InspectionDataEdit(user=request.user, params=self.query_params).edit(aid=aid)
+        queryset = InspectionDataEdit(user=request.user, params=request.data).edit(aid=aid)
 
         return Response(status=queryset)
 
@@ -820,13 +819,13 @@ class AliasIndustryAddView(BaseView):
     def __init__(self):
         super(AliasIndustryAddView, self).__init__()
 
-    def set_params(self, request):
-        super(AliasIndustryAddView, self).set_params(request.POST)
+    def set_request(self, request):
+        super(AliasIndustryAddView, self).set_request(request)
 
     def post(self, request):
-        self.set_params(request)
+        self.set_request(request)
 
-        queryset = AliasIndustryAdd(user=request.user, params=self.query_params).add()
+        queryset = AliasIndustryAdd(user=request.user, params=request.data).add()
 
         return Response(status=queryset)
 
@@ -836,13 +835,13 @@ class CCCIndustryAddView(BaseView):
     def __init__(self):
         super(CCCIndustryAddView, self).__init__()
 
-    def set_params(self, request):
-        super(CCCIndustryAddView, self).set_params(request.POST)
+    def set_request(self, request):
+        super(CCCIndustryAddView, self).set_request(request)
 
     def post(self, request):
-        self.set_params(request)
+        self.set_request(request)
 
-        queryset = CCCIndustryAdd(user=request.user, params=self.query_params).add()
+        queryset = CCCIndustryAdd(user=request.user, params=request.data).add()
 
         return Response(status=queryset)
 
@@ -852,13 +851,13 @@ class LicenseIndustryAddView(BaseView):
     def __init__(self):
         super(LicenseIndustryAddView, self).__init__()
 
-    def set_params(self, request):
-        super(LicenseIndustryAddView, self).set_params(request.POST)
+    def set_request(self, request):
+        super(LicenseIndustryAddView, self).set_request(request)
 
     def post(self, request):
-        self.set_params(request)
+        self.set_request(request)
 
-        queryset = LicenseIndustryAdd(user=request.user, params=self.query_params).add()
+        queryset = LicenseIndustryAdd(user=request.user, params=request.data).add()
 
         return Response(status=queryset)
 
@@ -868,11 +867,11 @@ class CorpusView(BaseView):
     def __init__(self):
         super(CorpusView, self).__init__()
 
-    def set_params(self, request):
-        super(CorpusView, self).set_params(request.GET)
+    def set_request(self, request):
+        super(CorpusView, self).set_request(request)
 
     def paging(self, queryset):
-        return super(CorpusView, self).paging(queryset, self.query_params.get('page', 1), self.query_params.get('length', 15))
+        return super(CorpusView, self).paging(queryset, request.query_params.get('page', 1), request.query_params.get('length', 15))
 
     def serialize(self, queryset):
         total = queryset.count()
@@ -880,19 +879,19 @@ class CorpusView(BaseView):
         data = {'total': total,
                 'list': map(lambda r: {
                     'id': r['id'],
-                    'industry_id': r['industry__id'], 
-                    'industry_name': r['industry__name'], 
-                    'riskword': r['riskword'], 
-                    'invalidword': r['invalidword'], 
+                    'industry_id': r['industry__id'],
+                    'industry_name': r['industry__name'],
+                    'riskword': r['riskword'],
+                    'invalidword': r['invalidword'],
                 }, results)
                 }
 
         return data
 
     def get(self, request):
-        self.set_params(request)
+        self.set_request(request)
 
-        queryset = CorpusData(params=self.query_params).get_all()
+        queryset = CorpusData(params=request.query_params).get_all()
 
         return Response(self.serialize(queryset))
 
@@ -902,13 +901,13 @@ class CorpusAddView(BaseView):
     def __init__(self):
         super(CorpusAddView, self).__init__()
 
-    def set_params(self, request):
-        super(CorpusAddView, self).set_params(request.POST)
+    def set_request(self, request):
+        super(CorpusAddView, self).set_request(request)
 
     def post(self, request):
-        self.set_params(request)
+        self.set_request(request)
 
-        queryset = CorpusAdd(user=request.user, params=self.query_params).add()
+        queryset = CorpusAdd(user=request.user, params=request.data).add()
 
         return Response(status=queryset)
 
@@ -918,13 +917,13 @@ class CorpusEditView(BaseView):
     def __init__(self):
         super(CorpusEditView, self).__init__()
 
-    def set_params(self, request):
-        super(CorpusEditView, self).set_params(request.POST)
+    def set_request(self, request):
+        super(CorpusEditView, self).set_request(request)
 
     def post(self, request, cid):
-        self.set_params(request)
+        self.set_request(request)
 
-        queryset = CorpusEdit(user=request.user, params=self.query_params).edit(cid=cid)
+        queryset = CorpusEdit(user=request.user, params=request.data).edit(cid=cid)
 
         return Response(status=queryset)
 
@@ -945,8 +944,8 @@ class SearchView(BaseView):
     def __init__(self):
         super(SearchView, self).__init__()
 
-    def set_params(self, request):
-        super(SearchView, self).set_params(request.GET)
+    def set_request(self, request):
+        super(SearchView, self).set_request(request)
 
     def serialize(self, queryset):
         results = queryset['hits']
@@ -968,20 +967,20 @@ class SearchView(BaseView):
         return data
 
     def get(self, request):
-        self.set_params(request)
+        self.set_request(request)
 
-        queryset = SearchData(params=self.query_params).get_all()
+        queryset = SearchData(params=request.query_params).get_all()
 
         return Response(self.serialize(queryset))
-        
+
 
 class SearchAdvancedView(BaseView):
 
     def __init__(self):
         super(SearchAdvancedView, self).__init__()
 
-    def set_params(self, request):
-        super(SearchAdvancedView, self).set_params(request.GET)
+    def set_request(self, request):
+        super(SearchAdvancedView, self).set_request(request)
 
     def serialize(self, queryset):
         return queryset
@@ -1005,9 +1004,8 @@ class SearchAdvancedView(BaseView):
         return data
 
     def get(self, request):
-        self.set_params(request)
+        self.set_request(request)
 
-        queryset = SearchAdvancedData(params=self.query_params).get_all()
+        queryset = SearchAdvancedData(params=request.query_params).get_all()
 
         return Response(self.serialize(queryset))
-        
