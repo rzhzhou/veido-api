@@ -23,12 +23,12 @@ class Area(models.Model):
 
 class UserArea(models.Model):
     user = models.ForeignKey(
-        User, 
+        User,
         on_delete=models.CASCADE,
         verbose_name='用户'
     )
     area = models.ForeignKey(
-        Area, 
+        Area,
         on_delete=models.CASCADE,
         verbose_name='地域'
     )
@@ -66,7 +66,11 @@ class CCCIndustry(models.Model):
     id = models.IntegerField(primary_key=True, editable=True, verbose_name='行业编号')
     name = models.CharField(max_length=100, verbose_name='行业名称')
     level = models.IntegerField(verbose_name='行业等级')
-    desc = models.CharField(max_length=255, blank=True, verbose_name='行业描述')
+    desc = models.CharField(
+        max_length=255,
+        null=True, blank=True,
+        verbose_name='行业描述'
+    )
 
     parent = models.ForeignKey(
         'self',
@@ -106,7 +110,7 @@ class LicenseIndustry(models.Model):
 
 class AliasIndustry(models.Model):
     name = models.CharField(max_length=100, unique=True, verbose_name='行业名称')
-    
+
     industry_id = models.IntegerField(verbose_name='行业ID')
     ccc_id = models.IntegerField(default=0, blank=True, verbose_name='3C行业ID')
     license_id = models.IntegerField(default=0, blank=True, verbose_name='许可证行业ID')
@@ -160,7 +164,7 @@ class Inspection(models.Model):
 class Enterprise(models.Model):
     name = models.CharField(max_length=255, verbose_name='名称')
     unitem = models.CharField(max_length=255, verbose_name='不合格项')
-    
+
     area_id = models.IntegerField(verbose_name='地域ID')
 
     class Meta:
@@ -207,7 +211,7 @@ class Article(models.Model):
 class ArticleArea(models.Model):
     article_id = models.CharField(max_length=32, verbose_name='文章GUID')
     area_id = models.IntegerField(verbose_name='地域ID')
-    
+
     class Meta:
         app_label = 'base'
         verbose_name_plural = '文章地域'
