@@ -1,30 +1,38 @@
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.http import FileResponse
+from rest_framework.parsers import FileUploadParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.parsers import FileUploadParser
 
-from observer.base.models import Industry, AliasIndustry
-from observer.base.service.dashboard import (DashboardData, )
-from observer.base.service.search import (SearchData, SearchAdvancedData, )
-from observer.base.service.industry import (IndustryData, CCCIndustryData, LicenseIndustryData,
-                                            Select2IndustryData, Select2AliasIndustryData,
-                                            AliasIndustryAdd, Select2CCCIndustryData,
-                                            Select2LicenseIndustryData, CCCIndustryAdd,
-                                            LicenseIndustryAdd, )
-from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd, RiskDataEdit,
-                                            RiskDataDelete, RiskDataUpload, RiskDataExport, )
-from observer.base.service.inspection import (InspectionData, InspectionDataAdd, InspectionDataEdit,
-                                            InspectionDataDelete, InspectionDataUpload, InspectionDataExport,
-                                            InspectionDataUnEnterpriseUpload, )
+from observer.base.models import CCCIndustry
 from observer.base.service.area import Select2AreaData
-from observer.base.service.corpus import (CorpusData, CorpusAdd, CorpusEdit, CorpusDelete,
-                                            )
-from observer.base.service.desmon import (DMLinkData, DMLinkAdd, DMLinkEdit, DMLinkDelete,
-                                        DMWordsData,
-                                            )
-from observer.base.service.base import (areas, categories, local_related, area,
-                                        alias_industry, qualitied, risk_injury, )
+from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd,
+                                           RiskDataDelete, RiskDataEdit,
+                                           RiskDataExport, RiskDataUpload)
+from observer.base.service.base import (alias_industry, area, areas,
+                                        categories, local_related, qualitied,
+                                        risk_injury)
+from observer.base.service.corpus import (CorpusAdd, CorpusData, CorpusDelete,
+                                          CorpusEdit)
+from observer.base.service.dashboard import DashboardData
+from observer.base.service.desmon import (DMLinkAdd, DMLinkData, DMLinkDelete,
+                                          DMLinkEdit, DMWordsData)
+from observer.base.service.industry import (AliasIndustryAdd, CCCIndustryAdd,
+                                            CCCIndustryData, IndustryData,
+                                            LicenseIndustryAdd,
+                                            LicenseIndustryData,
+                                            Select2AliasIndustryData,
+                                            Select2CCCIndustryData,
+                                            Select2IndustryData,
+                                            Select2LicenseIndustryData)
+from observer.base.service.inspection import (InspectionData,
+                                              InspectionDataAdd,
+                                              InspectionDataDelete,
+                                              InspectionDataEdit,
+                                              InspectionDataExport,
+                                              InspectionDataUnEnterpriseUpload,
+                                              InspectionDataUpload)
+from observer.base.service.search import SearchAdvancedData, SearchData
 from observer.utils.date_format import date_format
 from observer.utils.excel import write_by_openpyxl
 
@@ -77,7 +85,7 @@ class ArticleView(BaseView):
         super(ArticleView, self).set_request(request)
 
     def paging(self, queryset):
-        return super(ArticleView, self).paging(queryset, request.query_params.get('page', 1), request.query_params.get('length', 15))
+        return super(ArticleView, self).paging(queryset, self.request.query_params.get('page', 1), self.request.query_params.get('length', 15))
 
     def serialize0001(self, queryset):
         total = queryset.count()
@@ -165,7 +173,7 @@ class InspectionView(BaseView):
         super(InspectionView, self).set_request(request)
 
     def paging(self, queryset):
-        return super(InspectionView, self).paging(queryset, request.query_params.get('page', 1), request.query_params.get('length', 15))
+        return super(InspectionView, self).paging(queryset, self.request.query_params.get('page', 1), self.request.query_params.get('length', 15))
 
     def serialize(self, queryset):
         total = queryset.count()
@@ -203,7 +211,7 @@ class IndustryView(BaseView):
         super(IndustryView, self).set_request(request)
 
     def paging(self, queryset):
-        return super(IndustryView, self).paging(queryset, request.query_params.get('page', 1), request.query_params.get('length', 15))
+        return super(IndustryView, self).paging(queryset, self.request.query_params.get('page', 1), self.request.query_params.get('length', 15))
 
     def serialize(self, queryset):
         total = queryset.count()
@@ -252,6 +260,87 @@ class IndustryView(BaseView):
         return Response(self.serialize(queryset))
 
 
+class CCCListView(BaseView):
+
+    def __init__(self):
+        super(CCCListView, self).__init__()
+
+    def set_request(self, request):
+        super(CCCListView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(CCCListView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, queryset):
+        """
+        'parent__parent__id', 'parent__parent__name', 'parent__parent__desc',
+        'parent__id', 'parent__name', 'parent__desc',
+        'id', 'name', 'desc',
+        """
+        result = self.paging(queryset)
+
+        data = {
+            'total': result.paginator.count,
+            'list': map(lambda x: {
+                'l1': {
+                    'id': x['parent__parent__id'],
+                    'name': x['parent__parent__name'],
+                    'desc': x['parent__parent__desc'],
+                },
+                'l2': {
+                    'id': x['parent__id'],
+                    'name': x['parent__name'],
+                    'desc': x['parent__desc'],
+                },
+                'l3': {
+                    'id': x['id'],
+                    'name': x['name'],
+                    'desc': x['desc'],
+                },
+            }, result),
+        }
+
+        return data
+
+    def get(self, request):
+        self.set_request(request)
+
+        queryset = CCCIndustryData(params=request.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+
+class Select2CCCListView(BaseView):
+
+    def __init__(self):
+        super(Select2CCCListView, self).__init__()
+
+    def set_request(self, request):
+        super(Select2CCCListView, self).set_request(request)
+
+    def serialize(self, queryset):
+        data = map(
+            lambda x: {
+                'id': x['id'],
+                'text': x['name'],
+            },
+            queryset
+        )
+
+        return data
+
+    def get(self, request):
+        self.set_request(request)
+
+        queryset = CCCIndustryData(params=request.query_params).get_level()
+
+        return Response(self.serialize(queryset))
+
+
 class CCCIndustryView(BaseView):
 
     def __init__(self):
@@ -261,7 +350,7 @@ class CCCIndustryView(BaseView):
         super(CCCIndustryView, self).set_request(request)
 
     def paging(self, queryset):
-        return super(CCCIndustryView, self).paging(queryset, request.query_params.get('page', 1), request.query_params.get('length', 15))
+        return super(CCCIndustryView, self).paging(queryset, self.request.query_params.get('page', 1), self.request.query_params.get('length', 15))
 
     def serialize2(self, queryset):
         total = queryset.count()
@@ -316,7 +405,7 @@ class LicenseIndustryView(BaseView):
         super(LicenseIndustryView, self).set_request(request)
 
     def paging(self, queryset):
-        return super(LicenseIndustryView, self).paging(queryset, request.query_params.get('page', 1), request.query_params.get('length', 15))
+        return super(LicenseIndustryView, self).paging(queryset, self.request.query_params.get('page', 1), self.request.query_params.get('length', 15))
 
     def serialize2(self, queryset):
         total = queryset.count()
@@ -371,7 +460,7 @@ class DMLinkView(BaseView):
         super(DMLinkView, self).set_request(request)
 
     def paging(self, queryset):
-        return super(DMLinkView, self).paging(queryset, request.query_params.get('page', 1), request.query_params.get('length', 15))
+        return super(DMLinkView, self).paging(queryset, self.request.query_params.get('page', 1), self.request.query_params.get('length', 15))
 
     def serialize(self, queryset):
         total = queryset.count()
@@ -447,7 +536,7 @@ class DMWordsView(BaseView):
         super(DMWordsView, self).set_request(request)
 
     def paging(self, queryset):
-        return super(DMWordsView, self).paging(queryset, request.query_params.get('page', 1), request.query_params.get('length', 15))
+        return super(DMWordsView, self).paging(queryset, self.request.query_params.get('page', 1), self.request.query_params.get('length', 15))
 
     def serialize(self, queryset):
         total = queryset.count()
@@ -599,7 +688,7 @@ class RiskDataView(BaseView):
         super(RiskDataView, self).set_request(request)
 
     def paging(self, queryset):
-        return super(RiskDataView, self).paging(queryset, request.query_params.get('page', 1), request.query_params.get('length', 15))
+        return super(RiskDataView, self).paging(queryset, self.request.query_params.get('page', 1), self.request.query_params.get('length', 15))
 
     def serialize(self, queryset):
         total = queryset.count()
@@ -703,7 +792,7 @@ class InspectionDataView(BaseView):
         super(InspectionDataView, self).set_request(request)
 
     def paging(self, queryset):
-        return super(InspectionDataView, self).paging(queryset, request.query_params.get('page', 1), request.query_params.get('length', 15))
+        return super(InspectionDataView, self).paging(queryset, self.request.query_params.get('page', 1), self.request.query_params.get('length', 15))
 
     def serialize(self, queryset):
         total = queryset.count()
@@ -871,7 +960,7 @@ class CorpusView(BaseView):
         super(CorpusView, self).set_request(request)
 
     def paging(self, queryset):
-        return super(CorpusView, self).paging(queryset, request.query_params.get('page', 1), request.query_params.get('length', 15))
+        return super(CorpusView, self).paging(queryset, self.request.query_params.get('page', 1), self.request.query_params.get('length', 15))
 
     def serialize(self, queryset):
         total = queryset.count()

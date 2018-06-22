@@ -1,73 +1,58 @@
 from django.urls import path, re_path
-from rest_framework_jwt import views
+from rest_framework_jwt.views import obtain_jwt_token, verify_jwt_token
 
-from observer.base.views import (
-                                IndustryView, CCCIndustryView, LicenseIndustryView, 
-                                Select2IndustryView, ArticleView, Select2AreaView,
-                                InspectionView, DMLinkView, DMLinkAddView, 
-                                DMLinkEditView, DMLinkDeleteView, DMWordsView, 
-                                RiskDataView, RiskDataAddView, RiskDataEditView, 
-                                RiskDataDeleteView, RiskDataUploadView, InspectionDataView, 
-                                InspectionDataAddView, InspectionDataEditView, 
-                                InspectionDataDeleteView, InspectionDataUploadView, 
-                                Select2AliasIndustryView, AliasIndustryAddView,
-                                CorpusView, CorpusAddView, CorpusEditView, 
-                                CorpusDeleteView, Select2CCCIndustryView, 
-                                Select2LicenseIndustryView, CCCIndustryAddView,
-                                LicenseIndustryAddView, RiskDataExportView, 
-                                InspectionDataExportView, DashboardView, SearchView,
-                                SearchAdvancedView, InspectionDataUnEnterpriseUploadView, 
-                                )
+from observer.base import views
 
 
 urlpatterns = [
-    path('dashboard', DashboardView.as_view()),  # 整体概览
-    path('industries', IndustryView.as_view()),  # 行业列表
-    path('articles/<str:category>/', ArticleView.as_view()),  # 文章列表
-    path('inspections', InspectionView.as_view()),  # 抽检列表
-    path('ccc/<int:cid>/', CCCIndustryView.as_view()),  # 3C行业
-    path('license/<int:lid>/', LicenseIndustryView.as_view()),  # License行业
+    path('dashboard', views.DashboardView.as_view()),  # 整体概览
+    path('industries', views.IndustryView.as_view()),  # 行业列表
+    path('articles/<str:category>/', views.ArticleView.as_view()),  # 文章列表
+    path('inspections', views.InspectionView.as_view()),  # 抽检列表
+    path('ccc', views.CCCListView.as_view()),  # 3C行业
+    path('ccc/level', views.Select2CCCListView.as_view()),  # 3C行业
+    path('ccc/<int:cid>/', views.CCCIndustryView.as_view()),  # 3C行业
+    path('license/<int:lid>/', views.LicenseIndustryView.as_view()),  # License行业
 
-    path('dmlinks', DMLinkView.as_view()),  # 指定监测-链接 列表
-    path('dmlink/add', DMLinkAddView.as_view()),  # 添加指定监测-链接
-    path('dmlink/edit/<int:did>/', DMLinkEditView.as_view()),  # 修改指定监测-链接
-    path('dmlink/delete/<int:did>/', DMLinkDeleteView.as_view()),  # 删除指定监测-链接
-    path('dmwords', DMWordsView.as_view()),  # 指定监测-关键词 列表
+    path('dmlinks', views.DMLinkView.as_view()),  # 指定监测-链接 列表
+    path('dmlink/add', views.DMLinkAddView.as_view()),  # 添加指定监测-链接
+    path('dmlink/edit/<int:did>/', views.DMLinkEditView.as_view()),  # 修改指定监测-链接
+    path('dmlink/delete/<int:did>/', views.DMLinkDeleteView.as_view()),  # 删除指定监测-链接
+    path('dmwords', views.DMWordsView.as_view()),  # 指定监测-关键词 列表
 
-    # ADMIN 
-    path('risk_data', RiskDataView.as_view()),  # 风险数据
-    path('risk_data/add', RiskDataAddView.as_view()),  # 风险数据添加
-    path('risk_data/edit/<str:aid>/', RiskDataEditView.as_view()),  # 风险数据修改
-    path('risk_data/delete/<str:aid>/', RiskDataDeleteView.as_view()),  # 风险数据删除
-    path('risk_data/upload/<str:filename>/', RiskDataUploadView.as_view()),  # 风险数据上传
-    path('risk_data/export', RiskDataExportView.as_view()),  # 风险数据导出
-    path('inspection_data', InspectionDataView.as_view()),  # 抽检数据
-    path('inspection_data/add', InspectionDataAddView.as_view()),  # 抽检数据添加
-    path('inspection_data/edit/<str:aid>/', InspectionDataEditView.as_view()),  # 抽检数据修改
-    path('inspection_data/delete/<str:aid>/', InspectionDataDeleteView.as_view()),  # 抽检数据删除
-    path('inspection_data/upload/<str:filename>/', InspectionDataUploadView.as_view()),  # 抽检数据上传
-    path('inspection_data/un_enterprise/upload/<str:filename>/', InspectionDataUnEnterpriseUploadView.as_view()),  # 抽检数据不合格企业上传
-    path('inspection_data/export', InspectionDataExportView.as_view()),  # 抽检数据导出
-    path('alias_industry/add', AliasIndustryAddView.as_view()),  # 行业别名添加
-    path('ccc_industry/add', CCCIndustryAddView.as_view()),  # CCC行业添加
-    path('license_industry/add', LicenseIndustryAddView.as_view()),  # 许可证行业添加
-    path('corpus', CorpusView.as_view()),  # 语料词列表
-    path('corpus/add', CorpusAddView.as_view()),  # 语料词添加
-    path('corpus/edit/<int:cid>/', CorpusEditView.as_view()),  # 语料词编辑
-    path('corpus/delete/<int:cid>/', CorpusDeleteView.as_view()),  # 语料词删除
+    # ADMIN
+    path('risk_data', views.RiskDataView.as_view()),  # 风险数据
+    path('risk_data/add', views.RiskDataAddView.as_view()),  # 风险数据添加
+    path('risk_data/edit/<str:aid>/', views.RiskDataEditView.as_view()),  # 风险数据修改
+    path('risk_data/delete/<str:aid>/', views.RiskDataDeleteView.as_view()),  # 风险数据删除
+    path('risk_data/upload/<str:filename>/', views.RiskDataUploadView.as_view()),  # 风险数据上传
+    path('risk_data/export', views.RiskDataExportView.as_view()),  # 风险数据导出
+    path('inspection_data', views.InspectionDataView.as_view()),  # 抽检数据
+    path('inspection_data/add', views.InspectionDataAddView.as_view()),  # 抽检数据添加
+    path('inspection_data/edit/<str:aid>/', views.InspectionDataEditView.as_view()),  # 抽检数据修改
+    path('inspection_data/delete/<str:aid>/', views.InspectionDataDeleteView.as_view()),  # 抽检数据删除
+    path('inspection_data/upload/<str:filename>/', views.InspectionDataUploadView.as_view()),  # 抽检数据上传
+    path('inspection_data/un_enterprise/upload/<str:filename>/', views.InspectionDataUnEnterpriseUploadView.as_view()),  # 抽检数据不合格企业上传
+    path('inspection_data/export', views.InspectionDataExportView.as_view()),  # 抽检数据导出
+    path('alias_industry/add', views.AliasIndustryAddView.as_view()),  # 行业别名添加
+    path('ccc_industry/add', views.CCCIndustryAddView.as_view()),  # CCC行业添加
+    path('license_industry/add', views.LicenseIndustryAddView.as_view()),  # 许可证行业添加
+    path('corpus', views.CorpusView.as_view()),  # 语料词列表
+    path('corpus/add', views.CorpusAddView.as_view()),  # 语料词添加
+    path('corpus/edit/<int:cid>/', views.CorpusEditView.as_view()),  # 语料词编辑
+    path('corpus/delete/<int:cid>/', views.CorpusDeleteView.as_view()),  # 语料词删除
 
-    path('select2/industries', Select2IndustryView.as_view()),  # 行业名称
-    path('select2/alias_industries', Select2AliasIndustryView.as_view()),  # 行业别名
-    path('select2/ccc_industries', Select2CCCIndustryView.as_view()),  # 3C行业
-    path('select2/license_industries', Select2LicenseIndustryView.as_view()),  # License行业
-    path('select2/areas', Select2AreaView.as_view()),  # 地域名称
+    path('select2/industries', views.Select2IndustryView.as_view()),  # 行业名称
+    path('select2/alias_industries', views.Select2AliasIndustryView.as_view()),  # 行业别名
+    path('select2/ccc_industries', views.Select2CCCIndustryView.as_view()),  # 3C行业
+    path('select2/license_industries', views.Select2LicenseIndustryView.as_view()),  # License行业
+    path('select2/areas', views.Select2AreaView.as_view()),  # 地域名称
 
-    path('search', SearchView.as_view()),  # 搜索
-    path('search/advanced', SearchAdvancedView.as_view()),  # 高级搜索
+    path('search', views.SearchView.as_view()),  # 搜索
+    path('search/advanced', views.SearchAdvancedView.as_view()),  # 高级搜索
 ]
 
 urlpatterns += [
-    re_path(r'^token-auth$', views.obtain_jwt_token),
-    re_path(r'^token-verify$', views.verify_jwt_token),
-    re_path(r'^token-refresh$', views.refresh_jwt_token),
+    re_path(r'^token-auth$', obtain_jwt_token),
+    re_path(r'^token-verify$', verify_jwt_token),
 ]

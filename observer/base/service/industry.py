@@ -6,7 +6,7 @@ from observer.base.service.abstract import Abstract
 from observer.utils.date_format import date_format
 
 
-class IndustryData(Abstract):  
+class IndustryData(Abstract):
 
     def __init__(self, params):
         super(IndustryData, self).__init__(params)
@@ -15,7 +15,7 @@ class IndustryData(Abstract):
         cond = {
             'parent__parent': getattr(self, 'l1', None),
             'parent': getattr(self, 'l2', None),
-            'id': getattr(self, 'l3', None), 
+            'id': getattr(self, 'l3', None),
             'level': 3,
         }
         args = dict([k, v] for k, v in cond.items() if v)
@@ -30,17 +30,48 @@ class CCCIndustryData(Abstract):
     def __init__(self, params):
         super(CCCIndustryData, self).__init__(params)
 
+    def get_level(self):
+        fields = ('id', 'name',)
+
+        cond = {
+            'level': getattr(self, 'level'),
+            'parent': getattr(self, 'parent', None),
+        }
+
+        text = getattr(self, 'text', None)
+
+        args = dict([k, v] for k, v in cond.items() if v)
+
+        queryset = CCCIndustry.objects.filter(**args).values(*fields)
+
+        return queryset.filter(Q(name__istartswith=text)) if text else queryset
+
     def get_all(self):
-        return None
+        fields = (
+            'parent__parent__id', 'parent__parent__name', 'parent__parent__desc',
+            'parent__id', 'parent__name', 'parent__desc',
+            'id', 'name', 'desc',
+        )
+
+        cond = {
+            'parent__parent': getattr(self, 'l1', None),
+            'parent': getattr(self, 'l2', None),
+            'level': 3,
+        }
+        args = dict([k, v] for k, v in cond.items() if v)
+
+        queryset = CCCIndustry.objects.filter(**args).order_by('id').values(*fields)
+
+        return queryset
 
     def get_by_id(self, cid):
 
         queryset = CCCIndustry.objects.all()
 
         return queryset.filter(
-                    level=3, 
+                    level=3,
                     parent__id__in=queryset.filter(
-                        level=2, 
+                        level=2,
                         parent__id=cid
                         ).values_list('id', flat=True)
                 )
@@ -59,15 +90,15 @@ class LicenseIndustryData(Abstract):
         queryset = LicenseIndustry.objects.all()
 
         return queryset.filter(
-                    level=3, 
+                    level=3,
                     parent__id__in=queryset.filter(
-                        level=2, 
+                        level=2,
                         parent__id=cid
                         ).values_list('id', flat=True)
                 )
 
 
-class Select2IndustryData(Abstract):  
+class Select2IndustryData(Abstract):
 
     def __init__(self, params):
         super(Select2IndustryData, self).__init__(params)
@@ -83,13 +114,13 @@ class Select2IndustryData(Abstract):
         text = getattr(self, 'text', None)
 
         args = dict([k, v] for k, v in cond.items() if v)
-        
+
         queryset = Industry.objects.filter(**args).values(*fields)
 
         return queryset.filter(Q(id__istartswith=text) | Q(name__istartswith=text)) if text else queryset
 
 
-class Select2AliasIndustryData(Abstract):  
+class Select2AliasIndustryData(Abstract):
 
     def __init__(self, params):
         super(Select2AliasIndustryData, self).__init__(params)
@@ -105,7 +136,7 @@ class Select2AliasIndustryData(Abstract):
         return queryset.filter(Q(id__istartswith=text) | Q(name__istartswith=text)) if text else queryset
 
 
-class Select2CCCIndustryData(Abstract):  
+class Select2CCCIndustryData(Abstract):
 
     def __init__(self, params):
         super(Select2CCCIndustryData, self).__init__(params)
@@ -122,7 +153,7 @@ class Select2CCCIndustryData(Abstract):
 
 
 
-class Select2LicenseIndustryData(Abstract):  
+class Select2LicenseIndustryData(Abstract):
 
     def __init__(self, params):
         super(Select2LicenseIndustryData, self).__init__(params)
