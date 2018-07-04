@@ -11,7 +11,8 @@ urlpatterns = [
     path('inspections', views.InspectionView.as_view()),  # 抽检列表
     path('ccc', views.CCCListView.as_view()),  # 3C行业
     path('ccc/<int:cid>/', views.CCCIndustryView.as_view()),  # 3C行业
-    path('license/<int:lid>/', views.LicenseIndustryView.as_view()),  # License行业
+    path('licence', views.LicenceListView.as_view()),  # Licence行业
+    path('licence/<int:lid>/', views.LicenceIndustryView.as_view()),  # Licence行业
 
     path('dmlinks', views.DMLinkView.as_view()),  # 指定监测-链接 列表
     path('dmlink/add', views.DMLinkAddView.as_view()),  # 添加指定监测-链接
@@ -35,7 +36,7 @@ urlpatterns = [
     path('inspection_data/export', views.InspectionDataExportView.as_view()),  # 抽检数据导出
     path('alias_industry/add', views.AliasIndustryAddView.as_view()),  # 行业别名添加
     path('ccc_industry/add', views.CCCIndustryAddView.as_view()),  # CCC行业添加
-    path('license_industry/add', views.LicenseIndustryAddView.as_view()),  # 许可证行业添加
+    path('licence_industry/add', views.LicenceIndustryAddView.as_view()),  # 许可证行业添加
     path('corpus', views.CorpusView.as_view()),  # 语料词列表
     path('corpus/add', views.CorpusAddView.as_view()),  # 语料词添加
     path('corpus/edit/<int:cid>/', views.CorpusEditView.as_view()),  # 语料词编辑
@@ -44,7 +45,7 @@ urlpatterns = [
     path('select2/industries', views.Select2IndustryView.as_view()),  # 行业名称
     path('select2/alias_industries', views.Select2AliasIndustryView.as_view()),  # 行业别名
     path('select2/ccc_industries', views.Select2CCCListView.as_view()),  # 3C行业
-    path('select2/license_industries', views.Select2LicenseIndustryView.as_view()),  # License行业
+    path('select2/licence_industries', views.Select2LicenceListView.as_view()),  # Licence行业
     path('select2/areas', views.Select2AreaView.as_view()),  # 地域名称
 
     path('search', views.SearchView.as_view()),  # 搜索

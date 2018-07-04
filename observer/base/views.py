@@ -19,12 +19,12 @@ from observer.base.service.desmon import (DMLinkAdd, DMLinkData, DMLinkDelete,
                                           DMLinkEdit, DMWordsData)
 from observer.base.service.industry import (AliasIndustryAdd, CCCIndustryAdd,
                                             CCCIndustryData, IndustryData,
-                                            LicenseIndustryAdd,
-                                            LicenseIndustryData,
+                                            LicenceIndustryAdd,
+                                            LicenceIndustryData,
                                             Select2AliasIndustryData,
                                             Select2CCCIndustryData,
                                             Select2IndustryData,
-                                            Select2LicenseIndustryData)
+                                            Select2LicenceIndustryData)
 from observer.base.service.inspection import (InspectionData,
                                               InspectionDataAdd,
                                               InspectionDataDelete,
@@ -226,8 +226,8 @@ class IndustryView(BaseView):
                     'id': x['id'],
                     'name': x['name'],
                     'ccc_id': x['ccc_id'],
-                    'license_id': x['license_id'],
-                }, AliasIndustry.objects.filter(industry_id=l3.id).values('id', 'name', 'ccc_id', 'license_id'))),
+                    'licence_id': x['licence_id'],
+                }, AliasIndustry.objects.filter(industry_id=l3.id).values('id', 'name', 'ccc_id', 'licence_id'))),
                 'l3': {
                     'id': l3.id,
                     'name': l3.name,
@@ -477,16 +477,16 @@ class CCCIndustryView(BaseView):
             return Response(self.serialize2(queryset))
 
 
-class LicenseIndustryView(BaseView):
+class LicenceIndustryView(BaseView):
 
     def __init__(self):
-        super(LicenseIndustryView, self).__init__()
+        super(LicenceIndustryView, self).__init__()
 
     def set_request(self, request):
-        super(LicenseIndustryView, self).set_request(request)
+        super(LicenceIndustryView, self).set_request(request)
 
     def paging(self, queryset):
-        return super(LicenseIndustryView, self).paging(queryset, self.request.query_params.get('page', 1), self.request.query_params.get('length', 15))
+        return super(LicenceIndustryView, self).paging(queryset, self.request.query_params.get('page', 1), self.request.query_params.get('length', 15))
 
     def serialize2(self, queryset):
         total = queryset.count()
@@ -525,10 +525,10 @@ class LicenseIndustryView(BaseView):
         self.set_request(request)
 
         if not lid:
-            queryset = LicenseIndustryData(params=request.query_params).get_all()
+            queryset = LicenceIndustryData(params=request.query_params).get_all()
             return Response(self.serialize(queryset))
         else:
-            queryset = LicenseIndustryData(params=request.query_params).get_by_id(lid)
+            queryset = LicenceIndustryData(params=request.query_params).get_by_id(lid)
             return Response(self.serialize2(queryset))
 
 
@@ -712,13 +712,13 @@ class Select2CCCIndustryView(BaseView):
         return Response(self.serialize(queryset))
 
 
-class Select2LicenseIndustryView(BaseView):
+class Select2LicenceIndustryView(BaseView):
 
     def __init__(self):
-        super(Select2LicenseIndustryView, self).__init__()
+        super(Select2LicenceIndustryView, self).__init__()
 
     def set_request(self, request):
-        super(Select2LicenseIndustryView, self).set_request(request)
+        super(Select2LicenceIndustryView, self).set_request(request)
 
     def serialize(self, queryset):
         data = map(lambda q: {
@@ -731,7 +731,7 @@ class Select2LicenseIndustryView(BaseView):
     def get(self, request):
         self.set_request(request)
 
-        queryset = Select2LicenseIndustryData(params=request.query_params).get_all()
+        queryset = Select2LicenceIndustryData(params=request.query_params).get_all()
 
         return Response(self.serialize(queryset))
 
@@ -1016,18 +1016,18 @@ class CCCIndustryAddView(BaseView):
         return Response(status=queryset)
 
 
-class LicenseIndustryAddView(BaseView):
+class LicenceIndustryAddView(BaseView):
 
     def __init__(self):
-        super(LicenseIndustryAddView, self).__init__()
+        super(LicenceIndustryAddView, self).__init__()
 
     def set_request(self, request):
-        super(LicenseIndustryAddView, self).set_request(request)
+        super(LicenceIndustryAddView, self).set_request(request)
 
     def post(self, request):
         self.set_request(request)
 
-        queryset = LicenseIndustryAdd(user=request.user, params=request.data).add()
+        queryset = LicenceIndustryAdd(user=request.user, params=request.data).add()
 
         return Response(status=queryset)
 

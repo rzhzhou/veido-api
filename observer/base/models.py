@@ -87,7 +87,7 @@ class CCCIndustry(models.Model):
         return self.name
 
 
-class LicenseIndustry(models.Model):
+class LicenceIndustry(models.Model):
     id = models.IntegerField(primary_key=True, editable=True, verbose_name='行业编号')
     name = models.CharField(max_length=100, verbose_name='行业名称')
     level = models.IntegerField(verbose_name='行业等级')
@@ -117,7 +117,7 @@ class AliasIndustry(models.Model):
 
     industry_id = models.IntegerField(verbose_name='行业ID')
     ccc_id = models.IntegerField(default=0, blank=True, verbose_name='3C行业ID')
-    license_id = models.IntegerField(default=0, blank=True, verbose_name='许可证行业ID')
+    licence_id = models.IntegerField(default=0, blank=True, verbose_name='许可证行业ID')
 
     class Meta:
         app_label = 'base'

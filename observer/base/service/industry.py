@@ -1,7 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, Q, F
 
-from observer.base.models import Industry, CCCIndustry, LicenseIndustry, AliasIndustry
+from observer.base.models import Industry, CCCIndustry, LicenceIndustry, AliasIndustry
 from observer.base.service.abstract import Abstract
 from observer.utils.date_format import date_format
 
@@ -77,17 +77,48 @@ class CCCIndustryData(Abstract):
                 )
 
 
-class LicenseIndustryData(Abstract):
+class LicenceIndustryData(Abstract):
 
     def __init__(self, params):
-        super(LicenseIndustryData, self).__init__(params)
+        super(LicenceIndustryData, self).__init__(params)
+
+    def get_level(self):
+        fields = ('id', 'name',)
+
+        cond = {
+            'level': getattr(self, 'level'),
+            'parent': getattr(self, 'parent', None),
+        }
+
+        text = getattr(self, 'text', None)
+
+        args = dict([k, v] for k, v in cond.items() if v)
+
+        queryset = LicenceIndustry.objects.filter(**args).values(*fields)
+
+        return queryset.filter(Q(name__istartswith=text)) if text else queryset
 
     def get_all(self):
-        return None
+        fields = (
+            'parent__parent__id', 'parent__parent__name', 'parent__parent__desc',
+            'parent__id', 'parent__name', 'parent__desc',
+            'id', 'name', 'desc',
+        )
+
+        cond = {
+            'parent__parent': getattr(self, 'l1', None),
+            'parent': getattr(self, 'l2', None),
+            'level': 3,
+        }
+        args = dict([k, v] for k, v in cond.items() if v)
+
+        queryset = LicenceIndustry.objects.filter(**args).order_by('id').values(*fields)
+
+        return queryset
 
     def get_by_id(self, cid):
 
-        queryset = LicenseIndustry.objects.all()
+        queryset = LicenceIndustry.objects.all()
 
         return queryset.filter(
                     level=3,
@@ -152,11 +183,10 @@ class Select2CCCIndustryData(Abstract):
         return queryset.filter(Q(id__istartswith=text) | Q(name__istartswith=text)) if text else queryset
 
 
-
-class Select2LicenseIndustryData(Abstract):
+class Select2LicenceIndustryData(Abstract):
 
     def __init__(self, params):
-        super(Select2LicenseIndustryData, self).__init__(params)
+        super(Select2LicenceIndustryData, self).__init__(params)
 
     def get_all(self):
 
@@ -179,7 +209,7 @@ class AliasIndustryAdd(Abstract):
         name = getattr(self, 'name', '')
         industry_id = getattr(self, 'industry_id', '')
         ccc_id = getattr(self, 'ccc_id', 0)
-        license_id = getattr(self, 'license_id', 0)
+        licence_id = getattr(self, 'licence_id', 0)
 
         if not name or not industry_id:
             return 400
@@ -188,8 +218,8 @@ class AliasIndustryAdd(Abstract):
             AliasIndustry(
                 name=name,
                 industry_id=industry_id,
-                ccc_id=0 if not license_id else license_id,
-                license_id=0 if not license_id else license_id,
+                ccc_id=0 if not licence_id else licence_id,
+                licence_id=0 if not licence_id else licence_id,
             ).save()
 
         return 200
@@ -223,10 +253,10 @@ class CCCIndustryAdd(Abstract):
         return 200
 
 
-class LicenseIndustryAdd(Abstract):
+class LicenceIndustryAdd(Abstract):
 
     def __init__(self, user, params={}):
-        super(LicenseIndustryAdd, self).__init__(params)
+        super(LicenceIndustryAdd, self).__init__(params)
         self.user = user
 
     def add(self):
@@ -239,13 +269,13 @@ class LicenseIndustryAdd(Abstract):
         if not number or not name:
             return 400
 
-        if not LicenseIndustry.objects.filter(id=number).exists():
-            LicenseIndustry(
+        if not LicenceIndustry.objects.filter(id=number).exists():
+            LicenceIndustry(
                 id=number,
                 name=name,
                 level=level,
                 desc=desc,
-                parent=LicenseIndustry.objects.get(id=parent),
+                parent=LicenceIndustry.objects.get(id=parent),
             ).save()
 
         return 200

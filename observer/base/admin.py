@@ -13,26 +13,26 @@ class IndustryAdmin(ImportExportActionModelAdmin, ForeignKeyAutocompleteAdmin):
     autocomplete_fields = ('parent', )
     search_fields = ('id', 'name', )
     list_display = ('id', 'name', 'level', 'parent', )
-    
+
 
 class CCCIndustryAdmin(ImportExportActionModelAdmin, ForeignKeyAutocompleteAdmin):
     # resource_class = IndustryResources
     autocomplete_fields = ('parent', )
     search_fields = ('id', 'name', )
     list_display = ('id', 'name', 'level', 'parent', )
-    
 
-class LicenseIndustryAdmin(ImportExportActionModelAdmin, ForeignKeyAutocompleteAdmin):
+
+class LicenceIndustryAdmin(ImportExportActionModelAdmin, ForeignKeyAutocompleteAdmin):
     # resource_class = IndustryResources
     autocomplete_fields = ('parent', )
     search_fields = ('id', 'name', )
     list_display = ('id', 'name', 'level', 'parent', )
-    
+
 
 class AliasIndustryAdmin(ImportExportActionModelAdmin):
     # resource_class = IndustryResources
     search_fields = ('name', )
-    list_display = ('name', 'industry_id', 'ccc_id', 'license_id', )
+    list_display = ('name', 'industry_id', 'ccc_id', 'licence_id', )
 
 
 class AreaAdmin(ImportExportActionModelAdmin, ForeignKeyAutocompleteAdmin):
@@ -90,7 +90,7 @@ class CorpusAdmin(ImportExportActionModelAdmin):
 
 admin.site.register(Industry, IndustryAdmin)
 admin.site.register(CCCIndustry, CCCIndustryAdmin)
-admin.site.register(LicenseIndustry, LicenseIndustryAdmin)
+admin.site.register(LicenceIndustry, LicenceIndustryAdmin)
 admin.site.register(AliasIndustry, AliasIndustryAdmin)
 admin.site.register(Area, AreaAdmin)
 admin.site.register(UserArea, UserAreaAdmin)
