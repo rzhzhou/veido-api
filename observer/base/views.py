@@ -341,6 +341,87 @@ class Select2CCCListView(BaseView):
         return Response(self.serialize(queryset))
 
 
+class LicenceListView(BaseView):
+
+    def __init__(self):
+        super(LicenceListView, self).__init__()
+
+    def set_request(self, request):
+        super(LicenceListView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(LicenceListView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, queryset):
+        """
+        'parent__parent__id', 'parent__parent__name', 'parent__parent__desc',
+        'parent__id', 'parent__name', 'parent__desc',
+        'id', 'name', 'desc',
+        """
+        result = self.paging(queryset)
+
+        data = {
+            'total': result.paginator.count,
+            'list': map(lambda x: {
+                'l1': {
+                    'id': x['parent__parent__id'],
+                    'name': x['parent__parent__name'],
+                    'desc': x['parent__parent__desc'],
+                },
+                'l2': {
+                    'id': x['parent__id'],
+                    'name': x['parent__name'],
+                    'desc': x['parent__desc'],
+                },
+                'l3': {
+                    'id': x['id'],
+                    'name': x['name'],
+                    'desc': x['desc'],
+                },
+            }, result),
+        }
+
+        return data
+
+    def get(self, request):
+        self.set_request(request)
+
+        queryset = LicenceIndustryData(params=request.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+
+class Select2LicenceListView(BaseView):
+
+    def __init__(self):
+        super(Select2LicenceListView, self).__init__()
+
+    def set_request(self, request):
+        super(Select2LicenceListView, self).set_request(request)
+
+    def serialize(self, queryset):
+        data = map(
+            lambda x: {
+                'id': x['id'],
+                'text': x['name'],
+            },
+            queryset
+        )
+
+        return data
+
+    def get(self, request):
+        self.set_request(request)
+
+        queryset = LicenceIndustryData(params=request.query_params).get_level()
+
+        return Response(self.serialize(queryset))
+
+
 class CCCIndustryView(BaseView):
 
     def __init__(self):

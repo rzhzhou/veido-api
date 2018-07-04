@@ -91,7 +91,11 @@ class LicenseIndustry(models.Model):
     id = models.IntegerField(primary_key=True, editable=True, verbose_name='行业编号')
     name = models.CharField(max_length=100, verbose_name='行业名称')
     level = models.IntegerField(verbose_name='行业等级')
-    desc = models.CharField(max_length=255, blank=True, verbose_name='行业描述')
+    desc = models.CharField(
+        max_length=255,
+        null=True, blank=True,
+        verbose_name='行业描述'
+    )
 
     parent = models.ForeignKey(
         'self',

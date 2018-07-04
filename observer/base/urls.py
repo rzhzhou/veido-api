@@ -10,7 +10,6 @@ urlpatterns = [
     path('articles/<str:category>/', views.ArticleView.as_view()),  # 文章列表
     path('inspections', views.InspectionView.as_view()),  # 抽检列表
     path('ccc', views.CCCListView.as_view()),  # 3C行业
-    path('ccc/level', views.Select2CCCListView.as_view()),  # 3C行业
     path('ccc/<int:cid>/', views.CCCIndustryView.as_view()),  # 3C行业
     path('license/<int:lid>/', views.LicenseIndustryView.as_view()),  # License行业
 
@@ -44,7 +43,7 @@ urlpatterns = [
 
     path('select2/industries', views.Select2IndustryView.as_view()),  # 行业名称
     path('select2/alias_industries', views.Select2AliasIndustryView.as_view()),  # 行业别名
-    path('select2/ccc_industries', views.Select2CCCIndustryView.as_view()),  # 3C行业
+    path('select2/ccc_industries', views.Select2CCCListView.as_view()),  # 3C行业
     path('select2/license_industries', views.Select2LicenseIndustryView.as_view()),  # License行业
     path('select2/areas', views.Select2AreaView.as_view()),  # 地域名称
 
