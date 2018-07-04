@@ -36,6 +36,13 @@ class ConsumerIndustryAdmin(ImportExportActionModelAdmin, ForeignKeyAutocomplete
     list_display = ('id', 'name', 'level', 'parent', )
 
 
+class MajorIndustryAdmin(ImportExportActionModelAdmin, ForeignKeyAutocompleteAdmin):
+    # resource_class = IndustryResources
+    autocomplete_fields = ('parent', )
+    search_fields = ('id', 'name', )
+    list_display = ('id', 'name', 'level', 'parent', )
+
+
 class AliasIndustryAdmin(ImportExportActionModelAdmin):
     # resource_class = IndustryResources
     search_fields = ('name', )
@@ -101,6 +108,7 @@ admin.site.register(Industry, IndustryAdmin)
 admin.site.register(CCCIndustry, CCCIndustryAdmin)
 admin.site.register(LicenceIndustry, LicenceIndustryAdmin)
 admin.site.register(ConsumerIndustry, ConsumerIndustryAdmin)
+admin.site.register(MajorIndustry, MajorIndustryAdmin)
 admin.site.register(AliasIndustry, AliasIndustryAdmin)
 admin.site.register(Area, AreaAdmin)
 admin.site.register(UserArea, UserAreaAdmin)

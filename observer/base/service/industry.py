@@ -2,7 +2,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, F, Q
 
 from observer.base.models import (AliasIndustry, CCCIndustry, ConsumerIndustry,
-                                  Industry, LicenceIndustry)
+                                  Industry, LicenceIndustry, MajorIndustry)
 from observer.base.service.abstract import Abstract
 from observer.utils.date_format import date_format
 
@@ -167,6 +167,47 @@ class ConsumerIndustryData(Abstract):
         args = dict([k, v] for k, v in cond.items() if v)
 
         queryset = ConsumerIndustry.objects.filter(**args).order_by('id').values(*fields)
+
+        return queryset
+
+
+class MajorIndustryData(Abstract):
+
+    def __init__(self, params):
+        super(MajorIndustryData, self).__init__(params)
+
+    def get_level(self):
+        fields = ('id', 'name',)
+
+        cond = {
+            'level': getattr(self, 'level'),
+            'parent': getattr(self, 'parent', None),
+        }
+
+        text = getattr(self, 'text', None)
+
+        args = dict([k, v] for k, v in cond.items() if v)
+
+        queryset = MajorIndustry.objects.filter(**args).values(*fields)
+
+        return queryset.filter(Q(name__istartswith=text)) if text else queryset
+
+    def get_all(self):
+        fields = (
+            'parent__parent__id', 'parent__parent__name', 'parent__parent__desc',
+            'parent__id', 'parent__name', 'parent__desc',
+            'id', 'name', 'desc',
+        )
+
+        cond = {
+            'parent__parent__parent': getattr(self, 'l1', None),
+            'parent__parent': getattr(self, 'l2', None),
+            'parent': getattr(self, 'l3', None),
+            'level': 4,
+        }
+        args = dict([k, v] for k, v in cond.items() if v)
+
+        queryset = MajorIndustry.objects.filter(**args).order_by('id').values(*fields)
 
         return queryset
 

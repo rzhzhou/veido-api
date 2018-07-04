@@ -1,3 +1,4 @@
+import uuid
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -132,6 +133,31 @@ class ConsumerIndustry(models.Model):
     class Meta:
         app_label = 'base'
         verbose_name_plural = '消费品目录'
+
+    def __str__(self):
+        return self.name
+
+
+class MajorIndustry(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, verbose_name='行业编号')
+    name = models.CharField(max_length=100, verbose_name='行业名称')
+    level = models.IntegerField(verbose_name='行业等级')
+    desc = models.CharField(
+        max_length=255,
+        null=True, blank=True,
+        verbose_name='行业描述'
+    )
+
+    parent = models.ForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        null=True, blank=True,
+        verbose_name='上一级'
+    )
+
+    class Meta:
+        app_label = 'base'
+        verbose_name_plural = '重点产品目录'
 
     def __str__(self):
         return self.name

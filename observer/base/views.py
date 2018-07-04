@@ -22,6 +22,7 @@ from observer.base.service.industry import (AliasIndustryAdd, CCCIndustryAdd,
                                             ConsumerIndustryData, IndustryData,
                                             LicenceIndustryAdd,
                                             LicenceIndustryData,
+                                            MajorIndustryData,
                                             Select2AliasIndustryData,
                                             Select2CCCIndustryData,
                                             Select2IndustryData,
@@ -452,6 +453,7 @@ class ConsumerListView(BaseView):
 
     def serialize(self, queryset):
         """
+        'parent__parent__parent__id', 'parent__parent__parent__name', 'parent__parent__parent__desc',
         'parent__parent__id', 'parent__parent__name', 'parent__parent__desc',
         'parent__id', 'parent__name', 'parent__desc',
         'id', 'name', 'desc',
@@ -462,16 +464,21 @@ class ConsumerListView(BaseView):
             'total': result.paginator.count,
             'list': map(lambda x: {
                 'l1': {
+                    'id': x['parent__parent__parent__id'],
+                    'name': x['parent__parent__parent__name'],
+                    'desc': x['parent__parent__parent__desc'],
+                },
+                'l2': {
                     'id': x['parent__parent__id'],
                     'name': x['parent__parent__name'],
                     'desc': x['parent__parent__desc'],
                 },
-                'l2': {
+                'l3': {
                     'id': x['parent__id'],
                     'name': x['parent__name'],
                     'desc': x['parent__desc'],
                 },
-                'l3': {
+                'l4': {
                     'id': x['id'],
                     'name': x['name'],
                     'desc': x['desc'],
@@ -512,6 +519,93 @@ class Select2ConsumerListView(BaseView):
         self.set_request(request)
 
         queryset = ConsumerIndustryData(params=request.query_params).get_level()
+
+        return Response(self.serialize(queryset))
+
+
+class MajorListView(BaseView):
+
+    def __init__(self):
+        super(MajorListView, self).__init__()
+
+    def set_request(self, request):
+        super(MajorListView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(MajorListView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, queryset):
+        """
+        'parent__parent__parent__id', 'parent__parent__parent__name', 'parent__parent__parent__desc',
+        'parent__parent__id', 'parent__parent__name', 'parent__parent__desc',
+        'parent__id', 'parent__name', 'parent__desc',
+        'id', 'name', 'desc',
+        """
+        result = self.paging(queryset)
+
+        data = {
+            'total': result.paginator.count,
+            'list': map(lambda x: {
+                'l1': {
+                    'id': x['parent__parent__parent__id'],
+                    'name': x['parent__parent__parent__name'],
+                    'desc': x['parent__parent__parent__desc'],
+                },
+                'l2': {
+                    'id': x['parent__parent__id'],
+                    'name': x['parent__parent__name'],
+                    'desc': x['parent__parent__desc'],
+                },
+                'l3': {
+                    'id': x['parent__id'],
+                    'name': x['parent__name'],
+                    'desc': x['parent__desc'],
+                },
+                'l4': {
+                    'id': x['id'],
+                    'name': x['name'],
+                    'desc': x['desc'],
+                },
+            }, result),
+        }
+
+        return data
+
+    def get(self, request):
+        self.set_request(request)
+
+        queryset = MajorIndustryData(params=request.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+
+class Select2MajorListView(BaseView):
+
+    def __init__(self):
+        super(Select2MajorListView, self).__init__()
+
+    def set_request(self, request):
+        super(Select2MajorListView, self).set_request(request)
+
+    def serialize(self, queryset):
+        data = map(
+            lambda x: {
+                'id': x['id'],
+                'text': x['name'],
+            },
+            queryset
+        )
+
+        return data
+
+    def get(self, request):
+        self.set_request(request)
+
+        queryset = MajorIndustryData(params=request.query_params).get_level()
 
         return Response(self.serialize(queryset))
 
