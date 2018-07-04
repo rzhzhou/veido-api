@@ -86,7 +86,11 @@ class ArticleView(BaseView):
         super(ArticleView, self).set_request(request)
 
     def paging(self, queryset):
-        return super(ArticleView, self).paging(queryset, self.request.query_params.get('page', 1), self.request.query_params.get('length', 15))
+        return super(ArticleView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
 
     def serialize0001(self, queryset):
         total = queryset.count()
@@ -94,12 +98,12 @@ class ArticleView(BaseView):
         data = {
             'total': total,
             'list': map(lambda x: {
-                    'url': x['url'],
-                    'title': x['title'],
-                    'source': x['source'],
-                    'areas': areas(x['guid']),
-                    'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
-                }, result),
+                'url': x['url'],
+                'title': x['title'],
+                'source': x['source'],
+                'areas': areas(x['guid']),
+                'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
+            }, result),
         }
 
         return data
@@ -110,15 +114,15 @@ class ArticleView(BaseView):
         data = {
             'total': total,
             'list': map(lambda x: {
-                    'url': x['url'],
-                    'title': x['title'],
-                    'source': x['source'],
-                    'areas': areas(x['guid']),
-                    'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
-                    'score': x['score'],
-                    'local_related': local_related(x['guid'], self.user), # 本地风险相关度
-                    'risk_injury': risk_injury(x['guid']),
-                }, result),
+                'url': x['url'],
+                'title': x['title'],
+                'source': x['source'],
+                'areas': areas(x['guid']),
+                'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
+                'score': x['score'],
+                'local_related': local_related(x['guid'], self.user), # 本地风险相关度
+                'risk_injury': risk_injury(x['guid']),
+            }, result),
         }
 
         return data
@@ -129,13 +133,13 @@ class ArticleView(BaseView):
         data = {
             'total': total,
             'list': map(lambda x: {
-                    'categories': categories(x['guid']),
-                    'url': x['url'],
-                    'title': x['title'],
-                    'source': x['source'],
-                    'areas': areas(x['guid']),
-                    'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
-                }, result),
+                'categories': categories(x['guid']),
+                'url': x['url'],
+                'title': x['title'],
+                'source': x['source'],
+                'areas': areas(x['guid']),
+                'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
+            }, result),
         }
 
         return data
@@ -146,13 +150,13 @@ class ArticleView(BaseView):
         data = {
             'total': total,
             'list': map(lambda x: {
-                    'url': x['url'],
-                    'title': x['title'],
-                    'source': x['source'],
-                    'publisher': x['publisher'],
-                    'areas': areas(x['guid']),
-                    'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
-                }, result),
+                'url': x['url'],
+                'title': x['title'],
+                'source': x['source'],
+                'publisher': x['publisher'],
+                'areas': areas(x['guid']),
+                'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
+            }, result),
         }
 
         return data
@@ -174,7 +178,11 @@ class InspectionView(BaseView):
         super(InspectionView, self).set_request(request)
 
     def paging(self, queryset):
-        return super(InspectionView, self).paging(queryset, self.request.query_params.get('page', 1), self.request.query_params.get('length', 15))
+        return super(InspectionView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
 
     def serialize(self, queryset):
         total = queryset.count()
@@ -182,15 +190,15 @@ class InspectionView(BaseView):
         data = {
             'total': total,
             'list': map(lambda x: {
-                    'industry': alias_industry(x['industry_id']),
-                    'url': x['url'],
-                    'level': x['level'],
-                    'area': area(x['area_id']),
-                    'source': x['source'],
-                    'qualitied': qualitied(x['qualitied']),
-                    'category': x['category'],
-                    'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
-                }, result),
+                'industry': alias_industry(x['industry_id']),
+                'url': x['url'],
+                'level': x['level'],
+                'area': area(x['area_id']),
+                'source': x['source'],
+                'qualitied': qualitied(x['qualitied']),
+                'category': x['category'],
+                'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
+            }, result),
         }
 
         return data
@@ -212,7 +220,11 @@ class IndustryView(BaseView):
         super(IndustryView, self).set_request(request)
 
     def paging(self, queryset):
-        return super(IndustryView, self).paging(queryset, self.request.query_params.get('page', 1), self.request.query_params.get('length', 15))
+        return super(IndustryView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
 
     def serialize(self, queryset):
         total = queryset.count()
@@ -513,7 +525,11 @@ class CCCIndustryView(BaseView):
         super(CCCIndustryView, self).set_request(request)
 
     def paging(self, queryset):
-        return super(CCCIndustryView, self).paging(queryset, self.request.query_params.get('page', 1), self.request.query_params.get('length', 15))
+        return super(CCCIndustryView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
 
     def serialize2(self, queryset):
         total = queryset.count()
@@ -568,7 +584,11 @@ class LicenceIndustryView(BaseView):
         super(LicenceIndustryView, self).set_request(request)
 
     def paging(self, queryset):
-        return super(LicenceIndustryView, self).paging(queryset, self.request.query_params.get('page', 1), self.request.query_params.get('length', 15))
+        return super(LicenceIndustryView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
 
     def serialize2(self, queryset):
         total = queryset.count()
@@ -623,20 +643,25 @@ class DMLinkView(BaseView):
         super(DMLinkView, self).set_request(request)
 
     def paging(self, queryset):
-        return super(DMLinkView, self).paging(queryset, self.request.query_params.get('page', 1), self.request.query_params.get('length', 15))
+        return super(DMLinkView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
 
     def serialize(self, queryset):
         total = queryset.count()
         results = self.paging(queryset)
-        data = {'total': total,
-                'list': map(lambda r: {
-                    'name': r['name'],
-                    'link': r['link'],
-                    'kwords': r['kwords'],
-                    'fwords': r['fwords'],
-                    'status': r['status'],
-                }, results)
-                }
+        data = {
+            'total': total,
+            'list': map(lambda r: {
+                'name': r['name'],
+                'link': r['link'],
+                'kwords': r['kwords'],
+                'fwords': r['fwords'],
+                'status': r['status'],
+            }, results)
+        }
 
         return data
 
@@ -699,18 +724,23 @@ class DMWordsView(BaseView):
         super(DMWordsView, self).set_request(request)
 
     def paging(self, queryset):
-        return super(DMWordsView, self).paging(queryset, self.request.query_params.get('page', 1), self.request.query_params.get('length', 15))
+        return super(DMWordsView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
 
     def serialize(self, queryset):
         total = queryset.count()
         results = self.paging(queryset)
-        data = {'total': total,
-                'list': map(lambda r: {
-                    'industry': r['industry__name'],
-                    'riskword': r['riskword'],
-                    'invalidword': r['invalidword'],
-                }, results)
-                }
+        data = {
+            'total': total,
+            'list': map(lambda r: {
+                'industry': r['industry__name'],
+                'riskword': r['riskword'],
+                'invalidword': r['invalidword'],
+            }, results)
+        }
 
         return data
 
@@ -851,7 +881,11 @@ class RiskDataView(BaseView):
         super(RiskDataView, self).set_request(request)
 
     def paging(self, queryset):
-        return super(RiskDataView, self).paging(queryset, self.request.query_params.get('page', 1), self.request.query_params.get('length', 15))
+        return super(RiskDataView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
 
     def serialize(self, queryset):
         total = queryset.count()
@@ -859,15 +893,15 @@ class RiskDataView(BaseView):
         data = {
             'total': total,
             'list': map(lambda x: {
-                    'guid': x['guid'],
-                    'url': x['url'],
-                    'title': x['title'],
-                    'score': x['score'],
-                    'source': x['source'],
-                    'areas': areas(x['guid']),
-                    'categories': categories(x['guid'], admin=True),
-                    'pubtime': date_format(x['pubtime'], '%Y-%m-%d %H:%M:%S'),
-                }, result),
+                'guid': x['guid'],
+                'url': x['url'],
+                'title': x['title'],
+                'score': x['score'],
+                'source': x['source'],
+                'areas': areas(x['guid']),
+                'categories': categories(x['guid'], admin=True),
+                'pubtime': date_format(x['pubtime'], '%Y-%m-%d %H:%M:%S'),
+            }, result),
         }
 
         return data
@@ -940,7 +974,10 @@ class RiskDataExportView(BaseView):
         super(RiskDataExportView, self).__init__()
 
     def get(self, request):
-        response = FileResponse(RiskDataExport(user=request.user).export(), content_type='application/vnd.ms-excel')
+        response = FileResponse(
+            RiskDataExport(user=request.user).export(),
+            content_type='application/vnd.ms-excel'
+        )
         response["Content-Disposition"] = 'attachment; filename=articles.xlsx'
 
         return response
@@ -963,16 +1000,16 @@ class InspectionDataView(BaseView):
         data = {
             'total': total,
             'list': map(lambda x: {
-                    'guid': x['guid'],
-                    'industry': alias_industry(x['industry_id']),
-                    'url': x['url'],
-                    'level': x['level'],
-                    'area': area(x['area_id']),
-                    'source': x['source'],
-                    'qualitied': qualitied(x['qualitied']),
-                    'category': x['category'],
-                    'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
-                }, result),
+                'guid': x['guid'],
+                'industry': alias_industry(x['industry_id']),
+                'url': x['url'],
+                'level': x['level'],
+                'area': area(x['area_id']),
+                'source': x['source'],
+                'qualitied': qualitied(x['qualitied']),
+                'category': x['category'],
+                'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
+            }, result),
         }
 
         return data
@@ -1049,7 +1086,8 @@ class InspectionDataUnEnterpriseUploadView(BaseView):
 
     def put(self, request, filename, format=None):
 
-        queryset = InspectionDataUnEnterpriseUpload(user=request.user).upload(filename, request.FILES['file'])
+        queryset = InspectionDataUnEnterpriseUpload(user=request.user).upload(
+            filename, request.FILES['file'])
 
         return Response(queryset)
 
@@ -1060,7 +1098,10 @@ class InspectionDataExportView(BaseView):
         super(InspectionDataExportView, self).__init__()
 
     def get(self, request):
-        response = FileResponse(InspectionDataExport(user=request.user).export(), content_type='application/vnd.ms-excel')
+        response = FileResponse(
+            InspectionDataExport(user=request.user).export(),
+            content_type='application/vnd.ms-excel'
+        )
         response["Content-Disposition"] = 'attachment; filename=inspections.xlsx'
 
         return response
@@ -1123,20 +1164,25 @@ class CorpusView(BaseView):
         super(CorpusView, self).set_request(request)
 
     def paging(self, queryset):
-        return super(CorpusView, self).paging(queryset, self.request.query_params.get('page', 1), self.request.query_params.get('length', 15))
+        return super(CorpusView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
 
     def serialize(self, queryset):
         total = queryset.count()
         results = self.paging(queryset)
-        data = {'total': total,
-                'list': map(lambda r: {
-                    'id': r['id'],
-                    'industry_id': r['industry__id'],
-                    'industry_name': r['industry__name'],
-                    'riskword': r['riskword'],
-                    'invalidword': r['invalidword'],
-                }, results)
-                }
+        data = {
+            'total': total,
+            'list': map(lambda r: {
+                'id': r['id'],
+                'industry_id': r['industry__id'],
+                'industry_name': r['industry__name'],
+                'riskword': r['riskword'],
+                'invalidword': r['invalidword'],
+            }, results)
+        }
 
         return data
 
@@ -1204,7 +1250,7 @@ class SearchView(BaseView):
 
         data = {
             'total': results['total'],
-            'list': map(lambda x:{
+            'list': map(lambda x: {
                 'source': x['_source']['source'],
                 'category': x['_source']['category'],
                 'title': x['_source']['title'] if not x.get('highlight') else x['highlight']['title'][0],
@@ -1214,7 +1260,7 @@ class SearchView(BaseView):
                 'score': x['_source']['score'],
                 'url': x['_source']['url'],
                 'area': x['_source']['area'],
-                }, results['hits']),
+            }, results['hits']),
         }
         return data
 
@@ -1241,7 +1287,7 @@ class SearchAdvancedView(BaseView):
 
         data = {
             'total': results['total'],
-            'list': map(lambda x:{
+            'list': map(lambda x: {
                 'source': x['_source']['source'],
                 'category': x['_source']['category'],
                 'title': x['_source']['title'] if not x.get('highlight') else x['highlight']['title'][0],
@@ -1251,7 +1297,7 @@ class SearchAdvancedView(BaseView):
                 'score': x['_source']['score'],
                 'url': x['_source']['url'],
                 'area': x['_source']['area'],
-                }, results['hits']),
+            }, results['hits']),
         }
         return data
 
