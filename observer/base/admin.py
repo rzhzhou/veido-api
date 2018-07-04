@@ -29,6 +29,13 @@ class LicenceIndustryAdmin(ImportExportActionModelAdmin, ForeignKeyAutocompleteA
     list_display = ('id', 'name', 'level', 'parent', )
 
 
+class ConsumerIndustryAdmin(ImportExportActionModelAdmin, ForeignKeyAutocompleteAdmin):
+    # resource_class = IndustryResources
+    autocomplete_fields = ('parent', )
+    search_fields = ('id', 'name', )
+    list_display = ('id', 'name', 'level', 'parent', )
+
+
 class AliasIndustryAdmin(ImportExportActionModelAdmin):
     # resource_class = IndustryResources
     search_fields = ('name', )
@@ -50,7 +57,8 @@ class UserAreaAdmin(ImportExportActionModelAdmin, ForeignKeyAutocompleteAdmin):
 class InspectionAdmin(ImportExportActionModelAdmin):
     resource_class = InspectionResources
     search_fields = ('title', )
-    list_display = ('title', 'pubtime', 'source', 'qualitied', 'category', 'level', )
+    list_display = ('title', 'pubtime', 'source',
+                    'qualitied', 'category', 'level', )
 
 
 class EnterpriseAdmin(ImportExportActionModelAdmin):
@@ -80,7 +88,8 @@ class ArticleCategoryAdmin(ImportExportActionModelAdmin):
 
 class DMLinkAdmin(ImportExportActionModelAdmin, ForeignKeyAutocompleteAdmin):
     autocomplete_fields = ('create_by', )
-    list_display = ('name', 'link', 'kwords', 'fwords', 'create_at', 'create_by', 'status', )
+    list_display = ('name', 'link', 'kwords', 'fwords',
+                    'create_at', 'create_by', 'status', )
 
 
 class CorpusAdmin(ImportExportActionModelAdmin):
@@ -91,6 +100,7 @@ class CorpusAdmin(ImportExportActionModelAdmin):
 admin.site.register(Industry, IndustryAdmin)
 admin.site.register(CCCIndustry, CCCIndustryAdmin)
 admin.site.register(LicenceIndustry, LicenceIndustryAdmin)
+admin.site.register(ConsumerIndustry, ConsumerIndustryAdmin)
 admin.site.register(AliasIndustry, AliasIndustryAdmin)
 admin.site.register(Area, AreaAdmin)
 admin.site.register(UserArea, UserAreaAdmin)
