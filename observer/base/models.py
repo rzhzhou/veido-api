@@ -112,6 +112,31 @@ class LicenceIndustry(models.Model):
         return self.name
 
 
+class ConsumerIndustry(models.Model):
+    id = models.IntegerField(primary_key=True, editable=True, verbose_name='行业编号')
+    name = models.CharField(max_length=100, verbose_name='行业名称')
+    level = models.IntegerField(verbose_name='行业等级')
+    desc = models.CharField(
+        max_length=255,
+        null=True, blank=True,
+        verbose_name='行业描述'
+    )
+
+    parent = models.ForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        null=True, blank=True,
+        verbose_name='上一级'
+    )
+
+    class Meta:
+        app_label = 'base'
+        verbose_name_plural = '消费品目录'
+
+    def __str__(self):
+        return self.name
+
+
 class AliasIndustry(models.Model):
     name = models.CharField(max_length=100, unique=True, verbose_name='行业名称')
 

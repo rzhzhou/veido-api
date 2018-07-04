@@ -18,7 +18,8 @@ from observer.base.service.dashboard import DashboardData
 from observer.base.service.desmon import (DMLinkAdd, DMLinkData, DMLinkDelete,
                                           DMLinkEdit, DMWordsData)
 from observer.base.service.industry import (AliasIndustryAdd, CCCIndustryAdd,
-                                            CCCIndustryData, IndustryData,
+                                            CCCIndustryData,
+                                            ConsumerIndustryData, IndustryData,
                                             LicenceIndustryAdd,
                                             LicenceIndustryData,
                                             Select2AliasIndustryData,
@@ -418,6 +419,87 @@ class Select2LicenceListView(BaseView):
         self.set_request(request)
 
         queryset = LicenceIndustryData(params=request.query_params).get_level()
+
+        return Response(self.serialize(queryset))
+
+
+class ConsumerListView(BaseView):
+
+    def __init__(self):
+        super(ConsumerListView, self).__init__()
+
+    def set_request(self, request):
+        super(ConsumerListView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(ConsumerListView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, queryset):
+        """
+        'parent__parent__id', 'parent__parent__name', 'parent__parent__desc',
+        'parent__id', 'parent__name', 'parent__desc',
+        'id', 'name', 'desc',
+        """
+        result = self.paging(queryset)
+
+        data = {
+            'total': result.paginator.count,
+            'list': map(lambda x: {
+                'l1': {
+                    'id': x['parent__parent__id'],
+                    'name': x['parent__parent__name'],
+                    'desc': x['parent__parent__desc'],
+                },
+                'l2': {
+                    'id': x['parent__id'],
+                    'name': x['parent__name'],
+                    'desc': x['parent__desc'],
+                },
+                'l3': {
+                    'id': x['id'],
+                    'name': x['name'],
+                    'desc': x['desc'],
+                },
+            }, result),
+        }
+
+        return data
+
+    def get(self, request):
+        self.set_request(request)
+
+        queryset = ConsumerIndustryData(params=request.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+
+class Select2ConsumerListView(BaseView):
+
+    def __init__(self):
+        super(Select2ConsumerListView, self).__init__()
+
+    def set_request(self, request):
+        super(Select2ConsumerListView, self).set_request(request)
+
+    def serialize(self, queryset):
+        data = map(
+            lambda x: {
+                'id': x['id'],
+                'text': x['name'],
+            },
+            queryset
+        )
+
+        return data
+
+    def get(self, request):
+        self.set_request(request)
+
+        queryset = ConsumerIndustryData(params=request.query_params).get_level()
 
         return Response(self.serialize(queryset))
 
