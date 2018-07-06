@@ -194,16 +194,13 @@ class MajorIndustryData(Abstract):
 
     def get_all(self):
         fields = (
-            'parent__parent__id', 'parent__parent__name', 'parent__parent__desc',
             'parent__id', 'parent__name', 'parent__desc',
             'id', 'name', 'desc',
         )
 
         cond = {
-            'parent__parent__parent': getattr(self, 'l1', None),
-            'parent__parent': getattr(self, 'l2', None),
-            'parent': getattr(self, 'l3', None),
-            'level': 4,
+            'parent': getattr(self, 'l1', None),
+            'level': 2,
         }
         args = dict([k, v] for k, v in cond.items() if v)
 
