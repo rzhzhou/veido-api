@@ -139,7 +139,8 @@ class ConsumerIndustry(models.Model):
 
 
 class MajorIndustry(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, verbose_name='行业编号')
+    # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, verbose_name='行业编号')
+    id = models.IntegerField(primary_key=True, editable=True, verbose_name='行业编号')
     name = models.CharField(max_length=100, verbose_name='行业名称')
     level = models.IntegerField(verbose_name='行业等级')
     desc = models.CharField(
