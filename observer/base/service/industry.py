@@ -35,7 +35,7 @@ class CCCIndustryData(Abstract):
         fields = ('id', 'name',)
 
         cond = {
-            'level': getattr(self, 'level'),
+            'level': getattr(self, 'level', None),
             'parent': getattr(self, 'parent', None),
         }
 
@@ -45,7 +45,7 @@ class CCCIndustryData(Abstract):
 
         queryset = CCCIndustry.objects.filter(**args).values(*fields)
 
-        return queryset.filter(Q(name__istartswith=text)) if text else queryset
+        return queryset.filter(Q(name__icontains=text)) if text else queryset
 
     def get_all(self):
         fields = (
@@ -87,7 +87,7 @@ class LicenceIndustryData(Abstract):
         fields = ('id', 'name',)
 
         cond = {
-            'level': getattr(self, 'level'),
+            'level': getattr(self, 'level', None),
             'parent': getattr(self, 'parent', None),
         }
 
@@ -97,7 +97,7 @@ class LicenceIndustryData(Abstract):
 
         queryset = LicenceIndustry.objects.filter(**args).values(*fields)
 
-        return queryset.filter(Q(name__istartswith=text)) if text else queryset
+        return queryset.filter(Q(name__icontains=text)) if text else queryset
 
     def get_all(self):
         fields = (
@@ -149,7 +149,7 @@ class ConsumerIndustryData(Abstract):
 
         queryset = ConsumerIndustry.objects.filter(**args).values(*fields)
 
-        return queryset.filter(Q(name__istartswith=text)) if text else queryset
+        return queryset.filter(Q(name__icontains=text)) if text else queryset
 
     def get_all(self):
         fields = (
@@ -176,6 +176,18 @@ class MajorIndustryData(Abstract):
     def __init__(self, params):
         super(MajorIndustryData, self).__init__(params)
 
+    def save(self, id):
+        objs = MajorIndustry.objects.filter(id)
+
+        if objs:
+            major = objs[0]
+            major.ccc = self.ccc
+            major.licence = self.licence
+            major.save()
+            return 1
+
+        return 0
+
     def get_level(self):
         fields = ('id', 'name',)
 
@@ -190,7 +202,7 @@ class MajorIndustryData(Abstract):
 
         queryset = MajorIndustry.objects.filter(**args).values(*fields)
 
-        return queryset.filter(Q(name__istartswith=text)) if text else queryset
+        return queryset.filter(Q(name__icontains=text)) if text else queryset
 
     def get_all(self):
         fields = (
@@ -228,7 +240,7 @@ class Select2IndustryData(Abstract):
 
         queryset = Industry.objects.filter(**args).values(*fields)
 
-        return queryset.filter(Q(id__istartswith=text) | Q(name__istartswith=text)) if text else queryset
+        return queryset.filter(Q(id__icontains=text) | Q(name__icontains=text)) if text else queryset
 
 
 class Select2AliasIndustryData(Abstract):
@@ -244,7 +256,7 @@ class Select2AliasIndustryData(Abstract):
 
         queryset = AliasIndustry.objects.all().values(*fields)
 
-        return queryset.filter(Q(id__istartswith=text) | Q(name__istartswith=text)) if text else queryset
+        return queryset.filter(Q(id__icontains=text) | Q(name__icontains=text)) if text else queryset
 
 
 class Select2CCCIndustryData(Abstract):
@@ -260,7 +272,7 @@ class Select2CCCIndustryData(Abstract):
 
         queryset = AliasIndustry.objects.all().values(*fields)
 
-        return queryset.filter(Q(id__istartswith=text) | Q(name__istartswith=text)) if text else queryset
+        return queryset.filter(Q(id__icontains=text) | Q(name__icontains=text)) if text else queryset
 
 
 class Select2LicenceIndustryData(Abstract):
@@ -276,7 +288,7 @@ class Select2LicenceIndustryData(Abstract):
 
         queryset = AliasIndustry.objects.all().values(*fields)
 
-        return queryset.filter(Q(id__istartswith=text) | Q(name__istartswith=text)) if text else queryset
+        return queryset.filter(Q(id__icontains=text) | Q(name__icontains=text)) if text else queryset
 
 
 class AliasIndustryAdd(Abstract):

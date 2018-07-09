@@ -340,7 +340,7 @@ class Select2CCCListView(BaseView):
         data = map(
             lambda x: {
                 'id': x['id'],
-                'text': x['name'],
+                'text': '%s - %s' % (x['id'], x['name']),
             },
             queryset
         )
@@ -421,7 +421,7 @@ class Select2LicenceListView(BaseView):
         data = map(
             lambda x: {
                 'id': x['id'],
-                'text': x['name'],
+                'text': '%s - %s' % (x['id'], x['name']),
             },
             queryset
         )
@@ -571,6 +571,22 @@ class MajorListView(BaseView):
         queryset = MajorIndustryData(params=request.query_params).get_all()
 
         return Response(self.serialize(queryset))
+
+
+class MajorView(BaseView):
+
+    def __init__(self):
+        super(MajorView, self).__init__()
+
+    def set_request(self, request):
+        super(MajorView, self).set_request(request)
+
+    def patch(self, request, id):
+        self.set_request(request)
+
+        value = MajorIndustryData(params=request.query_params).save(id)
+
+        return Response(value)
 
 
 class Select2MajorListView(BaseView):
