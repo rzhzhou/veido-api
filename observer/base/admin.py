@@ -38,9 +38,9 @@ class ConsumerIndustryAdmin(ImportExportActionModelAdmin, ForeignKeyAutocomplete
 
 class MajorIndustryAdmin(ImportExportActionModelAdmin, ForeignKeyAutocompleteAdmin):
     # resource_class = IndustryResources
-    autocomplete_fields = ('parent', )
+    autocomplete_fields = ('parent', 'licence', 'ccc')
     search_fields = ('id', 'name', )
-    list_display = ('id', 'name', 'level', 'parent', )
+    list_display = ('id', 'name', 'level', 'parent', 'licence', 'ccc')
 
 
 class AliasIndustryAdmin(ImportExportActionModelAdmin):

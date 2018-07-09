@@ -558,6 +558,8 @@ class MajorListView(BaseView):
                     'name': x['name'],
                     'desc': x['desc'],
                 },
+                'licence': x['licence'],
+                'ccc': x['ccc'],
             }, result),
         }
 

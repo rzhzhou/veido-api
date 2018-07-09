@@ -195,7 +195,7 @@ class MajorIndustryData(Abstract):
     def get_all(self):
         fields = (
             'parent__id', 'parent__name', 'parent__desc',
-            'id', 'name', 'desc',
+            'id', 'name', 'desc', 'licence', 'ccc',
         )
 
         cond = {
