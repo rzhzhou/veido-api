@@ -61,7 +61,8 @@ class CCCIndustryData(Abstract):
         }
         args = dict([k, v] for k, v in cond.items() if v)
 
-        queryset = CCCIndustry.objects.filter(**args).order_by('id').values(*fields)
+        queryset = CCCIndustry.objects.filter(
+            **args).order_by('id').values(*fields)
 
         return queryset
 
@@ -70,12 +71,12 @@ class CCCIndustryData(Abstract):
         queryset = CCCIndustry.objects.all()
 
         return queryset.filter(
-                    level=3,
-                    parent__id__in=queryset.filter(
-                        level=2,
-                        parent__id=cid
-                        ).values_list('id', flat=True)
-                )
+            level=3,
+            parent__id__in=queryset.filter(
+                level=2,
+                parent__id=cid
+            ).values_list('id', flat=True)
+        )
 
 
 class LicenceIndustryData(Abstract):
@@ -113,7 +114,8 @@ class LicenceIndustryData(Abstract):
         }
         args = dict([k, v] for k, v in cond.items() if v)
 
-        queryset = LicenceIndustry.objects.filter(**args).order_by('id').values(*fields)
+        queryset = LicenceIndustry.objects.filter(
+            **args).order_by('id').values(*fields)
 
         return queryset
 
@@ -122,12 +124,12 @@ class LicenceIndustryData(Abstract):
         queryset = LicenceIndustry.objects.all()
 
         return queryset.filter(
-                    level=3,
-                    parent__id__in=queryset.filter(
-                        level=2,
-                        parent__id=cid
-                        ).values_list('id', flat=True)
-                )
+            level=3,
+            parent__id__in=queryset.filter(
+                level=2,
+                parent__id=cid
+            ).values_list('id', flat=True)
+        )
 
 
 class ConsumerIndustryData(Abstract):
@@ -166,7 +168,8 @@ class ConsumerIndustryData(Abstract):
         }
         args = dict([k, v] for k, v in cond.items() if v)
 
-        queryset = ConsumerIndustry.objects.filter(**args).order_by('id').values(*fields)
+        queryset = ConsumerIndustry.objects.filter(
+            **args).order_by('id').values(*fields)
 
         return queryset
 
@@ -181,8 +184,10 @@ class MajorIndustryData(Abstract):
 
         if objs:
             major = objs[0]
-            major.ccc = CCCIndustry.objects.get(pk=getattr(self, 'ccc')) if getattr(self, 'ccc') else None
-            major.licence = LicenceIndustry.objects.get(pk=getattr(self, 'licence'))  if getattr(self, 'licence') else None
+            major.ccc = CCCIndustry.objects.get(pk=getattr(
+                self, 'ccc')) if getattr(self, 'ccc') else None
+            major.licence = LicenceIndustry.objects.get(pk=getattr(
+                self, 'licence')) if getattr(self, 'licence') else None
             major.save()
             return 1
 
@@ -211,12 +216,16 @@ class MajorIndustryData(Abstract):
         )
 
         cond = {
-            'parent': getattr(self, 'l1', None),
+            'parent': getattr(self, 'l1'),
             'level': 2,
+            'licence__isnull': not bool(int(self.is_licence)) if getattr(self, 'is_licence') != '' else '',
+            'ccc__isnull': not bool(int(self.is_ccc)) if getattr(self, 'is_ccc') != '' else '',
         }
-        args = dict([k, v] for k, v in cond.items() if v)
 
-        queryset = MajorIndustry.objects.filter(**args).order_by('id').values(*fields)
+        args = dict([k, v] for k, v in cond.items() if v != '')
+
+        queryset = MajorIndustry.objects.filter(
+            **args).order_by('id').values(*fields)
 
         return queryset
 
