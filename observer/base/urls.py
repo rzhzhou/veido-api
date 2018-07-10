@@ -15,7 +15,7 @@ urlpatterns = [
     path('licence/<int:lid>/', views.LicenceIndustryView.as_view()),  # Licence行业
     path('consumer', views.ConsumerListView.as_view()),  # 消费品目录
     path('major', views.MajorListView.as_view()),  # 重点产品目录
-    path('major/<int:id>', views.MajorView.as_view()),  # 重点产品
+    path('major/<int:pk>', views.MajorView.as_view()),  # 重点产品
 
     path('dmlinks', views.DMLinkView.as_view()),  # 指定监测-链接 列表
     path('dmlink/add', views.DMLinkAddView.as_view()),  # 添加指定监测-链接

@@ -581,10 +581,10 @@ class MajorView(BaseView):
     def set_request(self, request):
         super(MajorView, self).set_request(request)
 
-    def patch(self, request, id):
+    def patch(self, request, pk):
         self.set_request(request)
 
-        value = MajorIndustryData(params=request.query_params).save(id)
+        value = MajorIndustryData(params=request.data).save(pk)
 
         return Response(value)
 

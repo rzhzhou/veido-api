@@ -176,13 +176,13 @@ class MajorIndustryData(Abstract):
     def __init__(self, params):
         super(MajorIndustryData, self).__init__(params)
 
-    def save(self, id):
-        objs = MajorIndustry.objects.filter(id)
+    def save(self, pk):
+        objs = MajorIndustry.objects.filter(pk=pk)
 
         if objs:
             major = objs[0]
-            major.ccc = self.ccc
-            major.licence = self.licence
+            major.ccc = CCCIndustry.objects.get(pk=getattr(self, 'ccc')) if getattr(self, 'ccc') else None
+            major.licence = LicenceIndustry.objects.get(pk=getattr(self, 'licence'))  if getattr(self, 'licence') else None
             major.save()
             return 1
 
