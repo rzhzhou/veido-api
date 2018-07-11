@@ -155,6 +155,7 @@ class ConsumerIndustryData(Abstract):
 
     def get_all(self):
         fields = (
+            'parent__parent__parent__id', 'parent__parent__parent__name', 'parent__parent__parent__desc',
             'parent__parent__id', 'parent__parent__name', 'parent__parent__desc',
             'parent__id', 'parent__name', 'parent__desc',
             'id', 'name', 'desc',
