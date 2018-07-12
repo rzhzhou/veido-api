@@ -20,6 +20,7 @@ from observer.base.service.desmon import (DMLinkAdd, DMLinkData, DMLinkDelete,
 from observer.base.service.industry import (AliasIndustryAdd, CCCIndustryAdd,
                                             CCCIndustryData,
                                             ConsumerIndustryData, IndustryData,
+                                            CpcIndustryData,
                                             LicenceIndustryAdd,
                                             LicenceIndustryData,
                                             MajorIndustryData,
@@ -354,6 +355,95 @@ class Select2CCCListView(BaseView):
 
         return Response(self.serialize(queryset))
 
+class selectCpcisView(BaseView):
+    """docstring for selectCpcisView"""
+    def __init__(self):
+        super(selectCpcisView, self).__init__()
+
+    def set_request(self, request):
+        super(selectCpcisView, self).set_request(request)
+
+    def serialize(self, queryset):
+        data = map(
+            lambda x: {
+                'id': x['id'],
+                'text': '%s - %s' % (x['id'], x['name']),
+            },
+            queryset
+        )
+
+        return data
+        
+    def get(self, request):
+        self.set_request(request)
+
+        queryset = CpcIndustryData(params=request.query_params).get_level()
+
+        return Response(self.serialize(queryset))
+        
+
+class CpcListView(BaseView):
+    def __init__(self):
+        super(CpcListView, self).__init__()
+
+    def set_request(self, request):
+        super(CpcListView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(CpcListView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+    def serialize(self, queryset):
+        """
+        'parent__parent__parent__parent__id', 'parent__parent__parent__parent__name', 'parent__parent__parent__parent__desc',
+        'parent__parent__parent__id', 'parent__parent__parent__name', 'parent__parent__parent__desc',
+        'parent__parent__id', 'parent__parent__name', 'parent__parent__desc',
+        'parent__id', 'parent__name', 'parent__desc',
+        'id', 'name', 'desc',
+        """
+        result = self.paging(queryset)
+
+        data = {
+            'total': result.paginator.count,
+            'list': map(lambda x: {
+                'l1': {
+                    'id': x['parent__parent__parent__parent__id'],
+                    'name': x['parent__parent__parent__parent__name'],
+                    'desc': x['parent__parent__parent__parent__desc'],
+                },
+                'l2': {
+                    'id': x['parent__parent__parent__id'],
+                    'name': x['parent__parent__parent__name'],
+                    'desc': x['parent__parent__parent__desc'],
+                },
+                'l3': {
+                    'id': x['parent__parent__id'],
+                    'name': x['parent__parent__name'],
+                    'desc': x['parent__parent__desc'],
+                },
+                'l4': {
+                    'id': x['parent__id'],
+                    'name': x['parent__name'],
+                    'desc': x['parent__desc'],
+                },
+                'l5': {
+                    'id': x['id'],
+                    'name': x['name'],
+                    'desc': x['desc'],
+                },
+
+            }, result),
+        }
+
+        return data
+    def get(self, request):
+        self.set_request(request)
+
+        queryset = CpcIndustryData(params=request.query_params).get_all()
+
+        return Response(self.serialize(queryset))
 
 class LicenceListView(BaseView):
 
@@ -673,7 +763,74 @@ class CCCIndustryView(BaseView):
         else:
             queryset = CCCIndustryData(params=request.query_params).get_by_id(cid)
             return Response(self.serialize2(queryset))
+# 产品总分类
+class CpcIndustryView(BaseView):
+    def __init__(self):
+        super(CpcIndustryView, self).__init__()
 
+    def set_request(self, request):
+        super(CpcIndustryView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(CpcIndustryView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+    def serialize2(self, queryset):
+        total = queryset.count()
+        result = self.paging(queryset)
+
+        temp = []
+        for l5 in result:
+            l4 = l5.parent
+            l3 = l4.parent
+            l2 = l3.parent
+            l1 = l2.parent
+            temp.append({
+                'l5': {
+                    'id': l5.id,
+                    'name': l5.name,
+                    'desc': l5.desc,
+                },
+                'l4': {
+                    'id': l4.id,
+                    'name': l4.name,
+                    'desc': l4.desc,
+                },
+                'l3': {
+                    'id': l3.id,
+                    'name': l3.name,
+                    'desc': l3.desc,
+                },
+                'l2': {
+                    'id': l2.id,
+                    'name': l2.name,
+                    'desc': l2.desc,
+                },
+                'l1': {
+                    'id': l1.id,
+                    'name': l1.name,
+                    'desc': l1.desc,
+                },
+            })
+
+        data = {
+            'total': total,
+            'list': temp,
+        }
+
+        return data
+
+    def get(self, request, lid=None):
+        self.set_request(request)
+
+        if not lid:
+            queryset = CpcIndustryData(params=request.query_params).get_all()
+            return Response(self.serialize(queryset))
+        else:
+            queryset = CpcIndustryData(params=request.query_params).get_by_id(lid)
+            return Response(self.serialize2(queryset))
 
 class LicenceIndustryView(BaseView):
 
