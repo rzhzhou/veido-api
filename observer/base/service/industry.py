@@ -37,6 +37,7 @@ class CCCIndustryData(Abstract):
         cond = {
             'level': getattr(self, 'level', None),
             'parent': getattr(self, 'parent', None),
+            'name__icontains': getattr(self, 'text', None),
         }
 
         text = getattr(self, 'text', None)
@@ -45,7 +46,7 @@ class CCCIndustryData(Abstract):
 
         queryset = CCCIndustry.objects.filter(**args).values(*fields)
 
-        return queryset.filter(Q(name__icontains=text)) if text else queryset
+        return queryset
 
     def get_all(self):
         fields = (
@@ -90,6 +91,7 @@ class LicenceIndustryData(Abstract):
         cond = {
             'level': getattr(self, 'level', None),
             'parent': getattr(self, 'parent', None),
+            'name__icontains': getattr(self, 'text', None),
         }
 
         text = getattr(self, 'text', None)
@@ -98,7 +100,7 @@ class LicenceIndustryData(Abstract):
 
         queryset = LicenceIndustry.objects.filter(**args).values(*fields)
 
-        return queryset.filter(Q(name__icontains=text)) if text else queryset
+        return queryset
 
     def get_all(self):
         fields = (
@@ -155,6 +157,7 @@ class ConsumerIndustryData(Abstract):
 
     def get_all(self):
         fields = (
+            'parent__parent__parent__id', 'parent__parent__parent__name', 'parent__parent__parent__desc',
             'parent__parent__id', 'parent__parent__name', 'parent__parent__desc',
             'parent__id', 'parent__name', 'parent__desc',
             'id', 'name', 'desc',
@@ -199,6 +202,7 @@ class MajorIndustryData(Abstract):
         cond = {
             'level': getattr(self, 'level'),
             'parent': getattr(self, 'parent', None),
+            'name__icontains': getattr(self, 'text', None),
         }
 
         text = getattr(self, 'text', None)
@@ -207,17 +211,20 @@ class MajorIndustryData(Abstract):
 
         queryset = MajorIndustry.objects.filter(**args).values(*fields)
 
-        return queryset.filter(Q(name__icontains=text)) if text else queryset
+        return queryset
 
     def get_all(self):
         fields = (
+            'parent__parent__id', 'parent__parent__name', 'parent__parent__desc',
             'parent__id', 'parent__name', 'parent__desc',
             'id', 'name', 'desc', 'licence', 'ccc',
         )
 
         cond = {
-            'parent': getattr(self, 'l1'),
-            'level': 2,
+            'parent__parent': getattr(self, 'l1', None),
+            'parent': getattr(self, 'l2', None),
+            'name__icontains': getattr(self, 'l3', None),
+            'level': 3,
             'licence__isnull': not bool(int(self.is_licence)) if getattr(self, 'is_licence') != '' else '',
             'ccc__isnull': not bool(int(self.is_ccc)) if getattr(self, 'is_ccc') != '' else '',
         }
@@ -228,7 +235,6 @@ class MajorIndustryData(Abstract):
             **args).order_by('id').values(*fields)
 
         return queryset
-
 
 class Select2IndustryData(Abstract):
 
@@ -241,6 +247,8 @@ class Select2IndustryData(Abstract):
         cond = {
             'level': getattr(self, 'level'),
             'parent': getattr(self, 'parent', None),
+            'id__icontains': getattr(self, 'text', None),
+            'name__icontains': getattr(self, 'text', None),
         }
 
         text = getattr(self, 'text', None)
@@ -249,7 +257,7 @@ class Select2IndustryData(Abstract):
 
         queryset = Industry.objects.filter(**args).values(*fields)
 
-        return queryset.filter(Q(id__icontains=text) | Q(name__icontains=text)) if text else queryset
+        return queryset
 
 
 class Select2AliasIndustryData(Abstract):
