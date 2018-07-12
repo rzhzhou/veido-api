@@ -1,7 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, F, Q
 
-from observer.base.models import (AliasIndustry, CCCIndustry, ConsumerIndustry,
+from observer.base.models import (AliasIndustry, CCCIndustry, ConsumerIndustry,CPCIndustry,
                                   Industry, LicenceIndustry, MajorIndustry)
 from observer.base.service.abstract import Abstract
 from observer.utils.date_format import date_format
@@ -78,7 +78,61 @@ class CCCIndustryData(Abstract):
                 parent__id=cid
             ).values_list('id', flat=True)
         )
+# 产品总分类
+class CpcIndustryData(Abstract):
+    def __init__(self, params):
+        super(CpcIndustryData, self).__init__(params)
 
+    def get_level(self):
+        fields = ('id', 'name',)
+
+        cond = {
+            'level': getattr(self, 'level', None),
+            'parent': getattr(self, 'parent', None),
+        }
+
+        text = getattr(self, 'text', None)
+
+        args = dict([k, v] for k, v in cond.items() if v)
+
+        queryset = CPCIndustry.objects.filter(**args).values(*fields)
+
+        return queryset.filter(Q(name__icontains=text)) if text else queryset
+
+    def get_all(self):
+        fields = (
+            'parent__parent__parent__parent__id', 'parent__parent__parent__parent__name', 'parent__parent__parent__parent__desc',
+            'parent__parent__parent__id', 'parent__parent__parent__name', 'parent__parent__parent__desc',
+            'parent__parent__id', 'parent__parent__name', 'parent__parent__desc',
+            'parent__id', 'parent__name', 'parent__desc',
+            'id', 'name', 'desc',
+        )
+
+        cond = {
+            'parent__parent__parent__parent': getattr(self, 'l1', None),
+            'parent__parent__parent': getattr(self, 'l2', None),
+            'parent__parent': getattr(self, 'l3', None),
+            'parent': getattr(self, 'l4', None),
+            'level': 5,
+        }
+        args = dict([k, v] for k, v in cond.items() if v)
+
+        queryset = CPCIndustry.objects.filter(
+            **args).order_by('id').values(*fields)
+
+        return queryset
+
+    def get_by_id(self, cid):
+
+        queryset = CPCIndustry.objects.all()
+
+        return queryset.filter(
+            level=5,
+            parent__id__in=queryset.filter(
+                level=4,
+                parent__id=cid
+            ).values_list('id', flat=True)
+        )
 
 class LicenceIndustryData(Abstract):
 

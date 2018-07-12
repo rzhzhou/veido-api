@@ -15,6 +15,12 @@ class IndustryAdmin(ImportExportActionModelAdmin, ForeignKeyAutocompleteAdmin):
     list_display = ('id', 'name', 'level', 'parent', )
 
 
+class CPCIndustryAdmin(ImportExportActionModelAdmin, ForeignKeyAutocompleteAdmin):
+    autocomplete_fields = ('parent', )
+    search_fields = ('id', 'name', )
+    list_display = ('id', 'name', 'level', 'parent', )
+
+
 class CCCIndustryAdmin(ImportExportActionModelAdmin, ForeignKeyAutocompleteAdmin):
     # resource_class = IndustryResources
     autocomplete_fields = ('parent', )
@@ -105,6 +111,7 @@ class CorpusAdmin(ImportExportActionModelAdmin):
 
 
 admin.site.register(Industry, IndustryAdmin)
+admin.site.register(CPCIndustry, CPCIndustryAdmin)
 admin.site.register(CCCIndustry, CCCIndustryAdmin)
 admin.site.register(LicenceIndustry, LicenceIndustryAdmin)
 admin.site.register(ConsumerIndustry, ConsumerIndustryAdmin)

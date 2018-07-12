@@ -11,6 +11,7 @@ urlpatterns = [
     path('inspections', views.InspectionView.as_view()),  # 抽检列表
     path('ccc', views.CCCListView.as_view()),  # 3C行业
     path('ccc/<int:cid>/', views.CCCIndustryView.as_view()),  # 3C行业
+    path('cpc', views.CpcListView.as_view()),  # 产品总分类
     path('licence', views.LicenceListView.as_view()),  # Licence行业
     path('licence/<int:lid>/', views.LicenceIndustryView.as_view()),  # Licence行业
     path('consumer', views.ConsumerListView.as_view()),  # 消费品目录
@@ -48,6 +49,7 @@ urlpatterns = [
     path('select2/industries', views.Select2IndustryView.as_view()),  # 行业名称
     path('select2/alias_industries', views.Select2AliasIndustryView.as_view()),  # 行业别名
     path('select2/ccc_industries', views.Select2CCCListView.as_view()),  # 3C行业
+    path('select/cpc_industries', views.selectCpcisView.as_view()),
     path('select2/licence_industries', views.Select2LicenceListView.as_view()),  # Licence行业
     path('select2/consumer_industries', views.Select2ConsumerListView.as_view()),  # 消费品目录
     path('select2/major_industries', views.Select2MajorListView.as_view()),  # 重点产品目录
