@@ -398,10 +398,6 @@ class CpcListView(BaseView):
         )
     def serialize(self, queryset):
         """
-        'parent__parent__parent__parent__id', 'parent__parent__parent__parent__name', 'parent__parent__parent__parent__desc',
-        'parent__parent__parent__id', 'parent__parent__parent__name', 'parent__parent__parent__desc',
-        'parent__parent__id', 'parent__parent__name', 'parent__parent__desc',
-        'parent__id', 'parent__name', 'parent__desc',
         'id', 'name', 'desc',
         """
         result = self.paging(queryset)
@@ -409,32 +405,10 @@ class CpcListView(BaseView):
         data = {
             'total': result.paginator.count,
             'list': map(lambda x: {
-                'l1': {
-                    'id': x['parent__parent__parent__parent__id'],
-                    'name': x['parent__parent__parent__parent__name'],
-                    'desc': x['parent__parent__parent__parent__desc'],
-                },
-                'l2': {
-                    'id': x['parent__parent__parent__id'],
-                    'name': x['parent__parent__parent__name'],
-                    'desc': x['parent__parent__parent__desc'],
-                },
-                'l3': {
-                    'id': x['parent__parent__id'],
-                    'name': x['parent__parent__name'],
-                    'desc': x['parent__parent__desc'],
-                },
-                'l4': {
-                    'id': x['parent__id'],
-                    'name': x['parent__name'],
-                    'desc': x['parent__desc'],
-                },
-                'l5': {
-                    'id': x['id'],
-                    'name': x['name'],
-                    'desc': x['desc'],
-                },
-
+                'id': x['id'],
+                'name': x['name'],
+                'desc': x['desc'],
+                'level': x['level'],
             }, result),
         }
 
