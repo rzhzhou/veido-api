@@ -355,6 +355,7 @@ class Select2CCCListView(BaseView):
 
         return Response(self.serialize(queryset))
 
+
 class selectCpcisView(BaseView):
     """docstring for selectCpcisView"""
     def __init__(self):
@@ -373,14 +374,14 @@ class selectCpcisView(BaseView):
         )
 
         return data
-        
+
     def get(self, request):
         self.set_request(request)
 
         queryset = CpcIndustryData(params=request.query_params).get_level()
 
         return Response(self.serialize(queryset))
-        
+
 
 class CpcListView(BaseView):
     def __init__(self):
@@ -444,6 +445,7 @@ class CpcListView(BaseView):
         queryset = CpcIndustryData(params=request.query_params).get_all()
 
         return Response(self.serialize(queryset))
+
 
 class LicenceListView(BaseView):
 
@@ -630,8 +632,6 @@ class MajorListView(BaseView):
 
     def serialize(self, queryset):
         """
-        'parent__parent__id', 'parent__parent__name', 'parent__parent__desc',
-        'parent__id', 'parent__name', 'parent__desc',
         'id', 'name', 'desc',
         """
         result = self.paging(queryset)
@@ -639,21 +639,10 @@ class MajorListView(BaseView):
         data = {
             'total': result.paginator.count,
             'list': map(lambda x: {
-                'l1': {
-                    'id': x['parent__parent__id'],
-                    'name': x['parent__parent__name'],
-                    'desc': x['parent__parent__desc'],
-                },
-                'l2': {
-                    'id': x['parent__id'],
-                    'name': x['parent__name'],
-                    'desc': x['parent__desc'],
-                },
-                'l3': {
-                    'id': x['id'],
-                    'name': x['name'],
-                    'desc': x['desc'],
-                },
+                'id': x['id'],
+                'name': x['name'],
+                'desc': x['desc'],
+                'level': x['level'],
                 'licence': x['licence'],
                 'ccc': x['ccc'],
             }, result),
