@@ -89,6 +89,7 @@ class CpcIndustryData(Abstract):
         cond = {
             'level': getattr(self, 'level', None),
             'parent': getattr(self, 'parent', None),
+            'name__icontains': getattr(self, 'text', None),
         }
 
         text = getattr(self, 'text', None)
@@ -101,19 +102,13 @@ class CpcIndustryData(Abstract):
 
     def get_all(self):
         fields = (
-            'parent__parent__parent__parent__id', 'parent__parent__parent__parent__name', 'parent__parent__parent__parent__desc',
-            'parent__parent__parent__id', 'parent__parent__parent__name', 'parent__parent__parent__desc',
-            'parent__parent__id', 'parent__parent__name', 'parent__parent__desc',
-            'parent__id', 'parent__name', 'parent__desc',
-            'id', 'name', 'desc',
+            'id', 'name', 'desc', 'level',
         )
 
         cond = {
-            'parent__parent__parent__parent': getattr(self, 'l1', None),
-            'parent__parent__parent': getattr(self, 'l2', None),
-            'parent__parent': getattr(self, 'l3', None),
-            'parent': getattr(self, 'l4', None),
-            'level': 5,
+            'parent': getattr(self, 'parent', None),
+            'level': getattr(self, 'level', None),
+            'name__icontains': getattr(self, 'name', None),
         }
         args = dict([k, v] for k, v in cond.items() if v)
 
