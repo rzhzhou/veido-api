@@ -3,7 +3,7 @@ from io import BytesIO
 import openpyxl
 from django.core.exceptions import ObjectDoesNotExist
 
-from observer.base.models import (AliasIndustry, Area, Enterprise, Industry,
+from observer.base.models import (MajorIndustry, AliasIndustry, Area, Enterprise, Industry,
                                   Inspection, InspectionEnterprise)
 from observer.base.service.abstract import Abstract
 from observer.base.service.base import (alias_industry, area,
@@ -229,23 +229,23 @@ class InspectionDataUpload(Abstract):
 
                     # 处理行业
                     try:
-                        Industry.objects.get(id=industry_number)
+                        MajorIndustry.objects.get(id=industry_number)
                     except Exception as e:
                         return {
                             'status': 0,
                             'message': '操作失败！Excel第%s行,行业编号不存在。详细错误信息：%s！' % (i, e, )
                         }
 
-                    if not AliasIndustry.objects.filter(name=product_name, industry_id=industry_number).exists():
-                        AliasIndustry(
-                            name=product_name,
-                            industry_id=industry_number,
-                            ccc_id=0,
-                            license_id=0,
-                        ).save()
+                    # if not AliasIndustry.objects.filter(name=product_name, industry_id=industry_number).exists():
+                    #     AliasIndustry(
+                    #         name=product_name,
+                    #         industry_id=industry_number,
+                    #         ccc_id=0,
+                    #         license_id=0,
+                    #     ).save()
 
-                    industry_id = AliasIndustry.objects.get(
-                        name=product_name, industry_id=industry_number).id
+                    # industry_id = AliasIndustry.objects.get(
+                    #     name=product_name, industry_id=industry_number).id
 
                     # 处理抽检地域
                     area = Area.objects.filter(name=area_name)
@@ -255,7 +255,7 @@ class InspectionDataUpload(Abstract):
                             'message': '操作失败！Excel第%s行，地域（%s）不存在！' % (i, area_name, )
                         }
 
-                    guid = str_to_md5str('{0}{1}'.format(url, industry_id))
+                    guid = str_to_md5str('{0}{1}'.format(url, product_name))
 
                     # 处理抽检信息
                     inspection = Inspection.objects.filter(guid=guid)
@@ -267,9 +267,9 @@ class InspectionDataUpload(Abstract):
                             pubtime=pubtime,
                             source=source,
                             qualitied=qr(qualitied_patch, inspect_patch),
-                            category=category,
+                            category='' if not category else category,
                             level=level,
-                            industry_id=industry_id,
+                            industry_id=industry_number,
                             area_id=area[0].id,
                             status=1,
                         ).save()

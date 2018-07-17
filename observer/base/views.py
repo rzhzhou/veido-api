@@ -9,7 +9,7 @@ from observer.base.service.area import Select2AreaData
 from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd,
                                            RiskDataDelete, RiskDataEdit,
                                            RiskDataExport, RiskDataUpload)
-from observer.base.service.base import (alias_industry, area, areas,
+from observer.base.service.base import (alias_industry, get_major_industry, area, areas,
                                         categories, local_related, qualitied,
                                         risk_injury)
 from observer.base.service.corpus import (CorpusAdd, CorpusData, CorpusDelete,
@@ -1253,7 +1253,7 @@ class InspectionDataView(BaseView):
             'total': total,
             'list': map(lambda x: {
                 'guid': x['guid'],
-                'industry': alias_industry(x['industry_id']),
+                'industry': get_major_industry(x['industry_id']),
                 'url': x['url'],
                 'level': x['level'],
                 'area': area(x['area_id']),

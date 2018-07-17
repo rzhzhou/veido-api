@@ -1,7 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 
 from observer.base.models import (Area, ArticleArea, ArticleCategory, 
-                                Category, UserArea, AliasIndustry, 
+                                Category, UserArea, AliasIndustry, MajorIndustry,
                                 InspectionEnterprise, Enterprise, )
 from observer.utils.date_format import date_format
 
@@ -72,14 +72,23 @@ def area(area_id, flat=False):
         return queryset.name
 
 
-def alias_industry(alias_industry_id, flat=False):
-    queryset = AliasIndustry.objects.get(id=alias_industry_id)
-    
+def get_major_industry(industry_id, flat=False):
+    queryset = MajorIndustry.objects.get(id=industry_id)
+
     if not flat:
         return {'id': queryset.id, 'text': queryset.name}
     else:
         return queryset.name
-    
+
+
+def alias_industry(alias_industry_id, flat=False):
+    queryset = AliasIndustry.objects.get(id=alias_industry_id)
+
+    if not flat:
+        return {'id': queryset.id, 'text': queryset.name}
+    else:
+        return queryset.name
+
 
 def industry_number(alias_industry_id):
     queryset = AliasIndustry.objects.get(id=alias_industry_id)
