@@ -6,7 +6,7 @@ from observer.base.models import(Area, UserArea, Article, ArticleArea,
                                 )
 from observer.base.service.abstract import Abstract
 from observer.base.service.base import (areas, categories, local_related,
-                                        alias_industry, area, qualitied, )
+                                        get_major_industry, area, qualitied, )
 from observer.utils.date_format import (date_format, str_to_date, get_months, )
 from observer.utils.str_format import str_to_md5str
 
@@ -157,7 +157,7 @@ class DashboardData(Abstract):
         q = lambda x: x.values('guid', 'title', 'url', 'pubtime', 'source', 'qualitied', 'category', 'level', 'industry_id', 'area_id', ).order_by('-pubtime')[0:self.length]
 
         return {'local': map(lambda x: {
-                        'industry': alias_industry(x['industry_id']),
+                        'industry': get_major_industry(x['industry_id']),
                         'url': x['url'],
                         'level': x['level'],
                         'area': area(x['area_id']),
@@ -167,7 +167,7 @@ class DashboardData(Abstract):
                         'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
                     }, q(Inspection.objects.filter(area_id=UserArea.objects.get(user=self.user).area.id))),
                 'all': map(lambda x: {
-                        'industry': alias_industry(x['industry_id']),
+                        'industry': get_major_industry(x['industry_id']),
                         'url': x['url'],
                         'level': x['level'],
                         'area': area(x['area_id']),

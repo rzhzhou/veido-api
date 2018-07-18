@@ -192,7 +192,7 @@ class InspectionView(BaseView):
         data = {
             'total': total,
             'list': map(lambda x: {
-                'industry': alias_industry(x['industry_id']),
+                'industry': get_major_industry(x['industry_id']),
                 'url': x['url'],
                 'level': x['level'],
                 'area': area(x['area_id']),
