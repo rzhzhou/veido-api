@@ -154,7 +154,7 @@ class DashboardData(Abstract):
 
 
     def get_0009(self):
-        q = lambda x: x.values('guid', 'title', 'url', 'pubtime', 'source', 'qualitied', 'category', 'level', 'industry_id', 'area_id', ).order_by('-pubtime')[0:self.length]
+        q = lambda x: x.values('guid', 'title', 'url', 'pubtime', 'source', 'qualitied', 'category', 'level', 'industry_id', 'area_id', 'product_name').order_by('-pubtime')[0:self.length]
 
         return {'local': map(lambda x: {
                         'industry': get_major_industry(x['industry_id']),
@@ -165,6 +165,7 @@ class DashboardData(Abstract):
                         'qualitied': qualitied(x['qualitied']),
                         'category': x['category'],
                         'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
+                        'product': x['product_name'],
                     }, q(Inspection.objects.filter(area_id=UserArea.objects.get(user=self.user).area.id))),
                 'all': map(lambda x: {
                         'industry': get_major_industry(x['industry_id']),
@@ -175,5 +176,6 @@ class DashboardData(Abstract):
                         'qualitied': qualitied(x['qualitied']),
                         'category': x['category'],
                         'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
+                        'product': x['product_name'],
                     }, q(Inspection.objects.all())),
                 }

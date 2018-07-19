@@ -200,6 +200,7 @@ class InspectionView(BaseView):
                 'qualitied': qualitied(x['qualitied']),
                 'category': x['category'],
                 'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
+                'product': x['product_name'],
             }, result),
         }
 
@@ -1235,6 +1236,7 @@ class InspectionDataView(BaseView):
                 'qualitied': qualitied(x['qualitied']),
                 'category': x['category'],
                 'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
+                'product': x['product_name'],
             }, result),
         }
 

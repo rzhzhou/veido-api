@@ -23,7 +23,7 @@ class InspectionData(Abstract):
     def get_all(self):
 
         fields = ('guid', 'title', 'url', 'pubtime', 'source',
-                  'qualitied', 'category', 'level', 'industry_id', 'area_id', )
+                  'qualitied', 'category', 'level', 'industry_id', 'area_id', 'product_name')
 
         cond = {
             'pubtime__gte': getattr(self, 'starttime', None),
@@ -236,17 +236,6 @@ class InspectionDataUpload(Abstract):
                             'message': '操作失败！Excel第%s行,行业编号不存在。详细错误信息：%s！' % (i, e, )
                         }
 
-                    # if not AliasIndustry.objects.filter(name=product_name, industry_id=industry_number).exists():
-                    #     AliasIndustry(
-                    #         name=product_name,
-                    #         industry_id=industry_number,
-                    #         ccc_id=0,
-                    #         license_id=0,
-                    #     ).save()
-
-                    # industry_id = AliasIndustry.objects.get(
-                    #     name=product_name, industry_id=industry_number).id
-
                     # 处理抽检地域
                     area = Area.objects.filter(name=area_name)
                     if not area.exists():
@@ -270,6 +259,7 @@ class InspectionDataUpload(Abstract):
                             category='' if not category else category,
                             level=level,
                             industry_id=industry_number,
+                            product_name = product_name,
                             area_id=area[0].id,
                             status=1,
                         ).save()
