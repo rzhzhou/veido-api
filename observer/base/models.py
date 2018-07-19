@@ -243,7 +243,8 @@ class Inspection(models.Model):
     level = models.CharField(max_length=2, verbose_name='检验等级') # 国、省、市
     status = models.IntegerField(default=0, verbose_name='状态')# 0, 默认值 -1, 无效 1 有效
 
-    industry_id = models.IntegerField(verbose_name='行业/产品ID')
+    industry_id = models.IntegerField(verbose_name='产品类别')
+    product_name = models.CharField(blank=True, null=True, max_length=255, verbose_name='产品名称')
     area_id = models.IntegerField(verbose_name='地域ID')
 
     class Meta:
