@@ -35,6 +35,7 @@ class InspectionData(Abstract):
             'level': getattr(self, 'level', None),
             'industry_id': getattr(self, 'industry', None),
             'area_id': getattr(self, 'area', None),
+            'product_name': getattr(self, 'product_name', None),
         }
 
         args = dict([k, v] for k, v in cond.items() if v)
