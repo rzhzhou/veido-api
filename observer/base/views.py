@@ -9,7 +9,7 @@ from observer.base.service.area import Select2AreaData
 from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd,
                                            RiskDataDelete, RiskDataEdit,
                                            RiskDataExport, RiskDataUpload)
-from observer.base.service.base import (alias_industry, get_major_industry, area, areas,
+from observer.base.service.base import (alias_industry, get_major_industry, get_enterprise_count, area, areas,
                                         categories, local_related, qualitied,
                                         risk_injury)
 from observer.base.service.corpus import (CorpusAdd, CorpusData, CorpusDelete,
@@ -29,6 +29,7 @@ from observer.base.service.industry import (AliasIndustryAdd, CCCIndustryAdd,
                                             Select2IndustryData,
                                             Select2LicenceIndustryData)
 from observer.base.service.inspection import (InspectionData,
+                                              EnterpriseData,
                                               InspectionDataAdd,
                                               InspectionDataDelete,
                                               InspectionDataEdit,
@@ -1237,6 +1238,7 @@ class InspectionDataView(BaseView):
                 'category': x['category'],
                 'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
                 'product': x['product_name'],
+                'enterprise': get_enterprise_count(x['guid']),
             }, result),
         }
 
@@ -1246,6 +1248,48 @@ class InspectionDataView(BaseView):
         self.set_request(request)
 
         queryset = InspectionData(params=request.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+
+class EnterpriseDataView(BaseView):
+
+    def __init__(self):
+        super(EnterpriseDataView, self).__init__()
+
+    def set_request(self, request):
+        super(EnterpriseDataView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(EnterpriseDataView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        result = self.paging(queryset)
+
+        temp = []
+        for index in result:
+            temp.append({
+                'name': index.name,
+                'area': area(index.area_id),
+                'unitem': index.unitem,
+            })
+
+        data = {
+            'total': total,
+            'list': temp,
+        }
+
+        return data
+
+    def get(self, request, eid=None):
+        self.set_request(request)
+
+        queryset = EnterpriseData(params=request.query_params).get_by_id(eid)
 
         return Response(self.serialize(queryset))
 

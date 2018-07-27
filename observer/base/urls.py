@@ -32,6 +32,7 @@ urlpatterns = [
     path('risk_data/upload/<str:filename>/', views.RiskDataUploadView.as_view()),  # 风险数据上传
     path('risk_data/export', views.RiskDataExportView.as_view()),  # 风险数据导出
     path('inspection_data', views.InspectionDataView.as_view()),  # 抽检数据
+    path('enterprise_data/<str:eid>/', views.EnterpriseDataView.as_view()), # 不合格企业
     path('inspection_data/add', views.InspectionDataAddView.as_view()),  # 抽检数据添加
     path('inspection_data/edit/<str:aid>/', views.InspectionDataEditView.as_view()),  # 抽检数据修改
     path('inspection_data/delete/<str:aid>/', views.InspectionDataDeleteView.as_view()),  # 抽检数据删除

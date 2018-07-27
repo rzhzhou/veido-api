@@ -22,13 +22,13 @@ def areas(article_id, flat=False):
 def categories(article_id, admin=False, flat=False):
     a_ids = ArticleCategory.objects.filter(article_id=article_id).values_list('category_id', flat=True)
     queryset = Category.objects.filter(id__in=a_ids)
-    
+
     if not admin:
         queryset = queryset.filter(level=2)
 
     if not queryset.exists():
         queryset = Category.objects.filter(name='其它')
-    
+
     if not flat:
         return list(map(lambda x: {'id': x['id'], 'text': x['name']}, queryset.values('id', 'name')))
     else:
@@ -79,6 +79,15 @@ def get_major_industry(industry_id, flat=False):
         return {'id': queryset.id, 'text': queryset.name}
     else:
         return queryset.name
+
+
+def get_enterprise_count(guid):
+    queryset = InspectionEnterprise.objects.filter(inspection_id=guid)
+
+    if not queryset.exists():
+        return 0
+    else:
+        return queryset.count()
 
 
 def alias_industry(alias_industry_id, flat=False):

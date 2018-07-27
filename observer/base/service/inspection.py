@@ -6,7 +6,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from observer.base.models import (MajorIndustry, AliasIndustry, Area, Enterprise, Industry,
                                   Inspection, InspectionEnterprise)
 from observer.base.service.abstract import Abstract
-from observer.base.service.base import (alias_industry, area,
+from observer.base.service.base import (alias_industry, get_major_industry, area,
                                         enterprise_area_name, enterprise_name,
                                         enterprise_unitem, industry_number,
                                         qualitied)
@@ -42,6 +42,20 @@ class InspectionData(Abstract):
 
         queryset = Inspection.objects.exclude(
             status=-1).filter(**args).values(*fields).order_by('-pubtime')
+
+        return queryset
+
+
+class EnterpriseData(Abstract):
+
+    def __init__(self, params):
+        super(EnterpriseData, self).__init__(params)
+
+    def get_by_id(self, eid):
+
+        enterprise_id = InspectionEnterprise.objects.filter(inspection_id=eid).values_list('enterprise_id', flat=True)
+
+        queryset = Enterprise.objects.filter(id__in=enterprise_id)
 
         return queryset
 
@@ -286,7 +300,7 @@ class InspectionDataUnEnterpriseUpload(Abstract):
 
     def upload(self, filename, file_obj):
         # ModelWeight
-        model = {'链接': 0, '行业编号': 0, '产品名称': 0,
+        model = {'链接': 0, '产品名称': 0,
                  '不合格企业': 0, '不合格企业地域': 0, '不合格项': 0}
         # sheet values
 
@@ -319,33 +333,12 @@ class InspectionDataUnEnterpriseUpload(Abstract):
                     if not url:
                         continue
 
-                    industry_number = sv(i, model['行业编号'], sheet)
                     product_name = sv(i, model['产品名称'], sheet)
                     unenterprise = sv(i, model['不合格企业'], sheet)
                     unenterprise_area = sv(i, model['不合格企业地域'], sheet)
                     unitem = sv(i, model['不合格项'], sheet)
 
                     total += 1
-
-                    # 处理行业
-                    try:
-                        Industry.objects.get(id=industry_number)
-                    except Exception as e:
-                        return {
-                            'status': 0,
-                            'message': '操作失败！Excel第%s行,行业编号不存在。详细错误信息：%s！' % (i, e, )
-                        }
-
-                    if not AliasIndustry.objects.filter(name=product_name, industry_id=industry_number).exists():
-                        AliasIndustry(
-                            name=product_name,
-                            industry_id=industry_number,
-                            ccc_id=0,
-                            license_id=0,
-                        ).save()
-
-                    industry_id = AliasIndustry.objects.get(
-                        name=product_name, industry_id=industry_number).id
 
                     # 处理抽检地域
                     area = Area.objects.filter(name=unenterprise_area)
@@ -357,7 +350,7 @@ class InspectionDataUnEnterpriseUpload(Abstract):
 
                     area_id = area[0].id
 
-                    guid = str_to_md5str('{0}{1}'.format(url, industry_id))
+                    guid = str_to_md5str('{0}{1}'.format(url, product_name))
 
                     # 处理不合格企业信息
                     enterprise = Enterprise.objects.filter(

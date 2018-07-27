@@ -266,20 +266,17 @@ class Enterprise(models.Model):
         app_label = 'base'
         verbose_name_plural = '企业'
 
-    def __str__(self):
-        return self.title
-
 
 class InspectionEnterprise(models.Model):
     inspection_id = models.CharField(max_length=32, verbose_name='抽检信息GUID')
-    enterprise_id = models.IntegerField(verbose_name='地域ID')
+    enterprise_id = models.IntegerField(verbose_name='企业ID')
 
     class Meta:
         app_label = 'base'
         verbose_name_plural = '抽检企业'
 
     def __str__(self):
-        return self.title
+        return self.inspection_id
 
 
 class Article(models.Model):
