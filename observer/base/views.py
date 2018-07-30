@@ -193,6 +193,7 @@ class InspectionView(BaseView):
         data = {
             'total': total,
             'list': map(lambda x: {
+                'guid': x['guid'],
                 'industry': get_major_industry(x['industry_id']),
                 'url': x['url'],
                 'level': x['level'],
@@ -202,6 +203,7 @@ class InspectionView(BaseView):
                 'category': x['category'],
                 'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
                 'product': x['product_name'],
+                'enterprise': get_enterprise_count(x['guid']),
             }, result),
         }
 
