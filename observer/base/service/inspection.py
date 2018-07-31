@@ -23,7 +23,7 @@ class InspectionData(Abstract):
     def get_all(self):
 
         fields = ('guid', 'title', 'url', 'pubtime', 'source',
-                  'qualitied', 'category', 'level', 'industry_id', 'area_id', 'product_name')
+                  'qualitied', 'unqualitied_patch', 'qualitied_patch', 'inspect_patch', 'category', 'level', 'industry_id', 'area_id', 'product_name')
 
         cond = {
             'pubtime__gte': getattr(self, 'starttime', None),
@@ -207,7 +207,7 @@ class InspectionDataUpload(Abstract):
             }
 
         total = 0
-        dupli = 0
+        bulk_inspection = {}
 
         for i, row in enumerate(rows):
             i += 1
@@ -216,80 +216,63 @@ class InspectionDataUpload(Abstract):
                 for k in model.keys():
                     model[k] = line.index(k) + 1
             else:
-                try:
-                    title = sv(i, model['标题'], sheet)
-                    url = sv(i, model['链接'], sheet)
+                title = sv(i, model['标题'], sheet)
+                url = sv(i, model['链接'], sheet)
 
-                    if not url:
-                        continue
+                if not url:
+                    continue
 
-                    pubtime = date_format(sv(i, model['发布日期'], sheet))
-                    if not pubtime:
-                        return {
-                            'status': 0,
-                            'message': '操作失败！Excel %s 行时间格式有误！' % (i + 1, )
-                        }
-
-                    category = sv(i, model['抽查类别'], sheet)
-                    level = sv(i, model['抽查等级'], sheet)
-                    source = sv(i, model['抽检单位'], sheet)
-                    area_name = sv(i, model['地域'], sheet)
-                    industry_number = sv(i, model['行业编号'], sheet)
-                    product_name = sv(i, model['产品名称'], sheet)
-                    inspect_patch = sv(i, model['抽查批次'], sheet)
-                    qualitied_patch = sv(i, model['合格批次'], sheet)
-                    unqualitied_patch = sv(i, model['不合格批次'], sheet)
-
-                    total += 1
-
-                    # 处理行业
-                    try:
-                        MajorIndustry.objects.get(id=industry_number)
-                    except Exception as e:
-                        return {
-                            'status': 0,
-                            'message': '操作失败！Excel第%s行,行业编号不存在。详细错误信息：%s！' % (i, e, )
-                        }
-
-                    # 处理抽检地域
-                    area = Area.objects.filter(name=area_name)
-                    if not area.exists():
-                        return {
-                            'status': 0,
-                            'message': '操作失败！Excel第%s行，地域（%s）不存在！' % (i, area_name, )
-                        }
-
-                    guid = str_to_md5str('{0}{1}'.format(url, product_name))
-
-                    # 处理抽检信息
-                    inspection = Inspection.objects.filter(guid=guid)
-                    if not inspection.exists():
-                        Inspection(
-                            guid=guid,
-                            title=title,
-                            url=url,
-                            pubtime=pubtime,
-                            source=source,
-                            qualitied=qr(qualitied_patch, inspect_patch),
-                            category='' if not category else category,
-                            level=level,
-                            industry_id=industry_number,
-                            product_name = product_name,
-                            area_id=area[0].id,
-                            status=1,
-                        ).save()
-                    else:
-                        dupli += 1
-
-                except Exception as e:
+                pubtime = date_format(sv(i, model['发布日期'], sheet))
+                if not pubtime:
                     return {
                         'status': 0,
-                        'message': '操作失败！Excel %s 行存在问题。详细错误信息：%s！' % (i + 1, e)
+                        'message': '操作失败！Excel %s 行时间格式有误！' % (i + 1, )
                     }
+
+                category = sv(i, model['抽查类别'], sheet)
+                level = sv(i, model['抽查等级'], sheet)
+                source = sv(i, model['抽检单位'], sheet)
+                area_name = sv(i, model['地域'], sheet)
+                industry_number = sv(i, model['行业编号'], sheet)
+                product_name = sv(i, model['产品名称'], sheet)
+                inspect_patch = sv(i, model['抽查批次'], sheet)
+                qualitied_patch = sv(i, model['合格批次'], sheet)
+                unqualitied_patch = sv(i, model['不合格批次'], sheet)
+
+                total += 1
+
+                # 处理抽检地域
+                area = Area.objects.filter(name=area_name)
+                if not area.exists():
+                    return {
+                        'status': 0,
+                        'message': '操作失败！Excel第%s行，地域（%s）不存在！' % (i, area_name, )
+                    }
+
+                guid = str_to_md5str('{0}{1}'.format(url, product_name))
+
+                bulk_inspection[guid] = Inspection(
+                    guid=guid,
+                    title=title,
+                    url=url,
+                    pubtime=pubtime,
+                    source=source,
+                    qualitied=qr(qualitied_patch, inspect_patch),
+                    unqualitied_patch=unqualitied_patch,
+                    qualitied_patch=qualitied_patch,
+                    inspect_patch=inspect_patch,
+                    category='' if not category else category,
+                    level=level,
+                    industry_id=industry_number,
+                    product_name = product_name,
+                    area_id=area[0].id,
+                    status=1,
+                )
+        Inspection.objects.bulk_create(bulk_inspection.values())
 
         return {
             'status': 1,
-            'message': '操作成功！共处理%s条数据，成功导入%s条数据，重复数据%s条！' % (total, total - dupli, dupli, )
+            'message': '操作成功！共处理%s条数据！' % total
         }
 
 

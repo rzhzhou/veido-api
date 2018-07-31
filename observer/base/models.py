@@ -239,6 +239,9 @@ class Inspection(models.Model):
     pubtime = models.DateField(verbose_name='发布时间')
     source = models.CharField(max_length=80, verbose_name='信息来源')
     qualitied = models.FloatField(default=1.0, verbose_name='合格率')
+    unqualitied_patch = models.IntegerField(default=0, verbose_name="不合格批次")
+    qualitied_patch = models.IntegerField(default=0, verbose_name="合格批次")
+    inspect_patch = models.IntegerField(default=0, verbose_name="抽查批次")
     category = models.CharField(max_length=32, verbose_name='抽查类别')
     level = models.CharField(max_length=2, verbose_name='检验等级') # 国、省、市
     status = models.IntegerField(default=0, verbose_name='状态')# 0, 默认值 -1, 无效 1 有效
