@@ -81,15 +81,6 @@ def get_major_industry(industry_id, flat=False):
         return queryset.name
 
 
-def get_enterprise_count(guid):
-    queryset = InspectionEnterprise.objects.filter(inspection_id=guid)
-
-    if not queryset.exists():
-        return 0
-    else:
-        return queryset.count()
-
-
 def alias_industry(alias_industry_id, flat=False):
     queryset = AliasIndustry.objects.get(id=alias_industry_id)
 

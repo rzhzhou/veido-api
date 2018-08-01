@@ -9,7 +9,7 @@ from observer.base.service.area import Select2AreaData
 from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd,
                                            RiskDataDelete, RiskDataEdit,
                                            RiskDataExport, RiskDataUpload)
-from observer.base.service.base import (alias_industry, get_major_industry, get_enterprise_count, area, areas,
+from observer.base.service.base import (alias_industry, get_major_industry, area, areas,
                                         categories, local_related, qualitied,
                                         risk_injury)
 from observer.base.service.corpus import (CorpusAdd, CorpusData, CorpusDelete,
@@ -206,7 +206,6 @@ class InspectionView(BaseView):
                 'category': x['category'],
                 'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
                 'product': x['product_name'],
-                'enterprise': get_enterprise_count(x['guid']),
             }, result),
         }
 
@@ -1246,7 +1245,6 @@ class InspectionDataView(BaseView):
                 'category': x['category'],
                 'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
                 'product': x['product_name'],
-                'enterprise': get_enterprise_count(x['guid']),
             }, result),
         }
 
@@ -1272,7 +1270,7 @@ class EnterpriseDataView(BaseView):
         return super(EnterpriseDataView, self).paging(
             queryset,
             self.request.query_params.get('page', 1),
-            self.request.query_params.get('length', 15)
+            self.request.query_params.get('length', 8)
         )
 
     def serialize(self, queryset):
