@@ -107,11 +107,22 @@ class DMLinkDelete(Abstract):
             return 0
 
 
-class DMWordsData(): 
+class DMWordsData(Abstract):
+
+    def __init__(self, params):
+        super(DMWordsData, self).__init__(params)
 
     def get_all(self):
-        fields = ('id', 'riskword', 'invalidword', 'industry__name', )
+        fields = ('id', 'riskword', 'industry_id')
 
-        queryset = Corpus.objects.all().values(*fields)
+        cond = {
+            'industry_id': getattr(self, 'industry', None),
+        }
+
+        args = dict([k, v] for k, v in cond.items() if v)
+
+        queryset = Corpus.objects.filter(**args).values(*fields)
+
+        # queryset = Corpus.objects.all().values(*fields)
 
         return queryset

@@ -218,14 +218,9 @@ class AliasIndustry(models.Model):
 
 
 class Corpus(models.Model):
-    riskword = models.CharField(max_length=255, verbose_name='风险语料词')
-    invalidword = models.CharField(max_length=255, verbose_name='无效词')
+    riskword = models.CharField(default=0, max_length=255, verbose_name='风险语料词')
 
-    industry = models.ForeignKey(
-        AliasIndustry,
-        on_delete=models.CASCADE,
-        verbose_name='行业别名'
-    )
+    industry_id = models.IntegerField(default=0, verbose_name='产品类别')
 
     class Meta:
         app_label = 'base'
@@ -293,6 +288,7 @@ class Article(models.Model):
     risk_keyword = models.CharField(max_length=255, blank=True, verbose_name='关键词')
     invalid_keyword = models.CharField(max_length=255, blank=True, verbose_name='无效关键词')
     status = models.IntegerField(default=0, verbose_name='状态')# 0, 默认值 -1, 无效 1 有效
+    industry_id = models.IntegerField(default=0, verbose_name='产品类别')
 
     class Meta:
         app_label = 'base'

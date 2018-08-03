@@ -968,9 +968,8 @@ class DMWordsView(BaseView):
         data = {
             'total': total,
             'list': map(lambda r: {
-                'industry': r['industry__name'],
+                'industry': get_major_industry(r['industry_id']),
                 'riskword': r['riskword'],
-                'invalidword': r['invalidword'],
             }, results)
         }
 
@@ -979,7 +978,7 @@ class DMWordsView(BaseView):
     def get(self, request):
         self.set_request(request)
 
-        queryset = DMWordsData().get_all()
+        queryset = DMWordsData(params=request.query_params).get_all()
 
         return Response(self.serialize(queryset))
 
@@ -1454,11 +1453,8 @@ class CorpusView(BaseView):
         data = {
             'total': total,
             'list': map(lambda r: {
-                'id': r['id'],
-                'industry_id': r['industry__id'],
-                'industry_name': r['industry__name'],
+                'industry': get_major_industry(r['industry_id']),
                 'riskword': r['riskword'],
-                'invalidword': r['invalidword'],
             }, results)
         }
 
@@ -1467,7 +1463,7 @@ class CorpusView(BaseView):
     def get(self, request):
         self.set_request(request)
 
-        queryset = CorpusData(params=request.query_params).get_all()
+        queryset = DMWordsData(params=request.query_params).get_all()
 
         return Response(self.serialize(queryset))
 

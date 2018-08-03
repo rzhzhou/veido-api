@@ -106,8 +106,7 @@ class DMLinkAdmin(ImportExportActionModelAdmin, ForeignKeyAutocompleteAdmin):
 
 
 class CorpusAdmin(ImportExportActionModelAdmin):
-    autocomplete_fields = ('industry', )
-    list_display = ('riskword', 'invalidword', 'industry', )
+    list_display = ('riskword', 'industry_id', )
 
 
 admin.site.register(Industry, IndustryAdmin)
