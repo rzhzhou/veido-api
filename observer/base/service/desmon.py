@@ -3,7 +3,7 @@ from datetime import datetime
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, Q, F
 
-from observer.base.models import (DMLink, Corpus, )
+from observer.base.models import (DMLink, Corpus )
 from observer.base.service.abstract import Abstract
 from observer.utils.date_format import date_format
 
