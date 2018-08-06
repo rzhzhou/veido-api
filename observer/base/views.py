@@ -1453,6 +1453,7 @@ class CorpusView(BaseView):
         data = {
             'total': total,
             'list': map(lambda r: {
+                'id': r['id'],
                 'industry': get_major_industry(r['industry_id']),
                 'riskword': r['riskword'],
             }, results)

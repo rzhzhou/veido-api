@@ -3,7 +3,7 @@ from datetime import datetime
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, Q, F
 
-from observer.base.models import (Corpus, AliasIndustry, )
+from observer.base.models import (Corpus, )
 from observer.base.service.abstract import Abstract
 from observer.utils.date_format import date_format
 
@@ -34,20 +34,17 @@ class CorpusAdd(Abstract):
 
     def add(self):
         riskword = getattr(self, 'riskword', '')
-        invalidword = getattr(self, 'invalidword', '')
         industry_id = getattr(self, 'industry_id', '')
 
         if not industry_id:
             return 400
 
-        industry = AliasIndustry.objects.get(id=industry_id)
-        if Corpus.objects.filter(industry=industry).exists():
+        if Corpus.objects.filter(industry_id=industry_id, riskword=riskword).exists():
             return 202
 
         Corpus(
             riskword=riskword,
-            invalidword=invalidword,
-            industry=industry,
+            industry_id=industry_id,
         ).save()
 
         return 200

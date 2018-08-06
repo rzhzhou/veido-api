@@ -249,7 +249,7 @@ class MajorIndustryData(Abstract):
         fields = ('id', 'name',)
 
         cond = {
-            'level': getattr(self, 'level'),
+            'level': getattr(self, 'level', None),
             'parent': getattr(self, 'parent', None),
             'name__icontains': getattr(self, 'text', None),
         }
