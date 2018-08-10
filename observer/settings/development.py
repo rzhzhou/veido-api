@@ -93,6 +93,15 @@ DATABASES = {
         'PASSWORD': 'P@55word',
         'PORT': 63440,
         'OPTIONS': {'charset': 'utf8mb4'},
+    },
+    'crawler': {
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': 'gz-cdb-ko3zdkzs.sql.tencentcdb.com',
+        'NAME': 'crawler',
+        'USER': 'shendu',
+        'PASSWORD': 'P@55word',
+        'PORT': 63440,
+        'OPTIONS': {'charset': 'utf8mb4'},
     }
 }
 
@@ -195,7 +204,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = False
+USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)

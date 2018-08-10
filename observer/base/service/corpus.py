@@ -3,7 +3,9 @@ from datetime import datetime
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, Q, F
 
-from observer.base.models import (Corpus, )
+from observer.base.models import Corpus
+from observer.utils.crawler.api import CrawlerTask
+import os
 from observer.base.service.abstract import Abstract
 from observer.utils.date_format import date_format
 
@@ -50,7 +52,7 @@ class CorpusAdd(Abstract):
         return 200
 
 
-class CorpusEdit(Abstract): 
+class CorpusEdit(Abstract):
 
     def __init__(self, user, params={}):
         super(CorpusEdit, self).__init__(params)
@@ -59,11 +61,9 @@ class CorpusEdit(Abstract):
     def edit(self, cid):
         edit_id = cid
         riskword = getattr(self, 'riskword', '')
-        invalidword = getattr(self, 'invalidword', '')
 
         corpus = Corpus.objects.get(id=edit_id)
         corpus.riskword = riskword
-        corpus.invalidword = invalidword
         corpus.save()
 
         return 200
@@ -77,5 +77,26 @@ class CorpusDelete(Abstract):
     def delete(self, cid):
         del_id = cid
         Corpus.objects.filter(id=del_id).delete()
-        
+
+        return 200
+
+
+class CrawlerData(Abstract):
+
+    def __init__(self, user, params={}):
+        super(CrawlerData, self).__init__(params)
+        self.user = user
+
+    def edit(self, cid):
+        edit_id = cid
+        status = getattr(self, 'status', '')
+        industry = getattr(self, 'name', '')
+        riskword = getattr(self, 'riskword', '')
+
+        CrawlerTask(industry, riskword).build()
+
+        corpus = Corpus.objects.get(id=edit_id)
+        corpus.status = status
+        corpus.save()
+
         return 200

@@ -58,6 +58,8 @@ urlpatterns = [
 
     path('search', views.SearchView.as_view()),  # 搜索
     path('search/advanced', views.SearchAdvancedView.as_view()),  # 高级搜索
+
+    path('crawler/<int:cid>/', views.CrawlerView.as_view()), #语料词爬取数据
 ]
 
 urlpatterns += [

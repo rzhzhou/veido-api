@@ -113,7 +113,7 @@ class DMWordsData(Abstract):
         super(DMWordsData, self).__init__(params)
 
     def get_all(self):
-        fields = ('id', 'riskword', 'industry_id')
+        fields = ('id', 'status', 'riskword', 'industry_id')
 
         cond = {
             'industry_id': getattr(self, 'industry', None),

@@ -78,6 +78,7 @@ class CCCIndustryData(Abstract):
                 parent__id=cid
             ).values_list('id', flat=True)
         )
+
 # 产品总分类
 class CpcIndustryData(Abstract):
     def __init__(self, params):
@@ -128,6 +129,7 @@ class CpcIndustryData(Abstract):
                 parent__id=cid
             ).values_list('id', flat=True)
         )
+
 
 class LicenceIndustryData(Abstract):
 
@@ -281,6 +283,7 @@ class MajorIndustryData(Abstract):
             **args).order_by('id').values(*fields)
 
         return queryset
+
 
 class Select2IndustryData(Abstract):
 

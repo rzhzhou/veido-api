@@ -55,3 +55,14 @@ def get_months():
     today = date.today()
     first_day = datetime(today.year, today.month, 1)
     return list(map(lambda x: [minus(first_day, x-11), minus(first_day, x-10)], range(0, 12)))
+
+
+def datetime_to_timestamp(dt):
+    if isinstance(dt, datetime):
+        value = int(mktime(dt.timetuple()))
+    elif isinstance(dt, int):
+        value = dt
+    else:
+        value = None
+
+    return value

@@ -1,3 +1,5 @@
+from observer.base.models import Corpus
+from django_extensions.admin import ForeignKeyAutocompleteAdmin
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.http import FileResponse
 from rest_framework.parsers import FileUploadParser
@@ -13,7 +15,7 @@ from observer.base.service.base import (alias_industry, get_major_industry, area
                                         categories, local_related, qualitied,
                                         risk_injury)
 from observer.base.service.corpus import (CorpusAdd, CorpusData, CorpusDelete,
-                                          CorpusEdit)
+                                          CorpusEdit, CrawlerData)
 from observer.base.service.dashboard import DashboardData
 from observer.base.service.desmon import (DMLinkAdd, DMLinkData, DMLinkDelete,
                                           DMLinkEdit, DMWordsData)
@@ -1454,6 +1456,7 @@ class CorpusView(BaseView):
             'total': total,
             'list': map(lambda r: {
                 'id': r['id'],
+                'status': r['status'],
                 'industry': get_major_industry(r['industry_id']),
                 'riskword': r['riskword'],
             }, results)
@@ -1582,3 +1585,19 @@ class SearchAdvancedView(BaseView):
         queryset = SearchAdvancedData(params=request.query_params).get_all()
 
         return Response(self.serialize(queryset))
+
+
+class CrawlerView(BaseView):
+
+    def __init__(self):
+        super(CrawlerView, self).__init__()
+
+    def set_request(self, request):
+        super(CrawlerView, self).set_request(request)
+
+    def post(self, request, cid):
+        self.set_request(request)
+
+        queryset = CrawlerData(user=request.user, params=request.data).edit(cid=cid)
+
+        return Response(status=queryset)
