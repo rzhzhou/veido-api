@@ -69,14 +69,20 @@ class CorpusEdit(Abstract):
         return 200
 
 
-class CorpusDelete(Abstract): 
+class CorpusDelete(Abstract):
 
-    def __init__(self, user):
+    def __init__(self, user, params={}):
+        super(CorpusDelete, self).__init__(params)
         self.user = user
 
     def delete(self, cid):
-        del_id = cid
-        Corpus.objects.filter(id=del_id).delete()
+        del_ids = cid
+        industrys = getattr(self, 'name', '')
+        riskwords = getattr(self, 'riskword', '')
+
+        for (ids, industry, riskword) in zip(del_ids.split(","), industrys.split(","), riskwords.split(",")):
+            CrawlerTask(industry, riskword).remove()
+            Corpus.objects.filter(id=ids).delete()
 
         return 200
 
@@ -88,15 +94,15 @@ class CrawlerData(Abstract):
         self.user = user
 
     def edit(self, cid):
-        edit_id = cid
+        edit_ids = cid
         status = getattr(self, 'status', '')
-        industry = getattr(self, 'name', '')
-        riskword = getattr(self, 'riskword', '')
+        industrys = getattr(self, 'name', '')
+        riskwords = getattr(self, 'riskword', '')
 
-        CrawlerTask(industry, riskword).build()
-
-        corpus = Corpus.objects.get(id=edit_id)
-        corpus.status = status
-        corpus.save()
+        for (ids, industry, riskword) in zip(edit_ids.split(","), industrys.split(","), riskwords.split(",")):
+            CrawlerTask(industry, riskword).build()
+            corpus = Corpus.objects.get(id=ids)
+            corpus.status = status
+            corpus.save()
 
         return 200

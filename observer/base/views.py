@@ -1509,8 +1509,11 @@ class CorpusDeleteView(BaseView):
     def __init__(self):
         super(CorpusDeleteView, self).__init__()
 
+    def set_request(self, request):
+        super(CorpusDeleteView, self).set_request(request)
+
     def delete(self, request, cid):
-        queryset = CorpusDelete(user=request.user).delete(cid=cid)
+        queryset = CorpusDelete(user=request.user, params=request.data).delete(cid=cid)
 
         return Response(status=queryset)
 

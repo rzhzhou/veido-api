@@ -45,7 +45,7 @@ urlpatterns = [
     path('corpus', views.CorpusView.as_view()),  # 语料词列表
     path('corpus/add', views.CorpusAddView.as_view()),  # 语料词添加
     path('corpus/edit/<int:cid>/', views.CorpusEditView.as_view()),  # 语料词编辑
-    path('corpus/delete/<int:cid>/', views.CorpusDeleteView.as_view()),  # 语料词删除
+    path('corpus/delete/<str:cid>/', views.CorpusDeleteView.as_view()),  # 语料词删除
 
     path('select2/industries', views.Select2IndustryView.as_view()),  # 行业名称
     path('select2/alias_industries', views.Select2AliasIndustryView.as_view()),  # 行业别名
@@ -59,7 +59,7 @@ urlpatterns = [
     path('search', views.SearchView.as_view()),  # 搜索
     path('search/advanced', views.SearchAdvancedView.as_view()),  # 高级搜索
 
-    path('crawler/<int:cid>/', views.CrawlerView.as_view()), #语料词爬取数据
+    path('crawler/<str:cid>/', views.CrawlerView.as_view()), #语料词爬取数据
 ]
 
 urlpatterns += [

@@ -54,8 +54,10 @@ class CrawlerTask(object):
         task = Task(**params)
         task.save(using='crawler')
 
-    def remove(self, corpus):
-        for v in self.source.itervalues():
-            for riskword in corpus.riskword.split():
-                url = v % (corpus.industry, riskword)
-                Task.objects.using('crawler').filter(url=url).delete()
+    def remove(self):
+        for k, v in self.source.items():
+            data = {
+                'syntax': v % (self.industry, self.riskword),
+                'source': k,
+            }
+            Task.objects.using('crawler').filter(url=data.get('syntax')).delete()
