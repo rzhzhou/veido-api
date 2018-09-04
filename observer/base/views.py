@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 from observer.base.models import AliasIndustry
 from observer.base.service.area import Select2AreaData
 from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd,
-                                           RiskDataDelete, RiskDataEdit,
+                                           RiskDataDelete, RiskDataEdit, RiskDataAudit,
                                            RiskDataExport, RiskDataUpload)
 from observer.base.service.base import (alias_industry, get_major_industry, area, areas,
                                         categories, local_related, qualitied,
@@ -1134,6 +1134,7 @@ class RiskDataView(BaseView):
                 'areas': areas(x['guid']),
                 'categories': categories(x['guid'], admin=True),
                 'pubtime': date_format(x['pubtime'], '%Y-%m-%d %H:%M:%S'),
+                'status': x['status'],
             }, result),
         }
 
@@ -1159,6 +1160,21 @@ class RiskDataAddView(BaseView):
         self.set_request(request)
 
         queryset = RiskDataAdd(user=request.user, params=request.data).add()
+
+        return Response(status=queryset)
+
+
+class RiskDataAuditView(BaseView):
+
+    def __init__(self):
+        super(RiskDataAuditView, self).__init__()
+
+    def set_request(self, request):
+        super(RiskDataAuditView, self).set_request(request)
+
+    def post(self, request, aid):
+        self.set_request(request)
+        queryset = RiskDataAudit(params=request.data).edit(aid=aid)
 
         return Response(status=queryset)
 

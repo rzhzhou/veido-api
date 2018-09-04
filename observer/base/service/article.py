@@ -63,7 +63,7 @@ class RiskData(Abstract):
         super(RiskData, self).__init__(params)
 
     def get_all(self):
-        fields = ('guid', 'url', 'title', 'source', 'pubtime', 'score', )
+        fields = ('guid', 'url', 'title', 'source', 'pubtime', 'score', 'status' )
 
         cond = {
             'pubtime__gte': getattr(self, 'starttime', None),
@@ -71,6 +71,7 @@ class RiskData(Abstract):
             'title__contains': getattr(self, 'title', None),
             'source__contains': getattr(self, 'source', None),
             'score': getattr(self, 'score', None),
+            'status': getattr(self, 'status', None),
         }
         area_ids = getattr(self, 'areas', None)
 
@@ -140,7 +141,19 @@ class RiskDataAdd(Abstract):
         return 200
 
 
-class RiskDataEdit(Abstract): 
+class RiskDataAudit(Abstract):
+    def __init__(self, params={}):
+        super(RiskDataAudit, self).__init__(params)
+
+    def edit(self, aid):
+        del_ids = aid
+        for ids in del_ids.split(","):
+            Article.objects.filter(guid=ids).update(status=1)
+
+        return 200
+
+
+class RiskDataEdit(Abstract):
 
     def __init__(self, params={}):
         super(RiskDataEdit, self).__init__(params)
@@ -166,7 +179,7 @@ class RiskDataEdit(Abstract):
 
         a_ids = areas.split(',')[:-1:]
         c_ids = categories.split(',')[:-1:]
-        
+
         ArticleArea.objects.filter(article_id=edit_id).delete()
         ArticleCategory.objects.filter(article_id=edit_id).delete()
 
@@ -187,15 +200,16 @@ class RiskDataEdit(Abstract):
         return 200
 
 
-class RiskDataDelete(Abstract): 
+class RiskDataDelete(Abstract):
 
     def __init__(self, user):
         self.user = user
 
     def delete(self, aid):
-        del_id = aid
-        Article.objects.filter(guid=del_id).update(status=-1)
-        
+        del_ids = aid
+        for ids in del_ids.split(","):
+            Article.objects.filter(guid=ids).update(status=-1)
+
         return 200
 
 

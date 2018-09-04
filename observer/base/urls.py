@@ -27,6 +27,7 @@ urlpatterns = [
     # ADMIN
     path('risk_data', views.RiskDataView.as_view()),  # 风险数据
     path('risk_data/add', views.RiskDataAddView.as_view()),  # 风险数据添加
+    path('risk_data/audit/<str:aid>/', views.RiskDataAuditView.as_view()), # 风险数据审核
     path('risk_data/edit/<str:aid>/', views.RiskDataEditView.as_view()),  # 风险数据修改
     path('risk_data/delete/<str:aid>/', views.RiskDataDeleteView.as_view()),  # 风险数据删除
     path('risk_data/upload/<str:filename>/', views.RiskDataUploadView.as_view()),  # 风险数据上传
