@@ -21,14 +21,13 @@ class ArticleData(Abstract):
         super(ArticleData, self).__init__(params)
 
     def get_all(self):
-        fields = ('guid', 'url', 'title', 'source', 'publisher', 'pubtime', 'score', )
+        fields = ('guid', 'url', 'title', 'source', 'pubtime', 'score', )
 
         cond = {
             'pubtime__gte': getattr(self, 'starttime', None),
             'pubtime__lt': getattr(self, 'endtime', None),
             'title__contains': getattr(self, 'title', None),
             'source__contains': getattr(self, 'source', None),
-            'publisher__contains': getattr(self, 'publisher', None),
             'score': getattr(self, 'score', None),
             'status': 1, 
         }

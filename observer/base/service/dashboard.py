@@ -112,13 +112,12 @@ class DashboardData(Abstract):
     def get_0006(self):
         ac_id = Category.objects.get(name='专家视点').id
         a_ids = ArticleCategory.objects.filter(category_id=ac_id).values_list('article_id', flat=True)
-        queryset = Article.objects.filter(status=1, guid__in=a_ids).values('url', 'title', 'source', 'publisher', 'pubtime').order_by('-pubtime')[0:self.length]
+        queryset = Article.objects.filter(status=1, guid__in=a_ids).values('url', 'title', 'source', 'pubtime').order_by('-pubtime')[0:self.length]
 
         return map(lambda x : {
                 'url': x['url'],
                 'title': x['title'],
                 'source': x['source'],
-                'publisher': x['publisher'],
                 'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
             }, queryset)
 

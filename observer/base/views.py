@@ -158,7 +158,6 @@ class ArticleView(BaseView):
                 'url': x['url'],
                 'title': x['title'],
                 'source': x['source'],
-                'publisher': x['publisher'],
                 'areas': areas(x['guid']),
                 'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
             }, result),
