@@ -115,8 +115,6 @@ class RiskDataAdd(Abstract):
             pubtime=pubtime,
             source=source,
             score=score,
-            risk_keyword='',
-            invalid_keyword='',
             status=1,
         ).save()
 
@@ -219,7 +217,7 @@ class RiskDataUpload(Abstract):
 
     def upload(self, filename, file_obj):
         #Model weight
-        model = {'GUID': 0, '标题': 0, 'URL': 0, '发布时间': 0, '来源': 0, '发布者': 0, '风险程度': 0, '地域': 0, '类别': 0}
+        model = {'GUID': 0, '标题': 0, 'URL': 0, '发布时间': 0, '来源': 0, '风险程度': 0, '地域': 0, '类别': 0}
         #sheet value
         sv = lambda x, y, z : z.cell(row=x, column=y).value
         #date format
@@ -267,7 +265,6 @@ class RiskDataUpload(Abstract):
                         }
                         
                     source = sv(i, model['来源'], sheet)
-                    publisher = sv(i, model['发布者'], sheet)
                     score = sv(i, model['风险程度'], sheet)
                     area = sv(i, model['地域'], sheet)
                     category = sv(i, model['类别'], sheet)
@@ -304,10 +301,7 @@ class RiskDataUpload(Abstract):
                         url=url,
                         pubtime=pubtime,
                         source=source,
-                        publisher='' if not publisher else publisher,
                         score=score,
-                        risk_keyword='',
-                        invalid_keyword='',
                         status=1,
                     ).save()
 
@@ -339,7 +333,7 @@ class RiskDataExport(Abstract):
         start = months[0].strftime('%Y-%m-%d')
         end = months[1].strftime('%Y-%m-%d')
 
-        queryset = Article.objects.filter(pubtime__gte=start, pubtime__lt=end).values('guid', 'title', 'url', 'pubtime', 'source', 'publisher', 'score')
+        queryset = Article.objects.filter(pubtime__gte=start, pubtime__lt=end).values('guid', 'title', 'url', 'pubtime', 'source', 'score')
 
         for q in queryset:
             data.append([q['guid'],
@@ -347,7 +341,6 @@ class RiskDataExport(Abstract):
                          q['url'],
                          date_format(q['pubtime'], '%Y-%m-%d'),
                          q['source'],
-                         q['publisher'],
                          q['score'],
                          areas(q['guid'], flat=True),
                          categories(q['guid'], flat=True)])
