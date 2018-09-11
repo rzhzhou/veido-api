@@ -10,10 +10,11 @@ from observer.utils.date_format import datetime_to_timestamp
 
 class CrawlerTask(object):
 
-    def __init__(self, industry, riskword, industry_id):
+    def __init__(self, industry, riskword, industry_id, corpus_id):
         self.industry = industry
         self.riskword = riskword
         self.industry_id = industry_id
+        self.corpus_id = corpus_id
         self.source = {
             'baidu': '"%s" +%s',
             # 'weibo': ('%s %s', 21600, 'zjld.weibo.newstitle',),
@@ -41,6 +42,7 @@ class CrawlerTask(object):
             'data': {
                 "last_pubtime": datetime_to_timestamp(datetime(2015, 1, 1)),
                 "industry_id": self.industry_id,
+                "corpus_id": self.corpus_id,
                 "source": data.get('source'),
                 'source_type': u'行业监测',
             },

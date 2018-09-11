@@ -101,9 +101,10 @@ class CrawlerData(Abstract):
         industrys = getattr(self, 'name', '')
         riskwords = getattr(self, 'riskword', '')
         industry_ids = getattr(self, 'industry_id')
+        corpus_ids = getattr(self, 'corpus_id')
 
-        for (ids, industry, riskword, industry_id) in zip(edit_ids.split(","), industrys.split(","), riskwords.split(","), industry_ids.split(",")):
-            CrawlerTask(industry, riskword, industry_id).build()
+        for (ids, industry, riskword, industry_id, corpus_id) in zip(edit_ids.split(","), industrys.split(","), riskwords.split(","), industry_ids.split(","), corpus_ids.split(",")):
+            CrawlerTask(industry, riskword, industry_id, corpus_id).build()
             corpus = Corpus.objects.get(id=ids)
             corpus.status = status
             corpus.save()
