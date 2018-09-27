@@ -54,8 +54,9 @@ class CrawlerTask(object):
             'status': 0
         }
 
-        task = Task(**params)
-        task.save(using='crawler')
+        if not Task.objects.using('crawler').filter(url=data.get('syntax')).exists():
+            task = Task(**params)
+            task.save(using='crawler')
 
     def remove(self):
         for k, v in self.source.items():

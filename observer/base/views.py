@@ -1116,7 +1116,7 @@ class RiskDataView(BaseView):
         return super(RiskDataView, self).paging(
             queryset,
             self.request.query_params.get('page', 1),
-            self.request.query_params.get('length', 15)
+            self.request.query_params.get('length', 30)
         )
 
     def serialize(self, queryset):

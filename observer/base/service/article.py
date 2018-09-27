@@ -78,7 +78,7 @@ class RiskData(Abstract):
         queryset = Article.objects.exclude(status=-1).filter(**args)
 
         if area_ids:
-            a_ids = ArticleArea.objects.filter(area_id__in=area_ids[:-1:].split(',')[:-1:]).values_list('article_id', flat=True)
+            a_ids = ArticleArea.objects.filter(area_id__in=area_ids[:-1:].split(',')).values_list('article_id', flat=True)
             queryset = queryset.filter(guid__in=a_ids)
 
 
