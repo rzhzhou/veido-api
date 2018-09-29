@@ -117,6 +117,7 @@ class DMWordsData(Abstract):
 
         cond = {
             'industry_id': getattr(self, 'industry', None),
+            'status': getattr(self, 'status', None),
         }
 
         args = dict([k, v] for k, v in cond.items() if v)

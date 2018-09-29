@@ -1550,12 +1550,12 @@ class SearchView(BaseView):
                 'source': x['_source']['source'],
                 'category': x['_source']['category'],
                 'title': x['_source']['title'] if not x.get('highlight') else x['highlight']['title'][0],
-                'risk_keyword': x['_source']['risk_keyword'],
                 'pubtime': x['_source']['pubtime'],
-                'invalid_keyword': x['_source']['invalid_keyword'],
                 'score': x['_source']['score'],
                 'url': x['_source']['url'],
                 'area': x['_source']['area'],
+                'industry_id': x['_source']['industry_id'],
+                'corpus_id': x['_source']['corpus_id'],
             }, results['hits']),
         }
         return data
