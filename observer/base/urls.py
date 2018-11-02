@@ -33,13 +33,19 @@ urlpatterns = [
     path('risk_data/upload/<str:filename>/', views.RiskDataUploadView.as_view()),  # 风险数据上传
     path('risk_data/export', views.RiskDataExportView.as_view()),  # 风险数据导出
     path('inspection_data', views.InspectionDataView.as_view()),  # 抽检数据
+    path('enterprise_data', views.EnterpriseDataListView.as_view()), # 不合格企业列表
+    path('enterprise_data/edit/<int:cid>/', views.EnterpriseDataEditView.as_view()), # 不合格企业修改
+    path('enterprise_data/delete/<str:cid>/', views.EnterpriseDataDeleteView.as_view()), # 不合格企业删除
+    path('enterprise_data/audit/<str:cid>/', views.EnterpriseDataAuditView.as_view()), # 不合格企业审核
     path('enterprise_data/<str:eid>/', views.EnterpriseDataView.as_view()), # 不合格企业
     path('inspection_data/add', views.InspectionDataAddView.as_view()),  # 抽检数据添加
-    path('inspection_data/edit/<str:aid>/', views.InspectionDataEditView.as_view()),  # 抽检数据修改
-    path('inspection_data/delete/<str:aid>/', views.InspectionDataDeleteView.as_view()),  # 抽检数据删除
+    path('inspection_data/edit/<int:cid>/', views.InspectionDataEditView.as_view()),  # 抽检数据修改
+    path('inspection_data/delete/<str:cid>/', views.InspectionDataDeleteView.as_view()),  # 抽检数据删除
     path('inspection_data/upload/<str:filename>/', views.InspectionDataUploadView.as_view()),  # 抽检数据上传
     path('inspection_data/un_enterprise/upload/<str:filename>/', views.InspectionDataUnEnterpriseUploadView.as_view()),  # 抽检数据不合格企业上传
     path('inspection_data/export', views.InspectionDataExportView.as_view()),  # 抽检数据导出
+    path('inspection_data/crawler/<str:cid>/', views.InspectionDataCrawlerView.as_view()),  # 抽检数据爬取不合格企业
+    path('inspection_data/audit/<str:cid>/', views.InspectionDataAuditView.as_view()), # 抽检数据审核
     path('alias_industry/add', views.AliasIndustryAddView.as_view()),  # 行业别名添加
     path('ccc_industry/add', views.CCCIndustryAddView.as_view()),  # CCC行业添加
     path('licence_industry/add', views.LicenceIndustryAddView.as_view()),  # 许可证行业添加
@@ -51,11 +57,12 @@ urlpatterns = [
     path('select2/industries', views.Select2IndustryView.as_view()),  # 行业名称
     path('select2/alias_industries', views.Select2AliasIndustryView.as_view()),  # 行业别名
     path('select2/ccc_industries', views.Select2CCCListView.as_view()),  # 3C行业
-    path('select/cpc_industries', views.selectCpcisView.as_view()),
+    path('select/cpc_industries', views.SelectCpcisView.as_view()),
     path('select2/licence_industries', views.Select2LicenceListView.as_view()),  # Licence行业
     path('select2/consumer_industries', views.Select2ConsumerListView.as_view()),  # 消费品目录
     path('select2/major_industries', views.Select2MajorListView.as_view()),  # 重点产品目录
     path('select2/areas', views.Select2AreaView.as_view()),  # 地域名称
+    path('select2/industry_products', views.Select2IndustryProductsView.as_view()),  # 行业产品
 
     path('search', views.SearchView.as_view()),  # 搜索
     path('search/advanced', views.SearchAdvancedView.as_view()),  # 高级搜索

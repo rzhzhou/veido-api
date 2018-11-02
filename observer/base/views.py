@@ -29,13 +29,19 @@ from observer.base.service.industry import (AliasIndustryAdd, CCCIndustryAdd,
                                             Select2AliasIndustryData,
                                             Select2CCCIndustryData,
                                             Select2IndustryData,
-                                            Select2LicenceIndustryData)
+                                            Select2LicenceIndustryData,
+                                            IndustryProductsData)
 from observer.base.service.inspection import (InspectionData,
+                                              EnterpriseDataEdit,
+                                              EnterpriseDataDelete,
+                                              EnterpriseDataAudit,
                                               EnterpriseData,
                                               InspectionDataAdd,
                                               InspectionDataDelete,
                                               InspectionDataEdit,
                                               InspectionDataExport,
+                                              InspectionDataCrawler,
+                                              InspectionDataAudit,
                                               InspectionDataUnEnterpriseUpload,
                                               InspectionDataUpload)
 from observer.base.service.search import SearchAdvancedData, SearchData
@@ -194,6 +200,7 @@ class InspectionView(BaseView):
         data = {
             'total': total,
             'list': map(lambda x: {
+                'id': x['id'],
                 'guid': x['guid'],
                 'industry': get_major_industry(x['industry_id']),
                 'url': x['url'],
@@ -207,6 +214,7 @@ class InspectionView(BaseView):
                 'category': x['category'],
                 'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
                 'product': x['product_name'],
+                'status': x['status'],
             }, result),
         }
 
@@ -363,13 +371,13 @@ class Select2CCCListView(BaseView):
         return Response(self.serialize(queryset))
 
 
-class selectCpcisView(BaseView):
-    """docstring for selectCpcisView"""
+class SelectCpcisView(BaseView):
+    """docstring for SelectCpcisView"""
     def __init__(self):
-        super(selectCpcisView, self).__init__()
+        super(SelectCpcisView, self).__init__()
 
     def set_request(self, request):
-        super(selectCpcisView, self).set_request(request)
+        super(SelectCpcisView, self).set_request(request)
 
     def serialize(self, queryset):
         data = map(
@@ -739,6 +747,7 @@ class CCCIndustryView(BaseView):
         else:
             queryset = CCCIndustryData(params=request.query_params).get_by_id(cid)
             return Response(self.serialize2(queryset))
+
 # 产品总分类
 class CpcIndustryView(BaseView):
     def __init__(self):
@@ -807,6 +816,7 @@ class CpcIndustryView(BaseView):
         else:
             queryset = CpcIndustryData(params=request.query_params).get_by_id(lid)
             return Response(self.serialize2(queryset))
+
 
 class LicenceIndustryView(BaseView):
 
@@ -1104,6 +1114,30 @@ class Select2AreaView(BaseView):
         return Response(self.serialize(queryset))
 
 
+class Select2IndustryProductsView(BaseView):
+
+    def __init__(self):
+        super(Select2IndustryProductsView, self).__init__()
+
+    def set_request(self, request):
+        super(Select2IndustryProductsView, self).set_request(request)
+
+    def serialize(self, queryset):
+        data = map(lambda q: {
+            'id': q['id'],
+            'text': q['name'],
+        }, queryset)
+
+        return data
+
+    def get(self, request):
+        self.set_request(request)
+
+        queryset = IndustryProductsData(params=request.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+
 class RiskDataView(BaseView):
 
     def __init__(self):
@@ -1248,8 +1282,10 @@ class InspectionDataView(BaseView):
         data = {
             'total': total,
             'list': map(lambda x: {
+                'id': x['id'],
                 'guid': x['guid'],
                 'industry': get_major_industry(x['industry_id']),
+                'origin_product': x['origin_product'],
                 'url': x['url'],
                 'level': x['level'],
                 'area': area(x['area_id']),
@@ -1261,6 +1297,7 @@ class InspectionDataView(BaseView):
                 'category': x['category'],
                 'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
                 'product': x['product_name'],
+                'status': x['status'],
             }, result),
         }
 
@@ -1272,6 +1309,86 @@ class InspectionDataView(BaseView):
         queryset = InspectionData(params=request.query_params).get_all()
 
         return Response(self.serialize(queryset))
+
+
+class EnterpriseDataListView(BaseView):
+
+    def __init__(self):
+        super(EnterpriseDataListView, self).__init__()
+
+    def set_request(self, request):
+        super(EnterpriseDataListView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(EnterpriseDataListView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        result = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda x: {
+                'id': x['id'],
+                'name': x['name'],
+                'unitem': x['unitem'],
+                'area': area(x['area_id']),
+                'status': x['status'],
+            }, result),
+        }
+
+        return data
+
+    def get(self, request):
+        self.set_request(request)
+
+        queryset = EnterpriseData(params=request.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+
+class EnterpriseDataEditView(BaseView):
+
+    def __init__(self):
+        super(EnterpriseDataEditView, self).__init__()
+
+    def set_request(self, request):
+        super(EnterpriseDataEditView, self).set_request(request)
+
+    def post(self, request, cid):
+        self.set_request(request)
+        queryset = EnterpriseDataEdit(params=request.data).edit(cid=cid)
+
+        return Response(status=queryset)
+
+
+class EnterpriseDataDeleteView(BaseView):
+
+    def __init__(self):
+        super(EnterpriseDataDeleteView, self).__init__()
+
+    def delete(self, request, cid):
+        queryset = EnterpriseDataDelete(user=request.user).delete(cid=cid)
+
+        return Response(status=queryset)
+
+
+class EnterpriseDataAuditView(BaseView):
+
+    def __init__(self):
+        super(EnterpriseDataAuditView, self).__init__()
+
+    def set_request(self, request):
+        super(EnterpriseDataAuditView, self).set_request(request)
+
+    def post(self, request, cid):
+        self.set_request(request)
+        queryset = EnterpriseDataAudit(params=request.data).edit(cid=cid)
+
+        return Response(status=queryset)
 
 
 class EnterpriseDataView(BaseView):
@@ -1340,10 +1457,10 @@ class InspectionDataEditView(BaseView):
     def set_request(self, request):
         super(InspectionDataEditView, self).set_request(request)
 
-    def post(self, request, aid):
+    def post(self, request, cid):
         self.set_request(request)
 
-        queryset = InspectionDataEdit(user=request.user, params=request.data).edit(aid=aid)
+        queryset = InspectionDataEdit(user=request.user, params=request.data).edit(cid=cid)
 
         return Response(status=queryset)
 
@@ -1353,8 +1470,8 @@ class InspectionDataDeleteView(BaseView):
     def __init__(self):
         super(InspectionDataDeleteView, self).__init__()
 
-    def delete(self, request, aid):
-        queryset = InspectionDataDelete(user=request.user).delete(aid=aid)
+    def delete(self, request, cid):
+        queryset = InspectionDataDelete(user=request.user).delete(cid=cid)
 
         return Response(status=queryset)
 
@@ -1399,6 +1516,38 @@ class InspectionDataExportView(BaseView):
         response["Content-Disposition"] = 'attachment; filename=inspections.xlsx'
 
         return response
+
+
+class InspectionDataCrawlerView(BaseView):
+
+    def __init__(self):
+        super(InspectionDataCrawlerView, self).__init__()
+
+    def set_request(self, request):
+        super(InspectionDataCrawlerView, self).set_request(request)
+
+    def post(self, request, cid):
+        self.set_request(request)
+
+        queryset = InspectionDataCrawler(user=request.user, params=request.data).edit(cid=cid)
+
+        return Response(status=queryset)
+
+
+class InspectionDataAuditView(BaseView):
+
+    def __init__(self):
+        super(InspectionDataAuditView, self).__init__()
+
+    def set_request(self, request):
+        super(InspectionDataAuditView, self).set_request(request)
+
+    def post(self, request, cid):
+        self.set_request(request)
+
+        queryset = InspectionDataAudit(user=request.user, params=request.data).edit(cid=cid)
+
+        return Response(status=queryset)
 
 
 class AliasIndustryAddView(BaseView):

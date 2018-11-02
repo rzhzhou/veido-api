@@ -2,7 +2,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, F, Q
 
 from observer.base.models import (AliasIndustry, CCCIndustry, ConsumerIndustry,CPCIndustry,
-                                  Industry, LicenceIndustry, MajorIndustry)
+                                  Industry, LicenceIndustry, MajorIndustry, IndustryProducts)
 from observer.base.service.abstract import Abstract
 from observer.utils.date_format import date_format
 
@@ -281,6 +281,25 @@ class MajorIndustryData(Abstract):
 
         queryset = MajorIndustry.objects.filter(
             **args).order_by('id').values(*fields)
+
+        return queryset
+
+
+class IndustryProductsData(Abstract):
+
+    def __init__(self, params):
+        super(IndustryProductsData, self).__init__(params)
+
+    def get_all(self):
+        fields = ('id', 'name', )
+
+        cond = {
+            'name__istartswith': getattr(self, 'text', None),
+        }
+
+        args = dict([k, v] for k, v in cond.items() if v)
+
+        queryset = IndustryProducts.objects.filter(**args).values(*fields)
 
         return queryset
 

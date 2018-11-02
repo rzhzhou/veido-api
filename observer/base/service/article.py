@@ -210,7 +210,7 @@ class RiskDataDelete(Abstract):
         return 200
 
 
-class RiskDataUpload(Abstract): 
+class RiskDataUpload(Abstract):
 
     def __init__(self, user):
         self.user = user
@@ -236,10 +236,10 @@ class RiskDataUpload(Abstract):
             rows = sheet.rows
         except Exception as e:
             return {
-                    'status': 0, 
+                    'status': 0,
                     'message': '操作失败！请检查文件是否有误。详细错误信息：%s！' % e
                 }
-        
+
         total = 0
         dupli = 0
 
@@ -260,10 +260,10 @@ class RiskDataUpload(Abstract):
                     pubtime = date_format(sv(i, model['发布时间'], sheet))
                     if not pubtime:
                         return {
-                            'status': 0, 
+                            'status': 0,
                             'message': '操作失败！Excel %s 行时间格式有误！' % (i + 1, )
                         }
-                        
+
                     source = sv(i, model['来源'], sheet)
                     score = sv(i, model['风险程度'], sheet)
                     area = sv(i, model['地域'], sheet)
@@ -294,7 +294,7 @@ class RiskDataUpload(Abstract):
                                 article_id=a_guid,
                                 category_id=c_id,
                             ).save()
-                    
+
                     Article(
                         guid=a_guid,
                         title=title,
@@ -307,17 +307,17 @@ class RiskDataUpload(Abstract):
 
                 except Exception as e:
                     return {
-                        'status': 0, 
+                        'status': 0,
                         'message': '操作失败！Excel %s 行存在问题。详细错误信息：%s！' % (i + 1, e)
                     }
 
         return {
-                    'status': 1, 
+                    'status': 1,
                     'message': '操作成功！共处理%s条数据，成功导入%s条数据，重复数据%s条！' % (total, total - dupli, dupli, )
                 }
-        
 
-class RiskDataExport(Abstract): 
+
+class RiskDataExport(Abstract):
 
     def __init__(self, user):
         self.user = user
