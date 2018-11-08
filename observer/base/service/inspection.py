@@ -7,6 +7,7 @@ import jieba.posseg as pseg
 
 import openpyxl
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
 
 from observer.base.models import (MajorIndustry, AliasIndustry, Area, Enterprise, Industry,
                                   Inspection, InspectionEnterprise, IndustryProducts)
@@ -31,7 +32,9 @@ class InspectionData(Abstract):
     def get_all(self):
 
         fields = ('id', 'guid', 'title', 'url', 'pubtime', 'source',
-                  'qualitied', 'unqualitied_patch', 'qualitied_patch', 'inspect_patch', 'category', 'level', 'industry_id', 'area_id', 'product_name', 'status', 'origin_product')
+                  'qualitied', 'unqualitied_patch', 'qualitied_patch',
+                  'inspect_patch', 'category', 'level', 'industry_id',
+                  'area_id', 'product_name', 'status', 'origin_product')
 
         cond = {
             'pubtime__gte': getattr(self, 'starttime', None),
@@ -557,3 +560,23 @@ class InspectionDataAudit(Abstract):
             inspection.save()
 
         return 200
+
+
+class InspectionDataSuzhou(Abstract):
+
+    def __init__(self, params={}):
+        super(InspectionDataSuzhou, self).__init__(params)
+
+    def get_inspection_list(self, search_value):
+        fields = ('id', 'industry_id', 'title', 'pubtime',
+                  'url', 'level', 'area_id', 'source', 'qualitied',
+                  'unqualitied_patch', 'qualitied_patch', 'inspect_patch',
+                  'category', 'product_name', 'status' )
+
+        args = {}
+        if not search_value:
+            queryset = Inspection.objects.filter(**args).values(*fields)
+        else:
+            queryset = Inspection.objects.filter(Q(source__contains=search_value) | Q(product_name__contains=search_value)).values(*fields)
+
+        return queryset

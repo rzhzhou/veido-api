@@ -16,7 +16,7 @@ def crawler(edit_ids, urls, product_names):
     for (ids, url, product_name) in zip(edit_ids.split(","), urls.split(","), product_names.split(",")):
         guid = str_to_md5str('{0}{1}'.format(url, product_name))
 
-        print('....................', product_name)
+        print('正在爬取...：', product_name)
 
         Inspection.objects.filter(id=ids).update(status=2)
 
@@ -52,11 +52,10 @@ def crawler(edit_ids, urls, product_names):
                 thead = []
                 for i in title:
                     thead.append(i.xpath('string(.)').strip())
-                print(thead)
 
                 e_col, u_col = [], []
                 enterprise_fields = ['生产企业名称', '标称生产者', '标称生产单位', '标称生产企业名称', '标称生产企业名称', '企业名称', '生产单位', '标示生产单位', '生产企业(标称)', '（标称）生产单位名称', '标称生产企业', '标称生产厂家']
-                unitem_fields = ['主要不合格项目', '不合格项目', '抽查结果', '不合格项目║检验结果║标准值', '主要不合格项目或主要问题', '主要不合格项（项目名称：标准值/实测值）', '不合格项目实测值', '不符合项目', '合格状态']
+                unitem_fields = ['主要不合格项目', '不合格项目', '不合格项目║检验结果║标准值', '主要不合格项目或主要问题', '主要不合格项（项目名称：标准值/实测值）', '不合格项目实测值', '不符合项目', '合格状态']
 
                 for i, unenterprise in enumerate(thead):
                     results = process.extract(unenterprise, enterprise_fields, limit=12)
@@ -76,8 +75,6 @@ def crawler(edit_ids, urls, product_names):
                 if u_col == []:
                     u_col.append('100')
 
-                print('>>>>>>>>>>>>>>>>', e_col[0], u_col[0])
-
                 unenterprise_xpath = '//table[%d]/tbody/tr/td[%s]' %(t+1, e_col[0])
                 unitem_xpath = '//table[%d]/tbody/tr/td[%s]' %(t+1, u_col[0])
 
@@ -85,11 +82,21 @@ def crawler(edit_ids, urls, product_names):
                 unitem = html.xpath(unitem_xpath)
 
                 data = []
+                new_words = ''
 
                 for i, j in zip(unenterprise, unitem):
                     m = 0
                     n = 0
-                    areas = pseg.cut(i.xpath('string(.)').strip())
+                    if i.xpath('string(.)').strip().find('市') != -1:
+                        new_words = i.xpath('string(.)').strip().replace('市', '')
+                    elif i.xpath('string(.)').strip().find('省') != -1:
+                        new_words = i.xpath('string(.)').strip().replace('省', '')
+                    elif i.xpath('string(.)').strip().find('县') != -1:
+                        new_words = i.xpath('string(.)').strip().replace('县', '')
+                    else:
+                        new_words = i.xpath('string(.)').strip()
+
+                    areas = pseg.cut(new_words)
                     for area, flag in areas:
                         if flag == 'findarea':
                             m += 1
@@ -100,17 +107,17 @@ def crawler(edit_ids, urls, product_names):
                             area_id = Area.objects.filter(name=area)[0].id
 
                             enterprise = Enterprise.objects.filter(
-                            name=i.xpath('string(.)').strip(), area_id=area_id)
+                            name=new_words, area_id=area_id)
                             if not enterprise.exists():
                                 Enterprise(
-                                    name=i.xpath('string(.)').strip(),
+                                    name=new_words,
                                     unitem=j.xpath('string(.)').strip(),
                                     area_id=area_id,
                                     status=0,
                                 ).save()
 
                             enterprise_id = Enterprise.objects.filter(
-                            name=i.xpath('string(.)').strip(), area_id=area_id)[0].id
+                            name=new_words, area_id=area_id)[0].id
                             inspection_enterprise = InspectionEnterprise.objects.filter(
                                 inspection_id=guid, enterprise_id=enterprise_id)
                             if not inspection_enterprise.exists():
@@ -129,17 +136,17 @@ def crawler(edit_ids, urls, product_names):
                         area_id = Area.objects.filter(name=area)[0].id
 
                         enterprise = Enterprise.objects.filter(
-                        name=i.xpath('string(.)').strip(), area_id=area_id)
+                        name=new_words, area_id=area_id)
                         if not enterprise.exists():
                             Enterprise(
-                                name=i.xpath('string(.)').strip(),
+                                name=new_words,
                                 unitem=j.xpath('string(.)').strip(),
                                 area_id=area_id,
                                 status=0,
                             ).save()
 
                         enterprise_id = Enterprise.objects.filter(
-                        name=i.xpath('string(.)').strip(), area_id=area_id)[0].id
+                        name=new_words, area_id=area_id)[0].id
                         inspection_enterprise = InspectionEnterprise.objects.filter(
                             inspection_id=guid, enterprise_id=enterprise_id)
                         if not inspection_enterprise.exists():
@@ -150,4 +157,3 @@ def crawler(edit_ids, urls, product_names):
 
                     m = 0
                     n = 0
-                # print(data)

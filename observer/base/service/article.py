@@ -205,7 +205,7 @@ class RiskDataDelete(Abstract):
     def delete(self, aid):
         del_ids = aid
         for ids in del_ids.split(","):
-            Article.objects.filter(guid=ids).update(status=-1)
+            Article.objects.filter(guid=ids).delete()
 
         return 200
 
@@ -349,3 +349,20 @@ class RiskDataExport(Abstract):
         write_by_openpyxl(filename, data)
 
         return open(filename, 'rb')
+
+
+class RiskDataSuzhou(Abstract):
+
+    def __init__(self, params={}):
+        super(RiskDataSuzhou, self).__init__(params)
+
+    def get_risk_data_list(self, search_value):
+        fields = ('guid', 'title', 'pubtime', 'url', 'source', 'score' )
+
+        args = {}
+        if not search_value:
+            queryset = Article.objects.exclude(status=0).filter(**args).values(*fields)
+        else:
+            queryset = Article.objects.exclude(status=0).filter(Q(title__contains=search_value) | Q(source__contains=search_value)).values(*fields)
+
+        return queryset

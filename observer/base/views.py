@@ -10,7 +10,7 @@ from observer.base.models import AliasIndustry
 from observer.base.service.area import Select2AreaData
 from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd,
                                            RiskDataDelete, RiskDataEdit, RiskDataAudit,
-                                           RiskDataExport, RiskDataUpload)
+                                           RiskDataExport, RiskDataUpload, RiskDataSuzhou)
 from observer.base.service.base import (alias_industry, get_major_industry, area, areas,
                                         categories, local_related, qualitied,
                                         risk_injury)
@@ -43,7 +43,8 @@ from observer.base.service.inspection import (InspectionData,
                                               InspectionDataCrawler,
                                               InspectionDataAudit,
                                               InspectionDataUnEnterpriseUpload,
-                                              InspectionDataUpload)
+                                              InspectionDataUpload,
+                                              InspectionDataSuzhou)
 from observer.base.service.search import SearchAdvancedData, SearchData
 from observer.utils.date_format import date_format
 from observer.utils.excel import write_by_openpyxl
@@ -1768,3 +1769,104 @@ class CrawlerView(BaseView):
         queryset = CrawlerData(user=request.user, params=request.data).edit(cid=cid)
 
         return Response(status=queryset)
+
+
+class InspectionDataViewSuzhou(BaseView):
+
+    def __init__(self):
+        super(InspectionDataViewSuzhou, self).__init__()
+
+    def set_request(self, request):
+        super(InspectionDataViewSuzhou, self).set_request(request)
+
+    def paging(self, queryset):
+        page = (int(self.request.query_params.get('start')) /
+                int(self.request.query_params.get('length'))) + 1
+        return super(InspectionDataViewSuzhou, self).paging(queryset, page, self.request.query_params.get('length'))
+
+    def serialize(self, queryset):
+        results = self.paging(queryset)
+        recordsTotal = queryset.count()
+        data = {
+            "draw": self.request.query_params.get('draw', 1),
+            "recordsTotal": recordsTotal,
+            "recordsFiltered": InspectionDataSuzhou(params=self.request.query_params).get_inspection_list(str(self.request.query_params.get('search[value]')).strip()).count(),
+            "data": map(lambda x: {
+                'id': x['id'],
+                'industry': get_major_industry(x['industry_id']),
+                'titleAndurl': [get_major_industry(x['industry_id']), x['url']],
+                'level': x['level'],
+                'area': area(x['area_id']),
+                'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
+                'source': x['source'],
+                'qualitied': qualitied(x['qualitied']),
+                'unqualitied_patch': x['unqualitied_patch'],
+                'qualitied_patch': x['qualitied_patch'],
+                'inspect_patch': x['inspect_patch'],
+                'category': x['category'],
+                'product': x['product_name'],
+                'status': x['status'],
+            }, results)
+        }
+
+        return data
+
+    def get(self, request):
+        self.set_request(request)
+
+        limit = int(request.query_params.get('limit', 0))
+
+        queryset = InspectionDataSuzhou(
+            params=request.query_params).get_inspection_list(str(request.query_params.get('search[value]')).strip()).order_by('-pubtime')
+
+        if limit:
+            queryset = queryset[:limit]
+
+        return Response(self.serialize(queryset))
+
+
+class RiskDataViewSuzhou(BaseView):
+
+    def __init__(self):
+        super(RiskDataViewSuzhou, self).__init__()
+
+    def set_request(self, request):
+        self.user = request.user
+        super(RiskDataViewSuzhou, self).set_request(request)
+
+    def paging(self, queryset):
+        page = (int(self.request.query_params.get('start')) /
+                int(self.request.query_params.get('length'))) + 1
+        return super(RiskDataViewSuzhou, self).paging(queryset, page, self.request.query_params.get('length'))
+
+    def serialize(self, queryset):
+        results = self.paging(queryset)
+        recordsTotal = queryset.count()
+        data = {
+            "draw": self.request.query_params.get('draw', 1),
+            "recordsTotal": recordsTotal,
+            "recordsFiltered": RiskDataSuzhou(params=self.request.query_params).get_risk_data_list(str(self.request.query_params.get('search[value]')).strip()).count(),
+            "data": map(lambda x: {
+                'titleAndurl': [x['title'], x['url']],
+                'source': x['source'],
+                'areas': areas(x['guid']),
+                'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
+                'score': x['score'],
+                'local_related': local_related(x['guid'], self.user), # 本地风险相关度
+            }, results)
+        }
+
+        return data
+
+    def get(self, request):
+        self.set_request(request)
+
+        limit = int(request.query_params.get('limit', 0))
+
+        queryset = RiskDataSuzhou(
+            params=request.query_params).get_risk_data_list(str(request.query_params.get('search[value]')).strip()).order_by('-pubtime')
+
+        if limit:
+            queryset = queryset[:limit]
+
+        return Response(self.serialize(queryset))

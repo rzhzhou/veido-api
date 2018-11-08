@@ -68,6 +68,10 @@ urlpatterns = [
     path('search/advanced', views.SearchAdvancedView.as_view()),  # 高级搜索
 
     path('crawler/<str:cid>/', views.CrawlerView.as_view()), #语料词爬取数据
+
+    # SUZHOU
+    path('risk_data_suzhou', views.RiskDataViewSuzhou.as_view()), # 新闻信息
+    path('inspection_suzhou', views.InspectionDataViewSuzhou.as_view()), # 抽检信息
 ]
 
 urlpatterns += [
