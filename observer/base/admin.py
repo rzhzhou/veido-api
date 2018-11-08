@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django_extensions.admin import ForeignKeyAutocompleteAdmin
-from import_export.admin import ImportExportActionModelAdmin
+from import_export.admin import ImportExportActionModelAdmin, ImportExportModelAdmin
 from django.core.exceptions import ObjectDoesNotExist
 
 from observer.base.models import *
@@ -82,7 +82,7 @@ class InspectionEnterpriseAdmin(ImportExportActionModelAdmin):
     pass
 
 
-class ArticleAdmin(ImportExportActionModelAdmin):
+class ArticleAdmin(ImportExportActionModelAdmin, ImportExportModelAdmin):
     resource_class = ArticleResources
     search_fields = ('title', 'source', )
     list_display = ('title', 'url', 'pubtime', 'source', 'score', )
@@ -109,6 +109,12 @@ class CorpusAdmin(ImportExportActionModelAdmin):
     list_display = ('riskword', 'industry_id', )
 
 
+class IndustryProductsAdmin(ImportExportActionModelAdmin, ImportExportModelAdmin):
+    resource_class = IndustryProductsResources
+    search_fields = ('name', 'industry_id')
+    list_display = ('name', 'industry_id')
+
+
 admin.site.register(Industry, IndustryAdmin)
 admin.site.register(CPCIndustry, CPCIndustryAdmin)
 admin.site.register(CCCIndustry, CCCIndustryAdmin)
@@ -126,3 +132,4 @@ admin.site.register(Category, CategoryAdmin)
 admin.site.register(ArticleCategory, ArticleCategoryAdmin)
 admin.site.register(DMLink, DMLinkAdmin)
 admin.site.register(Corpus, CorpusAdmin)
+admin.site.register(IndustryProducts, IndustryProductsAdmin)

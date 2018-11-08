@@ -13,7 +13,7 @@ class Select2AreaData(Abstract):
 
     def get_all(self):
         fields = ('id', 'name', )
-        
+
         cond = {
             'name__istartswith': getattr(self, 'text', None),
         }

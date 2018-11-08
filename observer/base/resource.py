@@ -85,12 +85,22 @@ class ArticleResources(resources.ModelResource):
     score = fields.Field(attribute='score', column_name='风险程度')
     area = fields.Field(attribute='area', column_name='地域')
     category = fields.Field(attribute='category', column_name='类别')
+    industry_id = fields.Field(attribute='industry_id', column_name='产品类别')
+    corpus_id = fields.Field(attribute='corpus_id', column_name='语料词编号')
 
     class Meta:
         model = Article
         import_id_fields = ('guid',)
-        fields = ('guid', 'title', 'url', 'pubtime', 'source', 'score', )
-        export_order = ('guid', 'title', 'url', 'pubtime', 'source', 'score', )
+        fields = ('guid', 'title', 'url', 'pubtime', 'source', 'score', 'industry_id', 'corpus_id', )
+        export_order = ('guid', 'title', 'url', 'pubtime', 'source', 'score', 'industry_id', 'corpus_id', )
+
+    def dehydrate_industry_id(self, obj):
+        try:
+            industry = ConsumerIndustry.objects.get(id=obj.industry_id)
+            return industry
+        except ObjectDoesNotExist:
+            pass
+
 
     def before_save_instance(self, instance, using_transactions, dry_run):
         a_guid = str_to_md5str(instance.url)
@@ -120,6 +130,7 @@ class ArticleResources(resources.ModelResource):
 
 
 class InspectionResources(resources.ModelResource):
+    id = fields.Field(attribute='id', column_name='ID')
     guid = fields.Field(attribute='guid', column_name='GUID')
     title = fields.Field(attribute='title', column_name='标题')
     url = fields.Field(attribute='url', column_name='URL')
@@ -131,12 +142,13 @@ class InspectionResources(resources.ModelResource):
     level = fields.Field(attribute='level', column_name='抽查级别')
     industry_id = fields.Field(attribute='industry_id', column_name='行业ID')
     area_id = fields.Field(attribute='area_id', column_name='地域ID')
+    origin_product = fields.Field(attribute='origin_product', column_name='导入产品名')
 
     class Meta:
         model = Inspection
         import_id_fields = ('guid',)
-        fields = ('guid', 'title', 'url', 'pubtime', 'source', 'unitem', 'qualitied', 'category', 'level', 'industry_id', 'area_id', )
-        export_order = ('guid', 'title', 'url', 'pubtime', 'source', 'unitem', 'qualitied', 'category', 'level', 'industry_id', 'area_id', )
+        fields = ('id', 'guid', 'title', 'url', 'pubtime', 'source', 'unitem', 'qualitied', 'category', 'level', 'industry_id', 'area_id', 'origin_product' )
+        export_order = ('id', 'guid', 'title', 'url', 'pubtime', 'source', 'unitem', 'qualitied', 'category', 'level', 'industry_id', 'area_id', 'origin_product' )
 
     def before_save_instance(self, instance, using_transactions, dry_run):
         i_guid = str_to_md5str(instance.url)
@@ -144,3 +156,14 @@ class InspectionResources(resources.ModelResource):
 
         if Article.objects.filter(guid=i_guid).exists():
             return
+
+
+class IndustryProductsResources(resources.ModelResource):
+    id = fields.Field(attribute='id', column_name='id')
+    name = fields.Field(attribute='name', column_name='name')
+    industry_id = fields.Field(attribute='industry_id', column_name='industry_id')
+
+    class Meta:
+        model = IndustryProducts
+        fields = ('id', 'name', 'industry_id')
+        export_order = fields

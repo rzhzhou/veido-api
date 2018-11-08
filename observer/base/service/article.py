@@ -205,12 +205,12 @@ class RiskDataDelete(Abstract):
     def delete(self, aid):
         del_ids = aid
         for ids in del_ids.split(","):
-            Article.objects.filter(guid=ids).update(status=-1)
+            Article.objects.filter(guid=ids).delete()
 
         return 200
 
 
-class RiskDataUpload(Abstract): 
+class RiskDataUpload(Abstract):
 
     def __init__(self, user):
         self.user = user
@@ -236,10 +236,10 @@ class RiskDataUpload(Abstract):
             rows = sheet.rows
         except Exception as e:
             return {
-                    'status': 0, 
+                    'status': 0,
                     'message': '操作失败！请检查文件是否有误。详细错误信息：%s！' % e
                 }
-        
+
         total = 0
         dupli = 0
 
@@ -260,10 +260,10 @@ class RiskDataUpload(Abstract):
                     pubtime = date_format(sv(i, model['发布时间'], sheet))
                     if not pubtime:
                         return {
-                            'status': 0, 
+                            'status': 0,
                             'message': '操作失败！Excel %s 行时间格式有误！' % (i + 1, )
                         }
-                        
+
                     source = sv(i, model['来源'], sheet)
                     score = sv(i, model['风险程度'], sheet)
                     area = sv(i, model['地域'], sheet)
@@ -294,7 +294,7 @@ class RiskDataUpload(Abstract):
                                 article_id=a_guid,
                                 category_id=c_id,
                             ).save()
-                    
+
                     Article(
                         guid=a_guid,
                         title=title,
@@ -307,17 +307,17 @@ class RiskDataUpload(Abstract):
 
                 except Exception as e:
                     return {
-                        'status': 0, 
+                        'status': 0,
                         'message': '操作失败！Excel %s 行存在问题。详细错误信息：%s！' % (i + 1, e)
                     }
 
         return {
-                    'status': 1, 
+                    'status': 1,
                     'message': '操作成功！共处理%s条数据，成功导入%s条数据，重复数据%s条！' % (total, total - dupli, dupli, )
                 }
-        
 
-class RiskDataExport(Abstract): 
+
+class RiskDataExport(Abstract):
 
     def __init__(self, user):
         self.user = user
@@ -349,3 +349,20 @@ class RiskDataExport(Abstract):
         write_by_openpyxl(filename, data)
 
         return open(filename, 'rb')
+
+
+class RiskDataSuzhou(Abstract):
+
+    def __init__(self, params={}):
+        super(RiskDataSuzhou, self).__init__(params)
+
+    def get_risk_data_list(self, search_value):
+        fields = ('guid', 'title', 'pubtime', 'url', 'source', 'score' )
+
+        args = {}
+        if not search_value:
+            queryset = Article.objects.exclude(status=0).filter(**args).values(*fields)
+        else:
+            queryset = Article.objects.exclude(status=0).filter(Q(title__contains=search_value) | Q(source__contains=search_value)).values(*fields)
+
+        return queryset

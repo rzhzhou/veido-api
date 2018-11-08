@@ -229,7 +229,7 @@ class Corpus(models.Model):
 
 
 class Inspection(models.Model):
-    guid = models.CharField(max_length=32, primary_key=True, editable=False, verbose_name='主键') # url + industry_id -> md5
+    guid = models.CharField(default=None, blank=True, null=True, max_length=32, verbose_name='GUID') # url + industry_id -> md5
     title = models.CharField(max_length=255, verbose_name='标题')
     url = models.URLField(blank=True, null=True, verbose_name='网站链接')
     pubtime = models.DateField(verbose_name='发布时间')
@@ -245,6 +245,7 @@ class Inspection(models.Model):
     industry_id = models.IntegerField(verbose_name='产品类别')
     product_name = models.CharField(blank=True, null=True, max_length=255, verbose_name='产品名称')
     area_id = models.IntegerField(verbose_name='地域ID')
+    origin_product = models.CharField(blank=True, null=True, max_length=255, verbose_name='导入产品名')
 
     class Meta:
         app_label = 'base'
@@ -260,6 +261,7 @@ class Enterprise(models.Model):
     unitem = models.CharField(max_length=255, verbose_name='不合格项')
 
     area_id = models.IntegerField(verbose_name='地域ID')
+    status = models.IntegerField(default=1, verbose_name='状态')# 0, 默认值 -1, 无效 1 有效
 
     class Meta:
         app_label = 'base'
@@ -384,3 +386,15 @@ class Task(models.Model):
 
     def __unicode__(self):
         return self.url
+
+
+class IndustryProducts(models.Model):
+    name = models.CharField(max_length=100, verbose_name='产品名称')
+    industry_id = models.IntegerField(verbose_name='产品行业编号')
+
+    class Meta:
+        app_label = 'base'
+        verbose_name_plural = '行业产品'
+
+    def __str__(self):
+        return self.name
