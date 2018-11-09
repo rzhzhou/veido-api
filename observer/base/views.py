@@ -1780,9 +1780,9 @@ class InspectionDataViewSuzhou(BaseView):
         super(InspectionDataViewSuzhou, self).set_request(request)
 
     def paging(self, queryset):
-        page = (int(self.request.query_params.get('start')) /
-                int(self.request.query_params.get('length'))) + 1
-        return super(InspectionDataViewSuzhou, self).paging(queryset, page, self.request.query_params.get('length'))
+        page = (int(self.request.query_params.get('start', 0)) /
+                int(self.request.query_params.get('length', 10))) + 1
+        return super(InspectionDataViewSuzhou, self).paging(queryset, page, self.request.query_params.get('length', 10))
 
     def serialize(self, queryset):
         results = self.paging(queryset)
@@ -1835,9 +1835,9 @@ class RiskDataViewSuzhou(BaseView):
         super(RiskDataViewSuzhou, self).set_request(request)
 
     def paging(self, queryset):
-        page = (int(self.request.query_params.get('start')) /
-                int(self.request.query_params.get('length'))) + 1
-        return super(RiskDataViewSuzhou, self).paging(queryset, page, self.request.query_params.get('length'))
+        page = (int(self.request.query_params.get('start', 0)) /
+                int(self.request.query_params.get('length', 10))) + 1
+        return super(RiskDataViewSuzhou, self).paging(queryset, page, self.request.query_params.get('length', 10))
 
     def serialize(self, queryset):
         results = self.paging(queryset)
