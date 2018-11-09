@@ -47,7 +47,7 @@ class InspectionData(Abstract):
             'industry_id': getattr(self, 'industry', None),
             'area_id': getattr(self, 'area', None),
             'product_name__icontains': getattr(self, 'product_name', None),
-            'status__in': getattr(self, 'status', None).split(',')
+            'status__in': getattr(self, 'status').split(',') if self.status else None
         }
 
         args = dict([k, v] for k, v in cond.items() if v)

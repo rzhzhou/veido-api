@@ -24,3 +24,15 @@ xlrd >= 1.1.0
 python-dateutil >= 2.7.2
 
 uwsgi >= 2.0.17
+
+# jieba
+jieba >= 0.39
+
+# lxml
+lxml >= 4.2.5
+
+# fuzzywuzzy
+fuzzywuzzy >= 0.17.0
+
+# requests
+requests >= 2.20.0
