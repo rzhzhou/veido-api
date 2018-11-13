@@ -360,9 +360,13 @@ class RiskDataSuzhou(Abstract):
         fields = ('guid', 'title', 'pubtime', 'url', 'source', 'score' )
 
         args = {}
+        a_ids = ArticleCategory.objects.filter(category_id='0002').values_list('article_id', flat=True)
+
         if not search_value:
             queryset = Article.objects.exclude(status=0).filter(**args).values(*fields)
+            queryset = queryset.filter(guid__in=a_ids)
         else:
             queryset = Article.objects.exclude(status=0).filter(Q(title__contains=search_value) | Q(source__contains=search_value)).values(*fields)
+            queryset = queryset.filter(guid__in=a_ids)
 
         return queryset
