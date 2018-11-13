@@ -54,11 +54,15 @@ def crawler(edit_ids, urls, product_names):
                     thead.append(i.xpath('string(.)').strip())
 
                 e_col, u_col = [], []
-                enterprise_fields = ['生产企业名称', '标称生产者', '标称生产单位', '标称生产企业名称', '标称生产企业名称', '企业名称', '生产单位', '标示生产单位', '生产企业(标称)', '（标称）生产单位名称', '标称生产企业', '标称生产厂家']
-                unitem_fields = ['主要不合格项目', '不合格项目', '不合格项目║检验结果║标准值', '主要不合格项目或主要问题', '主要不合格项（项目名称：标准值/实测值）', '不合格项目实测值', '不符合项目', '合格状态']
+                enterprise_fields = ['生产企业名称', '标称生产者', '标称生产单位', '标称生产企业名称', '标称生产企业名称',
+                '企业名称', '生产单位', '标示生产单位', '生产企业(标称)', '（标称）生产单位名称', '标称生产企业', '标称生产厂家',
+                '受检单位名称','被抽查单位','样品标称名称']
+
+                unitem_fields = ['主要不合格项目', '不合格项目', '不合格项目║检验结果║标准值', '主要不合格项目或主要问题',
+                 '主要不合格项（项目名称：标准值/实测值）', '不合格项目实测值', '不符合项目','不符合标准规定项']
 
                 for i, unenterprise in enumerate(thead):
-                    results = process.extract(unenterprise, enterprise_fields, limit=12)
+                    results = process.extract(unenterprise, enterprise_fields, limit=15)
                     for a in results:
                         if a[1] >= 99:
                             e_col.append(i+1)
@@ -67,7 +71,7 @@ def crawler(edit_ids, urls, product_names):
                     e_col.append('100')
 
                 for i, unitem in enumerate(thead):
-                    results = process.extract(unitem, unitem_fields, limit=9)
+                    results = process.extract(unitem, unitem_fields, limit=8)
                     for a in results:
                         if a[1] >= 99:
                             u_col.append(i+1)
@@ -82,6 +86,9 @@ def crawler(edit_ids, urls, product_names):
                 unitem = html.xpath(unitem_xpath)
 
                 data = []
+                invalid_words = ['', '/', '无', '—', '---', '主要不合格项目', '不合格项目',
+                '不合格项目║检验结果║标准值', '主要不合格项目或主要问题', '主要不合格项（项目名称：标准值/实测值）',
+                '不合格项目实测值', '不符合项目', '不符合标准规定项', '未发现不合格项目']
                 new_words = ''
 
                 for i, j in zip(unenterprise, unitem):
@@ -98,7 +105,7 @@ def crawler(edit_ids, urls, product_names):
 
                     areas = pseg.cut(new_words)
                     for area, flag in areas:
-                        if flag == 'findarea':
+                        if flag == 'findarea' and j.xpath('string(.)').strip() not in invalid_words:
                             m += 1
                             if m >= 2:
                                 continue
@@ -106,15 +113,13 @@ def crawler(edit_ids, urls, product_names):
 
                             area_id = Area.objects.filter(name=area)[0].id
 
-                            enterprise = Enterprise.objects.filter(
-                            name=new_words, area_id=area_id)
-                            if not enterprise.exists():
-                                Enterprise(
-                                    name=new_words,
-                                    unitem=j.xpath('string(.)').strip(),
-                                    area_id=area_id,
-                                    status=0,
-                                ).save()
+                            # 爬取的企业信息插入到不合格企业审核表 >status: 0
+                            Enterprise(
+                                name=new_words,
+                                unitem=j.xpath('string(.)').strip(),
+                                area_id=area_id,
+                                status=0,
+                            ).save()
 
                             enterprise_id = Enterprise.objects.filter(
                             name=new_words, area_id=area_id)[0].id
@@ -126,7 +131,7 @@ def crawler(edit_ids, urls, product_names):
                                     enterprise_id=enterprise_id,
                                 ).save()
 
-                    if m == 0:
+                    if m == 0 and j.xpath('string(.)').strip() not in invalid_words:
                         area = '全国'
                         n += 1
                         if n >= 2:
@@ -135,15 +140,12 @@ def crawler(edit_ids, urls, product_names):
 
                         area_id = Area.objects.filter(name=area)[0].id
 
-                        enterprise = Enterprise.objects.filter(
-                        name=new_words, area_id=area_id)
-                        if not enterprise.exists():
-                            Enterprise(
-                                name=new_words,
-                                unitem=j.xpath('string(.)').strip(),
-                                area_id=area_id,
-                                status=0,
-                            ).save()
+                        Enterprise(
+                            name=new_words,
+                            unitem=j.xpath('string(.)').strip(),
+                            area_id=area_id,
+                            status=0,
+                        ).save()
 
                         enterprise_id = Enterprise.objects.filter(
                         name=new_words, area_id=area_id)[0].id
