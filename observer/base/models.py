@@ -398,3 +398,43 @@ class IndustryProducts(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Nav(models.Model):
+    name = models.CharField(max_length=50, verbose_name='名称')
+    href = models.CharField(default=0, max_length=50, verbose_name='链接')
+    level = models.IntegerField(verbose_name='等级')
+
+    parent = models.ForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        null=True, blank=True,
+        verbose_name='上一级'
+    )
+
+    class Meta:
+        app_label = 'base'
+        verbose_name_plural = '导航栏'
+
+    def __str__(self):
+        return self.name
+
+
+class UserNav(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name='用户'
+    )
+    nav = models.ForeignKey(
+        Nav,
+        on_delete=models.CASCADE,
+        verbose_name='导航'
+    )
+
+    class Meta:
+        app_label = 'base'
+        verbose_name_plural = '用户导航栏'
+
+    def __str__(self):
+        return self.user.username

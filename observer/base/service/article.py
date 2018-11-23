@@ -217,7 +217,7 @@ class RiskDataUpload(Abstract):
 
     def upload(self, filename, file_obj):
         #Model weight
-        model = {'GUID': 0, '标题': 0, 'URL': 0, '发布时间': 0, '来源': 0, '风险程度': 0, '地域': 0, '类别': 0}
+        model = {'GUID': 0, '标题': 0, 'URL': 0, '发布时间': 0, '来源': 0, '风险程度': 0, '地域': 0, '类别': 0, '行业编号': 0}
         #sheet value
         sv = lambda x, y, z : z.cell(row=x, column=y).value
         #date format
@@ -268,6 +268,7 @@ class RiskDataUpload(Abstract):
                     score = sv(i, model['风险程度'], sheet)
                     area = sv(i, model['地域'], sheet)
                     category = sv(i, model['类别'], sheet)
+                    industry_id = sv(i, model['行业编号'], sheet)
 
                     total += 1
 
@@ -302,6 +303,7 @@ class RiskDataUpload(Abstract):
                         pubtime=pubtime,
                         source=source,
                         score=score,
+                        industry_id=industry_id,
                         status=1,
                     ).save()
 

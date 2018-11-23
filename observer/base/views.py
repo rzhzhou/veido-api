@@ -6,7 +6,7 @@ from rest_framework.parsers import FileUploadParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from observer.base.models import AliasIndustry
+from observer.base.models import AliasIndustry, Nav, UserNav
 from observer.base.service.area import Select2AreaData
 from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd,
                                            RiskDataDelete, RiskDataEdit, RiskDataAudit,
@@ -1151,7 +1151,7 @@ class RiskDataView(BaseView):
         return super(RiskDataView, self).paging(
             queryset,
             self.request.query_params.get('page', 1),
-            self.request.query_params.get('length', 30)
+            self.request.query_params.get('length', 15)
         )
 
     def serialize(self, queryset):
@@ -1870,3 +1870,48 @@ class RiskDataViewSuzhou(BaseView):
             queryset = queryset[:limit]
 
         return Response(self.serialize(queryset))
+
+
+class NavBarView(BaseView):
+
+    def __init__(self):
+        super(NavBarView, self).__init__()
+
+    def set_request(self, request):
+        self.user = request.user
+        super(NavBarView, self).set_request(request)
+
+    def serialize(self):
+        temp = []
+        u_navs_ids = UserNav.objects.filter(user=self.user).values_list('nav', flat=True)
+        L1 = Nav.objects.filter(id__in=u_navs_ids, level=1).values('name','id')
+        if L1:
+            for category in L1:
+                temp.append({
+                    'category': category['name'],
+                })
+
+                L2 = Nav.objects.filter(id__in=u_navs_ids, level=2, parent_id=category['id']).values('name', 'id', 'href')
+                if L2:
+                    for title in L2:
+                        childrens = Nav.objects.filter(id__in=u_navs_ids, level=3, parent_id=title['id']).values_list('name')
+                        temp.append({
+                            'icon': 'dashboard',
+                            'title': title['name'],
+                            'href': '' if title['href'] == '0' else title['href'],
+                            'children': list(map(lambda x: {
+                                'title': x['name'],
+                                'href': x['href'],
+                            }, Nav.objects.filter(id__in=u_navs_ids, level=3, parent_id=title['id']).values('name', 'href'))) if childrens else ''
+                        })
+
+        data = {
+            'menus': temp,
+        }
+
+        return data
+
+    def get(self, request):
+        self.set_request(request)
+
+        return Response(self.serialize())

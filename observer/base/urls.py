@@ -72,6 +72,9 @@ urlpatterns = [
     # SUZHOU
     path('risk_data_suzhou', views.RiskDataViewSuzhou.as_view()), # 新闻信息
     path('inspection_suzhou', views.InspectionDataViewSuzhou.as_view()), # 抽检信息
+
+    # 侧边栏
+    path('nav_bar', views.NavBarView.as_view()), # 侧边栏导航
 ]
 
 urlpatterns += [
