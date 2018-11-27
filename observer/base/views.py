@@ -45,6 +45,8 @@ from observer.base.service.inspection import (InspectionData,
                                               InspectionDataUnEnterpriseUpload,
                                               InspectionDataUpload,
                                               InspectionDataSuzhou)
+from observer.base.service.user import UserData
+from observer.base.service.navbar import NavBarEdit
 from observer.base.service.search import SearchAdvancedData, SearchData
 from observer.utils.date_format import date_format
 from observer.utils.excel import write_by_openpyxl
@@ -1915,3 +1917,62 @@ class NavBarView(BaseView):
         self.set_request(request)
 
         return Response(self.serialize())
+
+
+class NavBarEditView(BaseView):
+
+    def __init__(self):
+        super(NavBarEditView, self).__init__()
+
+    def set_request(self, request):
+        super(NavBarEditView, self).set_request(request)
+
+    def post(self, request, cid):
+        self.set_request(request)
+
+        queryset = NavBarEdit(user=request.user, params=request.data).edit(cid=cid)
+
+        return Response(status=queryset)
+
+
+class UserView(BaseView):
+
+    def __init__(self):
+        super(UserView, self).__init__()
+
+    def set_request(self, request):
+        super(UserView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(UserView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        results = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda x: {
+                'id': x['id'],
+                'username': x['username'],
+                'first_name': x['first_name'],
+                'last_name': x['last_name'],
+                'email': x['email'],
+                'is_active': x['is_active'],
+                'is_superuser': x['is_superuser'],
+                'flag': x['flag'],
+            }, results)
+        }
+
+        return data
+
+    def get(self, request):
+        self.set_request(request)
+
+        queryset = UserData(user=request.user).get_all()
+
+        return Response(self.serialize(queryset))
+

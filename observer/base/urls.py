@@ -53,6 +53,7 @@ urlpatterns = [
     path('corpus/add', views.CorpusAddView.as_view()),  # 语料词添加
     path('corpus/edit/<int:cid>/', views.CorpusEditView.as_view()),  # 语料词编辑
     path('corpus/delete/<str:cid>/', views.CorpusDeleteView.as_view()),  # 语料词删除
+    path('users', views.UserView.as_view()), # 用户管理
 
     path('select2/industries', views.Select2IndustryView.as_view()),  # 行业名称
     path('select2/alias_industries', views.Select2AliasIndustryView.as_view()),  # 行业别名
@@ -75,6 +76,7 @@ urlpatterns = [
 
     # 侧边栏
     path('nav_bar', views.NavBarView.as_view()), # 侧边栏导航
+    path('nav_bar/edit/<str:cid>/', views.NavBarEditView.as_view()), # 侧边栏导航
 ]
 
 urlpatterns += [
