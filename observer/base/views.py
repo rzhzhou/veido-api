@@ -47,7 +47,7 @@ from observer.base.service.inspection import (InspectionData,
                                               InspectionDataSuzhou)
 from observer.base.service.user import UserData
 from observer.base.service.navbar import NavBarEdit
-from observer.base.service.news import ViewsData, NewsAdd
+from observer.base.service.news import ViewsData, NewsAdd, NewsDelete, NewsEdit
 from observer.base.service.search import SearchAdvancedData, SearchData
 from observer.utils.date_format import date_format
 from observer.utils.excel import write_by_openpyxl
@@ -2006,6 +2006,7 @@ class NewsView(BaseView):
                 'pubtime': r['pubtime'],
                 'tag': r['tag'],
                 'views': r['views'],
+                'abstract': r['abstract'],
             }, results)
         }
 
@@ -2031,5 +2032,33 @@ class NewsAddView(BaseView):
         self.set_request(request)
 
         queryset = NewsAdd(user=request.user, params=request.data).add()
+
+        return Response(status=queryset)
+
+class NewsDeleteView(BaseView):
+    def __init__(self):
+        super(NewsDeleteView, self).__init__()
+
+    def set_request(self, request):
+        super(NewsDeleteView, self).set_request(request)
+
+    def delete(self, request, cid):
+        self.set_request(request)
+
+        queryset = NewsDelete(user=request.user, params=request.data).delete(cid=cid)
+
+        return Response(status=queryset)
+
+class NewsEditView(BaseView):
+    def __init__(self):
+        super(NewsEditView, self).__init__()
+
+    def set_request(self, request):
+        super(NewsEditView, self).set_request(request)
+
+    def post(self, request, cid):
+        self.set_request(request)
+
+        queryset = NewsEdit(user=request.user, params=request.data).edit(cid=cid)
 
         return Response(status=queryset)

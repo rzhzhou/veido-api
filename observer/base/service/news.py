@@ -14,7 +14,7 @@ class ViewsData(Abstract):
         super(ViewsData, self).__init__(params)
 
     def get_all(self):
-        fields = ('id', 'title', 'photo', 'content', 'pubtime', 'tag', 'views')
+        fields = ('id', 'title', 'photo', 'content', 'pubtime', 'tag', 'views', 'abstract')
 
         cond = {
             'title__contains': getattr(self, 'title', None),
@@ -55,3 +55,36 @@ class NewsAdd(Abstract):
         ).save(using='shendu')
 
         return 200
+
+
+class NewsDelete(Abstract):
+    def __init__(self, user, params={}):
+        super(NewsDelete, self).__init__(params)
+        self.user = user
+
+    def delete(self, cid):
+        del_ids = cid
+
+        for id in del_ids.split(","):
+            News.objects.using('shendu').filter(id=id).delete()
+
+class NewsEdit(Abstract):
+    def __init__(self, user, params={}):
+        super(NewsEdit, self).__init__(params)
+        self.user = user
+
+    def edit(self, cid):
+        edit_id = cid
+
+        title = getattr(self, 'title', '')
+        tag = getattr(self, 'tag', '')
+        abstract = getattr(self, 'abstract', '')
+        content = getattr(self, 'content', '')
+
+        news = News.objects.using('shendu').get(id=edit_id)
+        news.title = title
+        news.tag = tag
+        news.abstract = abstract
+        news.content = content
+        news.save()
+

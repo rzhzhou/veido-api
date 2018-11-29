@@ -77,7 +77,6 @@ class CorpusDelete(Abstract):
 
     def delete(self, cid):
         del_ids = cid
-        print("当前id:", del_ids)
         industrys = getattr(self, 'name', '')
         riskwords = getattr(self, 'riskword', '')
         industry_ids = getattr(self, 'industry_id')
