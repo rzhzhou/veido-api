@@ -124,6 +124,4 @@ class DMWordsData(Abstract):
 
         queryset = Corpus.objects.filter(**args).values(*fields)
 
-        # queryset = Corpus.objects.all().values(*fields)
-
         return queryset

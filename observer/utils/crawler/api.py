@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 from django.conf import settings
 
-from observer.base.models import Task
+from observer.apps.crawler.models import Task
 from observer.utils.date_format import datetime_to_timestamp
 
 

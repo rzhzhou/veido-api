@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'oauth2_provider',
     'corsheaders',
     'daterange_filter',
     'import_export',
@@ -103,7 +104,16 @@ DATABASES = {
         'PASSWORD': 'P@55word',
         'PORT': 63440,
         'OPTIONS': {'charset': 'utf8mb4'},
-    }
+    },
+    'shendu': {
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': 'gz-cdb-ko3zdkzs.sql.tencentcdb.com',
+        'NAME': 'shendu',
+        'USER': 'shendu',
+        'PASSWORD': 'P@55word',
+        'PORT': 63440,
+        'OPTIONS': {'charset': 'utf8mb4'},
+    },
 }
 
 

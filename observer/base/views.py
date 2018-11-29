@@ -47,6 +47,7 @@ from observer.base.service.inspection import (InspectionData,
                                               InspectionDataSuzhou)
 from observer.base.service.user import UserData
 from observer.base.service.navbar import NavBarEdit
+from observer.base.service.news import ViewsData, NewsAdd
 from observer.base.service.search import SearchAdvancedData, SearchData
 from observer.utils.date_format import date_format
 from observer.utils.excel import write_by_openpyxl
@@ -1976,3 +1977,59 @@ class UserView(BaseView):
 
         return Response(self.serialize(queryset))
 
+
+class NewsView(BaseView):
+
+    def __init__(self):
+        super(NewsView, self).__init__()
+
+    def set_request(self, request):
+        super(NewsView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(NewsView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        results = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda r: {
+                'id': r['id'],
+                'title': r['title'],
+                'photo': r['photo'],
+                'content': r['content'],
+                'pubtime': r['pubtime'],
+                'tag': r['tag'],
+                'views': r['views'],
+            }, results)
+        }
+
+        return data
+
+    def get(self, request):
+        self.set_request(request)
+
+        queryset = ViewsData(params=request.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+
+class NewsAddView(BaseView):
+
+    def __init__(self):
+        super(NewsAddView, self).__init__()
+
+    def set_request(self, request):
+        super(NewsAddView, self).set_request(request)
+
+    def post(self, request):
+        self.set_request(request)
+
+        queryset = NewsAdd(user=request.user, params=request.data).add()
+
+        return Response(status=queryset)
