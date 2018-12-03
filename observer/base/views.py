@@ -2062,3 +2062,17 @@ class NewsEditView(BaseView):
         queryset = NewsEdit(user=request.user, params=request.data).edit(cid=cid)
 
         return Response(status=queryset)
+
+class newsCrawlerView(BaseView):
+
+    def __init__(self):
+        super(newsCrawlerView, self).__init__()
+
+    def set_request(self, request):
+        super(newsCrawlerView, self).set_request(request)
+
+    def post(self, request):
+        self.set_request(request)
+        queryset = newsCrawlerData(user = request.user, params = request.data).edit()
+        return Response(status = queryset)
+

@@ -372,3 +372,14 @@ class RiskDataSuzhou(Abstract):
             queryset = queryset.filter(guid__in=a_ids)
 
         return queryset
+
+class newsCrawlerData(Abstract):
+    def __init__(self, user, **params):
+        super(newsCrawlerData, self).__init__(params)
+        self.user = user
+
+    def edit(self):
+        url = getattr(self, 'url', '')
+        thread = threading.Thread(target = newsCrawler, args = (url))
+        thread.start()
+        return 200
