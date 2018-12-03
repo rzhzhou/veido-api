@@ -10,7 +10,7 @@ from observer.base.models import AliasIndustry, Nav, UserNav
 from observer.base.service.area import Select2AreaData
 from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd,
                                            RiskDataDelete, RiskDataEdit, RiskDataAudit,
-                                           RiskDataExport, RiskDataUpload, RiskDataSuzhou)
+                                           RiskDataExport, RiskDataUpload, RiskDataSuzhou, newsCrawlerData)
 from observer.base.service.base import (alias_industry, get_major_industry, area, areas,
                                         categories, local_related, qualitied,
                                         risk_injury)
