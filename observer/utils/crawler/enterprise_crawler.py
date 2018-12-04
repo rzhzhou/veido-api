@@ -85,8 +85,7 @@ def crawler(edit_ids, urls, product_names):
                 unenterprise = html.xpath(unenterprise_xpath)
                 unitem = html.xpath(unitem_xpath)
 
-                data = []
-                invalid_words = ['', '/', '无', '—', '---', '——', '主要不合格项目', '不合格项目',
+                invalid_words = ['', '/', '无', '—', '---', '——', '----', '主要不合格项目', '不合格项目',
                 '不合格项目║检验结果║标准值', '主要不合格项目或主要问题', '主要不合格项（项目名称：标准值/实测值）',
                 '不合格项目实测值', '不符合项目', '不符合标准规定项', '未发现不合格项目']
                 new_words = ''
@@ -109,7 +108,6 @@ def crawler(edit_ids, urls, product_names):
                             m += 1
                             if m >= 2:
                                 continue
-                            data.append((guid, i.xpath('string(.)').strip(), j.xpath('string(.)').strip(), area))
 
                             area_id = Area.objects.filter(name=area)[0].id
 
@@ -136,7 +134,6 @@ def crawler(edit_ids, urls, product_names):
                         n += 1
                         if n >= 2:
                             continue
-                        data.append((guid, i.xpath('string(.)').strip(), j.xpath('string(.)').strip(), area))
 
                         area_id = Area.objects.filter(name=area)[0].id
 

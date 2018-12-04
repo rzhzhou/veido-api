@@ -240,7 +240,7 @@ class Inspection(models.Model):
     inspect_patch = models.IntegerField(default=0, verbose_name="抽查批次")
     category = models.CharField(max_length=32, verbose_name='抽查类别')
     level = models.CharField(max_length=2, verbose_name='检验等级') # 国、省、市
-    status = models.IntegerField(default=0, verbose_name='状态')# 0, 默认值 -1, 无效 1 有效
+    status = models.IntegerField(default=0, verbose_name='状态')# 0, 未审核(默认值) 1, 已审核 2, 已爬取
 
     industry_id = models.IntegerField(verbose_name='产品类别')
     product_name = models.CharField(blank=True, null=True, max_length=255, verbose_name='产品名称')
@@ -261,7 +261,7 @@ class Enterprise(models.Model):
     unitem = models.CharField(max_length=255, verbose_name='不合格项')
 
     area_id = models.IntegerField(verbose_name='地域ID')
-    status = models.IntegerField(default=1, verbose_name='状态')# 0, 默认值 -1, 无效 1 有效
+    status = models.IntegerField(default=1, verbose_name='状态')# 0, 未审核(默认值)  1, 已审核
 
     class Meta:
         app_label = 'base'
@@ -287,7 +287,7 @@ class Article(models.Model):
     pubtime = models.DateTimeField(auto_now=False, verbose_name='发布时间')
     source = models.CharField(max_length=80, blank=True, verbose_name='信息来源')
     score = models.IntegerField(default=0, verbose_name='风险程度')# 0, 默认值
-    status = models.IntegerField(default=0, verbose_name='状态')# 0, 默认值 -1, 无效 1 有效
+    status = models.IntegerField(default=0, verbose_name='状态')# 0, 默认值 1 有效
     industry_id = models.IntegerField(default=0, verbose_name='产品类别')
     corpus_id = models.IntegerField(default=0, verbose_name='语料词编号')
 

@@ -22,7 +22,7 @@ class ViewsData(Abstract):
 
         args = dict([k, v] for k, v in cond.items() if v)
 
-        queryset = News.objects.using('shendu').filter(**args).values(*fields)
+        queryset = News.objects.using('shendu').filter(**args).values(*fields).order_by('-pubtime')
 
         return queryset
 
@@ -65,7 +65,7 @@ class NewsDelete(Abstract):
     def delete(self, cid):
         del_ids = cid
 
-        for id in del_ids.split(","):
+        for id in del_ids.split(" "):
             News.objects.using('shendu').filter(id=id).delete()
 
 class NewsEdit(Abstract):
