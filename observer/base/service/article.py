@@ -1,5 +1,6 @@
 import openpyxl
 from io import BytesIO
+import threading
 
 from datetime import date, datetime, timedelta
 from django.core.exceptions import ObjectDoesNotExist
@@ -12,6 +13,7 @@ from observer.base.service.base import (areas, categories, )
 from observer.utils.date_format import (date_format, str_to_date, get_months)
 from observer.utils.str_format import str_to_md5str
 from observer.utils.excel import (read_by_openpyxl, write_by_openpyxl, )
+from observer.utils.crawler.news_crawler import newsCrawler
 
 
 class ArticleData(Abstract):
@@ -372,3 +374,14 @@ class RiskDataSuzhou(Abstract):
             queryset = queryset.filter(guid__in=a_ids)
 
         return queryset
+
+class newsCrawlerData(Abstract):
+    def __init__(self, user, **params):
+        super(newsCrawlerData, self).__init__(params)
+        self.user = user
+
+    def edit(self):
+        url = getattr(self, 'url', '')
+        thread = threading.Thread(target = newsCrawler, args = url)
+        thread.start()
+        return 200

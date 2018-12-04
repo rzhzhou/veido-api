@@ -12,7 +12,7 @@ from observer.base.models import AliasIndustry, Nav, UserNav
 from observer.base.service.area import Select2AreaData
 from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd,
                                            RiskDataDelete, RiskDataEdit, RiskDataAudit,
-                                           RiskDataExport, RiskDataUpload, RiskDataSuzhou)
+                                           RiskDataExport, RiskDataUpload, RiskDataSuzhou, newsCrawlerData)
 from observer.base.service.base import (alias_industry, get_major_industry, area, areas,
                                         categories, local_related, qualitied,
                                         risk_injury)
@@ -2066,3 +2066,17 @@ class NewsEditView(BaseView):
         queryset = NewsEdit(user=request.user, params=request.data).edit(cid=cid)
 
         return Response(status=queryset)
+
+class newsCrawlerView(BaseView):
+
+    def __init__(self):
+        super(newsCrawlerView, self).__init__()
+
+    def set_request(self, request):
+        super(newsCrawlerView, self).set_request(request)
+
+    def post(self, request):
+        self.set_request(request)
+        queryset = newsCrawlerData(user = request.user, params = request.data).edit()
+        return Response(status = queryset)
+
