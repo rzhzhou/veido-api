@@ -2,9 +2,11 @@ from observer.base.models import Corpus
 from django_extensions.admin import ForeignKeyAutocompleteAdmin
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.http import FileResponse
+from rest_framework.decorators import permission_classes
 from rest_framework.parsers import FileUploadParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
 
 from observer.base.models import AliasIndustry, Nav, UserNav
 from observer.base.service.area import Select2AreaData
@@ -2035,6 +2037,7 @@ class NewsAddView(BaseView):
 
         return Response(status=queryset)
 
+
 class NewsDeleteView(BaseView):
     def __init__(self):
         super(NewsDeleteView, self).__init__()
@@ -2048,6 +2051,7 @@ class NewsDeleteView(BaseView):
         queryset = NewsDelete(user=request.user, params=request.data).delete(cid=cid)
 
         return Response(status=queryset)
+
 
 class NewsEditView(BaseView):
     def __init__(self):
