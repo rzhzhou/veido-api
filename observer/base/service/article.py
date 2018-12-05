@@ -376,12 +376,12 @@ class RiskDataSuzhou(Abstract):
         return queryset
 
 class newsCrawlerData(Abstract):
-    def __init__(self, user, **params):
+    def __init__(self, user, params={}):
         super(newsCrawlerData, self).__init__(params)
         self.user = user
 
     def edit(self):
         url = getattr(self, 'url', '')
-        thread = threading.Thread(target = newsCrawler, args = url)
+        thread = threading.Thread(target = newsCrawler, args = (url,))
         thread.start()
         return 200
