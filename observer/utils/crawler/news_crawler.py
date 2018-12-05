@@ -5,9 +5,11 @@ from fuzzywuzzy import fuzz,process
 import jieba.posseg as pseg
 import jieba
 import time
+import datetime
+import random
 
 from observer.utils.str_format import str_to_md5str
-from observer.base.models import (Article, Area, ArticleArea)
+from observer.base.models import (Article, Area, ArticleArea, Category, ArticleCategory)
 
 jieba.load_userdict('observer/utils/dictionary.txt') # 引用自定义分词库 
 
@@ -26,22 +28,24 @@ def newsCrawler(url):
         guid_id = str_to_md5str(news_url) # 根据链接，加密处理它然后获得唯一标识符
         score_rand = random.randint(0,1)
         status = 2 # 状态
+        category = "特种设备"
         # 根据新闻来源过滤不需要的新闻
         newspaper_voc = ('东方财富网', 'IT168', '中国财经报网', '上海热线', '中国起重机械网', '和讯',
-         '腾讯大楚网', '政府采购信息网', '市场信息报', '食品伙伴网', '食安中国')
-        title_voc = ('食品','药品','化妆品','','','','','','','','')
+         '腾讯大楚网', '政府采购信息网', '市场信息报', '食品伙伴网', '食安中国', '40407网页游戏', '365地产家居网','凤凰娱乐','搜房网')
+        title_voc = ('食品','药品','化妆品','广告','加装电梯','电梯品牌','AI','','','','','','','','')
         similarity = 0  # 相似度变量
         similarity_title = 0
 
         for newspaper_i, title_j in zip(newspaper_voc, title_voc):
-            similarity = fuzz.partial_ratio(news, newspaper_i)
+            similarity = fuzz.partial_ratio(newspaper, newspaper_i)
             similarity_title = fuzz.partial_ratio(title,title_j)
-        if similarity == 100:
-            if similarity_title == 100:
+
+            if similarity == 100:
+                if similarity_title == 100:
+                    break
                 break
-            break
-        elif similarity_title == 100:
-            break
+            elif similarity_title == 100:
+                break
 
         if similarity != 100 and similarity_title != 100:
             
@@ -71,11 +75,17 @@ def newsCrawler(url):
                     area_real = '全国'
                 
             # 获取Area库里的id编号，然后存入ArticleArea，存入方法是将与唯一标识符a_guid绑定，等取出来时，根据a_guid取出来
-            area_id = Area.objects.filter(name = area_real)
-            if not ArticleArea.objects.filter(article_id = a_guid, area_id = area_id).exists():
+            area_id = Area.objects.filter(name = area_real)[0].id
+            category_id =  Category.objects.filter(name = category)[0].id
+            if not ArticleArea.objects.filter(article_id = guid_id, area_id = area_id).exists():
                 ArticleArea(
-                    article_id = a_guid,
+                    article_id = guid_id,
                     area_id = area_id
+                ).save()
+            if not ArticleCategory.objects.filter(article_id = guid_id, category_id = category_id).exists():
+                ArticleCategory(
+                    article_id=guid_id,
+                    category_id=category_id
                 ).save()
 
             # 接下来处理时间，处理为纯数字，用来下面判断是否为今天的新闻
@@ -88,9 +98,10 @@ def newsCrawler(url):
 
             # 根据处理，来判断，若是纯数字，则不是今天的新闻，直接在原数据上修改，否则，获取系统时间来覆盖原来的数据
             if _time_two.isdigit():
-                _time = _time.replace('年','/')
-                _time = _time.replace('月','/')
+                _time = _time.replace('年','-')
+                _time = _time.replace('月','-')
                 _time = _time.strip('日')
+                
 
                 Article(
                     guid = guid_id,
@@ -104,7 +115,7 @@ def newsCrawler(url):
                     
                     
             else:
-                _time = time.strftime('%Y/%m/%d', time.localtime(time.time()))
+                _time = datetime.date.today()  # time.strftime('%Y-%m-%d', time.localtime(time.time()))
                 
                 Article(
                     guid = guid_id,
