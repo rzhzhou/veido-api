@@ -154,6 +154,15 @@ REST_FRAMEWORK = {
     ),
 }
 
+OAUTH2_PROVIDER = {
+    'SCOPES': {
+        'read': 'Read scope',
+        'write': 'Write scope',
+        'introspection': 'Introspect token scope',
+    },
+    'ACCESS_TOKEN_EXPIRE_SECONDS': 1800,  # 0.5 Hour.
+}
+
 JWT_AUTH = {
     'JWT_ENCODE_HANDLER':
     'rest_framework_jwt.utils.jwt_encode_handler',
