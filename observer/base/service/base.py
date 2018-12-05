@@ -2,7 +2,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from observer.base.models import (Area, ArticleArea, ArticleCategory, 
                                 Category, UserArea, AliasIndustry, MajorIndustry,
-                                InspectionEnterprise, Enterprise, )
+                                InspectionEnterprise, Enterprise, UserNav)
 from observer.utils.date_format import date_format
 
 
@@ -138,3 +138,7 @@ def risk_injury(article_id):
     if c_id in c_ids:
         return 1
     return 0
+
+
+def get_user_nav(user_id):
+    return UserNav.objects.filter(user_id=user_id).values_list('nav_id', flat=True)

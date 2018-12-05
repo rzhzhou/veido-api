@@ -160,7 +160,7 @@ OAUTH2_PROVIDER = {
         'write': 'Write scope',
         'introspection': 'Introspect token scope',
     },
-    'ACCESS_TOKEN_EXPIRE_SECONDS': 1800,  # 0.5 Hour.
+    'ACCESS_TOKEN_EXPIRE_SECONDS': 86400,  # 1 Day.
 }
 
 JWT_AUTH = {

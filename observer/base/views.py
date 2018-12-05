@@ -15,7 +15,7 @@ from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd,
                                            RiskDataExport, RiskDataUpload, RiskDataSuzhou, newsCrawlerData)
 from observer.base.service.base import (alias_industry, get_major_industry, area, areas,
                                         categories, local_related, qualitied,
-                                        risk_injury)
+                                        risk_injury, get_user_nav)
 from observer.base.service.corpus import (CorpusAdd, CorpusData, CorpusDelete,
                                           CorpusEdit, CrawlerData)
 from observer.base.service.dashboard import DashboardData
@@ -1967,6 +1967,7 @@ class UserView(BaseView):
                 'is_active': x['is_active'],
                 'is_superuser': x['is_superuser'],
                 'flag': x['flag'],
+                'user_nav': get_user_nav(x['id']),
             }, results)
         }
 
