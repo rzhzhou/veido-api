@@ -381,7 +381,8 @@ class newsCrawlerData(Abstract):
         self.user = user
 
     def edit(self):
-        url = getattr(self, 'url', '')
-        thread = threading.Thread(target = newsCrawler, args = (url,))
+        word = getattr(self, 'word', '')
+        page = getattr(self, 'page', '')
+        thread = threading.Thread(target = newsCrawler, args = (word, page))
         thread.start()
         return 200
