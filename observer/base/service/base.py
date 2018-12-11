@@ -1,6 +1,8 @@
 from django.core.exceptions import ObjectDoesNotExist
 
-from observer.base.models import (Area, ArticleArea, ArticleCategory, 
+from django.contrib.auth.models import User, Group
+
+from observer.base.models import (Area, ArticleArea, ArticleCategory,
                                 Category, UserArea, AliasIndustry, MajorIndustry,
                                 InspectionEnterprise, Enterprise, UserNav)
 from observer.utils.date_format import date_format
@@ -142,3 +144,7 @@ def risk_injury(article_id):
 
 def get_user_nav(user_id):
     return UserNav.objects.filter(user_id=user_id).values_list('nav_id', flat=True)
+
+
+def get_user_groups(user_id):
+    return Group.objects.filter(user=user_id).values_list('name', flat=True)

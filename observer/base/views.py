@@ -15,7 +15,7 @@ from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd,
                                            RiskDataExport, RiskDataUpload, RiskDataSuzhou, newsCrawlerData)
 from observer.base.service.base import (alias_industry, get_major_industry, area, areas,
                                         categories, local_related, qualitied,
-                                        risk_injury, get_user_nav)
+                                        risk_injury, get_user_nav, get_user_groups)
 from observer.base.service.corpus import (CorpusAdd, CorpusData, CorpusDelete,
                                           CorpusEdit, CrawlerData)
 from observer.base.service.dashboard import DashboardData
@@ -47,7 +47,7 @@ from observer.base.service.inspection import (InspectionData,
                                               InspectionDataUnEnterpriseUpload,
                                               InspectionDataUpload,
                                               InspectionDataSuzhou)
-from observer.base.service.user import UserData
+from observer.base.service.user import UserData, UserAdd
 from observer.base.service.navbar import NavBarEdit
 from observer.base.service.news import ViewsData, NewsAdd, NewsDelete, NewsEdit
 from observer.base.service.search import SearchAdvancedData, SearchData
@@ -1954,10 +1954,10 @@ class UserView(BaseView):
         )
 
     def serialize(self, queryset):
-        total = queryset.count()
+        count = len(queryset)
         results = self.paging(queryset)
         data = {
-            'total': total,
+            'total': count,
             'list': map(lambda x: {
                 'id': x['id'],
                 'username': x['username'],
@@ -1968,6 +1968,7 @@ class UserView(BaseView):
                 'is_superuser': x['is_superuser'],
                 'flag': x['flag'],
                 'user_nav': get_user_nav(x['id']),
+                'group': get_user_groups(x['id']),
             }, results)
         }
 
@@ -1979,6 +1980,22 @@ class UserView(BaseView):
         queryset = UserData(user=request.user).get_all()
 
         return Response(self.serialize(queryset))
+
+
+class UserAddView(BaseView):
+
+    def __init__(self):
+        super(UserAddView, self).__init__()
+
+    def set_request(self, request):
+        super(UserAddView, self).set_request(request)
+
+    def post(self, request):
+        self.set_request(request)
+
+        queryset = UserAdd(user=request.user, params=request.data).add_user()
+
+        return Response(status=queryset)
 
 
 class NewsView(BaseView):

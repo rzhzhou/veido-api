@@ -55,6 +55,7 @@ urlpatterns = [
     path('corpus/edit/<int:cid>/', views.CorpusEditView.as_view()),  # 语料词编辑
     path('corpus/delete/<str:cid>/', views.CorpusDeleteView.as_view()),  # 语料词删除
     path('users', views.UserView.as_view()), # 用户管理
+    path('users/add', views.UserAddView.as_view()), # 用户添加
 
     path('select2/industries', views.Select2IndustryView.as_view()),  # 行业名称
     path('select2/alias_industries', views.Select2AliasIndustryView.as_view()),  # 行业别名
@@ -86,7 +87,7 @@ urlpatterns = [
     path('news/edit/<int:cid>/', views.NewsEditView.as_view()), # 修改公司动态
 ]
 
-urlpatterns += [
-    re_path(r'^token-auth$', obtain_jwt_token),
-    re_path(r'^token-verify$', verify_jwt_token),
-]
+# urlpatterns += [
+#     re_path(r'^token-auth$', obtain_jwt_token),
+#     re_path(r'^token-verify$', verify_jwt_token),
+# ]
