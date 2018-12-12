@@ -1889,25 +1889,25 @@ class NavBarView(BaseView):
     def serialize(self):
         temp = []
         u_navs_ids = UserNav.objects.filter(user=self.user).values_list('nav', flat=True)
-        L1 = Nav.objects.filter(id__in=u_navs_ids, level=1).values('name','id')
+        L1 = Nav.objects.filter(id__in=u_navs_ids, level=1).values('name','id').order_by('index')
         if L1:
             for category in L1:
                 temp.append({
                     'category': category['name'],
                 })
 
-                L2 = Nav.objects.filter(id__in=u_navs_ids, level=2, parent_id=category['id']).values('name', 'id', 'href')
+                L2 = Nav.objects.filter(id__in=u_navs_ids, level=2, parent_id=category['id']).values('name', 'id', 'href', 'icon').order_by('index')
                 if L2:
                     for title in L2:
                         childrens = Nav.objects.filter(id__in=u_navs_ids, level=3, parent_id=title['id']).values_list('name')
                         temp.append({
-                            'icon': 'dashboard',
+                            'icon': title['icon'],
                             'title': title['name'],
                             'href': '' if title['href'] == '0' else title['href'],
                             'children': list(map(lambda x: {
                                 'title': x['name'],
                                 'href': x['href'],
-                            }, Nav.objects.filter(id__in=u_navs_ids, level=3, parent_id=title['id']).values('name', 'href'))) if childrens else ''
+                            }, Nav.objects.filter(id__in=u_navs_ids, level=3, parent_id=title['id']).values('name', 'href').order_by('index'))) if childrens else ''
                         })
 
         data = {

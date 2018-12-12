@@ -378,6 +378,8 @@ class Nav(models.Model):
     name = models.CharField(max_length=50, verbose_name='名称')
     href = models.CharField(default=0, max_length=50, verbose_name='链接')
     level = models.IntegerField(verbose_name='等级')
+    icon = models.CharField(default='', max_length=50, verbose_name='图标')
+    index = models.IntegerField(default=0, verbose_name='索引')
 
     parent = models.ForeignKey(
         'self',
