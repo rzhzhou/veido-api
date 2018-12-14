@@ -1966,7 +1966,6 @@ class UserView(BaseView):
                 'email': x['email'],
                 'is_active': x['is_active'],
                 'is_superuser': x['is_superuser'],
-                'flag': x['flag'],
                 'user_nav': get_user_nav(x['id']),
                 'group': get_user_groups(x['id']),
             }, results)
