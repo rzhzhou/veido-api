@@ -15,7 +15,7 @@ from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd,
                                            RiskDataExport, RiskDataUpload, RiskDataSuzhou, newsCrawlerData)
 from observer.base.service.base import (alias_industry, get_major_industry, area, areas,
                                         categories, local_related, qualitied,
-                                        risk_injury, get_user_nav, get_user_groups)
+                                        risk_injury, get_user_nav, get_user_extra)
 from observer.base.service.corpus import (CorpusAdd, CorpusData, CorpusDelete,
                                           CorpusEdit, CrawlerData)
 from observer.base.service.dashboard import DashboardData
@@ -47,7 +47,7 @@ from observer.base.service.inspection import (InspectionData,
                                               InspectionDataUnEnterpriseUpload,
                                               InspectionDataUpload,
                                               InspectionDataSuzhou)
-from observer.base.service.user import UserData, UserAdd
+from observer.base.service.user import UserData, UserAdd, UserEdit, UserDelete
 from observer.base.service.navbar import NavBarEdit
 from observer.base.service.news import ViewsData, NewsAdd, NewsDelete, NewsEdit
 from observer.base.service.search import SearchAdvancedData, SearchData
@@ -1944,6 +1944,7 @@ class UserView(BaseView):
         super(UserView, self).__init__()
 
     def set_request(self, request):
+        self.user = request.user
         super(UserView, self).set_request(request)
 
     def paging(self, queryset):
@@ -1965,10 +1966,19 @@ class UserView(BaseView):
                 'last_name': x['last_name'],
                 'email': x['email'],
                 'is_active': x['is_active'],
-                'is_superuser': x['is_superuser'],
                 'user_nav': get_user_nav(x['id']),
-                'group': get_user_groups(x['id']),
-            }, results)
+                'extra': get_user_extra(x['id']),
+            }, results),
+            'current_user': {
+                'id': self.user.id,
+                'username': self.user.username,
+                'first_name': self.user.first_name,
+                'last_name': self.user.last_name,
+                'email': self.user.email,
+                'is_active': self.user.is_active,
+                'user_nav': get_user_nav(self.user.id),
+                'extra': get_user_extra(self.user.id),
+            }
         }
 
         return data
@@ -1993,6 +2003,38 @@ class UserAddView(BaseView):
         self.set_request(request)
 
         queryset = UserAdd(user=request.user, params=request.data).add_user()
+
+        return Response(status=queryset)
+
+
+class UserEditView(BaseView):
+
+    def __init__(self):
+        super(UserEditView, self).__init__()
+
+    def set_request(self, request):
+        super(UserEditView, self).set_request(request)
+
+    def post(self, request, cid):
+        self.set_request(request)
+
+        queryset = UserEdit(user=request.user, params=request.data).edit(cid=cid)
+
+        return Response(status=queryset)
+
+
+class UserDeleteView(BaseView):
+
+    def __init__(self):
+        super(UserDeleteView, self).__init__()
+
+    def set_request(self, request):
+        super(UserDeleteView, self).set_request(request)
+
+    def delete(self, request, cid):
+        self.set_request(request)
+
+        queryset = UserDelete(user=request.user).delete(cid=cid)
 
         return Response(status=queryset)
 

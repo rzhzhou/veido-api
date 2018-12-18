@@ -56,6 +56,8 @@ urlpatterns = [
     path('corpus/delete/<str:cid>/', views.CorpusDeleteView.as_view()),  # 语料词删除
     path('users', views.UserView.as_view()), # 用户管理
     path('users/add', views.UserAddView.as_view()), # 用户添加
+    path('users/edit/<int:cid>/', views.UserEditView.as_view()), # 用户修改
+    path('users/delete/<str:cid>/', views.UserDeleteView.as_view()), # 用户删除
 
     path('select2/industries', views.Select2IndustryView.as_view()),  # 行业名称
     path('select2/alias_industries', views.Select2AliasIndustryView.as_view()),  # 行业别名

@@ -146,5 +146,22 @@ def get_user_nav(user_id):
     return UserNav.objects.filter(user_id=user_id).values_list('nav_id', flat=True)
 
 
-def get_user_groups(user_id):
-    return Group.objects.filter(user=user_id).values_list('name', flat=True)
+def get_user_extra(user_id):
+    extra = {}
+    groups = Group.objects.filter(user=user_id).values_list('name', flat=True)
+
+    if '管理员' in groups:
+        extra['groups'] = list(groups)
+        extra['groups'].remove('管理员')
+        # extra['groups'] = extra['groups'][0]
+        extra['role'] = 1
+    elif '超级管理员' in groups:
+        extra['groups'] = list(groups)
+        extra['groups'].remove('超级管理员')
+        # extra['groups'] = extra['groups'][0]
+        extra['role'] = 2
+    else:
+        extra['groups'] = list(groups)
+        extra['role'] = 0
+
+    return extra

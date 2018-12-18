@@ -165,7 +165,7 @@ class DashboardData(Abstract):
                         'category': x['category'],
                         'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
                         'product': x['product_name'],
-                    }, q(Inspection.objects.filter(area_id=UserArea.objects.get(user=self.user).area.id))),
+                    }, q(Inspection.objects.filter(area_id=UserArea.objects.get(user=self.user).area.id, status=1))),
                 'all': map(lambda x: {
                         'industry': get_major_industry(x['industry_id']),
                         'url': x['url'],
@@ -176,5 +176,5 @@ class DashboardData(Abstract):
                         'category': x['category'],
                         'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
                         'product': x['product_name'],
-                    }, q(Inspection.objects.all())),
+                    }, q(Inspection.objects.filter(status=1).all())),
                 }

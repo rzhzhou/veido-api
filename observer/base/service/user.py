@@ -13,37 +13,22 @@ class UserData(Abstract):  # 获取系统用户
 
     def get_all(self):
         fields = ('id', 'username', 'first_name', 'last_name', 'email',
-                  'is_active', 'is_superuser')
-
-        # queryset = User.objects.values(*fields)
-
-        # if self.user.is_active:
-        #     if self.user.is_superuser:
-        #         list(map(lambda x: x.update({'flag': 1}), queryset))
-        #     else:
-        #         q1 = queryset.exclude(id=self.user.id)
-        #         list(map(lambda x: x.update({'flag': 0}), q1))
-
-        #         q2 = queryset.filter(id=self.user.id)
-        #         list(map(lambda x: x.update({'flag': 1}), q2))
-        #         queryset = list(chain(q1, q2))
-        # else:
-        #     list(map(lambda x: x.update({'flag': 0}), queryset))
+                  'is_active')
 
         if self.user.is_active:
             group_ids = Group.objects.filter(user=self.user).values_list('id', flat=True)
 
             # 如果当前操作的是'超级管理员'
             if 2 in group_ids:
-                queryset = User.objects.values(*fields)
+                queryset = User.objects.exclude(id=self.user.id).values(*fields)
             # 如果当前操作的是'管理员'
             elif 3 in group_ids:
                 group_list = list(group_ids)
                 group_list.remove(3)
-                queryset = User.objects.filter(groups__in=group_list).values(*fields)
+                queryset = User.objects.filter(groups__in=group_list).exclude(id=self.user.id).values(*fields)
             # 如果当前操作的是普通用户
             else:
-                queryset = User.objects.filter(username=self.user).values(*fields)
+                queryset = User.objects.filter(username=self.user).exclude(id=self.user.id).values(*fields)
 
             return queryset
 
@@ -106,6 +91,7 @@ class UserAdd(Abstract):  # 添加用户
                 else:
                     group = Group.objects.get(name=group_name)
                     user.groups.add(group)
+                user.groups.add(Group.objects.filter(name='管理员')[0])
                 return 200
             except Exception as e:
                 print(e)
@@ -119,7 +105,7 @@ class UserAdd(Abstract):  # 添加用户
                 return 205
             except ObjectDoesNotExist:
                 user = User(
-                    username=username,
+                    username=str(self.user)+'@'+str(username),
                     first_name=first_name,
                     last_name=last_name,
                     email=email,
@@ -138,3 +124,50 @@ class UserAdd(Abstract):  # 添加用户
             except Exception as e:
                 print(e)
                 return 206
+
+
+class UserEdit(Abstract):  # 修改用户
+
+    def __init__(self, user, params={}):
+        super(UserEdit, self).__init__(params)
+        self.user = user
+
+    def edit(self, cid):
+        edit_id = cid
+        old_password = getattr(self, 'old_password', None)
+        new_password = getattr(self, 'new_password', None)
+        re_password = getattr(self, 're_password', None)
+
+        user = User.objects.get(id=edit_id)
+
+        if not old_password or not new_password or not re_password:
+            return 201
+
+        if not user.check_password(old_password):
+            return 202
+
+        if new_password != re_password:
+            return 203
+
+        user.set_password(new_password)
+        user.save()
+
+        return 200
+
+class UserDelete(Abstract): # 删除用户
+
+    def __init__(self, user):
+        self.user = user
+
+    def delete(self, cid):
+        del_ids = cid
+
+        for id in del_ids.split(","):
+            user = User.objects.get(id=id)
+
+            if user == self.user:
+                return 201
+
+            user.delete()
+
+        return 200
