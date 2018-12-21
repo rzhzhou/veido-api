@@ -10,7 +10,7 @@ class SearchData(Abstract):
 
     def get_all(self):
         conf ={
-            'host': '192.168.0.104',
+            'host': 'localhost',
             'port': '9200',
             'index': 'observer',
             'type': 'article',
@@ -53,7 +53,7 @@ class SearchAdvancedData(Abstract):
 
     def get_all(self):
         conf ={
-            'host': '192.168.0.104',
+            'host': 'localhost',
             'port': '9200',
             'index': 'observer',
             'type': 'article',
