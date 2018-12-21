@@ -227,6 +227,15 @@ class Corpus(models.Model):
         app_label = 'base'
         verbose_name_plural = '语料库'
 
+class Corpus_categories(models.Model):
+    keyword = models.CharField(default=0, max_length=255, verbose_name='关键词语料词')
+    status = models.IntegerField(default=0, verbose_name='状态') # 默认值 0 :不执行爬虫, 1 ： 执行爬虫
+    category_id = models.CharField(max_length=5, verbose_name='信息类别')
+    
+    class Meta:
+        app_label = 'base'
+        verbose_name_plural = '语料库-信息类别'
+
 
 class Inspection(models.Model):
     guid = models.CharField(default=None, blank=True, null=True, max_length=32, verbose_name='GUID') # url + industry_id -> md5

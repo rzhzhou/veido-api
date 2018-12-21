@@ -15,7 +15,7 @@ from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd,
                                            RiskDataExport, RiskDataUpload, RiskDataSuzhou, newsCrawlerData)
 from observer.base.service.base import (alias_industry, get_major_industry, area, areas,
                                         categories, local_related, qualitied,
-                                        risk_injury, get_user_nav, get_user_groups)
+                                        risk_injury, get_user_nav, get_user_groups, get_major_category)
 from observer.base.service.corpus import (CorpusAdd, CorpusData, CorpusDelete,
                                           CorpusEdit, CrawlerData)
 from observer.base.service.dashboard import DashboardData
@@ -1627,9 +1627,12 @@ class CorpusView(BaseView):
             'list': map(lambda r: {
                 'id': r['id'],
                 'status': r['status'],
-                'industry': get_major_industry(r['industry_id']),
-                'riskword': r['riskword'],
+                'riskword': r.get('riskword', ''),
+                'industry': get_major_industry(r['industry_id']) if r.get('industry_id', None) else r.get('industry_id', ''),
+                'keyword': r.get('keyword', ''),
+                'category': get_major_category(r['category_id']) if r.get('category_id', None) else r.get('category_id', ''),
             }, results)
+          
         }
 
         return data

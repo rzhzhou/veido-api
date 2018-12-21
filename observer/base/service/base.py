@@ -82,6 +82,14 @@ def get_major_industry(industry_id, flat=False):
     else:
         return queryset.name
 
+def get_major_category(category_id, flat=False):
+    queryset = Category.objects.get(id=category_id)
+
+    if not flat:
+        return {'id': queryset.id, 'text': queryset.name}
+    else:
+        return queryset.name
+
 
 def alias_industry(alias_industry_id, flat=False):
     queryset = AliasIndustry.objects.get(id=alias_industry_id)

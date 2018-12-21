@@ -3,7 +3,7 @@ from datetime import datetime
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, Q, F
 
-from observer.base.models import (DMLink, Corpus )
+from observer.base.models import (DMLink, Corpus,Corpus_categories )
 from observer.base.service.abstract import Abstract
 from observer.utils.date_format import date_format
 
@@ -113,15 +113,33 @@ class DMWordsData(Abstract):
         super(DMWordsData, self).__init__(params)
 
     def get_all(self):
-        fields = ('id', 'status', 'riskword', 'industry_id')
 
-        cond = {
-            'industry_id': getattr(self, 'industry', None),
-            'status': getattr(self, 'status', None),
-        }
+        if getattr(self, 'industry', None):
+            fields = ('id', 'status', 'riskword', 'industry_id')
 
-        args = dict([k, v] for k, v in cond.items() if v)
+            cond = {
+                'industry_id': getattr(self, 'industry', None),
+                'status': getattr(self, 'status', None),
+            }
 
-        queryset = Corpus.objects.filter(**args).values(*fields)
+            args = dict([k, v] for k, v in cond.items() if v)
+
+            queryset = Corpus.objects.filter(**args).values(*fields)
+            
+        elif getattr(self, 'category', None):
+            fields = ('id', 'status', 'keyword', 'category_id')
+
+            cond = {
+                'category_id': getattr(self, 'category', None),
+                'status': getattr(self, 'status', None),
+            }
+
+            args = dict([k, v] for k, v in cond.items() if v)
+
+            queryset = Corpus_categories.objects.filter(**args).values(*fields)
+
+        else:
+            fields = ('id', 'status', 'riskword', 'industry_id')
+            queryset = Corpus.objects.filter().values(*fields)
 
         return queryset
