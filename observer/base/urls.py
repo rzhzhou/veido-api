@@ -93,7 +93,7 @@ urlpatterns = [
     path('news/edit/<int:cid>/', views.NewsEditView.as_view()), # 修改公司动态
 ]
 
-urlpatterns += [
-    re_path(r'^token-auth$', obtain_jwt_token),
-    re_path(r'^token-verify$', verify_jwt_token),
-]
+# urlpatterns += [
+#     re_path(r'^token-auth$', obtain_jwt_token),
+#     re_path(r'^token-verify$', verify_jwt_token),
+# ]
