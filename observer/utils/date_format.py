@@ -57,6 +57,15 @@ def get_months():
     return list(map(lambda x: [minus(first_day, x-11), minus(first_day, x-10)], range(0, 12)))
 
 
+def get_daterange():
+    end_day = date.today()
+    start_day = datetime(end_day.year, end_day.month, 1)
+    pre_start_day = start_day + relativedelta(months=-1)
+    pre_end_day = end_day + relativedelta(months=-1)
+
+    return ((pre_start_day, pre_end_day,), (start_day, end_day,),)
+
+
 def datetime_to_timestamp(dt):
     if isinstance(dt, datetime):
         value = int(mktime(dt.timetuple()))
