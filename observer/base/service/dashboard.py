@@ -7,7 +7,7 @@ from observer.base.models import(Area, UserArea, Article, ArticleArea,
 from observer.base.service.abstract import Abstract
 from observer.base.service.base import (areas, categories, local_related,
                                         get_major_industry, area, qualitied, )
-from observer.utils.date_format import (date_format, str_to_date, get_months, )
+from observer.utils.date_format import (date_format, str_to_date, get_daterange, )
 from observer.utils.str_format import str_to_md5str
 
 
@@ -18,7 +18,8 @@ class DashboardData(Abstract):
         super(DashboardData, self).__init__(params)
 
     def get_all(self):
-        months = get_months()[-2::]
+        months = get_daterange()
+
         # i0001 : 质量热点（panel 1）
         # i0002 : 风险快讯（panel 2）
         # i0003 : 业务信息（panel 3）
@@ -51,11 +52,11 @@ class DashboardData(Abstract):
         #本月
         cur_month = float(cur)
         #同比
-        if not pre_month or not cur_month:
-            mom = 'Nan%'
+        if not pre_month:
+            mom = 'NaN'
         else:
             rate = ((cur_month / pre_month) - 1 ) * 100
-            mom = '{0}%'.format(round(rate, 2))
+            mom = round(rate, 2)
 
         return cur, mom
 
@@ -165,7 +166,7 @@ class DashboardData(Abstract):
                         'category': x['category'],
                         'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
                         'product': x['product_name'],
-                    }, q(Inspection.objects.filter(area_id=UserArea.objects.get(user=self.user).area.id))),
+                    }, q(Inspection.objects.filter(area_id=UserArea.objects.get(user=self.user).area.id, status=1))),
                 'all': map(lambda x: {
                         'industry': get_major_industry(x['industry_id']),
                         'url': x['url'],
@@ -176,5 +177,5 @@ class DashboardData(Abstract):
                         'category': x['category'],
                         'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
                         'product': x['product_name'],
-                    }, q(Inspection.objects.all())),
+                    }, q(Inspection.objects.filter(status=1).all())),
                 }

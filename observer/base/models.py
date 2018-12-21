@@ -1,6 +1,9 @@
 import uuid
-from django.contrib.auth.models import User
+import datetime
+
+from django.contrib.auth.models import User, Group
 from django.db import models
+from observer.settings.development import UPLOAD_URL
 
 
 class Area(models.Model):
@@ -387,6 +390,8 @@ class Nav(models.Model):
     name = models.CharField(max_length=50, verbose_name='名称')
     href = models.CharField(default=0, max_length=50, verbose_name='链接')
     level = models.IntegerField(verbose_name='等级')
+    icon = models.CharField(default='', max_length=50, verbose_name='图标')
+    index = models.IntegerField(default=0, verbose_name='索引')
 
     parent = models.ForeignKey(
         'self',
@@ -421,3 +426,24 @@ class UserNav(models.Model):
 
     def __str__(self):
         return self.user.username
+
+
+class NewsReport(models.Model):
+    year = models.CharField(max_length=50, verbose_name='年份')
+    period = models.CharField(max_length=50, verbose_name='期数')
+    news_type = models.CharField(max_length=50, verbose_name='类型')
+    publisher = models.CharField(max_length=50, verbose_name='发布者')
+    pubtime = models.DateField(default=datetime.date.today, verbose_name='发布时间')
+    file = models.FileField(upload_to=UPLOAD_URL, verbose_name='文件')
+    group = models.ForeignKey(
+        Group,
+        on_delete=models.CASCADE,
+        verbose_name='单位'
+    )
+
+    class Meta:
+        app_label = 'base'
+        verbose_name_plural = '舆情报告'
+
+    def __str__(self):
+        return self.group.name
