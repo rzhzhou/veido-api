@@ -1,5 +1,6 @@
 from itertools import chain
 from django.contrib.auth.models import User, Group
+from observer.base.models import UserArea
 
 from datetime import date, timedelta, datetime
 from django.core.exceptions import ObjectDoesNotExist
@@ -20,7 +21,7 @@ class UserData(Abstract):  # 获取系统用户
 
             # 如果当前操作的是'超级管理员'
             if 2 in group_ids:
-                queryset = User.objects.exclude(id=self.user.id).values(*fields)
+                queryset = User.objects.values(*fields)
             # 如果当前操作的是'管理员'
             elif 3 in group_ids:
                 group_list = list(group_ids)
@@ -50,11 +51,12 @@ class UserAdd(Abstract):  # 添加用户
         first_name = getattr(self, 'first_name', '')
         email = getattr(self, 'email', '')
         group_name = getattr(self, 'group_name', '')
+        area = getattr(self, 'area_id', '')
 
         if password != re_password:
             return 201
 
-        if len(password) < 8:
+        if len(password) < 6:
             return 202
 
         if not self.user.is_active:
@@ -91,17 +93,24 @@ class UserAdd(Abstract):  # 添加用户
                 else:
                     group = Group.objects.get(name=group_name)
                     user.groups.add(group)
+                # 添加到管理员组
                 user.groups.add(Group.objects.filter(name='管理员')[0])
+
+                # 关联用户地域
+                user_id = User.objects.get(username=username).id
+                UserArea(user_id=user_id, area_id=area).save()
+
                 return 200
             except Exception as e:
                 print(e)
                 return 206
+
         # 如果当前操作的是'管理员'
         elif '管理员' in group_names:
             group_list = list(group_names)
             group_list.remove('管理员')
             try:
-                User.objects.get(username=username)
+                User.objects.get(username=str(self.user)+'@'+str(username))
                 return 205
             except ObjectDoesNotExist:
                 user = User(
@@ -120,6 +129,12 @@ class UserAdd(Abstract):  # 添加用户
 
                 group = Group.objects.get(name=group_list[0])
                 user.groups.add(group)
+
+                # 关联用户地域
+                user_id = User.objects.get(username=str(self.user)+'@'+str(username)).id
+                area_id = UserArea.objects.filter(user_id=self.user.id).values_list('area_id', flat=True)[0]
+                UserArea(user_id=user_id, area_id=area_id).save()
+
                 return 200
             except Exception as e:
                 print(e)
@@ -171,3 +186,22 @@ class UserDelete(Abstract): # 删除用户
             user.delete()
 
         return 200
+
+
+class GroupData(Abstract):
+
+    def __init__(self, params):
+        super(GroupData, self).__init__(params)
+
+    def get_all(self):
+        fields = ('id', 'name', )
+
+        cond = {
+            'name__istartswith': getattr(self, 'text', None),
+        }
+
+        args = dict([k, v] for k, v in cond.items() if v)
+
+        queryset = Group.objects.filter(**args).values(*fields)
+
+        return queryset

@@ -1,3 +1,4 @@
+import os
 from observer.base.models import Corpus
 from django_extensions.admin import ForeignKeyAutocompleteAdmin
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
@@ -8,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
 
-from observer.base.models import AliasIndustry, Nav, UserNav
+from observer.base.models import AliasIndustry, Nav, UserNav, NewsReport
 from observer.base.service.area import Select2AreaData
 from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd,
                                            RiskDataDelete, RiskDataEdit, RiskDataAudit,
@@ -47,10 +48,11 @@ from observer.base.service.inspection import (InspectionData,
                                               InspectionDataUnEnterpriseUpload,
                                               InspectionDataUpload,
                                               InspectionDataSuzhou)
-from observer.base.service.user import UserData, UserAdd, UserEdit, UserDelete
+from observer.base.service.user import UserData, UserAdd, UserEdit, UserDelete, GroupData
 from observer.base.service.navbar import NavBarEdit
 from observer.base.service.news import ViewsData, NewsAdd, NewsDelete, NewsEdit
 from observer.base.service.search import SearchAdvancedData, SearchData
+from observer.base.service.report import NewsReportUpload, NewsReportData
 from observer.utils.date_format import date_format
 from observer.utils.excel import write_by_openpyxl
 
@@ -1144,6 +1146,30 @@ class Select2IndustryProductsView(BaseView):
         return Response(self.serialize(queryset))
 
 
+class Select2GroupView(BaseView):
+
+    def __init__(self):
+        super(Select2GroupView, self).__init__()
+
+    def set_request(self, request):
+        super(Select2GroupView, self).set_request(request)
+
+    def serialize(self, queryset):
+        data = map(lambda q: {
+            'id': q['id'],
+            'text': q['name'],
+        }, queryset)
+
+        return data
+
+    def get(self, request):
+        self.set_request(request)
+
+        queryset = GroupData(params=request.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+
 class RiskDataView(BaseView):
 
     def __init__(self):
@@ -1887,12 +1913,13 @@ class NavBarView(BaseView):
         super(NavBarView, self).set_request(request)
 
     def serialize(self):
-        temp = []
+        navs = []
+        router = []
         u_navs_ids = UserNav.objects.filter(user=self.user).values_list('nav', flat=True)
         L1 = Nav.objects.filter(id__in=u_navs_ids, level=1).values('name','id').order_by('index')
         if L1:
             for category in L1:
-                temp.append({
+                navs.append({
                     'category': category['name'],
                 })
 
@@ -1900,7 +1927,7 @@ class NavBarView(BaseView):
                 if L2:
                     for title in L2:
                         childrens = Nav.objects.filter(id__in=u_navs_ids, level=3, parent_id=title['id']).values_list('name')
-                        temp.append({
+                        navs.append({
                             'icon': title['icon'],
                             'title': title['name'],
                             'href': '' if title['href'] == '0' else title['href'],
@@ -1911,7 +1938,7 @@ class NavBarView(BaseView):
                         })
 
         data = {
-            'menus': temp,
+            'menus': navs,
         }
 
         return data
@@ -2139,3 +2166,78 @@ class newsCrawlerView(BaseView):
         queryset = newsCrawlerData(user = request.user, params = request.data).edit()
         return Response(status = queryset)
 
+
+class NewsReportView(BaseView):
+
+    def __init__(self):
+        super(NewsReportView, self).__init__()
+
+    def set_request(self, request):
+        super(NewsReportView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(NewsReportView ,self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15),
+        )
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        results = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda x: {
+                'id': x['id'],
+                'group': x['group__name'],
+                'year': x['year'],
+                'period': x['period'],
+                'news_type': x['news_type'],
+                'publisher': x['publisher'],
+                'pubtime': x['pubtime'],
+            }, results)
+        }
+
+        return data
+
+    def get(self, request):
+        self.set_request(request)
+
+        queryset = NewsReportData(user=request.user, params=request.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+
+class NewsReportUploadView(BaseView):
+
+    def __init__(self):
+        super(NewsReportUploadView, self).__init__()
+
+    def set_request(self, request):
+        super(NewsReportUploadView, self).set_request(request)
+
+    def post(self, request):
+        self.set_request(request)
+
+        queryset = NewsReportUpload(user=request.user, params=request.data).add()
+
+        return Response(status=queryset)
+
+
+class NewsReportDownloadView(BaseView):
+
+    def __init__(self):
+        super(NewsReportDownloadView, self).__init__()
+
+    def get(self, request, cid):
+
+        fields = NewsReport.objects.filter(id=cid).values('file', 'year', 'period', 'news_type')[0]
+
+        try:
+            response = FileResponse(open(fields['file'], 'rb'))
+            response['Content-Type'] ='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            response['Content-Disposition'] = 'attachment; filename=report.docx'
+
+            return response
+        except Exception as e:
+            return Response(str(e))

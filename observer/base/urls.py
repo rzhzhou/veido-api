@@ -58,6 +58,9 @@ urlpatterns = [
     path('users/add', views.UserAddView.as_view()), # 用户添加
     path('users/edit/<int:cid>/', views.UserEditView.as_view()), # 用户修改
     path('users/delete/<str:cid>/', views.UserDeleteView.as_view()), # 用户删除
+    path('news_report', views.NewsReportView.as_view()), # 舆情报告
+    path('news_report/upload/', views.NewsReportUploadView.as_view()), # 舆情报告上传
+    path('news_report/download/<int:cid>/', views.NewsReportDownloadView.as_view()), # 舆情报告下载
 
     path('select2/industries', views.Select2IndustryView.as_view()),  # 行业名称
     path('select2/alias_industries', views.Select2AliasIndustryView.as_view()),  # 行业别名
@@ -68,6 +71,7 @@ urlpatterns = [
     path('select2/major_industries', views.Select2MajorListView.as_view()),  # 重点产品目录
     path('select2/areas', views.Select2AreaView.as_view()),  # 地域名称
     path('select2/industry_products', views.Select2IndustryProductsView.as_view()),  # 行业产品
+    path('select2/groups', views.Select2GroupView.as_view()), # 用户组
 
     path('search', views.SearchView.as_view()),  # 搜索
     path('search/advanced', views.SearchAdvancedView.as_view()),  # 高级搜索
