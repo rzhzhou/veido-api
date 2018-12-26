@@ -68,6 +68,7 @@ class NewsDelete(Abstract):
         for id in del_ids.split(" "):
             News.objects.using('shendu').filter(id=id).delete()
 
+
 class NewsEdit(Abstract):
     def __init__(self, user, params={}):
         super(NewsEdit, self).__init__(params)
@@ -87,4 +88,3 @@ class NewsEdit(Abstract):
         news.abstract = abstract
         news.content = content
         news.save()
-

@@ -53,7 +53,7 @@ class DashboardData(Abstract):
         cur_month = float(cur)
         #同比
         if not pre_month:
-            mom = 'NaN'
+            mom = '-'
         else:
             rate = ((cur_month / pre_month) - 1 ) * 100
             mom = round(rate, 2)

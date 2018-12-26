@@ -429,8 +429,8 @@ class UserNav(models.Model):
 
 
 class NewsReport(models.Model):
-    year = models.CharField(max_length=50, verbose_name='年份')
-    period = models.CharField(max_length=50, verbose_name='期数')
+    year = models.IntegerField(verbose_name='年份')
+    period = models.IntegerField(verbose_name='期数')
     news_type = models.CharField(max_length=50, verbose_name='类型')
     publisher = models.CharField(max_length=50, verbose_name='发布者')
     pubtime = models.DateField(default=datetime.date.today, verbose_name='发布时间')

@@ -8,24 +8,6 @@ from observer.base.models import NewsReport
 from django.contrib.auth.models import Group
 
 
-class NewsReportUpload(Abstract):
-
-    def __init__(self, user, params={}):
-        super(NewsReportUpload, self).__init__(params)
-        self.user = user
-
-    def add(self):
-        group_id = getattr(self, 'group_id', '')
-        year = getattr(self, 'year', '')
-        period = getattr(self, 'period', '')
-        news_type = getattr(self, 'news_type', '')
-        publisher = getattr(self, 'publisher', '')
-        file = getattr(self, 'file', '')
-
-        NewsReport(group_id=group_id, year=year, period=period, news_type=news_type, publisher=publisher, file=file).save()
-
-        return 200
-
 class NewsReportData(Abstract):
 
     def __init__(self, user, params={}):
@@ -57,6 +39,47 @@ class NewsReportData(Abstract):
             group_list.remove(3)
             queryset = queryset.filter(group=group_list[0])
 
-        queryset = queryset.values(*fields).order_by('-period')
+        queryset = queryset.values(*fields).order_by('-year', '-period')
 
         return queryset
+
+
+class NewsReportSuzhou(Abstract):
+
+    def __init__(self, params={}):
+        super(NewsReportSuzhou, self).__init__(params)
+
+    def get_news_report_list(self, search_value):
+        fields = ('id', 'group__name', 'year', 'period', 'news_type', 'pubtime', 'publisher')
+
+        args = {}
+
+        # 显示苏州市质监局的舆情报告
+        group_id = Group.objects.get(name='苏州市质监局').id
+
+        if not search_value:
+            queryset = NewsReport.objects.filter(group_id=group_id).values(*fields).order_by('-year', '-period')
+        else:
+            queryset = NewsReport.objects.filter(Q(year=search_value) | Q(period=search_value) | Q(news_type=search_value)).values(*fields)
+            queryset = queryset.filter(group_id=group_id).order_by('-year', '-period')
+
+        return queryset
+
+
+class NewsReportUpload(Abstract):
+
+    def __init__(self, user, params={}):
+        super(NewsReportUpload, self).__init__(params)
+        self.user = user
+
+    def add(self):
+        group_id = getattr(self, 'group_id', '')
+        year = getattr(self, 'year', '')
+        period = getattr(self, 'period', '')
+        news_type = getattr(self, 'news_type', '')
+        publisher = getattr(self, 'publisher', '')
+        file = getattr(self, 'file', '')
+
+        NewsReport(group_id=group_id, year=year, period=period, news_type=news_type, publisher=publisher, file=file).save()
+
+        return 200
