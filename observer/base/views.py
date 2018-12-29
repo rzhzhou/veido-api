@@ -52,7 +52,7 @@ from observer.base.service.user import UserData, UserAdd, UserEdit, UserDelete, 
 from observer.base.service.navbar import NavBarEdit
 from observer.base.service.news import ViewsData, NewsAdd, NewsDelete, NewsEdit
 from observer.base.service.search import SearchAdvancedData, SearchData
-from observer.base.service.report import NewsReportUpload, NewsReportData, NewsReportSuzhou
+from observer.base.service.report import NewsReportUpload, NewsReportData, NewsReportSuzhou, NewsReportDelete
 from observer.utils.date_format import date_format
 from observer.utils.excel import write_by_openpyxl
 
@@ -2287,3 +2287,19 @@ def news_report_download(request, cid):
         return response
     except Exception as e:
         return Response(str(e))
+
+
+class NewsReportDeleteView(BaseView):
+
+    def __init__(self):
+        super(NewsReportDeleteView, self).__init__()
+
+    def set_request(self, request):
+        super(NewsReportDeleteView, self).set_request(request)
+
+    def delete(self, request, cid):
+        self.set_request(request)
+
+        queryset = NewsReportDelete(user=request.user, params=request.data).delete(cid=cid)
+
+        return Response(status=queryset)

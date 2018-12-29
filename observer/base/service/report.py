@@ -1,11 +1,15 @@
+import os
 from datetime import datetime
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, Q, F
-import os
+from django.contrib.auth.models import Group
+
+from django.db.models.signals import post_delete
+from django.dispatch.dispatcher import receiver
+
 from observer.base.service.abstract import Abstract
 from observer.base.models import NewsReport
-from django.contrib.auth.models import Group
 
 
 class NewsReportData(Abstract):
@@ -83,3 +87,16 @@ class NewsReportUpload(Abstract):
         NewsReport(group_id=group_id, year=year, period=period, news_type=news_type, publisher=publisher, file=file).save()
 
         return 200
+
+class NewsReportDelete(Abstract):
+
+    def __init__(self, user, params={}):
+        super(NewsReportDelete, self).__init__(params)
+        self.user = user
+
+    def delete(self, cid):
+        file = NewsReport.objects.filter(id=cid).values_list('file', flat=True)[0]
+        # 删除指定目录的文件
+        os.remove(file)
+        # 删除数据库记录
+        NewsReport.objects.filter(id=cid).delete()
