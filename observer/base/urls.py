@@ -60,7 +60,7 @@ urlpatterns = [
     path('users/delete/<str:cid>/', views.UserDeleteView.as_view()), # 用户删除
     path('news_report', views.NewsReportView.as_view()), # 舆情报告
     path('news_report/upload/', views.NewsReportUploadView.as_view()), # 舆情报告上传
-    path('news_report/download/<int:cid>/', views.NewsReportDownloadView.as_view()), # 舆情报告下载
+    path('news_report/download/<int:cid>/', views.news_report_download), # 舆情报告下载
 
     path('select2/industries', views.Select2IndustryView.as_view()),  # 行业名称
     path('select2/alias_industries', views.Select2AliasIndustryView.as_view()),  # 行业别名
@@ -82,6 +82,7 @@ urlpatterns = [
     # SUZHOU
     path('risk_data_suzhou', views.RiskDataViewSuzhou.as_view()), # 新闻信息
     path('inspection_suzhou', views.InspectionDataViewSuzhou.as_view()), # 抽检信息
+    path('news_report_suzhou', views.NewsReportViewSuzhou.as_view()), # 舆情报告
 
     # 侧边栏
     path('nav_bar', views.NavBarView.as_view()), # 侧边栏导航

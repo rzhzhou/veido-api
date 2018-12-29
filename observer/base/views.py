@@ -16,7 +16,7 @@ from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd,
                                            RiskDataExport, RiskDataUpload, RiskDataSuzhou, newsCrawlerData)
 from observer.base.service.base import (alias_industry, get_major_industry, area, areas,
                                         categories, local_related, qualitied,
-                                        risk_injury, get_user_nav, get_major_category)
+                                        risk_injury, get_user_nav, get_major_category, get_user_extra)
 from observer.base.service.corpus import (CorpusAdd, CorpusData, CorpusDelete,
                                           CorpusEdit, CrawlerData, CategoryListData)
 from observer.base.service.dashboard import DashboardData
@@ -52,7 +52,7 @@ from observer.base.service.user import UserData, UserAdd, UserEdit, UserDelete, 
 from observer.base.service.navbar import NavBarEdit
 from observer.base.service.news import ViewsData, NewsAdd, NewsDelete, NewsEdit
 from observer.base.service.search import SearchAdvancedData, SearchData
-from observer.base.service.report import NewsReportUpload, NewsReportData
+from observer.base.service.report import NewsReportUpload, NewsReportData, NewsReportSuzhou
 from observer.utils.date_format import date_format
 from observer.utils.excel import write_by_openpyxl
 
@@ -1935,6 +1935,54 @@ class RiskDataViewSuzhou(BaseView):
         return Response(self.serialize(queryset))
 
 
+class NewsReportViewSuzhou(BaseView):
+
+    def __init__(self):
+        super(NewsReportViewSuzhou, self).__init__()
+
+    def set_request(self, request):
+        self.user = request.user
+        super(NewsReportViewSuzhou, self).set_request(request)
+
+    def paging(self, queryset):
+        page = (int(self.request.query_params.get('start', 0)) /
+                int(self.request.query_params.get('length', 10))) + 1
+        return super(NewsReportViewSuzhou, self).paging(queryset, page, self.request.query_params.get('length', 10))
+
+    def serialize(self, queryset):
+        results = self.paging(queryset)
+        recordsTotal = queryset.count()
+        data = {
+            "draw": self.request.query_params.get('draw', 1),
+            "recordsTotal": recordsTotal,
+            "recordsFiltered": NewsReportSuzhou(params=self.request.query_params).get_news_report_list(str(self.request.query_params.get('search[value]')).strip()).count(),
+            "data": map(lambda x: {
+                'id': x['id'],
+                'group': x['group__name'],
+                'year': x['year'],
+                'period': x['period'],
+                'news_type': x['news_type'],
+                'publisher': x['publisher'],
+                'pubtime': x['pubtime'],
+            }, results)
+        }
+
+        return data
+
+    def get(self, request):
+        self.set_request(request)
+
+        limit = int(request.query_params.get('limit', 0))
+
+        queryset = NewsReportSuzhou(
+            params=request.query_params).get_news_report_list(str(request.query_params.get('search[value]')).strip()).order_by('-pubtime')
+
+        if limit:
+            queryset = queryset[:limit]
+
+        return Response(self.serialize(queryset))
+
+
 class NavBarView(BaseView):
 
     def __init__(self):
@@ -2256,20 +2304,15 @@ class NewsReportUploadView(BaseView):
         return Response(status=queryset)
 
 
-class NewsReportDownloadView(BaseView):
+def news_report_download(request, cid):
 
-    def __init__(self):
-        super(NewsReportDownloadView, self).__init__()
+    fields = NewsReport.objects.filter(id=cid).values('file', 'year', 'period', 'news_type')[0]
 
-    def get(self, request, cid):
+    try:
+        response = FileResponse(open(fields['file'], 'rb'))
+        response['Content-Type'] ='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        response['Content-Disposition'] = 'attachment; filename=report.docx'
 
-        fields = NewsReport.objects.filter(id=cid).values('file', 'year', 'period', 'news_type')[0]
-
-        try:
-            response = FileResponse(open(fields['file'], 'rb'))
-            response['Content-Type'] ='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-            response['Content-Disposition'] = 'attachment; filename=report.docx'
-
-            return response
-        except Exception as e:
-            return Response(str(e))
+        return response
+    except Exception as e:
+        return Response(str(e))
