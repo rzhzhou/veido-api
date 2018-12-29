@@ -114,32 +114,16 @@ class DMWordsData(Abstract):
 
     def get_all(self):
 
-        if getattr(self, 'industry', None):
-            fields = ('id', 'status', 'riskword', 'industry_id')
+        fields = ('id', 'status', 'keyword', 'category_id', 'industry_id')
 
-            cond = {
-                'industry_id': getattr(self, 'industry', None),
-                'status': getattr(self, 'status', None),
-            }
+        cond = {
+            'category_id': getattr(self, 'category', None),
+            'status': getattr(self, 'status', None),
+        }
 
-            args = dict([k, v] for k, v in cond.items() if v)
+        args = dict([k, v] for k, v in cond.items() if v)
 
-            queryset = Corpus.objects.filter(**args).values(*fields)
-            
-        elif getattr(self, 'category', None):
-            fields = ('id', 'status', 'keyword', 'category_id')
+        queryset = Corpus_categories.objects.filter(**args).values(*fields)
 
-            cond = {
-                'category_id': getattr(self, 'category', None),
-                'status': getattr(self, 'status', None),
-            }
-
-            args = dict([k, v] for k, v in cond.items() if v)
-
-            queryset = Corpus_categories.objects.filter(**args).values(*fields)
-
-        else:
-            fields = ('id', 'status', 'riskword', 'industry_id')
-            queryset = Corpus.objects.filter().values(*fields)
 
         return queryset

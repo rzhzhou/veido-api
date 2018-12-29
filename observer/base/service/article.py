@@ -73,8 +73,10 @@ class RiskData(Abstract):
             'source__contains': getattr(self, 'source', None),
             'score': getattr(self, 'score', None),
             'status': getattr(self, 'status', None),
+            'industry_id': getattr(self, 'industry', None),
         }
         area_ids = getattr(self, 'areas', None)
+        cond_category = {'category_id' : getattr(self, 'category', None)}
 
         args = dict([k, v] for k, v in cond.items() if v)
         queryset = Article.objects.exclude(status=-1).filter(**args)
@@ -83,7 +85,11 @@ class RiskData(Abstract):
             a_ids = ArticleArea.objects.filter(area_id__in=area_ids[:-1:].split(',')).values_list('article_id', flat=True)
             queryset = queryset.filter(guid__in=a_ids)
 
-
+        args_category = dict([k, v] for k, v in cond_category.items() if v)
+        if args_category != {}:
+            guid_ids = ArticleCategory.objects.filter(**args_category).values_list('article_id', flat=True)
+            queryset = queryset.filter(guid__in=guid_ids)
+            
         return queryset.values(*fields).order_by('-pubtime')
 
 
