@@ -38,7 +38,7 @@ class CorpusAdd(Abstract):
         
         keyword = getattr(self, 'keyword', '')
         category_id = getattr(self, 'category_id', '')
-        industry_id = getattr(self, 'industry_id', '')
+        industry_id = getattr(self, 'industry_id') if getattr(self, 'industry_id') else 0
 
         if not category_id:
             return 400
