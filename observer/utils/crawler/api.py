@@ -69,9 +69,10 @@ class CrawlerTask(object):
 
 class CrawlerTask_category(object):
 
-    def __init__(self, keyword, category_id):
+    def __init__(self, keyword, category_id, industry_id):
         self.keyword = keyword
         self.category_id = category_id
+        self.industry_id = industry_id
         self.source = {
             'baidu' : '%s',
         }
@@ -97,6 +98,7 @@ class CrawlerTask_category(object):
             'data': {
                 "last_pubtime": datetime_to_timestamp(datetime(2015, 1, 1)),
                 "category_id": self.category_id,
+                "industry_id": self.industry_id,
                 "source": data.get('source'),
                 'source_type': u'信息类别',
             },
@@ -107,7 +109,7 @@ class CrawlerTask_category(object):
             'next_run': datetime.utcnow().replace(tzinfo=pytz.utc),
             'status': 0
         }
-
+        
         if not Task.objects.using('crawler').filter(url=data.get('syntax'), data=params.get('data')).exists():
             task = Task(**params)
             task.save(using='crawler')
@@ -119,6 +121,7 @@ class CrawlerTask_category(object):
                 'params': {
                     "last_pubtime": datetime_to_timestamp(datetime(2015, 1, 1)),
                     "category_id": self.category_id,
+                    "industry_id": self.industry_id,
                     "source": k,
                     'source_type': u'信息类别',
                 },

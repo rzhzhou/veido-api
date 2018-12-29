@@ -18,7 +18,7 @@ from observer.base.service.base import (alias_industry, get_major_industry, area
                                         categories, local_related, qualitied,
                                         risk_injury, get_user_nav, get_major_category, get_user_extra)
 from observer.base.service.corpus import (CorpusAdd, CorpusData, CorpusDelete,
-                                          CorpusEdit, CrawlerData)
+                                          CorpusEdit, CrawlerData, CategoryListData)
 from observer.base.service.dashboard import DashboardData
 from observer.base.service.desmon import (DMLinkAdd, DMLinkData, DMLinkDelete,
                                           DMLinkEdit, DMWordsData)
@@ -1654,7 +1654,7 @@ class CorpusView(BaseView):
                 'id': r['id'],
                 'status': r['status'],
                 'riskword': r.get('riskword', ''),
-                'industry': get_major_industry(r['industry_id']) if r.get('industry_id', None) else r.get('industry_id', ''),
+                'industry': r.get('industry_id') if r.get('industry_id', None) == 0 else get_major_industry(r['industry_id']),
                 'keyword': r.get('keyword', ''),
                 'category': get_major_category(r['category_id']) if r.get('category_id', None) else r.get('category_id', ''),
             }, results)
@@ -1685,6 +1685,35 @@ class CorpusAddView(BaseView):
         queryset = CorpusAdd(user=request.user, params=request.data).add()
 
         return Response(status=queryset)
+
+
+class CategoryListView(BaseView):
+    
+    def __init__(self):
+        super(CategoryListView, self).__init__()
+
+    def set_request(self, request):
+        super(CategoryListView, self).set_request(request)
+
+    def read_category(self, results):
+        
+        data = map(lambda r : {
+
+                'category_id' : r['id'],
+                'category' : r['name'],
+
+            },results)
+        
+        
+        return data    
+
+    def get(self, request):
+        self.set_request(request)
+        
+        results = CategoryListData(params = request.query_params).get_all()
+
+        return Response(self.read_category(results))
+        
 
 
 class CorpusEditView(BaseView):
