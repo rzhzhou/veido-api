@@ -54,15 +54,36 @@ def crawler(edit_ids, urls, product_names):
                     thead.append(i.xpath('string(.)').strip())
 
                 e_col, u_col = [], []
-                enterprise_fields = ['生产企业名称', '标称生产者', '标称生产单位', '标称生产企业名称', '标称生产企业名称',
-                '企业名称', '生产单位', '标示生产单位', '生产企业(标称)', '（标称）生产单位名称', '标称生产企业', '标称生产厂家',
-                '受检单位名称','被抽查单位','样品标称名称']
+                enterprise_fields = ['生产企业名称',
+                                '标称生产者',
+                                '标称生产单位',
+                                '标称生产企业名称',
+                                '企业名称',
+                                '生产单位',
+                                '标示生产单位',
+                                '生产企业(标称)',
+                                '（标称）生产单位名称',
+                                '标称生产企业',
+                                '标称生产厂家',
+                                '单位名称',
+                                '被抽检单位名称',
+                                '受检企业',
+                                '受检单位',
+                                '生产企业']
 
-                unitem_fields = ['主要不合格项目', '不合格项目', '不合格项目║检验结果║标准值', '主要不合格项目或主要问题',
-                 '主要不合格项（项目名称：标准值/实测值）', '不合格项目实测值', '不符合项目','不符合标准规定项']
+                unitem_fields = ['主要不合格项',
+                                '主要不合格项目',
+                                '不合格项目',
+                                '不合格项目║检验结果║标准值',
+                                '主要不合格项目或主要问题',
+                                '主要不合格项（项目名称：标准值/实测值）',
+                                '不合格项目实测值', '不符合项目',
+                                '合格状态',
+                                '不合格项目（标准值/实测值）',
+                                '不合格项']
 
                 for i, unenterprise in enumerate(thead):
-                    results = process.extract(unenterprise, enterprise_fields, limit=15)
+                    results = process.extract(unenterprise, enterprise_fields, limit=16)
                     for a in results:
                         if a[1] >= 99:
                             e_col.append(i+1)
@@ -71,7 +92,7 @@ def crawler(edit_ids, urls, product_names):
                     e_col.append('100')
 
                 for i, unitem in enumerate(thead):
-                    results = process.extract(unitem, unitem_fields, limit=8)
+                    results = process.extract(unitem, unitem_fields, limit=10)
                     for a in results:
                         if a[1] >= 99:
                             u_col.append(i+1)
