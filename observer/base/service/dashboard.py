@@ -64,7 +64,7 @@ class DashboardData(Abstract):
     def get_0001(self, months):
         ac_id = Category.objects.get(name='质量热点').id
         a_ids = ArticleCategory.objects.filter(category_id=ac_id).values_list('article_id', flat=True)
-        c = lambda x, y, z : y.objects.filter(pubtime__gte=x[0], pubtime__lt=x[1], status=1, guid__in=z).count()
+        c = lambda x, y, z : y.objects.filter(pubtime__gte=x[0], pubtime__lte=x[1], status=1, guid__in=z).count()
 
         pre = c(months[0], Article, a_ids)
         cur = c(months[1], Article, a_ids)
@@ -74,7 +74,7 @@ class DashboardData(Abstract):
     def get_0002(self, months):
         ac_id = Category.objects.get(name='风险快讯').id
         a_ids = ArticleCategory.objects.filter(category_id=ac_id).values_list('article_id', flat=True)
-        c = lambda x, y, z : y.objects.filter(pubtime__gte=x[0], pubtime__lt=x[1], status=1, guid__in=z).count()
+        c = lambda x, y, z : y.objects.filter(pubtime__gte=x[0], pubtime__lte=x[1], status=1, guid__in=z).count()
 
         pre = c(months[0], Article, a_ids)
         cur = c(months[1], Article, a_ids)
@@ -84,7 +84,7 @@ class DashboardData(Abstract):
     def get_0003(self, months):
         ac_ids = Category.objects.filter(parent__name='业务信息').values_list('id', flat=True)
         a_ids = ArticleCategory.objects.filter(category_id__in=ac_ids).values_list('article_id', flat=True)
-        c = lambda x, y, z : y.objects.filter(pubtime__gte=x[0], pubtime__lt=x[1], status=1, guid__in=z).count()
+        c = lambda x, y, z : y.objects.filter(pubtime__gte=x[0], pubtime__lte=x[1], status=1, guid__in=z).count()
 
         pre = c(months[0], Article, a_ids)
         cur = c(months[1], Article, a_ids)
@@ -92,7 +92,7 @@ class DashboardData(Abstract):
         return self.mom(pre, cur)
 
     def get_0004(self, months):
-        c = lambda x, y : y.objects.filter(pubtime__gte=x[0], pubtime__lt=x[1]).count()
+        c = lambda x, y : y.objects.filter(pubtime__gte=x[0], pubtime__lte=x[1]).count()
 
         pre = c(months[0], Inspection)
         cur = c(months[1], Inspection)
