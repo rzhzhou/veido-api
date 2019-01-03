@@ -3,7 +3,7 @@ from datetime import datetime
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, Q, F
 
-from observer.base.models import (DMLink, Corpus_categories )
+from observer.base.models import (DMLink, CorpusCategories )
 from observer.base.service.abstract import Abstract
 from observer.utils.date_format import date_format
 
@@ -123,7 +123,7 @@ class DMWordsData(Abstract):
 
         args = dict([k, v] for k, v in cond.items() if v)
 
-        queryset = Corpus_categories.objects.filter(**args).values(*fields)
+        queryset = CorpusCategories.objects.filter(**args).values(*fields)
 
 
         return queryset

@@ -3,7 +3,7 @@ from datetime import datetime
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, Q, F
 
-from observer.base.models import Corpus_categories, Category
+from observer.base.models import CorpusCategories, Category
 from observer.utils.crawler.api import CrawlerTask, CrawlerTask_category
 import os
 from observer.base.service.abstract import Abstract
@@ -43,10 +43,10 @@ class CorpusAdd(Abstract):
         if not category_id:
             return 400
 
-        if Corpus_categories.objects.filter(category_id=category_id, keyword=keyword, industry_id=industry_id).exists():
+        if CorpusCategories.objects.filter(category_id=category_id, keyword=keyword, industry_id=industry_id).exists():
             return 202
 
-        Corpus_categories(
+        CorpusCategories(
             keyword=keyword,
             category_id=category_id,
             industry_id=industry_id,
@@ -65,7 +65,7 @@ class CorpusEdit(Abstract):
         edit_id = cid
         keyword = getattr(self, 'keyword', None)
 
-        corpus_categories = Corpus_categories.objects.get(id=edit_id)
+        corpus_categories = CorpusCategories.objects.get(id=edit_id)
         corpus_categories.keyword = keyword
         corpus_categories.save()
 
@@ -87,10 +87,10 @@ class CorpusDelete(Abstract):
         if status == 1:
             for (ids, keyword, category_id, industry_id) in zip(del_ids.split(","), keywords.split(","), category_ids.split(","), industry_ids.split(",")):
                 CrawlerTask_category(keyword, category_id, industry_id).remove()
-                Corpus_categories.objects.filter(id=ids).delete()
+                CorpusCategories.objects.filter(id=ids).delete()
         else:
             for (ids, keyword, category_id, industry_id) in zip(del_ids.split(","), keywords.split(","), category_ids.split(","), industry_ids.split(",")):
-                Corpus_categories.objects.filter(id=ids).delete()
+                CorpusCategories.objects.filter(id=ids).delete()
 
         return 200
 
@@ -111,7 +111,7 @@ class CrawlerData(Abstract):
 
         for (ids, keyword, category_id, industry_id) in zip(edit_ids.split(","), keywords.split(","), category_ids.split(","), industry_ids.split(",")):
             CrawlerTask_category(keyword, category_id, industry_id).build()
-            corpus_categories = Corpus_categories.objects.get(id=ids)
+            corpus_categories = CorpusCategories.objects.get(id=ids)
             corpus_categories.status = status
             corpus_categories.save()
 

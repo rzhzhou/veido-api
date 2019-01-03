@@ -220,7 +220,7 @@ class AliasIndustry(models.Model):
         return self.name
 
 
-class Corpus_categories(models.Model):
+class CorpusCategories(models.Model):
     keyword = models.CharField(default=0, max_length=255, verbose_name='关键词语料词')
     status = models.IntegerField(default=0, verbose_name='状态') # 默认值 0 :不执行爬虫, 1 ： 执行爬虫
     category_id = models.CharField(max_length=5, verbose_name='信息类别')
