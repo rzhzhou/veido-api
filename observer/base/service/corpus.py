@@ -3,7 +3,7 @@ from datetime import datetime
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, Q, F
 
-from observer.base.models import Corpus, Corpus_categories, Category
+from observer.base.models import Corpus_categories, Category
 from observer.utils.crawler.api import CrawlerTask, CrawlerTask_category
 import os
 from observer.base.service.abstract import Abstract

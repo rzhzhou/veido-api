@@ -105,10 +105,6 @@ class DMLinkAdmin(ImportExportActionModelAdmin, ForeignKeyAutocompleteAdmin):
                     'create_at', 'create_by', 'status', )
 
 
-class CorpusAdmin(ImportExportActionModelAdmin):
-    list_display = ('riskword', 'industry_id', )
-
-
 class IndustryProductsAdmin(ImportExportActionModelAdmin, ImportExportModelAdmin):
     resource_class = IndustryProductsResources
     search_fields = ('name', 'industry_id')
@@ -132,5 +128,4 @@ admin.site.register(Category, CategoryAdmin)
 admin.site.register(Corpus_categories)
 admin.site.register(ArticleCategory, ArticleCategoryAdmin)
 admin.site.register(DMLink, DMLinkAdmin)
-admin.site.register(Corpus, CorpusAdmin)
 admin.site.register(IndustryProducts, IndustryProductsAdmin)

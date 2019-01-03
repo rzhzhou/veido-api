@@ -220,16 +220,6 @@ class AliasIndustry(models.Model):
         return self.name
 
 
-class Corpus(models.Model):
-    riskword = models.CharField(default=0, max_length=255, verbose_name='风险语料词')
-    status = models.IntegerField(default=0, verbose_name='状态') # 默认值 0 :不执行爬虫, 1 ： 执行爬虫
-
-    industry_id = models.IntegerField(default=0, verbose_name='产品类别')
-
-    class Meta:
-        app_label = 'base'
-        verbose_name_plural = '语料库'
-
 class Corpus_categories(models.Model):
     keyword = models.CharField(default=0, max_length=255, verbose_name='关键词语料词')
     status = models.IntegerField(default=0, verbose_name='状态') # 默认值 0 :不执行爬虫, 1 ： 执行爬虫

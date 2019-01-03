@@ -1,5 +1,4 @@
 import os
-from observer.base.models import Corpus
 from django_extensions.admin import ForeignKeyAutocompleteAdmin
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.http import FileResponse
