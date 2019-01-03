@@ -110,7 +110,7 @@ class CrawlerTask_category(object):
             'status': 0
         }
         
-        if not Task.objects.using('crawler').filter(url=data.get('syntax'), data=params.get('data')).exists():
+        if not Task.objects.using('crawler').filter(url=data.get('syntax'), data__contains=params.get('data').get('category_id')).exists():
             task = Task(**params)
             task.save(using='crawler')
 
@@ -119,12 +119,8 @@ class CrawlerTask_category(object):
             data = {
                 'syntax': v % (self.keyword),
                 'params': {
-                    "last_pubtime": datetime_to_timestamp(datetime(2015, 1, 1)),
                     "category_id": self.category_id,
-                    "industry_id": self.industry_id,
-                    "source": k,
-                    'source_type': u'信息类别',
                 },
             }
 
-            Task.objects.using('crawler').filter(url=data.get('syntax'), data=data.get('params')).delete()
+            Task.objects.using('crawler').filter(url=data.get('syntax'), data__contains=data.get('params').get('category_id')).delete()

@@ -84,14 +84,14 @@ class CorpusDelete(Abstract):
         keywords = getattr(self, 'keyword', '')
         category_ids = getattr(self, 'category_id', '')
         industry_ids = getattr(self, 'industry_id', '')
-        if status == 1:
-            for (ids, keyword, category_id, industry_id) in zip(del_ids.split(","), keywords.split(","), category_ids.split(","), industry_ids.split(",")):
+            
+        for (ids, keyword, category_id, industry_id, statu) in zip(del_ids.split(","), keywords.split(","), category_ids.split(","), industry_ids.split(","), status.split(",")):
+            if statu == '1':
                 CrawlerTask_category(keyword, category_id, industry_id).remove()
                 CorpusCategories.objects.filter(id=ids).delete()
-        else:
-            for (ids, keyword, category_id, industry_id) in zip(del_ids.split(","), keywords.split(","), category_ids.split(","), industry_ids.split(",")):
+            else:
                 CorpusCategories.objects.filter(id=ids).delete()
-
+                    
         return 200
 
 
