@@ -311,8 +311,8 @@ class Article(models.Model):
     source = models.CharField(max_length=80, blank=True, verbose_name='信息来源')
     score = models.IntegerField(default=0, verbose_name='风险程度')# 0, 默认值
     status = models.IntegerField(default=0, verbose_name='状态')# 0, 默认值 1 有效
-    industry_id = models.IntegerField(default=0, verbose_name='产品类别')
-    corpus_id = models.IntegerField(default=0, verbose_name='语料词编号')
+    industry_id = models.IntegerField(default=0, blank=True, null=True, verbose_name='产品类别')
+    corpus_id = models.IntegerField(default=0, blank=True, null=True, verbose_name='语料词编号')
 
     class Meta:
         app_label = 'base'
