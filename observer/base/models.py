@@ -333,11 +333,13 @@ class Article2(models.Model):
 
     industry = models.ForeignKey(
         MajorIndustry,
+        null=True, blank=True,
         on_delete=models.CASCADE,
         verbose_name='产品类别'
     )
     corpus = models.ForeignKey(
         CorpusCategories,
+        null=True, blank=True,
         on_delete=models.CASCADE,
         verbose_name='语料词'
     )
