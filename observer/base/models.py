@@ -225,6 +225,11 @@ class CorpusCategories(models.Model):
     status = models.IntegerField(default=0, verbose_name='状态') # 默认值 0 :不执行爬虫, 1 ： 执行爬虫
     category_id = models.CharField(max_length=5, verbose_name='信息类别')
     industry_id = models.IntegerField(default=0, verbose_name='产品类别')
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name='用户'
+    )
     
     class Meta:
         app_label = 'base'

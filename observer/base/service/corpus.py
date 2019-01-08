@@ -50,6 +50,7 @@ class CorpusAdd(Abstract):
             keyword=keyword,
             category_id=category_id,
             industry_id=industry_id,
+            user_id=self.user.id,
         ).save()
 
         return 200
@@ -110,7 +111,7 @@ class CrawlerData(Abstract):
         industry_ids = getattr(self, 'industry_id')
 
         for (ids, keyword, category_id, industry_id) in zip(edit_ids.split(","), keywords.split(","), category_ids.split(","), industry_ids.split(",")):
-            CrawlerTask_category(keyword, category_id, industry_id).build()
+            CrawlerTask_category(keyword, category_id, industry_id, self.user.id).build()
             corpus_categories = CorpusCategories.objects.get(id=ids)
             corpus_categories.status = status
             corpus_categories.save()
