@@ -3,6 +3,7 @@ from datetime import datetime
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, Q, F
 
+from django.contrib.auth.models import Group
 from observer.base.models import (DMLink, CorpusCategories )
 from observer.base.service.abstract import Abstract
 from observer.utils.date_format import date_format
@@ -109,7 +110,8 @@ class DMLinkDelete(Abstract):
 
 class DMWordsData(Abstract):
 
-    def __init__(self, params):
+    def __init__(self, user, params):
+        self.user = user
         super(DMWordsData, self).__init__(params)
 
     def get_all(self):
@@ -124,6 +126,11 @@ class DMWordsData(Abstract):
         args = dict([k, v] for k, v in cond.items() if v)
 
         queryset = CorpusCategories.objects.filter(**args).values(*fields)
+        
+        # 判断当前用户是否为武汉深度网科技有限公司成员，然后取出该用户管理的资料
+        group_ids = Group.objects.filter(user=self.user).values_list('id', flat=True)
+        if 4 in group_ids and 3 in group_ids:
+            queryset = CorpusCategories.objects.filter(**args).filter(user_id = self.user.id).values(*fields)
 
-
+        
         return queryset

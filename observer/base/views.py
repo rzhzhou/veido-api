@@ -1210,7 +1210,7 @@ class RiskDataView(BaseView):
     def get(self, request):
         self.set_request(request)
 
-        queryset = RiskData(params=request.query_params).get_all()
+        queryset = RiskData(user=request.user, params=request.query_params).get_all()
 
         return Response(self.serialize(queryset))
 
@@ -1656,7 +1656,7 @@ class CorpusView(BaseView):
                 'id': r['id'],
                 'status': r['status'],
                 'riskword': r.get('riskword', ''),
-                'industry': {'id': r.get('industry_id'), 'text': '无'} if r.get('industry_id', None) == 0 else get_major_industry(r['industry_id']),
+                'industry': {'id': r.get('industry_id', 0), 'text': '无'} if not r.get('industry_id') else get_major_industry(r['industry_id']),
                 'keyword': r.get('keyword', ''),
                 'category': get_major_category(r['category_id']) if r.get('category_id', None) else r.get('category_id', ''),
             }, results)
@@ -1668,7 +1668,7 @@ class CorpusView(BaseView):
     def get(self, request):
         self.set_request(request)
 
-        queryset = DMWordsData(params=request.query_params).get_all()
+        queryset = DMWordsData(user=request.user, params=request.query_params).get_all()
 
         return Response(self.serialize(queryset))
 

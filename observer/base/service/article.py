@@ -8,6 +8,7 @@ from django.db.models import Count, Q, F
 
 from observer.base.models import(Area, Article, ArticleArea, 
                                 Category, ArticleCategory, )
+from django.contrib.auth.models import Group
 from observer.base.service.abstract import Abstract
 from observer.base.service.base import (areas, categories, )
 from observer.utils.date_format import (date_format, str_to_date, get_months)
@@ -60,8 +61,9 @@ class ArticleData(Abstract):
 
 class RiskData(Abstract):
 
-    def __init__(self, params):
+    def __init__(self, user, params):
         super(RiskData, self).__init__(params)
+        self.user = user
 
     def get_all(self):
         fields = ('guid', 'url', 'title', 'source', 'pubtime', 'score', 'status' )
@@ -89,8 +91,15 @@ class RiskData(Abstract):
         if args_category != {}:
             guid_ids = ArticleCategory.objects.filter(**args_category).values_list('article_id', flat=True)
             queryset = queryset.filter(guid__in=guid_ids)
+
+        # 判断当前用户是否为武汉深度网科技有限公司成员，然后取出该用户管理的资料
+        group_ids = Group.objects.filter(user=self.user).values_list('id', flat=True)
+        if 4 in group_ids and 3 in group_ids:
+            queryset = queryset.filter(corpus_id = self.user.id).values(*fields)
+
+        queryset = queryset.values(*fields).order_by('-pubtime')
             
-        return queryset.values(*fields).order_by('-pubtime')
+        return queryset
 
 
 class RiskDataAdd(Abstract):
@@ -312,6 +321,7 @@ class RiskDataUpload(Abstract):
                         source=source,
                         score=score,
                         industry_id=industry_id,
+                        corpus_id=self.user.id,
                         status=1,
                     ).save()
 
