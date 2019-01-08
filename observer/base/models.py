@@ -288,35 +288,6 @@ class InspectionEnterprise(models.Model):
         return self.inspection_id
 
 
-class Article(models.Model):
-    guid = models.CharField(max_length=32, primary_key=True, editable=False, verbose_name='主键')# url -> md5
-    title = models.CharField(max_length=255, blank=True, verbose_name='标题')
-    url = models.URLField(verbose_name='网站链接')
-    pubtime = models.DateTimeField(auto_now=False, verbose_name='发布时间')
-    source = models.CharField(max_length=80, blank=True, verbose_name='信息来源')
-    score = models.IntegerField(default=0, verbose_name='风险程度')# 0, 默认值
-    status = models.IntegerField(default=0, verbose_name='状态')# 0, 默认值 1 有效
-    industry_id = models.IntegerField(default=0, verbose_name='产品类别')
-    corpus_id = models.IntegerField(default=0, verbose_name='语料词编号')
-
-    class Meta:
-        app_label = 'base'
-        verbose_name_plural = '文章'
-        ordering = ['-pubtime']
-
-    def __str__(self):
-        return self.title
-
-
-class ArticleArea(models.Model):
-    article_id = models.CharField(max_length=32, verbose_name='文章GUID')
-    area_id = models.BigIntegerField(verbose_name='地域ID')
-
-    class Meta:
-        app_label = 'base'
-        verbose_name_plural = '文章地域'
-
-
 class Category(models.Model):
     id = models.CharField(max_length=5, primary_key=True, editable=True, verbose_name='类别ID')
     name = models.CharField(max_length=10, verbose_name='名称')
@@ -335,6 +306,68 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Article(models.Model):
+    guid = models.CharField(max_length=32, primary_key=True, editable=False, verbose_name='主键')# url -> md5
+    title = models.CharField(max_length=255, blank=True, verbose_name='标题')
+    url = models.URLField(verbose_name='网站链接')
+    pubtime = models.DateTimeField(auto_now=False, verbose_name='发布时间')
+    source = models.CharField(max_length=80, blank=True, verbose_name='信息来源')
+    score = models.IntegerField(default=0, verbose_name='风险程度')# 0, 默认值
+    status = models.IntegerField(default=0, verbose_name='状态')# 0, 默认值 1 有效
+    industry_id = models.IntegerField(default=0, blank=True, null=True, verbose_name='产品类别')
+    corpus_id = models.IntegerField(default=0, blank=True, null=True, verbose_name='语料词编号')
+
+    class Meta:
+        app_label = 'base'
+        verbose_name_plural = '文章'
+        ordering = ['-pubtime']
+
+    def __str__(self):
+        return self.title
+
+
+class Article2(models.Model):
+    title = models.CharField(max_length=255, blank=True, verbose_name='标题')
+    url = models.URLField(verbose_name='网站链接')
+    pubtime = models.DateTimeField(auto_now=False, verbose_name='发布时间')
+    source = models.CharField(max_length=80, blank=True, verbose_name='信息来源')
+    score = models.IntegerField(default=0, verbose_name='风险程度')# 0, 默认值
+    status = models.IntegerField(default=0, verbose_name='状态')# 0, 默认值 1 有效
+
+    industry = models.ForeignKey(
+        MajorIndustry,
+        null=True, blank=True,
+        on_delete=models.CASCADE,
+        verbose_name='产品类别'
+    )
+    corpus = models.ForeignKey(
+        CorpusCategories,
+        null=True, blank=True,
+        on_delete=models.CASCADE,
+        verbose_name='语料词'
+    )
+
+    areas = models.ManyToManyField(Area)
+    categories = models.ManyToManyField(Category)
+
+    class Meta:
+        app_label = 'base'
+        verbose_name_plural = '文章'
+        ordering = ['-pubtime']
+
+    def __str__(self):
+        return self.title
+
+
+class ArticleArea(models.Model):
+    article_id = models.CharField(max_length=32, verbose_name='文章GUID')
+    area_id = models.BigIntegerField(verbose_name='地域ID')
+
+    class Meta:
+        app_label = 'base'
+        verbose_name_plural = '文章地域'
 
 
 class ArticleCategory(models.Model):
