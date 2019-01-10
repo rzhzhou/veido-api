@@ -9,6 +9,8 @@ from rest_framework.views import APIView
 from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
 
 from observer.base.models import AliasIndustry, Nav, UserNav, NewsReport
+from django.contrib.auth.models import User, Group
+
 from observer.base.service.area import Select2AreaData
 from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd,
                                            RiskDataDelete, RiskDataEdit, RiskDataAudit,
@@ -53,6 +55,7 @@ from observer.base.service.navbar import NavBarEdit
 from observer.base.service.news import ViewsData, NewsAdd, NewsDelete, NewsEdit
 from observer.base.service.search import SearchAdvancedData, SearchData
 from observer.base.service.report import NewsReportUpload, NewsReportData, NewsReportSuzhou, NewsReportDelete
+
 from observer.utils.date_format import date_format
 from observer.utils.excel import write_by_openpyxl
 
@@ -1994,7 +1997,6 @@ class NavBarView(BaseView):
 
     def serialize(self):
         navs = []
-        router = []
         u_navs_ids = UserNav.objects.filter(user=self.user).values_list('nav', flat=True)
         L1 = Nav.objects.filter(id__in=u_navs_ids, level=1).values('name','id').order_by('index')
         if L1:
@@ -2146,6 +2148,63 @@ class UserDeleteView(BaseView):
         return Response(status=queryset)
 
 
+class UserNavView(BaseView):
+
+    def __init__(self):
+        super(UserNavView, self).__init__()
+
+    def set_request(self, request):
+        self.user = request.user
+        super(UserNavView, self).set_request(request)
+
+    def get(self, request, cid):
+        self.set_request(request)
+        menus = []
+        group_names = Group.objects.filter(user=self.user).values_list('name', flat=True)
+        name_and_id = Nav.objects.values('name','id').order_by('index')
+
+        # 如果当前操作的是'超级管理员'
+        if '超级管理员' in group_names:
+            L1 = name_and_id.filter(level=1)
+            for category in L1:
+                menus.append({
+                    'id': category['id'],
+                    'label': category['name'],
+                    'children': list(map(lambda x: {
+                        'id': x['id'],
+                        'label': x['name'],
+                        'children': list(map(lambda y: {
+                            'id': y['id'],
+                            'label': y['name'],
+                        }, Nav.objects.filter(level=3, parent_id=x['id']).values('name', 'id').order_by('index'))) if Nav.objects.filter(level=3, parent_id=x['id']) else ''
+                    }, Nav.objects.filter(level=2, parent_id=category['id']).values('name', 'id').order_by('index'))) if Nav.objects.filter(level=2, parent_id=category['id']) else ''
+                })
+        else:
+            u_navs_ids = UserNav.objects.filter(user=self.user).values_list('nav', flat=True)
+            L1 = name_and_id.filter(id__in=u_navs_ids, level=1)
+
+            if L1:
+                for category in L1:
+                    menus.append({
+                        'id': category['id'],
+                        'label': category['name'],
+                        'children': list(map(lambda x: {
+                            'id': x['id'],
+                            'label': x['name'],
+                            'children': list(map(lambda y: {
+                                'id': y['id'],
+                                'label': y['name'],
+                            }, Nav.objects.filter(id__in=u_navs_ids, level=3, parent_id=x['id']).values('name', 'id').order_by('index'))) if Nav.objects.filter(id__in=u_navs_ids, level=3, parent_id=x['id']) else ''
+                        }, Nav.objects.filter(id__in=u_navs_ids, level=2, parent_id=category['id']).values('name', 'id').order_by('index'))) if Nav.objects.filter(id__in=u_navs_ids, level=2, parent_id=category['id']) else ''
+                    })
+
+        data = {
+            'menus': menus,
+        }
+
+        return Response(data)
+
+
 class NewsView(BaseView):
 
     def __init__(self):
@@ -2232,6 +2291,7 @@ class NewsEditView(BaseView):
         queryset = NewsEdit(user=request.user, params=request.data).edit(cid=cid)
 
         return Response(status=queryset)
+
 
 class newsCrawlerView(BaseView):
 

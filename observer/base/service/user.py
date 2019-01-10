@@ -1,6 +1,6 @@
 from itertools import chain
 from django.contrib.auth.models import User, Group
-from observer.base.models import UserArea
+from observer.base.models import UserArea, UserNav, Nav
 
 from datetime import date, timedelta, datetime
 from django.core.exceptions import ObjectDoesNotExist
@@ -65,7 +65,14 @@ class UserAdd(Abstract):  # 添加用户
         if not self.user.is_superuser:
             return 204
 
+        # 当前登录用户的组
         group_names = Group.objects.filter(user=self.user).values_list('name', flat=True)
+
+        # '权限管理'的ID
+        permissions_id = Nav.objects.get(name='权限管理').id
+
+        # 当前登录用户权限导航ID
+        u_navs_ids = UserNav.objects.filter(user=self.user).values_list('nav', flat=True)
 
         # 如果当前操作的是'超级管理员'
         if '超级管理员' in group_names:
@@ -134,6 +141,17 @@ class UserAdd(Abstract):  # 添加用户
                 user_id = User.objects.get(username=str(self.user)+'@'+str(username)).id
                 area_id = UserArea.objects.filter(user_id=self.user.id).values_list('area_id', flat=True)[0]
                 UserArea(user_id=user_id, area_id=area_id).save()
+
+                # 关联初始导航权限
+                bulk_usernav = []
+                u_navs_ids = u_navs_ids.exclude(nav=permissions_id)
+                for id in u_navs_ids:
+                    user_nav = UserNav(
+                        nav_id = id,
+                        user_id=user_id,
+                    )
+                    bulk_usernav.append(user_nav)
+                UserNav.objects.bulk_create(bulk_usernav)
 
                 return 200
             except Exception as e:

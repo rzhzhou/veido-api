@@ -63,6 +63,7 @@ urlpatterns = [
     path('news_report/upload/', views.NewsReportUploadView.as_view()), # 舆情报告上传
     path('news_report/download/<int:cid>/', views.news_report_download), # 舆情报告下载
     path('news_report/delete/<str:cid>/', views.NewsReportDeleteView.as_view()), # 舆情报告删除
+    path('user_nav/<int:cid>/', views.UserNavView.as_view()), # 用户权限导航
 
     path('select2/industries', views.Select2IndustryView.as_view()),  # 行业名称
     path('select2/alias_industries', views.Select2AliasIndustryView.as_view()),  # 行业别名
