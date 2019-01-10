@@ -12,7 +12,8 @@ from observer.base.models import AliasIndustry, Nav, UserNav, NewsReport
 from observer.base.service.area import Select2AreaData
 from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd,
                                            RiskDataDelete, RiskDataEdit, RiskDataAudit,
-                                           RiskDataExport, RiskDataUpload, RiskDataSuzhou, newsCrawlerData)
+                                           RiskDataExport, RiskDataUpload, RiskDataSuzhou,
+                                           newsCrawlerData, StatisticsShow)
 from observer.base.service.base import (alias_industry, get_major_industry, area, areas,
                                         categories, local_related, qualitied,
                                         risk_injury, get_user_nav, get_major_category, get_user_extra)
@@ -2331,3 +2332,13 @@ class NewsReportDeleteView(BaseView):
         queryset = NewsReportDelete(user=request.user, params=request.data).delete(cid=cid)
 
         return Response(status=queryset)
+
+
+class StatisticsView(BaseView):
+    def __init__(self):
+        super(StatisticsView, self).__init__()
+
+    def get(self, request):
+
+        result = StatisticsShow().get_data()
+        return Response(data = result)

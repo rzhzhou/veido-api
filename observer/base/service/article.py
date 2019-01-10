@@ -2,7 +2,7 @@ import openpyxl
 from io import BytesIO
 import threading
 
-from datetime import date, datetime, timedelta
+import datetime
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, Q, F
 
@@ -401,3 +401,40 @@ class newsCrawlerData(Abstract):
         thread = threading.Thread(target = newsCrawler, args = (word, page))
         thread.start()
         return 200
+
+
+class StatisticsShow(object):
+    def __init__(self):
+        self.StatisticsShow = StatisticsShow
+
+
+    def get_data(self):
+        now = datetime.datetime.strptime(datetime.datetime.now().strftime("%Y-%m-%d"), "%Y-%m-%d")
+        now =now + datetime.timedelta(hours=8, minutes=00, seconds=00)
+        time_week = now + datetime.timedelta(days = -7)
+        time_month = now + datetime.timedelta(days = -31)
+
+        queryset = Article.objects.filter(pubtime__gte = time_month)
+        
+        user_id = 65
+        listdata = []
+        while(user_id <= 71):
+            queryset_oneday = queryset.filter(pubtime__gte = now, corpus_id = user_id, status=1)
+            queryset_week = queryset.filter(pubtime__gte = time_week, corpus_id = user_id, status=1)
+            queryset_month = queryset.filter(pubtime__gte = time_month, corpus_id = user_id, status=1)
+            data = {
+                'user': user_id,
+                'onedayNum': queryset_oneday.count(),
+                'weekNum': queryset_week.count(),
+                'month': queryset_month.count(),
+            }
+            print(data)
+            listdata.append(data)
+            user_id += 1
+
+        return listdata
+
+    
+
+
+        
