@@ -33,7 +33,7 @@ urlpatterns = [
     path('risk_data/upload/<str:filename>/', views.RiskDataUploadView.as_view()),  # 风险数据上传
     path('risk_data/export', views.RiskDataExportView.as_view()),  # 风险数据导出
     path('risk_data/news_crawler/',views.newsCrawlerView.as_view()), # 电梯风险新闻爬取
-    path('risk_data/statistics', views.StatisticsView.as_view()),  # 收集数据统计信息条数（日、周、月）
+    path('risk_data/statistics/', views.StatisticsView.as_view()),  # 收集数据统计信息条数（日、周、月）
     path('inspection_data', views.InspectionDataView.as_view()),  # 抽检数据
     path('enterprise_data', views.EnterpriseDataListView.as_view()), # 不合格企业列表
     path('enterprise_data/edit/<int:cid>/', views.EnterpriseDataEditView.as_view()), # 不合格企业修改

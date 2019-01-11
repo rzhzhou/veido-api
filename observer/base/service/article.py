@@ -428,7 +428,6 @@ class StatisticsShow(object):
                 'weekNum': queryset_week.count(),
                 'month': queryset_month.count(),
             }
-            print(data)
             listdata.append(data)
             user_id += 1
 

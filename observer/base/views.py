@@ -2398,7 +2398,19 @@ class StatisticsView(BaseView):
     def __init__(self):
         super(StatisticsView, self).__init__()
 
-    def get(self, request):
+    def serialize(self, result):
 
+        data = {
+            'list': map(lambda r :{
+                'user': r['user'],
+                'onedayNum': r['onedayNum'],
+                'weekNum': r['weekNum'],
+                'month': r['month'],
+            }, result)
+        }
+
+        return data
+
+    def get(self, request):
         result = StatisticsShow().get_data()
-        return Response(data = result)
+        return Response(self.serialize(result))
