@@ -230,10 +230,22 @@ class CorpusCategories(models.Model):
         on_delete=models.CASCADE,
         verbose_name='用户'
     )
-    
+
     class Meta:
         app_label = 'base'
         verbose_name_plural = '语料库-信息类别'
+
+
+class Enterprise(models.Model):
+    name = models.CharField(max_length=255, verbose_name='名称')
+    unitem = models.CharField(max_length=255, verbose_name='不合格项')
+
+    area_id = models.IntegerField(verbose_name='地域ID')
+    status = models.IntegerField(default=1, verbose_name='状态')# 0, 未审核(默认值)  1, 已审核
+
+    class Meta:
+        app_label = 'base'
+        verbose_name_plural = '企业'
 
 
 class Inspection(models.Model):
@@ -264,16 +276,63 @@ class Inspection(models.Model):
         return self.title
 
 
-class Enterprise(models.Model):
-    name = models.CharField(max_length=255, verbose_name='名称')
-    unitem = models.CharField(max_length=255, verbose_name='不合格项')
+class Inspection2(models.Model):
+    INSPECTION_LEVEL_CHOICES = (
+        ('2', '国'),
+        ('1', '省'),
+        ('0', '市'),
+    )
+    STATUS_CHOICES = (
+        ('2', '已爬取'),
+        ('1', '已审核'),
+        ('0', '未审核'),
+    )
 
-    area_id = models.IntegerField(verbose_name='地域ID')
-    status = models.IntegerField(default=1, verbose_name='状态')# 0, 未审核(默认值)  1, 已审核
+    title = models.CharField(max_length=255, verbose_name='标题')
+    url = models.URLField(verbose_name='网站链接')
+    pubtime = models.DateField(verbose_name='发布时间')
+    source = models.CharField(max_length=255, verbose_name='信息来源')
+    origin_product = models.CharField(blank=True, null=True, max_length=255, verbose_name='导入产品名')
+    product_name = models.CharField(max_length=255, verbose_name='产品名称')
+    qualitied = models.FloatField(default=1.0, verbose_name='合格率')
+    unqualitied_patch = models.IntegerField(default=0, verbose_name="不合格批次")
+    qualitied_patch = models.IntegerField(default=0, verbose_name="合格批次")
+    inspect_patch = models.IntegerField(default=0, verbose_name="抽查批次")
+    category = models.CharField(max_length=32, verbose_name='抽查类别')
+
+    level = models.IntegerField(
+        default=0,
+        choices=INSPECTION_LEVEL_CHOICES,
+        verbose_name='检验等级',
+    )
+    status = models.IntegerField(
+        default=0,
+        choices=STATUS_CHOICES,
+        verbose_name='状态',
+    )
+
+    industry = models.ForeignKey(
+        MajorIndustry,
+        null=True, blank=True,
+        on_delete=models.CASCADE,
+        verbose_name='产品类别'
+    )
+    area = models.ForeignKey(
+        Area,
+        on_delete=models.CASCADE,
+        verbose_name='地域'
+    )
+
+    enterprises = models.ManyToManyField(Enterprise)
 
     class Meta:
         app_label = 'base'
-        verbose_name_plural = '企业'
+        verbose_name_plural = '抽检信息'
+        ordering = ['-pubtime']
+
+    def __str__(self):
+        return self.title
+
 
 
 class InspectionEnterprise(models.Model):
