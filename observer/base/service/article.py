@@ -403,9 +403,9 @@ class newsCrawlerData(Abstract):
         return 200
 
 
-class StatisticsShow(object):
-    def __init__(self):
-        self.StatisticsShow = StatisticsShow
+class StatisticsShow(Abstract):
+    def __init__(self, params):
+        super(StatisticsShow, self).__init__(params)
 
 
     def get_data(self):
@@ -420,18 +420,36 @@ class StatisticsShow(object):
         time_month = now + datetime.timedelta(days = aMonth)
 
         queryset = Article.objects.filter(pubtime__gte = time_month)
+
+        if getattr(self, 'category', None) == '0001' or getattr(self, 'category', None) == '0002':
+            category_id = getattr(self, 'category')
+            guid_ids = ArticleCategory.objects.filter(category_id = category_id).values_list('article_id', flat = True)
+            queryset = queryset.filter(guid__in = guid_ids)
+        if getattr(self, 'category', None) == '0003':
+            guid_business_ids = ArticleCategory.objects.exclude(category_id = '0001').exclude(category_id = '0002').values_list('article_id', flat = True)
+            queryset = queryset.filter(guid__in = guid_business_ids)
+
+        
         
         user_id = 65
         listdata = []
         while(user_id <= 71):
-            queryset_oneday = queryset.filter(pubtime__gte = now, corpus_id = user_id, status=1)
-            queryset_week = queryset.filter(pubtime__gte = time_week, corpus_id = user_id, status=1)
-            queryset_month = queryset.filter(pubtime__gte = time_month, corpus_id = user_id, status=1)
+            if getattr(self, 'time', None) == '每日':
+                queryset_oneday = queryset.filter(pubtime__gte = now, corpus_id = user_id, status=1)
+            elif getattr(self, 'time', None) == '每周':
+                queryset_week = queryset.filter(pubtime__gte = time_week, corpus_id = user_id, status=1)
+            elif getattr(self, 'time', None) == '每月':
+                queryset_month = queryset.filter(pubtime__gte = time_month, corpus_id = user_id, status=1)
+            else:
+                queryset_oneday = queryset.filter(pubtime__gte = now, corpus_id = user_id, status=1)
+                queryset_week = queryset.filter(pubtime__gte = time_week, corpus_id = user_id, status=1)
+                queryset_month = queryset.filter(pubtime__gte = time_month, corpus_id = user_id, status=1)
+
             data = {
                 'user': user_id,
-                'onedayNum': queryset_oneday.count(),
-                'weekNum': queryset_week.count(),
-                'month': queryset_month.count(),
+                'onedayNum': queryset_oneday.count() if getattr(self, 'time', None) == '每日' else 0,
+                'weekNum': queryset_week.count() if getattr(self, 'time', None) == '每周' else 0,
+                'month': queryset_month.count() if getattr(self, 'time', None) == '每月' else 0,
             }
             listdata.append(data)
             user_id += 1

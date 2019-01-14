@@ -2412,5 +2412,5 @@ class StatisticsView(BaseView):
         return data
 
     def get(self, request):
-        result = StatisticsShow().get_data()
+        result = StatisticsShow(params = request.query_params).get_data()
         return Response(self.serialize(result))
