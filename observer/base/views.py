@@ -16,7 +16,7 @@ from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd,
                                            RiskDataDelete, RiskDataEdit, RiskDataAudit,
                                            RiskDataExport, RiskDataUpload, RiskDataSuzhou,
                                            newsCrawlerData, StatisticsShow)
-from observer.base.service.base import (alias_industry, get_major_industry, area, areas,
+from observer.base.service.base import (alias_industry, areas,
                                         categories, local_related, qualitied,
                                         risk_injury, get_user_nav, get_major_category, get_user_extra)
 from observer.base.service.corpus import (CorpusAdd, CorpusData, CorpusDelete,
@@ -212,11 +212,11 @@ class InspectionView(BaseView):
             'total': total,
             'list': map(lambda x: {
                 'id': x['id'],
-                'guid': x['guid'],
-                'industry': get_major_industry(x['industry_id']),
+                'industry': {'id': x['industry'], 'text': x['industry__name']},
+                'origin_product': x['origin_product'],
                 'url': x['url'],
                 'level': x['level'],
-                'area': area(x['area_id']),
+                'area': {'id': x['area'], 'text': x['area__name']},
                 'source': x['source'],
                 'qualitied': qualitied(x['qualitied']),
                 'unqualitied_patch': x['unqualitied_patch'],
