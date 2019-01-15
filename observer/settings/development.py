@@ -89,11 +89,11 @@ WSGI_APPLICATION = 'observer.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': 'gz-cdb-ko3zdkzs.sql.tencentcdb.com',
+        'HOST': 'localhost',
         'NAME': 'observer',
-        'USER': 'shendu',
-        'PASSWORD': 'P@55word',
-        'PORT': 63440,
+        'USER': 'root',
+        'PASSWORD': '123456',
+        'PORT': 3306,
         'OPTIONS': {'charset': 'utf8mb4'},
     },
     'crawler': {

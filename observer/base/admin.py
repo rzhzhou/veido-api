@@ -78,8 +78,8 @@ class EnterpriseAdmin(ImportExportActionModelAdmin):
     pass
 
 
-class InspectionEnterpriseAdmin(ImportExportActionModelAdmin):
-    pass
+# class InspectionEnterpriseAdmin(ImportExportActionModelAdmin):
+#     pass
 
 
 class ArticleAdmin(ImportExportActionModelAdmin, ImportExportModelAdmin):
@@ -120,9 +120,9 @@ admin.site.register(MajorIndustry, MajorIndustryAdmin)
 admin.site.register(AliasIndustry, AliasIndustryAdmin)
 admin.site.register(Area, AreaAdmin)
 admin.site.register(UserArea, UserAreaAdmin)
-admin.site.register(Inspection, InspectionAdmin)
+admin.site.register(Inspection2, InspectionAdmin)
 admin.site.register(Enterprise, EnterpriseAdmin)
-admin.site.register(InspectionEnterprise, InspectionEnterpriseAdmin)
+# admin.site.register(InspectionEnterprise, InspectionEnterpriseAdmin)
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(CorpusCategories)

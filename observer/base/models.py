@@ -248,32 +248,32 @@ class Enterprise(models.Model):
         verbose_name_plural = '企业'
 
 
-class Inspection(models.Model):
-    guid = models.CharField(default=None, blank=True, null=True, max_length=32, verbose_name='GUID') # url + industry_id -> md5
-    title = models.CharField(max_length=255, verbose_name='标题')
-    url = models.URLField(blank=True, null=True, verbose_name='网站链接')
-    pubtime = models.DateField(verbose_name='发布时间')
-    source = models.CharField(max_length=80, verbose_name='信息来源')
-    qualitied = models.FloatField(default=1.0, verbose_name='合格率')
-    unqualitied_patch = models.IntegerField(default=0, verbose_name="不合格批次")
-    qualitied_patch = models.IntegerField(default=0, verbose_name="合格批次")
-    inspect_patch = models.IntegerField(default=0, verbose_name="抽查批次")
-    category = models.CharField(max_length=32, verbose_name='抽查类别')
-    level = models.CharField(max_length=2, verbose_name='检验等级') # 国、省、市
-    status = models.IntegerField(default=0, verbose_name='状态')# 0, 未审核(默认值) 1, 已审核 2, 已爬取
+# class Inspection(models.Model):
+#     guid = models.CharField(default=None, blank=True, null=True, max_length=32, verbose_name='GUID') # url + industry_id -> md5
+#     title = models.CharField(max_length=255, verbose_name='标题')
+#     url = models.URLField(blank=True, null=True, verbose_name='网站链接')
+#     pubtime = models.DateField(verbose_name='发布时间')
+#     source = models.CharField(max_length=80, verbose_name='信息来源')
+#     qualitied = models.FloatField(default=1.0, verbose_name='合格率')
+#     unqualitied_patch = models.IntegerField(default=0, verbose_name="不合格批次")
+#     qualitied_patch = models.IntegerField(default=0, verbose_name="合格批次")
+#     inspect_patch = models.IntegerField(default=0, verbose_name="抽查批次")
+#     category = models.CharField(max_length=32, verbose_name='抽查类别')
+#     level = models.CharField(max_length=2, verbose_name='检验等级') # 国、省、市
+#     status = models.IntegerField(default=0, verbose_name='状态')# 0, 未审核(默认值) 1, 已审核 2, 已爬取
 
-    industry_id = models.IntegerField(verbose_name='产品类别')
-    product_name = models.CharField(blank=True, null=True, max_length=255, verbose_name='产品名称')
-    area_id = models.IntegerField(verbose_name='地域ID')
-    origin_product = models.CharField(blank=True, null=True, max_length=255, verbose_name='导入产品名')
+#     industry_id = models.IntegerField(verbose_name='产品类别')
+#     product_name = models.CharField(blank=True, null=True, max_length=255, verbose_name='产品名称')
+#     area_id = models.IntegerField(verbose_name='地域ID')
+#     origin_product = models.CharField(blank=True, null=True, max_length=255, verbose_name='导入产品名')
 
-    class Meta:
-        app_label = 'base'
-        verbose_name_plural = '抽检信息'
-        ordering = ['-pubtime']
+#     class Meta:
+#         app_label = 'base'
+#         verbose_name_plural = '抽检信息'
+#         ordering = ['-pubtime']
 
-    def __str__(self):
-        return self.title
+#     def __str__(self):
+#         return self.title
 
 
 class Inspection2(models.Model):
@@ -334,16 +334,16 @@ class Inspection2(models.Model):
         return self.title
 
 
-class InspectionEnterprise(models.Model):
-    inspection_id = models.CharField(max_length=32, verbose_name='抽检信息GUID')
-    enterprise_id = models.IntegerField(verbose_name='企业ID')
+# class InspectionEnterprise(models.Model):
+#     inspection_id = models.CharField(max_length=32, verbose_name='抽检信息GUID')
+#     enterprise_id = models.IntegerField(verbose_name='企业ID')
 
-    class Meta:
-        app_label = 'base'
-        verbose_name_plural = '抽检企业'
+#     class Meta:
+#         app_label = 'base'
+#         verbose_name_plural = '抽检企业'
 
-    def __str__(self):
-        return self.inspection_id
+#     def __str__(self):
+#         return self.inspection_id
 
 
 class Category(models.Model):

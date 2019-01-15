@@ -7,7 +7,7 @@ import jieba.posseg as pseg
 from lxml import etree
 
 from observer.utils.str_format import str_to_md5str
-from observer.base.models import (Inspection, Area, Enterprise, InspectionEnterprise)
+from observer.base.models import (Inspection2, Area, Enterprise)
 
 jieba.load_userdict('observer/utils/dictionary.txt')
 
@@ -18,7 +18,7 @@ def crawler(edit_ids, urls, product_names):
 
         print('正在爬取...：', product_name)
 
-        Inspection.objects.filter(id=ids).update(status=2)
+        Inspection2.objects.filter(id=ids).update(status=2)
 
         # 爬取不合格企业
         response = requests.get(url)
@@ -142,13 +142,13 @@ def crawler(edit_ids, urls, product_names):
 
                             enterprise_id = Enterprise.objects.filter(
                             name=new_words, area_id=area_id)[0].id
-                            inspection_enterprise = InspectionEnterprise.objects.filter(
-                                inspection_id=guid, enterprise_id=enterprise_id)
-                            if not inspection_enterprise.exists():
-                                InspectionEnterprise(
-                                    inspection_id=guid,
-                                    enterprise_id=enterprise_id,
-                                ).save()
+                            # inspection_enterprise = InspectionEnterprise.objects.filter(
+                            #     inspection_id=guid, enterprise_id=enterprise_id)
+                            # if not inspection_enterprise.exists():
+                            #     InspectionEnterprise(
+                            #         inspection_id=guid,
+                            #         enterprise_id=enterprise_id,
+                            #     ).save()
 
                     if m == 0 and j.xpath('string(.)').strip() not in invalid_words:
                         area = '全国'
@@ -167,13 +167,13 @@ def crawler(edit_ids, urls, product_names):
 
                         enterprise_id = Enterprise.objects.filter(
                         name=new_words, area_id=area_id)[0].id
-                        inspection_enterprise = InspectionEnterprise.objects.filter(
-                            inspection_id=guid, enterprise_id=enterprise_id)
-                        if not inspection_enterprise.exists():
-                            InspectionEnterprise(
-                                inspection_id=guid,
-                                enterprise_id=enterprise_id,
-                            ).save()
+                        # inspection_enterprise = InspectionEnterprise.objects.filter(
+                        #     inspection_id=guid, enterprise_id=enterprise_id)
+                        # if not inspection_enterprise.exists():
+                        #     InspectionEnterprise(
+                        #         inspection_id=guid,
+                        #         enterprise_id=enterprise_id,
+                        #     ).save()
 
                     m = 0
                     n = 0

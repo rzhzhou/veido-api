@@ -145,7 +145,7 @@ class InspectionResources(resources.ModelResource):
     origin_product = fields.Field(attribute='origin_product', column_name='导入产品名')
 
     class Meta:
-        model = Inspection
+        model = Inspection2
         import_id_fields = ('guid',)
         fields = ('id', 'guid', 'title', 'url', 'pubtime', 'source', 'unitem', 'qualitied', 'category', 'level', 'industry_id', 'area_id', 'origin_product' )
         export_order = ('id', 'guid', 'title', 'url', 'pubtime', 'source', 'unitem', 'qualitied', 'category', 'level', 'industry_id', 'area_id', 'origin_product' )

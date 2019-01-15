@@ -39,7 +39,7 @@ urlpatterns = [
     path('enterprise_data/edit/<int:cid>/', views.EnterpriseDataEditView.as_view()), # 不合格企业修改
     path('enterprise_data/delete/<str:cid>/', views.EnterpriseDataDeleteView.as_view()), # 不合格企业删除
     path('enterprise_data/audit/<str:cid>/', views.EnterpriseDataAuditView.as_view()), # 不合格企业审核
-    path('enterprise_data/<str:eid>/', views.EnterpriseDataView.as_view()), # 不合格企业
+    path('enterprise_data/<str:eid>/', views.EnterpriseDataView.as_view()), # 抽检信息-不合格企业
     path('inspection_data/add', views.InspectionDataAddView.as_view()),  # 抽检数据添加
     path('inspection_data/edit/<int:cid>/', views.InspectionDataEditView.as_view()),  # 抽检数据修改
     path('inspection_data/delete/<str:cid>/', views.InspectionDataDeleteView.as_view()),  # 抽检数据删除

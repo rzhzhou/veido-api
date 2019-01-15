@@ -2,7 +2,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, Q, F
 
 from observer.base.models import(Area, UserArea, Article, ArticleArea,
-                                Category, ArticleCategory, Inspection,
+                                Category, ArticleCategory, Inspection2,
                                 )
 from observer.base.service.abstract import Abstract
 from observer.base.service.base import (areas, categories, local_related,
@@ -94,8 +94,8 @@ class DashboardData(Abstract):
     def get_0004(self, months):
         c = lambda x, y : y.objects.filter(pubtime__gte=x[0], pubtime__lte=x[1]).count()
 
-        pre = c(months[0], Inspection)
-        cur = c(months[1], Inspection)
+        pre = c(months[0], Inspection2)
+        cur = c(months[1], Inspection2)
 
         return self.mom(pre, cur)
 
@@ -166,7 +166,7 @@ class DashboardData(Abstract):
                         'category': x['category'],
                         'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
                         'product': x['product_name'],
-                    }, q(Inspection.objects.filter(area_id=UserArea.objects.get(user=self.user).area.id, status=1))),
+                    }, q(Inspection2.objects.filter(area_id=UserArea.objects.get(user=self.user).area.id, status=1))),
                 'all': map(lambda x: {
                         'industry': get_major_industry(x['industry_id']),
                         'url': x['url'],
@@ -177,5 +177,5 @@ class DashboardData(Abstract):
                         'category': x['category'],
                         'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
                         'product': x['product_name'],
-                    }, q(Inspection.objects.filter(status=1).all())),
+                    }, q(Inspection2.objects.filter(status=1).all())),
                 }
