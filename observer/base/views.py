@@ -2403,9 +2403,7 @@ class StatisticsView(BaseView):
         data = {
             'list': map(lambda r :{
                 'user': r['user'],
-                'onedayNum': r['onedayNum'],
-                'weekNum': r['weekNum'],
-                'month': r['month'],
+                'times': r['times'],
             }, result)
         }
 
