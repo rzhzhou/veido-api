@@ -560,15 +560,11 @@ class InspectionDataAudit(Abstract):
     def edit(self, cid):
         edit_ids = cid
         status = getattr(self, 'status', '')
-        urls = getattr(self, 'url', '')
-        product_names = getattr(self, 'product', '')
 
-        for (ids, url, product_name) in zip(edit_ids.split(","), urls.split(","), product_names.split(",")):
-            guid = str_to_md5str('{0}{1}'.format(url, product_name))
+        for ids in edit_ids.split(","):
 
             inspection2 = Inspection2.objects.get(id=ids)
             inspection2.status = status
-            inspection2.guid = guid
             inspection2.save()
 
         return 200
