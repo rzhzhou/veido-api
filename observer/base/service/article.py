@@ -415,7 +415,6 @@ class StatisticsShow(Abstract):
         monthInit = datetime.date(today.year, today.month, 1) # 获取本月的月初时间
         aMonth = (monthInit - today).days    #获取今天多少号的负数
 
-        now =now
         time_week = now + datetime.timedelta(days = aWeek)
         time_month = now + datetime.timedelta(days = aMonth)
 
