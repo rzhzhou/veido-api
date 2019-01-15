@@ -418,7 +418,7 @@ class StatisticsShow(Abstract):
         now =now
         time_week = now + datetime.timedelta(days = aWeek)
         time_month = now + datetime.timedelta(days = aMonth)
-        print(now, time_week, time_month)
+
         queryset = Article.objects.filter(pubtime__gte = time_month)
 
         if getattr(self, 'category', None) == '0001' or getattr(self, 'category', None) == '0002':
