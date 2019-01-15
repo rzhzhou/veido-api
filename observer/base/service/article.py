@@ -410,12 +410,11 @@ class StatisticsShow(Abstract):
 
     def get_data(self):
         now = datetime.datetime.strptime(datetime.datetime.now().strftime("%Y-%m-%d"), "%Y-%m-%d")
-        aWeek = -2-datetime.datetime.now().isoweekday() # 获取从上周六开始计算到今天获得的天数的负数
+        aWeek = -1-datetime.datetime.now().isoweekday() # 获取从上周六开始计算到今天获得的天数的负数
         today = datetime.datetime.now().date() # 获取今天日期的date类型
         monthInit = datetime.date(today.year, today.month, 1) # 获取本月的月初时间
-        aMonth = (monthInit - today).days - 1   #获取今天多少号的负数
+        aMonth = (monthInit - today).days    #获取今天多少号的负数
 
-        now =now + datetime.timedelta(hours=8, minutes=00, seconds=00)
         time_week = now + datetime.timedelta(days = aWeek)
         time_month = now + datetime.timedelta(days = aMonth)
 
