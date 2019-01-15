@@ -314,7 +314,9 @@ class InspectionDataUpload(Abstract):
                     }
 
                 category = sv(i, model['抽查类别'], sheet)
+
                 level = sv(i, model['抽查等级'], sheet)
+
                 source = sv(i, model['抽检单位'], sheet)
                 area_name = sv(i, model['地域'], sheet)
                 product_undisposed = sv(i, model['产品名称'], sheet)
