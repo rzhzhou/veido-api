@@ -310,12 +310,23 @@ class InspectionDataUpload(Abstract):
                 if not pubtime:
                     return {
                         'status': 0,
-                        'message': '操作失败！Excel %s 行时间格式有误！' % (i + 1, )
+                        'message': '操作失败！Excel %s 行"时间格式"有误！' % (i + 1, )
                     }
 
                 category = sv(i, model['抽查类别'], sheet)
 
                 level = sv(i, model['抽查等级'], sheet)
+                if level == '市':
+                    new_level = 0
+                elif level == '省':
+                    new_level = 1
+                elif level == '国':
+                    new_level = 2
+                else:
+                    return {
+                        'status': 0,
+                        'message': '操作失败！Excel %s 行"抽查等级"有误！' % (i + 1, )
+                    }
 
                 source = sv(i, model['抽检单位'], sheet)
                 area_name = sv(i, model['地域'], sheet)
@@ -369,7 +380,7 @@ class InspectionDataUpload(Abstract):
                     qualitied_patch=qualitied_patch,
                     inspect_patch=inspect_patch,
                     category='' if not category else category,
-                    level=level,
+                    level=new_level,
                     industry_id=industry_id,
                     product_name = product_name[0],
                     origin_product=origin_product,
