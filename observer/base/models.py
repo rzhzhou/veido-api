@@ -334,7 +334,6 @@ class Inspection2(models.Model):
         return self.title
 
 
-
 class InspectionEnterprise(models.Model):
     inspection_id = models.CharField(max_length=32, verbose_name='抽检信息GUID')
     enterprise_id = models.IntegerField(verbose_name='企业ID')
