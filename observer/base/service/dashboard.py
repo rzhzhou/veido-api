@@ -6,7 +6,7 @@ from observer.base.models import(Area, UserArea, Article, ArticleArea,
                                 )
 from observer.base.service.abstract import Abstract
 from observer.base.service.base import (areas, categories, local_related,
-                                        get_major_industry, area, qualitied, )
+                                        qualitied, )
 from observer.utils.date_format import (date_format, str_to_date, get_daterange, )
 from observer.utils.str_format import str_to_md5str
 
