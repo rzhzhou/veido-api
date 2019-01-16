@@ -301,7 +301,6 @@ class RiskDataUpload(Abstract):
                         old_article.source = source
                         old_article.score = score
                         old_article.industry_id = industry_id
-                        old_article.corpus_id = self.user.id
                         old_article.save()
                         dupli += 1
                         continue
@@ -344,7 +343,7 @@ class RiskDataUpload(Abstract):
 
         return {
                     'status': 1,
-                    'message': '操作成功！共处理%s条数据，成功导入%s条数据，更新数据%s条！' % (total, total - dupli, dupli, )
+                    'message': '操作成功！共处理%s条数据，新增数据%s条，更新数据%s条！' % (total, total - dupli, dupli, )
                 }
 
 
