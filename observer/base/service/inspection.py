@@ -105,6 +105,29 @@ class EnterpriseDataAudit(Abstract):
         return 200
 
 
+class EnterpriseDataUnqualified(Abstract):
+    def __init__(self, params):
+        super(EnterpriseDataUnqualified, self).__init__(params)
+
+    def get_all(self):
+
+        fields = ('inspection2__industry', 'inspection2__industry__name',
+                  'inspection2__product_name', 'inspection2__source', 'name', 'area_id', 'unitem')
+
+        cond = {
+            'inspection2__product_name__contains': getattr(self, 'productName', None),
+            'name__contains': getattr(self, 'enterpriseName', None),
+            'area_id': getattr(self, 'Area', None),
+            'inspection2__industry': getattr(self, 'industry', None),
+        }
+
+        args = dict([k, v] for k, v in cond.items() if v)
+
+        queryset = Enterprise.objects.filter(**args, status=1).values(*fields)
+
+        return queryset
+
+
 class EnterpriseData(Abstract):
 
     def __init__(self, params):
