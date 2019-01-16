@@ -248,6 +248,32 @@ class Enterprise(models.Model):
         verbose_name_plural = '企业'
 
 
+class Enterprise2(models.Model):
+    STATUS_CHOICES = (
+        ('1', '已审核'),
+        ('0', '未审核'),
+    )
+
+    name = models.CharField(max_length=255, verbose_name='名称')
+    unitem = models.CharField(max_length=255, verbose_name='不合格项')
+
+    status = models.IntegerField(
+        default=0,
+        choices=STATUS_CHOICES,
+        verbose_name='状态',
+    )
+
+    area = models.ForeignKey(
+        Area,
+        on_delete=models.CASCADE,
+        verbose_name='地域'
+    )
+
+    class Meta:
+        app_label = 'base'
+        verbose_name_plural = '企业'
+
+
 class Inspection2(models.Model):
     INSPECTION_LEVEL_CHOICES = (
         ('2', '国'),
