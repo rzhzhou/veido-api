@@ -38,7 +38,7 @@ class InspectionData(Abstract):
 
         cond = {
             'pubtime__gte': getattr(self, 'starttime', None),
-            'pubtime__lt': getattr(self, 'endtime', None),
+            'pubtime__lte': getattr(self, 'endtime', None),
             'qualitied__gte': getattr(self, 'qualitied_gte', None),
             'qualitied__lt': getattr(self, 'qualitied_lt', None),
             'category__contains': getattr(self, 'category', None),
@@ -112,18 +112,21 @@ class EnterpriseDataUnqualified(Abstract):
     def get_all(self):
 
         fields = ('inspection2__industry', 'inspection2__industry__name',
-                  'inspection2__product_name', 'inspection2__source', 'name', 'area_id', 'unitem')
+                  'inspection2__product_name', 'inspection2__source', 'name',
+                  'area_id', 'unitem', 'inspection2__pubtime')
 
         cond = {
             'inspection2__product_name__contains': getattr(self, 'productName', None),
             'name__contains': getattr(self, 'enterpriseName', None),
             'area_id': getattr(self, 'Area', None),
             'inspection2__industry': getattr(self, 'industry', None),
+            'inspection2__pubtime__gte': getattr(self, 'starttime', None),
+            'inspection2__pubtime__lte': getattr(self, 'endtime', None),
         }
 
         args = dict([k, v] for k, v in cond.items() if v)
 
-        queryset = Enterprise.objects.filter(**args, status=1).values(*fields)
+        queryset = Enterprise.objects.filter(**args, status=1).values(*fields).order_by('-inspection2__pubtime')
 
         return queryset
 
@@ -530,7 +533,7 @@ class InspectionDataExport(Abstract):
 #         start = months[0].strftime('%Y-%m-%d')
 #         end = months[1].strftime('%Y-%m-%d')
 
-#         queryset = Inspection2.objects.filter(pubtime__gte=start, pubtime__lt=end).values(
+#         queryset = Inspection2.objects.filter(pubtime__gte=start, pubtime__lte=end).values(
 #             'guid', 'title', 'url', 'pubtime', 'category', 'level', 'source', 'area_id', 'industry_id', 'qualitied',)
 
 #         for q in queryset:
