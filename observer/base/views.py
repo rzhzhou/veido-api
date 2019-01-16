@@ -16,7 +16,7 @@ from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd,
                                            RiskDataDelete, RiskDataEdit, RiskDataAudit,
                                            RiskDataExport, RiskDataUpload, RiskDataSuzhou,
                                            newsCrawlerData, StatisticsShow)
-from observer.base.service.base import (alias_industry, areas,
+from observer.base.service.base import (alias_industry, areas, area, get_major_industry,
                                         categories, local_related, qualitied,
                                         risk_injury, get_user_nav, get_major_category, get_user_extra)
 from observer.base.service.corpus import (CorpusAdd, CorpusData, CorpusDelete,

@@ -6,7 +6,7 @@ from observer.base.models import(Area, UserArea, Article, ArticleArea,
                                 )
 from observer.base.service.abstract import Abstract
 from observer.base.service.base import (areas, categories, local_related,
-                                        get_major_industry, area, qualitied, )
+                                        qualitied, )
 from observer.utils.date_format import (date_format, str_to_date, get_daterange, )
 from observer.utils.str_format import str_to_md5str
 
@@ -154,13 +154,14 @@ class DashboardData(Abstract):
 
 
     def get_0009(self):
-        q = lambda x: x.values('guid', 'title', 'url', 'pubtime', 'source', 'qualitied', 'category', 'level', 'industry_id', 'area_id', 'product_name').order_by('-pubtime')[0:self.length]
+        q = lambda x: x.values('title', 'url', 'pubtime', 'source', 'qualitied', 'category', 'level', 'industry',
+                               'industry__name', 'area', 'area__name', 'product_name').order_by('-pubtime')[0:self.length]
 
         return {'local': map(lambda x: {
-                        'industry': get_major_industry(x['industry_id']),
+                        'industry': {'id': x['industry'], 'text': x['industry__name']},
                         'url': x['url'],
                         'level': x['level'],
-                        'area': area(x['area_id']),
+                        'area': {'id': x['area'], 'text': x['area__name']},
                         'source': x['source'],
                         'qualitied': qualitied(x['qualitied']),
                         'category': x['category'],
@@ -168,10 +169,10 @@ class DashboardData(Abstract):
                         'product': x['product_name'],
                     }, q(Inspection2.objects.filter(area_id=UserArea.objects.get(user=self.user).area.id, status=1))),
                 'all': map(lambda x: {
-                        'industry': get_major_industry(x['industry_id']),
+                        'industry': {'id': x['industry'], 'text': x['industry__name']},
                         'url': x['url'],
                         'level': x['level'],
-                        'area': area(x['area_id']),
+                        'area': {'id': x['area'], 'text': x['area__name']},
                         'source': x['source'],
                         'qualitied': qualitied(x['qualitied']),
                         'category': x['category'],

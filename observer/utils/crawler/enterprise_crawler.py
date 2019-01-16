@@ -7,18 +7,17 @@ import jieba.posseg as pseg
 from lxml import etree
 
 from observer.utils.str_format import str_to_md5str
-from observer.base.models import (Inspection2, Area, Enterprise)
+from observer.base.models import Inspection2, Area, Enterprise
 
 jieba.load_userdict('observer/utils/dictionary.txt')
 
 
 def crawler(edit_ids, urls, product_names):
     for (ids, url, product_name) in zip(edit_ids.split(","), urls.split(","), product_names.split(",")):
-        guid = str_to_md5str('{0}{1}'.format(url, product_name))
 
-        print('正在爬取...：', product_name)
+        print('正在爬取...：', ids, product_name)
 
-        Inspection2.objects.filter(id=ids).update(status=2)
+        Inspection2.objects.filter(id=ids).update(status=2) # status:0 未爬取; 2 已爬取; 1 已审核
 
         # 爬取不合格企业
         response = requests.get(url)
@@ -132,23 +131,16 @@ def crawler(edit_ids, urls, product_names):
 
                             area_id = Area.objects.filter(name=area)[0].id
 
+                            inspection2 = Inspection2.objects.get(id=ids)
                             # 爬取的企业信息插入到不合格企业审核表 >status: 0
-                            Enterprise(
+                            enterprise = Enterprise(
                                 name=new_words,
                                 unitem=j.xpath('string(.)').strip(),
                                 area_id=area_id,
                                 status=0,
-                            ).save()
-
-                            enterprise_id = Enterprise.objects.filter(
-                            name=new_words, area_id=area_id)[0].id
-                            # inspection_enterprise = InspectionEnterprise.objects.filter(
-                            #     inspection_id=guid, enterprise_id=enterprise_id)
-                            # if not inspection_enterprise.exists():
-                            #     InspectionEnterprise(
-                            #         inspection_id=guid,
-                            #         enterprise_id=enterprise_id,
-                            #     ).save()
+                            )
+                            enterprise.save()
+                            inspection2.enterprises.add(enterprise)
 
                     if m == 0 and j.xpath('string(.)').strip() not in invalid_words:
                         area = '全国'
@@ -158,22 +150,16 @@ def crawler(edit_ids, urls, product_names):
 
                         area_id = Area.objects.filter(name=area)[0].id
 
-                        Enterprise(
+                        inspection2 = Inspection2.objects.get(id=ids)
+                        enterprise = Enterprise(
                             name=new_words,
                             unitem=j.xpath('string(.)').strip(),
                             area_id=area_id,
                             status=0,
-                        ).save()
+                        )
 
-                        enterprise_id = Enterprise.objects.filter(
-                        name=new_words, area_id=area_id)[0].id
-                        # inspection_enterprise = InspectionEnterprise.objects.filter(
-                        #     inspection_id=guid, enterprise_id=enterprise_id)
-                        # if not inspection_enterprise.exists():
-                        #     InspectionEnterprise(
-                        #         inspection_id=guid,
-                        #         enterprise_id=enterprise_id,
-                        #     ).save()
+                        enterprise.save()
+                        inspection2.enterprises.add(enterprise)
 
                     m = 0
                     n = 0

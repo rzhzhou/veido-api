@@ -107,7 +107,7 @@ def industry_number(alias_industry_id):
 
 
 def qualitied(q):
-    return '{0}%'.format('%.2f' % float(100.00 if not q else q * 100))
+    return '{0}%'.format('%.2f' % float(0 if q == 0 else q * 100))
 
 
 def enterprise_name(inspection_id, flat=False):

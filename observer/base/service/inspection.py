@@ -261,7 +261,7 @@ class InspectionDataUpload(Abstract):
                  '地域': 0, '产品名称': 0, '抽查批次': 0, '合格批次': 0, '不合格批次': 0}
         # qualification rate
 
-        def qr(x, y): return float(1) if not x else float(x) / float(y)
+        def qr(x, y): return float(0) if not x else float(x) / float(y)
         # sheet values
 
         def sv(x, y, z): return z.cell(row=x, column=y).value
@@ -310,12 +310,23 @@ class InspectionDataUpload(Abstract):
                 if not pubtime:
                     return {
                         'status': 0,
-                        'message': '操作失败！Excel %s 行时间格式有误！' % (i + 1, )
+                        'message': '操作失败！Excel %s 行"时间格式"有误！' % (i + 1, )
                     }
 
                 category = sv(i, model['抽查类别'], sheet)
 
                 level = sv(i, model['抽查等级'], sheet)
+                if level == '市':
+                    new_level = 0
+                elif level == '省':
+                    new_level = 1
+                elif level == '国':
+                    new_level = 2
+                else:
+                    return {
+                        'status': 0,
+                        'message': '操作失败！Excel %s 行"抽查等级"有误！' % (i + 1, )
+                    }
 
                 source = sv(i, model['抽检单位'], sheet)
                 area_name = sv(i, model['地域'], sheet)
@@ -369,7 +380,7 @@ class InspectionDataUpload(Abstract):
                     qualitied_patch=qualitied_patch,
                     inspect_patch=inspect_patch,
                     category='' if not category else category,
-                    level=level,
+                    level=new_level,
                     industry_id=industry_id,
                     product_name = product_name[0],
                     origin_product=origin_product,
@@ -549,15 +560,11 @@ class InspectionDataAudit(Abstract):
     def edit(self, cid):
         edit_ids = cid
         status = getattr(self, 'status', '')
-        urls = getattr(self, 'url', '')
-        product_names = getattr(self, 'product', '')
 
-        for (ids, url, product_name) in zip(edit_ids.split(","), urls.split(","), product_names.split(",")):
-            guid = str_to_md5str('{0}{1}'.format(url, product_name))
+        for ids in edit_ids.split(","):
 
             inspection2 = Inspection2.objects.get(id=ids)
             inspection2.status = status
-            inspection2.guid = guid
             inspection2.save()
 
         return 200
