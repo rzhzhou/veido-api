@@ -261,7 +261,7 @@ class InspectionDataUpload(Abstract):
                  '地域': 0, '产品名称': 0, '抽查批次': 0, '合格批次': 0, '不合格批次': 0}
         # qualification rate
 
-        def qr(x, y): return float(1) if not x else float(x) / float(y)
+        def qr(x, y): return float(0) if not x else float(x) / float(y)
         # sheet values
 
         def sv(x, y, z): return z.cell(row=x, column=y).value
