@@ -291,7 +291,17 @@ class RiskDataUpload(Abstract):
 
                     a_guid = str_to_md5str(url)
 
-                    if Article.objects.filter(guid=a_guid).exists():
+                    old_article = Article.objects.filter(guid=a_guid)
+
+                    if old_article.exists():
+                        old_article = old_article[0]
+                        old_article.title = title
+                        old_article.url = url
+                        old_article.pubtime = pubtime
+                        old_article.source = source
+                        old_article.score = score
+                        old_article.industry_id = industry_id
+                        old_article.save()
                         dupli += 1
                         continue
 
@@ -333,7 +343,7 @@ class RiskDataUpload(Abstract):
 
         return {
                     'status': 1,
-                    'message': '操作成功！共处理%s条数据，成功导入%s条数据，重复数据%s条！' % (total, total - dupli, dupli, )
+                    'message': '操作成功！共处理%s条数据，新增数据%s条，更新数据%s条！' % (total, total - dupli, dupli, )
                 }
 
 
