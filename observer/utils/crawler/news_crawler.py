@@ -11,9 +11,9 @@ import random
 from observer.utils.str_format import str_to_md5str
 from observer.base.models import (Article, Area, ArticleArea, Category, ArticleCategory)
 
-jieba.load_userdict('observer/utils/dictionary.txt') # 引用自定义分词库 
 
 def newsCrawler(word, page):
+    jieba.load_userdict('observer/utils/dictionary.txt') # 引用自定义分词库
     url_word = 'http://news.baidu.com/ns?word=intitle%3A%28' + word + '%29&pn='
     page = int(page)
     page_auto = 0
@@ -21,7 +21,7 @@ def newsCrawler(word, page):
         url = url_word + str(20*page_auto) +'&cl=2&ct=0&tn=newstitle&rn=20&ie=utf-8&bt=0&et=0&rsv_page=1'
         res = requests.get(url)
         res.encoding = 'utf-8'
-        
+
         soup = BeautifulSoup(res.text, 'lxml')
 
         for i, j in zip(soup.find_all('h3'), soup.find_all("div",class_="c-title-author")):
@@ -53,7 +53,7 @@ def newsCrawler(word, page):
                     break
 
             if similarity != 100 and similarity_title != 100:
-                
+
                 # 在标题中获取地域的信息
                 if title.strip().find('省市') != -1:
                     new_words = title.strip().replace('省市', '')
@@ -66,7 +66,6 @@ def newsCrawler(word, page):
                 else:
                     new_words = title.strip()
 
-                
                 areas = pseg.cut(new_words) #  根据自定义分词库来切割出所需地域分词
                 area_real = '' # 先设置一个空变量，以便储存下面获得地域
                 m = 0
@@ -78,7 +77,7 @@ def newsCrawler(word, page):
                         area_real = area
                     if m == 0:
                         area_real = '全国'
-                    
+
                 # 获取Area库里的id编号，然后存入ArticleArea，存入方法是将与唯一标识符a_guid绑定，等取出来时，根据a_guid取出来
                 area_id = Area.objects.filter(name = area_real)[0].id
                 category_id =  Category.objects.filter(name = category)[0].id
@@ -106,7 +105,6 @@ def newsCrawler(word, page):
                     _time = _time.replace('年','-')
                     _time = _time.replace('月','-')
                     _time = _time.strip('日')
-                    
 
                     Article(
                         guid = guid_id,
@@ -117,11 +115,10 @@ def newsCrawler(word, page):
                         pubtime = _time,
                         status = status
                     ).save()
-                        
-                        
+
                 else:
                     _time = datetime.date.today()  # time.strftime('%Y-%m-%d', time.localtime(time.time()))
-                    
+
                     Article(
                         guid = guid_id,
                         title = title,

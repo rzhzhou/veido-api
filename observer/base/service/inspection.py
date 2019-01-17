@@ -21,8 +21,6 @@ from observer.utils.excel import read_by_openpyxl, write_by_openpyxl
 from observer.utils.str_format import str_to_md5str
 from observer.utils.crawler.enterprise_crawler import crawler
 
-jieba.load_userdict('observer/utils/dictionary.txt')
-
 
 class InspectionData(Abstract):
 
@@ -141,7 +139,7 @@ class InspectionDataAdd(Abstract):
 
     def add(self):
         # qualification rate
-        def qr(x, y): return float(1) if not x else float(x) / float(y)
+        def qr(x, y): return float(0) if not x else float(x) / float(y)
 
         title = getattr(self, 'title', '')
         url = getattr(self, 'url', '')
@@ -154,6 +152,13 @@ class InspectionDataAdd(Abstract):
 
         category = getattr(self, 'category', '')
         level = getattr(self, 'level', '')
+        if level == '市':
+            new_level = 0
+        elif level == '省':
+            new_level = 1
+        elif level == '国':
+            new_level = 2
+
         area_id = getattr(self, 'area_id', '')
         product_id = getattr(self, 'product', '')
 
@@ -163,13 +168,7 @@ class InspectionDataAdd(Abstract):
         if not url or not pubtime or not source or not inspect_patch or not qualitied_patch or not unqualitied_patch or not level or not product_name or not area_id:
             return 400
 
-        guid = str_to_md5str('{0}{1}'.format(url, product_name))
-
-        if Inspection2.objects.filter(guid=guid).exists():
-            return 202
-
         Inspection2(
-            guid=guid,
             title=title,
             url=url,
             pubtime=pubtime,
@@ -179,11 +178,11 @@ class InspectionDataAdd(Abstract):
             qualitied_patch=qualitied_patch,
             unqualitied_patch=unqualitied_patch,
             category=category,
-            level=level,
+            level=new_level,
             product_name=product_name,
             industry_id=industry_id,
             area_id=area_id,
-            status=1,
+            status=0,
         ).save()
 
         return 200
@@ -251,6 +250,8 @@ class InspectionDataDelete(Abstract):
 
 
 class InspectionDataUpload(Abstract):
+
+    jieba.load_userdict('observer/utils/dictionary.txt')
 
     def __init__(self, user):
         self.user = user
