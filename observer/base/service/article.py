@@ -132,6 +132,7 @@ class RiskDataAdd(Abstract):
             pubtime=pubtime,
             source=source,
             score=score,
+            corpus_id=self.user.id,
             status=1,
         ).save()
 
