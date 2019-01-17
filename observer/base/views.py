@@ -1,61 +1,67 @@
 import os
-from django_extensions.admin import ForeignKeyAutocompleteAdmin
+
+from django.contrib.auth.models import Group, User
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.http import FileResponse
+from django_extensions.admin import ForeignKeyAutocompleteAdmin
+from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
 from rest_framework.decorators import permission_classes
 from rest_framework.parsers import FileUploadParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
 
-from observer.base.models import AliasIndustry, Nav, UserNav, NewsReport
-from django.contrib.auth.models import User, Group
-
+from observer.base.models import AliasIndustry, Nav, NewsReport, UserNav
 from observer.base.service.area import Select2AreaData
 from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd,
-                                           RiskDataDelete, RiskDataEdit, RiskDataAudit,
-                                           RiskDataExport, RiskDataUpload, RiskDataSuzhou,
-                                           newsCrawlerData, StatisticsShow)
-from observer.base.service.base import (alias_industry, areas, area, get_major_industry,
-                                        categories, local_related, qualitied,
-                                        risk_injury, get_user_nav, get_major_category, get_user_extra)
-from observer.base.service.corpus import (CorpusAdd, CorpusData, CorpusDelete,
-                                          CorpusEdit, CrawlerData, CategoryListData)
+                                           RiskDataAudit, RiskDataDelete,
+                                           RiskDataEdit, RiskDataExport,
+                                           RiskDataSuzhou, RiskDataUpload,
+                                           StatisticsShow, newsCrawlerData)
+from observer.base.service.base import (alias_industry, area, areas,
+                                        categories, get_major_category,
+                                        get_major_industry, get_user_extra,
+                                        get_user_nav, local_related, qualitied,
+                                        risk_injury)
+from observer.base.service.corpus import (CategoryListData, CorpusAdd,
+                                          CorpusData, CorpusDelete, CorpusEdit,
+                                          CrawlerData)
 from observer.base.service.dashboard import DashboardData
 from observer.base.service.desmon import (DMLinkAdd, DMLinkData, DMLinkDelete,
                                           DMLinkEdit, DMWordsData)
 from observer.base.service.industry import (AliasIndustryAdd, CCCIndustryAdd,
                                             CCCIndustryData,
-                                            ConsumerIndustryData, IndustryData,
-                                            CpcIndustryData,
+                                            ConsumerIndustryData,
+                                            CpcIndustryData, IndustryData,
+                                            IndustryProductsData,
                                             LicenceIndustryAdd,
                                             LicenceIndustryData,
                                             MajorIndustryData,
                                             Select2AliasIndustryData,
                                             Select2CCCIndustryData,
                                             Select2IndustryData,
-                                            Select2LicenceIndustryData,
-                                            IndustryProductsData)
-from observer.base.service.inspection import (InspectionData,
-                                              EnterpriseDataEdit,
-                                              EnterpriseDataDelete,
+                                            Select2LicenceIndustryData)
+from observer.base.service.inspection import (EnterpriseData,
                                               EnterpriseDataAudit,
-                                              EnterpriseData,
+                                              EnterpriseDataDelete,
+                                              EnterpriseDataEdit,
+                                              EnterpriseDataUnqualified,
+                                              InspectionData,
                                               InspectionDataAdd,
+                                              InspectionDataAudit,
+                                              InspectionDataCrawler,
                                               InspectionDataDelete,
                                               InspectionDataEdit,
                                               InspectionDataExport,
-                                              InspectionDataCrawler,
-                                              InspectionDataAudit,
+                                              InspectionDataSuzhou,
                                               InspectionDataUnEnterpriseUpload,
-                                              InspectionDataUpload,
-                                              InspectionDataSuzhou)
-from observer.base.service.user import UserData, UserAdd, UserEdit, UserDelete, GroupData
+                                              InspectionDataUpload)
 from observer.base.service.navbar import NavBarEdit
-from observer.base.service.news import ViewsData, NewsAdd, NewsDelete, NewsEdit
+from observer.base.service.news import NewsAdd, NewsDelete, NewsEdit, ViewsData
+from observer.base.service.report import (NewsReportData, NewsReportDelete,
+                                          NewsReportSuzhou, NewsReportUpload)
 from observer.base.service.search import SearchAdvancedData, SearchData
-from observer.base.service.report import NewsReportUpload, NewsReportData, NewsReportSuzhou, NewsReportDelete
-
+from observer.base.service.user import (GroupData, UserAdd, UserData,
+                                        UserDelete, UserEdit)
 from observer.utils.date_format import date_format
 from observer.utils.excel import write_by_openpyxl
 
@@ -1332,6 +1338,7 @@ class InspectionDataView(BaseView):
                 'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
                 'product': x['product_name'],
                 'status': x['status'],
+
             }, result),
         }
 
@@ -1344,6 +1351,44 @@ class InspectionDataView(BaseView):
 
         return Response(self.serialize(queryset))
 
+
+class EnterpriseDataUnqualifiedView(BaseView):
+    def __init__(self):
+        super(EnterpriseDataUnqualifiedView, self).__init__()
+
+    def set_request(self, request):
+        super(EnterpriseDataUnqualifiedView, self).set_request(request)
+
+    def paging(self, queryset):
+        # 传给前台的'length',15 key可以自定义,前台不指定 默认15条/页
+        return super(EnterpriseDataUnqualifiedView, self).paging(
+            queryset, self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15))
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        result = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda x: {
+                'industry': {'id':x['inspection2__industry'],'text':x['inspection2__industry__name']},
+                'product_name': x['inspection2__product_name'],
+                'source': x['inspection2__source'],
+                'enterprise': x['name'],
+                'area': area(x['area_id']),
+                'unitem': x['unitem'],
+                'pubtime': x['inspection2__pubtime'],
+            }, result),
+        }
+        return data
+
+    def get(self, request):
+        self.set_request(request)
+
+        queryset = EnterpriseDataUnqualified(
+            params=request.query_params).get_all()
+
+        return Response(self.serialize(queryset))
 
 class EnterpriseDataListView(BaseView):
 
@@ -1660,7 +1705,7 @@ class CorpusView(BaseView):
                 'keyword': r.get('keyword', ''),
                 'category': get_major_category(r['category_id']) if r.get('category_id', None) else r.get('category_id', ''),
             }, results)
-          
+
         }
 
         return data
@@ -1690,7 +1735,7 @@ class CorpusAddView(BaseView):
 
 
 class CategoryListView(BaseView):
-    
+
     def __init__(self):
         super(CategoryListView, self).__init__()
 
@@ -1698,24 +1743,24 @@ class CategoryListView(BaseView):
         super(CategoryListView, self).set_request(request)
 
     def read_category(self, results):
-        
+
         data = map(lambda r : {
 
                 'category_id' : r['id'],
                 'category' : r['name'],
 
             },results)
-        
-        
-        return data    
+
+
+        return data
 
     def get(self, request):
         self.set_request(request)
-        
+
         results = CategoryListData(params = request.query_params).get_all()
 
         return Response(self.read_category(results))
-        
+
 
 
 class CorpusEditView(BaseView):

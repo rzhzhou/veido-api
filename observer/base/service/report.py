@@ -27,7 +27,7 @@ class NewsReportData(Abstract):
             'period': getattr(self, 'period', None),
             'news_type': getattr(self, 'news_type', None),
             'pubtime__gte': getattr(self, 'starttime', None),
-            'pubtime__lt': getattr(self, 'endtime', None),
+            'pubtime__lte': getattr(self, 'endtime', None),
         }
 
         args = dict([k, v] for k, v in cond.items() if v)
