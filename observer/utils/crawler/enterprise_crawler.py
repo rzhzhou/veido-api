@@ -9,10 +9,9 @@ from lxml import etree
 from observer.utils.str_format import str_to_md5str
 from observer.base.models import Inspection2, Area, Enterprise
 
-jieba.load_userdict('observer/utils/dictionary.txt')
-
 
 def crawler(edit_ids, urls, product_names):
+    jieba.load_userdict('observer/utils/dictionary.txt')
     for (ids, url, product_name) in zip(edit_ids.split(","), urls.split(","), product_names.split(",")):
 
         print('正在爬取...：', ids, product_name)

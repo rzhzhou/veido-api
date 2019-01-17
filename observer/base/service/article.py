@@ -6,7 +6,7 @@ import datetime
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, Q, F
 
-from observer.base.models import(Area, Article, ArticleArea, 
+from observer.base.models import(Area, Article, ArticleArea,
                                 Category, ArticleCategory, )
 from django.contrib.auth.models import Group
 from observer.base.service.abstract import Abstract
@@ -24,15 +24,15 @@ class ArticleData(Abstract):
         super(ArticleData, self).__init__(params)
 
     def get_all(self):
-        fields = ('guid', 'url', 'title', 'source', 'pubtime', 'score', )
+        fields = ('guid', 'url', 'title', 'source', 'pubtime', 'score')
 
         cond = {
             'pubtime__gte': getattr(self, 'starttime', None),
-            'pubtime__lt': getattr(self, 'endtime', None),
+            'pubtime__lte': getattr(self, 'endtime', None),
             'title__contains': getattr(self, 'title', None),
             'source__contains': getattr(self, 'source', None),
             'score': getattr(self, 'score', None),
-            'status': 1, 
+            'status': 1,
         }
         area_ids = getattr(self, 'areas', None)
         category_ids = getattr(self, 'categories', None)
@@ -48,7 +48,7 @@ class ArticleData(Abstract):
                 a_ids = ArticleCategory.objects.filter(category_id=self.category).values_list('article_id', flat=True)
             else:
                 a_ids = ArticleCategory.objects.filter(category_id__in=c_ids).values_list('article_id', flat=True)
-            
+
             queryset = queryset.filter(guid__in=a_ids)
 
         if area_ids:
@@ -70,7 +70,7 @@ class RiskData(Abstract):
 
         cond = {
             'pubtime__gte': getattr(self, 'starttime', None),
-            'pubtime__lt': getattr(self, 'endtime', None),
+            'pubtime__lte': getattr(self, 'endtime', None),
             'title__contains': getattr(self, 'title', None),
             'source__contains': getattr(self, 'source', None),
             'score': getattr(self, 'score', None),
@@ -98,7 +98,7 @@ class RiskData(Abstract):
             queryset = queryset.filter(corpus_id = self.user.id).values(*fields)
 
         queryset = queryset.values(*fields).order_by('-pubtime')
-            
+
         return queryset
 
 
@@ -364,7 +364,7 @@ class RiskDataExport(Abstract):
         start = months[0].strftime('%Y-%m-%d')
         end = months[1].strftime('%Y-%m-%d')
 
-        queryset = Article.objects.filter(pubtime__gte=start, pubtime__lt=end).values('guid', 'title', 'url', 'pubtime', 'source', 'score')
+        queryset = Article.objects.filter(pubtime__gte=start, pubtime__lte=end).values('guid', 'title', 'url', 'pubtime', 'source', 'score')
 
         for q in queryset:
             data.append([q['guid'],
@@ -439,8 +439,8 @@ class StatisticsShow(Abstract):
             guid_business_ids = ArticleCategory.objects.exclude(category_id = '0001').exclude(category_id = '0002').values_list('article_id', flat = True)
             queryset = queryset.filter(guid__in = guid_business_ids)
 
-        
-        
+
+
         user_id = 65
         listdata = []
         while(user_id <= 71):
@@ -453,7 +453,7 @@ class StatisticsShow(Abstract):
                 queryset_short = queryset.filter(pubtime__gte = time_month, corpus_id = user_id, status=1)
             else:
                 queryset_short = queryset.filter(pubtime__gte = time_week, corpus_id = user_id, status=1)
-                
+
             data = {
                 'user': user_id,
                 'times': queryset_short.count(),
@@ -462,8 +462,3 @@ class StatisticsShow(Abstract):
             user_id += 1
 
         return listdata
-
-    
-
-
-        
