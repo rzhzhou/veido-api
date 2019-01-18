@@ -20,8 +20,7 @@ from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd,
 from observer.base.service.base import (alias_industry, area, areas,
                                         categories, get_major_category,
                                         get_major_industry, get_user_extra,
-                                        get_user_nav, local_related, qualitied,
-                                        risk_injury)
+                                        get_user_nav, local_related, qualitied)
 from observer.base.service.corpus import (CategoryListData, CorpusAdd,
                                           CorpusData, CorpusDelete, CorpusEdit,
                                           CrawlerData)
@@ -105,6 +104,10 @@ class DashboardView(BaseView):
 
 
 class ArticleView(BaseView):
+    # 0001---质量热点
+    # 0002---风险快讯
+    # 0003---业务信息
+    # 0004---专家视点
 
     def __init__(self):
         super(ArticleView, self).__init__()
@@ -129,7 +132,7 @@ class ArticleView(BaseView):
                 'url': x['url'],
                 'title': x['title'],
                 'source': x['source'],
-                'areas': areas(x['guid']),
+                'areas': areas(x['id']),
                 'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
             }, result),
         }
@@ -145,11 +148,10 @@ class ArticleView(BaseView):
                 'url': x['url'],
                 'title': x['title'],
                 'source': x['source'],
-                'areas': areas(x['guid']),
+                'areas': areas(x['id']),
                 'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
                 'score': x['score'],
-                'local_related': local_related(x['guid'], self.user), # 本地风险相关度
-                'risk_injury': risk_injury(x['guid']),
+                'local_related': local_related(x['id'], self.user), # 本地风险相关度
             }, result),
         }
 
@@ -161,11 +163,11 @@ class ArticleView(BaseView):
         data = {
             'total': total,
             'list': map(lambda x: {
-                'categories': categories(x['guid']),
+                'categories': categories(x['id']),
                 'url': x['url'],
                 'title': x['title'],
                 'source': x['source'],
-                'areas': areas(x['guid']),
+                'areas': areas(x['id']),
                 'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
             }, result),
         }
@@ -181,7 +183,7 @@ class ArticleView(BaseView):
                 'url': x['url'],
                 'title': x['title'],
                 'source': x['source'],
-                'areas': areas(x['guid']),
+                'areas': areas(x['id']),
                 'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
             }, result),
         }
@@ -1200,13 +1202,13 @@ class RiskDataView(BaseView):
         data = {
             'total': total,
             'list': map(lambda x: {
-                'guid': x['guid'],
+                'id': x['id'],
                 'url': x['url'],
                 'title': x['title'],
                 'score': x['score'],
                 'source': x['source'],
-                'areas': areas(x['guid']),
-                'categories': categories(x['guid'], admin=True),
+                'areas': areas(x['id']),
+                'categories': categories(x['id'], admin=True),
                 'pubtime': date_format(x['pubtime'], '%Y-%m-%d %H:%M:%S'),
                 'status': x['status'],
             }, result),

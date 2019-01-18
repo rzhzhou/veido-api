@@ -9,7 +9,7 @@ import datetime
 import random
 
 from observer.utils.str_format import str_to_md5str
-from observer.base.models import (Article, Area, ArticleArea, Category, ArticleCategory)
+from observer.base.models import (Article2, Area, Category,)
 
 
 def newsCrawler(word, page):
@@ -81,16 +81,16 @@ def newsCrawler(word, page):
                 # 获取Area库里的id编号，然后存入ArticleArea，存入方法是将与唯一标识符a_guid绑定，等取出来时，根据a_guid取出来
                 area_id = Area.objects.filter(name = area_real)[0].id
                 category_id =  Category.objects.filter(name = category)[0].id
-                if not ArticleArea.objects.filter(article_id = guid_id, area_id = area_id).exists():
-                    ArticleArea(
-                        article_id = guid_id,
-                        area_id = area_id
-                    ).save()
-                if not ArticleCategory.objects.filter(article_id = guid_id, category_id = category_id).exists():
-                    ArticleCategory(
-                        article_id=guid_id,
-                        category_id=category_id
-                    ).save()
+                # if not ArticleArea.objects.filter(article_id = guid_id, area_id = area_id).exists():
+                #     ArticleArea(
+                #         article_id = guid_id,
+                #         area_id = area_id
+                #     ).save()
+                # if not ArticleCategory.objects.filter(article_id = guid_id, category_id = category_id).exists():
+                #     ArticleCategory(
+                #         article_id=guid_id,
+                #         category_id=category_id
+                #     ).save()
 
                 # 接下来处理时间，处理为纯数字，用来下面判断是否为今天的新闻
                 _time_two = news_time[1]
@@ -106,7 +106,7 @@ def newsCrawler(word, page):
                     _time = _time.replace('月','-')
                     _time = _time.strip('日')
 
-                    Article(
+                    Article2(
                         guid = guid_id,
                         title = title,
                         url = news_url,
@@ -119,7 +119,7 @@ def newsCrawler(word, page):
                 else:
                     _time = datetime.date.today()  # time.strftime('%Y-%m-%d', time.localtime(time.time()))
 
-                    Article(
+                    Article2(
                         guid = guid_id,
                         title = title,
                         url = news_url,
