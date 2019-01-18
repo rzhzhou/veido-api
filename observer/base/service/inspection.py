@@ -84,9 +84,9 @@ class EnterpriseDataDelete(Abstract):
         self.user = user
 
     def delete(self, cid):
-        del_ids = cid
-        for ids in del_ids.split(","):
-            Enterprise.objects.filter(id=ids).delete()
+        del_ids = cid.split(",")
+
+        Enterprise.objects.filter(id__in=del_ids).delete()
 
         return 200
 
@@ -96,9 +96,9 @@ class EnterpriseDataAudit(Abstract):
         super(EnterpriseDataAudit, self).__init__(params)
 
     def edit(self, cid):
-        edi_ids = cid
-        for ids in edi_ids.split(","):
-            Enterprise.objects.filter(id=ids).update(status=1)
+        audit_ids = cid.split(",")
+
+        Enterprise.objects.filter(id__in=audit_ids).update(status=1)
 
         return 200
 
@@ -222,7 +222,7 @@ class InspectionDataEdit(Abstract):
 
     def edit(self, cid):
         # qualification rate
-        def qr(x, y): return float(1) if not x else float(x) / float(y)
+        def qr(x, y): return float(0) if not x else float(x) / float(y)
 
         edit_id = cid
         url = getattr(self, 'url', '')
@@ -268,21 +268,21 @@ class InspectionDataDelete(Abstract):
         self.user = user
 
     def delete(self, cid):
-        del_ids = cid
-        for ids in del_ids.split(","):
-            Inspection2.objects.filter(id=ids).delete()
+        del_ids = cid.split(",")
+
+        Inspection2.objects.filter(id__in=del_ids).delete()
 
         return 200
 
 
 class InspectionDataUpload(Abstract):
 
-    jieba.load_userdict('observer/utils/dictionary.txt')
-
     def __init__(self, user):
         self.user = user
 
     def upload(self, filename, file_obj):
+        jieba.load_userdict('observer/utils/dictionary.txt')
+
         # ModelWeight
         model = {'标题': 0, '链接': 0, '发布日期': 0, '抽查类别': 0, '抽查等级': 0, '抽检单位': 0,
                  '地域': 0, '产品名称': 0, '抽查批次': 0, '合格批次': 0, '不合格批次': 0}

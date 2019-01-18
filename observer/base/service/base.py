@@ -2,14 +2,13 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from django.contrib.auth.models import User, Group
 
-from observer.base.models import (Area, ArticleArea, ArticleCategory,
-                                Category, UserArea, AliasIndustry, MajorIndustry,
-                                Enterprise, UserNav)
+from observer.base.models import (Area, Category, UserArea, AliasIndustry, MajorIndustry,
+                                Enterprise, UserNav, Article2)
 from observer.utils.date_format import date_format
 
 
 def areas(article_id, flat=False):
-    a_ids = ArticleArea.objects.filter(article_id=article_id).values_list('area_id', flat=True)
+    a_ids = Article2.objects.filter(id=article_id).values_list('areas__id', flat=True)
     queryset = Area.objects.filter(id__in=a_ids)
 
     if not queryset.exists():
@@ -22,8 +21,8 @@ def areas(article_id, flat=False):
 
 
 def categories(article_id, admin=False, flat=False):
-    a_ids = ArticleCategory.objects.filter(article_id=article_id).values_list('category_id', flat=True)
-    queryset = Category.objects.filter(id__in=a_ids)
+    c_ids = Article2.objects.filter(id=article_id).values_list('categories__id', flat=True)
+    queryset = Category.objects.filter(id__in=c_ids)
 
     if not admin:
         queryset = queryset.filter(level=2)
@@ -41,24 +40,24 @@ def categories(article_id, admin=False, flat=False):
 def local_related(article_id, user):
     f = lambda x, y : set(x).issubset(set(y)) or set(y).issubset(set(x))
 
-    a_ids = ArticleArea.objects.filter(article_id=article_id).values_list('area_id', flat=True)
+    area_ids = Article2.objects.filter(id=article_id).values_list('areas__id', flat=True)
     u_area = UserArea.objects.get(user=user).area
     u_area_id = u_area.id
     u_level = u_area.level
 
     # 当前用户的地域存在于新闻中
-    if u_area_id in a_ids:
+    if u_area_id in area_ids:
         return 3
     else:
         # 当前用户的地域是省份城市
         if u_level == 2:
-            if f(Area.objects.filter(parent=u_area).values_list('id', flat=True), a_ids):
+            if f(Area.objects.filter(parent=u_area).values_list('id', flat=True), area_ids):
                 return 3
         # 当前用户的地域是市级城市
         elif u_level == 3:
-            if u_area.parent.id in a_ids:
+            if u_area.parent.id in area_ids:
                 return 2
-            if f(Area.objects.filter(parent=u_area.parent).values_list('id', flat=True), a_ids):
+            if f(Area.objects.filter(parent=u_area.parent).values_list('id', flat=True), area_ids):
                 return 2
 
     # 不符合上述所有情况
@@ -144,13 +143,13 @@ def enterprise_area_name(inspection_id, flat=False):
     return
 
 
-def risk_injury(article_id):
-    c_ids = ArticleCategory.objects.filter(article_id=article_id).values_list('category_id', flat=True)
-    c_id = Category.objects.get(name="风险伤害").id
+# def risk_injury(article_id):
+#     c_ids = ArticleCategory.objects.filter(article_id=article_id).values_list('category_id', flat=True)
+#     c_id = Category.objects.get(name="风险伤害").id
 
-    if c_id in c_ids:
-        return 1
-    return 0
+#     if c_id in c_ids:
+#         return 1
+#     return 0
 
 
 def get_user_nav(user_id):

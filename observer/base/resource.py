@@ -89,7 +89,7 @@ class ArticleResources(resources.ModelResource):
     corpus_id = fields.Field(attribute='corpus_id', column_name='语料词编号')
 
     class Meta:
-        model = Article
+        model = Article2
         import_id_fields = ('guid',)
         fields = ('guid', 'title', 'url', 'pubtime', 'source', 'score', 'industry_id', 'corpus_id', )
         export_order = ('guid', 'title', 'url', 'pubtime', 'source', 'score', 'industry_id', 'corpus_id', )
@@ -103,30 +103,35 @@ class ArticleResources(resources.ModelResource):
 
 
     def before_save_instance(self, instance, using_transactions, dry_run):
-        a_guid = str_to_md5str(instance.url)
-        instance.guid = a_guid
 
-        if Article.objects.filter(guid=a_guid).exists():
+        article2 = Article2.objects.filter(url=instance.url)
+        if article2.exists():
             return
 
-        areas = instance.area.split(' ')
+        areas = instance.area.split(',')
         a_ids = Area.objects.filter(name__in=areas).values_list('id', flat=True)
-        categorys = instance.category.split(' ')
-        c_ids = Category.objects.filter(name__in=categorys).values_list('id', flat=True)
+        if len(areas) != len(a_ids):
+            return {
+                'status': 0,
+                'message': '操作失败！Excel %s 行"地域"有误！' % (i + 1, )
+            }
 
-        for a_id in a_ids:
-            if not ArticleArea.objects.filter(article_id=a_guid, area_id=a_id).exists():
-                ArticleArea(
-                    article_id=a_guid,
-                    area_id=a_id,
-                ).save()
+        area = Area.objects.filter(id__in=a_ids)
 
-        for c_id in c_ids:
-            if not ArticleCategory.objects.filter(article_id=a_guid, category_id=c_id).exists():
-                ArticleCategory(
-                    article_id=a_guid,
-                    category_id=c_id,
-                ).save()
+
+        categories = instance.category.split(',')
+        c_ids = Category.objects.filter(name__in=categories).values_list('id', flat=True)
+
+        if len(categories) != len(c_ids):
+            return {
+                'status': 0,
+                'message': '操作失败！Excel %s 行"类别"有误！' % (i + 1, )
+            }
+
+        category = Category.objects.filter(id__in=c_ids)
+
+        article2.areas.add(*area)
+        article2.categories.add(*category)
 
 
 class InspectionResources(resources.ModelResource):
@@ -154,7 +159,7 @@ class InspectionResources(resources.ModelResource):
         i_guid = str_to_md5str(instance.url)
         instance.guid = i_guid
 
-        if Article.objects.filter(guid=i_guid).exists():
+        if Article2.objects.filter(guid=i_guid).exists():
             return
 
 

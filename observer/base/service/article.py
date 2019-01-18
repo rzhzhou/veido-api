@@ -6,8 +6,7 @@ import datetime
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, Q, F
 
-from observer.base.models import(Area, Article, ArticleArea,
-                                Category, ArticleCategory, )
+from observer.base.models import(Area, Article2, Category, )
 from django.contrib.auth.models import Group
 from observer.base.service.abstract import Abstract
 from observer.base.service.base import (areas, categories, )
@@ -24,7 +23,7 @@ class ArticleData(Abstract):
         super(ArticleData, self).__init__(params)
 
     def get_all(self):
-        fields = ('guid', 'url', 'title', 'source', 'pubtime', 'score')
+        fields = ('id', 'url', 'title', 'source', 'pubtime', 'score')
 
         cond = {
             'pubtime__gte': getattr(self, 'starttime', None),
@@ -32,29 +31,19 @@ class ArticleData(Abstract):
             'title__contains': getattr(self, 'title', None),
             'source__contains': getattr(self, 'source', None),
             'score': getattr(self, 'score', None),
+            'areas': getattr(self, 'areas', None),
+            'categories': getattr(self, 'categories', None),
             'status': 1,
         }
-        area_ids = getattr(self, 'areas', None)
-        category_ids = getattr(self, 'categories', None)
+
         args = dict([k, v] for k, v in cond.items() if v)
-        queryset = Article.objects.filter(**args)
+        queryset = Article2.objects.filter(**args)
 
-        if category_ids:
-            a_ids = ArticleCategory.objects.filter(category_id=category_ids).values_list('article_id', flat=True)
-            queryset = queryset.filter(guid__in=a_ids)
+        c_ids = Category.objects.filter(parent__id=self.category).values_list('id', flat=True)
+        if not c_ids:
+            queryset = queryset.filter(categories=self.category)
         else:
-            c_ids = Category.objects.filter(parent__id=self.category).values_list('id', flat=True)
-            if not c_ids:
-                a_ids = ArticleCategory.objects.filter(category_id=self.category).values_list('article_id', flat=True)
-            else:
-                a_ids = ArticleCategory.objects.filter(category_id__in=c_ids).values_list('article_id', flat=True)
-
-            queryset = queryset.filter(guid__in=a_ids)
-
-        if area_ids:
-            a_ids = ArticleArea.objects.filter(area_id__in=area_ids[:-1:].split(',')).values_list('article_id', flat=True)
-            queryset = queryset.filter(guid__in=a_ids)
-
+            queryset = queryset.filter(categories__in=c_ids)
 
         return queryset.values(*fields).order_by('-pubtime')
 
@@ -66,7 +55,7 @@ class RiskData(Abstract):
         self.user = user
 
     def get_all(self):
-        fields = ('guid', 'url', 'title', 'source', 'pubtime', 'score', 'status' )
+        fields = ('id', 'url', 'title', 'source', 'pubtime', 'score', 'status' )
 
         cond = {
             'pubtime__gte': getattr(self, 'starttime', None),
@@ -76,30 +65,19 @@ class RiskData(Abstract):
             'score': getattr(self, 'score', None),
             'status': getattr(self, 'status', None),
             'industry_id': getattr(self, 'industry', None),
+            'areas': getattr(self, 'areas', None),
+            'categories': getattr(self, 'category', None),
         }
-        area_ids = getattr(self, 'areas', None)
-        cond_category = {'category_id' : getattr(self, 'category', None)}
 
         args = dict([k, v] for k, v in cond.items() if v)
-        queryset = Article.objects.exclude(status=-1).filter(**args)
-
-        if area_ids:
-            a_ids = ArticleArea.objects.filter(area_id__in=area_ids[:-1:].split(',')).values_list('article_id', flat=True)
-            queryset = queryset.filter(guid__in=a_ids)
-
-        args_category = dict([k, v] for k, v in cond_category.items() if v)
-        if args_category != {}:
-            guid_ids = ArticleCategory.objects.filter(**args_category).values_list('article_id', flat=True)
-            queryset = queryset.filter(guid__in=guid_ids)
+        queryset = Article2.objects.filter(**args)
 
         # 判断当前用户是否为武汉深度网科技有限公司成员，然后取出该用户管理的资料
         group_ids = Group.objects.filter(user=self.user).values_list('id', flat=True)
         if 4 in group_ids and 3 in group_ids:
-            queryset = queryset.filter(corpus_id = self.user.id).values(*fields)
+            queryset = queryset.filter(user_id = self.user.id).values(*fields)
 
-        queryset = queryset.values(*fields).order_by('-pubtime')
-
-        return queryset
+        return queryset.values(*fields).order_by('-pubtime')
 
 
 class RiskDataAdd(Abstract):
@@ -118,42 +96,35 @@ class RiskDataAdd(Abstract):
         categories = getattr(self, 'categories', '')
         industries = getattr(self, 'industries', '')
 
-        if not url or not pubtime or not source or not areas or not categories:
+        if not url or not title or not pubtime or not source or not areas or not categories:
             return 400
 
-        guid = str_to_md5str(url)
-
-        if Article.objects.filter(guid=guid).exists():
+        if Article2.objects.filter(url=url).exists():
             return 202
 
-        Article(
-            guid=guid,
+        # 有多个地域时逗号分隔，并且忽略掉最后一个逗号
+        a_ids = areas.split(',')[:-1:]
+        area = Area.objects.filter(id__in=a_ids)
+
+        c_ids = categories.split(',')[:-1:]
+        category = Category.objects.filter(id__in=c_ids)
+
+        article2 = Article2(
             title=title,
             url=url,
             pubtime=pubtime,
             source=source,
             score=score,
             industry_id=industries,
-            corpus_id=self.user.id,
+            user_id=self.user.id,
             status=1,
-        ).save()
+        )
+        article2.save()
 
-        a_ids = areas.split(',')[:-1:]
-        c_ids = categories.split(',')[:-1:]
+        article2.areas.add(*area)
+        article2.categories.add(*category)
 
-        for a_id in a_ids:
-            if not ArticleArea.objects.filter(article_id=guid, area_id=a_id).exists():
-                ArticleArea(
-                    article_id=guid,
-                    area_id=a_id,
-                ).save()
-
-        for c_id in c_ids:
-            if not ArticleCategory.objects.filter(article_id=guid, category_id=c_id).exists():
-                ArticleCategory(
-                    article_id=guid,
-                    category_id=c_id,
-                ).save()
+        article2.save()
 
         return 200
 
@@ -163,9 +134,9 @@ class RiskDataAudit(Abstract):
         super(RiskDataAudit, self).__init__(params)
 
     def edit(self, aid):
-        del_ids = aid
-        for ids in del_ids.split(","):
-            Article.objects.filter(guid=ids).update(status=1)
+        audit_ids = aid.split(',')
+
+        Article2.objects.filter(id__in=audit_ids).update(status=1)
 
         return 200
 
@@ -187,32 +158,25 @@ class RiskDataEdit(Abstract):
         if not pubtime or not source or not areas or not categories:
             return 400
 
-        article = Article.objects.get(guid=edit_id)
-        article.title = title
-        article.pubtime = pubtime
-        article.score = score
-        article.source = source
-        article.save()
+        article2 = Article2.objects.get(id=edit_id)
+        article2.title = title
+        article2.pubtime = pubtime
+        article2.score = score
+        article2.source = source
+        article2.save()
 
-        a_ids = areas.split(',')[:-1:]
+        a_ids = areas.split(',')[:-1:] # 有多个地域时逗号分隔，并且忽略掉最后一个逗号
         c_ids = categories.split(',')[:-1:]
 
-        ArticleArea.objects.filter(article_id=edit_id).delete()
-        ArticleCategory.objects.filter(article_id=edit_id).delete()
+        area = Area.objects.filter(id__in=a_ids)
+        category = Category.objects.filter(id__in=c_ids)
 
-        for a_id in a_ids:
-            if not ArticleArea.objects.filter(article_id=edit_id, area_id=a_id).exists():
-                ArticleArea(
-                    article_id=edit_id,
-                    area_id=a_id,
-                ).save()
+        article2.areas.clear()
+        article2.categories.clear()
+        article2.areas.add(*area)
+        article2.categories.add(*category)
 
-        for c_id in c_ids:
-            if not ArticleCategory.objects.filter(article_id=edit_id, category_id=c_id).exists():
-                ArticleCategory(
-                    article_id=edit_id,
-                    category_id=c_id,
-                ).save()
+        article2.save()
 
         return 200
 
@@ -223,9 +187,9 @@ class RiskDataDelete(Abstract):
         self.user = user
 
     def delete(self, aid):
-        del_ids = aid
-        for ids in del_ids.split(","):
-            Article.objects.filter(guid=ids).delete()
+        del_ids = aid.split(',')
+
+        Article2.objects.filter(id__in=del_ids).delete()
 
         return 200
 
@@ -271,11 +235,14 @@ class RiskDataUpload(Abstract):
                     model[k] = line.index(k) + 1
             else:
                 try:
-                    title = sv(i, model['标题'], sheet)
-                    url = sv(i, model['URL'], sheet)
+                    title = str(sv(i, model['标题'], sheet)).strip()
+                    url = str(sv(i, model['URL'], sheet)).strip()
 
                     if not url:
-                        continue
+                        return {
+                            'status': 0,
+                            'message': '操作失败！Excel %s 行"链接"有误！' % (i + 1, )
+                        }
 
                     pubtime = date_format(sv(i, model['发布时间'], sheet))
                     if not pubtime:
@@ -284,17 +251,45 @@ class RiskDataUpload(Abstract):
                             'message': '操作失败！Excel %s 行时间格式有误！' % (i + 1, )
                         }
 
-                    source = sv(i, model['来源'], sheet)
+                    source = str(sv(i, model['来源'], sheet)).strip()
                     score = sv(i, model['风险程度'], sheet)
-                    area = sv(i, model['地域'], sheet)
-                    category = sv(i, model['类别'], sheet)
+
+                    # 地域
+                    area = str(sv(i, model['地域'], sheet)).strip()
+                    areas = area.split(',')
+                    a_ids = Area.objects.filter(name__in=areas).values_list('id', flat=True)
+
+                    if len(areas) != len(a_ids):
+                        return {
+                            'status': 0,
+                            'message': '操作失败！Excel %s 行"地域"有误！' % (i + 1, )
+                        }
+
+                    area = Area.objects.filter(id__in=a_ids)
+
+
+                    # 风险类别
+                    category = str(sv(i, model['类别'], sheet)).strip()
+                    categories = category.split(',')
+                    c_ids = Category.objects.filter(name__in=categories).values_list('id', flat=True)
+
+                    if len(categories) != len(c_ids):
+                        return {
+                            'status': 0,
+                            'message': '操作失败！Excel %s 行"类别"有误！' % (i + 1, )
+                        }
+
+                    category = Category.objects.filter(id__in=c_ids)
+
+                    # 行业编号
                     industry_id = sv(i, model['行业编号'], sheet)
+                    if not industry_id or industry_id == '0':
+                        industry_id = '-1'
 
                     total += 1
 
-                    a_guid = str_to_md5str(url)
-
-                    old_article = Article.objects.filter(guid=a_guid)
+                    # 唯一性
+                    old_article = Article2.objects.filter(url=url)
 
                     if old_article.exists():
                         old_article = old_article[0]
@@ -305,38 +300,29 @@ class RiskDataUpload(Abstract):
                         old_article.score = score
                         old_article.industry_id = industry_id
                         old_article.save()
+                        old_article.areas.clear()
+                        old_article.categories.clear()
+                        old_article.areas.add(*area)
+                        old_article.categories.add(*category)
+                        old_article.save()
+
                         dupli += 1
                         continue
 
-                    areas = area.split(',')
-                    a_ids = Area.objects.filter(name__in=areas).values_list('id', flat=True)
-                    categories = category.split(',')
-                    c_ids = Category.objects.filter(name__in=categories).values_list('id', flat=True)
-                    for a_id in a_ids:
-                        if not ArticleArea.objects.filter(article_id=a_guid, area_id=a_id).exists():
-                            ArticleArea(
-                                article_id=a_guid,
-                                area_id=a_id,
-                            ).save()
-
-                    for c_id in c_ids:
-                        if not ArticleCategory.objects.filter(article_id=a_guid, category_id=c_id).exists():
-                            ArticleCategory(
-                                article_id=a_guid,
-                                category_id=c_id,
-                            ).save()
-
-                    Article(
-                        guid=a_guid,
+                    article2 = Article2(
                         title=title,
                         url=url,
                         pubtime=pubtime,
                         source=source,
                         score=score,
                         industry_id=industry_id,
-                        corpus_id=self.user.id,
+                        user_id=self.user.id,
                         status=1,
-                    ).save()
+                    )
+                    article2.save()
+                    article2.areas.add(*area)
+                    article2.categories.add(*category)
+                    article2.save()
 
                 except Exception as e:
                     return {
@@ -355,33 +341,33 @@ class RiskDataExport(Abstract):
     def __init__(self, user):
         self.user = user
 
-    def export(self):
-        filename = "articles.xlsx"
+    # def export(self):
+    #     filename = "articles.xlsx"
 
-        # process data
-        data = [
-            ['GUID', '标题', 'URL', '发布时间', '来源', '发布者', '风险程度', '地域', '类别', ],
-        ]
-        months = get_months()[-1::][0]
-        start = months[0].strftime('%Y-%m-%d')
-        end = months[1].strftime('%Y-%m-%d')
+    #     # process data
+    #     data = [
+    #         ['GUID', '标题', 'URL', '发布时间', '来源', '发布者', '风险程度', '地域', '类别', ],
+    #     ]
+    #     months = get_months()[-1::][0]
+    #     start = months[0].strftime('%Y-%m-%d')
+    #     end = months[1].strftime('%Y-%m-%d')
 
-        queryset = Article.objects.filter(pubtime__gte=start, pubtime__lte=end).values('guid', 'title', 'url', 'pubtime', 'source', 'score')
+    #     queryset = Article.objects.filter(pubtime__gte=start, pubtime__lte=end).values('guid', 'title', 'url', 'pubtime', 'source', 'score')
 
-        for q in queryset:
-            data.append([q['guid'],
-                         q['title'],
-                         q['url'],
-                         date_format(q['pubtime'], '%Y-%m-%d'),
-                         q['source'],
-                         q['score'],
-                         areas(q['guid'], flat=True),
-                         categories(q['guid'], flat=True)])
+    #     for q in queryset:
+    #         data.append([q['guid'],
+    #                      q['title'],
+    #                      q['url'],
+    #                      date_format(q['pubtime'], '%Y-%m-%d'),
+    #                      q['source'],
+    #                      q['score'],
+    #                      areas(q['guid'], flat=True),
+    #                      categories(q['guid'], flat=True)])
 
-        # write file
-        write_by_openpyxl(filename, data)
+    #     # write file
+    #     write_by_openpyxl(filename, data)
 
-        return open(filename, 'rb')
+    #     return open(filename, 'rb')
 
 
 class RiskDataSuzhou(Abstract):
@@ -390,16 +376,16 @@ class RiskDataSuzhou(Abstract):
         super(RiskDataSuzhou, self).__init__(params)
 
     def get_risk_data_list(self, search_value):
-        fields = ('guid', 'title', 'pubtime', 'url', 'source', 'score' )
+        fields = ('id', 'title', 'pubtime', 'url', 'source', 'score' )
 
         args = {}
-        a_ids = ArticleCategory.objects.filter(category_id='0002').values_list('article_id', flat=True)
+        ac_id = Category.objects.get(name='风险快讯').id
 
         if not search_value:
-            queryset = Article.objects.exclude(status=0).filter(guid__in=a_ids).values(*fields)
+            queryset = Article2.objects.filter(categories__in=ac_id, status=1).values(*fields)
         else:
-            queryset = Article.objects.exclude(status=0).filter(Q(title__contains=search_value) | Q(source__contains=search_value)).values(*fields)
-            queryset = queryset.filter(guid__in=a_ids)
+            queryset = Article2.objects.filter(Q(title__contains=search_value) | Q(source__contains=search_value), status=1).values(*fields)
+            queryset = queryset.filter(categories__in=ac_id)
 
         return queryset
 
@@ -431,15 +417,15 @@ class StatisticsShow(Abstract):
         time_week = now + datetime.timedelta(days = aWeek)
         time_month = now + datetime.timedelta(days = aMonth)
 
-        queryset = Article.objects.filter(pubtime__gte = time_month)
+        queryset = Article2.objects.filter(pubtime__gte = time_month)
 
-        if getattr(self, 'category', None) == '0001' or getattr(self, 'category', None) == '0002':
-            category_id = getattr(self, 'category')
-            guid_ids = ArticleCategory.objects.filter(category_id = category_id).values_list('article_id', flat = True)
-            queryset = queryset.filter(guid__in = guid_ids)
-        if getattr(self, 'category', None) == '0003':
-            guid_business_ids = ArticleCategory.objects.exclude(category_id = '0001').exclude(category_id = '0002').values_list('article_id', flat = True)
-            queryset = queryset.filter(guid__in = guid_business_ids)
+        # if getattr(self, 'category', None) == '0001' or getattr(self, 'category', None) == '0002':
+        #     category_id = getattr(self, 'category')
+        #     guid_ids = ArticleCategory.objects.filter(category_id = category_id).values_list('article_id', flat = True)
+        #     queryset = queryset.filter(guid__in = guid_ids)
+        # if getattr(self, 'category', None) == '0003':
+        #     guid_business_ids = ArticleCategory.objects.exclude(category_id = '0001').exclude(category_id = '0002').values_list('article_id', flat = True)
+        #     queryset = queryset.filter(guid__in = guid_business_ids)
 
 
 
@@ -448,13 +434,13 @@ class StatisticsShow(Abstract):
         while(user_id <= 71):
             queryset_short = queryset
             if getattr(self, 'time', None) == '每日':
-                queryset_short = queryset.filter(pubtime__gte = now, corpus_id = user_id, status=1)
+                queryset_short = queryset.filter(pubtime__gte = now, user_id = user_id, status=1)
             elif getattr(self, 'time', None) == '每周':
-                queryset_short = queryset.filter(pubtime__gte = time_week, corpus_id = user_id, status=1)
+                queryset_short = queryset.filter(pubtime__gte = time_week, user_id = user_id, status=1)
             elif getattr(self, 'time', None) == '每月':
-                queryset_short = queryset.filter(pubtime__gte = time_month, corpus_id = user_id, status=1)
+                queryset_short = queryset.filter(pubtime__gte = time_month, user_id = user_id, status=1)
             else:
-                queryset_short = queryset.filter(pubtime__gte = time_week, corpus_id = user_id, status=1)
+                queryset_short = queryset.filter(pubtime__gte = time_week, user_id = user_id, status=1)
 
             data = {
                 'user': user_id,
