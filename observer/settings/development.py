@@ -98,11 +98,11 @@ DATABASES = {
     },
     'crawler': {
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': 'gz-cdb-ko3zdkzs.sql.tencentcdb.com',
+        'HOST': '192.168.0.123',
         'NAME': 'crawler',
-        'USER': 'shendu',
-        'PASSWORD': 'P@55word',
-        'PORT': 63440,
+        'USER': 'root',
+        'PASSWORD': '123456',
+        'PORT': 3306,
         'OPTIONS': {'charset': 'utf8mb4'},
     },
     'shendu': {

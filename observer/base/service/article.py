@@ -69,7 +69,7 @@ class RiskData(Abstract):
         # 判断当前用户是否为武汉深度网科技有限公司成员，然后取出该用户管理的资料
         group_ids = Group.objects.filter(user=self.user).values_list('id', flat=True)
         if 4 in group_ids and 3 in group_ids:
-            queryset = queryset.filter(corpus_id = self.user.id).values(*fields)
+            queryset = queryset.filter(user_id = self.user.id).values(*fields)
 
         return queryset.values(*fields).order_by('-pubtime')
 
@@ -110,7 +110,7 @@ class RiskDataAdd(Abstract):
             source=source,
             score=score,
             industry_id=industries,
-            corpus_id=self.user.id,
+            user_id=self.user.id,
             status=1,
         )
         article2.save()
@@ -310,7 +310,7 @@ class RiskDataUpload(Abstract):
                         source=source,
                         score=score,
                         industry_id=industry_id,
-                        corpus_id=self.user.id,
+                        user_id=self.user.id,
                         status=1,
                     )
                     article2.save()
@@ -411,7 +411,7 @@ class StatisticsShow(Abstract):
         time_week = now + datetime.timedelta(days = aWeek)
         time_month = now + datetime.timedelta(days = aMonth)
 
-        queryset = Article.objects.filter(pubtime__gte = time_month)
+        queryset = Article2.objects.filter(pubtime__gte = time_month)
 
         # if getattr(self, 'category', None) == '0001' or getattr(self, 'category', None) == '0002':
         #     category_id = getattr(self, 'category')
@@ -428,13 +428,13 @@ class StatisticsShow(Abstract):
         while(user_id <= 71):
             queryset_short = queryset
             if getattr(self, 'time', None) == '每日':
-                queryset_short = queryset.filter(pubtime__gte = now, corpus_id = user_id, status=1)
+                queryset_short = queryset.filter(pubtime__gte = now, user_id = user_id, status=1)
             elif getattr(self, 'time', None) == '每周':
-                queryset_short = queryset.filter(pubtime__gte = time_week, corpus_id = user_id, status=1)
+                queryset_short = queryset.filter(pubtime__gte = time_week, user_id = user_id, status=1)
             elif getattr(self, 'time', None) == '每月':
-                queryset_short = queryset.filter(pubtime__gte = time_month, corpus_id = user_id, status=1)
+                queryset_short = queryset.filter(pubtime__gte = time_month, user_id = user_id, status=1)
             else:
-                queryset_short = queryset.filter(pubtime__gte = time_week, corpus_id = user_id, status=1)
+                queryset_short = queryset.filter(pubtime__gte = time_week, user_id = user_id, status=1)
 
             data = {
                 'user': user_id,
