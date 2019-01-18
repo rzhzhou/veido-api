@@ -88,6 +88,7 @@ class RiskDataAdd(Abstract):
         source = getattr(self, 'source', '')
         areas = getattr(self, 'areas', '')
         categories = getattr(self, 'categories', '')
+        industries = getattr(self, 'industries', '')
 
         if not url or not title or not pubtime or not source or not areas or not categories:
             return 400
@@ -108,6 +109,8 @@ class RiskDataAdd(Abstract):
             pubtime=pubtime,
             source=source,
             score=score,
+            industry_id=industries,
+            corpus_id=self.user.id,
             status=1,
         )
         article2.save()

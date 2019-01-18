@@ -392,6 +392,12 @@ class Article2(models.Model):
         on_delete=models.CASCADE,
         verbose_name='语料词'
     )
+    user = models.ForeignKey(
+        User,
+        default=1,
+        on_delete=models.CASCADE,
+        verbose_name='用户'
+    )
 
     areas = models.ManyToManyField(Area)
     categories = models.ManyToManyField(Category)
