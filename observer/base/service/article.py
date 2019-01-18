@@ -39,6 +39,12 @@ class ArticleData(Abstract):
         args = dict([k, v] for k, v in cond.items() if v)
         queryset = Article2.objects.filter(**args)
 
+        c_ids = Category.objects.filter(parent__id=self.category).values_list('id', flat=True)
+        if not c_ids:
+            queryset = queryset.filter(categories=self.category)
+        else:
+            queryset = queryset.filter(categories__in=c_ids)
+
         return queryset.values(*fields).order_by('-pubtime')
 
 
