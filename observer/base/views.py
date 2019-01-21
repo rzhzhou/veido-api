@@ -1381,7 +1381,7 @@ class EnterpriseDataUnqualifiedView(BaseView):
                 'product_name': x['inspection__product_name'],
                 'source': x['inspection__source'],
                 'enterprise': x['name'],
-                'area': area(x['area_id']),
+                'area': {'id': x['area'], 'text': x['area__name']},
                 'unitem': x['unitem'],
                 'pubtime': x['inspection__pubtime'],
             }, result),

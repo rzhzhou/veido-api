@@ -238,18 +238,6 @@ class CorpusCategories(models.Model):
 
 
 class Enterprise(models.Model):
-    name = models.CharField(max_length=255, verbose_name='名称')
-    unitem = models.CharField(max_length=255, verbose_name='不合格项')
-
-    area_id = models.IntegerField(verbose_name='地域ID')
-    status = models.IntegerField(default=1, verbose_name='状态')# 0, 未审核(默认值)  1, 已审核
-
-    class Meta:
-        app_label = 'base'
-        verbose_name_plural = '企业'
-
-
-class Enterprise2(models.Model):
     STATUS_CHOICES = (
         ('1', '已审核'),
         ('0', '未审核'),
