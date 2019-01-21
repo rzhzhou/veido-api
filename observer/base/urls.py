@@ -65,7 +65,11 @@ urlpatterns = [
     path('news_report/download/<int:cid>/', views.news_report_download), # 舆情报告下载
     path('news_report/delete/<str:cid>/', views.NewsReportDeleteView.as_view()), # 舆情报告删除
     path('user_nav/<int:cid>/', views.UserNavView.as_view()), # 用户权限导航
-
+    path('versionrecord', views.VersionRecordDataView.as_view()), # 版本记录
+    path('versionrecord/add', views.VersionRecordDataAddView.as_view()), # 版本记录添加
+    path('versionrecord/delete/<str:cid>/', views.VersionRecordDataDeleteView.as_view()), # 版本记录删除
+    path('versionrecord/edit/<int:cid>/', views.VersionRecordDataEditView.as_view()), # 版本记录修改
+    
     path('select2/industries', views.Select2IndustryView.as_view()),  # 行业名称
     path('select2/alias_industries', views.Select2AliasIndustryView.as_view()),  # 行业别名
     path('select2/ccc_industries', views.Select2CCCListView.as_view()),  # 3C行业

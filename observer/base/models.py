@@ -4,6 +4,7 @@ import datetime
 from django.contrib.auth.models import User, Group
 from django.db import models
 from observer.settings.development import UPLOAD_URL
+from tinymce.models import HTMLField
 
 
 class Area(models.Model):
@@ -526,3 +527,17 @@ class NewsReport(models.Model):
 
     def __str__(self):
         return self.group.name
+
+
+class VersionRecord(models.Model):
+    version = models.CharField(max_length=255, verbose_name='版本号')
+    content = HTMLField(verbose_name='内容')
+    pubtime = models.DateTimeField(auto_now_add=True, verbose_name='时间')
+
+    class Meta:
+        app_label = 'base'
+        verbose_name_plural = '版本记录'
+        ordering = ['-pubtime']
+
+    def __str__(self):
+        return self.version

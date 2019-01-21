@@ -10,7 +10,7 @@ from rest_framework.parsers import FileUploadParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from observer.base.models import AliasIndustry, Nav, NewsReport, UserNav
+from observer.base.models import AliasIndustry, Nav, NewsReport, UserNav, VersionRecord
 from observer.base.service.area import Select2AreaData
 from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd,
                                            RiskDataAudit, RiskDataDelete,
@@ -54,6 +54,10 @@ from observer.base.service.inspection import (EnterpriseData,
                                               InspectionDataSuzhou,
                                               InspectionDataUnEnterpriseUpload,
                                               InspectionDataUpload)
+from observer.base.service.version import (VersionRecordData,
+                                           VersionRecordDataAdd,
+                                           VersionRecordDataEdit,
+                                           VersionRecordDataDelete)
 from observer.base.service.navbar import NavBarEdit
 from observer.base.service.news import NewsAdd, NewsDelete, NewsEdit, ViewsData
 from observer.base.service.report import (NewsReportData, NewsReportDelete,
@@ -1392,6 +1396,7 @@ class EnterpriseDataUnqualifiedView(BaseView):
 
         return Response(self.serialize(queryset))
 
+
 class EnterpriseDataListView(BaseView):
 
     def __init__(self):
@@ -2458,3 +2463,87 @@ class StatisticsView(BaseView):
     def get(self, request):
         result = StatisticsShow(params = request.query_params).get_data()
         return Response(self.serialize(result))
+
+
+class VersionRecordDataView(BaseView):
+
+    def __init__(self):
+        super(VersionRecordDataView, self).__init__()
+
+    def set_request(self, request):
+        super(VersionRecordDataView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(VersionRecordDataView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        result = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda x: {
+                'id': x['id'],
+                'version': x['version'],
+                'content': x['content'],
+                'pubtime': date_format(x['pubtime'], '%Y-%m-%d %T'),
+            }, result),
+        }
+
+        return data
+
+    def get(self, request):
+        self.set_request(request)
+
+        queryset = VersionRecordData(params=request.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+
+class VersionRecordDataAddView(BaseView):
+
+    def __init__(self):
+        super(VersionRecordDataAddView, self).__init__()
+
+    def set_request(self, request):
+        super(VersionRecordDataAddView, self).set_request(request)
+
+    def post(self, request):
+        self.set_request(request)
+
+        queryset = VersionRecordDataAdd(user=request.user, params=request.data).add()
+
+        return Response(status=queryset)
+
+
+class VersionRecordDataDeleteView(BaseView):
+    def __init__(self):
+        super(VersionRecordDataDeleteView, self).__init__()
+
+    def set_request(self, request):
+        super(VersionRecordDataDeleteView, self).set_request(request)
+
+    def delete(self, request, cid):
+        self.set_request(request)
+
+        queryset = VersionRecordDataDelete(user=request.user).delete(cid=cid)
+
+        return Response(status=queryset)
+
+
+class VersionRecordDataEditView(BaseView):
+    def __init__(self):
+        super(VersionRecordDataEditView, self).__init__()
+
+    def set_request(self, request):
+        super(VersionRecordDataEditView, self).set_request(request)
+
+    def post(self, request, cid):
+        self.set_request(request)
+
+        queryset = VersionRecordDataEdit(user=request.user, params=request.data).edit(cid=cid)
+
+        return Response(status=queryset)

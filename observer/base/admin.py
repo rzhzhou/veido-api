@@ -111,6 +111,12 @@ class IndustryProductsAdmin(ImportExportActionModelAdmin, ImportExportModelAdmin
     list_display = ('name', 'industry_id')
 
 
+class VersionRecordAdmin(ImportExportActionModelAdmin, ImportExportModelAdmin):
+    # resource_class = VersionRecordResources
+    search_fields = ('id', 'content')
+    list_display = ('version', 'content', 'pubtime')
+
+
 admin.site.register(Industry, IndustryAdmin)
 admin.site.register(CPCIndustry, CPCIndustryAdmin)
 admin.site.register(CCCIndustry, CCCIndustryAdmin)
@@ -129,3 +135,4 @@ admin.site.register(CorpusCategories)
 # admin.site.register(ArticleCategory, ArticleCategoryAdmin)
 admin.site.register(DMLink, DMLinkAdmin)
 admin.site.register(IndustryProducts, IndustryProductsAdmin)
+admin.site.register(VersionRecord, VersionRecordAdmin)
