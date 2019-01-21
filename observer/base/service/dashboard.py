@@ -1,8 +1,8 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, Q, F
 
-from observer.base.models import(Area, UserArea, Article2,
-                                Category, Inspection2,
+from observer.base.models import(Area, UserArea, Article,
+                                Category, Inspection,
                                 )
 from observer.base.service.abstract import Abstract
 from observer.base.service.base import areas, local_related, qualitied
@@ -62,46 +62,46 @@ class DashboardData(Abstract):
 
     def get_0001(self, months):
         ac_id = Category.objects.get(name='质量热点').id
-        a_ids = Article2.objects.filter(categories=ac_id).values_list('id', flat=True)
+        a_ids = Article.objects.filter(categories=ac_id).values_list('id', flat=True)
         c = lambda x, y, z : y.objects.filter(pubtime__gte=x[0], pubtime__lte=x[1], status=1, id__in=z).count()
 
-        pre = c(months[0], Article2, a_ids)
-        cur = c(months[1], Article2, a_ids)
+        pre = c(months[0], Article, a_ids)
+        cur = c(months[1], Article, a_ids)
 
         return self.mom(pre, cur)
 
     def get_0002(self, months):
         ac_id = Category.objects.get(name='风险快讯').id
-        a_ids = Article2.objects.filter(categories=ac_id).values_list('id', flat=True)
+        a_ids = Article.objects.filter(categories=ac_id).values_list('id', flat=True)
         c = lambda x, y, z : y.objects.filter(pubtime__gte=x[0], pubtime__lte=x[1], status=1, id__in=z).count()
 
-        pre = c(months[0], Article2, a_ids)
-        cur = c(months[1], Article2, a_ids)
+        pre = c(months[0], Article, a_ids)
+        cur = c(months[1], Article, a_ids)
 
         return self.mom(pre, cur)
 
     def get_0003(self, months):
         ac_ids = Category.objects.filter(parent__name='业务信息').values_list('id', flat=True)
-        a_ids = Article2.objects.filter(categories__in=ac_ids).values_list('id', flat=True)
+        a_ids = Article.objects.filter(categories__in=ac_ids).values_list('id', flat=True)
         c = lambda x, y, z : y.objects.filter(pubtime__gte=x[0], pubtime__lte=x[1], status=1, id__in=z).count()
 
-        pre = c(months[0], Article2, a_ids)
-        cur = c(months[1], Article2, a_ids)
+        pre = c(months[0], Article, a_ids)
+        cur = c(months[1], Article, a_ids)
 
         return self.mom(pre, cur)
 
     def get_0004(self, months):
         c = lambda x, y : y.objects.filter(pubtime__gte=x[0], pubtime__lte=x[1]).count()
 
-        pre = c(months[0], Inspection2)
-        cur = c(months[1], Inspection2)
+        pre = c(months[0], Inspection)
+        cur = c(months[1], Inspection)
 
         return self.mom(pre, cur)
 
     def get_0005(self):
         ac_id = Category.objects.get(name='质量热点').id
-        a_ids = Article2.objects.filter(categories=ac_id).values_list('id', flat=True)
-        queryset = Article2.objects.filter(status=1, id__in=a_ids).values('url', 'title', 'pubtime').order_by('-pubtime')[0:self.length]
+        a_ids = Article.objects.filter(categories=ac_id).values_list('id', flat=True)
+        queryset = Article.objects.filter(status=1, id__in=a_ids).values('url', 'title', 'pubtime').order_by('-pubtime')[0:self.length]
 
         return map(lambda x : {
                 'url': x['url'],
@@ -111,8 +111,8 @@ class DashboardData(Abstract):
 
     def get_0006(self):
         ac_id = Category.objects.get(name='专家视点').id
-        a_ids = Article2.objects.filter(categories=ac_id).values_list('id', flat=True)
-        queryset = Article2.objects.filter(status=1, id__in=a_ids).values('url', 'title', 'source', 'pubtime').order_by('-pubtime')[0:self.length]
+        a_ids = Article.objects.filter(categories=ac_id).values_list('id', flat=True)
+        queryset = Article.objects.filter(status=1, id__in=a_ids).values('url', 'title', 'source', 'pubtime').order_by('-pubtime')[0:self.length]
 
         return map(lambda x : {
                 'url': x['url'],
@@ -133,13 +133,13 @@ class DashboardData(Abstract):
                     'source': x['source'],
                     'areas': areas(x['id']),
                     'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
-                    }, q(Article2, c.id))
+                    }, q(Article, c.id))
             }, Category.objects.filter(parent__name='业务信息'))
 
     def get_0008(self):
         ac_id = Category.objects.get(name='风险快讯').id
-        a_ids = Article2.objects.filter(categories=ac_id).values_list('id', flat=True)
-        queryset = Article2.objects.filter(status=1, id__in=a_ids).values('id', 'url', 'source', 'score', 'title', 'pubtime').order_by('-pubtime')[0:self.length]
+        a_ids = Article.objects.filter(categories=ac_id).values_list('id', flat=True)
+        queryset = Article.objects.filter(status=1, id__in=a_ids).values('id', 'url', 'source', 'score', 'title', 'pubtime').order_by('-pubtime')[0:self.length]
 
         return map(lambda x : {
                 'url': x['url'],
@@ -166,7 +166,7 @@ class DashboardData(Abstract):
                         'category': x['category'],
                         'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
                         'product': x['product_name'],
-                    }, q(Inspection2.objects.filter(area_id=UserArea.objects.get(user=self.user).area.id, status=1))),
+                    }, q(Inspection.objects.filter(area_id=UserArea.objects.get(user=self.user).area.id, status=1))),
                 'all': map(lambda x: {
                         'industry': {'id': x['industry'], 'text': x['industry__name']},
                         'url': x['url'],
@@ -177,5 +177,5 @@ class DashboardData(Abstract):
                         'category': x['category'],
                         'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
                         'product': x['product_name'],
-                    }, q(Inspection2.objects.filter(status=1).all())),
+                    }, q(Inspection.objects.filter(status=1).all())),
                 }
