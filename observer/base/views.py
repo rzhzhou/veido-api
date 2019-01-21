@@ -1373,13 +1373,13 @@ class EnterpriseDataUnqualifiedView(BaseView):
         data = {
             'total': total,
             'list': map(lambda x: {
-                'industry': {'id':x['inspection2__industry'],'text':x['inspection2__industry__name']},
-                'product_name': x['inspection2__product_name'],
-                'source': x['inspection2__source'],
+                'industry': {'id':x['inspection__industry'],'text':x['inspection__industry__name']},
+                'product_name': x['inspection__product_name'],
+                'source': x['inspection__source'],
                 'enterprise': x['name'],
                 'area': area(x['area_id']),
                 'unitem': x['unitem'],
-                'pubtime': x['inspection2__pubtime'],
+                'pubtime': x['inspection__pubtime'],
             }, result),
         }
         return data
