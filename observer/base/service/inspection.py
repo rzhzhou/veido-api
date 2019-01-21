@@ -10,7 +10,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 
 from observer.base.models import (MajorIndustry, AliasIndustry, Area, Enterprise, Industry,
-                                  Inspection2, IndustryProducts)
+                                  Inspection, IndustryProducts)
 from observer.base.service.abstract import Abstract
 from observer.base.service.base import (alias_industry, get_major_industry, area,
                                         enterprise_area_name, enterprise_name,
@@ -50,7 +50,7 @@ class InspectionData(Abstract):
 
         args = dict([k, v] for k, v in cond.items() if v)
 
-        queryset = Inspection2.objects.filter(**args).values(*fields).order_by('-pubtime')
+        queryset = Inspection.objects.filter(**args).values(*fields).order_by('-pubtime')
 
         return queryset
 
@@ -109,22 +109,22 @@ class EnterpriseDataUnqualified(Abstract):
 
     def get_all(self):
 
-        fields = ('inspection2__industry', 'inspection2__industry__name',
-                  'inspection2__product_name', 'inspection2__source', 'name',
-                  'area_id', 'unitem', 'inspection2__pubtime')
+        fields = ('inspection__industry', 'inspection__industry__name',
+                  'inspection__product_name', 'inspection__source', 'name',
+                  'area_id', 'unitem', 'inspection__pubtime')
 
         cond = {
-            'inspection2__product_name__contains': getattr(self, 'productName', None),
+            'inspection__product_name__contains': getattr(self, 'productName', None),
             'name__contains': getattr(self, 'enterpriseName', None),
             'area_id': getattr(self, 'Area', None),
-            'inspection2__industry': getattr(self, 'industry', None),
-            'inspection2__pubtime__gte': getattr(self, 'starttime', None),
-            'inspection2__pubtime__lte': getattr(self, 'endtime', None),
+            'inspection__industry': getattr(self, 'industry', None),
+            'inspection__pubtime__gte': getattr(self, 'starttime', None),
+            'inspection__pubtime__lte': getattr(self, 'endtime', None),
         }
 
         args = dict([k, v] for k, v in cond.items() if v)
 
-        queryset = Enterprise.objects.filter(**args, status=1).values(*fields).order_by('-inspection2__pubtime')
+        queryset = Enterprise.objects.filter(**args, status=1).values(*fields).order_by('-inspection__pubtime')
 
         return queryset
 
@@ -152,7 +152,7 @@ class EnterpriseData(Abstract):
 
     def get_by_id(self, eid):
 
-        queryset = Enterprise.objects.filter(inspection2=eid)
+        queryset = Enterprise.objects.filter(inspection=eid)
 
         return queryset
 
@@ -194,7 +194,7 @@ class InspectionDataAdd(Abstract):
         if not url or not pubtime or not source or not inspect_patch or not qualitied_patch or not unqualitied_patch or not level or not product_name or not area_id:
             return 400
 
-        Inspection2(
+        Inspection(
             title=title,
             url=url,
             pubtime=pubtime,
@@ -244,20 +244,20 @@ class InspectionDataEdit(Abstract):
         if not url or not pubtime or not source or not inspect_patch or not qualitied_patch or not unqualitied_patch or not level or not industry_id or not area_id:
             return 400
 
-        inspection2 = Inspection2.objects.get(id=edit_id)
-        inspection2.url = url
-        inspection2.pubtime = pubtime
-        inspection2.source = source
-        inspection2.qualitied = qr(qualitied_patch, inspect_patch)
-        inspection2.inspect_patch = inspect_patch
-        inspection2.qualitied_patch = qualitied_patch
-        inspection2.unqualitied_patch = unqualitied_patch
-        inspection2.category = category
-        inspection2.level = level
-        inspection2.product_name = product_name
-        inspection2.industry_id = industry_id
-        inspection2.area_id = area_id
-        inspection2.save()
+        inspection = Inspection.objects.get(id=edit_id)
+        inspection.url = url
+        inspection.pubtime = pubtime
+        inspection.source = source
+        inspection.qualitied = qr(qualitied_patch, inspect_patch)
+        inspection.inspect_patch = inspect_patch
+        inspection.qualitied_patch = qualitied_patch
+        inspection.unqualitied_patch = unqualitied_patch
+        inspection.category = category
+        inspection.level = level
+        inspection.product_name = product_name
+        inspection.industry_id = industry_id
+        inspection.area_id = area_id
+        inspection.save()
 
         return 200
 
@@ -270,7 +270,7 @@ class InspectionDataDelete(Abstract):
     def delete(self, cid):
         del_ids = cid.split(",")
 
-        Inspection2.objects.filter(id__in=del_ids).delete()
+        Inspection.objects.filter(id__in=del_ids).delete()
 
         return 200
 
@@ -397,7 +397,7 @@ class InspectionDataUpload(Abstract):
 
                 industry_id = IndustryProducts.objects.filter(name=product_name[0])[0].industry_id
 
-                bulk_inspection2 = Inspection2(
+                bulk_inspection = Inspection(
                     title=title,
                     url=url,
                     pubtime=pubtime,
@@ -414,9 +414,9 @@ class InspectionDataUpload(Abstract):
                     area_id=area[0].id,
                     status=0,
                 )
-                data_list.append(bulk_inspection2)
+                data_list.append(bulk_inspection)
 
-        Inspection2.objects.bulk_create(data_list)
+        Inspection.objects.bulk_create(data_list)
 
         return {
             'status': 1,
@@ -534,7 +534,7 @@ class InspectionDataExport(Abstract):
 #         start = months[0].strftime('%Y-%m-%d')
 #         end = months[1].strftime('%Y-%m-%d')
 
-#         queryset = Inspection2.objects.filter(pubtime__gte=start, pubtime__lte=end).values(
+#         queryset = Inspection.objects.filter(pubtime__gte=start, pubtime__lte=end).values(
 #             'guid', 'title', 'url', 'pubtime', 'category', 'level', 'source', 'area_id', 'industry_id', 'qualitied',)
 
 #         for q in queryset:
@@ -590,9 +590,9 @@ class InspectionDataAudit(Abstract):
 
         for ids in edit_ids.split(","):
 
-            inspection2 = Inspection2.objects.get(id=ids)
-            inspection2.status = status
-            inspection2.save()
+            inspection = Inspection.objects.get(id=ids)
+            inspection.status = status
+            inspection.save()
 
         return 200
 
@@ -610,8 +610,8 @@ class InspectionDataSuzhou(Abstract):
 
         args = {}
         if not search_value:
-            queryset = Inspection2.objects.filter(**args).values(*fields)
+            queryset = Inspection.objects.filter(**args).values(*fields)
         else:
-            queryset = Inspection2.objects.filter(Q(source__contains=search_value) | Q(product_name__contains=search_value)).values(*fields)
+            queryset = Inspection.objects.filter(Q(source__contains=search_value) | Q(product_name__contains=search_value)).values(*fields)
 
         return queryset

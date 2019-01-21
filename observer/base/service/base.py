@@ -3,12 +3,12 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User, Group
 
 from observer.base.models import (Area, Category, UserArea, AliasIndustry, MajorIndustry,
-                                Enterprise, UserNav, Article2)
+                                Enterprise, UserNav, Article)
 from observer.utils.date_format import date_format
 
 
 def areas(article_id, flat=False):
-    a_ids = Article2.objects.filter(id=article_id).values_list('areas__id', flat=True)
+    a_ids = Article.objects.filter(id=article_id).values_list('areas__id', flat=True)
     queryset = Area.objects.filter(id__in=a_ids)
 
     if not queryset.exists():
@@ -21,7 +21,7 @@ def areas(article_id, flat=False):
 
 
 def categories(article_id, admin=False, flat=False):
-    c_ids = Article2.objects.filter(id=article_id).values_list('categories__id', flat=True)
+    c_ids = Article.objects.filter(id=article_id).values_list('categories__id', flat=True)
     queryset = Category.objects.filter(id__in=c_ids)
 
     if not admin:
@@ -40,7 +40,7 @@ def categories(article_id, admin=False, flat=False):
 def local_related(article_id, user):
     f = lambda x, y : set(x).issubset(set(y)) or set(y).issubset(set(x))
 
-    area_ids = Article2.objects.filter(id=article_id).values_list('areas__id', flat=True)
+    area_ids = Article.objects.filter(id=article_id).values_list('areas__id', flat=True)
     u_area = UserArea.objects.get(user=user).area
     u_area_id = u_area.id
     u_level = u_area.level

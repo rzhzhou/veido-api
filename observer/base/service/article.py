@@ -6,7 +6,7 @@ import datetime
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, Q, F
 
-from observer.base.models import(Area, Article2, Category, )
+from observer.base.models import(Area, Article, Category, )
 from django.contrib.auth.models import Group
 from observer.base.service.abstract import Abstract
 from observer.base.service.base import (areas, categories, )
@@ -37,7 +37,7 @@ class ArticleData(Abstract):
         }
 
         args = dict([k, v] for k, v in cond.items() if v)
-        queryset = Article2.objects.filter(**args)
+        queryset = Article.objects.filter(**args)
 
         c_ids = Category.objects.filter(parent__id=self.category).values_list('id', flat=True)
         if not c_ids:
@@ -70,7 +70,7 @@ class RiskData(Abstract):
         }
 
         args = dict([k, v] for k, v in cond.items() if v)
-        queryset = Article2.objects.filter(**args)
+        queryset = Article.objects.filter(**args)
 
         # 判断当前用户是否为武汉深度网科技有限公司成员，然后取出该用户管理的资料
         group_ids = Group.objects.filter(user=self.user).values_list('id', flat=True)
@@ -99,7 +99,7 @@ class RiskDataAdd(Abstract):
         if not url or not title or not pubtime or not source or not areas or not categories:
             return 400
 
-        if Article2.objects.filter(url=url).exists():
+        if Article.objects.filter(url=url).exists():
             return 202
 
         # 有多个地域时逗号分隔，并且忽略掉最后一个逗号
@@ -109,7 +109,7 @@ class RiskDataAdd(Abstract):
         c_ids = categories.split(',')[:-1:]
         category = Category.objects.filter(id__in=c_ids)
 
-        article2 = Article2(
+        article = Article(
             title=title,
             url=url,
             pubtime=pubtime,
@@ -119,12 +119,12 @@ class RiskDataAdd(Abstract):
             user_id=self.user.id,
             status=1,
         )
-        article2.save()
+        article.save()
 
-        article2.areas.add(*area)
-        article2.categories.add(*category)
+        article.areas.add(*area)
+        article.categories.add(*category)
 
-        article2.save()
+        article.save()
 
         return 200
 
@@ -136,7 +136,7 @@ class RiskDataAudit(Abstract):
     def edit(self, aid):
         audit_ids = aid.split(',')
 
-        Article2.objects.filter(id__in=audit_ids).update(status=1)
+        Article.objects.filter(id__in=audit_ids).update(status=1)
 
         return 200
 
@@ -158,12 +158,12 @@ class RiskDataEdit(Abstract):
         if not pubtime or not source or not areas or not categories:
             return 400
 
-        article2 = Article2.objects.get(id=edit_id)
-        article2.title = title
-        article2.pubtime = pubtime
-        article2.score = score
-        article2.source = source
-        article2.save()
+        article = Article.objects.get(id=edit_id)
+        article.title = title
+        article.pubtime = pubtime
+        article.score = score
+        article.source = source
+        article.save()
 
         a_ids = areas.split(',')[:-1:] # 有多个地域时逗号分隔，并且忽略掉最后一个逗号
         c_ids = categories.split(',')[:-1:]
@@ -171,12 +171,12 @@ class RiskDataEdit(Abstract):
         area = Area.objects.filter(id__in=a_ids)
         category = Category.objects.filter(id__in=c_ids)
 
-        article2.areas.clear()
-        article2.categories.clear()
-        article2.areas.add(*area)
-        article2.categories.add(*category)
+        article.areas.clear()
+        article.categories.clear()
+        article.areas.add(*area)
+        article.categories.add(*category)
 
-        article2.save()
+        article.save()
 
         return 200
 
@@ -189,7 +189,7 @@ class RiskDataDelete(Abstract):
     def delete(self, aid):
         del_ids = aid.split(',')
 
-        Article2.objects.filter(id__in=del_ids).delete()
+        Article.objects.filter(id__in=del_ids).delete()
 
         return 200
 
@@ -289,7 +289,7 @@ class RiskDataUpload(Abstract):
                     total += 1
 
                     # 唯一性
-                    old_article = Article2.objects.filter(url=url)
+                    old_article = Article.objects.filter(url=url)
 
                     if old_article.exists():
                         old_article = old_article[0]
@@ -309,7 +309,7 @@ class RiskDataUpload(Abstract):
                         dupli += 1
                         continue
 
-                    article2 = Article2(
+                    article = Article(
                         title=title,
                         url=url,
                         pubtime=pubtime,
@@ -319,10 +319,10 @@ class RiskDataUpload(Abstract):
                         user_id=self.user.id,
                         status=1,
                     )
-                    article2.save()
-                    article2.areas.add(*area)
-                    article2.categories.add(*category)
-                    article2.save()
+                    article.save()
+                    article.areas.add(*area)
+                    article.categories.add(*category)
+                    article.save()
 
                 except Exception as e:
                     return {
@@ -382,9 +382,9 @@ class RiskDataSuzhou(Abstract):
         ac_id = Category.objects.get(name='风险快讯').id
 
         if not search_value:
-            queryset = Article2.objects.filter(categories__in=ac_id, status=1).values(*fields)
+            queryset = Article.objects.filter(categories__in=ac_id, status=1).values(*fields)
         else:
-            queryset = Article2.objects.filter(Q(title__contains=search_value) | Q(source__contains=search_value), status=1).values(*fields)
+            queryset = Article.objects.filter(Q(title__contains=search_value) | Q(source__contains=search_value), status=1).values(*fields)
             queryset = queryset.filter(categories__in=ac_id)
 
         return queryset
@@ -417,7 +417,7 @@ class StatisticsShow(Abstract):
         time_week = now + datetime.timedelta(days = aWeek)
         time_month = now + datetime.timedelta(days = aMonth)
 
-        queryset = Article2.objects.filter(pubtime__gte = time_month)
+        queryset = Article.objects.filter(pubtime__gte = time_month)
 
         # if getattr(self, 'category', None) == '0001' or getattr(self, 'category', None) == '0002':
         #     category_id = getattr(self, 'category')

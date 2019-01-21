@@ -89,7 +89,7 @@ class ArticleResources(resources.ModelResource):
     corpus_id = fields.Field(attribute='corpus_id', column_name='语料词编号')
 
     class Meta:
-        model = Article2
+        model = Article
         import_id_fields = ('guid',)
         fields = ('guid', 'title', 'url', 'pubtime', 'source', 'score', 'industry_id', 'corpus_id', )
         export_order = ('guid', 'title', 'url', 'pubtime', 'source', 'score', 'industry_id', 'corpus_id', )
@@ -150,7 +150,7 @@ class InspectionResources(resources.ModelResource):
     origin_product = fields.Field(attribute='origin_product', column_name='导入产品名')
 
     class Meta:
-        model = Inspection2
+        model = Inspection
         import_id_fields = ('guid',)
         fields = ('id', 'guid', 'title', 'url', 'pubtime', 'source', 'unitem', 'qualitied', 'category', 'level', 'industry_id', 'area_id', 'origin_product' )
         export_order = ('id', 'guid', 'title', 'url', 'pubtime', 'source', 'unitem', 'qualitied', 'category', 'level', 'industry_id', 'area_id', 'origin_product' )
