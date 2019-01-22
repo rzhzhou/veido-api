@@ -111,12 +111,12 @@ class EnterpriseDataUnqualified(Abstract):
 
         fields = ('inspection__industry', 'inspection__industry__name',
                   'inspection__product_name', 'inspection__source', 'name',
-                  'area_id', 'unitem', 'inspection__pubtime')
+                  'area', 'area__name', 'unitem', 'inspection__pubtime')
 
         cond = {
             'inspection__product_name__contains': getattr(self, 'productName', None),
             'name__contains': getattr(self, 'enterpriseName', None),
-            'area_id': getattr(self, 'Area', None),
+            'area': getattr(self, 'Area', None),
             'inspection__industry': getattr(self, 'industry', None),
             'inspection__pubtime__gte': getattr(self, 'starttime', None),
             'inspection__pubtime__lte': getattr(self, 'endtime', None),
