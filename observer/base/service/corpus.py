@@ -38,7 +38,7 @@ class CorpusAdd(Abstract):
         
         keyword = getattr(self, 'keyword', '')
         category_id = getattr(self, 'category_id', '')
-        industry_id = getattr(self, 'industry_id') if getattr(self, 'industry_id') else 0
+        industry_id = getattr(self, 'industry_id') if getattr(self, 'industry_id') else -1
 
         if not category_id:
             return 400
@@ -109,9 +109,10 @@ class CrawlerData(Abstract):
         keywords = getattr(self, 'keyword', '')
         category_ids = getattr(self, 'category_id')
         industry_ids = getattr(self, 'industry_id')
+        corpus_ids = getattr(self, 'corpus_id')
 
-        for (ids, keyword, category_id, industry_id) in zip(edit_ids.split(","), keywords.split(","), category_ids.split(","), industry_ids.split(",")):
-            CrawlerTask_category(keyword, category_id, industry_id, self.user.id).build()
+        for (ids, keyword, category_id, industry_id, corpus_id) in zip(edit_ids.split(","), keywords.split(","), category_ids.split(","), industry_ids.split(","), corpus_ids.split(",")):
+            CrawlerTask_category(keyword, category_id, industry_id, self.user.id, corpus_id).build()
             corpus_categories = CorpusCategories.objects.get(id=ids)
             corpus_categories.status = status
             corpus_categories.save()
