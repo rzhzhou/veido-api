@@ -522,43 +522,43 @@ class InspectionDataExport(Abstract):
     def __init__(self, user):
         self.user = user
 
-#     def export(self):
-#         filename = "inspections.xlsx"
+    def export(self):
+        filename = "inspections.xlsx"
 
-#         # process data
-#         data = [
-#             ['GUID', '标题', '链接', '发布日期', '抽查类别', '抽查等级', '抽检单位', '地域',
-#                 '行业编号', '产品名称', '不合格企业', '不合格企业地域', '不合格项', '合格率', ],
-#         ]
-#         months = get_months()[-1::][0]
-#         start = months[0].strftime('%Y-%m-%d')
-#         end = months[1].strftime('%Y-%m-%d')
+        # process data
+        data = [
+            ['标题', '链接', '发布日期', '抽查类别', '抽查等级', '抽检单位', '地域',
+                '行业编号', '产品名称', '不合格企业', '不合格企业地域', '不合格项', '合格率', ],
+        ]
+        months = get_months()[-1::][0]
+        start = months[0].strftime('%Y-%m-%d')
+        end = months[1].strftime('%Y-%m-%d')
 
-#         queryset = Inspection.objects.filter(pubtime__gte=start, pubtime__lte=end).values(
-#             'guid', 'title', 'url', 'pubtime', 'category', 'level', 'source', 'area_id', 'industry_id', 'qualitied',)
+        queryset = Inspection.objects.filter(pubtime__gte=start, pubtime__lte=end).values(
+            'id', 'title', 'url', 'pubtime', 'category', 'level', 'source', 'area__name', 'industry_id', 'industry__name', 'qualitied', 'enterprises__name', 
+            'enterprises__area__name', 'enterprises__unitem')
 
-#         for q in queryset:
-#             data.append([
-#                 q['guid'],
-#                 q['title'],
-#                 q['url'],
-#                 date_format(q['pubtime'], '%Y-%m-%d'),
-#                 q['category'],
-#                 q['level'],
-#                 q['source'],
-#                 area(q['area_id'], flat=True),
-#                 industry_number(q['industry_id']),
-#                 alias_industry(q['industry_id'], flat=True),
-#                 enterprise_name(q['guid'], flat=True),
-#                 enterprise_area_name(q['guid'], flat=True),
-#                 enterprise_unitem(q['guid'], flat=True),
-#                 qualitied(q['qualitied']),
-#             ])
+        for q in queryset:
+            data.append([
+                q['title'],
+                q['url'],
+                date_format(q['pubtime'], '%Y-%m-%d'),
+                q['category'],
+                q['level'],
+                q['source'],
+                q['area__name'],
+                q['industry_id'],
+                q['industry__name'],
+                q['enterprises__name'],
+                q['enterprises__area__name'],
+                q['enterprises__unitem'],
+                qualitied(q['qualitied']),
+            ])
 
-#         # write file
-#         write_by_openpyxl(filename, data)
+        # write file
+        write_by_openpyxl(filename, data)
 
-#         return open(filename, 'rb')
+        return open(filename, 'rb')
 
 
 class InspectionDataCrawler(Abstract):
