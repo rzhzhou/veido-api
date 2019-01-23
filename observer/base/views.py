@@ -1708,7 +1708,7 @@ class CorpusView(BaseView):
                 'id': r['id'],
                 'status': r['status'],
                 'riskword': r.get('riskword', ''),
-                'industry': {'id': r.get('industry_id', 0), 'text': '无'} if not r.get('industry_id') else get_major_industry(r['industry_id']),
+                'industry': {'id': r.get('industry_id', -1), 'text': '无'} if not r.get('industry_id') else get_major_industry(r['industry_id']),
                 'keyword': r.get('keyword', ''),
                 'category': get_major_category(r['category_id']) if r.get('category_id', None) else r.get('category_id', ''),
             }, results)

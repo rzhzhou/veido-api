@@ -441,13 +441,13 @@ class StatisticsShow(Abstract):
 
         queryset = Article.objects.filter(pubtime__gte = time_month)
 
-        # if getattr(self, 'category', None) == '0001' or getattr(self, 'category', None) == '0002':
-        #     category_id = getattr(self, 'category')
-        #     guid_ids = ArticleCategory.objects.filter(category_id = category_id).values_list('article_id', flat = True)
-        #     queryset = queryset.filter(guid__in = guid_ids)
-        # if getattr(self, 'category', None) == '0003':
-        #     guid_business_ids = ArticleCategory.objects.exclude(category_id = '0001').exclude(category_id = '0002').values_list('article_id', flat = True)
-        #     queryset = queryset.filter(guid__in = guid_business_ids)
+        if getattr(self, 'category', None) == '0001' or getattr(self, 'category', None) == '0002':
+            category_id = getattr(self, 'category')
+            category_ids = Article.objects.filter(categories__id = category_id).values_list('id', flat = True)
+            queryset = queryset.filter(id__in = category_ids)
+        if getattr(self, 'category', None) == '0003':
+            category_business_ids = Article.objects.exclude(categories__id = '0001').exclude(categories__id = '0002').values_list('id', flat = True)
+            queryset = queryset.filter(id__in = category_business_ids)
 
 
 
