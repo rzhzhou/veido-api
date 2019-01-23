@@ -236,39 +236,24 @@ class RiskDataUpload(Abstract):
             else:
                 try:
                     title = str(sv(i, model['标题'], sheet)).strip()
-                    if not title:
-                        return {
-                            'status': 0,
-                            'message': '操作失败！请检查第 %s 行 "标题"！' % (i + 1, )
-                        }
+                    if title == 'None':
+                        continue
 
                     url = str(sv(i, model['URL'], sheet)).strip()
-                    if not url:
-                        return {
-                            'status': 0,
-                            'message': '操作失败！请检查第 %s 行 "URL"！' % (i + 1, )
-                        }
+                    if url == 'None':
+                        continue
 
                     pubtime = str(date_format(sv(i, model['发布时间'], sheet))).strip()
-                    if not pubtime:
-                        return {
-                            'status': 0,
-                            'message': '操作失败！请检查第 %s 行 "发布时间"！' % (i + 1, )
-                        }
+                    if pubtime == 'None':
+                        continue
 
                     source = str(sv(i, model['来源'], sheet)).strip()
-                    if not source:
-                        return {
-                            'status': 0,
-                            'message': '操作失败！请检查第 %s 行 "来源"！' % (i + 1, )
-                        }
+                    if source == 'None':
+                        continue
 
                     score = str(sv(i, model['风险程度'], sheet)).strip()
-                    if not score:
-                        return {
-                            'status': 0,
-                            'message': '操作失败！请检查第 %s 行 "风险程度"！' % (i + 1, )
-                        }
+                    if score == 'None':
+                        continue
 
                     # 行业编号
                     industry_id = sv(i, model['行业编号'], sheet)
