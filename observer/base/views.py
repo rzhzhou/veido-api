@@ -53,7 +53,8 @@ from observer.base.service.inspection import (EnterpriseData,
                                               InspectionDataExport,
                                               InspectionDataSuzhou,
                                               InspectionDataUnEnterpriseUpload,
-                                              InspectionDataUpload)
+                                              InspectionDataUpload,
+                                              InspectStatisticsData)
 from observer.base.service.version import (VersionRecordData,
                                            VersionRecordDataAdd,
                                            VersionRecordDataEdit,
@@ -249,6 +250,29 @@ class InspectionView(BaseView):
         queryset = InspectionData(params=request.query_params).get_all()
 
         return Response(self.serialize(queryset))
+
+
+class InspectStatisticsView(BaseView):
+    def __init__(self):
+        super(InspectStatisticsView, self).__init__()
+
+    def serialize(self, result):
+
+        data = {
+            'list': map(lambda r : {
+                'industry_name': r['industry_name'],
+                'sum_passrate': r['sum_passrate'],
+
+            },result)
+        }
+
+        return data
+
+    def get(self, request):
+
+        result = InspectStatisticsData(params = request.query_params).get_statistics_data()
+
+        return Response(self.serialize(result))
 
 
 class IndustryView(BaseView):
