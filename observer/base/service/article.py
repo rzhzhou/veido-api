@@ -201,7 +201,7 @@ class RiskDataUpload(Abstract):
 
     def upload(self, filename, file_obj):
         #Model weight
-        model = {'GUID': 0, '标题': 0, 'URL': 0, '发布时间': 0, '来源': 0, '风险程度': 0, '地域': 0, '类别': 0, '行业编号': 0}
+        model = {'标题': 0, 'URL': 0, '发布时间': 0, '来源': 0, '风险程度': 0, '地域': 0, '类别': 0, '行业编号': 0}
         #sheet value
         sv = lambda x, y, z : z.cell(row=x, column=y).value
         #date format
@@ -236,55 +236,77 @@ class RiskDataUpload(Abstract):
             else:
                 try:
                     title = str(sv(i, model['标题'], sheet)).strip()
-                    url = str(sv(i, model['URL'], sheet)).strip()
+                    if not title:
+                        return {
+                            'status': 0,
+                            'message': '操作失败！请检查第 %s 行 "标题"！' % (i + 1, )
+                        }
 
+                    url = str(sv(i, model['URL'], sheet)).strip()
                     if not url:
                         return {
                             'status': 0,
-                            'message': '操作失败！Excel %s 行"链接"有误！' % (i + 1, )
+                            'message': '操作失败！请检查第 %s 行 "URL"！' % (i + 1, )
                         }
 
-                    pubtime = date_format(sv(i, model['发布时间'], sheet))
+                    pubtime = str(date_format(sv(i, model['发布时间'], sheet))).strip()
                     if not pubtime:
                         return {
                             'status': 0,
-                            'message': '操作失败！Excel %s 行时间格式有误！' % (i + 1, )
+                            'message': '操作失败！请检查第 %s 行 "发布时间"！' % (i + 1, )
                         }
 
                     source = str(sv(i, model['来源'], sheet)).strip()
-                    score = sv(i, model['风险程度'], sheet)
-
-                    # 地域
-                    area = str(sv(i, model['地域'], sheet)).strip()
-                    areas = area.split(',')
-                    a_ids = Area.objects.filter(name__in=areas).values_list('id', flat=True)
-
-                    if len(areas) != len(a_ids):
+                    if not source:
                         return {
                             'status': 0,
-                            'message': '操作失败！Excel %s 行"地域"有误！' % (i + 1, )
+                            'message': '操作失败！请检查第 %s 行 "来源"！' % (i + 1, )
                         }
 
-                    area = Area.objects.filter(id__in=a_ids)
-
-
-                    # 风险类别
-                    category = str(sv(i, model['类别'], sheet)).strip()
-                    categories = category.split(',')
-                    c_ids = Category.objects.filter(name__in=categories).values_list('id', flat=True)
-
-                    if len(categories) != len(c_ids):
+                    score = str(sv(i, model['风险程度'], sheet)).strip()
+                    if not score:
                         return {
                             'status': 0,
-                            'message': '操作失败！Excel %s 行"类别"有误！' % (i + 1, )
+                            'message': '操作失败！请检查第 %s 行 "风险程度"！' % (i + 1, )
                         }
-
-                    category = Category.objects.filter(id__in=c_ids)
 
                     # 行业编号
                     industry_id = sv(i, model['行业编号'], sheet)
                     if not industry_id or industry_id == '0':
                         industry_id = '-1'
+
+                    # 地域
+                    area = str(sv(i, model['地域'], sheet)).strip()
+                    if area == 'None':
+                        continue
+                    else:
+                        print('area', area)
+                        areas = area.split(',')
+                        a_ids = Area.objects.filter(name__in=areas).values_list('id', flat=True)
+
+                        if len(areas) != len(a_ids):
+                            return {
+                                'status': 0,
+                                'message': '操作失败！请检查第 %s 行 "地域"！' % (i + 1, )
+                            }
+
+                        area = Area.objects.filter(id__in=a_ids)
+
+                    # 风险类别
+                    category = str(sv(i, model['类别'], sheet)).strip()
+                    if category == 'None':
+                        continue
+                    else:
+                        categories = category.split(',')
+                        c_ids = Category.objects.filter(name__in=categories).values_list('id', flat=True)
+
+                        if len(categories) != len(c_ids):
+                            return {
+                                'status': 0,
+                                'message': '操作失败！请检查第 %s 行 "类别"！' % (i + 1, )
+                            }
+
+                        category = Category.objects.filter(id__in=c_ids)
 
                     total += 1
 
