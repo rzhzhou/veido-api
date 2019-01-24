@@ -237,11 +237,14 @@ class MajorIndustryData(Abstract):
         objs = MajorIndustry.objects.filter(pk=pk)
 
         if objs:
+            ccc = getattr(self, 'ccc')
+            licence = getattr(self, 'licence')
+            consumer = getattr(self, 'consumer')
+
             major = objs[0]
-            major.ccc = CCCIndustry.objects.get(pk=getattr(
-                self, 'ccc')) if getattr(self, 'ccc') else None
-            major.licence = LicenceIndustry.objects.get(pk=getattr(
-                self, 'licence')) if getattr(self, 'licence') else None
+            major.ccc = CCCIndustry.objects.get(pk=ccc) if ccc else None
+            major.licence = LicenceIndustry.objects.get(pk=licence) if licence else None
+            major.consumer = ConsumerIndustry.objects.get(pk=consumer) if consumer else None
             major.save()
             return 1
 
