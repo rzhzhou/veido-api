@@ -637,7 +637,7 @@ class Select2ConsumerListView(BaseView):
         data = map(
             lambda x: {
                 'id': x['id'],
-                'text': x['name'],
+                'text': '%s - %s' % (x['id'], x['name']),
             },
             queryset
         )
