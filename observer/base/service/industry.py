@@ -242,6 +242,8 @@ class MajorIndustryData(Abstract):
                 self, 'ccc')) if getattr(self, 'ccc') else None
             major.licence = LicenceIndustry.objects.get(pk=getattr(
                 self, 'licence')) if getattr(self, 'licence') else None
+            major.consumer = ConsumerIndustry.objects.get(pk=getattr(
+                self, 'consumer')) if getattr(self, 'consumer') else None
             major.save()
             return 1
 
