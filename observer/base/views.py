@@ -10,7 +10,8 @@ from rest_framework.parsers import FileUploadParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from observer.base.models import AliasIndustry, Nav, NewsReport, UserNav, VersionRecord
+from observer.base.models import (AliasIndustry, Nav, NewsReport, UserNav,
+                                  VersionRecord)
 from observer.base.service.area import Select2AreaData
 from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd,
                                            RiskDataAudit, RiskDataDelete,
@@ -55,10 +56,6 @@ from observer.base.service.inspection import (EnterpriseData,
                                               InspectionDataUnEnterpriseUpload,
                                               InspectionDataUpload,
                                               InspectStatisticsData)
-from observer.base.service.version import (VersionRecordData,
-                                           VersionRecordDataAdd,
-                                           VersionRecordDataEdit,
-                                           VersionRecordDataDelete)
 from observer.base.service.navbar import NavBarEdit
 from observer.base.service.news import NewsAdd, NewsDelete, NewsEdit, ViewsData
 from observer.base.service.report import (NewsReportData, NewsReportDelete,
@@ -66,6 +63,10 @@ from observer.base.service.report import (NewsReportData, NewsReportDelete,
 from observer.base.service.search import SearchAdvancedData, SearchData
 from observer.base.service.user import (GroupData, UserAdd, UserData,
                                         UserDelete, UserEdit)
+from observer.base.service.version import (VersionRecordData,
+                                           VersionRecordDataAdd,
+                                           VersionRecordDataDelete,
+                                           VersionRecordDataEdit)
 from observer.utils.date_format import date_format
 from observer.utils.excel import write_by_openpyxl
 
@@ -630,7 +631,7 @@ class Select2ConsumerListView(BaseView):
         data = map(
             lambda x: {
                 'id': x['id'],
-                'text': x['name'],
+                'text': '%s - %s' % (x['id'], x['name']),
             },
             queryset
         )
@@ -675,6 +676,7 @@ class MajorListView(BaseView):
                 'level': x['level'],
                 'licence': x['licence'],
                 'ccc': x['ccc'],
+                'consumer': x['consumer'],
             }, result),
         }
 
@@ -2066,6 +2068,7 @@ class NavBarView(BaseView):
 
     def serialize(self):
         navs = []
+        routers = []
         u_navs_ids = UserNav.objects.filter(user=self.user).values_list('nav', flat=True)
         L1 = Nav.objects.filter(id__in=u_navs_ids, level=1).values('name','id').order_by('index')
         if L1:
@@ -2081,15 +2084,28 @@ class NavBarView(BaseView):
                         navs.append({
                             'icon': title['icon'],
                             'title': title['name'],
-                            'href': '' if title['href'] == '0' else title['href'],
+                            'href': '' if not title['href'] else title['href'],
                             'children': list(map(lambda x: {
                                 'title': x['name'],
                                 'href': x['href'],
                             }, Nav.objects.filter(id__in=u_navs_ids, level=3, parent_id=title['id']).values('name', 'href').order_by('index'))) if childrens else ''
                         })
 
+        routes = Nav.objects.filter(id__in=u_navs_ids).values('href', 'component').order_by('index')
+        j = 0
+        for i, route in enumerate(routes):
+            if route['href'] == '':
+                j+=1
+            else:
+                routers.append({
+                    'path': route['href'],
+                    'alias': '/' if i - j == 0 else '',
+                    'component': route['component'],
+                })
+
         data = {
             'menus': navs,
+            'routers': routers,
         }
 
         return data
