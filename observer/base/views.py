@@ -10,7 +10,8 @@ from rest_framework.parsers import FileUploadParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from observer.base.models import AliasIndustry, Nav, NewsReport, UserNav, VersionRecord
+from observer.base.models import (AliasIndustry, Nav, NewsReport, UserNav,
+                                  VersionRecord)
 from observer.base.service.area import Select2AreaData
 from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd,
                                            RiskDataAudit, RiskDataDelete,
@@ -55,10 +56,6 @@ from observer.base.service.inspection import (EnterpriseData,
                                               InspectionDataUnEnterpriseUpload,
                                               InspectionDataUpload,
                                               InspectStatisticsData)
-from observer.base.service.version import (VersionRecordData,
-                                           VersionRecordDataAdd,
-                                           VersionRecordDataEdit,
-                                           VersionRecordDataDelete)
 from observer.base.service.navbar import NavBarEdit
 from observer.base.service.news import NewsAdd, NewsDelete, NewsEdit, ViewsData
 from observer.base.service.report import (NewsReportData, NewsReportDelete,
@@ -66,6 +63,10 @@ from observer.base.service.report import (NewsReportData, NewsReportDelete,
 from observer.base.service.search import SearchAdvancedData, SearchData
 from observer.base.service.user import (GroupData, UserAdd, UserData,
                                         UserDelete, UserEdit)
+from observer.base.service.version import (VersionRecordData,
+                                           VersionRecordDataAdd,
+                                           VersionRecordDataDelete,
+                                           VersionRecordDataEdit)
 from observer.utils.date_format import date_format
 from observer.utils.excel import write_by_openpyxl
 
