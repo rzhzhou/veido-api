@@ -2048,6 +2048,7 @@ class NavBarView(BaseView):
 
     def serialize(self):
         navs = []
+        routers = []
         u_navs_ids = UserNav.objects.filter(user=self.user).values_list('nav', flat=True)
         L1 = Nav.objects.filter(id__in=u_navs_ids, level=1).values('name','id').order_by('index')
         if L1:
@@ -2063,15 +2064,28 @@ class NavBarView(BaseView):
                         navs.append({
                             'icon': title['icon'],
                             'title': title['name'],
-                            'href': '' if title['href'] == '0' else title['href'],
+                            'href': '' if not title['href'] else title['href'],
                             'children': list(map(lambda x: {
                                 'title': x['name'],
                                 'href': x['href'],
                             }, Nav.objects.filter(id__in=u_navs_ids, level=3, parent_id=title['id']).values('name', 'href').order_by('index'))) if childrens else ''
                         })
 
+        routes = Nav.objects.filter(id__in=u_navs_ids).values('href', 'component').order_by('index')
+        j = 0
+        for i, route in enumerate(routes):
+            if route['href'] == '':
+                j+=1
+            else:
+                routers.append({
+                    'path': route['href'],
+                    'alias': '/' if i - j == 0 else '',
+                    'component': route['component'],
+                })
+
         data = {
             'menus': navs,
+            'routers': routers,
         }
 
         return data
