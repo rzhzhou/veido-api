@@ -682,6 +682,7 @@ class MajorListView(BaseView):
                 'level': x['level'],
                 'licence': x['licence'],
                 'ccc': x['ccc'],
+                'consumer': x['consumer'],
             }, result),
         }
 

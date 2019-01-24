@@ -183,19 +183,23 @@ class MajorIndustry(models.Model):
         null=True, blank=True,
         verbose_name='上一级'
     )
-
     licence = models.ForeignKey(
         LicenceIndustry,
         on_delete=models.CASCADE,
         null=True, blank=True,
         verbose_name='许可证'
     )
-
     ccc = models.ForeignKey(
         CCCIndustry,
         on_delete=models.CASCADE,
         null=True, blank=True,
-        verbose_name='CCC'
+        verbose_name='强制认证'
+    )
+    consumer = models.ForeignKey(
+        ConsumerIndustry,
+        on_delete=models.CASCADE,
+        null=True, blank=True,
+        verbose_name='消费品'
     )
 
     class Meta:
