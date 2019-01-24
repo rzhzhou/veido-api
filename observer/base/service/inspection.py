@@ -615,3 +615,49 @@ class InspectionDataSuzhou(Abstract):
             queryset = Inspection.objects.filter(Q(source__contains=search_value) | Q(product_name__contains=search_value)).values(*fields)
 
         return queryset
+
+
+class InspectStatisticsData(Abstract):
+    
+    def __init__(self, params={}):
+        super(InspectStatisticsData, self).__init__(params)
+
+    def get_statistics_data(self):
+        fields = ('inspect_patch', 'qualitied_patch', 'industry__name')
+
+        cond = {
+            # 'industry_id': getattr(self, 'industry_id', None),
+            'level': getattr(self, 'level', None),
+            'industry__parent_id': getattr(self, 'parent_id', None),
+
+        }
+
+        cond2 = {
+            'parent_id': getattr(self, 'parent_id', None),
+            'level': None if getattr(self, 'parent_id', None) else 1,
+        }
+
+        args = dict([k, v] for k, v in cond.items() if v)
+        args2 = dict([k, v] for k, v in cond2.items() if v)
+
+        queryset_industry = MajorIndustry.objects.filter(**args2).values('name', 'id')
+        queryset = Inspection.objects.filter(**args).values(*fields)
+
+        
+        result = []
+        for q_i in queryset_industry:
+            sum_inspect_patch = 0
+            sum_qualitied_patch = 0
+
+            queryset_sum = queryset.filter(industry_id = q_i['id'])
+
+            for q in queryset_sum:
+                sum_inspect_patch += q['inspect_patch']
+                sum_qualitied_patch += q['qualitied_patch']
+                
+            result.append({
+                'industry_name': q_i['name'],
+                'sum_passrate': 0 if not sum_inspect_patch else round(sum_qualitied_patch/sum_inspect_patch*100, 2),
+            })
+        
+        return result

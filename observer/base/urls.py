@@ -10,6 +10,7 @@ urlpatterns = [
     path('articles/<str:category>/', views.ArticleView.as_view()),  # 文章列表
     path('inspections', views.InspectionView.as_view()),  # 抽检列表
     path('unqualifiedenterprise', views.EnterpriseDataUnqualifiedView.as_view()), # 不合格企业列表
+    path('inspectstatistics', views.InspectStatisticsView.as_view()),  # 抽检统计
     path('ccc', views.CCCListView.as_view()),  # 3C行业
     path('ccc/<int:cid>/', views.CCCIndustryView.as_view()),  # 3C行业
     path('cpc', views.CpcListView.as_view()),  # 产品总分类

@@ -266,15 +266,16 @@ class MajorIndustryData(Abstract):
 
     def get_all(self):
         fields = (
-            'id', 'name', 'desc', 'level', 'licence', 'ccc',
+            'id', 'name', 'desc', 'level', 'licence', 'ccc', 'consumer'
         )
 
         cond = {
             'parent': getattr(self, 'parent', None),
             'level': getattr(self, 'level', None),
             'name__icontains': getattr(self, 'name', None),
-            'licence__isnull': not bool(int(self.is_licence)) if getattr(self, 'is_licence') != '' else '',
-            'ccc__isnull': not bool(int(self.is_ccc)) if getattr(self, 'is_ccc') != '' else '',
+            'licence__isnull': not bool(int(self.is_licence)) if getattr(self, 'is_licence', '') else '',
+            'ccc__isnull': not bool(int(self.is_ccc)) if getattr(self, 'is_ccc', '') else '',
+            'consumer__isnull': not bool(int(self.is_consumer)) if getattr(self, 'is_consumer', '') else '',
         }
 
         args = dict([k, v] for k, v in cond.items() if v != '')

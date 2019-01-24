@@ -7,7 +7,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, Q, F
 
 from observer.base.models import(Area, Article, Category, )
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, User
 from observer.base.service.abstract import Abstract
 from observer.base.service.base import (areas, categories, )
 from observer.utils.date_format import (date_format, str_to_date, get_months)
@@ -438,22 +438,24 @@ class StatisticsShow(Abstract):
 
         user_id = 65
         listdata = []
-        while(user_id <= 71):
-            queryset_short = queryset
-            if getattr(self, 'time', None) == '每日':
-                queryset_short = queryset.filter(pubtime__gte = now, user_id = user_id, status=1)
-            elif getattr(self, 'time', None) == '每周':
-                queryset_short = queryset.filter(pubtime__gte = time_week, user_id = user_id, status=1)
-            elif getattr(self, 'time', None) == '每月':
-                queryset_short = queryset.filter(pubtime__gte = time_month, user_id = user_id, status=1)
-            else:
-                queryset_short = queryset.filter(pubtime__gte = time_week, user_id = user_id, status=1)
+        while(user_id <= 78):
+            if User.objects.filter(id = user_id).exists():
+                queryset_short = queryset
+                if getattr(self, 'time', None) == '每日':
+                    queryset_short = queryset.filter(pubtime__gte = now, user_id = user_id, status=1)
+                elif getattr(self, 'time', None) == '每周':
+                    queryset_short = queryset.filter(pubtime__gte = time_week, user_id = user_id, status=1)
+                elif getattr(self, 'time', None) == '每月':
+                    queryset_short = queryset.filter(pubtime__gte = time_month, user_id = user_id, status=1)
+                else:
+                    queryset_short = queryset.filter(pubtime__gte = time_week, user_id = user_id, status=1)
 
-            data = {
-                'user': user_id,
-                'times': queryset_short.count(),
-            }
-            listdata.append(data)
+                data = {
+                    'user': user_id,
+                    'times': queryset_short.count(),
+                }
+                listdata.append(data)
+
             user_id += 1
 
         return listdata
