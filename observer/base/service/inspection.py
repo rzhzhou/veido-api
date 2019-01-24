@@ -623,41 +623,87 @@ class InspectStatisticsData(Abstract):
         super(InspectStatisticsData, self).__init__(params)
 
     def get_statistics_data(self):
-        fields = ('inspect_patch', 'qualitied_patch', 'industry__name')
+        fields = ('inspect_patch', 'qualitied_patch')
 
         cond = {
-            # 'industry_id': getattr(self, 'industry_id', None),
             'level': getattr(self, 'level', None),
-            'industry__parent_id': getattr(self, 'parent_id', None),
-
-        }
-
-        cond2 = {
-            'parent_id': getattr(self, 'parent_id', None),
-            'level': None if getattr(self, 'parent_id', None) else 1,
+            'pubtime__gte': getattr(self, 'starttime', None),
+            'pubtime__lte': getattr(self, 'endtime', None),
         }
 
         args = dict([k, v] for k, v in cond.items() if v)
-        args2 = dict([k, v] for k, v in cond2.items() if v)
+        queryset = Inspection.objects.filter(**args)
 
-        queryset_industry = MajorIndustry.objects.filter(**args2).values('name', 'id')
-        queryset = Inspection.objects.filter(**args).values(*fields)
+        industry_level2_below = getattr(self, 'parent_level2', None)
+        industry_level3_below = getattr(self, 'parent_level3', None)
 
-        
+        queryset_industrylevel2 = MajorIndustry.objects.filter(parent_id = industry_level2_below).values('name', 'id')
+        queryset_industrylevel3 = MajorIndustry.objects.filter(parent_id = industry_level3_below).values('name', 'id')
+
+        sum_inspect_patch = 0
+        sum_qualitied_patch = 0
         result = []
-        for q_i in queryset_industry:
+        result_levle1 = []
+        result_levle2 = []
+        result_levle3 = []
+
+        industry_id = 1
+        while industry_id <= 5 :
+            queryset_level1_below = queryset.filter(Q(industry__parent_id = industry_id) | 
+                Q(industry__parent__parent_id = industry_id) | Q(industry_id__lte = industry_id)).values(*fields)
+
+            for q in queryset_level1_below:
+                sum_inspect_patch += q['inspect_patch']
+
+            result_levle1.append({
+                'industry_name': MajorIndustry.objects.filter(id = industry_id).values_list('name', flat = True),
+                'sum_spotcheck': sum_inspect_patch,
+            })
+            sum_inspect_patch = 0
+            industry_id += 1
+        
+        for q_il2 in queryset_industrylevel2:
+            queryset_level2_below = queryset.filter(Q(industry__parent_id = q_il2['id']) | 
+                Q(industry__parent__parent_id = q_il2['id']) | Q(industry_id = q_il2['id'])).values(*fields)
+
+            for q in queryset_level2_below:
+                sum_inspect_patch += q['inspect_patch']
+                sum_qualitied_patch += q['qualitied_patch']
+            
+            result_levle2.append({
+                'industry_name': q_il2['name'],
+                'sum_passrate': 0 if not sum_inspect_patch else round(sum_qualitied_patch/sum_inspect_patch*100, 2),
+            })
             sum_inspect_patch = 0
             sum_qualitied_patch = 0
 
-            queryset_sum = queryset.filter(industry_id = q_i['id'])
+        for q_il3 in queryset_industrylevel3:
+            queryset_level3_below = queryset.filter(Q(industry__parent_id = q_il3['id']) | Q(industry_id = q_il3['id'])).values(*fields)
 
-            for q in queryset_sum:
+            for q in queryset_level3_below:
                 sum_inspect_patch += q['inspect_patch']
                 sum_qualitied_patch += q['qualitied_patch']
-                
-            result.append({
-                'industry_name': q_i['name'],
+
+            result_levle3.append({
+                'industry_name': q_il3['name'],
                 'sum_passrate': 0 if not sum_inspect_patch else round(sum_qualitied_patch/sum_inspect_patch*100, 2),
             })
+            sum_inspect_patch = 0
+            sum_qualitied_patch = 0
         
+        result.append({
+            'listlevel1': map(lambda r1 : {
+                'industry_name': r1['industry_name'],
+                'sum_spotcheck': r1['sum_spotcheck'],
+                }, result_levle1),
+            'listlevel2': map(lambda r2 : {
+                'industry_name': r2['industry_name'],
+                'sum_passrate': r2['sum_passrate'],
+                }, result_levle2),
+            'listlevel3': map(lambda r3 : {
+                'industry_name': r3['industry_name'],
+                'sum_passrate': r3['sum_passrate'],
+                }, result_levle3),
+        })
+
         return result

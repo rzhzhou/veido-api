@@ -113,10 +113,10 @@ class CrawlerTask_category(object):
             'next_run': datetime.utcnow().replace(tzinfo=pytz.utc),
             'status': 0
         }
-        print(params)
-        # if not Task.objects.using('crawler').filter(url=data.get('syntax'), data__contains=params.get('data').get('category_id')).exists():
-        #     task = Task(**params)
-        #     task.save(using='crawler')
+
+        if not Task.objects.using('crawler').filter(url=data.get('syntax'), data__contains=params.get('data').get('category_id')).exists():
+            task = Task(**params)
+            task.save(using='crawler')
 
     def remove(self):
         for k, v in self.source.items():
@@ -126,5 +126,4 @@ class CrawlerTask_category(object):
                     "category_id": self.category_id,
                 },
             }
-
             Task.objects.using('crawler').filter(url=data.get('syntax'), data__contains=data.get('params').get('category_id')).delete()

@@ -258,13 +258,7 @@ class InspectStatisticsView(BaseView):
 
     def serialize(self, result):
 
-        data = {
-            'list': map(lambda r : {
-                'industry_name': r['industry_name'],
-                'sum_passrate': r['sum_passrate'],
-
-            },result)
-        }
+        data = result
 
         return data
 
