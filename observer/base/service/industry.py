@@ -260,7 +260,7 @@ class MajorIndustryData(Abstract):
 
         args = dict([k, v] for k, v in cond.items() if v)
 
-        queryset = MajorIndustry.objects.filter(**args).values(*fields)
+        queryset = MajorIndustry.objects.filter(**args).exclude(name='None').values(*fields)
 
         return queryset
 
@@ -281,7 +281,7 @@ class MajorIndustryData(Abstract):
         args = dict([k, v] for k, v in cond.items() if v != '')
 
         queryset = MajorIndustry.objects.filter(
-            **args).order_by('id').values(*fields)
+            **args).exclude(name='None').order_by('id').values(*fields)
 
         return queryset
 
