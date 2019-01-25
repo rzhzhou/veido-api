@@ -43,7 +43,7 @@ class CorpusAdd(Abstract):
         if not category_id:
             return 400
 
-        if CorpusCategories.objects.filter(category_id=category_id, keyword=keyword, industry_id=industry_id).exists():
+        if CorpusCategories.objects.filter(category_id=category_id, keyword=keyword, industry_id=industry_id, user_id=self.user.id).exists():
             return 202
 
         CorpusCategories(
