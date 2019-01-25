@@ -630,7 +630,7 @@ class InspectStatisticsData(Abstract):
             'pubtime__gte': getattr(self, 'starttime', None),
             'pubtime__lte': getattr(self, 'endtime', None),
         }
-        print(getattr(self, 'starttime', None), getattr(self, 'endtime', None))
+
         args = dict([k, v] for k, v in cond.items() if v)
         queryset = Inspection.objects.filter(**args)
 

@@ -1232,6 +1232,9 @@ class RiskDataView(BaseView):
                 'score': x['score'],
                 'source': x['source'],
                 'areas': areas(x['id']),
+                'keyword': '无' if not x['corpus__keyword'] else x['corpus__keyword'],
+                'industry_name': '无' if x['industry__name'] == 'None' else x['industry__name'],
+                'industry_parent_name': '无' if x['industry__name'] == 'None' else x['industry__parent__name'],
                 'categories': categories(x['id'], admin=True),
                 'pubtime': date_format(x['pubtime'], '%Y-%m-%d %H:%M:%S'),
                 'status': x['status'],
@@ -1728,7 +1731,7 @@ class CorpusView(BaseView):
                 'id': r['id'],
                 'status': r['status'],
                 'riskword': r.get('riskword', ''),
-                'industry': {'id': r.get('industry_id', -1), 'text': '无'} if not r.get('industry_id') else get_major_industry(r['industry_id']),
+                'industry': {'id': -1, 'text': '无'} if r['industry_id'] == -1 else get_major_industry(r['industry_id']),
                 'keyword': r.get('keyword', ''),
                 'category': get_major_category(r['category_id']) if r.get('category_id', None) else r.get('category_id', ''),
             }, results)
