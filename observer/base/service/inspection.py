@@ -7,15 +7,16 @@ import jieba.posseg as pseg
 
 import openpyxl
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.models import Group, User
 from django.db.models import Q
 
-from observer.base.models import (MajorIndustry, AliasIndustry, Area, Enterprise, Industry,
+from observer.base.models import (MajorIndustry, AliasIndustry, UserArea, Area, Enterprise, Industry,
                                   Inspection, IndustryProducts)
 from observer.base.service.abstract import Abstract
 from observer.base.service.base import (alias_industry, get_major_industry, area,
                                         enterprise_area_name, enterprise_name,
                                         enterprise_unitem, industry_number,
-                                        qualitied)
+                                        qualitied, involve_local)
 from observer.utils.date_format import date_format, get_months, str_to_date
 from observer.utils.excel import read_by_openpyxl, write_by_openpyxl
 from observer.utils.str_format import str_to_md5str
@@ -535,7 +536,7 @@ class InspectionDataExport(Abstract):
         end = months[1].strftime('%Y-%m-%d')
 
         queryset = Inspection.objects.filter(pubtime__gte=start, pubtime__lte=end).values(
-            'id', 'title', 'url', 'pubtime', 'category', 'level', 'source', 'area__name', 'industry_id', 'industry__name', 'qualitied', 'enterprises__name', 
+            'id', 'title', 'url', 'pubtime', 'category', 'level', 'source', 'area__name', 'industry_id', 'industry__name', 'qualitied', 'enterprises__name',
             'enterprises__area__name', 'enterprises__unitem')
 
         for q in queryset:
@@ -615,3 +616,205 @@ class InspectionDataSuzhou(Abstract):
             queryset = Inspection.objects.filter(Q(source__contains=search_value) | Q(product_name__contains=search_value)).values(*fields)
 
         return queryset
+
+
+class InspectionDataNation(Abstract):
+    def __init__(self, params):
+        super(InspectionDataNation, self).__init__(params)
+
+    def get_all(self):
+        fields = ('inspection__industry__name', 'unitem', 'area__name', 'inspection__pubtime')
+
+        cond = {
+            'inspection__level' : getattr(self, '', 2),
+            'inspection__pubtime__year': getattr(self,'year',None),
+            'inspection__pubtime__month': getattr(self,'month',None),
+        }
+
+        args = dict([k, v] for k, v in cond.items() if v)
+
+        queryset = Enterprise.objects.filter(**args).values(*fields)
+
+        return queryset
+
+
+class InspectionDataProAndCity(Abstract):
+    def __init__(self, params):
+        super(InspectionDataProAndCity, self).__init__(params)
+
+    def get_all(self):
+        fields = ('industry__name', 'qualitied', 'source', 'pubtime')
+
+        cond = {
+            'pubtime__gte': getattr(self, 'starttime', None),
+            'pubtime__lte': getattr(self, 'endtime', None),
+        }
+
+        args = dict([k, v] for k, v in cond.items() if v)
+
+        queryset = Inspection.objects.filter(**args).values(*fields).order_by('qualitied')
+
+        return queryset
+
+
+class InspectionDataLocal(Abstract):
+
+    def __init__(self, user, params):
+        super(InspectionDataLocal, self).__init__(params)
+        self.user = user
+
+    def get_all(self):
+        area_name = User.objects.filter(username=self.user).values('userarea__area__name')
+
+        fields = ('inspection__industry__name', 'name', 'unitem','inspection__source','inspection__pubtime')
+
+        cond = {
+            'area__name': getattr(self, '', area_name[0]['userarea__area__name']),
+            'inspection__pubtime__gte': getattr(self, 'starttime', None),
+            'inspection__pubtime__lte': getattr(self, 'endtime', None),
+        }
+
+        args = dict([k, v] for k, v in cond.items() if v)
+
+        queryset = Enterprise.objects.filter(**args).values(*fields)
+
+        return queryset
+
+
+class InspectionDataLocalExport(Abstract):
+
+    def __init__(self, user, params):
+        super(InspectionDataLocalExport, self).__init__(params)
+        self.user = user
+
+    def export(self):
+        filename = "o.xlsx"
+
+        # process data
+        data = [
+            ['序号', '抽查产品', '企业名称', '不合格项目', '抽检单位'],
+        ]
+  
+        area_name = User.objects.filter(username=self.user).values('userarea__area__name')
+
+        fields = ('inspection__industry__name', 'name', 'unitem', 'inspection__source', 'inspection__pubtime')
+
+        cond = {
+            'area__name': getattr(self, '', area_name[0]['userarea__area__name']),
+            'inspection__pubtime__gte': getattr(self, 'starttime', None),
+            'inspection__pubtime__lte': getattr(self, 'endtime', None),
+        }
+
+        args = dict([k, v] for k, v in cond.items() if v)
+
+        queryset = Enterprise.objects.filter(**args).values(*fields)
+        
+        print(queryset)
+
+        i = 1
+
+        for q in queryset:
+            data.append([
+                i,
+                q['inspection__industry__name'],
+                q['name'],
+                q['unitem'],
+                q['inspection__source'],
+            ])
+            i = i+1
+           
+
+        # write file
+        write_by_openpyxl(filename, data)
+
+        return open(filename, 'rb')
+
+
+class InspectionDataProAndCityExport(Abstract):
+
+    def __init__(self, user, params):
+        super(InspectionDataProAndCityExport, self).__init__(params)
+        self.user = user
+
+    def export(self):
+        filename = "o.xlsx"
+
+        # process data
+        data = [
+            ['序号','产品种类','合格率','抽检单位','发布日期'],
+        ]
+
+        fields = ('industry__name', 'qualitied', 'source', 'pubtime')
+
+        cond = {
+            'pubtime__gte': getattr(self, 'starttime', None),
+            'pubtime__lte': getattr(self, 'endtime', None),
+        }
+
+        args = dict([k, v] for k, v in cond.items() if v)
+
+        queryset = Inspection.objects.filter(**args).values(*fields).order_by('qualitied')
+  
+        i = 1
+
+        for q in queryset:
+            data.append([
+                i,
+                q['industry__name'],
+                str(round(float(q['qualitied'])*100,2))+'%',
+                q['source'],
+                q['pubtime'],
+            ])
+            i = i+1
+           
+
+        # write file
+        write_by_openpyxl(filename, data)
+
+        return open(filename, 'rb')
+
+
+class InspectionDataNationExport(Abstract):
+
+    def __init__(self, user, params):
+        super(InspectionDataNationExport, self).__init__(params)
+        self.user = user
+
+    def export(self):
+        filename = "o.xlsx"
+
+        # process data
+        data = [
+            ['序号', '不合格产品种类','不合格项目', '是否涉及本地企业'],
+        ]
+
+        areaname = User.objects.filter(username=self.user).values('userarea__area__name')
+
+        fields = ('inspection__industry__name', 'unitem', 'area__name', 'inspection__pubtime')
+
+        cond = {
+            'inspection__level':getattr(self, '', 2),
+            'inspection__pubtime__year': getattr(self,'year',None),
+            'inspection__pubtime__month': getattr(self,'month',None),
+        }
+
+        args = dict([k, v] for k, v in cond.items() if v)
+
+        queryset = Enterprise.objects.filter(**args).values(*fields).distinct()
+
+        i = 1
+
+        for q in queryset:
+            data.append([
+                i,
+                q['inspection__industry__name'],
+                q['unitem'],
+                involve_local(areaname[0]['userarea__area__name'], q['area__name']),
+            ])
+            i = i+1
+           
+
+        # write file
+        write_by_openpyxl(filename, data)
+
+        return open(filename, 'rb')

@@ -17,9 +17,6 @@ from observer.utils.excel import read_by_openpyxl, write_by_openpyxl
 from observer.utils.str_format import str_to_md5str
 from observer.utils.crawler.enterprise_crawler import crawler
 
-jieba.load_userdict('observer/utils/dictionary.txt')
-
-
 class VersionRecordData(Abstract):
     def __init__(self, params):
         super(VersionRecordData, self).__init__(params)
