@@ -1,21 +1,11 @@
 from io import BytesIO
 
-import threading
-
-import jieba
-import jieba.posseg as pseg
-
-import openpyxl
 import datetime
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Q
 
 from observer.base.models import VersionRecord
 from observer.base.service.abstract import Abstract
-from observer.utils.date_format import date_format, get_months, str_to_date
-from observer.utils.excel import read_by_openpyxl, write_by_openpyxl
-from observer.utils.str_format import str_to_md5str
-from observer.utils.crawler.enterprise_crawler import crawler
+
 
 class VersionRecordData(Abstract):
     def __init__(self, params):

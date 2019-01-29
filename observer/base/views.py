@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 
 from django.contrib.auth.models import Group, User
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
@@ -9,41 +10,61 @@ from rest_framework.decorators import permission_classes
 from rest_framework.parsers import FileUploadParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from datetime import datetime
 
-from observer.base.models import AliasIndustry, Nav, NewsReport, UserNav, UserArea, Inspection
+from observer.base.models import (AliasIndustry, Inspection, Nav, NewsReport,
+                                  UserArea, UserNav, VersionRecord)
 from observer.base.service.area import Select2AreaData
-from observer.base.service.article import (
-    ArticleData, RiskData, RiskDataAdd, RiskDataAudit, RiskDataDelete,
-    RiskDataEdit, RiskDataExport, RiskDataSuzhou, RiskDataUpload,
-    StatisticsShow, newsCrawlerData)
-from observer.base.service.base import (
-    alias_industry, area, areas, categories, get_major_category,
-    get_major_industry, get_user_extra, get_user_nav, local_related, qualitied,
-    involve_local)
+from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd,
+                                           RiskDataAudit, RiskDataDelete,
+                                           RiskDataEdit, RiskDataExport,
+                                           RiskDataSuzhou, RiskDataUpload,
+                                           StatisticsShow, newsCrawlerData)
+from observer.base.service.base import (alias_industry, area, areas,
+                                        categories, get_major_category,
+                                        get_major_industry, get_user_extra,
+                                        get_user_nav, involve_local,
+                                        local_related, qualitied)
 from observer.base.service.corpus import (CategoryListData, CorpusAdd,
                                           CorpusData, CorpusDelete, CorpusEdit,
                                           CrawlerData)
 from observer.base.service.dashboard import DashboardData
 from observer.base.service.desmon import (DMLinkAdd, DMLinkData, DMLinkDelete,
                                           DMLinkEdit, DMWordsData)
-from observer.base.service.industry import (
-    AliasIndustryAdd, CCCIndustryAdd, CCCIndustryData, ConsumerIndustryData,
-    CpcIndustryData, IndustryData, IndustryProductsData, LicenceIndustryAdd,
-    LicenceIndustryData, MajorIndustryData, Select2AliasIndustryData,
-    Select2CCCIndustryData, Select2IndustryData, Select2LicenceIndustryData)
-from observer.base.service.inspection import (
-    EnterpriseData, EnterpriseDataAudit, EnterpriseDataDelete,
-    EnterpriseDataEdit, EnterpriseDataUnqualified, InspectionData,
-    InspectionDataAdd, InspectionDataAudit, InspectionDataCrawler,
-    InspectionDataDelete, InspectionDataEdit, InspectionDataExport,
-    InspectionDataSuzhou, InspectionDataUnEnterpriseUpload,
-    InspectionDataUpload, InspectionDataLocal, InspectionDataProAndCity,
-    InspectionDataNation, InspectionDataLocalExport,
-    InspectionDataProAndCityExport, InspectionDataNationExport)
-from observer.base.service.version import (
-    VersionRecordData, VersionRecordDataAdd, VersionRecordDataEdit,
-    VersionRecordDataDelete)
+from observer.base.service.industry import (AliasIndustryAdd, CCCIndustryAdd,
+                                            CCCIndustryData,
+                                            ConsumerIndustryData,
+                                            CpcIndustryData, IndustryData,
+                                            IndustryProductsData,
+                                            LicenceIndustryAdd,
+                                            LicenceIndustryData,
+                                            MajorIndustryData,
+                                            Select2AliasIndustryData,
+                                            Select2CCCIndustryData,
+                                            Select2IndustryData,
+                                            Select2LicenceIndustryData)
+from observer.base.service.inspection import (EnterpriseData,
+                                              EnterpriseDataAudit,
+                                              EnterpriseDataDelete,
+                                              EnterpriseDataEdit,
+                                              EnterpriseDataUnqualified,
+                                              InspectionData,
+                                              InspectionDataAdd,
+                                              InspectionDataAudit,
+                                              InspectionDataCrawler,
+                                              InspectionDataDelete,
+                                              InspectionDataEdit,
+                                              InspectionDataExport,
+                                              InspectionDataSuzhou,
+                                              InspectionDataUnEnterpriseUpload,
+                                              InspectionDataUpload,
+                                              InspectStatisticsData,
+                                              InspectionDataNation,
+                                              InspectionDataProAndCity,
+                                              InspectionDataLocal,
+                                              InspectionDataLocalExport,
+                                              InspectionDataNationExport,
+                                              InspectionDataProAndCityExport,
+                                              )
 from observer.base.service.navbar import NavBarEdit
 from observer.base.service.news import NewsAdd, NewsDelete, NewsEdit, ViewsData
 from observer.base.service.report import (NewsReportData, NewsReportDelete,
@@ -51,6 +72,10 @@ from observer.base.service.report import (NewsReportData, NewsReportDelete,
 from observer.base.service.search import SearchAdvancedData, SearchData
 from observer.base.service.user import (GroupData, UserAdd, UserData,
                                         UserDelete, UserEdit)
+from observer.base.service.version import (VersionRecordData,
+                                           VersionRecordDataAdd,
+                                           VersionRecordDataDelete,
+                                           VersionRecordDataEdit)
 from observer.utils.date_format import date_format
 from observer.utils.excel import write_by_openpyxl
 
@@ -235,6 +260,23 @@ class InspectionView(BaseView):
         queryset = InspectionData(params=request.query_params).get_all()
 
         return Response(self.serialize(queryset))
+
+
+class InspectStatisticsView(BaseView):
+    def __init__(self):
+        super(InspectStatisticsView, self).__init__()
+
+    def serialize(self, result):
+
+        data = result
+
+        return data
+
+    def get(self, request):
+
+        result = InspectStatisticsData(params = request.query_params).get_statistics_data()
+
+        return Response(self.serialize(result))
 
 
 class IndustryView(BaseView):
@@ -598,7 +640,7 @@ class Select2ConsumerListView(BaseView):
         data = map(
             lambda x: {
                 'id': x['id'],
-                'text': x['name'],
+                'text': '%s - %s' % (x['id'], x['name']),
             },
             queryset
         )
@@ -643,6 +685,7 @@ class MajorListView(BaseView):
                 'level': x['level'],
                 'licence': x['licence'],
                 'ccc': x['ccc'],
+                'consumer': x['consumer'],
             }, result),
         }
 
@@ -1198,6 +1241,9 @@ class RiskDataView(BaseView):
                 'score': x['score'],
                 'source': x['source'],
                 'areas': areas(x['id']),
+                'keyword': '无' if not x['corpus__keyword'] else x['corpus__keyword'],
+                'industry_name': '无' if x['industry__name'] == 'None' else x['industry__name'],
+                'industry_parent_name': '无' if x['industry__name'] == 'None' else x['industry__parent__name'],
                 'categories': categories(x['id'], admin=True),
                 'pubtime': date_format(x['pubtime'], '%Y-%m-%d %H:%M:%S'),
                 'status': x['status'],
@@ -1693,7 +1739,7 @@ class CorpusView(BaseView):
                 'id': r['id'],
                 'status': r['status'],
                 'riskword': r.get('riskword', ''),
-                'industry': {'id': r.get('industry_id', -1), 'text': '无'} if not r.get('industry_id') else get_major_industry(r['industry_id']),
+                'industry': {'id': -1, 'text': '无'} if r['industry_id'] == -1 else get_major_industry(r['industry_id']),
                 'keyword': r.get('keyword', ''),
                 'category': get_major_category(r['category_id']) if r.get('category_id', None) else r.get('category_id', ''),
             }, results)
@@ -2033,6 +2079,7 @@ class NavBarView(BaseView):
 
     def serialize(self):
         navs = []
+        routers = []
         u_navs_ids = UserNav.objects.filter(user=self.user).values_list('nav', flat=True)
         L1 = Nav.objects.filter(id__in=u_navs_ids, level=1).values('name','id').order_by('index')
         if L1:
@@ -2048,15 +2095,28 @@ class NavBarView(BaseView):
                         navs.append({
                             'icon': title['icon'],
                             'title': title['name'],
-                            'href': '' if title['href'] == '0' else title['href'],
+                            'href': '' if not title['href'] else title['href'],
                             'children': list(map(lambda x: {
                                 'title': x['name'],
                                 'href': x['href'],
                             }, Nav.objects.filter(id__in=u_navs_ids, level=3, parent_id=title['id']).values('name', 'href').order_by('index'))) if childrens else ''
                         })
 
+        routes = Nav.objects.filter(id__in=u_navs_ids).values('href', 'component').order_by('index')
+        j = 0
+        for i, route in enumerate(routes):
+            if route['href'] == '':
+                j+=1
+            else:
+                routers.append({
+                    'path': route['href'],
+                    'alias': '/' if i - j == 0 else '',
+                    'component': route['component'],
+                })
+
         data = {
             'menus': navs,
+            'routers': routers,
         }
 
         return data

@@ -194,7 +194,7 @@ class ConsumerIndustryData(Abstract):
         fields = ('id', 'name',)
 
         cond = {
-            'level': getattr(self, 'level'),
+            'level': getattr(self, 'level', None),
             'parent': getattr(self, 'parent', None),
         }
 
@@ -237,11 +237,14 @@ class MajorIndustryData(Abstract):
         objs = MajorIndustry.objects.filter(pk=pk)
 
         if objs:
+            ccc = getattr(self, 'ccc')
+            licence = getattr(self, 'licence')
+            consumer = getattr(self, 'consumer')
+
             major = objs[0]
-            major.ccc = CCCIndustry.objects.get(pk=getattr(
-                self, 'ccc')) if getattr(self, 'ccc') else None
-            major.licence = LicenceIndustry.objects.get(pk=getattr(
-                self, 'licence')) if getattr(self, 'licence') else None
+            major.ccc = CCCIndustry.objects.get(pk=ccc) if ccc else None
+            major.licence = LicenceIndustry.objects.get(pk=licence) if licence else None
+            major.consumer = ConsumerIndustry.objects.get(pk=consumer) if consumer else None
             major.save()
             return 1
 
@@ -260,27 +263,28 @@ class MajorIndustryData(Abstract):
 
         args = dict([k, v] for k, v in cond.items() if v)
 
-        queryset = MajorIndustry.objects.filter(**args).values(*fields)
+        queryset = MajorIndustry.objects.filter(**args).exclude(name='None').values(*fields)
 
         return queryset
 
     def get_all(self):
         fields = (
-            'id', 'name', 'desc', 'level', 'licence', 'ccc',
+            'id', 'name', 'desc', 'level', 'licence', 'ccc', 'consumer'
         )
 
         cond = {
             'parent': getattr(self, 'parent', None),
             'level': getattr(self, 'level', None),
             'name__icontains': getattr(self, 'name', None),
-            'licence__isnull': not bool(int(self.is_licence)) if getattr(self, 'is_licence') != '' else '',
-            'ccc__isnull': not bool(int(self.is_ccc)) if getattr(self, 'is_ccc') != '' else '',
+            'licence__isnull': not bool(int(self.is_licence)) if getattr(self, 'is_licence', '') else '',
+            'ccc__isnull': not bool(int(self.is_ccc)) if getattr(self, 'is_ccc', '') else '',
+            'consumer__isnull': not bool(int(self.is_consumer)) if getattr(self, 'is_consumer', '') else '',
         }
 
         args = dict([k, v] for k, v in cond.items() if v != '')
 
         queryset = MajorIndustry.objects.filter(
-            **args).order_by('id').values(*fields)
+            **args).exclude(name='None').order_by('id').values(*fields)
 
         return queryset
 

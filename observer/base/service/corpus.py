@@ -43,7 +43,7 @@ class CorpusAdd(Abstract):
         if not category_id:
             return 400
 
-        if CorpusCategories.objects.filter(category_id=category_id, keyword=keyword, industry_id=industry_id).exists():
+        if CorpusCategories.objects.filter(category_id=category_id, keyword=keyword, industry_id=industry_id, user_id=self.user.id).exists():
             return 202
 
         CorpusCategories(
@@ -85,14 +85,20 @@ class CorpusDelete(Abstract):
         keywords = getattr(self, 'keyword', '')
         category_ids = getattr(self, 'category_id', '')
         industry_ids = getattr(self, 'industry_id', '')
-            
+        corpus_ids = getattr(self, 'corpus_id', '')
+   
         for (ids, keyword, category_id, industry_id, statu) in zip(del_ids.split(","), keywords.split(","), category_ids.split(","), industry_ids.split(","), status.split(",")):
             if statu == '1':
-                CrawlerTask_category(keyword, category_id, industry_id).remove()
-                CorpusCategories.objects.filter(id=ids).delete()
+                CrawlerTask_category(keyword, category_id, industry_id, self.user.id, ids).remove()
+                statuUp = CorpusCategories.objects.get(id=ids)
+                statuUp.status = 2  
+                statuUp.save()
             else:
-                CorpusCategories.objects.filter(id=ids).delete()
-                    
+                if statu == '0':
+                    CorpusCategories.objects.filter(id=ids).delete()
+                
+                
+
         return 200
 
 
@@ -109,10 +115,9 @@ class CrawlerData(Abstract):
         keywords = getattr(self, 'keyword', '')
         category_ids = getattr(self, 'category_id')
         industry_ids = getattr(self, 'industry_id')
-        corpus_ids = getattr(self, 'corpus_id')
 
-        for (ids, keyword, category_id, industry_id, corpus_id) in zip(edit_ids.split(","), keywords.split(","), category_ids.split(","), industry_ids.split(","), corpus_ids.split(",")):
-            CrawlerTask_category(keyword, category_id, industry_id, self.user.id, corpus_id).build()
+        for (ids, keyword, category_id, industry_id) in zip(edit_ids.split(","), keywords.split(","), category_ids.split(","), industry_ids.split(",")):
+            CrawlerTask_category(keyword, category_id, industry_id, self.user.id, ids).build()
             corpus_categories = CorpusCategories.objects.get(id=ids)
             corpus_categories.status = status
             corpus_categories.save()
