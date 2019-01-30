@@ -1022,8 +1022,8 @@ class DMWordsView(BaseView):
         data = {
             'total': total,
             'list': map(lambda r: {
-                'industry': get_major_industry(r['industry_id']),
-                'riskword': r['riskword'],
+                'industry': {'id': 1, 'text': '无'} if r['industry_id'] == -1 else get_major_industry(r['industry_id']),
+                'keyword': r['keyword'],
             }, results)
         }
 
@@ -1032,7 +1032,7 @@ class DMWordsView(BaseView):
     def get(self, request):
         self.set_request(request)
 
-        queryset = DMWordsData(params=request.query_params).get_all()
+        queryset = DMWordsData(user = request.user, params = request.query_params).get_all()
 
         return Response(self.serialize(queryset))
 
