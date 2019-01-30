@@ -2074,7 +2074,6 @@ class NavBarView(BaseView):
 
     def serialize(self):
         navs = []
-        routers = []
         u_navs_ids = UserNav.objects.filter(user=self.user).values_list('nav', flat=True)
         L1 = Nav.objects.filter(id__in=u_navs_ids, level=1).values('name','id').order_by('index')
         if L1:
@@ -2096,24 +2095,9 @@ class NavBarView(BaseView):
                                 'href': x['href'],
                             }, Nav.objects.filter(id__in=u_navs_ids, level=3, parent_id=title['id']).values('name', 'href').order_by('index'))) if childrens else ''
                         })
-
-        routes = Nav.objects.filter(id__in=u_navs_ids).values('href', 'component').order_by('index')
-        j = 0
-        for i, route in enumerate(routes):
-            if route['href'] == '':
-                j+=1
-            else:
-                routers.append({
-                    'path': route['href'],
-                    'alias': '/' if i - j == 0 else '',
-                    'component': route['component'],
-                })
-
         data = {
             'menus': navs,
-            'routers': routers,
         }
-
         return data
 
     def get(self, request):
@@ -2136,6 +2120,41 @@ class NavBarEditView(BaseView):
         queryset = NavBarEdit(user=request.user, params=request.data).edit(cid=cid)
 
         return Response(status=queryset)
+
+
+class RouteDataView(BaseView):
+
+    def __init__(self):
+        super(RouteDataView, self).__init__()
+
+    def set_request(self, request):
+        self.user = request.user
+        super(RouteDataView, self).set_request(request)
+
+    def serialize(self):
+        routers = []
+        u_navs_ids = UserNav.objects.filter(user=self.user).values_list('nav', flat=True)
+        routes = Nav.objects.filter(id__in=u_navs_ids).values('href', 'component').order_by('index')
+        j = 0
+        for i, route in enumerate(routes):
+            if route['href'] == '':
+                j+=1
+            else:
+                routers.append({
+                    'path': route['href'],
+                    'alias': '/' if i - j == 0 else '',
+                    'component': route['component'],
+                })
+        data = {
+            'routers': routers,
+        }
+
+        return data
+
+    def get(self, request):
+        self.set_request(request)
+
+        return Response(self.serialize())
 
 
 class UserView(BaseView):
