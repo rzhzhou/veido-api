@@ -103,6 +103,9 @@ urlpatterns = [
     path('nav_bar', views.NavBarView.as_view()), # 侧边栏导航
     path('nav_bar/edit/<str:cid>/', views.NavBarEditView.as_view()), # 分配侧边栏导航
 
+    # 动态路由
+    path('route_data/', views.RouteDataView.as_view()), # 动态路由
+
     # 官网
     path('news', views.NewsView.as_view()), # 公司动态
     path('news/add', views.NewsAddView.as_view()), # 发布一则公司动态
