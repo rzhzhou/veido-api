@@ -99,6 +99,15 @@ def alias_industry(alias_industry_id, flat=False):
         return queryset.name
 
 
+def involve_local(local_name, area_name):
+        if local_name == area_name:
+            return '是'
+        else:
+            return '否'
+    
+    
+
+
 def industry_number(alias_industry_id):
     queryset = AliasIndustry.objects.get(id=alias_industry_id)
 

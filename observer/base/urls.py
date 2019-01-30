@@ -10,7 +10,7 @@ urlpatterns = [
     path('articles/<str:category>/', views.ArticleView.as_view()),  # 文章列表
     path('inspections', views.InspectionView.as_view()),  # 抽检列表
     path('unqualifiedenterprise', views.EnterpriseDataUnqualifiedView.as_view()), # 不合格企业列表
-    path('inspectstatistics', views.InspectStatisticsView.as_view()),  # 抽检统计
+    path('inspectstatistics/', views.InspectStatisticsView.as_view()),  # 抽检统计
     path('ccc', views.CCCListView.as_view()),  # 3C行业
     path('ccc/<int:cid>/', views.CCCIndustryView.as_view()),  # 3C行业
     path('cpc', views.CpcListView.as_view()),  # 产品总分类
@@ -50,6 +50,12 @@ urlpatterns = [
     path('inspection_data/export', views.InspectionDataExportView.as_view()),  # 抽检数据导出
     path('inspection_data/crawler/<str:cid>/', views.InspectionDataCrawlerView.as_view()),  # 抽检数据爬取不合格企业
     path('inspection_data/audit/<str:cid>/', views.InspectionDataAuditView.as_view()), # 抽检数据审核
+    path('inspectionlocal', views.InspectionDataLocalView.as_view()), # 本地抽检数据 
+    path('inspectionprocity', views.InspectionDataProAndCityView.as_view()), # 省市抽检数据
+    path('inspectioncountry', views.InspectionDataNationView.as_view()), # 国家抽检数据 
+    path('inspectionlocal/export', views.InspectionDataLocalExportView.as_view()), # 本地抽检数据导出  
+    path('inspectionprocity/export', views.InspectionDataProAndCityExportView.as_view()), # 省市抽检数据导出
+    path('inspectioncountry/export', views.InspectionDataNationExportView.as_view()), # 国家抽检数据导出  
     path('alias_industry/add', views.AliasIndustryAddView.as_view()),  # 行业别名添加
     path('ccc_industry/add', views.CCCIndustryAddView.as_view()),  # CCC行业添加
     path('licence_industry/add', views.LicenceIndustryAddView.as_view()),  # 许可证行业添加

@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 
 from django.contrib.auth.models import Group, User
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
@@ -10,8 +11,8 @@ from rest_framework.parsers import FileUploadParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from observer.base.models import (AliasIndustry, Nav, NewsReport, UserNav,
-                                  VersionRecord)
+from observer.base.models import (AliasIndustry, Inspection, Nav, NewsReport,
+                                  UserArea, UserNav, VersionRecord)
 from observer.base.service.area import Select2AreaData
 from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd,
                                            RiskDataAudit, RiskDataDelete,
@@ -21,7 +22,8 @@ from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd,
 from observer.base.service.base import (alias_industry, area, areas,
                                         categories, get_major_category,
                                         get_major_industry, get_user_extra,
-                                        get_user_nav, local_related, qualitied)
+                                        get_user_nav, involve_local,
+                                        local_related, qualitied)
 from observer.base.service.corpus import (CategoryListData, CorpusAdd,
                                           CorpusData, CorpusDelete, CorpusEdit,
                                           CrawlerData)
@@ -55,7 +57,14 @@ from observer.base.service.inspection import (EnterpriseData,
                                               InspectionDataSuzhou,
                                               InspectionDataUnEnterpriseUpload,
                                               InspectionDataUpload,
-                                              InspectStatisticsData)
+                                              InspectStatisticsData,
+                                              InspectionDataNation,
+                                              InspectionDataProAndCity,
+                                              InspectionDataLocal,
+                                              InspectionDataLocalExport,
+                                              InspectionDataNationExport,
+                                              InspectionDataProAndCityExport,
+                                              )
 from observer.base.service.navbar import NavBarEdit
 from observer.base.service.news import NewsAdd, NewsDelete, NewsEdit, ViewsData
 from observer.base.service.report import (NewsReportData, NewsReportDelete,
@@ -259,13 +268,7 @@ class InspectStatisticsView(BaseView):
 
     def serialize(self, result):
 
-        data = {
-            'list': map(lambda r : {
-                'industry_name': r['industry_name'],
-                'sum_passrate': r['sum_passrate'],
-
-            },result)
-        }
+        data = result
 
         return data
 
@@ -1028,8 +1031,8 @@ class DMWordsView(BaseView):
         data = {
             'total': total,
             'list': map(lambda r: {
-                'industry': get_major_industry(r['industry_id']),
-                'riskword': r['riskword'],
+                'industry': {'id': 1, 'text': '无'} if r['industry_id'] == -1 else get_major_industry(r['industry_id']),
+                'keyword': r['keyword'],
             }, results)
         }
 
@@ -1038,7 +1041,7 @@ class DMWordsView(BaseView):
     def get(self, request):
         self.set_request(request)
 
-        queryset = DMWordsData(params=request.query_params).get_all()
+        queryset = DMWordsData(user = request.user, params = request.query_params).get_all()
 
         return Response(self.serialize(queryset))
 
@@ -1238,6 +1241,9 @@ class RiskDataView(BaseView):
                 'score': x['score'],
                 'source': x['source'],
                 'areas': areas(x['id']),
+                'keyword': '无' if not x['corpus__keyword'] else x['corpus__keyword'],
+                'industry_name': '无' if x['industry__name'] == 'None' else x['industry__name'],
+                'industry_parent_name': '无' if x['industry__name'] == 'None' else x['industry__parent__name'],
                 'categories': categories(x['id'], admin=True),
                 'pubtime': date_format(x['pubtime'], '%Y-%m-%d %H:%M:%S'),
                 'status': x['status'],
@@ -1336,7 +1342,6 @@ class RiskDataExportView(BaseView):
         response["Content-Disposition"] = 'attachment; filename=articles.xlsx'
 
         return response
-
 
 class InspectionDataView(BaseView):
 
@@ -1734,7 +1739,7 @@ class CorpusView(BaseView):
                 'id': r['id'],
                 'status': r['status'],
                 'riskword': r.get('riskword', ''),
-                'industry': {'id': r.get('industry_id', -1), 'text': '无'} if not r.get('industry_id') else get_major_industry(r['industry_id']),
+                'industry': {'id': -1, 'text': '无'} if r['industry_id'] == -1 else get_major_industry(r['industry_id']),
                 'keyword': r.get('keyword', ''),
                 'category': get_major_category(r['category_id']) if r.get('category_id', None) else r.get('category_id', ''),
             }, results)
@@ -2606,3 +2611,152 @@ class VersionRecordDataEditView(BaseView):
         queryset = VersionRecordDataEdit(user=request.user, params=request.data).edit(cid=cid)
 
         return Response(status=queryset)
+
+
+class InspectionDataNationView(BaseView):
+    def __init__(self):
+        super(InspectionDataNationView, self).__init__()
+
+    def set_request(self, request):
+        super(InspectionDataNationView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(InspectionDataNationView, self).paging(
+            queryset, self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 500))
+
+    def serialize(self, queryset, request):
+        areaname = User.objects.filter(username=request.user).values('userarea__area__name')
+        total = queryset.count()
+        result = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda x: {
+                'industry':x['inspection__industry__name'],
+                'unitem': x['unitem'],
+                'area':x['area__name'],
+                'involve': involve_local(areaname[0]['userarea__area__name'], x['area__name']),
+                # 'pubtime': x['inspection__pubtime'],
+            }, result),
+        }
+        return data
+
+    def get(self, request):
+        self.set_request(request)
+
+        queryset = InspectionDataNation(params=request.query_params).get_all()
+
+        return Response(self.serialize(queryset,request))
+
+
+class InspectionDataProAndCityView(BaseView):
+    def __init__(self):
+        super(InspectionDataProAndCityView, self).__init__()
+
+    def set_request(self, request):
+        super(InspectionDataProAndCityView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(InspectionDataProAndCityView, self).paging(
+            queryset, self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15))
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        result = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda x: {
+                'industry':x['industry__name'],
+                'qualified':str(round(float(x['qualitied'])*100,2))+'%',
+                'source':x['source'],
+                'pubtime':x['pubtime']
+            }, result),
+        }
+        return data
+
+    def get(self, request):
+        self.set_request(request)
+
+        queryset = InspectionDataProAndCity(params=request.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+
+class InspectionDataLocalView(BaseView):
+    def __init__(self):
+        super(InspectionDataLocalView, self).__init__()
+
+    def set_request(self, request):
+        super(InspectionDataLocalView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(InspectionDataLocalView, self).paging(
+            queryset, self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15))
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        result = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda x: {
+                'industry':x['inspection__industry__name'],
+                'enterprise':x['name'],
+                'unitem':x['unitem'],
+                'source':x['inspection__source']
+            }, result),
+        }
+        return data
+
+    def get(self, request):
+        self.set_request(request)
+
+        queryset = InspectionDataLocal(user=request.user, params=request.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+
+class InspectionDataLocalExportView(BaseView):
+    def __init__(self):
+        super(InspectionDataLocalExportView, self).__init__()
+
+    def get(self, request):
+        response = FileResponse(
+            InspectionDataLocalExport(user=request.user, params=request.query_params).export(),
+            content_type='application/vnd.ms-excel'
+        )
+        filename = datetime.now().strftime("%Y%m%d%H%M%S")+'_Local_Inspections'+'.xlsx'
+        response["Content-Disposition"] = 'attachment; filename='+filename
+
+        return response
+
+
+class InspectionDataProAndCityExportView(BaseView):
+    def __init__(self):
+        super(InspectionDataProAndCityExportView, self).__init__()
+
+    def get(self, request):
+        response = FileResponse(
+            InspectionDataProAndCityExport(user=request.user, params=request.query_params).export(),
+            content_type='application/vnd.ms-excel'
+        )
+        filename = datetime.now().strftime("%Y%m%d%H%M%S")+'_Province_City_Inspections'+'.xlsx'
+        response["Content-Disposition"] = 'attachment; filename='+filename
+
+        return response
+
+
+class InspectionDataNationExportView(BaseView):
+    def __init__(self):
+        super(InspectionDataNationExportView, self).__init__()
+
+    def get(self, request):
+        response = FileResponse(
+            InspectionDataNationExport(user=request.user, params=request.query_params).export(),
+            content_type='application/vnd.ms-excel'
+        )
+        filename = datetime.now().strftime("%Y%m%d%H%M%S")+'_Nation_Inspections'+'.xlsx'
+        response["Content-Disposition"] = 'attachment; filename='+filename
+
+        return response

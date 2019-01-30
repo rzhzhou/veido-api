@@ -55,7 +55,7 @@ class RiskData(Abstract):
         self.user = user
 
     def get_all(self):
-        fields = ('id', 'url', 'title', 'source', 'pubtime', 'score', 'status' )
+        fields = ('id', 'url', 'title', 'source', 'pubtime', 'score', 'status', 'corpus__keyword', 'industry__name', 'industry__parent__name' )
 
         cond = {
             'pubtime__gte': getattr(self, 'starttime', None),
@@ -94,7 +94,7 @@ class RiskDataAdd(Abstract):
         source = getattr(self, 'source', '')
         areas = getattr(self, 'areas', '')
         categories = getattr(self, 'categories', '')
-        industries = getattr(self, 'industries', '')
+        industries = getattr(self, 'industries', -1)
 
         if not url or not title or not pubtime or not source or not areas or not categories:
             return 400
