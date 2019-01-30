@@ -6,16 +6,16 @@ from observer.base.service.abstract import Abstract
 from observer.utils.date_format import date_format
 
 
-class Select2AreaData(Abstract):
+class SelectAreaData(Abstract):
 
     def __init__(self, params):
-        super(Select2AreaData, self).__init__(params)
+        super(SelectAreaData, self).__init__(params)
 
     def get_all(self):
         fields = ('id', 'name', )
 
         cond = {
-            'name__istartswith': getattr(self, 'text', None),
+            'name__istartswith': getattr(self, 'area', None),
         }
 
         args = dict([k, v] for k, v in cond.items() if v)

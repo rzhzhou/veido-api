@@ -13,7 +13,7 @@ from rest_framework.views import APIView
 
 from observer.base.models import (AliasIndustry, Inspection, Nav, NewsReport,
                                   UserArea, UserNav, VersionRecord)
-from observer.base.service.area import Select2AreaData
+from observer.base.service.area import SelectAreaData
 from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd,
                                            RiskDataAudit, RiskDataDelete,
                                            RiskDataEdit, RiskDataExport,
@@ -1142,18 +1142,18 @@ class Select2LicenceIndustryView(BaseView):
         return Response(self.serialize(queryset))
 
 
-class Select2AreaView(BaseView):
+class SelectAreaView(BaseView):
 
     def __init__(self):
-        super(Select2AreaView, self).__init__()
+        super(SelectAreaView, self).__init__()
 
     def set_request(self, request):
-        super(Select2AreaView, self).set_request(request)
+        super(SelectAreaView, self).set_request(request)
 
     def serialize(self, queryset):
         data = map(lambda q: {
             'id': q['id'],
-            'text': q['name'],
+            'name': q['name'],
         }, queryset)
 
         return data
@@ -1161,7 +1161,7 @@ class Select2AreaView(BaseView):
     def get(self, request):
         self.set_request(request)
 
-        queryset = Select2AreaData(params=request.query_params).get_all()
+        queryset = SelectAreaData(params=request.query_params).get_all()
 
         return Response(self.serialize(queryset))
 
