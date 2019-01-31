@@ -389,10 +389,10 @@ class RiskDataSuzhou(Abstract):
         ac_id = Category.objects.get(name='风险快讯').id
 
         if not search_value:
-            queryset = Article.objects.filter(categories__in=ac_id, status=1).values(*fields)
+            queryset = Article.objects.filter(categories=ac_id).values(*fields)
         else:
-            queryset = Article.objects.filter(Q(title__contains=search_value) | Q(source__contains=search_value), status=1).values(*fields)
-            queryset = queryset.filter(categories__in=ac_id)
+            queryset = Article.objects.filter(Q(title__contains=search_value) | Q(source__contains=search_value)).values(*fields)
+            queryset = queryset.filter(categories=ac_id)
 
         return queryset
 
