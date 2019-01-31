@@ -1784,8 +1784,8 @@ class CategoryListView(BaseView):
 
         data = map(lambda r : {
 
-                'category_id' : r['id'],
-                'category' : r['name'],
+                'id': r['id'],
+                'name': r['name'],
 
             },results)
 

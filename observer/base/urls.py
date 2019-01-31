@@ -84,7 +84,7 @@ urlpatterns = [
     path('select2/licence_industries', views.Select2LicenceListView.as_view()),  # Licence行业
     path('select2/consumer_industries', views.Select2ConsumerListView.as_view()),  # 消费品目录
     path('select2/major_industries', views.Select2MajorListView.as_view()),  # 重点产品目录
-    path('select2/category_list', views.CategoryListView.as_view()), # 信息类别目录
+    path('select/category_list', views.CategoryListView.as_view()), # 信息类别目录
     path('select/areas', views.SelectAreaView.as_view()),  # 地域名称
     path('select2/industry_products', views.Select2IndustryProductsView.as_view()),  # 行业产品
     path('select2/groups', views.Select2GroupView.as_view()), # 用户组

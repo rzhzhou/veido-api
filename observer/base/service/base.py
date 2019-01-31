@@ -15,7 +15,7 @@ def areas(article_id, flat=False):
         queryset = Area.objects.filter(name='全国')
 
     if not flat:
-        return list(map(lambda x: {'id': x['id'], 'text': x['name']}, queryset.values('id', 'name')))
+        return list(map(lambda x: {'id': x['id'], 'name': x['name']}, queryset.values('id', 'name')))
     else:
         return ','.join(queryset.values_list('name', flat=True))
 
@@ -31,7 +31,7 @@ def categories(article_id, admin=False, flat=False):
         queryset = Category.objects.filter(name='其它')
 
     if not flat:
-        return list(map(lambda x: {'id': x['id'], 'text': x['name']}, queryset.values('id', 'name')))
+        return list(map(lambda x: {'id': x['id'], 'name': x['name']}, queryset.values('id', 'name')))
     else:
         return ','.join(queryset.values_list('name', flat=True))
 
