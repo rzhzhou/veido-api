@@ -1361,11 +1361,11 @@ class InspectionDataView(BaseView):
             'total': total,
             'list': map(lambda x: {
                 'id': x['id'],
-                'industry': {'id': x['industry'], 'text': x['industry__name']},
+                'industry': {'id': x['industry'], 'name': x['industry__name']},
                 'origin_product': x['origin_product'],
                 'url': x['url'],
                 'level': x['level'],
-                'area': {'id': x['area'], 'text': x['area__name']},
+                'area': {'id': x['area'], 'name': x['area__name']},
                 'source': x['source'],
                 'qualitied': qualitied(x['qualitied']),
                 'unqualitied_patch': x['unqualitied_patch'],
