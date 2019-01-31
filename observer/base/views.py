@@ -1997,10 +1997,10 @@ class RiskDataViewSuzhou(BaseView):
             "data": map(lambda x: {
                 'titleAndurl': [x['title'], x['url']],
                 'source': x['source'],
-                'areas': areas(x['guid']),
+                'areas': areas(x['id']),
                 'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
                 'score': x['score'],
-                'local_related': local_related(x['guid'], self.user), # 本地风险相关度
+                'local_related': local_related(x['id'], self.user), # 本地风险相关度
             }, results)
         }
 
