@@ -50,12 +50,12 @@ urlpatterns = [
     path('inspection_data/export', views.InspectionDataExportView.as_view()),  # 抽检数据导出
     path('inspection_data/crawler/<str:cid>/', views.InspectionDataCrawlerView.as_view()),  # 抽检数据爬取不合格企业
     path('inspection_data/audit/<str:cid>/', views.InspectionDataAuditView.as_view()), # 抽检数据审核
-    path('inspectionlocal', views.InspectionDataLocalView.as_view()), # 本地抽检数据 
+    path('inspectionlocal', views.InspectionDataLocalView.as_view()), # 本地抽检数据
     path('inspectionprocity', views.InspectionDataProAndCityView.as_view()), # 省市抽检数据
-    path('inspectioncountry', views.InspectionDataNationView.as_view()), # 国家抽检数据 
-    path('inspectionlocal/export', views.InspectionDataLocalExportView.as_view()), # 本地抽检数据导出  
+    path('inspectioncountry', views.InspectionDataNationView.as_view()), # 国家抽检数据
+    path('inspectionlocal/export', views.InspectionDataLocalExportView.as_view()), # 本地抽检数据导出
     path('inspectionprocity/export', views.InspectionDataProAndCityExportView.as_view()), # 省市抽检数据导出
-    path('inspectioncountry/export', views.InspectionDataNationExportView.as_view()), # 国家抽检数据导出  
+    path('inspectioncountry/export', views.InspectionDataNationExportView.as_view()), # 国家抽检数据导出
     path('alias_industry/add', views.AliasIndustryAddView.as_view()),  # 行业别名添加
     path('ccc_industry/add', views.CCCIndustryAddView.as_view()),  # CCC行业添加
     path('licence_industry/add', views.LicenceIndustryAddView.as_view()),  # 许可证行业添加
@@ -76,7 +76,7 @@ urlpatterns = [
     path('versionrecord/add', views.VersionRecordDataAddView.as_view()), # 版本记录添加
     path('versionrecord/delete/<str:cid>/', views.VersionRecordDataDeleteView.as_view()), # 版本记录删除
     path('versionrecord/edit/<int:cid>/', views.VersionRecordDataEditView.as_view()), # 版本记录修改
-    
+
     path('select2/industries', views.Select2IndustryView.as_view()),  # 行业名称
     path('select2/alias_industries', views.Select2AliasIndustryView.as_view()),  # 行业别名
     path('select2/ccc_industries', views.Select2CCCListView.as_view()),  # 3C行业
@@ -86,7 +86,7 @@ urlpatterns = [
     path('select2/major_industries', views.Select2MajorListView.as_view()),  # 重点产品目录
     path('select/category_list', views.CategoryListView.as_view()), # 信息类别目录
     path('select/areas', views.SelectAreaView.as_view()),  # 地域名称
-    path('select2/industry_products', views.Select2IndustryProductsView.as_view()),  # 行业产品
+    path('select/industry_products', views.SelectIndustryProductsView.as_view()),  # 行业产品
     path('select2/groups', views.Select2GroupView.as_view()), # 用户组
 
     path('search', views.SearchView.as_view()),  # 搜索

@@ -37,7 +37,7 @@ class CCCIndustryData(Abstract):
         cond = {
             'level': getattr(self, 'level', None),
             'parent': getattr(self, 'parent', None),
-            'name__icontains': getattr(self, 'text', None),
+            'name__icontains': getattr(self, 'name', None),
         }
 
         text = getattr(self, 'text', None)
@@ -90,7 +90,7 @@ class CpcIndustryData(Abstract):
         cond = {
             'level': getattr(self, 'level', None),
             'parent': getattr(self, 'parent', None),
-            'name__icontains': getattr(self, 'text', None),
+            'name__icontains': getattr(self, 'name', None),
         }
 
         text = getattr(self, 'text', None)
@@ -142,7 +142,7 @@ class LicenceIndustryData(Abstract):
         cond = {
             'level': getattr(self, 'level', None),
             'parent': getattr(self, 'parent', None),
-            'name__icontains': getattr(self, 'text', None),
+            'name__icontains': getattr(self, 'name', None),
         }
 
         text = getattr(self, 'text', None)
@@ -196,6 +196,7 @@ class ConsumerIndustryData(Abstract):
         cond = {
             'level': getattr(self, 'level', None),
             'parent': getattr(self, 'parent', None),
+            'name__icontains': getattr(self, 'name', None),
         }
 
         text = getattr(self, 'text', None)
@@ -256,7 +257,7 @@ class MajorIndustryData(Abstract):
         cond = {
             'level': getattr(self, 'level', None),
             'parent': getattr(self, 'parent', None),
-            'name__icontains': getattr(self, 'text', None),
+            'name__icontains': getattr(self, 'name', None),
         }
 
         text = getattr(self, 'text', None)
@@ -298,7 +299,7 @@ class IndustryProductsData(Abstract):
         fields = ('id', 'name', )
 
         cond = {
-            'name__istartswith': getattr(self, 'text', None),
+            'name__icontains': getattr(self, 'product', None),
         }
 
         args = dict([k, v] for k, v in cond.items() if v)
@@ -319,8 +320,7 @@ class Select2IndustryData(Abstract):
         cond = {
             'level': getattr(self, 'level'),
             'parent': getattr(self, 'parent', None),
-            'id__icontains': getattr(self, 'text', None),
-            'name__icontains': getattr(self, 'text', None),
+            'name__icontains': getattr(self, 'name', None),
         }
 
         text = getattr(self, 'text', None)
