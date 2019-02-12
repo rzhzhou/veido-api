@@ -157,7 +157,7 @@ class DashboardData(Abstract):
                                'industry__name', 'area', 'area__name', 'product_name').order_by('-pubtime')[0:self.length]
 
         return {'local': map(lambda x: {
-                        'industry': {'id': x['industry'], 'text': x['industry__name']},
+                        'industry': {'id': x['industry'], 'name': x['industry__name']},
                         'url': x['url'],
                         'level': x['level'],
                         'area': {'id': x['area'], 'name': x['area__name']},
@@ -168,7 +168,7 @@ class DashboardData(Abstract):
                         'product': x['product_name'],
                     }, q(Inspection.objects.filter(area_id=UserArea.objects.get(user=self.user).area.id, status=1))),
                 'all': map(lambda x: {
-                        'industry': {'id': x['industry'], 'text': x['industry__name']},
+                        'industry': {'id': x['industry'], 'name': x['industry__name']},
                         'url': x['url'],
                         'level': x['level'],
                         'area': {'id': x['area'], 'name': x['area__name']},
