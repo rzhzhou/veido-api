@@ -395,13 +395,13 @@ class CCCListView(BaseView):
         return Response(self.serialize(queryset))
 
 
-class Select2CCCListView(BaseView):
+class SelectCccIndustriesView(BaseView):
 
     def __init__(self):
-        super(Select2CCCListView, self).__init__()
+        super(SelectCccIndustriesView, self).__init__()
 
     def set_request(self, request):
-        super(Select2CCCListView, self).set_request(request)
+        super(SelectCccIndustriesView, self).set_request(request)
 
     def serialize(self, queryset):
         data = map(
@@ -422,13 +422,13 @@ class Select2CCCListView(BaseView):
         return Response(self.serialize(queryset))
 
 
-class SelectCpcisView(BaseView):
-    """docstring for SelectCpcisView"""
+class SelectCpcIndustriesView(BaseView):
+
     def __init__(self):
-        super(SelectCpcisView, self).__init__()
+        super(SelectCpcIndustriesView, self).__init__()
 
     def set_request(self, request):
-        super(SelectCpcisView, self).set_request(request)
+        super(SelectCpcIndustriesView, self).set_request(request)
 
     def serialize(self, queryset):
         data = map(
@@ -541,13 +541,13 @@ class LicenceListView(BaseView):
         return Response(self.serialize(queryset))
 
 
-class Select2LicenceListView(BaseView):
+class SelectLicenceListView(BaseView):
 
     def __init__(self):
-        super(Select2LicenceListView, self).__init__()
+        super(SelectLicenceListView, self).__init__()
 
     def set_request(self, request):
-        super(Select2LicenceListView, self).set_request(request)
+        super(SelectLicenceListView, self).set_request(request)
 
     def serialize(self, queryset):
         data = map(
@@ -628,13 +628,13 @@ class ConsumerListView(BaseView):
         return Response(self.serialize(queryset))
 
 
-class Select2ConsumerListView(BaseView):
+class SelectConsumerListView(BaseView):
 
     def __init__(self):
-        super(Select2ConsumerListView, self).__init__()
+        super(SelectConsumerListView, self).__init__()
 
     def set_request(self, request):
-        super(Select2ConsumerListView, self).set_request(request)
+        super(SelectConsumerListView, self).set_request(request)
 
     def serialize(self, queryset):
         data = map(
@@ -715,13 +715,13 @@ class MajorView(BaseView):
         return Response(value)
 
 
-class Select2MajorListView(BaseView):
+class SelectMajorListView(BaseView):
 
     def __init__(self):
-        super(Select2MajorListView, self).__init__()
+        super(SelectMajorListView, self).__init__()
 
     def set_request(self, request):
-        super(Select2MajorListView, self).set_request(request)
+        super(SelectMajorListView, self).set_request(request)
 
     def serialize(self, queryset):
         data = map(
@@ -1046,13 +1046,13 @@ class DMWordsView(BaseView):
         return Response(self.serialize(queryset))
 
 
-class Select2IndustryView(BaseView):
+class SelectIndustryView(BaseView):
 
     def __init__(self):
-        super(Select2IndustryView, self).__init__()
+        super(SelectIndustryView, self).__init__()
 
     def set_request(self, request):
-        super(Select2IndustryView, self).set_request(request)
+        super(SelectIndustryView, self).set_request(request)
 
     def serialize(self, queryset):
         data = map(lambda q: {
@@ -1070,13 +1070,13 @@ class Select2IndustryView(BaseView):
         return Response(self.serialize(queryset))
 
 
-class Select2AliasIndustryView(BaseView):
+class SelectAliasIndustryView(BaseView):
 
     def __init__(self):
-        super(Select2AliasIndustryView, self).__init__()
+        super(SelectAliasIndustryView, self).__init__()
 
     def set_request(self, request):
-        super(Select2AliasIndustryView, self).set_request(request)
+        super(SelectAliasIndustryView, self).set_request(request)
 
     def serialize(self, queryset):
         data = map(lambda q: {
@@ -1190,13 +1190,13 @@ class SelectIndustryProductsView(BaseView):
         return Response(self.serialize(queryset))
 
 
-class Select2GroupView(BaseView):
+class SelectGroupView(BaseView):
 
     def __init__(self):
-        super(Select2GroupView, self).__init__()
+        super(SelectGroupView, self).__init__()
 
     def set_request(self, request):
-        super(Select2GroupView, self).set_request(request)
+        super(SelectGroupView, self).set_request(request)
 
     def serialize(self, queryset):
         data = map(lambda q: {
@@ -1376,7 +1376,6 @@ class InspectionDataView(BaseView):
                 'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
                 'product': x['product_name'],
                 'status': x['status'],
-
             }, result),
         }
 
@@ -1773,13 +1772,13 @@ class CorpusAddView(BaseView):
         return Response(status=queryset)
 
 
-class CategoryListView(BaseView):
+class SelectCategoryListView(BaseView):
 
     def __init__(self):
-        super(CategoryListView, self).__init__()
+        super(SelectCategoryListView, self).__init__()
 
     def set_request(self, request):
-        super(CategoryListView, self).set_request(request)
+        super(SelectCategoryListView, self).set_request(request)
 
     def read_category(self, results):
 
