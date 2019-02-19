@@ -157,7 +157,7 @@ class CategoryListData(Abstract):
         cond = {
             'level': getattr(self, 'level', None),
             'parent': getattr(self, 'parent', None),
-            'name__icontains': getattr(self, 'text', None),
+            'name__icontains': getattr(self, 'name', None),
         }
 
         args = dict([k,v] for k, v in cond.items() if v)

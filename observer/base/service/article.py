@@ -265,7 +265,6 @@ class RiskDataUpload(Abstract):
                     if area == 'None':
                         continue
                     else:
-                        print('area', area)
                         areas = area.split(',')
                         a_ids = Area.objects.filter(name__in=areas).values_list('id', flat=True)
 
