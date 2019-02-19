@@ -24,7 +24,9 @@ urlpatterns = [
     path('dmlink/add', views.DMLinkAddView.as_view()),  # 添加指定监测-链接
     path('dmlink/edit/<int:did>/', views.DMLinkEditView.as_view()),  # 修改指定监测-链接
     path('dmlink/delete/<int:did>/', views.DMLinkDeleteView.as_view()),  # 删除指定监测-链接
-    path('dmwords', views.DMWordsView.as_view()),  # 指定监测-关键词 列表
+    path('dmwords', views.DMWordsView.as_view()),  # 指定监测-重点监测 列表
+    path('dmwords/delete/<str:did>/', views.DMWordsDelView.as_view()),  # 指定监测-重点监测 关键词删除
+    path('dmwords/monitor_information/<int:did>/', views.MonitorInformationView.as_view()),  # 指定监测->重点监测-> 监测信息
 
     # ADMIN
     path('risk_data', views.RiskDataView.as_view()),  # 风险数据

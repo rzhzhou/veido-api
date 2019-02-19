@@ -4,7 +4,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, Q, F
 
 from django.contrib.auth.models import Group
-from observer.base.models import (DMLink, CorpusCategories )
+from observer.base.models import (DMLink, CorpusCategories, Article )
 from observer.base.service.abstract import Abstract
 from observer.utils.date_format import date_format
 
@@ -134,3 +134,44 @@ class DMWordsData(Abstract):
 
         
         return queryset
+
+
+class DMWordsFocusData(object):
+
+    def __init__(self, user):
+        self.user = user
+
+    def get_all(self):
+
+        fields = ('id', 'keyword', 'startTime', 'stopTime')
+        status = 1
+        queryset = CorpusCategories.objects.filter(user_id = self.user.id, status=status).values(*fields)
+ 
+        return queryset
+
+
+class DMWordsDelete(object):
+    def __init__(self, user):
+        self.user = user
+
+    def delete(self, did):
+        Arr_id = did
+
+        for a_id in Arr_id.split(','):
+            corCategory = CorpusCategories.objects.get(id=a_id)
+            corCategory.status = 2
+            corCategory.save()
+
+        return 200
+
+class MonitorInformationData(object):
+    def __init__(self, user):
+        self.user = user
+
+    def get_all(self, did):
+        fields = ('title', 'url', 'pubtime', 'source', 'areas__name')
+
+        result = Article.objects.filter(corpus_id=did).values(*fields)
+
+        return result
+

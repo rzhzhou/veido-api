@@ -29,7 +29,8 @@ from observer.base.service.corpus import (CategoryListData, CorpusAdd,
                                           CrawlerData)
 from observer.base.service.dashboard import DashboardData
 from observer.base.service.desmon import (DMLinkAdd, DMLinkData, DMLinkDelete,
-                                          DMLinkEdit, DMWordsData)
+                                          DMLinkEdit, DMWordsData, DMWordsFocusData, 
+                                          DMWordsDelete, MonitorInformationData)
 from observer.base.service.industry import (AliasIndustryAdd, CCCIndustryAdd,
                                             CCCIndustryData,
                                             ConsumerIndustryData,
@@ -1031,8 +1032,10 @@ class DMWordsView(BaseView):
         data = {
             'total': total,
             'list': map(lambda r: {
-                'industry': {'id': 1, 'text': '无'} if r['industry_id'] == -1 else get_major_industry(r['industry_id']),
+                'id': r['id'],
                 'keyword': r['keyword'],
+                'startTime': r['startTime'],
+                'endTime': r['stopTime'],
             }, results)
         }
 
@@ -1041,7 +1044,56 @@ class DMWordsView(BaseView):
     def get(self, request):
         self.set_request(request)
 
-        queryset = DMWordsData(user = request.user, params = request.query_params).get_all()
+        queryset = DMWordsFocusData(user = request.user).get_all()
+
+        return Response(self.serialize(queryset))
+
+
+class DMWordsDelView(BaseView):
+
+    def __init__(self):
+        super(DMWordsDelView, self).__init__()
+
+    def set_request(self, request):
+        super(DMWordsDelView, self).set_request(request)
+
+    def delete(self, request, did):
+        queryset = DMWordsDelete(user=request.user).delete(did=did)
+
+        return Response(status=queryset)
+
+class MonitorInformationView(BaseView):
+    def __init__(self):
+        super(MonitorInformationView, self).__init__()
+
+    def set_request(self, request):
+        super(MonitorInformationView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(MonitorInformationView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        result = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda r: {
+                'title': r['title'],
+                'url': r['url'],
+                'source': r['source'],
+                'area': r['areas__name'],
+                'time': date_format(r['pubtime'], '%Y-%m-%d'),
+            }, result)
+        }
+
+        return data
+
+    def get(self, request, did):
+        queryset = MonitorInformationData(user = request.user).get_all(did=did)
 
         return Response(self.serialize(queryset))
 
@@ -1738,7 +1790,6 @@ class CorpusView(BaseView):
             'list': map(lambda r: {
                 'id': r['id'],
                 'status': r['status'],
-                'riskword': r.get('riskword', ''),
                 'industry': {'id': -1, 'text': '无'} if r['industry_id'] == -1 else get_major_industry(r['industry_id']),
                 'keyword': r.get('keyword', ''),
                 'category': get_major_category(r['category_id']) if r.get('category_id', None) else r.get('category_id', ''),

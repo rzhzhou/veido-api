@@ -37,8 +37,10 @@ class CorpusAdd(Abstract):
     def add(self):
         
         keyword = getattr(self, 'keyword', '')
-        category_id = getattr(self, 'category_id', '')
-        industry_id = getattr(self, 'industry_id') if getattr(self, 'industry_id') else -1
+        category_id = getattr(self, 'category_id') if getattr(self, 'category_id', None) else '0006'
+        industry_id = getattr(self, 'industry_id') if getattr(self, 'industry_id', None) else -1
+        startTime = getattr(self, 'startTime', '0001-01-01')
+        endTime = getattr(self, 'endTime', '9999-12-30')
 
         if not category_id:
             return 400
@@ -46,12 +48,26 @@ class CorpusAdd(Abstract):
         if CorpusCategories.objects.filter(category_id=category_id, keyword=keyword, industry_id=industry_id, user_id=self.user.id).exists():
             return 202
 
-        CorpusCategories(
-            keyword=keyword,
-            category_id=category_id,
-            industry_id=industry_id,
-            user_id=self.user.id,
-        ).save()
+        # 涉及到两个功能，语料添加和监测词添加，若不存在类别和行业则储存监测词
+        if getattr(self, 'category_id', None) or getattr(self, 'industry_id', None):
+            CorpusCategories(
+                keyword=keyword,
+                category_id=category_id,
+                industry_id=industry_id,
+                startTime=startTime,
+                stopTime=endTime,
+                user_id=self.user.id,
+            ).save()
+        else:
+            CorpusCategories(
+                keyword=keyword,
+                status=1,
+                category_id=category_id,
+                industry_id=industry_id,
+                startTime=startTime,
+                stopTime=endTime,
+                user_id=self.user.id,
+            ).save()
 
         return 200
 
@@ -86,7 +102,7 @@ class CorpusDelete(Abstract):
         category_ids = getattr(self, 'category_id', '')
         industry_ids = getattr(self, 'industry_id', '')
         corpus_ids = getattr(self, 'corpus_id', '')
-   
+
         for (ids, keyword, category_id, industry_id, statu) in zip(del_ids.split(","), keywords.split(","), category_ids.split(","), industry_ids.split(","), status.split(",")):
             if statu == '1':
                 CrawlerTask_category(keyword, category_id, industry_id, self.user.id, ids).remove()
@@ -96,8 +112,14 @@ class CorpusDelete(Abstract):
             else:
                 if statu == '0':
                     CorpusCategories.objects.filter(id=ids).delete()
-                
-                
+                if statu == '2':
+                    corCategory = CorpusCategories.objects.get(id=ids)
+                    if self.user != 1:
+                        corCategory.user_id = 1
+                        corCategory.save()
+                    else:
+                        corCategory.delete()
+
 
         return 200
 

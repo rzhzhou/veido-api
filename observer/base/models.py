@@ -227,9 +227,11 @@ class AliasIndustry(models.Model):
 
 class CorpusCategories(models.Model):
     keyword = models.CharField(default=0, max_length=255, verbose_name='关键词语料词')
-    status = models.IntegerField(default=0, verbose_name='状态') # 默认值 0 :不执行爬虫, 1 ： 执行爬虫
+    status = models.IntegerField(default=0, verbose_name='状态') # 默认值 0 :未执行爬虫, 1 ： 已执行爬虫， 2：已停止并删除爬虫（但保留关键词来显示新闻关联来源）
     category_id = models.CharField(max_length=5, verbose_name='信息类别')
     industry_id = models.IntegerField(default=0, verbose_name='产品类别')
+    startTime = models.DateField(null=True, verbose_name='开始时间')
+    stopTime = models.DateField(null=True, verbose_name='结束时间')
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
