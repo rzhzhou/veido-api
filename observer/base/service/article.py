@@ -6,7 +6,8 @@ import datetime
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, Q, F
 
-from observer.base.models import(Area, Article, Category, )
+from observer.base.models import(Area, Article, Category,
+                                CorpusCategories)
 from django.contrib.auth.models import Group, User
 from observer.base.service.abstract import Abstract
 from observer.base.service.base import (areas, categories, )
@@ -201,7 +202,7 @@ class RiskDataUpload(Abstract):
 
     def upload(self, filename, file_obj):
         #Model weight
-        model = {'标题': 0, 'URL': 0, '发布时间': 0, '来源': 0, '风险程度': 0, '地域': 0, '类别': 0, '行业编号': 0}
+        model = {'标题': 0, 'URL': 0, '发布时间': 0, '来源': 0, '风险程度': 0, '地域': 0, '类别': 0, '行业编号': 0, '监测词': 0}
         #sheet value
         sv = lambda x, y, z : z.cell(row=x, column=y).value
         #date format
@@ -292,6 +293,21 @@ class RiskDataUpload(Abstract):
 
                         category = Category.objects.filter(id__in=c_ids)
 
+                    # 监测词
+                    monitorWord = str(sv(i, model['监测词'], sheet)).strip()
+                    if monitorWord == 'None':
+                        monitorWord = ''
+                    else:
+                        m_id = CorpusCategories.objects.filter(keyword=monitorWord).values_list('id', flat=True)
+
+                        if not m_id.exists():
+                            return {
+                                'status': 0,
+                                'message': '操作失败！请检查第 %s 行 "监测词"！' % (i + 1, )
+                            }
+
+                        monitorWord = list(m_id)[0]
+
                     total += 1
 
                     # 唯一性
@@ -321,6 +337,7 @@ class RiskDataUpload(Abstract):
                         pubtime=pubtime,
                         source=source,
                         score=score,
+                        corpus_id=monitorWord,
                         industry_id=industry_id,
                         user_id=self.user.id,
                         status=1,
