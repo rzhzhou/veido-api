@@ -321,6 +321,8 @@ class RiskDataUpload(Abstract):
                         old_article.source = source
                         old_article.score = score
                         old_article.industry_id = industry_id
+                        if not old_article.corpus_id:
+                            old_article.corpus_id = monitorWord
                         old_article.save()
                         old_article.areas.clear()
                         old_article.categories.clear()
