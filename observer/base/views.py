@@ -1388,7 +1388,7 @@ class RiskDataExportView(BaseView):
 
     def get(self, request):
         response = FileResponse(
-            RiskDataExport(user=request.user).export(),
+            RiskDataExport(params=request.query_params, user=request.user).export(),
             content_type='application/vnd.ms-excel'
         )
         response["Content-Disposition"] = 'attachment; filename=articles.xlsx'

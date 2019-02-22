@@ -363,36 +363,50 @@ class RiskDataUpload(Abstract):
 
 class RiskDataExport(Abstract):
 
-    def __init__(self, user):
+    def __init__(self, user, params={}):
         self.user = user
+        super(RiskDataExport, self).__init__(params)
 
-    # def export(self):
-    #     filename = "articles.xlsx"
+    def export(self):
+        filename = "articles.xlsx"
 
-    #     # process data
-    #     data = [
-    #         ['GUID', '标题', 'URL', '发布时间', '来源', '发布者', '风险程度', '地域', '类别', ],
-    #     ]
-    #     months = get_months()[-1::][0]
-    #     start = months[0].strftime('%Y-%m-%d')
-    #     end = months[1].strftime('%Y-%m-%d')
+        # process data
+        data = [
+            ['标题', 'URL', '发布时间', '来源', '风险程度', '地域', '类别', '行业'],
+        ]
+        fields = ('id', 'title', 'url', 'pubtime', 'source', 'score', 'areas__name', 'industry__name')
+        cond = {
+            'areas__id': getattr(self, 'areas', None),
+            'status': getattr(self, 'status'),
+            'pubtime__gte': getattr(self, 'starttime', None),
+            'pubtime__lte': getattr(self, 'endtime', None),
+        }
+        print(getattr(self, 'areas', None), getattr(self, 'status'),
+            getattr(self, 'starttime', None),getattr(self, 'endtime', None))
+        args = dict([k, v] for k, v in cond.items() if v)
+        # months = get_months()[-1::][0]
+        # start = months[0].strftime('%Y-%m-%d')
+        # end = months[1].strftime('%Y-%m-%d')
 
-    #     queryset = Article.objects.filter(pubtime__gte=start, pubtime__lte=end).values('guid', 'title', 'url', 'pubtime', 'source', 'score')
+        queryset = Article.objects.filter(**args).values(*fields)
 
-    #     for q in queryset:
-    #         data.append([q['guid'],
-    #                      q['title'],
-    #                      q['url'],
-    #                      date_format(q['pubtime'], '%Y-%m-%d'),
-    #                      q['source'],
-    #                      q['score'],
-    #                      areas(q['guid'], flat=True),
-    #                      categories(q['guid'], flat=True)])
+        for q in queryset:
+            industry__name = '无' if q['industry__name'] == 'None' else q['industry__name']
+            catogories = categories(q['id'], admin=True, flat=True)
+            data.append([q['title'],
+                         q['url'],
+                         date_format(q['pubtime'], '%Y-%m-%d'),
+                         q['source'],
+                         q['score'],
+                         q['areas__name'],
+                         catogories,
+                         industry__name,
+                        ])
 
-    #     # write file
-    #     write_by_openpyxl(filename, data)
+        # write file
+        write_by_openpyxl(filename, data)
 
-    #     return open(filename, 'rb')
+        return open(filename, 'rb')
 
 
 class RiskDataSuzhou(Abstract):
