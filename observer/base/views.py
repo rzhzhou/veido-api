@@ -80,6 +80,8 @@ from observer.base.service.version import (VersionRecordData,
 from observer.utils.date_format import date_format
 from observer.utils.excel import write_by_openpyxl
 
+from observer.base.service.govreports import GovReportsData, GovReportsAdd, GovReportsDelete, GovReportsEdit
+
 
 class BaseView(APIView):
 
@@ -2810,3 +2812,90 @@ class InspectionDataNationExportView(BaseView):
         response["Content-Disposition"] = 'attachment; filename='+filename
 
         return response
+
+
+
+class GovReportsView(BaseView):
+
+    def __init__(self):
+        super(GovReportsView, self).__init__()
+
+    def set_request(self, request):
+        super(GovReportsView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(GovReportsView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        results = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda r: {
+                'id': r['id'],
+                'title': r['title'],
+                'province_level': r['province_level'],
+                'year': r['year'],
+                'area': [{'id': r['areas__id'], 'name': r['areas__name']}],
+                'content': r['content']
+            }, results)
+        }
+
+        return data
+
+    def get(self, request):
+        self.set_request(request)
+
+        queryset = GovReportsData(params=request.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+
+class GovReportsAddView(BaseView):
+
+    def __init__(self):
+        super(GovReportsAddView, self).__init__()
+
+    def set_request(self, request):
+        super(GovReportsAddView, self).set_request(request)
+
+    def post(self, request):
+        self.set_request(request)
+
+        queryset = GovReportsAdd(user=request.user, params=request.data).add()
+
+        return Response(status=queryset)
+
+
+class GovReportsDeleteView(BaseView):
+    def __init__(self):
+        super(GovReportsDeleteView, self).__init__()
+
+    def set_request(self, request):
+        super(GovReportsDeleteView, self).set_request(request)
+
+    def delete(self, request, cid):
+        self.set_request(request)
+
+        queryset = GovReportsDelete(user=request.user, params=request.data).delete(cid=cid)
+
+        return Response(status=queryset)
+
+class GovReportsEditView(BaseView):
+
+    def __init__(self):
+        super(GovReportsEditView, self).__init__()
+
+    def set_request(self, request):
+        super(GovReportsEditView, self).set_request(request)
+
+    def post(self, request, cid):
+        self.set_request(request)
+
+        queryset = GovReportsEdit(user=request.user, params=request.data).edit(cid=cid)
+
+        return Response(status=queryset)
