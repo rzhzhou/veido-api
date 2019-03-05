@@ -3,7 +3,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User, Group
 
 from observer.base.models import (Area, Category, UserArea, AliasIndustry, MajorIndustry,
-                                Enterprise, UserNav, Article)
+                                Enterprise, UserNav, Article, HarmIndicator, HarmPeople)
 from observer.utils.date_format import date_format
 
 
@@ -191,3 +191,22 @@ def get_user_extra(user_id):
         extra['role'] = 0
 
     return extra
+
+
+def harmName(harm_id):
+    harmIndicator = HarmIndicator.objects.filter(id=harm_id).values_list('name', flat=True)
+    name = list(harmIndicator)
+
+    return name[0]
+
+
+def harmPeople(harm_id):
+    harmpeople = HarmPeople.objects.filter(harm_id=harm_id).values('age', 'sex')
+
+    return list(map(lambda x: {'age': harmName(x['age']), 'sex': harmName(x['sex'])}, harmpeople))
+
+
+def countPeople(harm_id):
+    harmpeople = HarmPeople.objects.filter(harm_id=harm_id)
+
+    return harmpeople.count()
