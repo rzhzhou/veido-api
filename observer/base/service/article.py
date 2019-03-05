@@ -7,7 +7,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, Q, F
 
 from observer.base.models import(Area, Article, Category,
-                                CorpusCategories)
+                                CorpusCategories, HarmIndicator, Harm,
+                                HarmPeople)
 from django.contrib.auth.models import Group, User
 from observer.base.service.abstract import Abstract
 from observer.base.service.base import (areas, categories, )
@@ -24,7 +25,7 @@ class ArticleData(Abstract):
         super(ArticleData, self).__init__(params)
 
     def get_all(self):
-        fields = ('id', 'url', 'title', 'source', 'pubtime', 'score')
+        fields = ('id', 'url', 'title', 'source', 'pubtime', 'score', 'harm__id')
 
         cond = {
             'pubtime__gte': getattr(self, 'starttime', None),
@@ -56,7 +57,8 @@ class RiskData(Abstract):
         self.user = user
 
     def get_all(self):
-        fields = ('id', 'url', 'title', 'source', 'pubtime', 'score', 'status', 'corpus__keyword', 'industry__name', 'industry__parent__name' )
+        fields = ('id', 'url', 'title', 'source', 'pubtime', 'score', 'status', 'corpus__keyword', 'industry__name',
+                 'industry__parent__name', 'harm__id' )
 
         cond = {
             'pubtime__gte': getattr(self, 'starttime', None),
@@ -77,7 +79,6 @@ class RiskData(Abstract):
         group_ids = Group.objects.filter(user=self.user).values_list('id', flat=True)
         if 4 in group_ids and 3 in group_ids:
             queryset = queryset.filter(user_id = self.user.id).values(*fields)
-
         return queryset.values(*fields).order_by('-pubtime')
 
 
@@ -430,6 +431,95 @@ class RiskDataSuzhou(Abstract):
 
         return queryset
 
+
+class RiskHarmsManageSave(Abstract):
+
+    def __init__(self, params={}):
+        super(RiskHarmsManageSave, self).__init__(params)
+
+    def toSave(self):
+        hid = getattr(self, 'id')
+        cond = {
+            'environment': getattr(self, 'modelEn'),
+            'activity': getattr(self, 'modelAct'),
+            'mind_body': getattr(self, 'modelMab'),
+            'behavior': getattr(self, 'modelBeh'),
+            'indoor': getattr(self, 'modelTie'),
+            'outdoor': getattr(self, 'modelToe'),
+            'physics': getattr(self, 'modelPhy'),
+            'chemical': getattr(self, 'modelChe'),
+            'biology': getattr(self, 'modelBio'),
+            'damage_types': getattr(self, 'modelDt'),
+            'damage_degree': getattr(self, 'modelTdod'),
+            'damage_reason': getattr(self, 'modelDr'),
+        }
+        age = getattr(self, 'modelAge')
+        sex = getattr(self, 'sex')
+        # 切片, 切掉第一个和最后一个逗号
+        age_ids = age.split(',')[1:-1:]
+        sex_ids = sex.split(',')[1:-1:]
+
+        args = dict([k, v] for k, v in cond.items() if v)
+
+        harm = Harm.objects.create(**args)
+        harm.save()
+
+        if sex_ids == [] or sex_ids == ['']:
+            for age_id in age_ids:
+                HarmPeople(
+                    age = age_id,
+                    sex = 34,
+                    harm_id = harm.id,
+                ).save()
+        else:
+            for age_id, sex_id in zip(age_ids, sex_ids):
+                HarmPeople(
+                    age = age_id,
+                    sex = sex_id,
+                    harm_id = harm.id,
+                ).save()
+
+        article = Article.objects.get(id=hid)
+        harm.article = article
+        harm.save()
+
+        return 200
+
+
+class RiskHarmsDetailsData(Abstract):
+
+    def __init__(self, params={}):
+        super(RiskHarmsDetailsData, self).__init__(params)
+
+    def get_data(self):
+        fields = ('id', 'environment', 'activity', 'mind_body', 'behavior', 'indoor', 'outdoor', 'physics', 'chemical',
+                 'biology', 'damage_types', 'damage_degree', 'damage_reason', 'article__industry__name')
+
+        hid = getattr(self, 'id')
+
+        queryset = Harm.objects.filter(article_id=hid).values(*fields)
+
+        return queryset
+
+
+class RiskHarmsData(Abstract):
+    def __init__(self, params={}):
+        super(RiskHarmsData, self).__init__(params)
+
+    def get_data(self):
+        fields = ('id', 'name', 'desc', 'parent_id')
+        cond = {
+            'id': getattr(self, 'hid', None),
+            'parent_id': getattr(self, 'parent_id', None),
+        }
+
+        args = dict([k, v] for k, v in cond.items() if v)
+
+        queryset = HarmIndicator.objects.filter(**args).values(*fields)
+
+        return queryset
+
+
 class newsCrawlerData(Abstract):
     def __init__(self, user, params={}):
         super(newsCrawlerData, self).__init__(params)
@@ -454,18 +544,19 @@ class StatisticsShow(Abstract):
         today = datetime.datetime.now().date() # 获取今天日期的date类型
         monthInit = datetime.date(today.year, today.month, 1) # 获取本月的月初时间
         aMonth = (monthInit - today).days    #获取今天多少号的负数
-
+        
         time_week = now + datetime.timedelta(days = aWeek)
         time_month = now + datetime.timedelta(days = aMonth)
+        time_monthAddweek = now + datetime.timedelta(days = aMonth - 7)
 
-        queryset = Article.objects.filter(pubtime__gte = time_month)
+        queryset = Article.objects.filter(pubtime__gte = time_monthAddweek)
 
         if getattr(self, 'category', None) == '0001' or getattr(self, 'category', None) == '0002':
             category_id = getattr(self, 'category')
             category_ids = Article.objects.filter(categories__id = category_id).values_list('id', flat = True)
             queryset = queryset.filter(id__in = category_ids)
         if getattr(self, 'category', None) == '0003':
-            category_business_ids = Article.objects.exclude(categories__id = '0001').exclude(categories__id = '0002').values_list('id', flat = True)
+            category_business_ids = Article.objects.filter(categories__parent_id = '0003').values_list('id', flat = True)
             queryset = queryset.filter(id__in = category_business_ids)
 
 

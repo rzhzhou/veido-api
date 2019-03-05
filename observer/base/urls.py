@@ -11,6 +11,7 @@ urlpatterns = [
     path('inspections', views.InspectionView.as_view()),  # 抽检列表
     path('unqualifiedenterprise', views.EnterpriseDataUnqualifiedView.as_view()), # 不合格企业列表
     path('inspectstatistics/', views.InspectStatisticsView.as_view()),  # 抽检统计
+    path('riskharmsdetails/', views.RiskHarmsDetailsView.as_view()), # 风险伤害详情
 
     path('search', views.SearchView.as_view()),  # 搜索
     path('search/advanced', views.SearchAdvancedView.as_view()),  # 高级搜索
@@ -37,15 +38,16 @@ urlpatterns = [
     path('ccc_industry/add', views.CCCIndustryAddView.as_view()),  # CCC行业添加
     path('licence_industry/add', views.LicenceIndustryAddView.as_view()),  # 许可证行业添加
 
-    path('risk_data', views.RiskDataView.as_view()),  # 风险数据
-    path('risk_data/add', views.RiskDataAddView.as_view()),  # 风险数据添加
-    path('risk_data/audit/<str:aid>/', views.RiskDataAuditView.as_view()), # 风险数据审核
-    path('risk_data/edit/<str:aid>/', views.RiskDataEditView.as_view()),  # 风险数据修改
-    path('risk_data/delete/<str:aid>/', views.RiskDataDeleteView.as_view()),  # 风险数据删除
-    path('risk_data/upload/<str:filename>/', views.RiskDataUploadView.as_view()),  # 风险数据上传
-    path('risk_data/export', views.RiskDataExportView.as_view()),  # 风险数据导出
+    path('risk_data', views.RiskDataView.as_view()),  # 线上数据
+    path('risk_data/add', views.RiskDataAddView.as_view()),  # 线上数据添加
+    path('risk_data/audit/<str:aid>/', views.RiskDataAuditView.as_view()), # 线上数据审核
+    path('risk_data/edit/<str:aid>/', views.RiskDataEditView.as_view()),  # 线上数据修改
+    path('risk_data/delete/<str:aid>/', views.RiskDataDeleteView.as_view()),  # 线上数据删除
+    path('risk_data/upload/<str:filename>/', views.RiskDataUploadView.as_view()),  # 线上数据上传
+    path('risk_data/export', views.RiskDataExportView.as_view()),  # 线上数据导出
     path('risk_data/news_crawler/',views.newsCrawlerView.as_view()), # 电梯风险新闻爬取
     path('risk_data/statistics/', views.StatisticsView.as_view()),  # 收集数据统计信息条数（日、周、月）
+    path('risk_data/riskharmsmanage/', views.RiskHarmsManageView.as_view()),  # 风险伤害数据管理
 
     path('inspection_data', views.InspectionDataView.as_view()),  # 抽检数据
     path('inspection_data/add', views.InspectionDataAddView.as_view()),  # 抽检数据添加
@@ -103,8 +105,9 @@ urlpatterns = [
     path('select/areas', views.SelectAreaView.as_view()),  # 地域选择器
     path('select/industry_products', views.SelectIndustryProductsView.as_view()),  # 行业产品选择器
     path('select/groups', views.SelectGroupView.as_view()), # 用户组选择器
+    path('select/riskharms/', views.RiskHarmsView.as_view()),  # 风险伤害信息选择
 
-    path('crawler/<str:cid>/', views.CrawlerView.as_view()), #语料词爬取数据
+    path('crawler/<str:cid>/', views.CrawlerView.as_view()), # 语料词爬取数据
 
     # SUZHOU
     path('risk_data_suzhou', views.RiskDataViewSuzhou.as_view()), # 新闻信息

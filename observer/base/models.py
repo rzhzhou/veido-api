@@ -386,6 +386,70 @@ class Article(models.Model):
         return self.title
 
 
+class Harm(models.Model):
+    environment = models.IntegerField(null=True, verbose_name='发生时环境')
+    activity = models.IntegerField(null=True, verbose_name='进行的活动')
+    mind_body = models.IntegerField(null=True, verbose_name='心里和生理因素')
+    behavior = models.IntegerField(null=True, verbose_name='行为')
+    indoor = models.IntegerField(null=True, verbose_name='室内环境')
+    outdoor = models.IntegerField(null=True, verbose_name='室外环境')
+    physics = models.IntegerField(null=True, verbose_name='物理危害')
+    chemical = models.IntegerField(null=True, verbose_name='化学危害')
+    biology = models.IntegerField(null=True, verbose_name='生物危害')
+    damage_types = models.IntegerField(null=True, verbose_name='伤害类型')
+    damage_degree = models.IntegerField(null=True, verbose_name='伤害程度')
+    damage_reason = models.IntegerField(null=True, verbose_name='伤害原因')
+
+    article = models.OneToOneField(
+        Article,
+        null=True, blank=True,
+        on_delete=models.CASCADE,
+        verbose_name='文章'
+    )
+
+    class Meta:
+        app_label = 'base'
+        verbose_name_plural = '风险伤害'
+
+
+
+class HarmPeople(models.Model):
+    age = models.IntegerField(null=True, verbose_name='年龄')
+    sex = models.IntegerField(null=True, verbose_name='性别')
+
+    harm = models.ForeignKey(
+        Harm,
+        null=True, blank=True,
+        on_delete=models.CASCADE,
+        verbose_name='风险伤害'
+    )
+
+    class Meta:
+        app_label = 'base'
+        verbose_name_plural = '伤害涉及者'
+        
+
+
+class HarmIndicator(models.Model):
+    name = models.CharField(max_length=100, verbose_name='名称')
+    desc = models.CharField(
+        max_length=255,
+        null=True, blank=True,
+        verbose_name='定义'
+    )
+
+    parent = models.ForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        null=True, blank=True,
+        verbose_name='上一级'
+    )
+
+    class Meta:
+        app_label = 'base'
+        verbose_name_plural = '风险伤害'
+
+
 class DMLink(models.Model):
     name = models.CharField(max_length=32, verbose_name='网站名')
     link = models.URLField(verbose_name='网站链接')

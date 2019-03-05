@@ -18,12 +18,15 @@ from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd,
                                            RiskDataAudit, RiskDataDelete,
                                            RiskDataEdit, RiskDataExport,
                                            RiskDataSuzhou, RiskDataUpload,
-                                           StatisticsShow, newsCrawlerData)
+                                           StatisticsShow, newsCrawlerData,
+                                           RiskHarmsData, RiskHarmsManageSave,
+                                           RiskHarmsDetailsData)
 from observer.base.service.base import (alias_industry, area, areas,
                                         categories, get_major_category,
                                         get_major_industry, get_user_extra,
                                         get_user_nav, involve_local,
-                                        local_related, qualitied)
+                                        local_related, qualitied, harmName,
+                                        harmPeople, countPeople)
 from observer.base.service.corpus import (CategoryListData, CorpusAdd,
                                           CorpusData, CorpusDelete, CorpusEdit,
                                           CrawlerData)
@@ -124,6 +127,7 @@ class ArticleView(BaseView):
     # 0002---风险快讯
     # 0003---业务信息
     # 0004---专家视点
+    # 0005---风险伤害
 
     def __init__(self):
         super(ArticleView, self).__init__()
@@ -201,6 +205,25 @@ class ArticleView(BaseView):
                 'source': x['source'],
                 'areas': areas(x['id']),
                 'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
+            }, result),
+        }
+
+        return data
+
+    def serialize0005(self, queryset):
+        total = queryset.count()
+        result = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda x: {
+                'id': x['id'],
+                'url': x['url'],
+                'title': x['title'],
+                'source': x['source'],
+                'score': x['score'],
+                'areas': areas(x['id']),
+                'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
+                'people': countPeople(x['harm__id']),
             }, result),
         }
 
@@ -1299,6 +1322,7 @@ class RiskDataView(BaseView):
                 'categories': categories(x['id'], admin=True),
                 'pubtime': date_format(x['pubtime'], '%Y-%m-%d %H:%M:%S'),
                 'status': x['status'],
+                'harm': '无' if not x['harm__id'] else '已存在',
             }, result),
         }
 
@@ -2810,3 +2834,67 @@ class InspectionDataNationExportView(BaseView):
         response["Content-Disposition"] = 'attachment; filename='+filename
 
         return response
+
+
+class RiskHarmsManageView(BaseView):
+    def __init__(self):
+        super(RiskHarmsManageView, self).__init__()
+
+    def post(self, request):
+
+        status = RiskHarmsManageSave(params=request.data).toSave()
+        return Response(status=status)
+
+
+class RiskHarmsDetailsView(BaseView):
+
+    def __init__(self):
+        super(RiskHarmsDetailsView, self).__init__()
+
+    def serialize(self, result):
+
+        data = {
+            'list': map(lambda r: {
+                'productName': '无' if r['article__industry__name'] == 'None' else r['article__industry__name'],
+                'usingEnvironment': harmName(r['environment']),
+                'temporalMotion': harmName(r['activity']),
+                'people': harmPeople(r['id']),
+                'psyandphy': harmName(r['mind_body']),
+                'behFactors': harmName(r['behavior']),
+                'indoorEnvironment': harmName(r['indoor']),
+                'outdoorEnvironment': harmName(r['outdoor']),
+                'phyHarm': harmName(r['physics']),
+                'chemicalHarm': harmName(r['chemical']),
+                'biologicalHarm': harmName(r['biology']),
+                'damageTypes': harmName(r['damage_types']),
+                'degree_damage': harmName(r['damage_degree']),
+                'damageReason': harmName(r['damage_reason']),
+            }, result),
+        }
+
+        return data
+
+    def get(self, request):
+        
+        result = RiskHarmsDetailsData(params=request.query_params).get_data()
+        return Response(self.serialize(result))
+        
+
+class RiskHarmsView(BaseView):
+    def __init__(self):
+        super(RiskHarmsView, self).__init__()
+
+    def serialize(self, result):
+        data = {
+            'list': map(lambda r : {
+                'id': r['id'],
+                'name': r['name'],
+            }, result)
+        }
+
+        return data
+
+    def get(self, request):
+        result = RiskHarmsData(params=request.query_params).get_data()
+
+        return Response(self.serialize(result))
