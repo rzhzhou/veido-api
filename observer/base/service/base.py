@@ -72,6 +72,13 @@ def area(area_id, flat=False):
     else:
         return queryset.name
 
+def gov_area(area_id, flat=False):
+    queryset = Area.objects.get(id=area_id)
+
+    if not flat:
+        return [{'id': queryset.id, 'name': queryset.name}]
+    else:
+        return queryset.name
 
 def get_major_industry(industry_id, flat=False):
     queryset = MajorIndustry.objects.get(id=industry_id)

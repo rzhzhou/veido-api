@@ -23,7 +23,7 @@ from observer.base.service.base import (alias_industry, area, areas,
                                         categories, get_major_category,
                                         get_major_industry, get_user_extra,
                                         get_user_nav, involve_local,
-                                        local_related, qualitied)
+                                        local_related, qualitied, gov_area)
 from observer.base.service.corpus import (CategoryListData, CorpusAdd,
                                           CorpusData, CorpusDelete, CorpusEdit,
                                           CrawlerData)
@@ -80,7 +80,8 @@ from observer.base.service.version import (VersionRecordData,
 from observer.utils.date_format import date_format
 from observer.utils.excel import write_by_openpyxl
 
-from observer.base.service.govreports import GovReportsData, GovReportsAdd, GovReportsDelete, GovReportsEdit
+from observer.base.service.govreports import (GovReportsData, GovReportsAdd, GovReportsDelete,
+                                             GovReportsEdit)
 
 
 class BaseView(APIView):
@@ -1063,6 +1064,7 @@ class DMWordsDelView(BaseView):
         queryset = DMWordsDelete(user=request.user).delete(did=did)
 
         return Response(status=queryset)
+
 
 class MonitorInformationView(BaseView):
     def __init__(self):
@@ -2814,7 +2816,6 @@ class InspectionDataNationExportView(BaseView):
         return response
 
 
-
 class GovReportsView(BaseView):
 
     def __init__(self):
@@ -2838,10 +2839,10 @@ class GovReportsView(BaseView):
             'list': map(lambda r: {
                 'id': r['id'],
                 'title': r['title'],
-                'province_level': r['province_level'],
+                'level': r['area__level'],
                 'year': r['year'],
-                'area': [{'id': r['areas__id'], 'name': r['areas__name']}],
-                'content': r['content']
+                'areas': gov_area(r['area_id']),
+                'content': r['content'],
             }, results)
         }
 
@@ -2884,6 +2885,7 @@ class GovReportsDeleteView(BaseView):
         queryset = GovReportsDelete(user=request.user, params=request.data).delete(cid=cid)
 
         return Response(status=queryset)
+
 
 class GovReportsEditView(BaseView):
 

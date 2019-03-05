@@ -13,12 +13,12 @@ class GovReportsData(Abstract):
         super(GovReportsData, self).__init__(params)
 
     def get_all(self):
-        fields = ('id', 'title', 'content', 'province_level', 'year', 'areas__id', 'areas__name')
+        fields = ('id', 'title', 'content', 'year', 'area_id', 'area__level')
 
         cond = {
-            'province_level': getattr(self, 'province_level', None),
+            'area__level': getattr(self, 'level', None),
             'year': getattr(self, 'year', None),
-            'areas': getattr(self, 'area', None),
+            'area': getattr(self, 'area', None),
         }
         args = dict([k, v] for k, v in cond.items() if v)
         queryset = GovReports.objects.using('hqi').filter(**args)
@@ -36,21 +36,16 @@ class GovReportsAdd(Abstract):
         title = getattr(self, 'title', '')
         content = getattr(self, 'content', '')
         year = getattr(self, 'year', '')
-        province_level = getattr(self, 'province_level', '')
         areas = getattr(self, 'areas', '')
 
-        if not title or not areas or not content or not year or not province_level:
+        if not title or not areas or not content or not year:
             return 400
         govreports = GovReports(
             title = title,
-            province_level=province_level,
             content = content,
             year = year,
+            area_id = areas,
         )
-        govreports.save(using='hqi')
-
-        area = Area.objects.using('hqi').filter(id=areas)
-        govreports.areas.add(*area)
         govreports.save(using='hqi')
         return 200
 
@@ -62,6 +57,7 @@ class GovReportsDelete(Abstract):
 
     def delete(self, cid):
         del_ids = cid
+        print(del_ids)
 
         for id in del_ids.split(","):
             GovReports.objects.using('hqi').filter(id=id).delete()
@@ -76,23 +72,17 @@ class GovReportsEdit(Abstract):
         edit_id = cid
 
         title = getattr(self, 'title', '')
-        province_level = getattr(self, 'province_level', '')
         content = getattr(self, 'content', '')
         year = getattr(self, 'year', '')
         areas = getattr(self, 'areas', '')
-        if not title or not areas or not content or not year or not province_level:
+        if not title or not areas or not content or not year:
             return 400
 
         area = Area.objects.using('hqi').filter(id=areas)    #返回单个id
 
-        govreports = GovReports.objects.get(id=edit_id)
+        govreports = GovReports.objects.using('hqi').get(id=edit_id)
         govreports.title = title
         govreports.content = content
         govreports.year = year
-        govreports.province_level = province_level
-        govreports.save(using='hqi')
-
-        govreports.areas.clear()
-        govreports.areas.add(*area)
-        govreports.save(using='hqi')
+        govreports.save()
         return 200

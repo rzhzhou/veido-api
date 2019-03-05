@@ -21,18 +21,22 @@ class Area(models.Model):
     def __str__(self):
         return self.name
 
+
 class GovReports(models.Model):
     title = models.CharField(max_length=255, verbose_name='标题')
     content = HTMLField(verbose_name='内容')
-    province_level = models.CharField(default='', max_length=255, verbose_name='级别')
-    year = models.CharField(default='', max_length=255, verbose_name='年份')
+    year = models.IntegerField(verbose_name='年份')
 
-    areas = models.ManyToManyField(Area)
+    area = models.ForeignKey(
+        Area,
+        on_delete=models.CASCADE,
+        verbose_name=u'地域'
+    )
 
     class Meta:
         app_label = 'apps'
         db_table = 'base_govreports'
         verbose_name_plural = '政府报告'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
