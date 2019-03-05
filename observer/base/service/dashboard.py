@@ -51,7 +51,9 @@ class DashboardData(Abstract):
         #本月
         cur_month = float(cur)
         #同比
-        if not pre_month:
+        if not pre_month and cur_month:
+            mom = '100'
+        elif not cur_month:
             mom = '-'
         else:
             rate = ((cur_month / pre_month) - 1 ) * 100
@@ -62,31 +64,28 @@ class DashboardData(Abstract):
 
     def get_0001(self, months):
         ac_id = Category.objects.get(name='质量热点').id
-        a_ids = Article.objects.filter(categories=ac_id).values_list('id', flat=True)
-        c = lambda x, y, z : y.objects.filter(pubtime__gte=x[0], pubtime__lte=x[1], status=1, id__in=z).count()
+        c = lambda x, y : y.objects.filter(pubtime__gte=x[0], pubtime__lte=x[1], status=1, categories=ac_id).count()
 
-        pre = c(months[0], Article, a_ids)
-        cur = c(months[1], Article, a_ids)
+        pre = c(months[0], Article) # 上月截至到本月同一时间新闻数 例如：2018/1/1 ~ 2018/1/20
+        cur = c(months[1], Article) # 本月截止到现在的新闻数 例如：2018/2/1 ~ 2018/2/20
 
         return self.mom(pre, cur)
 
     def get_0002(self, months):
         ac_id = Category.objects.get(name='风险快讯').id
-        a_ids = Article.objects.filter(categories=ac_id).values_list('id', flat=True)
-        c = lambda x, y, z : y.objects.filter(pubtime__gte=x[0], pubtime__lte=x[1], status=1, id__in=z).count()
+        c = lambda x, y : y.objects.filter(pubtime__gte=x[0], pubtime__lte=x[1], status=1, categories=ac_id).count()
 
-        pre = c(months[0], Article, a_ids)
-        cur = c(months[1], Article, a_ids)
+        pre = c(months[0], Article)
+        cur = c(months[1], Article)
 
         return self.mom(pre, cur)
 
     def get_0003(self, months):
         ac_ids = Category.objects.filter(parent__name='业务信息').values_list('id', flat=True)
-        a_ids = Article.objects.filter(categories__in=ac_ids).values_list('id', flat=True)
-        c = lambda x, y, z : y.objects.filter(pubtime__gte=x[0], pubtime__lte=x[1], status=1, id__in=z).count()
+        c = lambda x, y : y.objects.filter(pubtime__gte=x[0], pubtime__lte=x[1], status=1, categories__in=ac_ids).count()
 
-        pre = c(months[0], Article, a_ids)
-        cur = c(months[1], Article, a_ids)
+        pre = c(months[0], Article)
+        cur = c(months[1], Article)
 
         return self.mom(pre, cur)
 
@@ -100,8 +99,7 @@ class DashboardData(Abstract):
 
     def get_0005(self):
         ac_id = Category.objects.get(name='质量热点').id
-        a_ids = Article.objects.filter(categories=ac_id).values_list('id', flat=True)
-        queryset = Article.objects.filter(status=1, id__in=a_ids).values('url', 'title', 'pubtime').order_by('-pubtime')[0:self.length]
+        queryset = Article.objects.filter(status=1, categories=ac_id).values('url', 'title', 'pubtime').order_by('-pubtime')[0:self.length]
 
         return map(lambda x : {
                 'url': x['url'],
@@ -111,8 +109,7 @@ class DashboardData(Abstract):
 
     def get_0006(self):
         ac_id = Category.objects.get(name='专家视点').id
-        a_ids = Article.objects.filter(categories=ac_id).values_list('id', flat=True)
-        queryset = Article.objects.filter(status=1, id__in=a_ids).values('url', 'title', 'source', 'pubtime').order_by('-pubtime')[0:self.length]
+        queryset = Article.objects.filter(status=1, categories=ac_id).values('url', 'title', 'source', 'pubtime').order_by('-pubtime')[0:self.length]
 
         return map(lambda x : {
                 'url': x['url'],
@@ -122,7 +119,7 @@ class DashboardData(Abstract):
             }, queryset)
 
     def get_0007(self):
-        q = lambda x, y : x.objects.filter(status=1, id__in=x.objects.filter(categories=y).values_list('id', flat=True)).values('id', 'url', 'title', 'source', 'pubtime').order_by('-pubtime')[0:self.length]
+        q = lambda x, y : x.objects.filter(status=1, categories=y).values('id', 'url', 'title', 'source', 'pubtime').order_by('-pubtime')[0:self.length]
 
         return map(lambda c : {
                 'id': c.id,
@@ -138,8 +135,7 @@ class DashboardData(Abstract):
 
     def get_0008(self):
         ac_id = Category.objects.get(name='风险快讯').id
-        a_ids = Article.objects.filter(categories=ac_id).values_list('id', flat=True)
-        queryset = Article.objects.filter(status=1, id__in=a_ids).values('id', 'url', 'source', 'score', 'title', 'pubtime').order_by('-pubtime')[0:self.length]
+        queryset = Article.objects.filter(status=1, categories=ac_id).values('id', 'url', 'source', 'score', 'title', 'pubtime').order_by('-pubtime')[0:self.length]
 
         return map(lambda x : {
                 'url': x['url'],

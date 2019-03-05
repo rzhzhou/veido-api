@@ -114,6 +114,15 @@ DATABASES = {
         'PORT': 63440,
         'OPTIONS': {'charset': 'utf8mb4'},
     },
+    'hqi': {
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': 'gz-cdb-ko3zdkzs.sql.tencentcdb.com',
+        'NAME': 'hqi',
+        'USER': 'shendu',
+        'PASSWORD': 'P@55word',
+        'PORT': 63440,
+        'OPTIONS': {'charset': 'utf8mb4'},
+    },
 }
 
 

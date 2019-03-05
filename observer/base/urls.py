@@ -126,6 +126,13 @@ urlpatterns = [
     path('news/add', views.NewsAddView.as_view()), # 发布一则公司动态
     path('news/delete/<str:cid>/', views.NewsDeleteView.as_view()), # 删除公司动态
     path('news/edit/<int:cid>/', views.NewsEditView.as_view()), # 修改公司动态
+
+
+    # 官网
+    path('govreports', views.GovReportsView.as_view()), # 政府报告动态
+    path('govreports/add', views.GovReportsAddView.as_view()), # 发布一则政府动态动态
+    path('govreports/delete/<str:cid>/', views.GovReportsDeleteView.as_view()), # 删除政府动态
+    path('govreports/edit/<int:cid>/', views.GovReportsEditView.as_view()), # 修改政府动态
 ]
 
 # urlpatterns += [
