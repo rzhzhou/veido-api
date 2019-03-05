@@ -25,12 +25,9 @@ from observer.base.service.base import (alias_industry, area, areas,
                                         categories, get_major_category,
                                         get_major_industry, get_user_extra,
                                         get_user_nav, involve_local,
-<<<<<<< HEAD
-                                        local_related, qualitied, gov_area)
-=======
-                                        local_related, qualitied, harmName,
-                                        harmPeople, countPeople)
->>>>>>> 20759a7afe2690174fe631fd39206c5344e68402
+                                        local_related, qualitied, gov_area,
+                                        harmPeople, countPeople, harmName)
+
 from observer.base.service.corpus import (CategoryListData, CorpusAdd,
                                           CorpusData, CorpusDelete, CorpusEdit,
                                           CrawlerData)
