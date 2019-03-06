@@ -98,7 +98,10 @@ class RiskDataAdd(Abstract):
         categories = getattr(self, 'categories', '')
         industries = getattr(self, 'industries', -1)
 
-        if not url or not title or not pubtime or not source or not areas or not categories:
+        if not pubtime:
+            pubtime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        if not url or not title or not source or not areas or not categories:
             return 400
 
         if Article.objects.filter(url=url).exists():
@@ -247,7 +250,7 @@ class RiskDataUpload(Abstract):
 
                     pubtime = str(date_format(sv(i, model['发布时间'], sheet))).strip()
                     if pubtime == 'None':
-                        continue
+                        pubtime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
                     source = str(sv(i, model['来源'], sheet)).strip()
                     if source == 'None':

@@ -104,7 +104,7 @@ class DashboardData(Abstract):
         return map(lambda x : {
                 'url': x['url'],
                 'title': x['title'],
-                'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
+                'pubtime': date_format(x['pubtime'], '%Y-%m-%d %H:%M:%S'),
             }, queryset)
 
     def get_0006(self):
@@ -115,7 +115,7 @@ class DashboardData(Abstract):
                 'url': x['url'],
                 'title': x['title'],
                 'source': x['source'],
-                'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
+                'pubtime': date_format(x['pubtime'], '%Y-%m-%d %H:%M:%S'),
             }, queryset)
 
     def get_0007(self):
@@ -129,7 +129,7 @@ class DashboardData(Abstract):
                     'title': x['title'],
                     'source': x['source'],
                     'areas': areas(x['id']),
-                    'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
+                    'pubtime': date_format(x['pubtime'], '%Y-%m-%d %H:%M:%S'),
                     }, q(Article, c.id))
             }, Category.objects.filter(parent__name='业务信息'))
 
@@ -142,7 +142,7 @@ class DashboardData(Abstract):
                 'title': x['title'],
                 'source': x['source'],
                 'areas': areas(x['id']),
-                'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
+                'pubtime': date_format(x['pubtime'], '%Y-%m-%d %H:%M:%S'),
                 'score': x['score'],
                 'local_related': local_related(x['id'], self.user), # 本地风险相关度
             }, queryset)
@@ -160,7 +160,7 @@ class DashboardData(Abstract):
                         'source': x['source'],
                         'qualitied': qualitied(x['qualitied']),
                         'category': x['category'],
-                        'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
+                        'pubtime': date_format(x['pubtime'], '%Y-%m-%d %H:%M:%S'),
                         'product': x['product_name'],
                     }, q(Inspection.objects.filter(area_id=UserArea.objects.get(user=self.user).area.id, status=1))),
                 'all': map(lambda x: {
@@ -171,7 +171,7 @@ class DashboardData(Abstract):
                         'source': x['source'],
                         'qualitied': qualitied(x['qualitied']),
                         'category': x['category'],
-                        'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
+                        'pubtime': date_format(x['pubtime'], '%Y-%m-%d %H:%M:%S'),
                         'product': x['product_name'],
                     }, q(Inspection.objects.filter(status=1).all())),
                 }
