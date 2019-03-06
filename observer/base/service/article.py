@@ -101,6 +101,9 @@ class RiskDataAdd(Abstract):
         if not pubtime:
             pubtime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+        if not industries:
+            industries = -1
+
         if not url or not title or not source or not areas or not categories:
             return 400
 
