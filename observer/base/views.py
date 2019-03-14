@@ -22,7 +22,7 @@ from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd,
                                            RiskHarmsData, RiskHarmsManageSave,
                                            RiskHarmsDetailsData)
 from observer.base.service.base import (alias_industry, area, areas,
-                                        categories, get_major_category,
+                                        categories, content,get_major_category,
                                         get_major_industry, get_user_extra,
                                         get_user_nav, involve_local,
                                         local_related, qualitied, gov_area,
@@ -86,7 +86,9 @@ from observer.utils.excel import write_by_openpyxl
 
 from observer.base.service.govreports import (GovReportsData, GovReportsAdd, GovReportsDelete,
                                              GovReportsEdit)
-
+from observer.base.service.indicatordata import IndicatorData,IndicatorDelete
+# ,IndicatorDataUpload
+from observer.base.service.policyregion import  PolicyRegionData
 
 class BaseView(APIView):
 
@@ -2989,5 +2991,155 @@ class GovReportsEditView(BaseView):
         self.set_request(request)
 
         queryset = GovReportsEdit(user=request.user, params=request.data).edit(cid=cid)
+
+        return Response(status=queryset)
+
+class IndicatorView(BaseView):
+
+    def __init__(self):
+        super(IndicatorView, self).__init__()
+
+    def set_request(self, request):
+        super(IndicatorView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(IndicatorView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        results = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda r: {
+                'id': r['id'],
+                'name': r['indicator__name'],
+                'level': r['indicator__level'],
+                'parenttwo': r['indicator__parent_id__name'],
+                'parentone': r['indicator__parent_id__parent_id__name'],
+                'value': r['value'],
+                'unit': r['indicator__unit'],
+                'areas': area(r['area__id']),
+                'year': r['year'],
+            }, results)
+        }
+
+        return data
+
+    def get(self, request):
+
+        self.set_request(request)
+
+        queryset = IndicatorData(params=request.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+class IndicatorDeleteView(BaseView):
+    def __init__(self):
+        super(IndicatorDeleteView, self).__init__()
+
+    def set_request(self, request):
+        super(IndicatorDeleteView, self).set_request(request)
+
+    def delete(self, request, cid):
+        self.set_request(request)
+
+        queryset = IndicatorDelete(user=request.user, params=request.data).delete(cid=cid)
+
+        return Response(status=queryset)
+
+class SelectIndicatorListView(BaseView):
+
+    def __init__(self):
+        super(SelectIndicatorListView, self).__init__()
+
+    def set_request(self, request):
+        super(SelectIndicatorListView, self).set_request(request)
+
+    def serialize(self, queryset):
+        data = map(
+            lambda x: {
+                'id': x['id'],
+                'name': x['name'],
+            },
+            queryset
+        )
+
+        return data
+
+    def get(self, request):
+        self.set_request(request)
+
+        queryset = IndicatorData(params=request.query_params).get_level()
+
+        return Response(self.serialize(queryset))
+
+
+class IndicatorDataUploadView(BaseView):
+    parser_classes = (FileUploadParser,)
+
+    def __init__(self):
+        super(IndicatorDataUploadView, self).__init__()
+
+    def put(self, request, filename, format=None):
+
+        queryset = IndicatorDataUpload(user=request.user).upload(filename, request.FILES['file'])
+
+        return Response(queryset)
+
+class PolicyreginView(BaseView):
+
+    def __init__(self):
+        super(PolicyreginView, self).__init__()
+
+    def set_request(self, request):
+        super(PolicyreginView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(PolicyreginView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        results = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda r: {
+                'id': r['id'],
+                'areas': area(r['area__id']),
+                'total': r['total'],
+                'year': r['year'],
+                'content': content(r['id'], admin=True),
+            }, results)
+        }
+
+        return data
+
+    def get(self, request):
+
+        self.set_request(request)
+
+        queryset = PolicyRegionData(params=request.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+class PolicyRegionAddView(BaseView):
+
+    def __init__(self):
+        super(PolicyRegionAddView, self).__init__()
+
+    def set_request(self, request):
+        super(PolicyRegionAddView, self).set_request(request)
+
+    def post(self, request):
+        self.set_request(request)
+
+        queryset = PolicyRegionAdd(user=request.user, params=request.data).add()
 
         return Response(status=queryset)
