@@ -55,7 +55,7 @@ def content(policydata_id, admin=False, flat=False):
 #指标
 def indicatores(indicator_id, admin=False, flat=False):
     c_ids = IndicatorDataParent.objects.filter(id=indicator_id).values_list('indicatores__id', flat=True)
-    queryset = Indicator.objects.filter(id__in=c_ids)
+    queryset = Indicator.objects.using('hqi').filter(id__in=c_ids)
 
     if not admin:
         queryset = queryset.filter(level=2)
