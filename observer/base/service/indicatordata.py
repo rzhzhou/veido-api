@@ -124,20 +124,24 @@ class IndicatorDataUpload(Abstract):
 
 
                     # 地域
-                    area = str(sv(i, model['地域'], sheet)).strip()
+                    # area = str(sv(i, model['地域'], sheet)).strip()
+                    # if area == 'None':
+                    #     continue
+                    # else:
+                    #     areas = area.split()
+                    #     a_ids = Area.objects.filter(name__in=areas).values_list('id', flat=True)
+
+                    #     if len(areas) != len(a_ids):
+                    #         return {
+                    #             'status': 0,
+                    #             'message': '操作失败！请检查第 %s 行 "地域"！' % (i + 1, )
+                    #         }
+
+                    #     area = Area.objects.filter(id__in=a_ids)
+
+                    area_id = sv(i, model['地域'], sheet)
                     if area == 'None':
                         continue
-                    else:
-                        areas = area.split()
-                        a_ids = Area.objects.filter(name__in=areas).values_list('id', flat=True)
-
-                        if len(areas) != len(a_ids):
-                            return {
-                                'status': 0,
-                                'message': '操作失败！请检查第 %s 行 "地域"！' % (i + 1, )
-                            }
-
-                        area = Area.objects.filter(id__in=a_ids)
 
                     # 指标类别
                     indicator = str(sv(i, model['指标'], sheet)).strip()
@@ -159,7 +163,7 @@ class IndicatorDataUpload(Abstract):
                     total += 1
 
                     #唯一性
-                    old_indicator = IndicatorDataParent.objects.filter(year=year)
+                    old_indicator = IndicatorDataParent.objects.using('hqi').filter(year=year)
 
                     if old_indicator.exists():
                         old_indicator = old_indicator[0]
