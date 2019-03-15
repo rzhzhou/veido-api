@@ -2994,6 +2994,7 @@ class GovReportsEditView(BaseView):
 
         return Response(status=queryset)
 
+
 class IndicatorView(BaseView):
 
     def __init__(self):
@@ -3037,6 +3038,7 @@ class IndicatorView(BaseView):
 
         return Response(self.serialize(queryset))
 
+
 class IndicatorDeleteView(BaseView):
     def __init__(self):
         super(IndicatorDeleteView, self).__init__()
@@ -3050,6 +3052,7 @@ class IndicatorDeleteView(BaseView):
         queryset = IndicatorDelete(user=request.user, params=request.data).delete(cid=cid)
 
         return Response(status=queryset)
+
 
 class SelectIndicatorListView(BaseView):
 
@@ -3090,6 +3093,22 @@ class IndicatorDataUploadView(BaseView):
 
         return Response(queryset)
 
+
+class IndicatorDataExportView(BaseView):
+
+    def __init__(self):
+        super(IndicatorDataExportView, self).__init__()
+
+    def get(self, request):
+        response = FileResponse(
+            IndicatorDataExport(params=request.query_params, user=request.user).export(),
+            content_type='application/vnd.ms-excel'
+        )
+        response["Content-Disposition"] = 'attachment; filename=indicator.xlsx'
+
+        return response
+
+
 class PolicyreginView(BaseView):
 
     def __init__(self):
@@ -3128,6 +3147,7 @@ class PolicyreginView(BaseView):
         queryset = PolicyRegionData(params=request.query_params).get_all()
 
         return Response(self.serialize(queryset))
+        
 
 class PolicyRegionAddView(BaseView):
 
