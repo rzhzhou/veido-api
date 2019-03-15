@@ -145,7 +145,7 @@ class IndicatorDataUpload(Abstract):
                         continue
                     else:
                         indicatores = indicator.split()
-                        c_ids = Indicator.objects.filter(name__in=indicatores).values_list('id', flat=True)
+                        c_ids = Indicator.objects.using('hqi').filter(name__in=indicatores).values_list('id', flat=True)
 
                         if len(indicatores) != len(c_ids):
                             return {
@@ -153,7 +153,7 @@ class IndicatorDataUpload(Abstract):
                                 'message': '操作失败！请检查第 %s 行 "指标"！' % (i + 1, )
                             }
 
-                        indicator = Indicator.objects.filter(id__in=c_ids)
+                        indicator = Indicator.objects.using('hqi').filter(id__in=c_ids)
 
 
                     total += 1
@@ -167,13 +167,13 @@ class IndicatorDataUpload(Abstract):
                         old_indicator.year = year
                         old_indicator.indicator_id = indicator_id
                         old_indicator.area_id = area_id
-                        if not old_indicator.corpus_id:
-                            old_indicator.corpus_id = monitorWord
+                        # if not old_indicator.corpus_id:
+                        #     old_indicator.corpus_id = monitorWord
                         old_indicator.save()
-                        old_indicator.areas.clear()
+                        old_indicator.area.clear()
                         old_indicator.indicatores.clear()
-                        old_indicator.areas.add(*area)
-                        old_indicator.indicatores.add(*category)
+                        old_indicator.area.add(*area)
+                        old_indicator.indicatores.add(*indicator)
                         old_indicator.save()
 
                         dupli += 1
@@ -187,8 +187,8 @@ class IndicatorDataUpload(Abstract):
 
                     )
                     indicatordata.save()
-                    indicatordata.areas.add(*area)
-                    indicatordata.indicatores.add(*category)
+                    indicatordata.area.add(*area)
+                    indicatordata.indicatores.add(*indicator)
                     indicatordata.save()
 
                 except Exception as e:
