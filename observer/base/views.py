@@ -2279,7 +2279,6 @@ class ThemeEditView(BaseView):
         self.set_request(request)
 
         theme = getattr(self, 'theme', '')
-        print('theme', theme)
 
         queryset = ThemeEdit(user=request.user, params=request.data).edit()
 
