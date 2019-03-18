@@ -10,7 +10,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import Group, User
 from django.db.models import Q
 
-from observer.base.models import (MajorIndustry, AliasIndustry, UserArea, Area, Enterprise, Industry,
+from observer.base.models import (MajorIndustry, AliasIndustry, Area, Enterprise, Industry,
                                   Inspection, IndustryProducts)
 from observer.base.service.abstract import Abstract
 from observer.base.service.base import (alias_industry, get_major_industry, area,

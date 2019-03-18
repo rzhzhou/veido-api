@@ -1,7 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, Q, F
 
-from observer.base.models import(Area, UserArea, Article,
+from observer.base.models import(Area, UserInfo, Article,
                                 Category, Inspection,
                                 )
 from observer.base.service.abstract import Abstract
@@ -162,7 +162,7 @@ class DashboardData(Abstract):
                         'category': x['category'],
                         'pubtime': date_format(x['pubtime'], '%Y-%m-%d %H:%M:%S'),
                         'product': x['product_name'],
-                    }, q(Inspection.objects.filter(area_id=UserArea.objects.get(user=self.user).area.id, status=1))),
+                    }, q(Inspection.objects.filter(area_id=UserInfo.objects.get(user=self.user).area.id, status=1))),
                 'all': map(lambda x: {
                         'industry': {'id': x['industry'], 'name': x['industry__name']},
                         'url': x['url'],

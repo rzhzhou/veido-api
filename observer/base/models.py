@@ -26,8 +26,8 @@ class Area(models.Model):
         return self.name
 
 
-class UserArea(models.Model):
-    user = models.ForeignKey(
+class UserInfo(models.Model):
+    user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
         verbose_name='用户'
@@ -38,9 +38,11 @@ class UserArea(models.Model):
         verbose_name='地域'
     )
 
+    theme = models.CharField(max_length=50, verbose_name='主题')
+
     class Meta:
         app_label = 'base'
-        verbose_name_plural = '用户地域'
+        verbose_name_plural = '用户信息'
 
     def __str__(self):
         return self.user.username
