@@ -108,6 +108,7 @@ urlpatterns = [
     path('select/riskharms/', views.RiskHarmsView.as_view()),  # 风险伤害信息选择
 
     path('crawler/<str:cid>/', views.CrawlerView.as_view()), # 语料词爬取数据
+    path('select/indicator_list', views.SelectIndicatorListView.as_view()), # 查找指标
 
     # SUZHOU
     path('risk_data_suzhou', views.RiskDataViewSuzhou.as_view()), # 新闻信息
@@ -137,6 +138,17 @@ urlpatterns = [
     path('govreports/add', views.GovReportsAddView.as_view()), # 发布一则政府动态动态
     path('govreports/delete/<str:cid>/', views.GovReportsDeleteView.as_view()), # 删除政府动态
     path('govreports/edit/<int:cid>/', views.GovReportsEditView.as_view()), # 修改政府动态
+
+    #指标数据
+    path('indicator', views.IndicatorView.as_view()), # 显示指标数据
+    path('indicator/delete/<str:cid>/', views.IndicatorDeleteView.as_view()), # 删除政府动态
+    path('indicator/upload/<str:filename>/', views.IndicatorDataUploadView.as_view()),  # 线上数据上传
+    path('indicator_data/export', views.IndicatorDataExportView.as_view()),  # 线上数据导出
+
+    #政策
+    path('policyregin', views.PolicyreginView.as_view()), # 显示地区政策
+    path('policyregin/add', views.PolicyRegionAddView.as_view()), # 添加地区政策
+
 ]
 
 # urlpatterns += [
