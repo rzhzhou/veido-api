@@ -122,6 +122,10 @@ urlpatterns = [
     # 动态路由
     path('route_data/', views.RouteDataView.as_view()), # 动态路由
 
+    # 动态主题
+    path('theme', views.ThemeView.as_view()), # 动态主题
+    path('theme/edit', views.ThemeEditView.as_view()), # 修改主题
+
     # 官网
     path('news', views.NewsView.as_view()), # 公司动态
     path('news/add', views.NewsAddView.as_view()), # 发布一则公司动态

@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from observer.base.models import (AliasIndustry, Inspection, Nav, NewsReport,
-                                  UserArea, UserNav, VersionRecord)
+                                  UserInfo, UserNav, VersionRecord)
 from observer.base.service.area import SelectAreaData
 from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd,
                                            RiskDataAudit, RiskDataDelete,
@@ -33,7 +33,7 @@ from observer.base.service.corpus import (CategoryListData, CorpusAdd,
                                           CrawlerData)
 from observer.base.service.dashboard import DashboardData
 from observer.base.service.desmon import (DMLinkAdd, DMLinkData, DMLinkDelete,
-                                          DMLinkEdit, DMWordsData, DMWordsFocusData, 
+                                          DMLinkEdit, DMWordsData, DMWordsFocusData,
                                           DMWordsDelete, MonitorInformationData)
 from observer.base.service.industry import (AliasIndustryAdd, CCCIndustryAdd,
                                             CCCIndustryData,
@@ -76,7 +76,7 @@ from observer.base.service.report import (NewsReportData, NewsReportDelete,
                                           NewsReportSuzhou, NewsReportUpload)
 from observer.base.service.search import SearchAdvancedData, SearchData
 from observer.base.service.user import (GroupData, UserAdd, UserData,
-                                        UserDelete, UserEdit)
+                                        UserDelete, UserEdit, ThemeEdit)
 from observer.base.service.version import (VersionRecordData,
                                            VersionRecordDataAdd,
                                            VersionRecordDataDelete,
@@ -2240,6 +2240,49 @@ class RouteDataView(BaseView):
         self.set_request(request)
 
         return Response(self.serialize())
+
+
+class ThemeView(BaseView):
+
+    def __init__(self):
+        super(ThemeView, self).__init__()
+
+    def set_request(self, request):
+        self.user = request.user
+        super(ThemeView, self).set_request(request)
+
+    def serialize(self):
+        user_theme = UserInfo.objects.get(user_id=self.user).theme
+
+        data = {
+            'user_theme': user_theme,
+        }
+
+        return data
+
+    def get(self, request):
+        self.set_request(request)
+
+        return Response(self.serialize())
+
+
+class ThemeEditView(BaseView):
+
+    def __init__(self):
+        super(ThemeEditView, self).__init__()
+
+    def set_request(self, request):
+        self.user = request.user
+        super(ThemeEditView, self).set_request(request)
+
+    def post(self, request):
+        self.set_request(request)
+
+        theme = getattr(self, 'theme', '')
+
+        queryset = ThemeEdit(user=request.user, params=request.data).edit()
+
+        return Response(queryset)
 
 
 class UserView(BaseView):

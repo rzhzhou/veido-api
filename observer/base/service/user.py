@@ -1,6 +1,6 @@
 from itertools import chain
 from django.contrib.auth.models import User, Group
-from observer.base.models import UserArea, UserNav, Nav
+from observer.base.models import UserInfo, UserNav, Nav
 
 from datetime import date, timedelta, datetime
 from django.core.exceptions import ObjectDoesNotExist
@@ -105,7 +105,7 @@ class UserAdd(Abstract):  # 添加用户
 
                 # 关联用户地域
                 user_id = User.objects.get(username=username).id
-                UserArea(user_id=user_id, area_id=area).save()
+                UserInfo(user_id=user_id, area_id=area).save()
 
                 return 200
             except Exception as e:
@@ -139,8 +139,8 @@ class UserAdd(Abstract):  # 添加用户
 
                 # 关联用户地域
                 user_id = User.objects.get(username=str(self.user)+'@'+str(username)).id
-                area_id = UserArea.objects.filter(user_id=self.user.id).values_list('area_id', flat=True)[0]
-                UserArea(user_id=user_id, area_id=area_id).save()
+                area_id = UserInfo.objects.filter(user_id=self.user.id).values_list('area_id', flat=True)[0]
+                UserInfo(user_id=user_id, area_id=area_id).save()
 
                 # 关联初始导航权限
                 bulk_usernav = []
@@ -223,3 +223,16 @@ class GroupData(Abstract):
         queryset = Group.objects.filter(**args).values(*fields)
 
         return queryset
+
+class ThemeEdit(Abstract):
+
+    def __init__(self, user, params={}):
+        super(ThemeEdit, self).__init__(params)
+        self.user = user
+
+    def edit(self):
+        theme = getattr(self, 'theme', '')
+
+        UserInfo.objects.filter(user_id=self.user).update(theme=theme)
+
+        return theme

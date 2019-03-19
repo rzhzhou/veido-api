@@ -2,7 +2,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from django.contrib.auth.models import User, Group
 
-from observer.base.models import (Area,Category, UserArea, AliasIndustry, MajorIndustry,
+from observer.base.models import (Area, Category, UserInfo, AliasIndustry, MajorIndustry,
                                 Enterprise, UserNav, Article, HarmIndicator, HarmPeople)
 from observer.apps.hqi.models import Indicator,IndicatorDataParent,Policy,PolicyData
 from observer.utils.date_format import date_format
@@ -73,7 +73,7 @@ def local_related(article_id, user):
     f = lambda x, y : set(x).issubset(set(y)) or set(y).issubset(set(x))
 
     area_ids = Article.objects.filter(id=article_id).values_list('areas__id', flat=True)
-    u_area = UserArea.objects.get(user=user).area
+    u_area = UserInfo.objects.get(user=user).area
     u_area_id = u_area.id
     u_level = u_area.level
 
@@ -143,8 +143,6 @@ def involve_local(local_name, area_name):
             return '是'
         else:
             return '否'
-    
-    
 
 
 def industry_number(alias_industry_id):
