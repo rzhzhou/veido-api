@@ -214,21 +214,20 @@ class IndicatorDataExport(Abstract):
         data = [
             ['值', '年份', '地域', '指标'],
         ]
-        fields = ('value', 'year', 'areas__name', 'indicator__name')
+        fields = ('id','value', 'year', 'area__name', 'indicator__name')
         cond = {
-            # 'areas__id': getattr(self, 'areas', None),
-            # 'status': getattr(self, 'status'),
-            # 'pubtime__gte': getattr(self, 'starttime', None),
-            # 'pubtime__lte': getattr(self, 'endtime', None),
+            'area__id': getattr(self, 'areas', None),
+            'year': getattr(self, 'year', None),
+            'indicator__name': getattr(self, 'indicator_name', None),
         }
         # print(getattr(self, 'areas', None), getattr(self, 'status'),
         #     getattr(self, 'starttime', None),getattr(self, 'endtime', None))
         args = dict([k, v] for k, v in cond.items() if v)
 
-        queryset = IndicatorDataParent.objects.filter(**args).values(*fields)
+        queryset = IndicatorDataParent.objects.using('hqi').filter(**args).values(*fields).exclude(indicator__level=-1)
 
         # 判断当前用户是否为武汉深度网科技有限公司成员，然后取出该用户管理的资料
-        group_ids = Group.objects.filter(user=self.user).values_list('id', flat=True)
+        group_ids = Group.objects.using('hqi').filter(user=self.user).values_list('id', flat=True)
         if 4 in group_ids and 3 in group_ids:
             queryset = queryset.filter(user_id = self.user.id).values(*fields)
 
@@ -237,7 +236,7 @@ class IndicatorDataExport(Abstract):
             # catogories = categories(q['id'], admin=True, flat=True)
             data.append([q['value'],
                          q['year'],
-                         q['areas__name'],
+                         q['area__name'],
                          q['indicator__name'],
                         ])
 

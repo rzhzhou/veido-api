@@ -140,10 +140,14 @@ urlpatterns = [
     path('govreports/edit/<int:cid>/', views.GovReportsEditView.as_view()), # 修改政府动态
 
     #指标数据
-    path('indicatordataparent', views.IndicatorView.as_view()), # 显示指标数据
-    path('indicatordataparent/delete/<str:cid>/', views.IndicatorDeleteView.as_view()), # 删除指标数据
-    path('indicatordataparent/upload/<str:filename>/', views.IndicatorDataUploadView.as_view()),  # 指标数据上传
-    path('indicatordataparent_data/export', views.IndicatorDataExportView.as_view()),  # 指标数据导出
+    path('indicatordataparent', views.IndicatordataparentView.as_view()), # 显示指标数据
+    path('indicatordataparent/delete/<str:cid>/', views.IndicatordataparentDeleteView.as_view()), # 删除指标数据
+    path('indicatordataparent/upload/<str:filename>/', views.IndicatordataparentDataUploadView.as_view()),  # 指标数据上传
+    path('indicatordataparent_data/export', views.IndicatordataparentDataExportView.as_view()),  # 指标数据导出
+
+    #指标排名
+    # path('indicator',views.Indicator)
+
 
     #政策
     path('policyregin', views.PolicyreginView.as_view()), # 显示地区政策
