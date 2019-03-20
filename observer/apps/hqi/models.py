@@ -76,6 +76,7 @@ class Indicator(models.Model):
     name = models.CharField(max_length=255, verbose_name="名称")
     unit = models.CharField(max_length=255, null=True, blank=True, verbose_name='单位')
     level = models.IntegerField(verbose_name='等级')
+    index=models.IntegerField(verbose_name='索引',null=True)
 
     parent = models.ForeignKey(
         'self',
