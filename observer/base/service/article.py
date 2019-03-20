@@ -8,7 +8,7 @@ from django.db.models import Count, Q, F
 
 from observer.base.models import(Area, Article, Category,
                                 CorpusCategories, HarmIndicator, Harm,
-                                HarmPeople)
+                                HarmPeople, Events)
 from django.contrib.auth.models import Group, User
 from observer.base.service.abstract import Abstract
 from observer.base.service.base import (areas, categories, )
@@ -522,6 +522,83 @@ class RiskHarmsData(Abstract):
         args = dict([k, v] for k, v in cond.items() if v)
 
         queryset = HarmIndicator.objects.filter(**args).values(*fields)
+
+        return queryset
+
+
+class EventsManageData(Abstract):
+    def __init__(self, params):
+        super(EventsManageData, self).__init__(params)
+
+    def get_data(self):
+        # 标题，社会危害程度，影响范围，分级，发布时间，事件总结
+        fields = ('id', 'title', 'socialHarm', 'scope', 'grading', 'pubtime', 'desc')
+        cond = {
+            'title__contains': getattr(self, 'title', None),
+            'socialHarm': getattr(self, 'socialHarm', None),
+            'scope': getattr(self, 'scope', None),
+            'grading': getattr(self, 'grading', None),
+            'pubtime__gte': getattr(self, 'starttime', None),
+            'pubtime__lte': getattr(self, 'endtime', None),
+        }
+
+        args = dict([k, v] for k, v in cond.items() if v)
+
+        queryset = Events.objects.filter(**args).values(*fields)
+
+        return queryset
+
+    def toSave(self):
+        title = getattr(self, 'title')
+        socialHarm = getattr(self, 'socialHarm')
+        scope = getattr(self, 'scope')
+        grading = getattr(self, 'grading')
+        pubtime = getattr(self, 'pubtime')
+
+        Events(
+            title = title,
+            socialHarm = socialHarm,
+            scope = scope,
+            grading = grading,
+            pubtime = pubtime,
+        ).save()
+
+        return 200
+
+    def toDel(self, eid):
+        eids = eid.split(',')
+
+        Events.objects.filter(id__in = eids).delete()
+
+        return 200
+
+    def toUpd(self):
+        eid = getattr(self, 'id')
+        title = getattr(self, 'title')
+        socialHarm = getattr(self, 'socialHarm')
+        scope = getattr(self, 'scope')
+        grading = getattr(self, 'grading')
+        pubtime = getattr(self, 'pubtime')
+        desc = getattr(self, 'desc', '')
+
+        event = Events.objects.get(id = eid)
+        event.title = title
+        event.socialHarm = socialHarm
+        event.scope = scope
+        event.grading = grading
+        event.pubtime = pubtime
+        event.desc = desc
+        event.save()
+
+        return 200
+
+    # 点击事件名，跳转页面,显示和article关联的数据
+    def LinkData(self, eid):
+        fields = ('id', 'title', 'url', 'pubtime', 'source')
+        event_ids = Events.objects.filter(id = eid).values_list('articles__id', flat=True)
+        print(event_ids)
+        queryset = Article.objects.filter(id__in = event_ids).values(*fields)
+        print(queryset)
 
         return queryset
 

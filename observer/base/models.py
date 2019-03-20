@@ -356,6 +356,7 @@ class Article(models.Model):
     source = models.CharField(max_length=80, blank=True, verbose_name='信息来源')
     score = models.IntegerField(default=0, verbose_name='风险程度')# 0, 默认值
     status = models.IntegerField(default=0, verbose_name='状态')# 0, 默认值 1 有效
+    sentiment = models.IntegerField(null=True, verbose_name='情感属性')# 0:负面，1:中性，2:正面
 
     industry = models.ForeignKey(
         MajorIndustry,
@@ -450,6 +451,21 @@ class HarmIndicator(models.Model):
     class Meta:
         app_label = 'base'
         verbose_name_plural = '风险伤害'
+
+
+class Events(models.Model):
+    title = models.CharField(max_length=100, verbose_name='名称')
+    socialHarm = models.CharField(max_length=50, verbose_name='社会危害程度')
+    scope = models.CharField(max_length=50, verbose_name='影响范围')
+    grading = models.CharField(max_length=50, verbose_name='分级')
+    pubtime = models.DateField(default=datetime.date.today, verbose_name='发布时间')
+    desc = models.TextField(null=True, verbose_name='事件总结')
+
+    articles = models.ManyToManyField(Article)
+
+    class Meta:
+        app_label = 'base'
+        verbose_name_plural = '事件分析'
 
 
 class DMLink(models.Model):

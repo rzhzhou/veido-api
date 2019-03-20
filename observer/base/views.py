@@ -20,7 +20,7 @@ from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd,
                                            RiskDataSuzhou, RiskDataUpload,
                                            StatisticsShow, newsCrawlerData,
                                            RiskHarmsData, RiskHarmsManageSave,
-                                           RiskHarmsDetailsData)
+                                           RiskHarmsDetailsData, EventsManageData)
 from observer.base.service.base import (alias_industry, area, areas,
                                         categories, content,get_major_category,
                                         get_major_industry, get_user_extra,
@@ -2884,6 +2884,114 @@ class InspectionDataNationExportView(BaseView):
         response["Content-Disposition"] = 'attachment; filename='+filename
 
         return response
+
+
+class EventsManageView(BaseView):
+    def __init__(self):
+        super(EventsManageView, self).__init__()
+
+    def set_request(self, request):
+        super(EventsManageView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(EventsManageView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, result):
+        total = result.count()
+        resultPage = self.paging(result)
+        data = {
+            'total': total,
+            'list': map(lambda r : {
+                'id': r['id'],
+                'title': r['title'],
+                'socialHarm': r['socialHarm'],
+                'scope': r['scope'],
+                'grading': r['grading'],
+                'pubtime': date_format(r['pubtime'], "%Y-%m-%d"),
+                'desc': r['desc']
+            }, resultPage)
+        }
+
+        return data
+        
+    def get(self, request):
+        result = EventsManageData(params = request.query_params).get_data()
+
+        return Response(self.serialize(result))
+
+
+class EventsSaveView(BaseView):
+
+    def __init__(self):
+        super(EventsSaveView, self).__init__()
+
+    def post(self, request):
+        status = EventsManageData(params = request.data).toSave()
+
+        return Response(status)
+
+
+class EventsDeleteView(BaseView):
+
+    def __init__(self):
+        super(EventsDeleteView, self).__init__()
+
+    def delete(self, request, eid):
+        status = EventsManageData(params = request.data).toDel(eid = eid)
+
+        return Response(status)
+
+
+class EventsUpdataView(BaseView):
+
+    def __init__(self):
+        super(EventsUpdataView, self).__init__()
+
+    def post(self, request):
+        status = EventsManageData(params = request.data).toUpd()
+
+        return Response(status)
+
+
+class EventsDataView(BaseView):
+
+    def __init__(self):
+        super(EventsDataView, self).__init__()
+
+    def set_request(self, request):
+        super(EventsDataView, self).set_request(request)
+
+    def paging(self, queryset):
+        super(EventsDataView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15))
+
+    def serialize(self, result):
+        total = result.count()
+        # resultPage = self.paging(result)
+        data = {
+            'total': total,
+            'list': map(lambda r: {
+                'id': r['id'],
+                'title': r['title'],
+                'url': r['url'],
+                'pubtime': date_format(r['pubtime'], '%Y-%m-%d %H:%M:%S'),
+                'source': r['source'],
+                'areas': areas(r['id']),
+            }, result)
+        }
+
+        return data
+
+    def get(self, request, eid):
+        result = EventsManageData(params = request.query_params).LinkData(eid = eid)
+
+        return Response(self.serialize(result))
 
 
 class RiskHarmsManageView(BaseView):
