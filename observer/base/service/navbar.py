@@ -1,4 +1,4 @@
-from observer.base.models import UserNav
+from observer.base.models import UserNav, Nav
 
 from observer.base.service.abstract import Abstract
 
@@ -27,9 +27,17 @@ class NavBarEdit(Abstract):
 
         if diff_nav_ids:
             for nav_id in diff_nav_ids:
+                child_ids = Nav.objects.filter(parent_id=nav_id, level=-1).values_list('id', flat=True)
+
                 if not UserNav.objects.filter(user_id=edit_id, nav_id=nav_id).exists():
                     UserNav(user_id=edit_id, nav_id=nav_id).save()
+                    if child_ids.exists() and not UserNav.objects.filter(user_id=edit_id, nav_id__in=child_ids).exists():
+                        for child_id in child_ids:
+                            UserNav(user_id=edit_id, nav_id=child_id).save()
                 else:
                     UserNav.objects.filter(user_id=edit_id, nav_id=nav_id).delete()
+                    if child_ids.exists() and UserNav.objects.filter(user_id=edit_id, nav_id__in=child_ids).exists():
+                        for child_id in child_ids:
+                            UserNav(user_id=edit_id, nav_id=child_id).delete()
 
         return 200

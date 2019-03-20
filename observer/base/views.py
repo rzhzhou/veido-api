@@ -86,7 +86,7 @@ from observer.utils.excel import write_by_openpyxl
 
 from observer.base.service.govreports import (GovReportsData, GovReportsAdd, GovReportsDelete,
                                              GovReportsEdit)
-from observer.base.service.indicatordata import IndicatorData,IndicatorDelete,IndicatorDataUpload
+from observer.base.service.indicatordata import IndicatorData,IndicatorDelete,IndicatorDataUpload,IndicatorDataExport
 from observer.base.service.policyregion import  PolicyRegionData
 
 class BaseView(APIView):
@@ -2279,7 +2279,6 @@ class ThemeEditView(BaseView):
         self.set_request(request)
 
         theme = getattr(self, 'theme', '')
-        print('theme', theme)
 
         queryset = ThemeEdit(user=request.user, params=request.data).edit()
 
@@ -3146,16 +3145,16 @@ class GovReportsEditView(BaseView):
         return Response(status=queryset)
 
 
-class IndicatorView(BaseView):
+class IndicatordataparentView(BaseView):
 
     def __init__(self):
-        super(IndicatorView, self).__init__()
+        super(IndicatordataparentView, self).__init__()
 
     def set_request(self, request):
-        super(IndicatorView, self).set_request(request)
+        super(IndicatordataparentView, self).set_request(request)
 
     def paging(self, queryset):
-        return super(IndicatorView, self).paging(
+        return super(IndicatordataparentView, self).paging(
             queryset,
             self.request.query_params.get('page', 1),
             self.request.query_params.get('length', 15)
@@ -3190,12 +3189,12 @@ class IndicatorView(BaseView):
         return Response(self.serialize(queryset))
 
 
-class IndicatorDeleteView(BaseView):
+class IndicatordataparentDeleteView(BaseView):
     def __init__(self):
-        super(IndicatorDeleteView, self).__init__()
+        super(IndicatordataparentDeleteView, self).__init__()
 
     def set_request(self, request):
-        super(IndicatorDeleteView, self).set_request(request)
+        super(IndicatordataparentDeleteView, self).set_request(request)
 
     def delete(self, request, cid):
         self.set_request(request)
@@ -3232,11 +3231,11 @@ class SelectIndicatorListView(BaseView):
         return Response(self.serialize(queryset))
 
 
-class IndicatorDataUploadView(BaseView):
+class IndicatordataparentDataUploadView(BaseView):
     parser_classes = (FileUploadParser,)
 
     def __init__(self):
-        super(IndicatorDataUploadView, self).__init__()
+        super(IndicatordataparentDataUploadView, self).__init__()
 
     def put(self, request, filename, format=None):
 
@@ -3245,10 +3244,10 @@ class IndicatorDataUploadView(BaseView):
         return Response(queryset)
 
 
-class IndicatorDataExportView(BaseView):
+class IndicatordataparentDataExportView(BaseView):
 
     def __init__(self):
-        super(IndicatorDataExportView, self).__init__()
+        super(IndicatordataparentDataExportView, self).__init__()
 
     def get(self, request):
         response = FileResponse(

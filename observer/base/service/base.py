@@ -199,7 +199,7 @@ def enterprise_area_name(inspection_id, flat=False):
 
 
 def get_user_nav(user_id):
-    return UserNav.objects.filter(user_id=user_id).values_list('nav_id', flat=True)
+    return UserNav.objects.filter(user_id=user_id).exclude(nav__href='').values_list('nav_id', flat=True)
 
 
 def get_user_extra(user_id):
