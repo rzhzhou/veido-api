@@ -20,7 +20,8 @@ from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd,
                                            RiskDataSuzhou, RiskDataUpload,
                                            StatisticsShow, newsCrawlerData,
                                            RiskHarmsData, RiskHarmsManageSave,
-                                           RiskHarmsDetailsData, EventsManageData)
+                                           RiskHarmsDetailsData, EventsManageData,
+                                           EventsDataUpload)
 from observer.base.service.base import (alias_industry, area, areas,
                                         categories, content,get_major_category,
                                         get_major_industry, get_user_extra,
@@ -2965,14 +2966,15 @@ class EventsDataView(BaseView):
         super(EventsDataView, self).set_request(request)
 
     def paging(self, queryset):
-        super(EventsDataView, self).paging(
+        return super(EventsDataView, self).paging(
             queryset,
             self.request.query_params.get('page', 1),
-            self.request.query_params.get('length', 15))
+            self.request.query_params.get('length', 15)
+        )
 
     def serialize(self, result):
         total = result.count()
-        # resultPage = self.paging(result)
+        resultPage = self.paging(result)
         data = {
             'total': total,
             'list': map(lambda r: {
@@ -2982,7 +2984,8 @@ class EventsDataView(BaseView):
                 'pubtime': date_format(r['pubtime'], '%Y-%m-%d %H:%M:%S'),
                 'source': r['source'],
                 'areas': areas(r['id']),
-            }, result)
+                'keyword': r['eventskeyword__name'],
+            }, resultPage)
         }
 
         return data
@@ -2991,6 +2994,17 @@ class EventsDataView(BaseView):
         result = EventsManageData(params = request.query_params).LinkData(eid = eid)
 
         return Response(self.serialize(result))
+
+
+class EventsUploadView(BaseView):
+
+    def __init__(self):
+        super(EventsUploadView, self).__init__()
+
+    def put(self, request, filename, format=None):
+        queryset = EventsDataUpload(user=request.user).upload(filename, request.FILES['file'])
+
+        return Response(queryset)
 
 
 class RiskHarmsManageView(BaseView):
