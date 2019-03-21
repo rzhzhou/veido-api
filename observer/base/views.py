@@ -2219,7 +2219,7 @@ class RouteDataView(BaseView):
     def serialize(self):
         routers = []
         u_navs_ids = UserNav.objects.filter(user=self.user).values_list('nav', flat=True)
-        routes = Nav.objects.filter(id__in=u_navs_ids).values('href', 'component').order_by('index')
+        routes = Nav.objects.filter(id__in=u_navs_ids).exclude(level=1).values('id', 'href', 'component').order_by('index')
         j = 0
         for i, route in enumerate(routes):
             if route['href'] == '':
