@@ -715,24 +715,27 @@ class EventsDataUpload(Abstract):
                     if keyWord == 'None':
                         continue
                     else:
-                        keyWord = EventsKeyword.objects.get(name = keyWord)
-
-                        if not keyWord:
+                        keyWord_id = EventsKeyword.objects.filter(name = keyWord)
+                        if not keyWord_id.exists():
                             EventsKeyword(name = keyWord).save()
-                            keyWord = EventsKeyword.objects.get(name = keyWord)
+                            keyWord_id = EventsKeyword.objects.filter(name = keyWord)
+
+                        keyWord = keyWord_id[0]
 
                     # 事件
                     event = str(sv(i, model['事件'], sheet)).strip()
                     if event == 'None':
                         continue
                     else:
-                        event_id = Events.objects.get(title = event)
+                        event_id = Events.objects.filter(title = event)
 
-                        if not event_id:
+                        if not event_id.exists():
                             return {
                                 'status': 0,
                                 'message': '操作失败！请检查第 %s 行 "事件"！' % (i + 1, )
                             }
+
+                        event_id = event_id[0]
 
                     total += 1
 
