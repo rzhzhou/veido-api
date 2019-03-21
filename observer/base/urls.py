@@ -146,12 +146,13 @@ urlpatterns = [
     path('indicatordataparent_data/export', views.IndicatordataparentDataExportView.as_view()),  # 指标数据导出
 
     #指标排名
-    # path('indicator',views.Indicator)
+    path('indicator',views.IndicatorView.as_view()),  #显示指标排名
+    path('indicatorscore/<int:cid>/',views.IndicatorscoreView.as_view()),  #显示指标分数
 
 
     #政策
-    path('policyregin', views.PolicyreginView.as_view()), # 显示地区政策
-    path('policyregin/add', views.PolicyRegionAddView.as_view()), # 添加地区政策
+    # path('policyregin', views.PolicyreginView.as_view()), # 显示地区政策
+    # path('policyregin/add', views.PolicyRegionAddView.as_view()), # 添加地区政策
 
 ]
 

@@ -87,6 +87,7 @@ from observer.utils.excel import write_by_openpyxl
 from observer.base.service.govreports import (GovReportsData, GovReportsAdd, GovReportsDelete,
                                              GovReportsEdit)
 from observer.base.service.indicatordata import IndicatorData,IndicatorDelete,IndicatorDataUpload,IndicatorDataExport
+from observer.base.service.indicator import IndicatorChart,IndicatorRanking
 from observer.base.service.policyregion import  PolicyRegionData
 
 class BaseView(APIView):
@@ -3149,6 +3150,86 @@ class IndicatordataparentDataExportView(BaseView):
         response["Content-Disposition"] = 'attachment; filename=indicator.xlsx'
 
         return response
+
+
+class IndicatorView(BaseView):
+
+    def __init__(self):
+        super(IndicatorView, self).__init__()
+
+    def set_request(self, request):
+        super(IndicatorView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(IndicatorView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        results = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda r: {
+                'id': r['id'],
+                'onename':r['parent_id__parent_id__name'],
+                'twoname': r['parent_id__name'],
+                'name': r['name'],
+            }, results)
+        }
+
+        return data
+
+    def get(self, request):
+
+        self.set_request(request)
+
+        queryset = IndicatorChart(params=request.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+
+class IndicatorscoreView(BaseView):
+
+    def __init__(self):
+        super(IndicatorscoreView, self).__init__()
+
+    def set_request(self, request):
+        super(IndicatorscoreView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(IndicatorscoreView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        results = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda r: {
+                'id': r['id'],
+                'value': r['value'],
+                'areas': area(r['area_id']),
+                'year': r['year'],
+                'indicator_name': r['indicator_id__name'],
+                'indicator_id': r['indicator_id']
+            }, results)
+        }
+
+        return data
+
+    def get(self, request, cid):
+
+        self.set_request(request)
+
+        queryset = IndicatorRanking(params=request.query_params).get_all(cid=cid)
+
+        return Response(self.serialize(queryset))
 
 
 class PolicyreginView(BaseView):

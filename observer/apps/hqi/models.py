@@ -113,3 +113,24 @@ class IndicatorDataParent(models.Model):
         app_label = 'apps'
         db_table = 'base_indicatordataparent'
         verbose_name_plural = '指标数据'
+
+
+class IndicatorScore(models.Model):
+    value = models.FloatField(default=0, verbose_name='值')
+    year = models.IntegerField(verbose_name='年份')
+
+    area = models.ForeignKey(
+        Area,
+        on_delete=models.CASCADE,
+        verbose_name=u'地域'
+    )
+    indicator = models.ForeignKey(
+        Indicator,
+        on_delete=models.CASCADE,
+        verbose_name='指标'
+    )
+
+    class Meta:
+        app_label = 'apps'
+        db_table = 'base_indicatorscore'
+        verbose_name_plural = '指标数据(量化)'
