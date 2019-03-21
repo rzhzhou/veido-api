@@ -468,6 +468,19 @@ class Events(models.Model):
         verbose_name_plural = '事件分析'
 
 
+class EventsKeyword(models.Model):
+    name = models.CharField(max_length=100, verbose_name='关键词名')
+
+    events = models.ForeignKey(
+        Events,
+        on_delete=models.CASCADE,
+        null=True, blank=True,
+        verbose_name='事件'
+    )
+
+    articles = models.ManyToManyField(Article)
+
+
 class DMLink(models.Model):
     name = models.CharField(max_length=32, verbose_name='网站名')
     link = models.URLField(verbose_name='网站链接')
