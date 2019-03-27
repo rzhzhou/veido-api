@@ -356,6 +356,7 @@ class Article(models.Model):
     source = models.CharField(max_length=80, blank=True, verbose_name='信息来源')
     score = models.IntegerField(default=0, verbose_name='风险程度')# 0, 默认值
     status = models.IntegerField(default=0, verbose_name='状态')# 0, 默认值 1 有效
+    sentiment = models.IntegerField(null=True, verbose_name='情感属性')# 0:负面，1:中性，2:正面
 
     industry = models.ForeignKey(
         MajorIndustry,
@@ -452,6 +453,34 @@ class HarmIndicator(models.Model):
         verbose_name_plural = '风险伤害'
 
 
+class Events(models.Model):
+    title = models.CharField(max_length=100, verbose_name='名称')
+    socialHarm = models.CharField(max_length=50, verbose_name='社会危害程度')
+    scope = models.CharField(max_length=50, verbose_name='影响范围')
+    grading = models.CharField(max_length=50, verbose_name='分级')
+    pubtime = models.DateField(default=datetime.date.today, verbose_name='发布时间')
+    desc = models.TextField(null=True, verbose_name='事件总结')
+
+    articles = models.ManyToManyField(Article)
+
+    class Meta:
+        app_label = 'base'
+        verbose_name_plural = '事件分析'
+
+
+class EventsKeyword(models.Model):
+    name = models.CharField(max_length=100, verbose_name='关键词名')
+
+    events = models.ForeignKey(
+        Events,
+        on_delete=models.CASCADE,
+        null=True, blank=True,
+        verbose_name='事件'
+    )
+
+    articles = models.ManyToManyField(Article)
+
+
 class DMLink(models.Model):
     name = models.CharField(max_length=32, verbose_name='网站名')
     link = models.URLField(verbose_name='网站链接')
@@ -491,10 +520,10 @@ class IndustryProducts(models.Model):
 class Nav(models.Model):
     name = models.CharField(max_length=50, verbose_name='名称')
     href = models.CharField(default='', max_length=50, verbose_name='链接')
-    level = models.IntegerField(verbose_name='等级')
+    level = models.IntegerField(verbose_name='等级') # 1: 一级, 2： 二级页面, 3: 三级页面, -1: 子页面
     icon = models.CharField(default='', max_length=50, verbose_name='图标')
     component = models.CharField(default='', max_length=50, verbose_name='组件')
-    index = models.IntegerField(default=0, verbose_name='索引')
+    index = models.IntegerField(default=0, verbose_name='索引') # 排序依据
 
     parent = models.ForeignKey(
         'self',

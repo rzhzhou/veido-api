@@ -48,6 +48,12 @@ urlpatterns = [
     path('risk_data/news_crawler/',views.newsCrawlerView.as_view()), # 电梯风险新闻爬取
     path('risk_data/statistics/', views.StatisticsView.as_view()),  # 收集数据统计信息条数（日、周、月）
     path('risk_data/riskharmsmanage/', views.RiskHarmsManageView.as_view()),  # 风险伤害数据管理
+    path('risk_data/events/', views.EventsManageView.as_view()),  # 事件分析管理
+    path('risk_data/events_save/', views.EventsSaveView.as_view()),  # 事件添加
+    path('risk_data/events_delete/<str:eid>/', views.EventsDeleteView.as_view()),  # 事件删除
+    path('risk_data/events_updata/', views.EventsUpdataView.as_view()),  # 事件修改
+    path('risk_data/events_data/<int:eid>/', views.EventsDataView.as_view()),  # 事件关联数据
+    path('risk_data/events_upload/<str:filename>/', views.EventsUploadView.as_view()),  # 事件关联数据上传
 
     path('inspection_data', views.InspectionDataView.as_view()),  # 抽检数据
     path('inspection_data/add', views.InspectionDataAddView.as_view()),  # 抽检数据添加
