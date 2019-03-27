@@ -56,8 +56,8 @@ class PolicyData(models.Model):
     policy_class = models.IntegerField( verbose_name='政策类别')
     industry_class=models.CharField(max_length=255, null=True, verbose_name='产业类别')
     year =  models.DateTimeField(verbose_name='发布时间')
-    total = models.IntegerField( verbose_name='条数总计')
-    content =models.ManyToManyField(Policy)
+    total = models.IntegerField( verbose_name='条数总计', null=True)
+    policys =models.ManyToManyField(Policy)
 
     area = models.ForeignKey(
         Area,

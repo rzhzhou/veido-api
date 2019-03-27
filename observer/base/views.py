@@ -88,7 +88,9 @@ from observer.base.service.govreports import (GovReportsData, GovReportsAdd, Gov
                                              GovReportsEdit)
 from observer.base.service.indicatordata import IndicatorData,IndicatorDelete,IndicatorDataUpload,IndicatorDataExport
 from observer.base.service.indicator import IndicatorChart,IndicatorRanking
-from observer.base.service.policyregion import  PolicyRegionData
+from observer.base.service.policyregion import  (PolicyAreaData,PolicyAreaTotalData,PolicyAreaAdd,
+                                                PolicyPrivateData,PolicPrivatelTotalData,PolicPrivatelAdd,
+                                                PolicyIndustryData,PolicyIndustryTotalData,PolicyIndustryAdd)
 
 class BaseView(APIView):
 
@@ -3232,16 +3234,16 @@ class IndicatorscoreView(BaseView):
         return Response(self.serialize(queryset))
 
 
-class PolicyreginView(BaseView):
+class PolicyAreaView(BaseView):
 
     def __init__(self):
-        super(PolicyreginView, self).__init__()
+        super(PolicyAreaView, self).__init__()
 
     def set_request(self, request):
-        super(PolicyreginView, self).set_request(request)
+        super(PolicyAreaView, self).set_request(request)
 
     def paging(self, queryset):
-        return super(PolicyreginView, self).paging(
+        return super(PolicyAreaView, self).paging(
             queryset,
             self.request.query_params.get('page', 1),
             self.request.query_params.get('length', 15)
@@ -3256,8 +3258,7 @@ class PolicyreginView(BaseView):
                 'id': r['id'],
                 'areas': area(r['area__id']),
                 'total': r['total'],
-                'year': r['year'],
-                'content': content(r['id'], admin=True),
+                'year': date_format(r['year'], '%Y-%m-%d %H:%M:%S'),
             }, results)
         }
 
@@ -3267,7 +3268,44 @@ class PolicyreginView(BaseView):
 
         self.set_request(request)
 
-        queryset = PolicyRegionData(params=request.query_params).get_all()
+        queryset = PolicyAreaData(params=request.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+
+class PolicyAreaTotalView(BaseView):
+
+    def __init__(self):
+        super(PolicyAreaTotalView, self).__init__()
+
+    def set_request(self, request):
+        super(PolicyAreaTotalView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(PolicyAreaTotalView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        results = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda r: {
+                'id': r['id'],
+                'name': r['policys__name'],
+            }, results)
+        }
+
+        return data
+
+    def get(self, request, pid):
+
+        self.set_request(request)
+
+        queryset = PolicyAreaTotalData(params=request.query_params).get_all(pid=pid)
 
         return Response(self.serialize(queryset))
 
@@ -3283,6 +3321,191 @@ class PolicyRegionAddView(BaseView):
     def post(self, request):
         self.set_request(request)
 
-        queryset = PolicyRegionAdd(user=request.user, params=request.data).add()
+        queryset = PolicyAreaAdd(user=request.user, params=request.data).add()
+
+        return Response(status=queryset)
+
+
+class PolicPrivatelView(BaseView):
+
+    def __init__(self):
+        super(PolicPrivatelView, self).__init__()
+
+    def set_request(self, request):
+        super(PolicPrivatelView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(PolicPrivatelView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        results = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda r: {
+                'id': r['id'],
+                'areas': area(r['area__id']),
+                'total': r['total'],
+                'year': date_format(r['year'], '%Y-%m-%d %H:%M:%S'),
+            }, results)
+        }
+
+        return data
+
+    def get(self, request):
+
+        self.set_request(request)
+
+        queryset = PolicyPrivateData(params=request.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+
+class PolicPrivatelTotalView(BaseView):
+
+    def __init__(self):
+        super(PolicPrivatelTotalView, self).__init__()
+
+    def set_request(self, request):
+        super(PolicPrivatelTotalView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(PolicPrivatelTotalView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        results = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda r: {
+                'id': r['id'],
+                'name': r['policys__name'],
+            }, results)
+        }
+
+        return data
+
+    def get(self, request, pid):
+
+        self.set_request(request)
+
+        queryset = PolicPrivatelTotalData(params=request.query_params).get_all(pid=pid)
+
+        return Response(self.serialize(queryset))
+
+
+class PolicPrivatelAddView(BaseView):
+
+    def __init__(self):
+        super(PolicPrivatelAddView, self).__init__()
+
+    def set_request(self, request):
+        super(PolicPrivatelAddView, self).set_request(request)
+
+    def post(self, request):
+        self.set_request(request)
+
+        queryset = PolicPrivatelAdd(user=request.user, params=request.data).add()
+
+        return Response(status=queryset)
+
+
+class PolicyIndustryView(BaseView):
+
+    def __init__(self):
+        super(PolicyIndustryView, self).__init__()
+
+    def set_request(self, request):
+        super(PolicyIndustryView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(PolicyIndustryView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        results = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda r: {
+                'id': r['id'],
+                'areas': area(r['area__id']),
+                'industry_class': r['industry_class'],
+                'total': r['total'],
+                'year': date_format(r['year'], '%Y-%m-%d %H:%M:%S'),
+            }, results)
+        }
+
+        return data
+
+    def get(self, request):
+
+        self.set_request(request)
+
+        queryset = PolicyIndustryData(params=request.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+
+class PolicyIndustryTotalView(BaseView):
+
+    def __init__(self):
+        super(PolicyIndustryTotalView, self).__init__()
+
+    def set_request(self, request):
+        super(PolicyIndustryTotalView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(PolicyIndustryTotalView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        results = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda r: {
+                'id': r['id'],
+                'name': r['policys__name'],
+            }, results)
+        }
+
+        return data
+
+    def get(self, request, pid):
+
+        self.set_request(request)
+
+        queryset = PolicyIndustryTotalData(params=request.query_params).get_all(pid=pid)
+
+        return Response(self.serialize(queryset))
+
+
+class PolicyIndustryAddView(BaseView):
+
+    def __init__(self):
+        super(PolicyIndustryAddView, self).__init__()
+
+    def set_request(self, request):
+        super(PolicyIndustryAddView, self).set_request(request)
+
+    def post(self, request):
+        self.set_request(request)
+
+        queryset = PolicyIndustryAdd(user=request.user, params=request.data).add()
 
         return Response(status=queryset)
