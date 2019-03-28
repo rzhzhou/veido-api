@@ -330,7 +330,7 @@ class Inspection(models.Model):
 
 
 class Category(models.Model):
-    id = models.CharField(max_length=5, primary_key=True, editable=True, verbose_name='类别ID')
+    id = models.CharField(max_length=6, primary_key=True, editable=True, verbose_name='类别ID')
     name = models.CharField(max_length=10, verbose_name='名称')
     level = models.IntegerField(verbose_name='等级')
 
