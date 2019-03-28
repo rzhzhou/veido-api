@@ -23,7 +23,6 @@ class PolicyAreaData(Abstract):
 
 
         cond = {
-            'id': getattr(self, 'id', None),
             'area': getattr(self, 'area', None),
         }
         args = dict([k, v] for k, v in cond.items() if v)
@@ -110,7 +109,6 @@ class PolicyPrivateData(Abstract):
 
 
         cond = {
-            'id': getattr(self, 'id', None),
             'area': getattr(self, 'area', None),
         }
         args = dict([k, v] for k, v in cond.items() if v)
@@ -197,8 +195,8 @@ class PolicyIndustryData(Abstract):
 
 
         cond = {
-            'id': getattr(self, 'id', None),
             'area': getattr(self, 'area', None),
+            'industry_class':getattr(self, 'industry_class', None),
         }
         args = dict([k, v] for k, v in cond.items() if v)
 
@@ -243,8 +241,7 @@ class PolicyIndustryAdd(Abstract):
 
 
 
-
-        if not PolicyData.objects.using('hqi').filter(policy_class=3).filter(area_id=areas).exists():
+        if not PolicyData.objects.using('hqi').filter(policy_class=3,area_id=areas).exists():
             policydata = PolicyData(
                 policy_class = 3,
                 year = year,
@@ -252,11 +249,21 @@ class PolicyIndustryAdd(Abstract):
                 area_id = areas,
             )
             policydata.save(using='hqi')
+
         else:
-            policydataids=PolicyData.objects.using('hqi').filter(policy_class=3,area_id=areas).values_list('id',flat=True)[0]
-            policydata = PolicyData.objects.using('hqi').get(id=policydataids)
-            policydata.year = year
-            policydata.save()
+            if not PolicyData.objects.using('hqi').filter(policy_class=3,area_id=areas,industry_class=industrys).exists():
+                policydata = PolicyData(
+                    policy_class = 3,
+                    year = year,
+                    industry_class = industrys,
+                    area_id = areas,
+                )
+                policydata.save(using='hqi')
+            else:
+                policydataids=PolicyData.objects.using('hqi').filter(policy_class=3,area_id=areas).values_list('id',flat=True)[0]
+                policydata = PolicyData.objects.using('hqi').get(id=policydataids)
+                policydata.year = year
+                policydata.save()
 
 
         policy_id = Policy.objects.using('hqi').filter(name=policyname).values_list('id', flat=True)
