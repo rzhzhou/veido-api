@@ -21,7 +21,7 @@ from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd,
                                            StatisticsShow, newsCrawlerData,
                                            RiskHarmsData, RiskHarmsManageSave,
                                            RiskHarmsDetailsData, EventsManageData,
-                                           EventsDataUpload)
+                                           EventsDataUpload, EventsAnalysis)
 from observer.base.service.base import (alias_industry, area, areas,
                                         categories, content,get_major_category,
                                         get_major_industry, get_user_extra,
@@ -243,6 +243,131 @@ class ArticleView(BaseView):
         return Response(eval('self.serialize%s' % category)(queryset))
 
 
+class EventView(APIView):
+
+    def __init__(self):
+        super(EventView, self).__init__()
+
+    def serialize(self, result):
+        data = map(lambda r: {
+            'title': r['title'],
+            'socialHarm': r['socialHarm'],
+            'scope': r['scope'],
+            'grading': r['grading'],
+            'pubtime': r['pubtime'],
+            'desc': r['desc'],
+        }, result)
+
+        return data
+    
+    def get(self, request, eid):
+        result = EventsAnalysis().getEvent(eid = eid)
+
+        return Response(self.serialize(result))
+
+
+class EventInformationView(BaseView):
+
+    def __init__(self):
+        super(EventInformationView, self).__init__()
+
+    def set_request(self, request):
+        super(EventInformationView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(EventInformationView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15))
+
+    def serialize(self, result):
+        total = result.count()
+        resultPage = self.paging(result)
+        data = {
+            'total': total,
+            'list': map(lambda r: {
+                'title': r['title'],
+                'url': r['url'],
+                'keyword': r['eventskeyword__name'],
+                'source': r['source'],
+                'pubtime': date_format(r['pubtime'], '%Y-%m-%d'),
+                'sentiment': r['sentiment'],
+            }, resultPage)
+        }
+
+        return data
+
+    def get(self, result, eid):
+        result = EventsAnalysis().get_data(eid = eid)
+
+        return Response(self.serialize(result))
+
+
+class EventContentView(APIView):
+
+    def __init__(self):
+        super(EventContentView, self).__init__()
+
+    def serialize(self, sentiment, source, areas, keywords):
+        data = {
+            'sentimentList': map(lambda s: {
+                'sentiment': s['sentiment'],
+            }, sentiment),
+
+            'source': map(lambda s: {
+                'name': s['articles__source'],
+                'sum': s['num_source'],
+            }, source),
+
+            'areas': map(lambda a: {
+                'name': a['name'],
+                'sum': a['sum'],
+            }, areas),
+
+            'keywords': map(lambda k: {
+                'name': k['name'],
+                'sum': k['num_eventskeyword'],
+            }, keywords),
+        }
+
+        return data
+
+    def get(self, request, eid):
+        sentiment = EventsAnalysis().getSentiment(eid = eid)
+        source = EventsAnalysis().getSource(eid = eid)
+        areas = EventsAnalysis().getAreas(eid = eid)
+        keywords = EventsAnalysis().getKeywords(eid = eid)
+
+        return Response(self.serialize(sentiment, source, areas, keywords))
+
+
+class EventSpreadView(APIView):
+
+    def __init__(self):
+        super(EventSpreadView, self).__init__()
+
+    def serialize(self, timeTrend, trend):
+        data = {
+            'time': map(lambda t: {
+                'timeTrend': date_format(t['articles__pubtime'], '%Y-%m-%d'),
+            }, timeTrend),
+
+            'trend': map(lambda t: {
+                'name': t['name'],
+                'numTrend': t['numTrend'],
+            }, trend),
+        }
+
+        return data
+
+    def get(self, request, eid):
+        timeTrend = EventsAnalysis().getTimeTrend(eid = eid)
+        trend = EventsAnalysis().getTrend(eid = eid)
+        # way = EventsAnalysis().getWay(eid = eid)
+
+        return Response(self.serialize(timeTrend, trend))
+
+        
 class InspectionView(BaseView):
 
     def __init__(self):

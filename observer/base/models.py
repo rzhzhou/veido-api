@@ -480,6 +480,33 @@ class EventsKeyword(models.Model):
 
     articles = models.ManyToManyField(Article)
 
+    class Meta:
+        app_label = 'base'
+        verbose_name_plural = '事件关键词'
+
+
+class EventsMedia(models.Model):
+    source = models.CharField(max_length=50, verbose_name='新闻来源')
+    website = models.CharField(max_length=50, verbose_name='自身发布网站')
+
+    parent = models.ForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        null=True, blank=True,
+        verbose_name='上一级'
+    )
+
+    articles = models.ForeignKey(
+        Article,
+        null=True, blank=True,
+        on_delete=models.CASCADE,
+        verbose_name='文章'
+    )
+    
+    class Meta:
+        app_label = 'base'
+        verbose_name_plural = '新闻来源关联' 
+
 
 class DMLink(models.Model):
     name = models.CharField(max_length=32, verbose_name='网站名')
