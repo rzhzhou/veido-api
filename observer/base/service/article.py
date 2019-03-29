@@ -144,7 +144,7 @@ class EventsAnalysis(object):
         event = EventsKeyword.objects.filter(events_id = eid)
         articles = Article.objects.filter(events__id = eid)
 
-        source = event.annotate(Count('articles')).values_list('articles__source', flat = True)
+        source = event.annotate(num_source = Count('articles')).values_list('articles__source', flat = True).order_by('-num_source')[:5]
         time = event.annotate(Count('articles')).values_list('articles__pubtime', flat = True).order_by('articles__pubtime')
 
         data = []
@@ -514,8 +514,7 @@ class RiskDataExport(Abstract):
             'pubtime__gte': getattr(self, 'starttime', None),
             'pubtime__lte': getattr(self, 'endtime', None),
         }
-        print(getattr(self, 'areas', None), getattr(self, 'status'),
-            getattr(self, 'starttime', None),getattr(self, 'endtime', None))
+        
         args = dict([k, v] for k, v in cond.items() if v)
 
         queryset = Article.objects.filter(**args).values(*fields)
