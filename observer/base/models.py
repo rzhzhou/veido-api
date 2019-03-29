@@ -330,7 +330,7 @@ class Inspection(models.Model):
 
 
 class Category(models.Model):
-    id = models.CharField(max_length=5, primary_key=True, editable=True, verbose_name='类别ID')
+    id = models.CharField(max_length=6, primary_key=True, editable=True, verbose_name='类别ID')
     name = models.CharField(max_length=10, verbose_name='名称')
     level = models.IntegerField(verbose_name='等级')
 
@@ -547,10 +547,10 @@ class IndustryProducts(models.Model):
 class Nav(models.Model):
     name = models.CharField(max_length=50, verbose_name='名称')
     href = models.CharField(default='', max_length=50, verbose_name='链接')
-    level = models.IntegerField(verbose_name='等级')
+    level = models.IntegerField(verbose_name='等级') # 1: 一级, 2： 二级页面, 3: 三级页面, -1: 子页面
     icon = models.CharField(default='', max_length=50, verbose_name='图标')
     component = models.CharField(default='', max_length=50, verbose_name='组件')
-    index = models.IntegerField(default=0, verbose_name='索引')
+    index = models.IntegerField(default=0, verbose_name='索引') # 排序依据
 
     parent = models.ForeignKey(
         'self',

@@ -20,7 +20,7 @@ class NavBarEdit(Abstract):
         if not self.user.is_superuser:
             return 204
 
-        origin_nav_ids = list(map(str, list(UserNav.objects.filter(user_id=edit_id).values_list('nav_id', flat=True))))
+        origin_nav_ids = list(map(str, list(UserNav.objects.filter(user_id=edit_id).exclude(nav__level=-1).values_list('nav_id', flat=True))))
         edit_nav_ids = nav_ids.split(',')
 
         diff_nav_ids = list(set(origin_nav_ids).difference(set(edit_nav_ids))) + list(set(edit_nav_ids).difference(set(origin_nav_ids)))
