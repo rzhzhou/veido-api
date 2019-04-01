@@ -12,6 +12,10 @@ urlpatterns = [
     path('unqualifiedenterprise', views.EnterpriseDataUnqualifiedView.as_view()), # 不合格企业列表
     path('inspectstatistics/', views.InspectStatisticsView.as_view()),  # 抽检统计
     path('riskharmsdetails/', views.RiskHarmsDetailsView.as_view()), # 风险伤害详情
+    path('events/<int:eid>/', views.EventView.as_view()),  # 单一事件
+    path('events/information/<int:eid>/', views.EventInformationView.as_view()),  # 事件信息
+    path('events/content/<int:eid>/', views.EventContentView.as_view()),  # 事件内容分析
+    path('events/spread/<int:eid>/', views.EventSpreadView.as_view()),  # 事件传播分析
 
     path('search', views.SearchView.as_view()),  # 搜索
     path('search/advanced', views.SearchAdvancedView.as_view()),  # 高级搜索
