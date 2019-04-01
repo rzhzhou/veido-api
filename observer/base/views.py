@@ -1713,7 +1713,7 @@ class InspectionDataExportView(BaseView):
 
     def get(self, request):
         response = FileResponse(
-            InspectionDataExport(user=request.user).export(),
+            InspectionDataExport(params=request.query_params, user=request.user).export(),
             content_type='application/vnd.ms-excel'
         )
         response["Content-Disposition"] = 'attachment; filename=inspections.xlsx'

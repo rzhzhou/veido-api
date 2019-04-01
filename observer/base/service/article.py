@@ -413,7 +413,7 @@ class RiskDataExport(Abstract):
                         ])
 
         # write file
-        write_by_openpyxl(filename, data)
+        write_by_openpyxl(filename, data, None)
 
         return open(filename, 'rb')
 
