@@ -13,20 +13,19 @@ class UserData(Abstract):  # 获取系统用户
         self.user = user
 
     def get_all(self):
-        fields = ('id', 'username', 'first_name', 'last_name', 'email',
-                  'is_active')
+        fields = ('id', 'username', 'first_name', 'last_name', 'email', 'is_active')
 
         if self.user.is_active:
-            group_ids = Group.objects.filter(user=self.user).values_list('id', flat=True)
+            groups = Group.objects.filter(user=self.user).values_list('name', flat=True)
 
             # 如果当前操作的是'超级管理员'
-            if 2 in group_ids:
+            if '超级管理员' in groups:
                 queryset = User.objects.values(*fields)
             # 如果当前操作的是'管理员'
-            elif 3 in group_ids:
-                group_list = list(group_ids)
-                group_list.remove(3)
-                queryset = User.objects.filter(groups__in=group_list).exclude(id=self.user.id).values(*fields)
+            elif '管理员' in groups:
+                groups = list(groups)
+                groups.remove('管理员')
+                queryset = User.objects.filter(groups__name__in=groups).exclude(id=self.user.id).values(*fields)
             # 如果当前操作的是普通用户
             else:
                 queryset = User.objects.filter(username=self.user).exclude(id=self.user.id).values(*fields)
@@ -165,8 +164,8 @@ class UserEdit(Abstract):  # 修改用户
         super(UserEdit, self).__init__(params)
         self.user = user
 
-    def edit(self, cid):
-        edit_id = cid
+    def edit(self, uid):
+        edit_id = uid
         old_password = getattr(self, 'old_password', None)
         new_password = getattr(self, 'new_password', None)
         re_password = getattr(self, 're_password', None)
@@ -192,8 +191,8 @@ class UserDelete(Abstract): # 删除用户
     def __init__(self, user):
         self.user = user
 
-    def delete(self, cid):
-        del_ids = cid
+    def delete(self, uid):
+        del_ids = uid
 
         for id in del_ids.split(","):
             user = User.objects.get(id=id)
@@ -204,6 +203,59 @@ class UserDelete(Abstract): # 删除用户
             user.delete()
 
         return 200
+
+
+class UserNavData(Abstract):
+
+    def __init__(self, user):
+        self.user = user
+
+    def get_menus(self, uid):
+        menus = []
+        group_names = Group.objects.filter(user=self.user).values_list('name', flat=True)
+        name_and_id = Nav.objects.values('name','id').order_by('index')
+
+        # 如果当前操作的是'超级管理员'
+        if '超级管理员' in group_names:
+            is_staff = User.objects.get(id=uid).is_staff
+            if is_staff == 1:
+                nav_type = [0, 2]
+            elif is_staff == 0:
+                nav_type = [0, 1]
+            L1 = name_and_id.filter(level=1, nav_type__in=nav_type)
+            for category in L1:
+                menus.append({
+                    'id': category['id'],
+                    'label': category['name'],
+                    'children': list(map(lambda x: {
+                        'id': x['id'],
+                        'label': x['name'],
+                        'children': list(map(lambda y: {
+                            'id': y['id'],
+                            'label': y['name'],
+                        }, Nav.objects.filter(level=3, parent_id=x['id'], nav_type__in=nav_type).values('name', 'id').order_by('index'))) if Nav.objects.filter(level=3, parent_id=x['id'], nav_type__in=nav_type) else ''
+                    }, Nav.objects.filter(level=2, parent_id=category['id'], nav_type__in=nav_type).values('name', 'id').order_by('index'))) if Nav.objects.filter(level=2, parent_id=category['id'], nav_type__in=nav_type) else ''
+                })
+        else:
+            u_navs_ids = UserNav.objects.filter(user=self.user).values_list('nav', flat=True)
+            L1 = name_and_id.filter(id__in=u_navs_ids, level=1)
+
+            if L1:
+                for category in L1:
+                    menus.append({
+                        'id': category['id'],
+                        'label': category['name'],
+                        'children': list(map(lambda x: {
+                            'id': x['id'],
+                            'label': x['name'],
+                            'children': list(map(lambda y: {
+                                'id': y['id'],
+                                'label': y['name'],
+                            }, Nav.objects.filter(id__in=u_navs_ids, level=3, parent_id=x['id']).values('name', 'id').order_by('index'))) if Nav.objects.filter(id__in=u_navs_ids, level=3, parent_id=x['id']) else ''
+                        }, Nav.objects.filter(id__in=u_navs_ids, level=2, parent_id=category['id']).values('name', 'id').order_by('index'))) if Nav.objects.filter(id__in=u_navs_ids, level=2, parent_id=category['id']) else ''
+                    })
+
+        return menus
 
 
 class GroupData(Abstract):

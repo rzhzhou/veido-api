@@ -2,6 +2,38 @@ from observer.base.models import UserNav, Nav
 
 from observer.base.service.abstract import Abstract
 
+class NavBarData(Abstract):
+
+    def __init__(self, user):
+        self.user = user
+
+    def get_navs(self):
+        navs = []
+        u_navs_ids = UserNav.objects.filter(user=self.user).values_list('nav', flat=True)
+        L1 = Nav.objects.filter(id__in=u_navs_ids, level=1).values('name','id').order_by('index')
+        if L1:
+            for category in L1:
+                navs.append({
+                    'category': category['name'],
+                })
+
+                L2 = Nav.objects.filter(id__in=u_navs_ids, level=2, parent_id=category['id']).values('name', 'id', 'href', 'icon').order_by('index')
+                if L2:
+                    for title in L2:
+                        childrens = Nav.objects.filter(id__in=u_navs_ids, level=3, parent_id=title['id']).values_list('name')
+                        navs.append({
+                            'icon': title['icon'],
+                            'title': title['name'],
+                            'href': '' if not title['href'] else title['href'],
+                            'children': list(map(lambda x: {
+                                'title': x['name'],
+                                'href': x['href'],
+                            }, Nav.objects.filter(id__in=u_navs_ids, level=3, parent_id=title['id']).values('name', 'href').order_by('index'))) if childrens else ''
+                        })
+
+        return navs
+
+
 class NavBarEdit(Abstract):
 
     def __init__(self, user, params={}):
@@ -41,3 +73,25 @@ class NavBarEdit(Abstract):
                             UserNav(user_id=edit_id, nav_id=child_id).delete()
 
         return 200
+
+class RouteData(Abstract):
+
+    def __init__(self, user):
+        self.user = user
+
+    def get_routers(self):
+        routers = []
+        u_navs_ids = UserNav.objects.filter(user=self.user).values_list('nav', flat=True)
+        routes = Nav.objects.filter(id__in=u_navs_ids).exclude(level=1).values('id', 'href', 'component').order_by('index')
+        j = 0
+        for i, route in enumerate(routes):
+            if route['href'] == '':
+                j+=1
+            else:
+                routers.append({
+                    'path': route['href'],
+                    'alias': '/' if i - j == 0 else '',
+                    'component': route['component'],
+                })
+
+        return routers

@@ -89,9 +89,9 @@ urlpatterns = [
 
     path('users', views.UserView.as_view()), # 用户管理
     path('users/add', views.UserAddView.as_view()), # 用户添加
-    path('users/edit/<int:cid>/', views.UserEditView.as_view()), # 用户修改
-    path('users/delete/<str:cid>/', views.UserDeleteView.as_view()), # 用户删除
-    path('user_nav/<int:cid>/', views.UserNavView.as_view()), # 用户权限导航
+    path('users/edit/<int:uid>/', views.UserEditView.as_view()), # 用户修改
+    path('users/delete/<str:uid>/', views.UserDeleteView.as_view()), # 用户删除
+    path('user_nav/<int:uid>/', views.UserNavDataView.as_view()), # 用户权限导航
 
     path('news_report', views.NewsReportView.as_view()), # 舆情报告
     path('news_report/upload/', views.NewsReportUploadView.as_view()), # 舆情报告上传
@@ -126,7 +126,7 @@ urlpatterns = [
     path('news_report_suzhou', views.NewsReportViewSuzhou.as_view()), # 舆情报告
 
     # 侧边栏
-    path('nav_bar', views.NavBarView.as_view()), # 侧边栏导航
+    path('nav_bar', views.NavBarDataView.as_view()), # 侧边栏导航
     path('nav_bar/edit/<str:cid>/', views.NavBarEditView.as_view()), # 分配侧边栏导航
 
     # 动态路由
@@ -138,7 +138,7 @@ urlpatterns = [
 
     # 官网
     path('news', views.NewsView.as_view()), # 公司动态
-    path('news/add', views.NewsAddView.as_view()), # 发布一则公司动态
+    path('news/add', views.NewsAddView.as_view()), # 发布公司动态
     path('news/delete/<str:cid>/', views.NewsDeleteView.as_view()), # 删除公司动态
     path('news/edit/<int:cid>/', views.NewsEditView.as_view()), # 修改公司动态
 

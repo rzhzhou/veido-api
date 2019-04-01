@@ -551,6 +551,7 @@ class Nav(models.Model):
     icon = models.CharField(default='', max_length=50, verbose_name='图标')
     component = models.CharField(default='', max_length=50, verbose_name='组件')
     index = models.IntegerField(default=0, verbose_name='索引') # 排序依据
+    nav_type = models.IntegerField(default=0, verbose_name='导航类型') # 0: 共用, 1: 质量舆情(App), 2: 产品目录管理(Admin)
 
     parent = models.ForeignKey(
         'self',
