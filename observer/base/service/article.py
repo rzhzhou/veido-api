@@ -2,13 +2,14 @@ import openpyxl
 from io import BytesIO
 import threading
 
-import datetime
+import datetime, copy
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Count, Q, F
+from django.db.models import Count, Q, F, Max, Min
 
 from observer.base.models import(Area, Article, Category,
                                 CorpusCategories, HarmIndicator, Harm,
-                                HarmPeople, Events, EventsKeyword)
+                                HarmPeople, Events, EventsKeyword,
+                                EventsMedia)
 from django.contrib.auth.models import Group, User
 from observer.base.service.abstract import Abstract
 from observer.base.service.base import (areas, categories, )
@@ -48,6 +49,131 @@ class ArticleData(Abstract):
             queryset = queryset.filter(categories__in=c_ids)
 
         return queryset.values(*fields).order_by('-pubtime')
+
+
+class EventsAnalysis(object):
+
+    def __init__(self):
+        super(EventsAnalysis, self).__init__()
+
+    # 单一事件
+    def getEvent(self, eid):
+        fields = ('title', 'socialHarm', 'scope', 'grading', 'pubtime', 'desc')
+
+        queryset = Events.objects.filter(id = eid).values(*fields)
+
+        return queryset
+
+    # 事件信息
+    def get_data(self, eid):
+        fields = ('title', 'url', 'eventskeyword__name', 'source', 'pubtime', 'sentiment')
+
+        queryset = Article.objects.filter(events__id = eid).values(*fields)
+
+        return queryset
+
+    # 事件内容分析
+    def getSentiment(self, eid):
+            articles = Article.objects.filter(events__id = eid)
+
+            # 查询情感条数（0 负面， 1 中性， 2 正面）
+            sentimentList = []
+            s = 3
+            for x in range(s):
+                sentiment = articles.filter(sentiment = x)
+
+                data = {
+                    'sentiment': sentiment.count(),
+                }
+                sentimentList.append(data)
+
+            return sentimentList
+
+    def getSource(self, eid):
+        event = EventsKeyword.objects.filter(events_id = eid)
+        event = event.annotate(num_source = Count('articles'))
+        source = event.values('articles__source', 'num_source').order_by('-num_source')
+        
+        return source
+
+    def getAreas(self, eid):
+        articles = Article.objects.filter(events__id = eid)
+        areas = Area.objects.filter(level = 2).values_list('name', flat = True)
+
+        areasList = []
+        for a in areas:
+            areas_id = Area.objects.get(name = a).id
+            areas_sum = articles.filter(Q(areas__id = areas_id) | Q(areas__parent_id = areas_id) | 
+                Q(areas__parent__parent_id = areas_id))
+            data = {
+                'name': a,
+                'sum': areas_sum.count(),
+            }
+
+            areasList.append(data)
+
+        areasNum = len(areasList)
+        for i in range(areasNum):
+            if i == range(areasNum):
+                continue
+            j = i + 1
+            while j < areasNum:
+                if areasList[i]['sum'] < areasList[j]['sum']:
+                    areasListCopy = copy.deepcopy(areasList[j])
+                    areasList[j] = copy.deepcopy(areasList[i])
+                    areasList[i] = copy.deepcopy(areasListCopy)
+
+                j += 1
+
+        return areasList
+
+    def getKeywords(self, eid):
+        event = EventsKeyword.objects.filter(events_id = eid)
+        event = event.annotate(num_eventskeyword = Count('articles')).values('name', 'num_eventskeyword')
+
+        return event
+
+    # 事件传播分析
+    def getTimeTrend(self, eid):
+        event = EventsKeyword.objects.filter(events_id = eid)
+        time = event.annotate(num_source = Count('articles')).values('articles__pubtime').order_by('articles__pubtime')
+        
+        return time
+
+    def getTrend(self, eid):
+        event = EventsKeyword.objects.filter(events_id = eid)
+        articles = Article.objects.filter(events__id = eid)
+
+        source = event.annotate(num_source = Count('articles')).values_list('articles__source', flat = True).order_by('-num_source')[:5]
+        time = event.annotate(Count('articles')).values_list('articles__pubtime', flat = True).order_by('articles__pubtime')
+
+        data = []
+        result = []
+        for s in source:
+            sourceFilter = articles.filter(source = s)
+
+            timeTrent = []
+            for t in time:
+                number = sourceFilter.filter(pubtime = t).count()
+                timeTrent.append(number)
+
+            data = {
+                'name': s,
+                'numTrend': timeTrent,
+            }
+
+            result.append(data)
+
+        return result 
+
+    # def getWay(self, eid):
+    #     event = EventsKeyword.objects.filter(events_id = eid)
+    #     eventsmedia = EventsMedia.objects.filter(articles__events__id = eid)
+    #     articles = Article.objects.filter(events__id = eid)
+        
+    #     source = event.annotate(Count('articles')).values_list('articles__source', flat = True)
+    #     media = eventsmedia.annotate(Count('eventsmedia')).values('source')
+        # print(source)
 
 
 class RiskData(Abstract):
@@ -388,8 +514,7 @@ class RiskDataExport(Abstract):
             'pubtime__gte': getattr(self, 'starttime', None),
             'pubtime__lte': getattr(self, 'endtime', None),
         }
-        print(getattr(self, 'areas', None), getattr(self, 'status'),
-            getattr(self, 'starttime', None),getattr(self, 'endtime', None))
+        
         args = dict([k, v] for k, v in cond.items() if v)
 
         queryset = Article.objects.filter(**args).values(*fields)
@@ -413,7 +538,7 @@ class RiskDataExport(Abstract):
                         ])
 
         # write file
-        write_by_openpyxl(filename, data)
+        write_by_openpyxl(filename, data, None)
 
         return open(filename, 'rb')
 
@@ -743,6 +868,7 @@ class EventsDataUpload(Abstract):
                     old_article = Article.objects.filter(url=url)
 
                     if old_article.exists():
+                        # 更新新闻
                         old_article = old_article[0]
                         old_article.title = title
                         old_article.url = url
@@ -757,12 +883,12 @@ class EventsDataUpload(Abstract):
                         old_article.areas.add(*area)
                         old_article.categories.add(*category)
                         old_article.save()
-
+                        # 关键词和事件和新闻绑定
                         keyWord.events_id = event_id.id
                         keyWord.save()
                         keyWord.articles.add(old_article)
                         keyWord.save()
-
+                        # 事件和新闻绑定
                         event_id.articles.add(old_article)
                         event_id.save()
 

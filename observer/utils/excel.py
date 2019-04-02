@@ -82,13 +82,19 @@ def read_by_xlrd(filename=None, file_contents=None, title={}):
 
     return data
 
-def write_by_openpyxl(filename, data):
+def write_by_openpyxl(filename, data, enterprises):
     wb = openpyxl.Workbook(write_only=True)
     ws = wb.create_sheet()
 
     # now we'll fill it with 100 rows x 200 columns
     for d in data:
         ws.append(d)
+
+    # 导出企业：
+    if enterprises:
+        en = wb.create_sheet('企业')
+        for e in enterprises:
+            en.append(e)
 
     # save the file
     wb.save(filename)

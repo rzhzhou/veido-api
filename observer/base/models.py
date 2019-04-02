@@ -38,7 +38,8 @@ class UserInfo(models.Model):
         verbose_name='地域'
     )
 
-    theme = models.CharField(max_length=50, verbose_name='主题')
+    theme = models.CharField(default='', max_length=50, verbose_name='主题')
+    logo = models.CharField(default='', max_length=50, verbose_name='logo')
 
     class Meta:
         app_label = 'base'
@@ -330,7 +331,7 @@ class Inspection(models.Model):
 
 
 class Category(models.Model):
-    id = models.CharField(max_length=5, primary_key=True, editable=True, verbose_name='类别ID')
+    id = models.CharField(max_length=6, primary_key=True, editable=True, verbose_name='类别ID')
     name = models.CharField(max_length=10, verbose_name='名称')
     level = models.IntegerField(verbose_name='等级')
 
@@ -480,6 +481,33 @@ class EventsKeyword(models.Model):
 
     articles = models.ManyToManyField(Article)
 
+    class Meta:
+        app_label = 'base'
+        verbose_name_plural = '事件关键词'
+
+
+class EventsMedia(models.Model):
+    source = models.CharField(max_length=50, verbose_name='新闻来源')
+    website = models.CharField(max_length=50, verbose_name='自身发布网站')
+
+    parent = models.ForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        null=True, blank=True,
+        verbose_name='上一级'
+    )
+
+    articles = models.ForeignKey(
+        Article,
+        null=True, blank=True,
+        on_delete=models.CASCADE,
+        verbose_name='文章'
+    )
+    
+    class Meta:
+        app_label = 'base'
+        verbose_name_plural = '新闻来源关联' 
+
 
 class DMLink(models.Model):
     name = models.CharField(max_length=32, verbose_name='网站名')
@@ -524,6 +552,7 @@ class Nav(models.Model):
     icon = models.CharField(default='', max_length=50, verbose_name='图标')
     component = models.CharField(default='', max_length=50, verbose_name='组件')
     index = models.IntegerField(default=0, verbose_name='索引') # 排序依据
+    nav_type = models.IntegerField(default=0, verbose_name='导航类型') # 0: 共用, 1: 质量舆情(App), 2: 产品目录管理(Admin)
 
     parent = models.ForeignKey(
         'self',

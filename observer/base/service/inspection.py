@@ -430,134 +430,167 @@ class InspectionDataUnEnterpriseUpload(Abstract):
     def __init__(self, user):
         self.user = user
 
-#     def upload(self, filename, file_obj):
-#         # ModelWeight
-#         model = {'链接': 0, '产品名称': 0,
-#                  '不合格企业': 0, '不合格企业地域': 0, '不合格项': 0}
-#         # sheet values
+    def upload(self, filename, file_obj):
+        # ModelWeight
+        model = {'链接': 0, '产品名称': 0,
+                 '不合格企业': 0, '不合格企业地域': 0, '不合格项': 0}
+        # sheet values
 
-#         def sv(x, y, z): return z.cell(row=x, column=y).value
+        def sv(x, y, z): return z.cell(row=x, column=y).value
 
-#         try:
-#             xlsx_book = openpyxl.load_workbook(
-#                 BytesIO(file_obj.read()), read_only=True)
-#             sheet = xlsx_book.active
-#             rows = sheet.rows
-#         except Exception as e:
-#             return {
-#                 'status': 0,
-#                 'message': '操作失败！请检查文件是否有误。详细错误信息：%s！' % e
-#             }
+        try:
+            xlsx_book = openpyxl.load_workbook(
+                BytesIO(file_obj.read()), read_only=True)
+            sheet = xlsx_book.active
+            rows = sheet.rows
+        except Exception as e:
+            return {
+                'status': 0,
+                'message': '操作失败！请检查文件是否有误。详细错误信息：%s！' % e
+            }
 
-#         total = 0
-#         dupli = 0
+        total = 0
+        dupli = 0
 
-#         for i, row in enumerate(rows):
-#             i += 1
-#             if i == 1:
-#                 line = [cell.value for cell in row]
-#                 for k in model.keys():
-#                     model[k] = line.index(k) + 1
-#             else:
-#                 try:
-#                     url = sv(i, model['链接'], sheet)
+        for i, row in enumerate(rows):
+            i += 1
+            if i == 1:
+                line = [cell.value for cell in row]
+                for k in model.keys():
+                    model[k] = line.index(k) + 1
+            else:
+                try:
+                    url = sv(i, model['链接'], sheet)
 
-#                     if not url:
-#                         continue
+                    if not url:
+                        continue
 
-#                     product_name = sv(i, model['产品名称'], sheet)
-#                     unenterprise = sv(i, model['不合格企业'], sheet)
-#                     unenterprise_area = sv(i, model['不合格企业地域'], sheet)
-#                     unitem = sv(i, model['不合格项'], sheet)
+                    product_name = sv(i, model['产品名称'], sheet)
+                    unenterprise = sv(i, model['不合格企业'], sheet)
+                    unenterprise_area = sv(i, model['不合格企业地域'], sheet)
+                    unitem = sv(i, model['不合格项'], sheet)
 
-#                     total += 1
+                    total += 1
 
-#                     # 处理抽检地域
-#                     area = Area.objects.filter(name=unenterprise_area)
-#                     if not area.exists():
-#                         return {
-#                             'status': 0,
-#                             'message': '操作失败！Excel第%s行，地域（%s）不存在！' % (i, unenterprise_area, )
-#                         }
+                    # 处理抽检地域
+                    area = Area.objects.filter(name=unenterprise_area)
+                    if not area.exists():
+                        return {
+                            'status': 0,
+                            'message': '操作失败！Excel第%s行，地域（%s）不存在！' % (i, unenterprise_area, )
+                        }
 
-#                     area_id = area[0].id
+                    area_id = area[0].id
 
-#                     guid = str_to_md5str('{0}{1}'.format(url, product_name))
+                    guid = str_to_md5str('{0}{1}'.format(url, product_name))
 
-#                     # 处理不合格企业信息
-#                     enterprise = Enterprise.objects.filter(
-#                         name=unenterprise, area_id=area_id)
-#                     if not enterprise.exists():
-#                         Enterprise(
-#                             name=unenterprise,
-#                             unitem=unitem,
-#                             area_id=area_id,
-#                         ).save()
+                    # 处理不合格企业信息
+                    enterprise = Enterprise.objects.filter(
+                        name=unenterprise, area_id=area_id)
+                    if not enterprise.exists():
+                        Enterprise(
+                            name=unenterprise,
+                            unitem=unitem,
+                            area_id=area_id,
+                        ).save()
 
-#                     enterprise_id = Enterprise.objects.filter(
-#                         name=unenterprise, area_id=area_id)[0].id
-#                     inspection_enterprise = InspectionEnterprise.objects.filter(
-#                         inspection_id=guid, enterprise_id=enterprise_id)
-#                     if not inspection_enterprise.exists():
-#                         InspectionEnterprise(
-#                             inspection_id=guid,
-#                             enterprise_id=enterprise_id,
-#                         ).save()
-#                     else:
-#                         dupli += 1
+                    enterprise_id = Enterprise.objects.filter(
+                        name=unenterprise, area_id=area_id)[0].id
+                    # inspection_enterprise = InspectionEnterprise.objects.filter(
+                    #     inspection_id=guid, enterprise_id=enterprise_id)
+                    # if not inspection_enterprise.exists():
+                    #     InspectionEnterprise(
+                    #         inspection_id=guid,
+                    #         enterprise_id=enterprise_id,
+                    #     ).save()
+                    # else:
+                    #     dupli += 1
 
-#                 except Exception as e:
-#                     return {
-#                         'status': 0,
-#                         'message': '操作失败！Excel %s 行存在问题。详细错误信息：%s！' % (i + 1, e)
-#                     }
+                except Exception as e:
+                    return {
+                        'status': 0,
+                        'message': '操作失败！Excel %s 行存在问题。详细错误信息：%s！' % (i + 1, e)
+                    }
 
-#         return {
-#             'status': 1,
-#             'message': '操作成功！共处理%s条数据，成功导入%s条数据，重复数据%s条！' % (total, total - dupli, dupli, )
-#         }
+        return {
+            'status': 1,
+            'message': '操作成功！共处理%s条数据，成功导入%s条数据，重复数据%s条！' % (total, total - dupli, dupli, )
+        }
 
 
 class InspectionDataExport(Abstract):
 
-    def __init__(self, user):
+    def __init__(self, user, params={}):
         self.user = user
+        super(InspectionDataExport, self).__init__(params)
 
     def export(self):
         filename = "inspections.xlsx"
 
-        # process data
-        data = [
-            ['标题', '链接', '发布日期', '抽查类别', '抽查等级', '抽检单位', '地域',
-                '行业编号', '产品名称', '不合格企业', '不合格企业地域', '不合格项', '合格率', ],
+        inspections_fields = ('title', 'url', 'pubtime', 'category', 'level', 'source', 'area__name', 'product_name', 'inspect_patch',
+                              'qualitied_patch', 'unqualitied_patch', )
+
+        enterprises_fields = ('url', 'enterprises__name', 'enterprises__unitem', 'product_name', 'enterprises__area__name', )
+
+        inspections = [
+            ['标题', '链接', '发布日期', '抽查类别', '抽查等级', '抽检单位', '地域', '产品名称', '抽查批次', '合格批次', '不合格批次', ]
         ]
-        months = get_months()[-1::][0]
-        start = months[0].strftime('%Y-%m-%d')
-        end = months[1].strftime('%Y-%m-%d')
+        enterprises = [
+            ['链接', '不合格企业', '不合格项', '产品名称', '不合格企业地域', ]
+        ]
 
-        queryset = Inspection.objects.filter(pubtime__gte=start, pubtime__lte=end).values(
-            'id', 'title', 'url', 'pubtime', 'category', 'level', 'source', 'area__name', 'industry_id', 'industry__name', 'qualitied', 'enterprises__name',
-            'enterprises__area__name', 'enterprises__unitem')
+        cond = {
+            'pubtime__gte': getattr(self, 'starttime', None),
+            'pubtime__lte': getattr(self, 'endtime', None),
+            'qualitied__gte': getattr(self, 'qualitied_gte', None),
+            'qualitied__lt': getattr(self, 'qualitied_lt', None),
+            'category__contains': getattr(self, 'category', None),
+            'source__contains': getattr(self, 'source', None),
+            'level': getattr(self, 'level', None),
+            'area': getattr(self, 'area', None),
+            'product_name__icontains': getattr(self, 'product_name', None),
+        }
 
-        for q in queryset:
-            data.append([
+        args = dict([k, v] for k, v in cond.items() if v)
+
+        inspections_list = Inspection.objects.filter(**args).values(*inspections_fields).order_by('-pubtime')
+        enterprises_list = Inspection.objects.filter(**args).values(*enterprises_fields).order_by('-pubtime')
+
+        for q in inspections_list:
+            if q['level'] == 2:
+                level = '国'
+            elif q['level'] == 1:
+                level = '省'
+            else:
+                level = '市'
+            inspections.append([
                 q['title'],
                 q['url'],
                 date_format(q['pubtime'], '%Y-%m-%d'),
                 q['category'],
-                q['level'],
+                level,
                 q['source'],
                 q['area__name'],
-                q['industry_id'],
-                q['industry__name'],
-                q['enterprises__name'],
-                q['enterprises__area__name'],
-                q['enterprises__unitem'],
-                qualitied(q['qualitied']),
+                q['product_name'],
+                q['inspect_patch'],
+                q['qualitied_patch'],
+                q['unqualitied_patch'],
             ])
 
+        for q in enterprises_list:
+            if not q['enterprises__name']:
+                continue
+            else:
+                enterprises.append([
+                    q['url'],
+                    q['enterprises__name'],
+                    q['enterprises__unitem'],
+                    q['product_name'],
+                    q['enterprises__area__name'],
+                ])
+
         # write file
-        write_by_openpyxl(filename, data)
+        write_by_openpyxl(filename, inspections, enterprises)
 
         return open(filename, 'rb')
 

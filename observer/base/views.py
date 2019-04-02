@@ -11,8 +11,8 @@ from rest_framework.parsers import FileUploadParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from observer.base.models import (AliasIndustry, Inspection, Nav, NewsReport,
-                                  UserInfo, UserNav, VersionRecord)
+from observer.base.models import (AliasIndustry, NewsReport,
+                                  UserInfo)
 from observer.base.service.area import SelectAreaData
 from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd,
                                            RiskDataAudit, RiskDataDelete,
@@ -21,7 +21,7 @@ from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd,
                                            StatisticsShow, newsCrawlerData,
                                            RiskHarmsData, RiskHarmsManageSave,
                                            RiskHarmsDetailsData, EventsManageData,
-                                           EventsDataUpload)
+                                           EventsDataUpload, EventsAnalysis)
 from observer.base.service.base import (alias_industry, area, areas,
                                         categories,get_major_category,
                                         get_major_industry, get_user_extra,
@@ -71,13 +71,13 @@ from observer.base.service.inspection import (EnterpriseData,
                                               InspectionDataNationExport,
                                               InspectionDataProAndCityExport,
                                               )
-from observer.base.service.navbar import NavBarEdit
+from observer.base.service.navbar import NavBarData, NavBarEdit, RouteData
 from observer.base.service.news import NewsAdd, NewsDelete, NewsEdit, ViewsData
 from observer.base.service.report import (NewsReportData, NewsReportDelete,
                                           NewsReportSuzhou, NewsReportUpload)
 from observer.base.service.search import SearchAdvancedData, SearchData
 from observer.base.service.user import (GroupData, UserAdd, UserData,
-                                        UserDelete, UserEdit, ThemeEdit)
+                                        UserDelete, UserEdit, UserNavData, ThemeEdit)
 from observer.base.service.version import (VersionRecordData,
                                            VersionRecordDataAdd,
                                            VersionRecordDataDelete,
@@ -245,6 +245,131 @@ class ArticleView(BaseView):
         queryset = ArticleData(params=request.query_params, category=category).get_all()
 
         return Response(eval('self.serialize%s' % category)(queryset))
+
+
+class EventView(APIView):
+
+    def __init__(self):
+        super(EventView, self).__init__()
+
+    def serialize(self, result):
+        data = map(lambda r: {
+            'title': r['title'],
+            'socialHarm': r['socialHarm'],
+            'scope': r['scope'],
+            'grading': r['grading'],
+            'pubtime': r['pubtime'],
+            'desc': r['desc'],
+        }, result)
+
+        return data
+    
+    def get(self, request, eid):
+        result = EventsAnalysis().getEvent(eid = eid)
+
+        return Response(self.serialize(result))
+
+
+class EventInformationView(BaseView):
+
+    def __init__(self):
+        super(EventInformationView, self).__init__()
+
+    def set_request(self, request):
+        super(EventInformationView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(EventInformationView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15))
+
+    def serialize(self, result):
+        total = result.count()
+        resultPage = self.paging(result)
+        data = {
+            'total': total,
+            'list': map(lambda r: {
+                'title': r['title'],
+                'url': r['url'],
+                'keyword': r['eventskeyword__name'],
+                'source': r['source'],
+                'pubtime': date_format(r['pubtime'], '%Y-%m-%d'),
+                'sentiment': r['sentiment'],
+            }, resultPage)
+        }
+
+        return data
+
+    def get(self, result, eid):
+        result = EventsAnalysis().get_data(eid = eid)
+
+        return Response(self.serialize(result))
+
+
+class EventContentView(APIView):
+
+    def __init__(self):
+        super(EventContentView, self).__init__()
+
+    def serialize(self, sentiment, source, areas, keywords):
+        data = {
+            'sentimentList': map(lambda s: {
+                'sentiment': s['sentiment'],
+            }, sentiment),
+
+            'source': map(lambda s: {
+                'name': s['articles__source'],
+                'sum': s['num_source'],
+            }, source),
+
+            'areas': map(lambda a: {
+                'name': a['name'],
+                'sum': a['sum'],
+            }, areas),
+
+            'keywords': map(lambda k: {
+                'name': k['name'],
+                'sum': k['num_eventskeyword'],
+            }, keywords),
+        }
+
+        return data
+
+    def get(self, request, eid):
+        sentiment = EventsAnalysis().getSentiment(eid = eid)
+        source = EventsAnalysis().getSource(eid = eid)
+        areas = EventsAnalysis().getAreas(eid = eid)
+        keywords = EventsAnalysis().getKeywords(eid = eid)
+
+        return Response(self.serialize(sentiment, source, areas, keywords))
+
+
+class EventSpreadView(APIView):
+
+    def __init__(self):
+        super(EventSpreadView, self).__init__()
+
+    def serialize(self, timeTrend, trend):
+        data = {
+            'time': map(lambda t: {
+                'timeTrend': date_format(t['articles__pubtime'], '%Y-%m-%d'),
+            }, timeTrend),
+
+            'trend': map(lambda t: {
+                'name': t['name'],
+                'numTrend': t['numTrend'],
+            }, trend),
+        }
+
+        return data
+
+    def get(self, request, eid):
+        timeTrend = EventsAnalysis().getTimeTrend(eid = eid)
+        trend = EventsAnalysis().getTrend(eid = eid)
+        # way = EventsAnalysis().getWay(eid = eid)
+
+        return Response(self.serialize(timeTrend, trend))
 
 
 class InspectionView(BaseView):
@@ -1715,7 +1840,7 @@ class InspectionDataExportView(BaseView):
 
     def get(self, request):
         response = FileResponse(
-            InspectionDataExport(user=request.user).export(),
+            InspectionDataExport(params=request.query_params, user=request.user).export(),
             content_type='application/vnd.ms-excel'
         )
         response["Content-Disposition"] = 'attachment; filename=inspections.xlsx'
@@ -2154,47 +2279,25 @@ class NewsReportViewSuzhou(BaseView):
         return Response(self.serialize(queryset))
 
 
-class NavBarView(BaseView):
+class NavBarDataView(BaseView):
 
     def __init__(self):
-        super(NavBarView, self).__init__()
+        super(NavBarDataView, self).__init__()
 
     def set_request(self, request):
         self.user = request.user
-        super(NavBarView, self).set_request(request)
-
-    def serialize(self):
-        navs = []
-        u_navs_ids = UserNav.objects.filter(user=self.user).values_list('nav', flat=True)
-        L1 = Nav.objects.filter(id__in=u_navs_ids, level=1).values('name','id').order_by('index')
-        if L1:
-            for category in L1:
-                navs.append({
-                    'category': category['name'],
-                })
-
-                L2 = Nav.objects.filter(id__in=u_navs_ids, level=2, parent_id=category['id']).values('name', 'id', 'href', 'icon').order_by('index')
-                if L2:
-                    for title in L2:
-                        childrens = Nav.objects.filter(id__in=u_navs_ids, level=3, parent_id=title['id']).values_list('name')
-                        navs.append({
-                            'icon': title['icon'],
-                            'title': title['name'],
-                            'href': '' if not title['href'] else title['href'],
-                            'children': list(map(lambda x: {
-                                'title': x['name'],
-                                'href': x['href'],
-                            }, Nav.objects.filter(id__in=u_navs_ids, level=3, parent_id=title['id']).values('name', 'href').order_by('index'))) if childrens else ''
-                        })
-        data = {
-            'menus': navs,
-        }
-        return data
+        super(NavBarDataView, self).set_request(request)
 
     def get(self, request):
         self.set_request(request)
 
-        return Response(self.serialize())
+        navs = NavBarData(user=request.user).get_navs()
+
+        data = {
+            'menus': navs,
+        }
+
+        return Response(data)
 
 
 class NavBarEditView(BaseView):
@@ -2222,46 +2325,35 @@ class RouteDataView(BaseView):
         self.user = request.user
         super(RouteDataView, self).set_request(request)
 
-    def serialize(self):
-        routers = []
-        u_navs_ids = UserNav.objects.filter(user=self.user).values_list('nav', flat=True)
-        routes = Nav.objects.filter(id__in=u_navs_ids).exclude(level=1).values('id', 'href', 'component').order_by('index')
-        j = 0
-        for i, route in enumerate(routes):
-            if route['href'] == '':
-                j+=1
-            else:
-                routers.append({
-                    'path': route['href'],
-                    'alias': '/' if i - j == 0 else '',
-                    'component': route['component'],
-                })
+    def get(self, request):
+        self.set_request(request)
+
+        routers = RouteData(user=request.user).get_routers()
+
         data = {
             'routers': routers,
         }
 
-        return data
-
-    def get(self, request):
-        self.set_request(request)
-
-        return Response(self.serialize())
+        return Response(data)
 
 
-class ThemeView(BaseView):
+class UserInfoView(BaseView):
 
     def __init__(self):
-        super(ThemeView, self).__init__()
+        super(UserInfoView, self).__init__()
 
     def set_request(self, request):
         self.user = request.user
-        super(ThemeView, self).set_request(request)
+        super(UserInfoView, self).set_request(request)
 
     def serialize(self):
-        user_theme = UserInfo.objects.get(user_id=self.user).theme
+        user_info = UserInfo.objects.get(user_id=self.user)
+        user_theme = user_info.theme
+        user_logo = user_info.logo
 
         data = {
             'user_theme': user_theme,
+            'user_logo': user_logo,
         }
 
         return data
@@ -2368,10 +2460,10 @@ class UserEditView(BaseView):
     def set_request(self, request):
         super(UserEditView, self).set_request(request)
 
-    def post(self, request, cid):
+    def post(self, request, uid):
         self.set_request(request)
 
-        queryset = UserEdit(user=request.user, params=request.data).edit(cid=cid)
+        queryset = UserEdit(user=request.user, params=request.data).edit(uid=uid)
 
         return Response(status=queryset)
 
@@ -2384,63 +2476,27 @@ class UserDeleteView(BaseView):
     def set_request(self, request):
         super(UserDeleteView, self).set_request(request)
 
-    def delete(self, request, cid):
+    def delete(self, request, uid):
         self.set_request(request)
 
-        queryset = UserDelete(user=request.user).delete(cid=cid)
+        queryset = UserDelete(user=request.user).delete(uid=uid)
 
         return Response(status=queryset)
 
 
-class UserNavView(BaseView):
+class UserNavDataView(BaseView):
 
     def __init__(self):
-        super(UserNavView, self).__init__()
+        super(UserNavDataView, self).__init__()
 
     def set_request(self, request):
         self.user = request.user
-        super(UserNavView, self).set_request(request)
+        super(UserNavDataView, self).set_request(request)
 
-    def get(self, request, cid):
+    def get(self, request, uid):
         self.set_request(request)
-        menus = []
-        group_names = Group.objects.filter(user=self.user).values_list('name', flat=True)
-        name_and_id = Nav.objects.values('name','id').order_by('index')
 
-        # 如果当前操作的是'超级管理员'
-        if '超级管理员' in group_names:
-            L1 = name_and_id.filter(level=1)
-            for category in L1:
-                menus.append({
-                    'id': category['id'],
-                    'label': category['name'],
-                    'children': list(map(lambda x: {
-                        'id': x['id'],
-                        'label': x['name'],
-                        'children': list(map(lambda y: {
-                            'id': y['id'],
-                            'label': y['name'],
-                        }, Nav.objects.filter(level=3, parent_id=x['id']).values('name', 'id').order_by('index'))) if Nav.objects.filter(level=3, parent_id=x['id']) else ''
-                    }, Nav.objects.filter(level=2, parent_id=category['id']).values('name', 'id').order_by('index'))) if Nav.objects.filter(level=2, parent_id=category['id']) else ''
-                })
-        else:
-            u_navs_ids = UserNav.objects.filter(user=self.user).values_list('nav', flat=True)
-            L1 = name_and_id.filter(id__in=u_navs_ids, level=1)
-
-            if L1:
-                for category in L1:
-                    menus.append({
-                        'id': category['id'],
-                        'label': category['name'],
-                        'children': list(map(lambda x: {
-                            'id': x['id'],
-                            'label': x['name'],
-                            'children': list(map(lambda y: {
-                                'id': y['id'],
-                                'label': y['name'],
-                            }, Nav.objects.filter(id__in=u_navs_ids, level=3, parent_id=x['id']).values('name', 'id').order_by('index'))) if Nav.objects.filter(id__in=u_navs_ids, level=3, parent_id=x['id']) else ''
-                        }, Nav.objects.filter(id__in=u_navs_ids, level=2, parent_id=category['id']).values('name', 'id').order_by('index'))) if Nav.objects.filter(id__in=u_navs_ids, level=2, parent_id=category['id']) else ''
-                    })
+        menus = UserNavData(user=request.user).get_menus(uid=uid)
 
         data = {
             'menus': menus,
