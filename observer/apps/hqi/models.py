@@ -14,7 +14,7 @@ class Area(models.Model):
     )
 
     class Meta:
-        app_label = 'apps'
+        app_label = 'hqi'
         db_table = 'base_area'
         verbose_name_plural = '地域'
 
@@ -34,43 +34,29 @@ class GovReports(models.Model):
     )
 
     class Meta:
-        app_label = 'apps'
+        app_label = 'hqi'
         db_table = 'base_govreports'
         verbose_name_plural = '政府报告'
 
     def __str__(self):
         return self.title
 
+
 class Policy(models.Model):
-    name = models.CharField(max_length=255, verbose_name='名称')
+    category = models.CharField(max_length=255, verbose_name='政策类别')
+    industry = models.CharField(max_length=255, blank=True, verbose_name='产业类别')
+    name = models.CharField(max_length=255, verbose_name='政策')
+
+    areas = models.ManyToManyField(Area)
 
     class Meta:
-        app_label = 'apps'
+        app_label = 'hqi'
         db_table = 'base_policy'
-        verbose_name_plural = '政策'
+        verbose_name_plural = '政府政策'
 
     def __unicode__(self):
         return self.name
 
-class PolicyData(models.Model):
-    policy_class = models.IntegerField( verbose_name='政策类别')
-    industry_class=models.CharField(max_length=255, null=True, verbose_name='产业类别')
-    year =  models.DateTimeField(verbose_name='发布时间')
-    total = models.IntegerField( verbose_name='条数总计', null=True)
-    policys =models.ManyToManyField(Policy)
-
-    area = models.ForeignKey(
-        Area,
-        on_delete=models.CASCADE,
-        verbose_name=u'地域'
-    )
-    class Meta:
-        app_label = 'apps'
-        db_table = 'base_policydata'
-        verbose_name_plural = '政策'
-
-    def __unicode__(self):
-        return self.name
 
 class Indicator(models.Model):
     name = models.CharField(max_length=255, verbose_name="名称")
@@ -86,7 +72,7 @@ class Indicator(models.Model):
     )
 
     class Meta:
-        app_label = 'apps'
+        app_label = 'hqi'
         db_table = 'base_indicator'
         verbose_name_plural = '指标'
 
@@ -110,7 +96,7 @@ class IndicatorDataParent(models.Model):
     )
 
     class Meta:
-        app_label = 'apps'
+        app_label = 'hqi'
         db_table = 'base_indicatordataparent'
         verbose_name_plural = '指标数据'
 
@@ -131,6 +117,6 @@ class IndicatorScore(models.Model):
     )
 
     class Meta:
-        app_label = 'apps'
+        app_label = 'hqi'
         db_table = 'base_indicatorscore'
         verbose_name_plural = '指标数据(量化)'

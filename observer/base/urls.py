@@ -168,8 +168,12 @@ urlpatterns = [
 
     #产业政策
     path('policyindustry', views.PolicyIndustryView.as_view()), # 显示产业政策
-    path('policyindustrytotal/<int:pid>/', views.PolicyIndustryTotalView.as_view()), # 显示民营政策
+    path('policyindustrytotal', views.PolicyIndustryTotalView.as_view()), # 显示民营政策
     path('policyindustry/add', views.PolicyIndustryAddView.as_view()), # 显示民营政策
+
+    #政策导入
+    path('policy/upload/<str:filename>/', views.PolicyDataUploadView.as_view()),  # 区域、民营政策导入
+    path('policyindustry/upload/<str:filename>/', views.PolicyIndustryDataUploadView.as_view()),  # 区域、民营政策导入
 
 
 ]

@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'django_extensions',
 
     'observer.base',
+    'observer.apps.hqi',
 ]
 
 MIDDLEWARE = [
