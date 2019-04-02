@@ -38,7 +38,8 @@ class UserInfo(models.Model):
         verbose_name='地域'
     )
 
-    theme = models.CharField(max_length=50, verbose_name='主题')
+    theme = models.CharField(default='', max_length=50, verbose_name='主题')
+    logo = models.CharField(default='', max_length=50, verbose_name='logo')
 
     class Meta:
         app_label = 'base'

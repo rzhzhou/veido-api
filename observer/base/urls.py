@@ -91,7 +91,12 @@ urlpatterns = [
     path('users/add', views.UserAddView.as_view()), # 用户添加
     path('users/edit/<int:uid>/', views.UserEditView.as_view()), # 用户修改
     path('users/delete/<str:uid>/', views.UserDeleteView.as_view()), # 用户删除
-    path('user_nav/<int:uid>/', views.UserNavDataView.as_view()), # 用户权限导航
+    path('user_nav/<int:uid>/', views.UserNavDataView.as_view()), # 分配用户权限导航栏
+    path('nav_bar', views.NavBarDataView.as_view()), # 用户系统左侧导航栏
+    path('nav_bar/edit/<str:cid>/', views.NavBarEditView.as_view()), # 分配用户侧边栏导航
+    path('route_data/', views.RouteDataView.as_view()), # 用户动态路由
+    path('user_info', views.UserInfoView.as_view()), # 用户信息: 动态主题、动态logo
+    path('theme/edit', views.ThemeEditView.as_view()), # 修改用户主题
 
     path('news_report', views.NewsReportView.as_view()), # 舆情报告
     path('news_report/upload/', views.NewsReportUploadView.as_view()), # 舆情报告上传
@@ -125,25 +130,12 @@ urlpatterns = [
     path('inspection_suzhou', views.InspectionDataViewSuzhou.as_view()), # 抽检信息
     path('news_report_suzhou', views.NewsReportViewSuzhou.as_view()), # 舆情报告
 
-    # 侧边栏
-    path('nav_bar', views.NavBarDataView.as_view()), # 侧边栏导航
-    path('nav_bar/edit/<str:cid>/', views.NavBarEditView.as_view()), # 分配侧边栏导航
-
-    # 动态路由
-    path('route_data/', views.RouteDataView.as_view()), # 动态路由
-
-    # 动态主题
-    path('theme', views.ThemeView.as_view()), # 动态主题
-    path('theme/edit', views.ThemeEditView.as_view()), # 修改主题
-
     # 官网
     path('news', views.NewsView.as_view()), # 公司动态
     path('news/add', views.NewsAddView.as_view()), # 发布公司动态
     path('news/delete/<str:cid>/', views.NewsDeleteView.as_view()), # 删除公司动态
     path('news/edit/<int:cid>/', views.NewsEditView.as_view()), # 修改公司动态
 
-
-    # 官网
     path('govreports', views.GovReportsView.as_view()), # 政府报告动态
     path('govreports/add', views.GovReportsAddView.as_view()), # 发布一则政府动态动态
     path('govreports/delete/<str:cid>/', views.GovReportsDeleteView.as_view()), # 删除政府动态

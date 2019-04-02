@@ -2335,20 +2335,23 @@ class RouteDataView(BaseView):
         return Response(data)
 
 
-class ThemeView(BaseView):
+class UserInfoView(BaseView):
 
     def __init__(self):
-        super(ThemeView, self).__init__()
+        super(UserInfoView, self).__init__()
 
     def set_request(self, request):
         self.user = request.user
-        super(ThemeView, self).set_request(request)
+        super(UserInfoView, self).set_request(request)
 
     def serialize(self):
-        user_theme = UserInfo.objects.get(user_id=self.user).theme
+        user_info = UserInfo.objects.get(user_id=self.user)
+        user_theme = user_info.theme
+        user_logo = user_info.logo
 
         data = {
             'user_theme': user_theme,
+            'user_logo': user_logo,
         }
 
         return data
