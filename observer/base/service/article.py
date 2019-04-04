@@ -17,6 +17,7 @@ from observer.utils.date_format import (date_format, str_to_date, get_months)
 from observer.utils.str_format import str_to_md5str
 from observer.utils.excel import (read_by_openpyxl, write_by_openpyxl, )
 from observer.utils.crawler.news_crawler import newsCrawler
+from observer.utils.crawler.baiDuAIP import BaiDuAI
 
 
 class ArticleData(Abstract):
@@ -476,6 +477,7 @@ class RiskDataUpload(Abstract):
                         industry_id=industry_id,
                         user_id=self.user.id,
                         status=1,
+                        sentiment=-1,
                     )
                     article.save()
                     article.areas.add(*area)
@@ -511,6 +513,7 @@ class RiskDataExport(Abstract):
         cond = {
             'areas__id': getattr(self, 'areas', None),
             'status': getattr(self, 'status'),
+            'categories__id': getattr(self, 'category', None),
             'pubtime__gte': getattr(self, 'starttime', None),
             'pubtime__lte': getattr(self, 'endtime', None),
         }
@@ -864,6 +867,9 @@ class EventsDataUpload(Abstract):
 
                     total += 1
 
+                    # 用百度情感分析AI分析标题情感
+                    sentiment = BaiDuAI(title)
+
                     # 唯一性
                     old_article = Article.objects.filter(url=url)
 
@@ -876,6 +882,7 @@ class EventsDataUpload(Abstract):
                         old_article.source = source
                         old_article.score = score
                         old_article.industry_id = industry_id
+                        old_article.sentiment = sentiment
                         old_article.save()
 
                         old_article.areas.clear()
@@ -904,6 +911,7 @@ class EventsDataUpload(Abstract):
                         industry_id=industry_id,
                         user_id=self.user.id,
                         status=1,
+                        sentiment=sentiment,
                     )
                     article.save()
                     article.areas.add(*area)

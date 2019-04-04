@@ -43,3 +43,6 @@ requests >= 2.20.0
 
 # beautifulsoup
 beautifulsoup4 >= 4.6.3
+
+# baidu AI AipNlp
+baidu-aip >= 2.2.13.0
