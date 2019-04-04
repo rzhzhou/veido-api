@@ -4,7 +4,7 @@ from django.contrib.auth.models import User, Group
 
 from observer.base.models import (Area, Category, UserInfo, AliasIndustry, MajorIndustry,
                                 Enterprise, UserNav, Article, HarmIndicator, HarmPeople)
-from observer.apps.hqi.models import Indicator,IndicatorDataParent,Policy,PolicyData
+from observer.apps.hqi.models import Indicator,IndicatorDataParent,Policy
 from observer.utils.date_format import date_format
 
 
@@ -36,21 +36,6 @@ def categories(article_id, admin=False, flat=False):
     else:
         return ','.join(queryset.values_list('name', flat=True))
 
-#政策
-def content(policydata_id, admin=False, flat=False):
-    c_ids = PolicyData.objects.filter(id=policydata_id).values_list('content__id', flat=True)
-    queryset = Policy.objects.using('hqi').filter(id__in=c_ids)
-
-    if not admin:
-        queryset = queryset.filter(level=2)
-
-    if not queryset.exists():
-        queryset = Policy.objects.using('hqi').filter(name='其它')
-
-    if not flat:
-        return list(map(lambda x: {'id': x['id'], 'name': x['name']}, queryset.values('id', 'name')))
-    else:
-        return ','.join(queryset.values_list('name', flat=True))
 
 #指标
 def indicatores(indicator_id, admin=False, flat=False):

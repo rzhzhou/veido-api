@@ -23,7 +23,7 @@ from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd,
                                            RiskHarmsDetailsData, EventsManageData,
                                            EventsDataUpload, EventsAnalysis)
 from observer.base.service.base import (alias_industry, area, areas,
-                                        categories, content,get_major_category,
+                                        categories,get_major_category,
                                         get_major_industry, get_user_extra,
                                         get_user_nav, involve_local,
                                         local_related, qualitied, gov_area,
@@ -91,7 +91,8 @@ from observer.base.service.indicatordata import IndicatorData,IndicatorDelete,In
 from observer.base.service.indicator import IndicatorChart,IndicatorRanking
 from observer.base.service.policyregion import  (PolicyAreaData,PolicyAreaTotalData,PolicyAreaAdd,
                                                 PolicyPrivateData,PolicPrivatelTotalData,PolicPrivatelAdd,
-                                                PolicyIndustryData,PolicyIndustryTotalData,PolicyIndustryAdd)
+                                                PolicyIndustryData,PolicyIndustryTotalData,PolicyIndustryAdd,
+                                                PolicyDataUpload,PolicyIndustryDataUpload)
 
 class BaseView(APIView):
 
@@ -1467,6 +1468,7 @@ class RiskDataView(BaseView):
         self.set_request(request)
 
         queryset = RiskData(user=request.user, params=request.query_params).get_all()
+        print(queryset)
 
         return Response(self.serialize(queryset))
 
@@ -3428,15 +3430,15 @@ class PolicyAreaView(BaseView):
         )
 
     def serialize(self, queryset):
-        total = queryset.count()
+        total = len(queryset)
         results = self.paging(queryset)
         data = {
             'total': total,
             'list': map(lambda r: {
-                'id': r['id'],
-                'areas': area(r['area__id']),
-                'total': r['total'],
-                'year': date_format(r['year'], '%Y-%m-%d %H:%M:%S'),
+                'area': r['id'],
+                'area__id': r['area__id'],
+                'total': r['areas__name'],
+
             }, results)
         }
 
@@ -3473,7 +3475,7 @@ class PolicyAreaTotalView(BaseView):
             'total': total,
             'list': map(lambda r: {
                 'id': r['id'],
-                'name': r['policys__name'],
+                'name': r['name'],
             }, results)
         }
 
@@ -3520,15 +3522,15 @@ class PolicPrivatelView(BaseView):
         )
 
     def serialize(self, queryset):
-        total = queryset.count()
+        total = len(queryset)
         results = self.paging(queryset)
         data = {
             'total': total,
             'list': map(lambda r: {
-                'id': r['id'],
-                'areas': area(r['area__id']),
-                'total': r['total'],
-                'year': date_format(r['year'], '%Y-%m-%d %H:%M:%S'),
+                'area': r['id'],
+                'area__id': r['area__id'],
+                'total': r['areas__name'],
+
             }, results)
         }
 
@@ -3565,7 +3567,7 @@ class PolicPrivatelTotalView(BaseView):
             'total': total,
             'list': map(lambda r: {
                 'id': r['id'],
-                'name': r['policys__name'],
+                'name': r['name'],
             }, results)
         }
 
@@ -3612,19 +3614,18 @@ class PolicyIndustryView(BaseView):
         )
 
     def serialize(self, queryset):
-        total = queryset.count()
+        total = len(queryset)
         results = self.paging(queryset)
         data = {
             'total': total,
             'list': map(lambda r: {
-                'id': r['id'],
-                'areas': area(r['area__id']),
-                'industry_class': r['industry_class'],
-                'total': r['total'],
-                'year': date_format(r['year'], '%Y-%m-%d %H:%M:%S'),
+                'area': r['id'],
+                'industry': r['industry'],
+                'area__id': r['area__id'],
+                'total': r['areas__name'],
+
             }, results)
         }
-
         return data
 
     def get(self, request):
@@ -3658,17 +3659,18 @@ class PolicyIndustryTotalView(BaseView):
             'total': total,
             'list': map(lambda r: {
                 'id': r['id'],
-                'name': r['policys__name'],
+                'industry': r['industry'],
+                'name': r['name'],
             }, results)
         }
 
         return data
 
-    def get(self, request, pid):
+    def get(self, request):
 
         self.set_request(request)
 
-        queryset = PolicyIndustryTotalData(params=request.query_params).get_all(pid=pid)
+        queryset = PolicyIndustryTotalData(params=request.query_params).get_all()
 
         return Response(self.serialize(queryset))
 
@@ -3687,3 +3689,29 @@ class PolicyIndustryAddView(BaseView):
         queryset = PolicyIndustryAdd(user=request.user, params=request.data).add()
 
         return Response(status=queryset)
+
+
+class PolicyDataUploadView(BaseView):
+    parser_classes = (FileUploadParser,)
+
+    def __init__(self):
+        super(PolicyDataUploadView, self).__init__()
+
+    def put(self, request, filename, format=None):
+
+        queryset = PolicyDataUpload(user=request.user).upload(filename, request.FILES['file'])
+
+        return Response(queryset)
+
+
+class PolicyIndustryDataUploadView(BaseView):
+    parser_classes = (FileUploadParser,)
+
+    def __init__(self):
+        super(PolicyIndustryDataUploadView, self).__init__()
+
+    def put(self, request, filename, format=None):
+
+        queryset = PolicyIndustryDataUpload(user=request.user).upload(filename, request.FILES['file'])
+
+        return Response(queryset)
