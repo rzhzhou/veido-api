@@ -224,6 +224,12 @@ class RiskDataAdd(Abstract):
         areas = getattr(self, 'areas', '')
         categories = getattr(self, 'categories', '')
         industries = getattr(self, 'industries', -1)
+        categoriesnum = categories.split(',')
+
+        for x in range(len(categoriesnum)-1):
+            print(categories.split(',')[x])
+            if  categories.split(',')[x] =='0002' and score == '0':
+                score = '1'
 
         if not pubtime:
             pubtime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -236,6 +242,8 @@ class RiskDataAdd(Abstract):
 
         if Article.objects.filter(url=url).exists():
             return 202
+
+
 
         # 有多个地域时逗号分隔，并且忽略掉最后一个逗号
         a_ids = areas.split(',')[:-1:]
@@ -417,8 +425,12 @@ class RiskDataUpload(Abstract):
                         continue
                     else:
                         categories = category.split()
-                        c_ids = Category.objects.filter(name__in=categories).values_list('id', flat=True)
 
+                        if categories[0] =='风险快讯' and score =='0':
+                            score = '1'
+
+                        c_ids = Category.objects.filter(name__in=categories).values_list('id', flat=True)
+                        print(c_ids)
                         if len(categories) != len(c_ids):
                             return {
                                 'status': 0,

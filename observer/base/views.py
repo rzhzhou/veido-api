@@ -1468,7 +1468,6 @@ class RiskDataView(BaseView):
         self.set_request(request)
 
         queryset = RiskData(user=request.user, params=request.query_params).get_all()
-        print(queryset)
 
         return Response(self.serialize(queryset))
 
@@ -3435,9 +3434,10 @@ class PolicyAreaView(BaseView):
         data = {
             'total': total,
             'list': map(lambda r: {
-                'area': r['id'],
+                'area': r['area'],
                 'area__id': r['area__id'],
-                'total': r['areas__name'],
+                'total': r['total'],
+                'level': r['level'],
 
             }, results)
         }
@@ -3476,6 +3476,8 @@ class PolicyAreaTotalView(BaseView):
             'list': map(lambda r: {
                 'id': r['id'],
                 'name': r['name'],
+                'url': r['url'],
+                'time': r['pubtime'].strftime("%Y-%m-%d"),
             }, results)
         }
 
@@ -3530,6 +3532,7 @@ class PolicPrivatelView(BaseView):
                 'area': r['id'],
                 'area__id': r['area__id'],
                 'total': r['areas__name'],
+                'level': r['level'],
 
             }, results)
         }
@@ -3568,6 +3571,8 @@ class PolicPrivatelTotalView(BaseView):
             'list': map(lambda r: {
                 'id': r['id'],
                 'name': r['name'],
+                'url': r['url'],
+                'time': r['pubtime'].strftime("%Y-%m-%d"),
             }, results)
         }
 
@@ -3623,6 +3628,7 @@ class PolicyIndustryView(BaseView):
                 'industry': r['industry'],
                 'area__id': r['area__id'],
                 'total': r['areas__name'],
+                'level': r['level'],
 
             }, results)
         }
@@ -3661,6 +3667,8 @@ class PolicyIndustryTotalView(BaseView):
                 'id': r['id'],
                 'industry': r['industry'],
                 'name': r['name'],
+                'url': r['url'],
+                'time': r['pubtime'].strftime("%Y-%m-%d"),
             }, results)
         }
 
