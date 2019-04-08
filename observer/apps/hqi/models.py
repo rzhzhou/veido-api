@@ -44,8 +44,11 @@ class GovReports(models.Model):
 
 class Policy(models.Model):
     category = models.CharField(max_length=255, verbose_name='政策类别')
-    industry = models.CharField(max_length=255, blank=True, verbose_name='产业类别')
-    name = models.CharField(max_length=255, verbose_name='政策')
+    industry = models.CharField(max_length=255, null=True, verbose_name='产业类别')
+    url = models.URLField(verbose_name='网站链接', null=True, default='')
+    pubtime = models.DateTimeField(auto_now_add=True, verbose_name='发布时间')
+    name = models.CharField(max_length=255, null=True, verbose_name='政策')
+
 
     areas = models.ManyToManyField(Area)
 
