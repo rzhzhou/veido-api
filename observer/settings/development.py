@@ -50,6 +50,8 @@ INSTALLED_APPS = [
 
     'observer.base',
     'observer.apps.hqi',
+    'observer.apps.officialsite',
+    'observer.apps.crawler',
 ]
 
 MIDDLEWARE = [

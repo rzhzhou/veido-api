@@ -14,7 +14,7 @@ class News(models.Model):
     abstract = models.CharField(default='', max_length=255, verbose_name='摘要')
 
     class Meta:
-        app_label = 'apps'
+        app_label = 'officialsite'
         db_table = 'base_news'
         verbose_name_plural = u'公司动态'
 
