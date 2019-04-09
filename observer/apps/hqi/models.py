@@ -15,7 +15,7 @@ class Area(models.Model):
 
     class Meta:
         app_label = 'hqi'
-        db_table = 'base_area'
+        db_table = 'hqi_area'
         verbose_name_plural = '地域'
 
     def __str__(self):
@@ -35,7 +35,7 @@ class GovReports(models.Model):
 
     class Meta:
         app_label = 'hqi'
-        db_table = 'base_govreports'
+        db_table = 'hqi_govreports'
         verbose_name_plural = '政府报告'
 
     def __str__(self):
@@ -54,7 +54,7 @@ class Policy(models.Model):
 
     class Meta:
         app_label = 'hqi'
-        db_table = 'base_policy'
+        db_table = 'hqi_policy'
         verbose_name_plural = '政府政策'
 
     def __unicode__(self):
@@ -76,7 +76,7 @@ class Indicator(models.Model):
 
     class Meta:
         app_label = 'hqi'
-        db_table = 'base_indicator'
+        db_table = 'hqi_indicator'
         verbose_name_plural = '指标'
 
     def __str__(self):
@@ -100,7 +100,7 @@ class IndicatorDataParent(models.Model):
 
     class Meta:
         app_label = 'hqi'
-        db_table = 'base_indicatordataparent'
+        db_table = 'hqi_indicatordataparent'
         verbose_name_plural = '指标数据'
 
 
@@ -121,5 +121,5 @@ class IndicatorScore(models.Model):
 
     class Meta:
         app_label = 'hqi'
-        db_table = 'base_indicatorscore'
+        db_table = 'hqi_indicatorscore'
         verbose_name_plural = '指标数据(量化)'
