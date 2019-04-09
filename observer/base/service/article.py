@@ -91,7 +91,7 @@ class EventsAnalysis(object):
             return sentimentList
 
     def getSource(self, eid):
-        event = EventsKeyword.objects.filter(events_id = eid)
+        event = Events.objects.filter(id = eid)
         event = event.annotate(num_source = Count('articles'))
         source = event.values('articles__source', 'num_source').order_by('-num_source')
         
@@ -136,13 +136,13 @@ class EventsAnalysis(object):
 
     # 事件传播分析
     def getTimeTrend(self, eid):
-        event = EventsKeyword.objects.filter(events_id = eid)
+        event = Events.objects.filter(id = eid)
         time = event.annotate(num_source = Count('articles')).values('articles__pubtime').order_by('articles__pubtime')
         
         return time
 
     def getTrend(self, eid):
-        event = EventsKeyword.objects.filter(events_id = eid)
+        event = Events.objects.filter(id = eid)
         articles = Article.objects.filter(events__id = eid)
 
         source = event.annotate(num_source = Count('articles')).values_list('articles__source', flat = True).order_by('-num_source')[:5]
