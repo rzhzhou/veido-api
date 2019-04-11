@@ -3434,10 +3434,12 @@ class PolicyAreaView(BaseView):
         data = {
             'total': total,
             'list': map(lambda r: {
-                'area': r['area'],
+                'name': r['area'],
                 'area__id': r['area__id'],
                 'total': r['total'],
                 'level': r['level'],
+                'title': r['articletitle'],
+                'url': r['articleurl'],
 
             }, results)
         }
@@ -3476,18 +3478,19 @@ class PolicyAreaTotalView(BaseView):
             'list': map(lambda r: {
                 'id': r['id'],
                 'name': r['name'],
-                'url': r['url'],
-                'time': r['pubtime'].strftime("%Y-%m-%d"),
+                'detail': r['detail'],
+                'pubtime': r['policyarticle_id__pubtime'],
+                # 'time': r['pubtime'].strftime("%Y-%m-%d"),
             }, results)
         }
 
         return data
 
-    def get(self, request, pid):
+    def get(self, request):
 
         self.set_request(request)
 
-        queryset = PolicyAreaTotalData(params=request.query_params).get_all(pid=pid)
+        queryset = PolicyAreaTotalData(params=request.query_params).get_all()
 
         return Response(self.serialize(queryset))
 
@@ -3529,10 +3532,13 @@ class PolicPrivatelView(BaseView):
         data = {
             'total': total,
             'list': map(lambda r: {
-                'area': r['id'],
+                'name': r['area'],
                 'area__id': r['area__id'],
                 'total': r['areas__name'],
                 'level': r['level'],
+                'title': r['articletitle'],
+                'url': r['articleurl'],
+
 
             }, results)
         }
@@ -3571,18 +3577,18 @@ class PolicPrivatelTotalView(BaseView):
             'list': map(lambda r: {
                 'id': r['id'],
                 'name': r['name'],
-                'url': r['url'],
-                'time': r['pubtime'].strftime("%Y-%m-%d"),
+                'detail': r['detail'],
+                'pubtime': r['policyarticle_id__pubtime'].strftime("%Y-%m-%d"),
             }, results)
         }
 
         return data
 
-    def get(self, request, pid):
+    def get(self, request):
 
         self.set_request(request)
 
-        queryset = PolicPrivatelTotalData(params=request.query_params).get_all(pid=pid)
+        queryset = PolicPrivatelTotalData(params=request.query_params).get_all()
 
         return Response(self.serialize(queryset))
 
@@ -3624,11 +3630,13 @@ class PolicyIndustryView(BaseView):
         data = {
             'total': total,
             'list': map(lambda r: {
-                'area': r['id'],
+                'name': r['area'],
                 'industry': r['industry'],
                 'area__id': r['area__id'],
                 'total': r['areas__name'],
                 'level': r['level'],
+                'title': r['articletitle'],
+                'url': r['articleurl'],
 
             }, results)
         }
@@ -3665,10 +3673,9 @@ class PolicyIndustryTotalView(BaseView):
             'total': total,
             'list': map(lambda r: {
                 'id': r['id'],
-                'industry': r['industry'],
                 'name': r['name'],
-                'url': r['url'],
-                'time': r['pubtime'].strftime("%Y-%m-%d"),
+                'detail': r['detail'],
+                'pubtime': r['policyarticle_id__pubtime'].strftime("%Y-%m-%d"),
             }, results)
         }
 
