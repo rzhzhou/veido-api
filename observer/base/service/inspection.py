@@ -404,7 +404,6 @@ class InspectionDataUpload(Abstract):
                 old_inspection = Inspection.objects.filter(url=url)
 
                 if old_inspection.exists():
-                    print(1)
                     old_inspection.title = title,
                     old_inspection.url = url,
                     old_inspection.pubtime = pubtime,
@@ -420,9 +419,7 @@ class InspectionDataUpload(Abstract):
                     old_inspection.origin_product = origin_product,
                     old_inspection.area_id = area[0].id,
                     old_inspection.status = 0,
-                    print(old_inspection.pubtime)
                     for x in old_inspection:
-                        print(x)
                         x.save()
 
                     dupli += 1
