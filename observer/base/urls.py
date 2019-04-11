@@ -154,12 +154,12 @@ urlpatterns = [
 
     #区域政策
     path('policyarea', views.PolicyAreaView.as_view()), # 显示区域政策
-    path('policyareatotal/<int:pid>/', views.PolicyAreaTotalView.as_view()), # 显示区域政策内容
+    path('policyareatotal', views.PolicyAreaTotalView.as_view()), # 显示区域政策内容
     path('policyarea/add', views.PolicyRegionAddView.as_view()), # 添加地区政策
 
     #民营政策
     path('policyprivate', views.PolicPrivatelView.as_view()), # 显示民营政策
-    path('policyprivatetotal/<int:pid>/', views.PolicPrivatelTotalView.as_view()), # 显示民营政策
+    path('policyprivatetotal', views.PolicPrivatelTotalView.as_view()), # 显示民营政策
     path('policyprivate/add', views.PolicPrivatelAddView.as_view()), # 显示民营政策
 
     #产业政策

@@ -316,6 +316,7 @@ class InspectionDataUpload(Abstract):
             }
 
         total = 0
+        dupli = 0
         data_list = []
 
         for i, row in enumerate(rows):
@@ -398,6 +399,35 @@ class InspectionDataUpload(Abstract):
 
                 industry_id = IndustryProducts.objects.filter(name=product_name[0])[0].industry_id
 
+
+                # 唯一性
+                old_inspection = Inspection.objects.filter(url=url)
+
+                if old_inspection.exists():
+                    print(1)
+                    old_inspection.title = title,
+                    old_inspection.url = url,
+                    old_inspection.pubtime = pubtime,
+                    old_inspection.source = source,
+                    old_inspection.qualitied = qr(qualitied_patch, inspect_patch),
+                    old_inspection.unqualitied_patch = unqualitied_patch,
+                    old_inspection.qualitied_patch = qualitied_patch,
+                    old_inspection.inspect_patch = inspect_patch,
+                    old_inspection.category = '' if not category else category,
+                    old_inspection.level = new_level,
+                    old_inspection.industry_id = industry_id,
+                    old_inspection.product_name = product_name[0],
+                    old_inspection.origin_product = origin_product,
+                    old_inspection.area_id = area[0].id,
+                    old_inspection.status = 0,
+                    print(old_inspection.pubtime)
+                    for x in old_inspection:
+                        print(x)
+                        x.save()
+
+                    dupli += 1
+                    continue
+
                 bulk_inspection = Inspection(
                     title=title,
                     url=url,
@@ -421,7 +451,7 @@ class InspectionDataUpload(Abstract):
 
         return {
             'status': 1,
-            'message': '操作成功！共处理%s条数据！' % total
+            'message': '操作成功！共处理%s条数据，新增数据%s条，更新数据%s条！' % (total, total - dupli, dupli,)
         }
 
 
