@@ -21,21 +21,25 @@ class PolicyAreaData(Abstract):
             'level': getattr(self, 'level', None),
         }
         args = dict([k, v] for k, v in cond.items() if v)
-        areas = Area.objects.using('hqi').filter(policy__category='区域政策').filter(**args).annotate(num_policies=Count('policy'))
+        areas = Area.objects.using('hqi').filter(policy__category='区域政策',**args).annotate(num_policies=Count('policy'))
         for area in areas:
             if area.num_policies:
                 level = Area.objects.using('hqi').filter(id=area.id).values_list('level',flat=True)[0]
-                policies = Area.objects.using('hqi').filter(id=area.id).values_list('policy__id',flat=True)[0]
-                articletitle = Policy.objects.using('hqi').filter(id=policies).values_list('policyarticle_id__title',flat=True)[0]
-                articleurl = Policy.objects.using('hqi').filter(id=policies).values_list('policyarticle_id__url',flat=True)[0]
+                policies = Area.objects.using('hqi').filter(policy__category='区域政策',id=area.id).values_list('policy__id',flat=True)
+                fields = {'policyarticle_id__title','policyarticle_id__url'}
+                articles = Policy.objects.using('hqi').filter(id__in=policies).values(*fields)[0]
+                articletitle = articles['policyarticle_id__title']
+                articleurl = articles['policyarticle_id__url']
+                nums = Policy.objects.using('hqi').filter(policyarticle__url=articleurl).count()
                 a = {'area':area.name,
                     'area__id':area.id,
-                    'total':area.num_policies,
+                    'total':nums,
                     'level':level,
                     'articletitle':articletitle,
                     'articleurl':articleurl,
                     }
-                policydata.append(a)
+                if a not in policydata:
+                    policydata.append(a)
 
         return policydata
 
@@ -116,21 +120,25 @@ class PolicyPrivateData(Abstract):
             'level': getattr(self, 'level', None),
         }
         args = dict([k, v] for k, v in cond.items() if v)
-        areas = Area.objects.using('hqi').filter(policy__category='民营政策').filter(**args).annotate(num_policies=Count('policy'))
+        areas = Area.objects.using('hqi').filter(policy__category='民营政策',**args).annotate(num_policies=Count('policy'))
         for area in areas:
             if area.num_policies:
                 level = Area.objects.using('hqi').filter(id=area.id).values_list('level',flat=True)[0]
-                policies = Area.objects.using('hqi').filter(id=area.id).values_list('policy__id',flat=True)[0]
-                articletitle = Policy.objects.using('hqi').filter(id=policies).values_list('policyarticle_id__title',flat=True)[0]
-                articleurl = Policy.objects.using('hqi').filter(id=policies).values_list('policyarticle_id__url',flat=True)[0]
+                policies = Area.objects.using('hqi').filter(policy__category='民营政策',id=area.id).values_list('policy__id',flat=True)
+                fields = {'policyarticle_id__title','policyarticle_id__url'}
+                articles = Policy.objects.using('hqi').filter(id__in=policies).values(*fields)[0]
+                articletitle = articles['policyarticle_id__title']
+                articleurl = articles['policyarticle_id__url']
+                nums = Policy.objects.using('hqi').filter(policyarticle__url=articleurl).count()
                 a = {'area':area.name,
                     'area__id':area.id,
-                    'areas__name':area.num_policies,
+                    'total':nums,
                     'level':level,
                     'articletitle':articletitle,
                     'articleurl':articleurl,
                     }
-                policydata.append(a)
+                if a not in policydata:
+                    policydata.append(a)
 
         return policydata
 
@@ -217,6 +225,7 @@ class PolicyIndustryData(Abstract):
         args = dict([k, v] for k, v in cond.items() if v)
         areas = Area.objects.using('hqi').filter(policy__category='产业政策').annotate(num_policies=Count('policy'))
         for area in areas:
+            print(area.num_policies)
             if area.num_policies:
                 for x in range(area.num_policies):
                     policiess = Policy.objects.using('hqi').filter(areas__id=area.id,category='产业政策').values_list('industry',flat=True)[x]
@@ -323,7 +332,7 @@ class PolicyDataUpload(Abstract):
 
     def upload(self, filename, file_obj):
         #Model weight
-        model = {'政策类别': 0,  'URL':0 , '标题':0 ,'政策': 0, '详细':0 , '地域': 0,'时间':0}
+        model = {'地域': 0,'政策类别': 0,  'URL':0 , '标题':0 ,'政策': 0, '详细':0 , '时间':0}
         #sheet value
         sv = lambda x, y, z : z.cell(row=x, column=y).value
         #date format
@@ -420,6 +429,7 @@ class PolicyDataUpload(Abstract):
                         policy.save(using = 'hqi')
                         dupli += 1
 
+
                 except Exception as e:
                     return {
                         'status': 0,
@@ -438,7 +448,7 @@ class PolicyIndustryDataUpload(Abstract):
 
     def upload(self, filename, file_obj):
         #Model weight
-        model = {'政策类别': 0,'产业类别': 0,  'URL':0 , '标题':0 ,'政策': 0, '详细':0 , '地域': 0,'时间':0}
+        model = {'地域': 0,'政策类别': 0,'产业类别': 0,  'URL':0 , '标题':0 ,'政策': 0, '详细':0 , '时间':0}
 
         #sheet value
         sv = lambda x, y, z : z.cell(row=x, column=y).value

@@ -62,6 +62,7 @@ class GovReportsDelete(Abstract):
         for id in del_ids.split(","):
             GovReports.objects.using('hqi').filter(id=id).delete()
 
+
 class GovReportsEdit(Abstract):
 
     def __init__(self, user, params={}):
