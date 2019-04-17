@@ -486,6 +486,21 @@ class EventsKeyword(models.Model):
         verbose_name_plural = '事件关键词'
 
 
+class KeywordsStatistical(models.Model):
+    name = models.CharField(max_length=20, verbose_name='关键词')
+    number = models.IntegerField(null=True, verbose_name='总数')
+
+    events = models.ForeignKey(
+        Events,
+        on_delete=models.CASCADE,
+        verbose_name='事件'
+    )
+
+    class Meta:
+        app_label = 'base'
+        verbose_name_plural = '关键词统计'
+
+
 class EventsMedia(models.Model):
     source = models.CharField(max_length=50, verbose_name='新闻来源')
     website = models.CharField(max_length=50, verbose_name='自身发布网站')

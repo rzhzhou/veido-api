@@ -9,7 +9,7 @@ from django.db.models import Count, Q, F, Max, Min
 from observer.base.models import(Area, Article, Category,
                                 CorpusCategories, HarmIndicator, Harm,
                                 HarmPeople, Events, EventsKeyword,
-                                EventsMedia)
+                                EventsMedia, KeywordsStatistical)
 from django.contrib.auth.models import Group, User
 from observer.base.service.abstract import Abstract
 from observer.base.service.base import (areas, categories, )
@@ -18,6 +18,7 @@ from observer.utils.str_format import str_to_md5str
 from observer.utils.excel import (read_by_openpyxl, write_by_openpyxl, )
 from observer.utils.crawler.news_crawler import newsCrawler
 from observer.utils.crawler.baiDuAIP import BaiDuAI
+from observer.utils.crawler.keywords import cutKeywords
 
 
 class ArticleData(Abstract):
@@ -129,10 +130,9 @@ class EventsAnalysis(object):
         return areasList
 
     def getKeywords(self, eid):
-        event = EventsKeyword.objects.filter(events_id = eid)
-        event = event.annotate(num_eventskeyword = Count('articles')).values('name', 'num_eventskeyword')
+        keywords = KeywordsStatistical.objects.filter(events_id = eid).values('name', 'number')[:150]
 
-        return event
+        return keywords
 
     # 事件传播分析
     def getTimeTrend(self, eid):
@@ -942,6 +942,9 @@ class EventsDataUpload(Abstract):
 
                     event_id.articles.add(article_id)
                     event_id.save()
+
+                    # 分析标题，生成关键词，和统计关键词数量
+                    cutKeywords(title, event_id.id)
 
                 except Exception as e:
                     return {

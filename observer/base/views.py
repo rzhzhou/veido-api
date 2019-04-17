@@ -330,7 +330,7 @@ class EventContentView(APIView):
 
             'keywords': map(lambda k: {
                 'name': k['name'],
-                'sum': k['num_eventskeyword'],
+                'sum': k['number'],
             }, keywords),
         }
 
