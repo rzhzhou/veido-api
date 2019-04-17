@@ -227,7 +227,6 @@ class RiskDataAdd(Abstract):
         categoriesnum = categories.split(',')
 
         for x in range(len(categoriesnum)-1):
-            print(categories.split(',')[x])
             if  categories.split(',')[x] =='0002' and score == '0':
                 score = '1'
 
@@ -297,6 +296,11 @@ class RiskDataEdit(Abstract):
         source = getattr(self, 'source', '')
         areas = getattr(self, 'areas', '')
         categories = getattr(self, 'categories', '')
+        categoriesnum = categories.split(',')
+
+        for x in range(len(categoriesnum)-1):
+            if  categories.split(',')[x] =='0002' and score == '0':
+                score = '1'
 
         if not pubtime or not source or not areas or not categories:
             return 400

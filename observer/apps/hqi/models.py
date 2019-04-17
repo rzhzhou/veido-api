@@ -61,7 +61,7 @@ class Policy(models.Model):
     category = models.CharField(max_length=255, verbose_name='政策类别')
     industry = models.CharField(max_length=255, null=True, verbose_name='产业类别')
     name = models.CharField(max_length=255, null=True, verbose_name='政策')
-    detail = models.CharField(max_length=255, null= True, verbose_name='政策详情')
+    detail = models.CharField(max_length=1500, null= True, verbose_name='政策详情')
     areas = models.ManyToManyField(Area)
 
     policyarticle = models.ForeignKey(

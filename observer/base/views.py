@@ -3534,7 +3534,7 @@ class PolicPrivatelView(BaseView):
             'list': map(lambda r: {
                 'name': r['area'],
                 'area__id': r['area__id'],
-                'total': r['areas__name'],
+                'total': r['total'],
                 'level': r['level'],
                 'title': r['articletitle'],
                 'url': r['articleurl'],
