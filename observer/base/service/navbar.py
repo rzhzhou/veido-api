@@ -82,7 +82,7 @@ class RouteData(Abstract):
     def get_routers(self):
         routers = []
         u_navs_ids = UserNav.objects.filter(user=self.user).values_list('nav', flat=True)
-        routes = Nav.objects.filter(id__in=u_navs_ids).exclude(level=1).values('id', 'href', 'component').order_by('index')
+        routes = Nav.objects.filter(id__in=u_navs_ids).exclude(level=1).values('id', 'href', 'component', 'nav_type').order_by('index')
         j = 0
         for i, route in enumerate(routes):
             if route['href'] == '':
@@ -92,6 +92,7 @@ class RouteData(Abstract):
                     'path': route['href'],
                     'alias': '/' if i - j == 0 else '',
                     'component': route['component'],
+                    'meta': { 'pageAside': True } if route['nav_type'] else { 'pageAside': False },
                 })
 
         return routers

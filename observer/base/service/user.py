@@ -68,7 +68,7 @@ class UserAdd(Abstract):  # 添加用户
         group_names = Group.objects.filter(user=self.user).values_list('name', flat=True)
 
         # '权限管理'的ID
-        permissions_id = Nav.objects.get(name='权限管理').id
+        permissions_ids = Nav.objects.filter(name='权限管理').values_list('id', flat=True)
 
         # 当前登录用户权限导航ID
         u_navs_ids = UserNav.objects.filter(user=self.user).values_list('nav', flat=True)
@@ -143,7 +143,7 @@ class UserAdd(Abstract):  # 添加用户
 
                 # 关联初始导航权限
                 bulk_usernav = []
-                u_navs_ids = u_navs_ids.exclude(nav=permissions_id)
+                u_navs_ids = u_navs_ids.exclude(nav__in=permissions_ids)
                 for id in u_navs_ids:
                     user_nav = UserNav(
                         nav_id = id,
@@ -219,10 +219,10 @@ class UserNavData(Abstract):
         if '超级管理员' in group_names:
             is_staff = User.objects.get(id=uid).is_staff
             if is_staff == 1:
-                nav_type = [0, 2]
+                project = [0, 2]
             elif is_staff == 0:
-                nav_type = [0, 1]
-            L1 = name_and_id.filter(level=1, nav_type__in=nav_type)
+                project = [0, 1]
+            L1 = name_and_id.filter(level=1, project__in=project)
             for category in L1:
                 menus.append({
                     'id': category['id'],
@@ -233,8 +233,8 @@ class UserNavData(Abstract):
                         'children': list(map(lambda y: {
                             'id': y['id'],
                             'label': y['name'],
-                        }, Nav.objects.filter(level=3, parent_id=x['id'], nav_type__in=nav_type).values('name', 'id').order_by('index'))) if Nav.objects.filter(level=3, parent_id=x['id'], nav_type__in=nav_type) else ''
-                    }, Nav.objects.filter(level=2, parent_id=category['id'], nav_type__in=nav_type).values('name', 'id').order_by('index'))) if Nav.objects.filter(level=2, parent_id=category['id'], nav_type__in=nav_type) else ''
+                        }, Nav.objects.filter(level=3, parent_id=x['id'], project__in=project).values('name', 'id').order_by('index'))) if Nav.objects.filter(level=3, parent_id=x['id'], project__in=project) else ''
+                    }, Nav.objects.filter(level=2, parent_id=category['id'], project__in=project).values('name', 'id').order_by('index'))) if Nav.objects.filter(level=2, parent_id=category['id'], project__in=project) else ''
                 })
         else:
             u_navs_ids = UserNav.objects.filter(user=self.user).values_list('nav', flat=True)
