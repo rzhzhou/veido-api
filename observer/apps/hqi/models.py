@@ -15,7 +15,7 @@ class Area(models.Model):
 
     class Meta:
         app_label = 'hqi'
-        db_table = 'base_area'
+        db_table = 'hqi_area'
         verbose_name_plural = '地域'
 
     def __str__(self):
@@ -35,23 +35,45 @@ class GovReports(models.Model):
 
     class Meta:
         app_label = 'hqi'
-        db_table = 'base_govreports'
+        db_table = 'hqi_govreports'
         verbose_name_plural = '政府报告'
 
     def __str__(self):
         return self.title
 
 
+class PolicyArticle(models.Model):
+    title = models.CharField(max_length=255, verbose_name='标题')
+    url = models.URLField(verbose_name='网站链接')
+    pubtime = models.DateTimeField(auto_now_add=True, verbose_name='发布时间')
+    total = models.IntegerField(verbose_name='总计', null=True)
+
+    class Meta:
+        app_label = 'hqi'
+        db_table = 'hqi_policyarticle'
+        verbose_name_plural = '地域链接'
+
+    def __str__(self):
+        return self.name
+
+
 class Policy(models.Model):
     category = models.CharField(max_length=255, verbose_name='政策类别')
-    industry = models.CharField(max_length=255, blank=True, verbose_name='产业类别')
-    name = models.CharField(max_length=255, verbose_name='政策')
+    industry = models.CharField(max_length=255, null=True, verbose_name='产业类别')
+    name = models.CharField(max_length=255, null=True, verbose_name='政策')
+    detail = models.CharField(max_length=255, null= True, verbose_name='政策详情')
+    areas = models.ManyToManyField(Area)
 
+    policyarticle = models.ForeignKey(
+        PolicyArticle,
+        on_delete=models.CASCADE,
+        verbose_name=u'地域链接'
+    )
     areas = models.ManyToManyField(Area)
 
     class Meta:
         app_label = 'hqi'
-        db_table = 'base_policy'
+        db_table = 'hqi_policy'
         verbose_name_plural = '政府政策'
 
     def __unicode__(self):
@@ -73,7 +95,7 @@ class Indicator(models.Model):
 
     class Meta:
         app_label = 'hqi'
-        db_table = 'base_indicator'
+        db_table = 'hqi_indicator'
         verbose_name_plural = '指标'
 
     def __str__(self):
@@ -97,7 +119,7 @@ class IndicatorDataParent(models.Model):
 
     class Meta:
         app_label = 'hqi'
-        db_table = 'base_indicatordataparent'
+        db_table = 'hqi_indicatordataparent'
         verbose_name_plural = '指标数据'
 
 
@@ -118,5 +140,5 @@ class IndicatorScore(models.Model):
 
     class Meta:
         app_label = 'hqi'
-        db_table = 'base_indicatorscore'
+        db_table = 'hqi_indicatorscore'
         verbose_name_plural = '指标数据(量化)'

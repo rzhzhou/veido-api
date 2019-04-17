@@ -9,7 +9,7 @@ from django.db.models import Count, Q, F, Max, Min
 from observer.base.models import(Area, Article, Category,
                                 CorpusCategories, HarmIndicator, Harm,
                                 HarmPeople, Events, EventsKeyword,
-                                EventsMedia)
+                                EventsMedia, KeywordsStatistical)
 from django.contrib.auth.models import Group, User
 from observer.base.service.abstract import Abstract
 from observer.base.service.base import (areas, categories, )
@@ -18,6 +18,7 @@ from observer.utils.str_format import str_to_md5str
 from observer.utils.excel import (read_by_openpyxl, write_by_openpyxl, )
 from observer.utils.crawler.news_crawler import newsCrawler
 from observer.utils.crawler.baiDuAIP import BaiDuAI
+from observer.utils.crawler.keywords import cutKeywords
 
 
 class ArticleData(Abstract):
@@ -91,7 +92,7 @@ class EventsAnalysis(object):
             return sentimentList
 
     def getSource(self, eid):
-        event = EventsKeyword.objects.filter(events_id = eid)
+        event = Events.objects.filter(id = eid)
         event = event.annotate(num_source = Count('articles'))
         source = event.values('articles__source', 'num_source').order_by('-num_source')
         
@@ -129,20 +130,19 @@ class EventsAnalysis(object):
         return areasList
 
     def getKeywords(self, eid):
-        event = EventsKeyword.objects.filter(events_id = eid)
-        event = event.annotate(num_eventskeyword = Count('articles')).values('name', 'num_eventskeyword')
+        keywords = KeywordsStatistical.objects.filter(events_id = eid).values('name', 'number')[:150]
 
-        return event
+        return keywords
 
     # 事件传播分析
     def getTimeTrend(self, eid):
-        event = EventsKeyword.objects.filter(events_id = eid)
+        event = Events.objects.filter(id = eid)
         time = event.annotate(num_source = Count('articles')).values('articles__pubtime').order_by('articles__pubtime')
         
         return time
 
     def getTrend(self, eid):
-        event = EventsKeyword.objects.filter(events_id = eid)
+        event = Events.objects.filter(id = eid)
         articles = Article.objects.filter(events__id = eid)
 
         source = event.annotate(num_source = Count('articles')).values_list('articles__source', flat = True).order_by('-num_source')[:5]
@@ -224,6 +224,12 @@ class RiskDataAdd(Abstract):
         areas = getattr(self, 'areas', '')
         categories = getattr(self, 'categories', '')
         industries = getattr(self, 'industries', -1)
+        categoriesnum = categories.split(',')
+
+        for x in range(len(categoriesnum)-1):
+            print(categories.split(',')[x])
+            if  categories.split(',')[x] =='0002' and score == '0':
+                score = '1'
 
         if not pubtime:
             pubtime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -236,6 +242,8 @@ class RiskDataAdd(Abstract):
 
         if Article.objects.filter(url=url).exists():
             return 202
+
+
 
         # 有多个地域时逗号分隔，并且忽略掉最后一个逗号
         a_ids = areas.split(',')[:-1:]
@@ -417,8 +425,12 @@ class RiskDataUpload(Abstract):
                         continue
                     else:
                         categories = category.split()
-                        c_ids = Category.objects.filter(name__in=categories).values_list('id', flat=True)
 
+                        if categories[0] =='风险快讯' and score =='0':
+                            score = '1'
+
+                        c_ids = Category.objects.filter(name__in=categories).values_list('id', flat=True)
+                        print(c_ids)
                         if len(categories) != len(c_ids):
                             return {
                                 'status': 0,
@@ -926,6 +938,9 @@ class EventsDataUpload(Abstract):
 
                     event_id.articles.add(article_id)
                     event_id.save()
+
+                    # 分析标题，生成关键词，和统计关键词数量
+                    cutKeywords(title, event_id.id)
 
                 except Exception as e:
                     return {

@@ -4,7 +4,7 @@ from io import BytesIO
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, Q, F
-from observer.apps.hqi.models import Policy, Area
+from observer.apps.hqi.models import Policy, Area, PolicyArticle
 from observer.base.service.abstract import Abstract
 from observer.utils.excel import (read_by_openpyxl, write_by_openpyxl, )
 
@@ -18,17 +18,25 @@ class PolicyAreaData(Abstract):
         policydata = []
         cond = {
             'id': getattr(self, 'areas', None),
+            'level': getattr(self, 'level', None),
         }
         args = dict([k, v] for k, v in cond.items() if v)
         areas = Area.objects.using('hqi').filter(policy__category='区域政策').filter(**args).annotate(num_policies=Count('policy'))
         for area in areas:
             if area.num_policies:
-                a = {'id':area.name,
+                level = Area.objects.using('hqi').filter(id=area.id).values_list('level',flat=True)[0]
+                policies = Area.objects.using('hqi').filter(id=area.id).values_list('policy__id',flat=True)[0]
+                articletitle = Policy.objects.using('hqi').filter(id=policies).values_list('policyarticle_id__title',flat=True)[0]
+                articleurl = Policy.objects.using('hqi').filter(id=policies).values_list('policyarticle_id__url',flat=True)[0]
+                a = {'area':area.name,
                     'area__id':area.id,
-                    'areas__name':area.num_policies,
+                    'total':area.num_policies,
+                    'level':level,
+                    'articletitle':articletitle,
+                    'articleurl':articleurl,
                     }
                 policydata.append(a)
-        print(policydata)
+
         return policydata
 
 
@@ -37,9 +45,10 @@ class PolicyAreaTotalData(Abstract):
     def __init__(self, params={}):
         super(PolicyAreaTotalData, self).__init__(params)
 
-    def get_all(self, pid):
-        fields = ('id', 'name')
-        queryset = Policy.objects.using('hqi').filter(category='区域政策').filter(areas__id=pid)
+    def get_all(self):
+        fields = ('id', 'name','detail','policyarticle_id__pubtime')
+        url = getattr(self, 'url', None)
+        queryset = Policy.objects.using('hqi').filter(category='区域政策',policyarticle_id__url=url)
 
         return queryset.values(*fields)
 
@@ -51,28 +60,47 @@ class PolicyAreaAdd(Abstract):
         self.user = user
 
     def add(self):
+        title = getattr(self,'title', '')
+        url = getattr(self, 'url', '')
+        pubtime = getattr(self, 'pubtime', '')
         areas = getattr(self, 'areas', '')
-        policyname = getattr(self, 'policyname', '')
+        name = getattr(self, 'name', '')
+        detail = getattr(self, 'detail', '')
 
-        if not Policy.objects.using('hqi').filter(category='区域政策').filter(name=policyname).exists():
+        if not PolicyArticle.objects.using('hqi').filter(url=url, title=title).exists():
+            policyarticle =PolicyArticle(
+                title = title,
+                url = url,
+                pubtime = pubtime,
+            )
+            policyarticle.save(using='hqi')
+            policyarticleid = PolicyArticle.objects.using('hqi').filter(url=url, title=title).values_list('id',flat=True)[0]
             policy = Policy(
                 category = '区域政策',
-                industry = '',
-                name = policyname,
+                name = name,
+                detail = detail,
+                policyarticle_id = policyarticleid,
             )
             policy.save(using='hqi')
+            area_id = Area.objects.using('hqi').filter(name=areas).values_list('id', flat=True)
+            areas = Area.objects.using('hqi').filter(id__in=area_id)
+            policy.areas.add(*areas)
+            policy.save(using='hqi')
+
         else:
-            print('2')
-            policies = Policy.objects.using('hqi').filter(category='区域政策').filter(name=policyname).values_list('id',flat=True)[0]
-            policy = Policy.objects.using('hqi').get(id=policies)
-            policy.industry = ''
-            policy.save()
-
-        area_id = Area.objects.using('hqi').filter(name=areas).values_list('id', flat=True)
-        areas = Area.objects.using('hqi').filter(id__in=area_id)
-        policy.areas.add(*areas)
-        policy.save(using='hqi')
-
+            if not Policy.objects.using('hqi').filter(category='区域政策',name=name,detail=detail).exists():
+                policyarticleid = PolicyArticle.objects.using('hqi').filter(url=url, title=title).values_list('id',flat=True)[0]
+                policy = Policy(
+                    category = '区域政策',
+                    name = name,
+                    detail = detail,
+                    policyarticle_id = policyarticleid,
+                )
+                policy.save(using='hqi')
+                area_id = Area.objects.using('hqi').filter(name=areas).values_list('id', flat=True)
+                areas = Area.objects.using('hqi').filter(id__in=area_id)
+                policy.areas.add(*areas)
+                policy.save(using='hqi')
 
 
 # 民营
@@ -85,17 +113,25 @@ class PolicyPrivateData(Abstract):
         policydata = []
         cond = {
             'id': getattr(self, 'areas', None),
+            'level': getattr(self, 'level', None),
         }
         args = dict([k, v] for k, v in cond.items() if v)
         areas = Area.objects.using('hqi').filter(policy__category='民营政策').filter(**args).annotate(num_policies=Count('policy'))
         for area in areas:
             if area.num_policies:
-                a = {'id':area.name,
+                level = Area.objects.using('hqi').filter(id=area.id).values_list('level',flat=True)[0]
+                policies = Area.objects.using('hqi').filter(id=area.id).values_list('policy__id',flat=True)[0]
+                articletitle = Policy.objects.using('hqi').filter(id=policies).values_list('policyarticle_id__title',flat=True)[0]
+                articleurl = Policy.objects.using('hqi').filter(id=policies).values_list('policyarticle_id__url',flat=True)[0]
+                a = {'area':area.name,
                     'area__id':area.id,
                     'areas__name':area.num_policies,
+                    'level':level,
+                    'articletitle':articletitle,
+                    'articleurl':articleurl,
                     }
                 policydata.append(a)
-        print(policydata)
+
         return policydata
 
 
@@ -104,9 +140,10 @@ class PolicPrivatelTotalData(Abstract):
     def __init__(self, params={}):
         super(PolicPrivatelTotalData, self).__init__(params)
 
-    def get_all(self, pid):
-        fields = ('id', 'name')
-        queryset = Policy.objects.using('hqi').filter(category='民营政策').filter(areas__id=pid)
+    def get_all(self):
+        fields = ('id', 'name','detail','policyarticle_id__pubtime')
+        url = getattr(self, 'url', None)
+        queryset = Policy.objects.using('hqi').filter(category='民营政策',policyarticle_id__url=url)
 
         return queryset.values(*fields)
 
@@ -118,27 +155,48 @@ class PolicPrivatelAdd(Abstract):
         self.user = user
 
     def add(self):
+        title = getattr(self,'title', '')
+        url = getattr(self, 'url', '')
+        pubtime = getattr(self, 'pubtime', '')
         areas = getattr(self, 'areas', '')
-        policyname = getattr(self, 'policyname', '')
+        name = getattr(self, 'name', '')
+        detail = getattr(self, 'detail', '')
 
-        if not Policy.objects.using('hqi').filter(category='民营政策').filter(name=policyname).exists():
+        if not PolicyArticle.objects.using('hqi').filter(url=url, title=title).exists():
+            policyarticle =PolicyArticle(
+                title = title,
+                url = url,
+                pubtime = pubtime,
+            )
+            policyarticle.save(using='hqi')
+            policyarticleid = PolicyArticle.objects.using('hqi').filter(url=url, title=title).values_list('id',flat=True)[0]
             policy = Policy(
                 category = '民营政策',
-                industry = '',
-                name = policyname,
+                name = name,
+                detail = detail,
+                policyarticle_id = policyarticleid,
             )
             policy.save(using='hqi')
-        else:
-            print('2')
-            policies = Policy.objects.using('hqi').filter(category='民营政策').filter(name=policyname).values_list('id',flat=True)[0]
-            policy = Policy.objects.using('hqi').get(id=policies)
-            policy.industry = ''
-            policy.save()
+            area_id = Area.objects.using('hqi').filter(name=areas).values_list('id', flat=True)
+            areas = Area.objects.using('hqi').filter(id__in=area_id)
+            policy.areas.add(*areas)
+            policy.save(using='hqi')
 
-        area_id = Area.objects.using('hqi').filter(name=areas).values_list('id', flat=True)
-        areas = Area.objects.using('hqi').filter(id__in=area_id)
-        policy.areas.add(*areas)
-        policy.save(using='hqi')
+        else:
+            if not Policy.objects.using('hqi').filter(category='民营政策',name=name,detail=detail).exists() :
+                policyarticleid = PolicyArticle.objects.using('hqi').filter(url=url, title=title).values_list('id',flat=True)[0]
+                policy = Policy(
+                    category = '民营政策',
+                    name = name,
+                    detail = detail,
+                    policyarticle_id = policyarticleid,
+                )
+                policy.save(using='hqi')
+                area_id = Area.objects.using('hqi').filter(name=areas).values_list('id', flat=True)
+                print(area_id)
+                areas = Area.objects.using('hqi').filter(id__in=area_id)
+                policy.areas.add(*areas)
+                policy.save(using='hqi')
 
 
 # 产业
@@ -150,34 +208,47 @@ class PolicyIndustryData(Abstract):
     def get_all(self):
         policydata = []
         policies = []
+        policyarticles = []
         cond = {
             'id': getattr(self, 'areas', None),
             'policy__industry': getattr(self, 'industry', None),
+            'level': getattr(self, 'level', None),
         }
         args = dict([k, v] for k, v in cond.items() if v)
         areas = Area.objects.using('hqi').filter(policy__category='产业政策').annotate(num_policies=Count('policy'))
         for area in areas:
             if area.num_policies:
                 for x in range(area.num_policies):
-                    policiess = Policy.objects.using('hqi').filter(areas__id=area.id).filter(category='产业政策').values_list('industry',flat=True)[x]
+                    policiess = Policy.objects.using('hqi').filter(areas__id=area.id,category='产业政策').values_list('industry',flat=True)[x]
+                    policyarticless = Policy.objects.using('hqi').filter(areas__id=area.id,category='产业政策').values_list('id',flat=True)[x]
                     policies.append(policiess)
+                    policyarticles.append(policyarticless)
         policy__industry = getattr(self, 'industry', None)
 
-        for x in policies:
-            if x !=policy__industry and policy__industry != '':
-                continue
-            areas = Area.objects.using('hqi').filter(**args).filter(policy__category='产业政策',policy__industry=x).annotate(num_policies=Count('policy'))
+
+        for x in policyarticles:
+            policyarticleid = Policy.objects.using('hqi').filter(id=x).values_list('policyarticle',flat=True)[0]
+            areas = Area.objects.using('hqi').filter(**args).filter(policy__category='产业政策',policy__policyarticle_id=policyarticleid).annotate(num_policies=Count('policy'))
             for area in areas:
                 if area.num_policies:
-                    a = {
-                        'id':area.name,
-                        'industry': x,
+                    fields =('policyarticle__title','policyarticle__url','industry')
+                    level = Area.objects.using('hqi').filter(id=area.id).values_list('level',flat=True)[0]
+                    articles = Policy.objects.using('hqi').filter(id=x).values(*fields)
+                    articletitle = articles[0]['policyarticle__title']
+                    articleurl = articles[0]['policyarticle__url']
+                    industries = articles[0]['industry']
+                    a = {'area':area.name,
                         'area__id':area.id,
                         'areas__name':area.num_policies,
+                        'level':level,
+                        'articletitle':articletitle,
+                        'articleurl':articleurl,
+                        'industry': industries,
                         }
                     if a not in policydata:
                         policydata.append(a)
-                        print(a)
+
+
         return policydata
 
 
@@ -187,10 +258,9 @@ class PolicyIndustryTotalData(Abstract):
         super(PolicyIndustryTotalData, self).__init__(params)
 
     def get_all(self):
-        fields = ('id', 'name','industry')
-        areas = getattr(self, 'area', '')
-        industrys = getattr(self,'industry', '')
-        queryset = Policy.objects.using('hqi').filter(category='产业政策',industry=industrys,areas__id=areas)
+        fields = ('id', 'name','detail','policyarticle_id__pubtime')
+        url = getattr(self, 'url', None)
+        queryset = Policy.objects.using('hqi').filter(category='产业政策',policyarticle_id__url=url)
 
         return queryset.values(*fields)
 
@@ -202,27 +272,50 @@ class PolicyIndustryAdd(Abstract):
         self.user = user
 
     def add(self):
+        title = getattr(self,'title', '')
+        url = getattr(self, 'url', '')
+        pubtime = getattr(self, 'pubtime', '')
         areas = getattr(self, 'areas', '')
+        name = getattr(self, 'name', '')
+        detail = getattr(self, 'detail', '')
         industrys = getattr(self,'industrys','')
-        policyname = getattr(self, 'policyname', '')
 
-        if not Policy.objects.using('hqi').filter(category='产业政策',industry=industrys).filter(name=policyname).exists():
+        if not PolicyArticle.objects.using('hqi').filter(url=url, title=title).exists():
+            policyarticle =PolicyArticle(
+                title = title,
+                url = url,
+                pubtime = pubtime,
+            )
+            policyarticle.save(using='hqi')
+            policyarticleid = PolicyArticle.objects.using('hqi').filter(url=url, title=title).values_list('id',flat=True)[0]
             policy = Policy(
                 category = '产业政策',
                 industry = industrys,
-                name = policyname,
+                name = name,
+                detail = detail,
+                policyarticle_id = policyarticleid,
             )
             policy.save(using='hqi')
+
+            policy.areas.add(areas)
+            policy.save(using='hqi')
+
         else:
-            policies = Policy.objects.using('hqi').filter(category='产业政策',industry=industrys).filter(name=policyname).values_list('id',flat=True)[0]
-            policy = Policy.objects.using('hqi').get(id=policies)
-            policy.industry = industrys
-            policy.save()
+            if not Policy.objects.using('hqi').filter(category='产业政策', industry =industrys, name=name,detail=detail).exists():
+                policyarticleid = PolicyArticle.objects.using('hqi').filter(url=url, title=title).values_list('id',flat=True)[0]
+                policy = Policy(
+                    category = '产业政策',
+                    industry = industrys,
+                    name = name,
+                    detail = detail,
+                    policyarticle_id = policyarticleid,
+                )
+                policy.save(using='hqi')
+                policy.areas.add(areas)
+                policy.save(using='hqi')
 
-        policy.areas.add(areas)
-        policy.save(using='hqi')
 
-
+#导入
 class PolicyDataUpload(Abstract):
 
     def __init__(self, user):
@@ -230,7 +323,7 @@ class PolicyDataUpload(Abstract):
 
     def upload(self, filename, file_obj):
         #Model weight
-        model = {'政策类别': 0, '政策': 0, '地域': 0}
+        model = {'政策类别': 0,  'URL':0 , '标题':0 ,'政策': 0, '详细':0 , '地域': 0,'时间':0}
         #sheet value
         sv = lambda x, y, z : z.cell(row=x, column=y).value
         #date format
@@ -274,6 +367,18 @@ class PolicyDataUpload(Abstract):
                     if name == 'None':
                         continue
 
+                    # URL
+                    url = sv(i, model['URL'], sheet)
+
+                    # 时间
+                    pubtime = sv(i, model['时间'], sheet)
+
+                    # 标题
+                    title = sv(i, model['标题'], sheet)
+
+                    # 详细
+                    detail = sv(i, model['详细'], sheet)
+
                     try:
                         # 地域
                         area = sv(i, model['地域'], sheet)
@@ -285,20 +390,35 @@ class PolicyDataUpload(Abstract):
                     except Exception as e:
                         return {
                             'status': 0,
-                            'message': '地域或指标不存在！Excel %s 行存在问题。详细错误信息：%s！' % (i + 1, e)
+                            'message': '地域不存在！Excel %s 行存在问题。详细错误信息：%s！' % (i + 1, e)
                         }
 
 
                     total += 1
-                    print(category,name,area_id)
-                    policy = Policy(
-                        category = category,
-                        name = name,
-                    )
-                    policy.save(using = 'hqi')
-                    policy.areas.add(area_id)
-                    policy.save(using = 'hqi')
 
+                    # 唯一性
+                    old_policy = Policy.objects.using('hqi').filter(policyarticle__title=title,policyarticle__url=url,name=name)
+
+                    if not old_policy.exists():
+                        old_policyarticle = PolicyArticle.objects.using('hqi').filter(title=title,url=url)
+                        if not old_policyarticle.exists():
+                            policyarticle = PolicyArticle(
+                                title = title,
+                                url = url,
+                                pubtime = pubtime,
+                            )
+                            policyarticle.save(using= 'hqi')
+                        policyarticleid = PolicyArticle.objects.using('hqi').filter(url=url, title=title).values_list('id',flat=True)[0]
+                        policy = Policy(
+                            category = category,
+                            name = name,
+                            detail = detail,
+                            policyarticle_id = policyarticleid,
+                        )
+                        policy.save(using = 'hqi')
+                        policy.areas.add(area_id)
+                        policy.save(using = 'hqi')
+                        dupli += 1
 
                 except Exception as e:
                     return {
@@ -306,8 +426,8 @@ class PolicyDataUpload(Abstract):
                         'message': '操作失败！Excel %s 行存在问题。详细错误信息：%s！' % (i + 1, e)
                     }
         return {
-                    'status': 1,
-                    'message': '操作成功！共处理%s条数据，新增数据%s条，更新数据%s条！' % (total, total - dupli, dupli, )
+                'status': 1,
+                'message': '操作成功！共处理%s条数据，新增数据%s条，更新数据%s条！' % (total, total - dupli, dupli, )
                 }
 
 
@@ -318,7 +438,8 @@ class PolicyIndustryDataUpload(Abstract):
 
     def upload(self, filename, file_obj):
         #Model weight
-        model = {'政策类别': 0,'产业类别': 0, '政策': 0, '地域': 0}
+        model = {'政策类别': 0,'产业类别': 0,  'URL':0 , '标题':0 ,'政策': 0, '详细':0 , '地域': 0,'时间':0}
+
         #sheet value
         sv = lambda x, y, z : z.cell(row=x, column=y).value
         #date format
@@ -362,9 +483,22 @@ class PolicyIndustryDataUpload(Abstract):
                     if industry == 'None':
                         continue
 
+                    # 政策
                     name = sv(i, model['政策'], sheet)
                     if name == 'None':
                         continue
+
+                    # URL
+                    url = sv(i, model['URL'], sheet)
+
+                    # 时间
+                    pubtime = sv(i, model['时间'], sheet)
+
+                    # 标题
+                    title = sv(i, model['标题'], sheet)
+
+                    # 详细
+                    detail = sv(i, model['详细'], sheet)
 
                     try:
                         # 地域
@@ -373,28 +507,39 @@ class PolicyIndustryDataUpload(Abstract):
                             continue
                         area_id = Area.objects.using('hqi').get(name = area).id
 
-                        # # 政策
-                        # name = sv(i, model['政策'], sheet)
-
-                        # indicator_id = Policy.objects.using('hqi').get(name = name).id
-
                     except Exception as e:
                         return {
                             'status': 0,
-                            'message': '地域或指标不存在！Excel %s 行存在问题。详细错误信息：%s！' % (i + 1, e)
+                            'message': '地域不存在！Excel %s 行存在问题。详细错误信息：%s！' % (i + 1, e)
                         }
 
 
                     total += 1
-                    print(category,name,area_id)
-                    policy = Policy(
-                        category = category,
-                        industry = industry,
-                        name = name,
-                    )
-                    policy.save(using = 'hqi')
-                    policy.areas.add(area_id)
-                    policy.save(using = 'hqi')
+
+                    # 唯一性
+                    old_policy = Policy.objects.using('hqi').filter(policyarticle__title=title,policyarticle__url=url,name=name)
+
+
+                    if not old_policy.exists():
+                        old_policyarticle = PolicyArticle.objects.using('hqi').filter(title=title,url=url)
+                        if not old_policyarticle.exists():
+                            policyarticle = PolicyArticle(
+                                title = title,
+                                url = url,
+                                pubtime = pubtime,
+                            )
+                            policyarticle.save(using= 'hqi')
+                        policyarticleid = PolicyArticle.objects.using('hqi').filter(url=url, title=title).values_list('id',flat=True)[0]
+                        policy = Policy(
+                            category = category,
+                            industry = industry,
+                            name = name,
+                            detail = detail,
+                            policyarticle_id = policyarticleid,
+                        )
+                        policy.save(using = 'hqi')
+                        policy.areas.add(area_id)
+                        policy.save(using = 'hqi')
 
 
                 except Exception as e:
@@ -406,7 +551,3 @@ class PolicyIndustryDataUpload(Abstract):
                     'status': 1,
                     'message': '操作成功！共处理%s条数据，新增数据%s条，更新数据%s条！' % (total, total - dupli, dupli, )
                 }
-
-
-
-
