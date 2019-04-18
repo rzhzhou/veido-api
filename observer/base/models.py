@@ -431,7 +431,6 @@ class HarmPeople(models.Model):
     class Meta:
         app_label = 'base'
         verbose_name_plural = '伤害涉及者'
-        
 
 
 class HarmIndicator(models.Model):
@@ -567,7 +566,8 @@ class Nav(models.Model):
     icon = models.CharField(default='', max_length=50, verbose_name='图标')
     component = models.CharField(default='', max_length=50, verbose_name='组件')
     index = models.IntegerField(default=0, verbose_name='索引') # 排序依据
-    nav_type = models.IntegerField(default=0, verbose_name='导航类型') # 0: 共用, 1: 质量舆情(App), 2: 产品目录管理(Admin)
+    project = models.IntegerField(default=0, verbose_name='所属项目') # 0: 共用, 1: 质量舆情(App), 2: 产品目录管理(Admin)
+    nav_type = models.IntegerField(default=0, verbose_name='导航类型') # 0: 普通导航, 1: 主页面包含子导航的导航
 
     parent = models.ForeignKey(
         'self',
