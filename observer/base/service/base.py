@@ -18,7 +18,7 @@ def areas(article_id, flat=False):
     if not flat:
         return list(map(lambda x: {'id': x['id'], 'name': x['name']}, queryset.values('id', 'name')))
     else:
-        return ','.join(queryset.values_list('name', flat=True))
+        return ' '.join(queryset.values_list('name', flat=True))
 
 
 def categories(article_id, admin=False, flat=False):
