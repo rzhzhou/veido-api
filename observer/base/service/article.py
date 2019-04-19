@@ -527,6 +527,8 @@ class RiskDataExport(Abstract):
         ]
         fields = ('id', 'title', 'url', 'pubtime', 'source', 'score', 'areas__name', 'industry__name')
         cond = {
+            'title__contains': getattr(self, 'title', None),
+            'source__contains': getattr(self, 'source', None),
             'areas__id': getattr(self, 'areas', None),
             'status': getattr(self, 'status'),
             'categories__id': getattr(self, 'category', None),
