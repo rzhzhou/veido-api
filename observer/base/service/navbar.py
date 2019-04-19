@@ -52,7 +52,10 @@ class NavBarEdit(Abstract):
         if not self.user.is_superuser:
             return 204
 
+    # 对比用户前后路由差异
+        # 用户已存在的权限id
         origin_nav_ids = list(map(str, list(UserNav.objects.filter(user_id=edit_id).exclude(nav__level=-1).values_list('nav_id', flat=True))))
+        # 用户要分配权限id
         edit_nav_ids = nav_ids.split(',')
 
         diff_nav_ids = list(set(origin_nav_ids).difference(set(edit_nav_ids))) + list(set(edit_nav_ids).difference(set(origin_nav_ids)))
@@ -63,14 +66,16 @@ class NavBarEdit(Abstract):
 
                 if not UserNav.objects.filter(user_id=edit_id, nav_id=nav_id).exists():
                     UserNav(user_id=edit_id, nav_id=nav_id).save()
-                    if child_ids.exists() and not UserNav.objects.filter(user_id=edit_id, nav_id__in=child_ids).exists():
-                        for child_id in child_ids:
-                            UserNav(user_id=edit_id, nav_id=child_id).save()
+                    if child_ids.exists():
+                        if not UserNav.objects.filter(user_id=edit_id, nav_id__in=child_ids).exists():
+                            for child_id in child_ids:
+                                UserNav(user_id=edit_id, nav_id=child_id).save()
                 else:
                     UserNav.objects.filter(user_id=edit_id, nav_id=nav_id).delete()
-                    if child_ids.exists() and UserNav.objects.filter(user_id=edit_id, nav_id__in=child_ids).exists():
-                        for child_id in child_ids:
-                            UserNav(user_id=edit_id, nav_id=child_id).delete()
+                    if child_ids.exists():
+                        if UserNav.objects.filter(user_id=edit_id, nav_id__in=child_ids).exists():
+                            for child_id in child_ids:
+                                UserNav.objects.filter(user_id=edit_id, nav_id=child_id).delete()
 
         return 200
 
