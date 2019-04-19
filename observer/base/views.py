@@ -32,7 +32,7 @@ from observer.base.service.base import (alias_industry, area, areas,
 from observer.base.service.corpus import (CategoryListData, CorpusAdd,
                                           CorpusData, CorpusDelete, CorpusEdit,
                                           CrawlerData)
-from observer.base.service.dashboard import DashboardData
+from observer.base.service.dashboard import DashboardData, V2Data
 from observer.base.service.desmon import (DMLinkAdd, DMLinkData, DMLinkDelete,
                                           DMLinkEdit, DMWordsData, DMWordsFocusData,
                                           DMWordsDelete, MonitorInformationData)
@@ -131,6 +131,37 @@ class DashboardView(BaseView):
 
         return Response(DashboardData(params=request.query_params, user=request.user).get_all())
 
+
+class V2View(BaseView):
+    
+    def __init__(self):
+        super(V2View, self).__init__()
+        
+    def set_request(self, request):
+        super(V2View, self).set_request(request)
+
+    def serialize(self, hotSpots, events):
+        data = {
+            'hotSpots' : map(lambda h: {
+                'title': h['title'],
+                'pubtime': date_format(h['pubtime'], '%Y-%m-%d %H:%M:%S'),
+            }, hotSpots),
+
+            'events' : map(lambda e: {
+                'title': e['title'],
+                'socialHarm': e['socialHarm'],
+                'num_articles': e['num_articles'],
+            }, events),
+        }
+
+        return data
+
+    def get(self, request):
+        self.set_request(request)
+
+        hotSpots = V2Data(params=request.query_params).hotSpots()
+        events = V2Data(params=request.query_params).events()
+        return Response(self.serialize(hotSpots, events))
 
 class ArticleView(BaseView):
     # 0001---质量热点
@@ -422,6 +453,7 @@ class InspectionView(BaseView):
 
 
 class InspectStatisticsView(BaseView):
+
     def __init__(self):
         super(InspectStatisticsView, self).__init__()
 
@@ -609,6 +641,7 @@ class SelectCpcIndustriesView(BaseView):
 
 
 class CpcListView(BaseView):
+
     def __init__(self):
         super(CpcListView, self).__init__()
 
@@ -961,6 +994,7 @@ class CCCIndustryView(BaseView):
 
 # 产品总分类
 class CpcIndustryView(BaseView):
+
     def __init__(self):
         super(CpcIndustryView, self).__init__()
 
@@ -1222,6 +1256,7 @@ class DMWordsDelView(BaseView):
 
 
 class MonitorInformationView(BaseView):
+
     def __init__(self):
         super(MonitorInformationView, self).__init__()
 
@@ -1602,6 +1637,7 @@ class InspectionDataView(BaseView):
 
 
 class EnterpriseDataUnqualifiedView(BaseView):
+
     def __init__(self):
         super(EnterpriseDataUnqualifiedView, self).__init__()
 
@@ -2563,6 +2599,7 @@ class NewsAddView(BaseView):
 
 
 class NewsDeleteView(BaseView):
+
     def __init__(self):
         super(NewsDeleteView, self).__init__()
 
@@ -2578,6 +2615,7 @@ class NewsDeleteView(BaseView):
 
 
 class NewsEditView(BaseView):
+
     def __init__(self):
         super(NewsEditView, self).__init__()
 
@@ -2783,6 +2821,7 @@ class VersionRecordDataDeleteView(BaseView):
 
 
 class VersionRecordDataEditView(BaseView):
+
     def __init__(self):
         super(VersionRecordDataEditView, self).__init__()
 
@@ -2798,6 +2837,7 @@ class VersionRecordDataEditView(BaseView):
 
 
 class InspectionDataNationView(BaseView):
+
     def __init__(self):
         super(InspectionDataNationView, self).__init__()
 
@@ -2834,6 +2874,7 @@ class InspectionDataNationView(BaseView):
 
 
 class InspectionDataProAndCityView(BaseView):
+
     def __init__(self):
         super(InspectionDataProAndCityView, self).__init__()
 
@@ -2868,6 +2909,7 @@ class InspectionDataProAndCityView(BaseView):
 
 
 class InspectionDataLocalView(BaseView):
+
     def __init__(self):
         super(InspectionDataLocalView, self).__init__()
 
@@ -2902,6 +2944,7 @@ class InspectionDataLocalView(BaseView):
 
 
 class InspectionDataLocalExportView(BaseView):
+
     def __init__(self):
         super(InspectionDataLocalExportView, self).__init__()
 
@@ -2917,6 +2960,7 @@ class InspectionDataLocalExportView(BaseView):
 
 
 class InspectionDataProAndCityExportView(BaseView):
+
     def __init__(self):
         super(InspectionDataProAndCityExportView, self).__init__()
 
@@ -2932,6 +2976,7 @@ class InspectionDataProAndCityExportView(BaseView):
 
 
 class InspectionDataNationExportView(BaseView):
+
     def __init__(self):
         super(InspectionDataNationExportView, self).__init__()
 
@@ -2947,6 +2992,7 @@ class InspectionDataNationExportView(BaseView):
 
 
 class EventsManageView(BaseView):
+
     def __init__(self):
         super(EventsManageView, self).__init__()
 
@@ -3068,6 +3114,7 @@ class EventsUploadView(BaseView):
 
 
 class RiskHarmsManageView(BaseView):
+
     def __init__(self):
         super(RiskHarmsManageView, self).__init__()
 
@@ -3112,6 +3159,7 @@ class RiskHarmsDetailsView(BaseView):
 
 
 class RiskHarmsView(BaseView):
+
     def __init__(self):
         super(RiskHarmsView, self).__init__()
 
@@ -3189,6 +3237,7 @@ class GovReportsAddView(BaseView):
 
 
 class GovReportsDeleteView(BaseView):
+
     def __init__(self):
         super(GovReportsDeleteView, self).__init__()
 
@@ -3264,6 +3313,7 @@ class IndicatordataparentView(BaseView):
 
 
 class IndicatordataparentDeleteView(BaseView):
+
     def __init__(self):
         super(IndicatordataparentDeleteView, self).__init__()
 

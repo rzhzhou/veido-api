@@ -2,8 +2,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, Q, F
 
 from observer.base.models import(Area, UserInfo, Article,
-                                Category, Inspection,
-                                )
+                                Category, Inspection, Events)
 from observer.base.service.abstract import Abstract
 from observer.base.service.base import areas, local_related, qualitied
 from observer.utils.date_format import date_format, str_to_date, get_daterange
@@ -175,3 +174,20 @@ class DashboardData(Abstract):
                         'product': x['product_name'],
                     }, q(Inspection.objects.filter(status=1).all())),
                 }
+
+
+class V2Data(Abstract):
+
+    def __init__(self, params):
+        super(V2Data, self).__init__(params)
+
+    def hotSpots(self):
+        queryset = Article.objects.filter(categories__id='0001').values('title', 'pubtime').order_by('-pubtime')[:10]
+
+        return queryset
+
+    def events(self):
+        queryset = Events.objects.annotate(num_articles = Count('articles')).values('title', 'socialHarm', 'num_articles').order_by('-num_articles')[:10]
+        
+        return queryset
+        
