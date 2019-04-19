@@ -42,41 +42,39 @@ class GovReports(models.Model):
         return self.title
 
 
-class PolicyArticle(models.Model):
-    title = models.CharField(max_length=255, verbose_name='标题')
-    url = models.URLField(verbose_name='网站链接')
-    pubtime = models.DateTimeField(auto_now_add=True, verbose_name='发布时间')
-    total = models.IntegerField(verbose_name='总计', null=True)
-
-    class Meta:
-        app_label = 'hqi'
-        db_table = 'hqi_policyarticle'
-        verbose_name_plural = '地域链接'
-
-    def __str__(self):
-        return self.name
-
-
 class Policy(models.Model):
     category = models.CharField(max_length=255, verbose_name='政策类别')
     industry = models.CharField(max_length=255, null=True, verbose_name='产业类别')
     name = models.CharField(max_length=255, null=True, verbose_name='政策')
     detail = models.CharField(max_length=1500, null= True, verbose_name='政策详情')
-    areas = models.ManyToManyField(Area)
-
-    policyarticle = models.ForeignKey(
-        PolicyArticle,
-        on_delete=models.CASCADE,
-        verbose_name=u'地域链接'
-    )
-    areas = models.ManyToManyField(Area)
 
     class Meta:
         app_label = 'hqi'
-        db_table = 'hqi_policy'
         verbose_name_plural = '政府政策'
 
     def __unicode__(self):
+        return self.name
+
+
+class PolicyArticle(models.Model):
+    title = models.CharField(max_length=255, verbose_name='标题')
+    url = models.URLField(verbose_name='网站链接')
+    pubtime = models.DateTimeField(auto_now_add=True, verbose_name='发布时间')
+    total = models.IntegerField(verbose_name='总计', null=True)
+    
+    areas = models.ManyToManyField(Area)
+
+    policy = models.ForeignKey(
+        Policy,
+        on_delete=models.CASCADE,
+        verbose_name=u'地域链接'
+    )
+
+    class Meta:
+        app_label = 'hqi'
+        verbose_name_plural = '地域链接'
+
+    def __str__(self):
         return self.name
 
 

@@ -3526,10 +3526,10 @@ class PolicyAreaTotalView(BaseView):
         data = {
             'total': total,
             'list': map(lambda r: {
-                'id': r['id'],
-                'name': r['name'],
-                'detail': r['detail'],
-                'pubtime': r['policyarticle_id__pubtime'],
+                'id': r['policy__id'],
+                'name': r['policy__name'],
+                'detail': r['policy__detail'],
+                'pubtime': r['pubtime'],
                 # 'time': r['pubtime'].strftime("%Y-%m-%d"),
             }, results)
         }
@@ -3625,10 +3625,10 @@ class PolicPrivatelTotalView(BaseView):
         data = {
             'total': total,
             'list': map(lambda r: {
-                'id': r['id'],
-                'name': r['name'],
-                'detail': r['detail'],
-                'pubtime': r['policyarticle_id__pubtime'].strftime("%Y-%m-%d"),
+                'id': r['policy__id'],
+                'name': r['policy__name'],
+                'detail': r['policy__detail'],
+                'pubtime': r['pubtime'].strftime("%Y-%m-%d"),
             }, results)
         }
 
@@ -3683,7 +3683,7 @@ class PolicyIndustryView(BaseView):
                 'name': r['area'],
                 'industry': r['industry'],
                 'area__id': r['area__id'],
-                'total': r['areas__name'],
+                'total': r['total'],
                 'level': r['level'],
                 'title': r['articletitle'],
                 'url': r['articleurl'],
@@ -3722,10 +3722,10 @@ class PolicyIndustryTotalView(BaseView):
         data = {
             'total': total,
             'list': map(lambda r: {
-                'id': r['id'],
-                'name': r['name'],
-                'detail': r['detail'],
-                'pubtime': r['policyarticle_id__pubtime'].strftime("%Y-%m-%d"),
+                'id': r['policy__id'],
+                'name': r['policy__name'],
+                'detail': r['policy__detail'],
+                'pubtime': r['pubtime'].strftime("%Y-%m-%d"),
             }, results)
         }
 
