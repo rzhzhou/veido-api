@@ -61,7 +61,7 @@ class PolicyArticle(models.Model):
     url = models.URLField(verbose_name='网站链接')
     pubtime = models.DateTimeField(auto_now_add=True, verbose_name='发布时间')
     total = models.IntegerField(verbose_name='总计', null=True)
-    
+
     areas = models.ManyToManyField(Area)
 
     policy = models.ForeignKey(

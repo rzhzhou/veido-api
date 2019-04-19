@@ -133,10 +133,9 @@ class DashboardView(BaseView):
 
 
 class V2View(BaseView):
-    
     def __init__(self):
         super(V2View, self).__init__()
-        
+
     def set_request(self, request):
         super(V2View, self).set_request(request)
 

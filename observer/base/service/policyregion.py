@@ -413,6 +413,7 @@ class PolicyDataUpload(Abstract):
 
                     total += 1
 
+
                     old_policyarticle = PolicyArticle.objects.using('hqi').filter(url=url,policy__name=name)
                     if not old_policyarticle.exists():
                         policy = Policy(
@@ -432,6 +433,7 @@ class PolicyDataUpload(Abstract):
                         policyarticle.areas.add(area_id)
                         policyarticle.save(using='hqi')
                         dupli += 1
+
 
 
                 except Exception as e:
