@@ -404,26 +404,22 @@ class InspectionDataUpload(Abstract):
                 old_inspection = Inspection.objects.filter(url=url)
 
                 if old_inspection.exists():
-                    old_inspections = Inspection.objects.using('hqi').get(url=url)
-                    print('1')
-                    old_inspections.title = title
-                    old_inspections.pubtime = pubtime
-                    old_inspections.source = source
-                    old_inspections.qualitied = qr(qualitied_patch, inspect_patch)
-                    old_inspections.unqualitied_patch = unqualitied_patch
-                    old_inspections.qualitied_patch = qualitied_patch
-                    old_inspections.inspect_patch = inspect_patch
-                    old_inspections.category = '' if not category else category
-                    old_inspections.level = new_level
-                    old_inspections.industry_id = industry_id
-                    old_inspections.product_name = product_name[0]
-                    old_inspections.origin_product = origin_product
-                    old_inspections.area_id = area[0].id
-                    old_inspections.status = 0
-                    print(old_inspections)
-
-                    for x in old_inspections:
-                        x.save()
+                    old_inspection = old_inspection[0]
+                    old_inspection.title = title
+                    old_inspection.pubtime = pubtime
+                    old_inspection.source = source
+                    old_inspection.qualitied = qr(qualitied_patch, inspect_patch)
+                    old_inspection.unqualitied_patch = unqualitied_patch
+                    old_inspection.qualitied_patch = qualitied_patch
+                    old_inspection.inspect_patch = inspect_patch
+                    old_inspection.category = '' if not category else category
+                    old_inspection.level = new_level
+                    old_inspection.industry_id = industry_id
+                    old_inspection.product_name = product_name[0]
+                    old_inspection.origin_product = origin_product
+                    old_inspection.area_id = area[0].id
+                    old_inspection.status = 0
+                    old_inspection.save()
 
                     dupli += 1
                     continue
