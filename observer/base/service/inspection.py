@@ -404,8 +404,7 @@ class InspectionDataUpload(Abstract):
                 old_inspection = Inspection.objects.filter(url=url)
 
                 if old_inspection.exists():
-                    old_inspections = Inspection.objects.using('hqi').get(url=url)
-                    print('1')
+                    old_inspections = Inspection.objects.filter(url=url)
                     old_inspections.title = title
                     old_inspections.pubtime = pubtime
                     old_inspections.source = source
@@ -420,7 +419,6 @@ class InspectionDataUpload(Abstract):
                     old_inspections.origin_product = origin_product
                     old_inspections.area_id = area[0].id
                     old_inspections.status = 0
-                    print(old_inspections)
 
                     for x in old_inspections:
                         x.save()
