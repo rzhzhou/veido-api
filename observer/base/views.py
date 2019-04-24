@@ -93,6 +93,7 @@ from observer.base.service.policyregion import  (PolicyAreaData,PolicyAreaTotalD
                                                 PolicyPrivateData,PolicPrivatelTotalData,PolicPrivatelAdd,
                                                 PolicyIndustryData,PolicyIndustryTotalData,PolicyIndustryAdd,
                                                 PolicyDataUpload,PolicyIndustryDataUpload)
+from observer.base.service.randomcheck import RandomCheckTaskData, RandomCheckEnterprise, RandomCheckTaskUpload
 
 class BaseView(APIView):
 
@@ -2311,6 +2312,101 @@ class NewsReportViewSuzhou(BaseView):
             queryset = queryset[:limit]
 
         return Response(self.serialize(queryset))
+
+
+class RandomCheckTaskView(BaseView):
+
+    def __init__(self):
+        super(RandomCheckTaskView, self).__init__()
+
+    def set_request(self, request):
+        super(RandomCheckTaskView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(RandomCheckTaskView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        result = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda x: {
+                'id': x['id'],
+                'name': x['name'],
+                'perform_number': x['perform_number'],
+                'delegate': x['delegate'],
+                'check_agency': x['check_agency'],
+                'enterprise_number': x['enterprise_number'],
+            }, result),
+        }
+
+        return data
+
+    def get(self, request):
+        self.set_request(request)
+
+        queryset = RandomCheckTaskData(params=request.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+
+class RandomCheckEnterpriseView(BaseView):
+
+    def __init__(self):
+        super(RandomCheckEnterpriseView, self).__init__()
+
+    def set_request(self, request):
+        super(RandomCheckEnterpriseView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(RandomCheckEnterpriseView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        result = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda x: {
+                'id': x['id'],
+                'product_name': x['product_name'],
+                'enterprise_name': x['enterprise_name'],
+                'enterprise_address': x['enterprise_address'],
+                'contacts': x['contacts'],
+                'phone': x['phone'],
+                'area': x['area'],
+                'status': x['status'],
+            }, result),
+        }
+
+        return data
+
+    def get(self, request, tid=None):
+        self.set_request(request)
+
+        queryset = RandomCheckEnterprise(params=request.query_params).get_by_id(tid)
+
+        return Response(self.serialize(queryset))
+
+
+class RandomCheckTaskUploadView(BaseView):
+    parser_classes = (FileUploadParser,)
+
+    def __init__(self):
+        super(RandomCheckTaskUploadView, self).__init__()
+
+    def put(self, request, filename, enterprise_number, format=None):
+
+        queryset = RandomCheckTaskUpload(params=request.data).upload(filename, enterprise_number, request.FILES['file'])
+
+        return Response(queryset)
 
 
 class NavBarDataView(BaseView):
