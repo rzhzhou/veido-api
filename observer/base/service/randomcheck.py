@@ -167,16 +167,12 @@ class RandomCheckTaskUpload(Abstract):
                 )
                 data_list.append(bulk_enterprise)
 
+        random_num = random.sample(range(len(data_list)), enterprise_number)
+
+        for num in random_num:
+            data_list[num].status = 1
+
         RandomCheckEnterpriseList.objects.bulk_create(data_list)
-
-        queryset = RandomCheckEnterpriseList.objects.filter(task_id=random_task.id)
-        enterprise_first_id = queryset.values_list('id', flat=True).order_by('id')[0]
-        enterprise_last_id = queryset.count() + enterprise_first_id - 1
-
-        selected_ids = [random.randint(enterprise_first_id, enterprise_last_id) for _ in range(enterprise_number)]
-        print(selected_ids)
-
-        RandomCheckEnterpriseList.objects.filter(id__in=selected_ids).update(status=1)
 
         return {
             'status': 1,

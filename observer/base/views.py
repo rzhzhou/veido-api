@@ -294,7 +294,7 @@ class EventView(APIView):
         }, result)
 
         return data
-    
+
     def get(self, request, eid):
         result = EventsAnalysis().getEvent(eid = eid)
 
@@ -3118,7 +3118,7 @@ class EventsManageView(BaseView):
         }
 
         return data
-        
+
     def get(self, request):
         result = EventsManageData(params = request.query_params).get_data()
 
