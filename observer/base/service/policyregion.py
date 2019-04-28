@@ -16,33 +16,20 @@ class PolicyAreaData(Abstract):
 
     def get_all(self):
         policydata = []
+
+        fields = ('areas__id','areas__level', 'areas__name','title', 'url','total')
         cond = {
-            'id': getattr(self, 'areas', None),
-            'level': getattr(self, 'level', None),
+            'areas__level': getattr(self, 'level', None),
+            'areas__id': getattr(self, 'areas', None),
         }
         args = dict([k, v] for k, v in cond.items() if v)
-        areas = Area.objects.using('hqi').filter(policyarticle__policy__category='区域政策',**args).annotate(num_policies=Count('policyarticle'))
-        for area in areas:
-            if area.num_policies:
-                level = Area.objects.using('hqi').filter(id=area.id).values_list('level',flat=True)[0]
-                policies = Area.objects.using('hqi').filter(policyarticle__policy__category='区域政策',id=area.id).values_list('policyarticle__id',flat=True)
-                fields = {'title','url'}
-                articles = PolicyArticle.objects.using('hqi').filter(id__in=policies).values(*fields)
-                for x in map(lambda r: {'url': r['url'],'title': r['title'],},articles):
-                    articletitle = x['title']
-                    articleurl = x['url']
-                    nums = PolicyArticle.objects.using('hqi').filter(url=articleurl).count()
-                    a = {'area':area.name,
-                        'area__id':area.id,
-                        'total':nums,
-                        'level':level,
-                        'articletitle':articletitle,
-                        'articleurl':articleurl,
-                        }
-                    if a not in policydata:
-                        policydata.append(a)
-
-
+        queryset = PolicyArticle.objects.using('hqi').filter(**args).filter(policy__category='区域政策').values(*fields)
+        for x in range(len(queryset)):
+            total = PolicyArticle.objects.using('hqi').filter(url=queryset[x]['url']).count()
+            queryset[x]['total'] =total
+            a = queryset[x]
+            if a not in policydata:
+                policydata.append(a)
         return policydata
 
 
@@ -123,33 +110,19 @@ class PolicyPrivateData(Abstract):
 
     def get_all(self):
         policydata = []
+        fields = ('areas__id','areas__level', 'areas__name','title', 'url','total')
         cond = {
-            'id': getattr(self, 'areas', None),
-            'level': getattr(self, 'level', None),
+            'areas__level': getattr(self, 'level', None),
+            'areas__id': getattr(self, 'areas', None),
         }
         args = dict([k, v] for k, v in cond.items() if v)
-        areas = Area.objects.using('hqi').filter(policyarticle__policy__category='民营政策',**args).annotate(num_policies=Count('policyarticle'))
-        for area in areas:
-            if area.num_policies:
-                level = Area.objects.using('hqi').filter(id=area.id).values_list('level',flat=True)[0]
-                policies = Area.objects.using('hqi').filter(policyarticle__policy__category='民营政策',id=area.id).values_list('policyarticle__id',flat=True)
-                fields = {'title','url'}
-                articles = PolicyArticle.objects.using('hqi').filter(id__in=policies).values(*fields)
-                for x in map(lambda r: {'url': r['url'],'title': r['title'],},articles):
-                    articletitle = x['title']
-                    articleurl = x['url']
-                    nums = PolicyArticle.objects.using('hqi').filter(url=articleurl).count()
-                    a = {'area':area.name,
-                        'area__id':area.id,
-                        'total':nums,
-                        'level':level,
-                        'articletitle':articletitle,
-                        'articleurl':articleurl,
-                        }
-                    if a not in policydata:
-                        policydata.append(a)
-
-
+        queryset = PolicyArticle.objects.using('hqi').filter(**args).filter(policy__category='民营政策').values(*fields)
+        for x in range(len(queryset)):
+            total = PolicyArticle.objects.using('hqi').filter(url=queryset[x]['url']).count()
+            queryset[x]['total'] =total
+            a = queryset[x]
+            if a not in policydata:
+                policydata.append(a)
         return policydata
 
 
