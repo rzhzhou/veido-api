@@ -3575,17 +3575,17 @@ class PolicyAreaView(BaseView):
 
     def serialize(self, queryset):
         total = len(queryset)
+        # total = queryset.count()
         results = self.paging(queryset)
         data = {
             'total': total,
             'list': map(lambda r: {
-                'name': r['area'],
-                'area__id': r['area__id'],
-                'total': r['total'],
-                'level': r['level'],
-                'title': r['articletitle'],
-                'url': r['articleurl'],
-
+                'areas__id': r['areas__id'],
+                'level': r['areas__level'],
+                'name': r['areas__name'],
+                'title': r['title'],
+                'url': r['url'],
+                'total': r['total']
             }, results)
         }
 
@@ -3677,12 +3677,12 @@ class PolicPrivatelView(BaseView):
         data = {
             'total': total,
             'list': map(lambda r: {
-                'name': r['area'],
-                'area__id': r['area__id'],
-                'total': r['total'],
-                'level': r['level'],
-                'title': r['articletitle'],
-                'url': r['articleurl'],
+                'areas__id': r['areas__id'],
+                'level': r['areas__level'],
+                'name': r['areas__name'],
+                'title': r['title'],
+                'url': r['url'],
+                'total': r['total']
 
 
             }, results)
