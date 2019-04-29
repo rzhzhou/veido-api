@@ -644,7 +644,8 @@ class RandomCheckTask(models.Model):
     perform_number = models.CharField(default='', max_length=255, verbose_name='执行文号')
     delegate = models.CharField(default='', max_length=255, verbose_name='委托单位')
     check_agency = models.CharField(default='', max_length=255, verbose_name='检验机构')
-    enterprise_number = models.IntegerField(default=0, verbose_name='抽检企业数')
+    enterprise_number = models.IntegerField(default=0, verbose_name='抽检企业数或企业比例')
+    check_type = models.IntegerField(default=0, verbose_name='抽查方式') # 0: 按企业个数来抽, 1: 按企业比例来抽
 
     class Meta:
         app_label = 'base'

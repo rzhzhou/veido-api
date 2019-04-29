@@ -93,7 +93,8 @@ from observer.base.service.policyregion import  (PolicyAreaData,PolicyAreaTotalD
                                                 PolicyPrivateData,PolicPrivatelTotalData,PolicPrivatelAdd,
                                                 PolicyIndustryData,PolicyIndustryTotalData,PolicyIndustryAdd,
                                                 PolicyDataUpload,PolicyIndustryDataUpload)
-from observer.base.service.randomcheck import RandomCheckTaskData, RandomCheckEnterprise, RandomCheckTaskUpload
+from observer.base.service.randomcheck import (RandomCheckTaskData, RandomCheckEnterprise, RandomCheckTaskUpload,
+                                                RandomCheckTaskDelete, TaskName)
 
 class BaseView(APIView):
 
@@ -2341,6 +2342,7 @@ class RandomCheckTaskView(BaseView):
                 'delegate': x['delegate'],
                 'check_agency': x['check_agency'],
                 'enterprise_number': x['enterprise_number'],
+                'check_type': x['check_type'],
             }, result),
         }
 
@@ -2352,6 +2354,18 @@ class RandomCheckTaskView(BaseView):
         queryset = RandomCheckTaskData(params=request.query_params).get_all()
 
         return Response(self.serialize(queryset))
+
+
+class RandomCheckTaskDeleteView(BaseView):
+
+    def __init__(self):
+        super(RandomCheckTaskDeleteView, self).__init__()
+
+    def delete(self, request, tid):
+
+        queryset = RandomCheckTaskDelete(user=request.user).delete(tid)
+
+        return Response(queryset)
 
 
 class RandomCheckEnterpriseView(BaseView):
@@ -2402,9 +2416,26 @@ class RandomCheckTaskUploadView(BaseView):
     def __init__(self):
         super(RandomCheckTaskUploadView, self).__init__()
 
-    def put(self, request, filename, enterprise_number, format=None):
+    def put(self, request, filename, enterprise_number, check_type, format=None):
 
-        queryset = RandomCheckTaskUpload(params=request.data).upload(filename, enterprise_number, request.FILES['file'])
+        queryset = RandomCheckTaskUpload(params=request.data).upload(filename, enterprise_number, check_type, request.FILES['file'])
+
+        return Response(queryset)
+
+
+
+class TaskNameView(BaseView):
+
+    def __init__(self):
+        super(TaskNameView, self).__init__()
+
+    def set_request(self, request):
+        super(TaskNameView, self).set_request(request)
+
+    def get(self, request, tid):
+        self.set_request(request)
+
+        queryset = TaskName(params=request.query_params).get_by_id(tid)
 
         return Response(queryset)
 

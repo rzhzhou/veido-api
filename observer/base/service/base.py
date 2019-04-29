@@ -3,7 +3,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User, Group
 
 from observer.base.models import (Area, Category, UserInfo, AliasIndustry, MajorIndustry,
-                                Enterprise, UserNav, Article, HarmIndicator, HarmPeople)
+                                Enterprise, UserNav, Article, HarmIndicator, HarmPeople, RandomCheckTask,
+                                RandomCheckEnterpriseList)
 from observer.apps.hqi.models import Indicator,IndicatorDataParent,Policy
 from observer.utils.date_format import date_format
 
