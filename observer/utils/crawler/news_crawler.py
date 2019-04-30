@@ -9,7 +9,7 @@ import datetime
 import random
 
 from observer.utils.str_format import str_to_md5str
-from observer.base.models import (Article2, Area, Category,)
+from observer.base.models import (Article, Area, Category,)
 
 
 def newsCrawler(word, page):
@@ -106,7 +106,7 @@ def newsCrawler(word, page):
                     _time = _time.replace('月','-')
                     _time = _time.strip('日')
 
-                    Article2(
+                    Article(
                         guid = guid_id,
                         title = title,
                         url = news_url,
@@ -119,7 +119,7 @@ def newsCrawler(word, page):
                 else:
                     _time = datetime.date.today()  # time.strftime('%Y-%m-%d', time.localtime(time.time()))
 
-                    Article2(
+                    Article(
                         guid = guid_id,
                         title = title,
                         url = news_url,

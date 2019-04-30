@@ -89,7 +89,7 @@ class ArticleResources(resources.ModelResource):
     corpus_id = fields.Field(attribute='corpus_id', column_name='语料词编号')
 
     class Meta:
-        model = Article2
+        model = Article
         import_id_fields = ('guid',)
         fields = ('guid', 'title', 'url', 'pubtime', 'source', 'score', 'industry_id', 'corpus_id', )
         export_order = ('guid', 'title', 'url', 'pubtime', 'source', 'score', 'industry_id', 'corpus_id', )
@@ -135,32 +135,24 @@ class ArticleResources(resources.ModelResource):
 
 
 class InspectionResources(resources.ModelResource):
-    id = fields.Field(attribute='id', column_name='ID')
-    guid = fields.Field(attribute='guid', column_name='GUID')
-    title = fields.Field(attribute='title', column_name='标题')
-    url = fields.Field(attribute='url', column_name='URL')
-    pubtime = fields.Field(attribute='pubtime', column_name='发布时间')
-    source = fields.Field(attribute='source', column_name='抽检单位')
-    unitem = fields.Field(attribute='unitem', column_name='不合格项')
-    qualitied = fields.Field(attribute='qualitied', column_name='合格率')
-    category = fields.Field(attribute='category', column_name='抽查类别')
-    level = fields.Field(attribute='level', column_name='抽查级别')
-    industry_id = fields.Field(attribute='industry_id', column_name='行业ID')
-    area_id = fields.Field(attribute='area_id', column_name='地域ID')
-    origin_product = fields.Field(attribute='origin_product', column_name='导入产品名')
+    # id = fields.Field(attribute='id', column_name='ID')
+    # title = fields.Field(attribute='title', column_name='标题')
+    # url = fields.Field(attribute='url', column_name='URL')
+    # pubtime = fields.Field(attribute='pubtime', column_name='发布时间')
+    # source = fields.Field(attribute='source', column_name='抽检单位')
+    # origin_product = fields.Field(attribute='origin_product', column_name='导入产品名')
+    # product_name = fields.Field(attribute='product_name', column_name='产品名称')
+    # qualitied = fields.Field(attribute='qualitied', column_name='合格率')
+    # unqualitied_patch = fields.Field(attribute='unqualitied_patch', column_name="不合格批次")
+    # qualitied_patch = fields.Field(attribute='qualitied_patch', column_name="合格批次")
+    # inspect_patch = fields.Field(attribute='inspect_patch', column_name="抽查批次")
+    # category = fields.Field(attribute='category', column_name='抽查类别')
 
     class Meta:
-        model = Inspection2
-        import_id_fields = ('guid',)
-        fields = ('id', 'guid', 'title', 'url', 'pubtime', 'source', 'unitem', 'qualitied', 'category', 'level', 'industry_id', 'area_id', 'origin_product' )
-        export_order = ('id', 'guid', 'title', 'url', 'pubtime', 'source', 'unitem', 'qualitied', 'category', 'level', 'industry_id', 'area_id', 'origin_product' )
-
-    def before_save_instance(self, instance, using_transactions, dry_run):
-        i_guid = str_to_md5str(instance.url)
-        instance.guid = i_guid
-
-        if Article2.objects.filter(guid=i_guid).exists():
-            return
+        model = Inspection
+        # import_id_fields = ('guid',)
+        # fields = ('id', 'guid', 'title', 'url', 'pubtime', 'source', 'unitem', 'qualitied', 'category', 'level', 'industry_id', 'area_id', 'origin_product' )
+        # export_order = ('id', 'guid', 'title', 'url', 'pubtime', 'source', 'unitem', 'qualitied', 'category', 'level', 'industry_id', 'area_id', 'origin_product' )
 
 
 class IndustryProductsResources(resources.ModelResource):

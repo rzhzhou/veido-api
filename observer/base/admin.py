@@ -44,9 +44,9 @@ class ConsumerIndustryAdmin(ImportExportActionModelAdmin, ForeignKeyAutocomplete
 
 class MajorIndustryAdmin(ImportExportActionModelAdmin, ForeignKeyAutocompleteAdmin):
     # resource_class = IndustryResources
-    autocomplete_fields = ('parent', 'licence', 'ccc')
+    autocomplete_fields = ('parent', 'licence', 'ccc', 'consumer')
     search_fields = ('id', 'name', )
-    list_display = ('id', 'name', 'level', 'parent', 'licence', 'ccc')
+    list_display = ('id', 'name', 'level', 'parent', 'licence', 'ccc', 'consumer')
 
 
 class AliasIndustryAdmin(ImportExportActionModelAdmin):
@@ -62,7 +62,7 @@ class AreaAdmin(ImportExportActionModelAdmin, ForeignKeyAutocompleteAdmin):
     list_display = ('id', 'name', 'level', 'parent', )
 
 
-class UserAreaAdmin(ImportExportActionModelAdmin, ForeignKeyAutocompleteAdmin):
+class UserInfoAdmin(ImportExportActionModelAdmin, ForeignKeyAutocompleteAdmin):
     autocomplete_fields = ('user', 'area', )
     list_display = ('user', 'area', )
 
@@ -111,6 +111,12 @@ class IndustryProductsAdmin(ImportExportActionModelAdmin, ImportExportModelAdmin
     list_display = ('name', 'industry_id')
 
 
+class VersionRecordAdmin(ImportExportActionModelAdmin, ImportExportModelAdmin):
+    # resource_class = VersionRecordResources
+    search_fields = ('id', 'content')
+    list_display = ('version', 'content', 'pubtime')
+
+
 admin.site.register(Industry, IndustryAdmin)
 admin.site.register(CPCIndustry, CPCIndustryAdmin)
 admin.site.register(CCCIndustry, CCCIndustryAdmin)
@@ -119,13 +125,14 @@ admin.site.register(ConsumerIndustry, ConsumerIndustryAdmin)
 admin.site.register(MajorIndustry, MajorIndustryAdmin)
 admin.site.register(AliasIndustry, AliasIndustryAdmin)
 admin.site.register(Area, AreaAdmin)
-admin.site.register(UserArea, UserAreaAdmin)
-admin.site.register(Inspection2, InspectionAdmin)
+admin.site.register(UserInfo, UserInfoAdmin)
+admin.site.register(Inspection, InspectionAdmin)
 admin.site.register(Enterprise, EnterpriseAdmin)
 # admin.site.register(InspectionEnterprise, InspectionEnterpriseAdmin)
-admin.site.register(Article2, ArticleAdmin)
+admin.site.register(Article, ArticleAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(CorpusCategories)
 # admin.site.register(ArticleCategory, ArticleCategoryAdmin)
 admin.site.register(DMLink, DMLinkAdmin)
 admin.site.register(IndustryProducts, IndustryProductsAdmin)
+admin.site.register(VersionRecord, VersionRecordAdmin)

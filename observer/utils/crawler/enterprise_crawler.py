@@ -7,7 +7,7 @@ import jieba.posseg as pseg
 from lxml import etree
 
 from observer.utils.str_format import str_to_md5str
-from observer.base.models import Inspection2, Area, Enterprise
+from observer.base.models import Inspection, Area, Enterprise
 
 
 def crawler(edit_ids, urls, product_names):
@@ -16,7 +16,7 @@ def crawler(edit_ids, urls, product_names):
 
         print('正在爬取...：', ids, product_name)
 
-        Inspection2.objects.filter(id=ids).update(status=2) # status:0 未爬取; 2 已爬取; 1 已审核
+        Inspection.objects.filter(id=ids).update(status=2) # status:0 未爬取; 2 已爬取; 1 已审核
 
         # 爬取不合格企业
         response = requests.get(url)
@@ -130,7 +130,7 @@ def crawler(edit_ids, urls, product_names):
 
                             area_id = Area.objects.filter(name=area)[0].id
 
-                            inspection2 = Inspection2.objects.get(id=ids)
+                            inspection = Inspection.objects.get(id=ids)
                             # 爬取的企业信息插入到不合格企业审核表 >status: 0
                             enterprise = Enterprise(
                                 name=new_words,
@@ -139,7 +139,7 @@ def crawler(edit_ids, urls, product_names):
                                 status=0,
                             )
                             enterprise.save()
-                            inspection2.enterprises.add(enterprise)
+                            inspection.enterprises.add(enterprise)
 
                     if m == 0 and j.xpath('string(.)').strip() not in invalid_words:
                         area = '全国'
@@ -149,7 +149,7 @@ def crawler(edit_ids, urls, product_names):
 
                         area_id = Area.objects.filter(name=area)[0].id
 
-                        inspection2 = Inspection2.objects.get(id=ids)
+                        inspection = Inspection.objects.get(id=ids)
                         enterprise = Enterprise(
                             name=new_words,
                             unitem=j.xpath('string(.)').strip(),
@@ -158,7 +158,7 @@ def crawler(edit_ids, urls, product_names):
                         )
 
                         enterprise.save()
-                        inspection2.enterprises.add(enterprise)
+                        inspection.enterprises.add(enterprise)
 
                     m = 0
                     n = 0
