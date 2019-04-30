@@ -35,13 +35,14 @@ class NewsReportData(Abstract):
         queryset = NewsReport.objects.filter(**args)
 
         if self.user.is_active:
-            group_ids = Group.objects.filter(user=self.user).values_list('id', flat=True)
+            groups = Group.objects.filter(user=self.user).values_list('name', flat=True)
 
-        # 如果当前操作的不是'超级管理员'
-        if 2 not in group_ids:
-            group_list = list(group_ids)
-            group_list.remove(3)
-            queryset = queryset.filter(group=group_list[0])
+        # 如果当前操作的不是'超级管理员'或者'武汉深度网科技有限公司'成员
+        if '超级管理员' and '武汉深度网科技有限公司' not in groups:
+            group_list = list(groups)
+            group_list.remove('管理员')
+            group_id = Group.objects.filter(name=group_list[0]).values_list('id', flat=True)
+            queryset = queryset.filter(group=group_id[0])
 
         queryset = queryset.values(*fields).order_by('-year', '-period')
 

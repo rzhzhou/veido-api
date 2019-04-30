@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 
 from django.contrib.auth.models import Group, User
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
@@ -10,23 +11,31 @@ from rest_framework.parsers import FileUploadParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from observer.base.models import AliasIndustry, Nav, NewsReport, UserNav
-from observer.base.service.area import Select2AreaData
+from observer.base.models import (AliasIndustry, NewsReport,
+                                  UserInfo)
+from observer.base.service.area import SelectAreaData
 from observer.base.service.article import (ArticleData, RiskData, RiskDataAdd,
                                            RiskDataAudit, RiskDataDelete,
                                            RiskDataEdit, RiskDataExport,
                                            RiskDataSuzhou, RiskDataUpload,
-                                           StatisticsShow, newsCrawlerData)
+                                           StatisticsShow, newsCrawlerData,
+                                           RiskHarmsData, RiskHarmsManageSave,
+                                           RiskHarmsDetailsData, EventsManageData,
+                                           EventsDataUpload, EventsAnalysis)
 from observer.base.service.base import (alias_industry, area, areas,
-                                        categories, get_major_category,
+                                        categories,get_major_category,
                                         get_major_industry, get_user_extra,
-                                        get_user_nav, local_related, qualitied)
+                                        get_user_nav, involve_local,
+                                        local_related, qualitied, gov_area,
+                                        harmPeople, countPeople, harmName)
+
 from observer.base.service.corpus import (CategoryListData, CorpusAdd,
                                           CorpusData, CorpusDelete, CorpusEdit,
                                           CrawlerData)
-from observer.base.service.dashboard import DashboardData
+from observer.base.service.dashboard import DashboardData, V2Data
 from observer.base.service.desmon import (DMLinkAdd, DMLinkData, DMLinkDelete,
-                                          DMLinkEdit, DMWordsData)
+                                          DMLinkEdit, DMWordsData, DMWordsFocusData,
+                                          DMWordsDelete, MonitorInformationData)
 from observer.base.service.industry import (AliasIndustryAdd, CCCIndustryAdd,
                                             CCCIndustryData,
                                             ConsumerIndustryData,
@@ -53,17 +62,39 @@ from observer.base.service.inspection import (EnterpriseData,
                                               InspectionDataExport,
                                               InspectionDataSuzhou,
                                               InspectionDataUnEnterpriseUpload,
-                                              InspectionDataUpload)
-from observer.base.service.navbar import NavBarEdit
+                                              InspectionDataUpload,
+                                              InspectStatisticsData,
+                                              InspectionDataNation,
+                                              InspectionDataProAndCity,
+                                              InspectionDataLocal,
+                                              InspectionDataLocalExport,
+                                              InspectionDataNationExport,
+                                              InspectionDataProAndCityExport,
+                                              )
+from observer.base.service.navbar import NavBarData, NavBarEdit, RouteData
 from observer.base.service.news import NewsAdd, NewsDelete, NewsEdit, ViewsData
 from observer.base.service.report import (NewsReportData, NewsReportDelete,
                                           NewsReportSuzhou, NewsReportUpload)
 from observer.base.service.search import SearchAdvancedData, SearchData
 from observer.base.service.user import (GroupData, UserAdd, UserData,
-                                        UserDelete, UserEdit)
+                                        UserDelete, UserEdit, UserNavData, ThemeEdit)
+from observer.base.service.version import (VersionRecordData,
+                                           VersionRecordDataAdd,
+                                           VersionRecordDataDelete,
+                                           VersionRecordDataEdit)
 from observer.utils.date_format import date_format
 from observer.utils.excel import write_by_openpyxl
 
+from observer.base.service.govreports import (GovReportsData, GovReportsAdd, GovReportsDelete,
+                                             GovReportsEdit)
+from observer.base.service.indicatordata import IndicatorData,IndicatorDelete,IndicatorDataUpload,IndicatorDataExport
+from observer.base.service.indicator import IndicatorChart,IndicatorRanking
+from observer.base.service.policyregion import  (PolicyAreaData,PolicyAreaTotalData,PolicyAreaAdd,
+                                                PolicyPrivateData,PolicPrivatelTotalData,PolicPrivatelAdd,
+                                                PolicyIndustryData,PolicyIndustryTotalData,PolicyIndustryAdd,
+                                                PolicyDataUpload,PolicyIndustryDataUpload)
+from observer.base.service.randomcheck import (RandomCheckTaskData, RandomCheckEnterprise, RandomCheckTaskUpload,
+                                                RandomCheckTaskDelete, TaskName)
 
 class BaseView(APIView):
 
@@ -103,11 +134,42 @@ class DashboardView(BaseView):
         return Response(DashboardData(params=request.query_params, user=request.user).get_all())
 
 
+class V2View(BaseView):
+    def __init__(self):
+        super(V2View, self).__init__()
+
+    def set_request(self, request):
+        super(V2View, self).set_request(request)
+
+    def serialize(self, hotSpots, events):
+        data = {
+            'hotSpots' : map(lambda h: {
+                'title': h['title'],
+                'pubtime': date_format(h['pubtime'], '%Y-%m-%d %H:%M:%S'),
+            }, hotSpots),
+
+            'events' : map(lambda e: {
+                'title': e['title'],
+                'socialHarm': e['socialHarm'],
+                'num_articles': e['num_articles'],
+            }, events),
+        }
+
+        return data
+
+    def get(self, request):
+        self.set_request(request)
+
+        hotSpots = V2Data(params=request.query_params).hotSpots()
+        events = V2Data(params=request.query_params).events()
+        return Response(self.serialize(hotSpots, events))
+
 class ArticleView(BaseView):
     # 0001---质量热点
     # 0002---风险快讯
     # 0003---业务信息
     # 0004---专家视点
+    # 0005---风险伤害
 
     def __init__(self):
         super(ArticleView, self).__init__()
@@ -190,12 +252,156 @@ class ArticleView(BaseView):
 
         return data
 
+    def serialize0005(self, queryset):
+        total = queryset.count()
+        result = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda x: {
+                'id': x['id'],
+                'url': x['url'],
+                'title': x['title'],
+                'source': x['source'],
+                'score': x['score'],
+                'areas': areas(x['id']),
+                'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
+                'people': countPeople(x['harm__id']),
+            }, result),
+        }
+
+        return data
+
     def get(self, request, category):
         self.set_request(request)
 
         queryset = ArticleData(params=request.query_params, category=category).get_all()
 
         return Response(eval('self.serialize%s' % category)(queryset))
+
+
+class EventView(APIView):
+
+    def __init__(self):
+        super(EventView, self).__init__()
+
+    def serialize(self, result):
+        data = map(lambda r: {
+            'title': r['title'],
+            'socialHarm': r['socialHarm'],
+            'scope': r['scope'],
+            'grading': r['grading'],
+            'pubtime': r['pubtime'],
+            'desc': r['desc'],
+        }, result)
+
+        return data
+
+    def get(self, request, eid):
+        result = EventsAnalysis().getEvent(eid = eid)
+
+        return Response(self.serialize(result))
+
+
+class EventInformationView(BaseView):
+
+    def __init__(self):
+        super(EventInformationView, self).__init__()
+
+    def set_request(self, request):
+        super(EventInformationView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(EventInformationView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15))
+
+    def serialize(self, result):
+        total = result.count()
+        resultPage = self.paging(result)
+        data = {
+            'total': total,
+            'list': map(lambda r: {
+                'title': r['title'],
+                'url': r['url'],
+                'keyword': r['eventskeyword__name'],
+                'source': r['source'],
+                'pubtime': date_format(r['pubtime'], '%Y-%m-%d'),
+                'sentiment': r['sentiment'],
+            }, resultPage)
+        }
+
+        return data
+
+    def get(self, result, eid):
+        result = EventsAnalysis().get_data(eid = eid)
+
+        return Response(self.serialize(result))
+
+
+class EventContentView(APIView):
+
+    def __init__(self):
+        super(EventContentView, self).__init__()
+
+    def serialize(self, sentiment, source, areas, keywords):
+        data = {
+            'sentimentList': map(lambda s: {
+                'sentiment': s['sentiment'],
+            }, sentiment),
+
+            'source': map(lambda s: {
+                'name': s['articles__source'],
+                'sum': s['num_source'],
+            }, source),
+
+            'areas': map(lambda a: {
+                'name': a['name'],
+                'sum': a['sum'],
+            }, areas),
+
+            'keywords': map(lambda k: {
+                'name': k['name'],
+                'sum': k['number'],
+            }, keywords),
+        }
+
+        return data
+
+    def get(self, request, eid):
+        sentiment = EventsAnalysis().getSentiment(eid = eid)
+        source = EventsAnalysis().getSource(eid = eid)
+        areas = EventsAnalysis().getAreas(eid = eid)
+        keywords = EventsAnalysis().getKeywords(eid = eid)
+
+        return Response(self.serialize(sentiment, source, areas, keywords))
+
+
+class EventSpreadView(APIView):
+
+    def __init__(self):
+        super(EventSpreadView, self).__init__()
+
+    def serialize(self, timeTrend, trend):
+        data = {
+            'time': map(lambda t: {
+                'timeTrend': date_format(t['articles__pubtime'], '%Y-%m-%d'),
+            }, timeTrend),
+
+            'trend': map(lambda t: {
+                'name': t['name'],
+                'numTrend': t['numTrend'],
+            }, trend),
+        }
+
+        return data
+
+    def get(self, request, eid):
+        timeTrend = EventsAnalysis().getTimeTrend(eid = eid)
+        trend = EventsAnalysis().getTrend(eid = eid)
+        # way = EventsAnalysis().getWay(eid = eid)
+
+        return Response(self.serialize(timeTrend, trend))
 
 
 class InspectionView(BaseView):
@@ -220,11 +426,11 @@ class InspectionView(BaseView):
             'total': total,
             'list': map(lambda x: {
                 'id': x['id'],
-                'industry': {'id': x['industry'], 'text': x['industry__name']},
+                'industry': {'id': x['industry'], 'name': x['industry__name']},
                 'origin_product': x['origin_product'],
                 'url': x['url'],
                 'level': x['level'],
-                'area': {'id': x['area'], 'text': x['area__name']},
+                'area': {'id': x['area'], 'name': x['area__name']},
                 'source': x['source'],
                 'qualitied': qualitied(x['qualitied']),
                 'unqualitied_patch': x['unqualitied_patch'],
@@ -245,6 +451,24 @@ class InspectionView(BaseView):
         queryset = InspectionData(params=request.query_params).get_all()
 
         return Response(self.serialize(queryset))
+
+
+class InspectStatisticsView(BaseView):
+
+    def __init__(self):
+        super(InspectStatisticsView, self).__init__()
+
+    def serialize(self, result):
+
+        data = result
+
+        return data
+
+    def get(self, request):
+
+        result = InspectStatisticsData(params = request.query_params).get_statistics_data()
+
+        return Response(self.serialize(result))
 
 
 class IndustryView(BaseView):
@@ -363,19 +587,19 @@ class CCCListView(BaseView):
         return Response(self.serialize(queryset))
 
 
-class Select2CCCListView(BaseView):
+class SelectCccIndustriesView(BaseView):
 
     def __init__(self):
-        super(Select2CCCListView, self).__init__()
+        super(SelectCccIndustriesView, self).__init__()
 
     def set_request(self, request):
-        super(Select2CCCListView, self).set_request(request)
+        super(SelectCccIndustriesView, self).set_request(request)
 
     def serialize(self, queryset):
         data = map(
             lambda x: {
                 'id': x['id'],
-                'text': '%s - %s' % (x['id'], x['name']),
+                'name': '%s - %s' % (x['id'], x['name']),
             },
             queryset
         )
@@ -390,19 +614,19 @@ class Select2CCCListView(BaseView):
         return Response(self.serialize(queryset))
 
 
-class SelectCpcisView(BaseView):
-    """docstring for SelectCpcisView"""
+class SelectCpcIndustriesView(BaseView):
+
     def __init__(self):
-        super(SelectCpcisView, self).__init__()
+        super(SelectCpcIndustriesView, self).__init__()
 
     def set_request(self, request):
-        super(SelectCpcisView, self).set_request(request)
+        super(SelectCpcIndustriesView, self).set_request(request)
 
     def serialize(self, queryset):
         data = map(
             lambda x: {
                 'id': x['id'],
-                'text': '%s - %s' % (x['id'], x['name']),
+                'name': '%s - %s' % (x['id'], x['name']),
             },
             queryset
         )
@@ -418,6 +642,7 @@ class SelectCpcisView(BaseView):
 
 
 class CpcListView(BaseView):
+
     def __init__(self):
         super(CpcListView, self).__init__()
 
@@ -509,19 +734,19 @@ class LicenceListView(BaseView):
         return Response(self.serialize(queryset))
 
 
-class Select2LicenceListView(BaseView):
+class SelectLicenceListView(BaseView):
 
     def __init__(self):
-        super(Select2LicenceListView, self).__init__()
+        super(SelectLicenceListView, self).__init__()
 
     def set_request(self, request):
-        super(Select2LicenceListView, self).set_request(request)
+        super(SelectLicenceListView, self).set_request(request)
 
     def serialize(self, queryset):
         data = map(
             lambda x: {
                 'id': x['id'],
-                'text': '%s - %s' % (x['id'], x['name']),
+                'name': '%s - %s' % (x['id'], x['name']),
             },
             queryset
         )
@@ -596,19 +821,19 @@ class ConsumerListView(BaseView):
         return Response(self.serialize(queryset))
 
 
-class Select2ConsumerListView(BaseView):
+class SelectConsumerListView(BaseView):
 
     def __init__(self):
-        super(Select2ConsumerListView, self).__init__()
+        super(SelectConsumerListView, self).__init__()
 
     def set_request(self, request):
-        super(Select2ConsumerListView, self).set_request(request)
+        super(SelectConsumerListView, self).set_request(request)
 
     def serialize(self, queryset):
         data = map(
             lambda x: {
                 'id': x['id'],
-                'text': x['name'],
+                'name': '%s - %s' % (x['id'], x['name']),
             },
             queryset
         )
@@ -653,6 +878,7 @@ class MajorListView(BaseView):
                 'level': x['level'],
                 'licence': x['licence'],
                 'ccc': x['ccc'],
+                'consumer': x['consumer'],
             }, result),
         }
 
@@ -682,19 +908,19 @@ class MajorView(BaseView):
         return Response(value)
 
 
-class Select2MajorListView(BaseView):
+class SelectMajorListView(BaseView):
 
     def __init__(self):
-        super(Select2MajorListView, self).__init__()
+        super(SelectMajorListView, self).__init__()
 
     def set_request(self, request):
-        super(Select2MajorListView, self).set_request(request)
+        super(SelectMajorListView, self).set_request(request)
 
     def serialize(self, queryset):
         data = map(
             lambda x: {
                 'id': x['id'],
-                'text': x['name'],
+                'name': x['name'],
             },
             queryset
         )
@@ -769,6 +995,7 @@ class CCCIndustryView(BaseView):
 
 # 产品总分类
 class CpcIndustryView(BaseView):
+
     def __init__(self):
         super(CpcIndustryView, self).__init__()
 
@@ -998,8 +1225,10 @@ class DMWordsView(BaseView):
         data = {
             'total': total,
             'list': map(lambda r: {
-                'industry': get_major_industry(r['industry_id']),
-                'riskword': r['riskword'],
+                'id': r['id'],
+                'keyword': r['keyword'],
+                'startTime': r['startTime'],
+                'endTime': r['stopTime'],
             }, results)
         }
 
@@ -1008,23 +1237,74 @@ class DMWordsView(BaseView):
     def get(self, request):
         self.set_request(request)
 
-        queryset = DMWordsData(params=request.query_params).get_all()
+        queryset = DMWordsFocusData(user = request.user).get_all()
 
         return Response(self.serialize(queryset))
 
 
-class Select2IndustryView(BaseView):
+class DMWordsDelView(BaseView):
 
     def __init__(self):
-        super(Select2IndustryView, self).__init__()
+        super(DMWordsDelView, self).__init__()
 
     def set_request(self, request):
-        super(Select2IndustryView, self).set_request(request)
+        super(DMWordsDelView, self).set_request(request)
+
+    def delete(self, request, did):
+        queryset = DMWordsDelete(user=request.user).delete(did=did)
+
+        return Response(status=queryset)
+
+
+class MonitorInformationView(BaseView):
+
+    def __init__(self):
+        super(MonitorInformationView, self).__init__()
+
+    def set_request(self, request):
+        super(MonitorInformationView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(MonitorInformationView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        result = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda r: {
+                'title': r['title'],
+                'url': r['url'],
+                'source': r['source'],
+                'area': r['areas__name'],
+                'time': date_format(r['pubtime'], '%Y-%m-%d'),
+            }, result)
+        }
+
+        return data
+
+    def get(self, request, did):
+        queryset = MonitorInformationData(user = request.user).get_all(did=did)
+
+        return Response(self.serialize(queryset))
+
+
+class SelectIndustryView(BaseView):
+
+    def __init__(self):
+        super(SelectIndustryView, self).__init__()
+
+    def set_request(self, request):
+        super(SelectIndustryView, self).set_request(request)
 
     def serialize(self, queryset):
         data = map(lambda q: {
             'id': q['id'],
-            'text': q['name'],
+            'name': q['name'],
         }, queryset)
 
         return data
@@ -1037,13 +1317,13 @@ class Select2IndustryView(BaseView):
         return Response(self.serialize(queryset))
 
 
-class Select2AliasIndustryView(BaseView):
+class SelectAliasIndustryView(BaseView):
 
     def __init__(self):
-        super(Select2AliasIndustryView, self).__init__()
+        super(SelectAliasIndustryView, self).__init__()
 
     def set_request(self, request):
-        super(Select2AliasIndustryView, self).set_request(request)
+        super(SelectAliasIndustryView, self).set_request(request)
 
     def serialize(self, queryset):
         data = map(lambda q: {
@@ -1109,18 +1389,18 @@ class Select2LicenceIndustryView(BaseView):
         return Response(self.serialize(queryset))
 
 
-class Select2AreaView(BaseView):
+class SelectAreaView(BaseView):
 
     def __init__(self):
-        super(Select2AreaView, self).__init__()
+        super(SelectAreaView, self).__init__()
 
     def set_request(self, request):
-        super(Select2AreaView, self).set_request(request)
+        super(SelectAreaView, self).set_request(request)
 
     def serialize(self, queryset):
         data = map(lambda q: {
             'id': q['id'],
-            'text': q['name'],
+            'name': q['name'],
         }, queryset)
 
         return data
@@ -1128,23 +1408,23 @@ class Select2AreaView(BaseView):
     def get(self, request):
         self.set_request(request)
 
-        queryset = Select2AreaData(params=request.query_params).get_all()
+        queryset = SelectAreaData(params=request.query_params).get_all()
 
         return Response(self.serialize(queryset))
 
 
-class Select2IndustryProductsView(BaseView):
+class SelectIndustryProductsView(BaseView):
 
     def __init__(self):
-        super(Select2IndustryProductsView, self).__init__()
+        super(SelectIndustryProductsView, self).__init__()
 
     def set_request(self, request):
-        super(Select2IndustryProductsView, self).set_request(request)
+        super(SelectIndustryProductsView, self).set_request(request)
 
     def serialize(self, queryset):
         data = map(lambda q: {
             'id': q['id'],
-            'text': q['name'],
+            'name': q['name'],
         }, queryset)
 
         return data
@@ -1157,13 +1437,13 @@ class Select2IndustryProductsView(BaseView):
         return Response(self.serialize(queryset))
 
 
-class Select2GroupView(BaseView):
+class SelectGroupView(BaseView):
 
     def __init__(self):
-        super(Select2GroupView, self).__init__()
+        super(SelectGroupView, self).__init__()
 
     def set_request(self, request):
-        super(Select2GroupView, self).set_request(request)
+        super(SelectGroupView, self).set_request(request)
 
     def serialize(self, queryset):
         data = map(lambda q: {
@@ -1208,9 +1488,13 @@ class RiskDataView(BaseView):
                 'score': x['score'],
                 'source': x['source'],
                 'areas': areas(x['id']),
+                'keyword': '无' if not x['corpus__keyword'] else x['corpus__keyword'],
+                'industry_name': '无' if x['industry__name'] == 'None' else x['industry__name'],
+                'industry_parent_name': '无' if x['industry__name'] == 'None' else x['industry__parent__name'],
                 'categories': categories(x['id'], admin=True),
                 'pubtime': date_format(x['pubtime'], '%Y-%m-%d %H:%M:%S'),
                 'status': x['status'],
+                'harm': '无' if not x['harm__id'] else '已存在',
             }, result),
         }
 
@@ -1300,7 +1584,7 @@ class RiskDataExportView(BaseView):
 
     def get(self, request):
         response = FileResponse(
-            RiskDataExport(user=request.user).export(),
+            RiskDataExport(params=request.query_params, user=request.user).export(),
             content_type='application/vnd.ms-excel'
         )
         response["Content-Disposition"] = 'attachment; filename=articles.xlsx'
@@ -1326,11 +1610,11 @@ class InspectionDataView(BaseView):
             'total': total,
             'list': map(lambda x: {
                 'id': x['id'],
-                'industry': {'id': x['industry'], 'text': x['industry__name']},
+                'industry': {'id': x['industry'], 'name': x['industry__name']},
                 'origin_product': x['origin_product'],
                 'url': x['url'],
                 'level': x['level'],
-                'area': {'id': x['area'], 'text': x['area__name']},
+                'area': {'id': x['area'], 'name': x['area__name']},
                 'source': x['source'],
                 'qualitied': qualitied(x['qualitied']),
                 'unqualitied_patch': x['unqualitied_patch'],
@@ -1340,7 +1624,6 @@ class InspectionDataView(BaseView):
                 'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
                 'product': x['product_name'],
                 'status': x['status'],
-
             }, result),
         }
 
@@ -1355,6 +1638,7 @@ class InspectionDataView(BaseView):
 
 
 class EnterpriseDataUnqualifiedView(BaseView):
+
     def __init__(self):
         super(EnterpriseDataUnqualifiedView, self).__init__()
 
@@ -1373,13 +1657,13 @@ class EnterpriseDataUnqualifiedView(BaseView):
         data = {
             'total': total,
             'list': map(lambda x: {
-                'industry': {'id':x['inspection2__industry'],'text':x['inspection2__industry__name']},
-                'product_name': x['inspection2__product_name'],
-                'source': x['inspection2__source'],
+                'industry': {'id':x['inspection__industry'], 'name':x['inspection__industry__name']},
+                'product_name': x['inspection__product_name'],
+                'source': x['inspection__source'],
                 'enterprise': x['name'],
-                'area': area(x['area_id']),
+                'area': {'id': x['area'], 'name': x['area__name']},
                 'unitem': x['unitem'],
-                'pubtime': x['inspection2__pubtime'],
+                'pubtime': x['inspection__pubtime'],
             }, result),
         }
         return data
@@ -1391,6 +1675,7 @@ class EnterpriseDataUnqualifiedView(BaseView):
             params=request.query_params).get_all()
 
         return Response(self.serialize(queryset))
+
 
 class EnterpriseDataListView(BaseView):
 
@@ -1591,7 +1876,7 @@ class InspectionDataExportView(BaseView):
 
     def get(self, request):
         response = FileResponse(
-            InspectionDataExport(user=request.user).export(),
+            InspectionDataExport(params=request.query_params, user=request.user).export(),
             content_type='application/vnd.ms-excel'
         )
         response["Content-Disposition"] = 'attachment; filename=inspections.xlsx'
@@ -1702,8 +1987,7 @@ class CorpusView(BaseView):
             'list': map(lambda r: {
                 'id': r['id'],
                 'status': r['status'],
-                'riskword': r.get('riskword', ''),
-                'industry': {'id': r.get('industry_id', 0), 'text': '无'} if not r.get('industry_id') else get_major_industry(r['industry_id']),
+                'industry': {'id': -1, 'name': '无'} if r['industry_id'] == -1 else get_major_industry(r['industry_id']),
                 'keyword': r.get('keyword', ''),
                 'category': get_major_category(r['category_id']) if r.get('category_id', None) else r.get('category_id', ''),
             }, results)
@@ -1736,20 +2020,20 @@ class CorpusAddView(BaseView):
         return Response(status=queryset)
 
 
-class CategoryListView(BaseView):
+class SelectCategoryListView(BaseView):
 
     def __init__(self):
-        super(CategoryListView, self).__init__()
+        super(SelectCategoryListView, self).__init__()
 
     def set_request(self, request):
-        super(CategoryListView, self).set_request(request)
+        super(SelectCategoryListView, self).set_request(request)
 
     def read_category(self, results):
 
         data = map(lambda r : {
 
-                'category_id' : r['id'],
-                'category' : r['name'],
+                'id': r['id'],
+                'name': r['name'],
 
             },results)
 
@@ -1762,7 +2046,6 @@ class CategoryListView(BaseView):
         results = CategoryListData(params = request.query_params).get_all()
 
         return Response(self.read_category(results))
-
 
 
 class CorpusEditView(BaseView):
@@ -1961,10 +2244,10 @@ class RiskDataViewSuzhou(BaseView):
             "data": map(lambda x: {
                 'titleAndurl': [x['title'], x['url']],
                 'source': x['source'],
-                'areas': areas(x['guid']),
+                'areas': areas(x['id']),
                 'pubtime': date_format(x['pubtime'], '%Y-%m-%d'),
                 'score': x['score'],
-                'local_related': local_related(x['guid'], self.user), # 本地风险相关度
+                'local_related': local_related(x['id'], self.user), # 本地风险相关度
             }, results)
         }
 
@@ -2032,41 +2315,35 @@ class NewsReportViewSuzhou(BaseView):
         return Response(self.serialize(queryset))
 
 
-class NavBarView(BaseView):
+class RandomCheckTaskView(BaseView):
 
     def __init__(self):
-        super(NavBarView, self).__init__()
+        super(RandomCheckTaskView, self).__init__()
 
     def set_request(self, request):
-        self.user = request.user
-        super(NavBarView, self).set_request(request)
+        super(RandomCheckTaskView, self).set_request(request)
 
-    def serialize(self):
-        navs = []
-        u_navs_ids = UserNav.objects.filter(user=self.user).values_list('nav', flat=True)
-        L1 = Nav.objects.filter(id__in=u_navs_ids, level=1).values('name','id').order_by('index')
-        if L1:
-            for category in L1:
-                navs.append({
-                    'category': category['name'],
-                })
+    def paging(self, queryset):
+        return super(RandomCheckTaskView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
 
-                L2 = Nav.objects.filter(id__in=u_navs_ids, level=2, parent_id=category['id']).values('name', 'id', 'href', 'icon').order_by('index')
-                if L2:
-                    for title in L2:
-                        childrens = Nav.objects.filter(id__in=u_navs_ids, level=3, parent_id=title['id']).values_list('name')
-                        navs.append({
-                            'icon': title['icon'],
-                            'title': title['name'],
-                            'href': '' if title['href'] == '0' else title['href'],
-                            'children': list(map(lambda x: {
-                                'title': x['name'],
-                                'href': x['href'],
-                            }, Nav.objects.filter(id__in=u_navs_ids, level=3, parent_id=title['id']).values('name', 'href').order_by('index'))) if childrens else ''
-                        })
-
+    def serialize(self, queryset):
+        total = queryset.count()
+        result = self.paging(queryset)
         data = {
-            'menus': navs,
+            'total': total,
+            'list': map(lambda x: {
+                'id': x['id'],
+                'name': x['name'],
+                'perform_number': x['perform_number'],
+                'delegate': x['delegate'],
+                'check_agency': x['check_agency'],
+                'enterprise_number': x['enterprise_number'],
+                'check_type': x['check_type'],
+            }, result),
         }
 
         return data
@@ -2074,7 +2351,114 @@ class NavBarView(BaseView):
     def get(self, request):
         self.set_request(request)
 
-        return Response(self.serialize())
+        queryset = RandomCheckTaskData(params=request.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+
+class RandomCheckTaskDeleteView(BaseView):
+
+    def __init__(self):
+        super(RandomCheckTaskDeleteView, self).__init__()
+
+    def delete(self, request, tid):
+
+        queryset = RandomCheckTaskDelete(user=request.user).delete(tid)
+
+        return Response(queryset)
+
+
+class RandomCheckEnterpriseView(BaseView):
+
+    def __init__(self):
+        super(RandomCheckEnterpriseView, self).__init__()
+
+    def set_request(self, request):
+        super(RandomCheckEnterpriseView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(RandomCheckEnterpriseView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        result = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda x: {
+                'id': x['id'],
+                'product_name': x['product_name'],
+                'enterprise_name': x['enterprise_name'],
+                'enterprise_address': x['enterprise_address'],
+                'contacts': x['contacts'],
+                'phone': x['phone'],
+                'area': x['area'],
+                'status': x['status'],
+            }, result),
+        }
+
+        return data
+
+    def get(self, request, tid=None):
+        self.set_request(request)
+
+        queryset = RandomCheckEnterprise(params=request.query_params).get_by_id(tid)
+
+        return Response(self.serialize(queryset))
+
+
+class RandomCheckTaskUploadView(BaseView):
+    parser_classes = (FileUploadParser,)
+
+    def __init__(self):
+        super(RandomCheckTaskUploadView, self).__init__()
+
+    def put(self, request, filename, enterprise_number, check_type, format=None):
+
+        queryset = RandomCheckTaskUpload(params=request.data).upload(filename, enterprise_number, check_type, request.FILES['file'])
+
+        return Response(queryset)
+
+
+
+class TaskNameView(BaseView):
+
+    def __init__(self):
+        super(TaskNameView, self).__init__()
+
+    def set_request(self, request):
+        super(TaskNameView, self).set_request(request)
+
+    def get(self, request, tid):
+        self.set_request(request)
+
+        queryset = TaskName(params=request.query_params).get_by_id(tid)
+
+        return Response(queryset)
+
+
+class NavBarDataView(BaseView):
+
+    def __init__(self):
+        super(NavBarDataView, self).__init__()
+
+    def set_request(self, request):
+        self.user = request.user
+        super(NavBarDataView, self).set_request(request)
+
+    def get(self, request):
+        self.set_request(request)
+
+        navs = NavBarData(user=request.user).get_navs()
+
+        data = {
+            'menus': navs,
+        }
+
+        return Response(data)
 
 
 class NavBarEditView(BaseView):
@@ -2091,6 +2475,73 @@ class NavBarEditView(BaseView):
         queryset = NavBarEdit(user=request.user, params=request.data).edit(cid=cid)
 
         return Response(status=queryset)
+
+
+class RouteDataView(BaseView):
+
+    def __init__(self):
+        super(RouteDataView, self).__init__()
+
+    def set_request(self, request):
+        self.user = request.user
+        super(RouteDataView, self).set_request(request)
+
+    def get(self, request):
+        self.set_request(request)
+
+        routers = RouteData(user=request.user).get_routers()
+
+        data = {
+            'routers': routers,
+        }
+
+        return Response(data)
+
+
+class UserInfoView(BaseView):
+
+    def __init__(self):
+        super(UserInfoView, self).__init__()
+
+    def set_request(self, request):
+        self.user = request.user
+        super(UserInfoView, self).set_request(request)
+
+    def serialize(self):
+        user_info = UserInfo.objects.get(user_id=self.user)
+        user_theme = user_info.theme
+        user_logo = user_info.logo
+
+        data = {
+            'user_theme': user_theme,
+            'user_logo': user_logo,
+        }
+
+        return data
+
+    def get(self, request):
+        self.set_request(request)
+
+        return Response(self.serialize())
+
+
+class ThemeEditView(BaseView):
+
+    def __init__(self):
+        super(ThemeEditView, self).__init__()
+
+    def set_request(self, request):
+        self.user = request.user
+        super(ThemeEditView, self).set_request(request)
+
+    def post(self, request):
+        self.set_request(request)
+
+        theme = getattr(self, 'theme', '')
+
+        queryset = ThemeEdit(user=request.user, params=request.data).edit()
+
+        return Response(queryset)
 
 
 class UserView(BaseView):
@@ -2170,10 +2621,10 @@ class UserEditView(BaseView):
     def set_request(self, request):
         super(UserEditView, self).set_request(request)
 
-    def post(self, request, cid):
+    def post(self, request, uid):
         self.set_request(request)
 
-        queryset = UserEdit(user=request.user, params=request.data).edit(cid=cid)
+        queryset = UserEdit(user=request.user, params=request.data).edit(uid=uid)
 
         return Response(status=queryset)
 
@@ -2186,63 +2637,27 @@ class UserDeleteView(BaseView):
     def set_request(self, request):
         super(UserDeleteView, self).set_request(request)
 
-    def delete(self, request, cid):
+    def delete(self, request, uid):
         self.set_request(request)
 
-        queryset = UserDelete(user=request.user).delete(cid=cid)
+        queryset = UserDelete(user=request.user).delete(uid=uid)
 
         return Response(status=queryset)
 
 
-class UserNavView(BaseView):
+class UserNavDataView(BaseView):
 
     def __init__(self):
-        super(UserNavView, self).__init__()
+        super(UserNavDataView, self).__init__()
 
     def set_request(self, request):
         self.user = request.user
-        super(UserNavView, self).set_request(request)
+        super(UserNavDataView, self).set_request(request)
 
-    def get(self, request, cid):
+    def get(self, request, uid):
         self.set_request(request)
-        menus = []
-        group_names = Group.objects.filter(user=self.user).values_list('name', flat=True)
-        name_and_id = Nav.objects.values('name','id').order_by('index')
 
-        # 如果当前操作的是'超级管理员'
-        if '超级管理员' in group_names:
-            L1 = name_and_id.filter(level=1)
-            for category in L1:
-                menus.append({
-                    'id': category['id'],
-                    'label': category['name'],
-                    'children': list(map(lambda x: {
-                        'id': x['id'],
-                        'label': x['name'],
-                        'children': list(map(lambda y: {
-                            'id': y['id'],
-                            'label': y['name'],
-                        }, Nav.objects.filter(level=3, parent_id=x['id']).values('name', 'id').order_by('index'))) if Nav.objects.filter(level=3, parent_id=x['id']) else ''
-                    }, Nav.objects.filter(level=2, parent_id=category['id']).values('name', 'id').order_by('index'))) if Nav.objects.filter(level=2, parent_id=category['id']) else ''
-                })
-        else:
-            u_navs_ids = UserNav.objects.filter(user=self.user).values_list('nav', flat=True)
-            L1 = name_and_id.filter(id__in=u_navs_ids, level=1)
-
-            if L1:
-                for category in L1:
-                    menus.append({
-                        'id': category['id'],
-                        'label': category['name'],
-                        'children': list(map(lambda x: {
-                            'id': x['id'],
-                            'label': x['name'],
-                            'children': list(map(lambda y: {
-                                'id': y['id'],
-                                'label': y['name'],
-                            }, Nav.objects.filter(id__in=u_navs_ids, level=3, parent_id=x['id']).values('name', 'id').order_by('index'))) if Nav.objects.filter(id__in=u_navs_ids, level=3, parent_id=x['id']) else ''
-                        }, Nav.objects.filter(id__in=u_navs_ids, level=2, parent_id=category['id']).values('name', 'id').order_by('index'))) if Nav.objects.filter(id__in=u_navs_ids, level=2, parent_id=category['id']) else ''
-                    })
+        menus = UserNavData(user=request.user).get_menus(uid=uid)
 
         data = {
             'menus': menus,
@@ -2310,6 +2725,7 @@ class NewsAddView(BaseView):
 
 
 class NewsDeleteView(BaseView):
+
     def __init__(self):
         super(NewsDeleteView, self).__init__()
 
@@ -2325,6 +2741,7 @@ class NewsDeleteView(BaseView):
 
 
 class NewsEditView(BaseView):
+
     def __init__(self):
         super(NewsEditView, self).__init__()
 
@@ -2458,3 +2875,1034 @@ class StatisticsView(BaseView):
     def get(self, request):
         result = StatisticsShow(params = request.query_params).get_data()
         return Response(self.serialize(result))
+
+
+class VersionRecordDataView(BaseView):
+
+    def __init__(self):
+        super(VersionRecordDataView, self).__init__()
+
+    def set_request(self, request):
+        super(VersionRecordDataView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(VersionRecordDataView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        result = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda x: {
+                'id': x['id'],
+                'version': x['version'],
+                'content': x['content'],
+                'pubtime': date_format(x['pubtime'], '%Y-%m-%d %T'),
+            }, result),
+        }
+
+        return data
+
+    def get(self, request):
+        self.set_request(request)
+
+        queryset = VersionRecordData(params=request.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+
+class VersionRecordDataAddView(BaseView):
+
+    def __init__(self):
+        super(VersionRecordDataAddView, self).__init__()
+
+    def set_request(self, request):
+        super(VersionRecordDataAddView, self).set_request(request)
+
+    def post(self, request):
+        self.set_request(request)
+
+        queryset = VersionRecordDataAdd(user=request.user, params=request.data).add()
+
+        return Response(status=queryset)
+
+
+class VersionRecordDataDeleteView(BaseView):
+    def __init__(self):
+        super(VersionRecordDataDeleteView, self).__init__()
+
+    def set_request(self, request):
+        super(VersionRecordDataDeleteView, self).set_request(request)
+
+    def delete(self, request, cid):
+        self.set_request(request)
+
+        queryset = VersionRecordDataDelete(user=request.user).delete(cid=cid)
+
+        return Response(status=queryset)
+
+
+class VersionRecordDataEditView(BaseView):
+
+    def __init__(self):
+        super(VersionRecordDataEditView, self).__init__()
+
+    def set_request(self, request):
+        super(VersionRecordDataEditView, self).set_request(request)
+
+    def post(self, request, cid):
+        self.set_request(request)
+
+        queryset = VersionRecordDataEdit(user=request.user, params=request.data).edit(cid=cid)
+
+        return Response(status=queryset)
+
+
+class InspectionDataNationView(BaseView):
+
+    def __init__(self):
+        super(InspectionDataNationView, self).__init__()
+
+    def set_request(self, request):
+        super(InspectionDataNationView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(InspectionDataNationView, self).paging(
+            queryset, self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 500))
+
+    def serialize(self, queryset, request):
+        areaname = User.objects.filter(username=request.user).values('userarea__area__name')
+        total = queryset.count()
+        result = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda x: {
+                'industry':x['inspection__industry__name'],
+                'unitem': x['unitem'],
+                'area':x['area__name'],
+                'involve': involve_local(areaname[0]['userarea__area__name'], x['area__name']),
+                # 'pubtime': x['inspection__pubtime'],
+            }, result),
+        }
+        return data
+
+    def get(self, request):
+        self.set_request(request)
+
+        queryset = InspectionDataNation(params=request.query_params).get_all()
+
+        return Response(self.serialize(queryset,request))
+
+
+class InspectionDataProAndCityView(BaseView):
+
+    def __init__(self):
+        super(InspectionDataProAndCityView, self).__init__()
+
+    def set_request(self, request):
+        super(InspectionDataProAndCityView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(InspectionDataProAndCityView, self).paging(
+            queryset, self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15))
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        result = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda x: {
+                'industry':x['industry__name'],
+                'qualified':str(round(float(x['qualitied'])*100,2))+'%',
+                'source':x['source'],
+                'pubtime':x['pubtime']
+            }, result),
+        }
+        return data
+
+    def get(self, request):
+        self.set_request(request)
+
+        queryset = InspectionDataProAndCity(params=request.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+
+class InspectionDataLocalView(BaseView):
+
+    def __init__(self):
+        super(InspectionDataLocalView, self).__init__()
+
+    def set_request(self, request):
+        super(InspectionDataLocalView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(InspectionDataLocalView, self).paging(
+            queryset, self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15))
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        result = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda x: {
+                'industry':x['inspection__industry__name'],
+                'enterprise':x['name'],
+                'unitem':x['unitem'],
+                'source':x['inspection__source']
+            }, result),
+        }
+        return data
+
+    def get(self, request):
+        self.set_request(request)
+
+        queryset = InspectionDataLocal(user=request.user, params=request.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+
+class InspectionDataLocalExportView(BaseView):
+
+    def __init__(self):
+        super(InspectionDataLocalExportView, self).__init__()
+
+    def get(self, request):
+        response = FileResponse(
+            InspectionDataLocalExport(user=request.user, params=request.query_params).export(),
+            content_type='application/vnd.ms-excel'
+        )
+        filename = datetime.now().strftime("%Y%m%d%H%M%S")+'_Local_Inspections'+'.xlsx'
+        response["Content-Disposition"] = 'attachment; filename='+filename
+
+        return response
+
+
+class InspectionDataProAndCityExportView(BaseView):
+
+    def __init__(self):
+        super(InspectionDataProAndCityExportView, self).__init__()
+
+    def get(self, request):
+        response = FileResponse(
+            InspectionDataProAndCityExport(user=request.user, params=request.query_params).export(),
+            content_type='application/vnd.ms-excel'
+        )
+        filename = datetime.now().strftime("%Y%m%d%H%M%S")+'_Province_City_Inspections'+'.xlsx'
+        response["Content-Disposition"] = 'attachment; filename='+filename
+
+        return response
+
+
+class InspectionDataNationExportView(BaseView):
+
+    def __init__(self):
+        super(InspectionDataNationExportView, self).__init__()
+
+    def get(self, request):
+        response = FileResponse(
+            InspectionDataNationExport(user=request.user, params=request.query_params).export(),
+            content_type='application/vnd.ms-excel'
+        )
+        filename = datetime.now().strftime("%Y%m%d%H%M%S")+'_Nation_Inspections'+'.xlsx'
+        response["Content-Disposition"] = 'attachment; filename='+filename
+
+        return response
+
+
+class EventsManageView(BaseView):
+
+    def __init__(self):
+        super(EventsManageView, self).__init__()
+
+    def set_request(self, request):
+        super(EventsManageView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(EventsManageView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, result):
+        total = result.count()
+        resultPage = self.paging(result)
+        data = {
+            'total': total,
+            'list': map(lambda r : {
+                'id': r['id'],
+                'title': r['title'],
+                'socialHarm': r['socialHarm'],
+                'scope': r['scope'],
+                'grading': r['grading'],
+                'pubtime': date_format(r['pubtime'], "%Y-%m-%d"),
+                'desc': r['desc']
+            }, resultPage)
+        }
+
+        return data
+
+    def get(self, request):
+        result = EventsManageData(params = request.query_params).get_data()
+
+        return Response(self.serialize(result))
+
+
+class EventsSaveView(BaseView):
+
+    def __init__(self):
+        super(EventsSaveView, self).__init__()
+
+    def post(self, request):
+        status = EventsManageData(params = request.data).toSave()
+
+        return Response(status)
+
+
+class EventsDeleteView(BaseView):
+
+    def __init__(self):
+        super(EventsDeleteView, self).__init__()
+
+    def delete(self, request, eid):
+        status = EventsManageData(params = request.data).toDel(eid = eid)
+
+        return Response(status)
+
+
+class EventsUpdataView(BaseView):
+
+    def __init__(self):
+        super(EventsUpdataView, self).__init__()
+
+    def post(self, request):
+        status = EventsManageData(params = request.data).toUpd()
+
+        return Response(status)
+
+
+class EventsDataView(BaseView):
+
+    def __init__(self):
+        super(EventsDataView, self).__init__()
+
+    def set_request(self, request):
+        super(EventsDataView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(EventsDataView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, result):
+        total = result.count()
+        resultPage = self.paging(result)
+        data = {
+            'total': total,
+            'list': map(lambda r: {
+                'id': r['id'],
+                'title': r['title'],
+                'url': r['url'],
+                'pubtime': date_format(r['pubtime'], '%Y-%m-%d %H:%M:%S'),
+                'source': r['source'],
+                'areas': areas(r['id']),
+                'keyword': r['eventskeyword__name'],
+            }, resultPage)
+        }
+
+        return data
+
+    def get(self, request, eid):
+        result = EventsManageData(params = request.query_params).LinkData(eid = eid)
+
+        return Response(self.serialize(result))
+
+
+class EventsUploadView(BaseView):
+
+    def __init__(self):
+        super(EventsUploadView, self).__init__()
+
+    def put(self, request, filename, format=None):
+        queryset = EventsDataUpload(user=request.user).upload(filename, request.FILES['file'])
+
+        return Response(queryset)
+
+
+class RiskHarmsManageView(BaseView):
+
+    def __init__(self):
+        super(RiskHarmsManageView, self).__init__()
+
+    def post(self, request):
+
+        status = RiskHarmsManageSave(params=request.data).toSave()
+        return Response(status=status)
+
+
+class RiskHarmsDetailsView(BaseView):
+
+    def __init__(self):
+        super(RiskHarmsDetailsView, self).__init__()
+
+    def serialize(self, result):
+
+        data = {
+            'list': map(lambda r: {
+                'productName': '无' if r['article__industry__name'] == 'None' else r['article__industry__name'],
+                'usingEnvironment': harmName(r['environment']),
+                'temporalMotion': harmName(r['activity']),
+                'people': harmPeople(r['id']),
+                'psyandphy': harmName(r['mind_body']),
+                'behFactors': harmName(r['behavior']),
+                'indoorEnvironment': harmName(r['indoor']),
+                'outdoorEnvironment': harmName(r['outdoor']),
+                'phyHarm': harmName(r['physics']),
+                'chemicalHarm': harmName(r['chemical']),
+                'biologicalHarm': harmName(r['biology']),
+                'damageTypes': harmName(r['damage_types']),
+                'degree_damage': harmName(r['damage_degree']),
+                'damageReason': harmName(r['damage_reason']),
+            }, result),
+        }
+
+        return data
+
+    def get(self, request):
+
+        result = RiskHarmsDetailsData(params=request.query_params).get_data()
+        return Response(self.serialize(result))
+
+
+class RiskHarmsView(BaseView):
+
+    def __init__(self):
+        super(RiskHarmsView, self).__init__()
+
+    def serialize(self, result):
+        data = {
+            'list': map(lambda r : {
+                'id': r['id'],
+                'name': r['name'],
+            }, result)
+        }
+
+        return data
+
+    def get(self, request):
+        result = RiskHarmsData(params=request.query_params).get_data()
+
+        return Response(self.serialize(result))
+
+
+class GovReportsView(BaseView):
+
+    def __init__(self):
+        super(GovReportsView, self).__init__()
+
+    def set_request(self, request):
+        super(GovReportsView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(GovReportsView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        results = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda r: {
+                'id': r['id'],
+                'title': r['title'],
+                'level': r['area__level'],
+                'year': r['year'],
+                'areas': gov_area(r['area_id']),
+                'content': r['content'],
+            }, results)
+        }
+
+        return data
+
+    def get(self, request):
+
+        self.set_request(request)
+
+        queryset = GovReportsData(params=request.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+
+class GovReportsAddView(BaseView):
+
+    def __init__(self):
+        super(GovReportsAddView, self).__init__()
+
+    def set_request(self, request):
+        super(GovReportsAddView, self).set_request(request)
+
+    def post(self, request):
+        self.set_request(request)
+
+        queryset = GovReportsAdd(user=request.user, params=request.data).add()
+
+        return Response(status=queryset)
+
+
+class GovReportsDeleteView(BaseView):
+
+    def __init__(self):
+        super(GovReportsDeleteView, self).__init__()
+
+    def set_request(self, request):
+        super(GovReportsDeleteView, self).set_request(request)
+
+    def delete(self, request, cid):
+        self.set_request(request)
+
+        queryset = GovReportsDelete(user=request.user, params=request.data).delete(cid=cid)
+
+        return Response(status=queryset)
+
+
+class GovReportsEditView(BaseView):
+
+    def __init__(self):
+        super(GovReportsEditView, self).__init__()
+
+    def set_request(self, request):
+        super(GovReportsEditView, self).set_request(request)
+
+    def post(self, request, cid):
+        self.set_request(request)
+
+        queryset = GovReportsEdit(user=request.user, params=request.data).edit(cid=cid)
+
+        return Response(status=queryset)
+
+
+class IndicatordataparentView(BaseView):
+
+    def __init__(self):
+        super(IndicatordataparentView, self).__init__()
+
+    def set_request(self, request):
+        super(IndicatordataparentView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(IndicatordataparentView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        results = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda r: {
+                'id': r['id'],
+                'name': r['indicator__name'],
+                'level': r['indicator__level'],
+                'parenttwo': r['indicator__parent_id__name'],
+                'parentone': r['indicator__parent_id__parent_id__name'],
+                'value': r['value'],
+                'unit': r['indicator__unit'],
+                'areas': area(r['area__id']),
+                'year': r['year'],
+            }, results)
+        }
+
+        return data
+
+    def get(self, request):
+
+        self.set_request(request)
+
+        queryset = IndicatorData(params=request.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+
+class IndicatordataparentDeleteView(BaseView):
+
+    def __init__(self):
+        super(IndicatordataparentDeleteView, self).__init__()
+
+    def set_request(self, request):
+        super(IndicatordataparentDeleteView, self).set_request(request)
+
+    def delete(self, request, cid):
+        self.set_request(request)
+
+        queryset = IndicatorDelete(user=request.user, params=request.data).delete(cid=cid)
+
+        return Response(status=queryset)
+
+
+class SelectIndicatorListView(BaseView):
+
+    def __init__(self):
+        super(SelectIndicatorListView, self).__init__()
+
+    def set_request(self, request):
+        super(SelectIndicatorListView, self).set_request(request)
+
+    def serialize(self, queryset):
+        data = map(
+            lambda x: {
+                'id': x['id'],
+                'name': x['name'],
+            },
+            queryset
+        )
+
+        return data
+
+    def get(self, request):
+        self.set_request(request)
+
+        queryset = IndicatorData(params=request.query_params).get_level()
+
+        return Response(self.serialize(queryset))
+
+
+class IndicatordataparentDataUploadView(BaseView):
+    parser_classes = (FileUploadParser,)
+
+    def __init__(self):
+        super(IndicatordataparentDataUploadView, self).__init__()
+
+    def put(self, request, filename, format=None):
+
+        queryset = IndicatorDataUpload(user=request.user).upload(filename, request.FILES['file'])
+
+        return Response(queryset)
+
+
+class IndicatordataparentDataExportView(BaseView):
+
+    def __init__(self):
+        super(IndicatordataparentDataExportView, self).__init__()
+
+    def get(self, request):
+        response = FileResponse(
+            IndicatorDataExport(params=request.query_params, user=request.user).export(),
+            content_type='application/vnd.ms-excel'
+        )
+        response["Content-Disposition"] = 'attachment; filename=indicator.xlsx'
+
+        return response
+
+
+class IndicatorView(BaseView):
+
+    def __init__(self):
+        super(IndicatorView, self).__init__()
+
+    def set_request(self, request):
+        super(IndicatorView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(IndicatorView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        results = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda r: {
+                'id': r['id'],
+                'onename':r['parent_id__parent_id__name'],
+                'twoname': r['parent_id__name'],
+                'name': r['name'],
+            }, results)
+        }
+
+        return data
+
+    def get(self, request):
+
+        self.set_request(request)
+
+        queryset = IndicatorChart(params=request.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+
+class IndicatorscoreView(BaseView):
+
+    def __init__(self):
+        super(IndicatorscoreView, self).__init__()
+
+    def set_request(self, request):
+        super(IndicatorscoreView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(IndicatorscoreView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        results = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda r: {
+                'id': r['id'],
+                'value': r['value'],
+                'areas': area(r['area_id']),
+                'year': r['year'],
+                'indicator_name': r['indicator_id__name'],
+                'indicator_id': r['indicator_id']
+            }, results)
+        }
+
+        return data
+
+    def get(self, request, cid):
+
+        self.set_request(request)
+
+        queryset = IndicatorRanking(params=request.query_params).get_all(cid=cid)
+
+        return Response(self.serialize(queryset))
+
+
+class PolicyAreaView(BaseView):
+
+    def __init__(self):
+        super(PolicyAreaView, self).__init__()
+
+    def set_request(self, request):
+        super(PolicyAreaView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(PolicyAreaView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, queryset):
+        total = len(queryset)
+        # total = queryset.count()
+        results = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda r: {
+                'areas__id': r['areas__id'],
+                'level': r['areas__level'],
+                'name': r['areas__name'],
+                'title': r['title'],
+                'url': r['url'],
+                'total': r['total']
+            }, results)
+        }
+
+        return data
+
+    def get(self, request):
+
+        self.set_request(request)
+
+        queryset = PolicyAreaData(params=request.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+
+class PolicyAreaTotalView(BaseView):
+
+    def __init__(self):
+        super(PolicyAreaTotalView, self).__init__()
+
+    def set_request(self, request):
+        super(PolicyAreaTotalView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(PolicyAreaTotalView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        results = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda r: {
+                'id': r['policy__id'],
+                'name': r['policy__name'],
+                'detail': r['policy__detail'],
+                'pubtime': r['pubtime'],
+                # 'time': r['pubtime'].strftime("%Y-%m-%d"),
+            }, results)
+        }
+
+        return data
+
+    def get(self, request):
+
+        self.set_request(request)
+
+        queryset = PolicyAreaTotalData(params=request.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+
+class PolicyRegionAddView(BaseView):
+
+    def __init__(self):
+        super(PolicyRegionAddView, self).__init__()
+
+    def set_request(self, request):
+        super(PolicyRegionAddView, self).set_request(request)
+
+    def post(self, request):
+        self.set_request(request)
+
+        queryset = PolicyAreaAdd(user=request.user, params=request.data).add()
+
+        return Response(status=queryset)
+
+
+class PolicPrivatelView(BaseView):
+
+    def __init__(self):
+        super(PolicPrivatelView, self).__init__()
+
+    def set_request(self, request):
+        super(PolicPrivatelView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(PolicPrivatelView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, queryset):
+        total = len(queryset)
+        results = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda r: {
+                'areas__id': r['areas__id'],
+                'level': r['areas__level'],
+                'name': r['areas__name'],
+                'title': r['title'],
+                'url': r['url'],
+                'total': r['total']
+
+
+            }, results)
+        }
+
+        return data
+
+    def get(self, request):
+
+        self.set_request(request)
+
+        queryset = PolicyPrivateData(params=request.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+
+class PolicPrivatelTotalView(BaseView):
+
+    def __init__(self):
+        super(PolicPrivatelTotalView, self).__init__()
+
+    def set_request(self, request):
+        super(PolicPrivatelTotalView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(PolicPrivatelTotalView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        results = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda r: {
+                'id': r['policy__id'],
+                'name': r['policy__name'],
+                'detail': r['policy__detail'],
+                'pubtime': r['pubtime'].strftime("%Y-%m-%d"),
+            }, results)
+        }
+
+        return data
+
+    def get(self, request):
+
+        self.set_request(request)
+
+        queryset = PolicPrivatelTotalData(params=request.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+
+class PolicPrivatelAddView(BaseView):
+
+    def __init__(self):
+        super(PolicPrivatelAddView, self).__init__()
+
+    def set_request(self, request):
+        super(PolicPrivatelAddView, self).set_request(request)
+
+    def post(self, request):
+        self.set_request(request)
+
+        queryset = PolicPrivatelAdd(user=request.user, params=request.data).add()
+
+        return Response(status=queryset)
+
+
+class PolicyIndustryView(BaseView):
+
+    def __init__(self):
+        super(PolicyIndustryView, self).__init__()
+
+    def set_request(self, request):
+        super(PolicyIndustryView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(PolicyIndustryView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, queryset):
+        total = len(queryset)
+        results = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda r: {
+                'name': r['area'],
+                'industry': r['industry'],
+                'area__id': r['area__id'],
+                'total': r['total'],
+                'level': r['level'],
+                'title': r['articletitle'],
+                'url': r['articleurl'],
+
+            }, results)
+        }
+        return data
+
+    def get(self, request):
+
+        self.set_request(request)
+
+        queryset = PolicyIndustryData(params=request.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+
+class PolicyIndustryTotalView(BaseView):
+
+    def __init__(self):
+        super(PolicyIndustryTotalView, self).__init__()
+
+    def set_request(self, request):
+        super(PolicyIndustryTotalView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(PolicyIndustryTotalView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        results = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda r: {
+                'id': r['policy__id'],
+                'name': r['policy__name'],
+                'detail': r['policy__detail'],
+                'pubtime': r['pubtime'].strftime("%Y-%m-%d"),
+            }, results)
+        }
+
+        return data
+
+    def get(self, request):
+
+        self.set_request(request)
+
+        queryset = PolicyIndustryTotalData(params=request.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+
+class PolicyIndustryAddView(BaseView):
+
+    def __init__(self):
+        super(PolicyIndustryAddView, self).__init__()
+
+    def set_request(self, request):
+        super(PolicyIndustryAddView, self).set_request(request)
+
+    def post(self, request):
+        self.set_request(request)
+
+        queryset = PolicyIndustryAdd(user=request.user, params=request.data).add()
+
+        return Response(status=queryset)
+
+
+class PolicyDataUploadView(BaseView):
+    parser_classes = (FileUploadParser,)
+
+    def __init__(self):
+        super(PolicyDataUploadView, self).__init__()
+
+    def put(self, request, filename, format=None):
+
+        queryset = PolicyDataUpload(user=request.user).upload(filename, request.FILES['file'])
+
+        return Response(queryset)
+
+
+class PolicyIndustryDataUploadView(BaseView):
+    parser_classes = (FileUploadParser,)
+
+    def __init__(self):
+        super(PolicyIndustryDataUploadView, self).__init__()
+
+    def put(self, request, filename, format=None):
+
+        queryset = PolicyIndustryDataUpload(user=request.user).upload(filename, request.FILES['file'])
+
+        return Response(queryset)

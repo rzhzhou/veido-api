@@ -2,26 +2,28 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from django.contrib.auth.models import User, Group
 
-from observer.base.models import (Area, Category, UserArea, AliasIndustry, MajorIndustry,
-                                Enterprise, UserNav, Article2)
+from observer.base.models import (Area, Category, UserInfo, AliasIndustry, MajorIndustry,
+                                Enterprise, UserNav, Article, HarmIndicator, HarmPeople, RandomCheckTask,
+                                RandomCheckEnterpriseList)
+from observer.apps.hqi.models import Indicator,IndicatorDataParent,Policy
 from observer.utils.date_format import date_format
 
 
 def areas(article_id, flat=False):
-    a_ids = Article2.objects.filter(id=article_id).values_list('areas__id', flat=True)
+    a_ids = Article.objects.filter(id=article_id).values_list('areas__id', flat=True)
     queryset = Area.objects.filter(id__in=a_ids)
 
     if not queryset.exists():
         queryset = Area.objects.filter(name='全国')
 
     if not flat:
-        return list(map(lambda x: {'id': x['id'], 'text': x['name']}, queryset.values('id', 'name')))
+        return list(map(lambda x: {'id': x['id'], 'name': x['name']}, queryset.values('id', 'name')))
     else:
-        return ','.join(queryset.values_list('name', flat=True))
+        return ' '.join(queryset.values_list('name', flat=True))
 
 
 def categories(article_id, admin=False, flat=False):
-    c_ids = Article2.objects.filter(id=article_id).values_list('categories__id', flat=True)
+    c_ids = Article.objects.filter(id=article_id).values_list('categories__id', flat=True)
     queryset = Category.objects.filter(id__in=c_ids)
 
     if not admin:
@@ -31,17 +33,33 @@ def categories(article_id, admin=False, flat=False):
         queryset = Category.objects.filter(name='其它')
 
     if not flat:
-        return list(map(lambda x: {'id': x['id'], 'text': x['name']}, queryset.values('id', 'name')))
+        return list(map(lambda x: {'id': x['id'], 'name': x['name']}, queryset.values('id', 'name')))
+    else:
+        return ' '.join(queryset.values_list('name', flat=True))
+
+
+#指标
+def indicatores(indicator_id, admin=False, flat=False):
+    c_ids = IndicatorDataParent.objects.filter(id=indicator_id).values_list('indicatores__id', flat=True)
+    queryset = Indicator.objects.using('hqi').filter(id__in=c_ids)
+
+    if not admin:
+        queryset = queryset.filter(level=2)
+
+    if not queryset.exists():
+        queryset = Indicator.objects.filter(name='其它')
+
+    if not flat:
+        return list(map(lambda x: {'id': x['id'], 'name': x['name']}, queryset.values('id', 'name')))
     else:
         return ','.join(queryset.values_list('name', flat=True))
-
 
 # 本地相关度算法
 def local_related(article_id, user):
     f = lambda x, y : set(x).issubset(set(y)) or set(y).issubset(set(x))
 
-    area_ids = Article2.objects.filter(id=article_id).values_list('areas__id', flat=True)
-    u_area = UserArea.objects.get(user=user).area
+    area_ids = Article.objects.filter(id=article_id).values_list('areas__id', flat=True)
+    u_area = UserInfo.objects.get(user=user).area
     u_area_id = u_area.id
     u_level = u_area.level
 
@@ -68,16 +86,23 @@ def area(area_id, flat=False):
     queryset = Area.objects.get(id=area_id)
 
     if not flat:
-        return {'id': queryset.id, 'text': queryset.name}
+        return {'id': queryset.id, 'name': queryset.name}
     else:
         return queryset.name
 
+def gov_area(area_id, flat=False):
+    queryset = Area.objects.get(id=area_id)
+
+    if not flat:
+        return [{'id': queryset.id, 'name': queryset.name}]
+    else:
+        return queryset.name
 
 def get_major_industry(industry_id, flat=False):
     queryset = MajorIndustry.objects.get(id=industry_id)
 
     if not flat:
-        return {'id': queryset.id, 'text': queryset.name}
+        return {'id': queryset.id, 'name': queryset.name}
     else:
         return queryset.name
 
@@ -85,7 +110,7 @@ def get_major_category(category_id, flat=False):
     queryset = Category.objects.get(id=category_id)
 
     if not flat:
-        return {'id': queryset.id, 'text': queryset.name}
+        return {'id': queryset.id, 'name': queryset.name}
     else:
         return queryset.name
 
@@ -97,6 +122,13 @@ def alias_industry(alias_industry_id, flat=False):
         return {'id': queryset.id, 'text': queryset.name}
     else:
         return queryset.name
+
+
+def involve_local(local_name, area_name):
+        if local_name == area_name:
+            return '是'
+        else:
+            return '否'
 
 
 def industry_number(alias_industry_id):
@@ -153,7 +185,7 @@ def enterprise_area_name(inspection_id, flat=False):
 
 
 def get_user_nav(user_id):
-    return UserNav.objects.filter(user_id=user_id).values_list('nav_id', flat=True)
+    return UserNav.objects.filter(user_id=user_id).exclude(nav__href='').values_list('nav_id', flat=True)
 
 
 def get_user_extra(user_id):
@@ -175,3 +207,22 @@ def get_user_extra(user_id):
         extra['role'] = 0
 
     return extra
+
+
+def harmName(harm_id):
+    harmIndicator = HarmIndicator.objects.filter(id=harm_id).values_list('name', flat=True)
+    name = list(harmIndicator)
+
+    return name[0]
+
+
+def harmPeople(harm_id):
+    harmpeople = HarmPeople.objects.filter(harm_id=harm_id).values('age', 'sex')
+
+    return list(map(lambda x: {'age': harmName(x['age']), 'sex': harmName(x['sex'])}, harmpeople))
+
+
+def countPeople(harm_id):
+    harmpeople = HarmPeople.objects.filter(harm_id=harm_id)
+
+    return harmpeople.count()

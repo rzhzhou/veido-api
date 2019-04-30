@@ -69,11 +69,12 @@ class CrawlerTask(object):
 
 class CrawlerTask_category(object):
 
-    def __init__(self, keyword, category_id, industry_id, user_id):
+    def __init__(self, keyword, category_id, industry_id, user_id, corpus_id):
         self.keyword = keyword
         self.category_id = category_id
         self.industry_id = industry_id
         self.user_id = user_id
+        self.corpus_id = corpus_id
         self.source = {
             'baidu' : '%s',
         }
@@ -100,6 +101,7 @@ class CrawlerTask_category(object):
                 "last_pubtime": datetime_to_timestamp(datetime(2015, 1, 1)),
                 "category_id": self.category_id,
                 "industry_id": self.industry_id,
+                "corpus_id": self.corpus_id,
                 "user_id" : self.user_id,
                 "source": data.get('source'),
                 'source_type': u'信息类别',
@@ -111,7 +113,7 @@ class CrawlerTask_category(object):
             'next_run': datetime.utcnow().replace(tzinfo=pytz.utc),
             'status': 0
         }
-        
+
         if not Task.objects.using('crawler').filter(url=data.get('syntax'), data__contains=params.get('data').get('category_id')).exists():
             task = Task(**params)
             task.save(using='crawler')
@@ -124,5 +126,4 @@ class CrawlerTask_category(object):
                     "category_id": self.category_id,
                 },
             }
-
             Task.objects.using('crawler').filter(url=data.get('syntax'), data__contains=data.get('params').get('category_id')).delete()

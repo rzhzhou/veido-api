@@ -65,7 +65,7 @@ class NewsDelete(Abstract):
     def delete(self, cid):
         del_ids = cid
 
-        for id in del_ids.split(" "):
+        for id in del_ids.split(","):
             News.objects.using('shendu').filter(id=id).delete()
 
 

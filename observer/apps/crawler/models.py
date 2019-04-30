@@ -18,7 +18,7 @@ class Task(models.Model):
     status = models.IntegerField(verbose_name=u'状态')
 
     class Meta:
-        app_label = 'apps'
+        app_label = 'crawler'
         db_table = 'crawler_task'
         ordering = ['-rank', 'next_run', '-priority']
         verbose_name_plural = u'爬虫任务'

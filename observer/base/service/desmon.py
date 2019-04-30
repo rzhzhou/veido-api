@@ -4,7 +4,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, Q, F
 
 from django.contrib.auth.models import Group
-from observer.base.models import (DMLink, CorpusCategories )
+from observer.base.models import (DMLink, CorpusCategories, Article )
 from observer.base.service.abstract import Abstract
 from observer.utils.date_format import date_format
 
@@ -58,7 +58,7 @@ class DMLinkAdd(Abstract):
             return 0
 
 
-class DMLinkEdit(Abstract): 
+class DMLinkEdit(Abstract):
 
     def __init__(self, params={}):
         super(DMLinkEdit, self).__init__(params)
@@ -92,7 +92,7 @@ class DMLinkEdit(Abstract):
             return 0
 
 
-class DMLinkDelete(Abstract): 
+class DMLinkDelete(Abstract):
 
     def __init__(self, user):
         self.user = user
@@ -119,18 +119,58 @@ class DMWordsData(Abstract):
         fields = ('id', 'status', 'keyword', 'category_id', 'industry_id')
 
         cond = {
-            'category_id': getattr(self, 'category', None),
+            'category_id__icontains': getattr(self, 'category', None),
             'status': getattr(self, 'status', None),
         }
 
         args = dict([k, v] for k, v in cond.items() if v)
 
         queryset = CorpusCategories.objects.filter(**args).values(*fields)
-        
+
         # 判断当前用户是否为武汉深度网科技有限公司成员，然后取出该用户管理的资料
         group_ids = Group.objects.filter(user=self.user).values_list('id', flat=True)
         if 4 in group_ids and 3 in group_ids:
             queryset = CorpusCategories.objects.filter(**args).filter(user_id = self.user.id).values(*fields)
 
-        
         return queryset
+
+
+class DMWordsFocusData(object):
+
+    def __init__(self, user):
+        self.user = user
+
+    def get_all(self):
+
+        fields = ('id', 'keyword', 'startTime', 'stopTime')
+        status = 1
+        queryset = CorpusCategories.objects.filter(user_id = self.user.id, status=status).values(*fields)
+ 
+        return queryset
+
+
+class DMWordsDelete(object):
+    def __init__(self, user):
+        self.user = user
+
+    def delete(self, did):
+        Arr_id = did
+
+        for a_id in Arr_id.split(','):
+            corCategory = CorpusCategories.objects.get(id=a_id)
+            corCategory.status = 2
+            corCategory.save()
+
+        return 200
+
+class MonitorInformationData(object):
+    def __init__(self, user):
+        self.user = user
+
+    def get_all(self, did):
+        fields = ('title', 'url', 'pubtime', 'source', 'areas__name')
+
+        result = Article.objects.filter(corpus_id=did).values(*fields)
+
+        return result
+

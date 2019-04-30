@@ -7,15 +7,16 @@ import jieba.posseg as pseg
 
 import openpyxl
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.models import Group, User
 from django.db.models import Q
 
 from observer.base.models import (MajorIndustry, AliasIndustry, Area, Enterprise, Industry,
-                                  Inspection2, IndustryProducts)
+                                  Inspection, IndustryProducts)
 from observer.base.service.abstract import Abstract
 from observer.base.service.base import (alias_industry, get_major_industry, area,
                                         enterprise_area_name, enterprise_name,
                                         enterprise_unitem, industry_number,
-                                        qualitied)
+                                        qualitied, involve_local)
 from observer.utils.date_format import date_format, get_months, str_to_date
 from observer.utils.excel import read_by_openpyxl, write_by_openpyxl
 from observer.utils.str_format import str_to_md5str
@@ -50,7 +51,7 @@ class InspectionData(Abstract):
 
         args = dict([k, v] for k, v in cond.items() if v)
 
-        queryset = Inspection2.objects.filter(**args).values(*fields).order_by('-pubtime')
+        queryset = Inspection.objects.filter(**args).values(*fields).order_by('-pubtime')
 
         return queryset
 
@@ -109,22 +110,22 @@ class EnterpriseDataUnqualified(Abstract):
 
     def get_all(self):
 
-        fields = ('inspection2__industry', 'inspection2__industry__name',
-                  'inspection2__product_name', 'inspection2__source', 'name',
-                  'area_id', 'unitem', 'inspection2__pubtime')
+        fields = ('inspection__industry', 'inspection__industry__name',
+                  'inspection__product_name', 'inspection__source', 'name',
+                  'area', 'area__name', 'unitem', 'inspection__pubtime')
 
         cond = {
-            'inspection2__product_name__contains': getattr(self, 'productName', None),
+            'inspection__product_name__contains': getattr(self, 'productName', None),
             'name__contains': getattr(self, 'enterpriseName', None),
-            'area_id': getattr(self, 'Area', None),
-            'inspection2__industry': getattr(self, 'industry', None),
-            'inspection2__pubtime__gte': getattr(self, 'starttime', None),
-            'inspection2__pubtime__lte': getattr(self, 'endtime', None),
+            'area': getattr(self, 'Area', None),
+            'inspection__industry': getattr(self, 'industry', None),
+            'inspection__pubtime__gte': getattr(self, 'starttime', None),
+            'inspection__pubtime__lte': getattr(self, 'endtime', None),
         }
 
         args = dict([k, v] for k, v in cond.items() if v)
 
-        queryset = Enterprise.objects.filter(**args, status=1).values(*fields).order_by('-inspection2__pubtime')
+        queryset = Enterprise.objects.filter(**args, status=1).values(*fields).order_by('-inspection__pubtime')
 
         return queryset
 
@@ -152,7 +153,7 @@ class EnterpriseData(Abstract):
 
     def get_by_id(self, eid):
 
-        queryset = Enterprise.objects.filter(inspection2=eid)
+        queryset = Enterprise.objects.filter(inspection=eid)
 
         return queryset
 
@@ -194,7 +195,7 @@ class InspectionDataAdd(Abstract):
         if not url or not pubtime or not source or not inspect_patch or not qualitied_patch or not unqualitied_patch or not level or not product_name or not area_id:
             return 400
 
-        Inspection2(
+        Inspection(
             title=title,
             url=url,
             pubtime=pubtime,
@@ -244,20 +245,20 @@ class InspectionDataEdit(Abstract):
         if not url or not pubtime or not source or not inspect_patch or not qualitied_patch or not unqualitied_patch or not level or not industry_id or not area_id:
             return 400
 
-        inspection2 = Inspection2.objects.get(id=edit_id)
-        inspection2.url = url
-        inspection2.pubtime = pubtime
-        inspection2.source = source
-        inspection2.qualitied = qr(qualitied_patch, inspect_patch)
-        inspection2.inspect_patch = inspect_patch
-        inspection2.qualitied_patch = qualitied_patch
-        inspection2.unqualitied_patch = unqualitied_patch
-        inspection2.category = category
-        inspection2.level = level
-        inspection2.product_name = product_name
-        inspection2.industry_id = industry_id
-        inspection2.area_id = area_id
-        inspection2.save()
+        inspection = Inspection.objects.get(id=edit_id)
+        inspection.url = url
+        inspection.pubtime = pubtime
+        inspection.source = source
+        inspection.qualitied = qr(qualitied_patch, inspect_patch)
+        inspection.inspect_patch = inspect_patch
+        inspection.qualitied_patch = qualitied_patch
+        inspection.unqualitied_patch = unqualitied_patch
+        inspection.category = category
+        inspection.level = level
+        inspection.product_name = product_name
+        inspection.industry_id = industry_id
+        inspection.area_id = area_id
+        inspection.save()
 
         return 200
 
@@ -270,7 +271,7 @@ class InspectionDataDelete(Abstract):
     def delete(self, cid):
         del_ids = cid.split(",")
 
-        Inspection2.objects.filter(id__in=del_ids).delete()
+        Inspection.objects.filter(id__in=del_ids).delete()
 
         return 200
 
@@ -315,6 +316,7 @@ class InspectionDataUpload(Abstract):
             }
 
         total = 0
+        dupli = 0
         data_list = []
 
         for i, row in enumerate(rows):
@@ -397,30 +399,55 @@ class InspectionDataUpload(Abstract):
 
                 industry_id = IndustryProducts.objects.filter(name=product_name[0])[0].industry_id
 
-                bulk_inspection2 = Inspection2(
-                    title=title,
-                    url=url,
-                    pubtime=pubtime,
-                    source=source,
-                    qualitied=qr(qualitied_patch, inspect_patch),
-                    unqualitied_patch=unqualitied_patch,
-                    qualitied_patch=qualitied_patch,
-                    inspect_patch=inspect_patch,
-                    category='' if not category else category,
-                    level=new_level,
-                    industry_id=industry_id,
-                    product_name = product_name[0],
-                    origin_product=origin_product,
-                    area_id=area[0].id,
-                    status=0,
-                )
-                data_list.append(bulk_inspection2)
 
-        Inspection2.objects.bulk_create(data_list)
+                # 唯一性
+                old_inspection = Inspection.objects.filter(url=url)
+
+                if old_inspection.exists():
+                    old_inspection = old_inspection[0]
+                    old_inspection.title = title
+                    old_inspection.pubtime = pubtime
+                    old_inspection.source = source
+                    old_inspection.qualitied = qr(qualitied_patch, inspect_patch)
+                    old_inspection.unqualitied_patch = unqualitied_patch
+                    old_inspection.qualitied_patch = qualitied_patch
+                    old_inspection.inspect_patch = inspect_patch
+                    old_inspection.category = '' if not category else category
+                    old_inspection.level = new_level
+                    old_inspection.industry_id = industry_id
+                    old_inspection.product_name = product_name[0]
+                    old_inspection.origin_product = origin_product
+                    old_inspection.area_id = area[0].id
+                    old_inspection.status = 0
+                    old_inspection.save()
+
+                    dupli += 1
+                    continue
+                else:
+                    bulk_inspection = Inspection(
+                        title=title,
+                        url=url,
+                        pubtime=pubtime,
+                        source=source,
+                        qualitied=qr(qualitied_patch, inspect_patch),
+                        unqualitied_patch=unqualitied_patch,
+                        qualitied_patch=qualitied_patch,
+                        inspect_patch=inspect_patch,
+                        category='' if not category else category,
+                        level=new_level,
+                        industry_id=industry_id,
+                        product_name = product_name[0],
+                        origin_product=origin_product,
+                        area_id=area[0].id,
+                        status=0,
+                    )
+                    data_list.append(bulk_inspection)
+
+        Inspection.objects.bulk_create(data_list)
 
         return {
             'status': 1,
-            'message': '操作成功！共处理%s条数据！' % total
+            'message': '操作成功！共处理%s条数据，新增数据%s条，更新数据%s条！' % (total, total - dupli, dupli,)
         }
 
 
@@ -429,136 +456,173 @@ class InspectionDataUnEnterpriseUpload(Abstract):
     def __init__(self, user):
         self.user = user
 
-#     def upload(self, filename, file_obj):
-#         # ModelWeight
-#         model = {'链接': 0, '产品名称': 0,
-#                  '不合格企业': 0, '不合格企业地域': 0, '不合格项': 0}
-#         # sheet values
+    def upload(self, filename, file_obj):
+        # ModelWeight
+        model = {'链接': 0, '产品名称': 0,
+                 '不合格企业': 0, '不合格企业地域': 0, '不合格项': 0}
+        # sheet values
 
-#         def sv(x, y, z): return z.cell(row=x, column=y).value
+        def sv(x, y, z): return z.cell(row=x, column=y).value
 
-#         try:
-#             xlsx_book = openpyxl.load_workbook(
-#                 BytesIO(file_obj.read()), read_only=True)
-#             sheet = xlsx_book.active
-#             rows = sheet.rows
-#         except Exception as e:
-#             return {
-#                 'status': 0,
-#                 'message': '操作失败！请检查文件是否有误。详细错误信息：%s！' % e
-#             }
+        try:
+            xlsx_book = openpyxl.load_workbook(
+                BytesIO(file_obj.read()), read_only=True)
+            sheet = xlsx_book.active
+            rows = sheet.rows
+        except Exception as e:
+            return {
+                'status': 0,
+                'message': '操作失败！请检查文件是否有误。详细错误信息：%s！' % e
+            }
 
-#         total = 0
-#         dupli = 0
+        total = 0
+        dupli = 0
 
-#         for i, row in enumerate(rows):
-#             i += 1
-#             if i == 1:
-#                 line = [cell.value for cell in row]
-#                 for k in model.keys():
-#                     model[k] = line.index(k) + 1
-#             else:
-#                 try:
-#                     url = sv(i, model['链接'], sheet)
+        for i, row in enumerate(rows):
+            i += 1
+            if i == 1:
+                line = [cell.value for cell in row]
+                for k in model.keys():
+                    model[k] = line.index(k) + 1
+            else:
+                try:
+                    url = sv(i, model['链接'], sheet)
 
-#                     if not url:
-#                         continue
+                    if not url:
+                        continue
 
-#                     product_name = sv(i, model['产品名称'], sheet)
-#                     unenterprise = sv(i, model['不合格企业'], sheet)
-#                     unenterprise_area = sv(i, model['不合格企业地域'], sheet)
-#                     unitem = sv(i, model['不合格项'], sheet)
+                    product_name = sv(i, model['产品名称'], sheet)
+                    unenterprise = sv(i, model['不合格企业'], sheet)
+                    unenterprise_area = sv(i, model['不合格企业地域'], sheet)
+                    unitem = sv(i, model['不合格项'], sheet)
 
-#                     total += 1
+                    total += 1
 
-#                     # 处理抽检地域
-#                     area = Area.objects.filter(name=unenterprise_area)
-#                     if not area.exists():
-#                         return {
-#                             'status': 0,
-#                             'message': '操作失败！Excel第%s行，地域（%s）不存在！' % (i, unenterprise_area, )
-#                         }
+                    # 处理抽检地域
+                    area = Area.objects.filter(name=unenterprise_area)
+                    if not area.exists():
+                        return {
+                            'status': 0,
+                            'message': '操作失败！Excel第%s行，地域（%s）不存在！' % (i, unenterprise_area, )
+                        }
 
-#                     area_id = area[0].id
+                    area_id = area[0].id
 
-#                     guid = str_to_md5str('{0}{1}'.format(url, product_name))
+                    guid = str_to_md5str('{0}{1}'.format(url, product_name))
 
-#                     # 处理不合格企业信息
-#                     enterprise = Enterprise.objects.filter(
-#                         name=unenterprise, area_id=area_id)
-#                     if not enterprise.exists():
-#                         Enterprise(
-#                             name=unenterprise,
-#                             unitem=unitem,
-#                             area_id=area_id,
-#                         ).save()
+                    # 处理不合格企业信息
+                    enterprise = Enterprise.objects.filter(
+                        name=unenterprise, area_id=area_id)
+                    if not enterprise.exists():
+                        Enterprise(
+                            name=unenterprise,
+                            unitem=unitem,
+                            area_id=area_id,
+                        ).save()
 
-#                     enterprise_id = Enterprise.objects.filter(
-#                         name=unenterprise, area_id=area_id)[0].id
-#                     inspection_enterprise = InspectionEnterprise.objects.filter(
-#                         inspection_id=guid, enterprise_id=enterprise_id)
-#                     if not inspection_enterprise.exists():
-#                         InspectionEnterprise(
-#                             inspection_id=guid,
-#                             enterprise_id=enterprise_id,
-#                         ).save()
-#                     else:
-#                         dupli += 1
+                    enterprise_id = Enterprise.objects.filter(
+                        name=unenterprise, area_id=area_id)[0].id
+                    # inspection_enterprise = InspectionEnterprise.objects.filter(
+                    #     inspection_id=guid, enterprise_id=enterprise_id)
+                    # if not inspection_enterprise.exists():
+                    #     InspectionEnterprise(
+                    #         inspection_id=guid,
+                    #         enterprise_id=enterprise_id,
+                    #     ).save()
+                    # else:
+                    #     dupli += 1
 
-#                 except Exception as e:
-#                     return {
-#                         'status': 0,
-#                         'message': '操作失败！Excel %s 行存在问题。详细错误信息：%s！' % (i + 1, e)
-#                     }
+                except Exception as e:
+                    return {
+                        'status': 0,
+                        'message': '操作失败！Excel %s 行存在问题。详细错误信息：%s！' % (i + 1, e)
+                    }
 
-#         return {
-#             'status': 1,
-#             'message': '操作成功！共处理%s条数据，成功导入%s条数据，重复数据%s条！' % (total, total - dupli, dupli, )
-#         }
+        return {
+            'status': 1,
+            'message': '操作成功！共处理%s条数据，成功导入%s条数据，重复数据%s条！' % (total, total - dupli, dupli, )
+        }
 
 
 class InspectionDataExport(Abstract):
 
-    def __init__(self, user):
+    def __init__(self, user, params={}):
         self.user = user
+        super(InspectionDataExport, self).__init__(params)
 
-#     def export(self):
-#         filename = "inspections.xlsx"
+    def export(self):
+        filename = "inspections.xlsx"
 
-#         # process data
-#         data = [
-#             ['GUID', '标题', '链接', '发布日期', '抽查类别', '抽查等级', '抽检单位', '地域',
-#                 '行业编号', '产品名称', '不合格企业', '不合格企业地域', '不合格项', '合格率', ],
-#         ]
-#         months = get_months()[-1::][0]
-#         start = months[0].strftime('%Y-%m-%d')
-#         end = months[1].strftime('%Y-%m-%d')
+        inspections_fields = ('title', 'url', 'pubtime', 'category', 'level', 'source', 'area__name', 'product_name',
+                            'inspect_patch', 'qualitied_patch', 'unqualitied_patch', 'qualitied', )
 
-#         queryset = Inspection2.objects.filter(pubtime__gte=start, pubtime__lte=end).values(
-#             'guid', 'title', 'url', 'pubtime', 'category', 'level', 'source', 'area_id', 'industry_id', 'qualitied',)
+        enterprises_fields = ('url', 'enterprises__name', 'enterprises__unitem', 'product_name',
+                             'enterprises__area__name', 'source', )
 
-#         for q in queryset:
-#             data.append([
-#                 q['guid'],
-#                 q['title'],
-#                 q['url'],
-#                 date_format(q['pubtime'], '%Y-%m-%d'),
-#                 q['category'],
-#                 q['level'],
-#                 q['source'],
-#                 area(q['area_id'], flat=True),
-#                 industry_number(q['industry_id']),
-#                 alias_industry(q['industry_id'], flat=True),
-#                 enterprise_name(q['guid'], flat=True),
-#                 enterprise_area_name(q['guid'], flat=True),
-#                 enterprise_unitem(q['guid'], flat=True),
-#                 qualitied(q['qualitied']),
-#             ])
+        inspections = [
+            ['标题', '链接', '发布日期', '抽查类别', '抽查等级', '抽检单位', '地域', '产品名称', '抽查批次', '合格批次',
+             '不合格批次', '合格率', ]
+        ]
+        enterprises = [
+            ['链接', '不合格企业', '不合格项', '产品名称', '不合格企业地域', '抽检单位', ]
+        ]
 
-#         # write file
-#         write_by_openpyxl(filename, data)
+        cond = {
+            'pubtime__gte': getattr(self, 'starttime', None),
+            'pubtime__lte': getattr(self, 'endtime', None),
+            'qualitied__gte': getattr(self, 'qualitied_gte', None),
+            'qualitied__lt': getattr(self, 'qualitied_lt', None),
+            'category__contains': getattr(self, 'category', None),
+            'source__contains': getattr(self, 'source', None),
+            'level': getattr(self, 'level', None),
+            'area': getattr(self, 'area', None),
+            'product_name__icontains': getattr(self, 'product_name', None),
+        }
 
-#         return open(filename, 'rb')
+        args = dict([k, v] for k, v in cond.items() if v)
+
+        inspections_list = Inspection.objects.filter(**args).values(*inspections_fields).order_by('-pubtime')
+        enterprises_list = Inspection.objects.filter(**args).values(*enterprises_fields).order_by('-pubtime')
+
+        for q in inspections_list:
+            if q['level'] == 2:
+                level = '国'
+            elif q['level'] == 1:
+                level = '省'
+            else:
+                level = '市'
+            inspections.append([
+                q['title'],
+                q['url'],
+                date_format(q['pubtime'], '%Y-%m-%d'),
+                q['category'],
+                level,
+                q['source'],
+                q['area__name'],
+                q['product_name'],
+                q['inspect_patch'],
+                q['qualitied_patch'],
+                q['unqualitied_patch'],
+                q['qualitied'],
+            ])
+
+        for q in enterprises_list:
+            if not q['enterprises__name']:
+                continue
+            else:
+                enterprises.append([
+                    q['url'],
+                    q['enterprises__name'],
+                    q['enterprises__unitem'],
+                    q['product_name'],
+                    q['enterprises__area__name'],
+                    q['source'],
+                ])
+
+        # write file
+        write_by_openpyxl(filename, inspections, enterprises)
+
+        return open(filename, 'rb')
 
 
 class InspectionDataCrawler(Abstract):
@@ -590,9 +654,9 @@ class InspectionDataAudit(Abstract):
 
         for ids in edit_ids.split(","):
 
-            inspection2 = Inspection2.objects.get(id=ids)
-            inspection2.status = status
-            inspection2.save()
+            inspection = Inspection.objects.get(id=ids)
+            inspection.status = status
+            inspection.save()
 
         return 200
 
@@ -610,8 +674,302 @@ class InspectionDataSuzhou(Abstract):
 
         args = {}
         if not search_value:
-            queryset = Inspection2.objects.filter(**args).values(*fields)
+            queryset = Inspection.objects.filter(**args).values(*fields)
         else:
-            queryset = Inspection2.objects.filter(Q(source__contains=search_value) | Q(product_name__contains=search_value)).values(*fields)
+            queryset = Inspection.objects.filter(Q(source__contains=search_value) | Q(product_name__contains=search_value)).values(*fields)
 
         return queryset
+
+
+class InspectionDataNation(Abstract):
+    def __init__(self, params):
+        super(InspectionDataNation, self).__init__(params)
+
+    def get_all(self):
+        fields = ('inspection__industry__name', 'unitem', 'area__name', 'inspection__pubtime')
+
+        cond = {
+            'inspection__level' : getattr(self, '', 2),
+            'inspection__pubtime__year': getattr(self,'year',None),
+            'inspection__pubtime__month': getattr(self,'month',None),
+        }
+
+        args = dict([k, v] for k, v in cond.items() if v)
+
+        queryset = Enterprise.objects.filter(**args).values(*fields)
+
+        return queryset
+
+
+class InspectionDataProAndCity(Abstract):
+    def __init__(self, params):
+        super(InspectionDataProAndCity, self).__init__(params)
+
+    def get_all(self):
+        fields = ('industry__name', 'qualitied', 'source', 'pubtime')
+
+        cond = {
+            'pubtime__gte': getattr(self, 'starttime', None),
+            'pubtime__lte': getattr(self, 'endtime', None),
+        }
+
+        args = dict([k, v] for k, v in cond.items() if v)
+
+        queryset = Inspection.objects.filter(**args).values(*fields).order_by('qualitied')
+
+        return queryset
+
+
+class InspectionDataLocal(Abstract):
+
+    def __init__(self, user, params):
+        super(InspectionDataLocal, self).__init__(params)
+        self.user = user
+
+    def get_all(self):
+        area_name = User.objects.filter(username=self.user).values('userarea__area__name')
+
+        fields = ('inspection__industry__name', 'name', 'unitem','inspection__source','inspection__pubtime')
+
+        cond = {
+            'area__name': getattr(self, '', area_name[0]['userarea__area__name']),
+            'inspection__pubtime__gte': getattr(self, 'starttime', None),
+            'inspection__pubtime__lte': getattr(self, 'endtime', None),
+        }
+
+        args = dict([k, v] for k, v in cond.items() if v)
+
+        queryset = Enterprise.objects.filter(**args).values(*fields)
+
+        return queryset
+
+
+class InspectionDataLocalExport(Abstract):
+
+    def __init__(self, user, params):
+        super(InspectionDataLocalExport, self).__init__(params)
+        self.user = user
+
+    def export(self):
+        filename = "o.xlsx"
+
+        # process data
+        data = [
+            ['序号', '抽查产品', '企业名称', '不合格项目', '抽检单位'],
+        ]
+  
+        area_name = User.objects.filter(username=self.user).values('userarea__area__name')
+
+        fields = ('inspection__industry__name', 'name', 'unitem', 'inspection__source', 'inspection__pubtime')
+
+        cond = {
+            'area__name': getattr(self, '', area_name[0]['userarea__area__name']),
+            'inspection__pubtime__gte': getattr(self, 'starttime', None),
+            'inspection__pubtime__lte': getattr(self, 'endtime', None),
+        }
+
+        args = dict([k, v] for k, v in cond.items() if v)
+
+        queryset = Enterprise.objects.filter(**args).values(*fields)
+        
+        print(queryset)
+
+        i = 1
+
+        for q in queryset:
+            data.append([
+                i,
+                q['inspection__industry__name'],
+                q['name'],
+                q['unitem'],
+                q['inspection__source'],
+            ])
+            i = i+1
+           
+
+        # write file
+        write_by_openpyxl(filename, data)
+
+        return open(filename, 'rb')
+
+
+class InspectionDataProAndCityExport(Abstract):
+
+    def __init__(self, user, params):
+        super(InspectionDataProAndCityExport, self).__init__(params)
+        self.user = user
+
+    def export(self):
+        filename = "o.xlsx"
+
+        # process data
+        data = [
+            ['序号','产品种类','合格率','抽检单位','发布日期'],
+        ]
+
+        fields = ('industry__name', 'qualitied', 'source', 'pubtime')
+
+        cond = {
+            'pubtime__gte': getattr(self, 'starttime', None),
+            'pubtime__lte': getattr(self, 'endtime', None),
+        }
+
+        args = dict([k, v] for k, v in cond.items() if v)
+
+        queryset = Inspection.objects.filter(**args).values(*fields).order_by('qualitied')
+  
+        i = 1
+
+        for q in queryset:
+            data.append([
+                i,
+                q['industry__name'],
+                str(round(float(q['qualitied'])*100,2))+'%',
+                q['source'],
+                q['pubtime'],
+            ])
+            i = i+1
+           
+
+        # write file
+        write_by_openpyxl(filename, data)
+
+        return open(filename, 'rb')
+
+
+class InspectionDataNationExport(Abstract):
+
+    def __init__(self, user, params):
+        super(InspectionDataNationExport, self).__init__(params)
+        self.user = user
+
+    def export(self):
+        filename = "o.xlsx"
+
+        # process data
+        data = [
+            ['序号', '不合格产品种类','不合格项目', '是否涉及本地企业'],
+        ]
+
+        areaname = User.objects.filter(username=self.user).values('userarea__area__name')
+
+        fields = ('inspection__industry__name', 'unitem', 'area__name', 'inspection__pubtime')
+
+        cond = {
+            'inspection__level':getattr(self, '', 2),
+            'inspection__pubtime__year': getattr(self,'year',None),
+            'inspection__pubtime__month': getattr(self,'month',None),
+        }
+
+        args = dict([k, v] for k, v in cond.items() if v)
+
+        queryset = Enterprise.objects.filter(**args).values(*fields).distinct()
+
+        i = 1
+
+        for q in queryset:
+            data.append([
+                i,
+                q['inspection__industry__name'],
+                q['unitem'],
+                involve_local(areaname[0]['userarea__area__name'], q['area__name']),
+            ])
+            i = i+1
+           
+
+        # write file
+        write_by_openpyxl(filename, data)
+
+        return open(filename, 'rb')
+
+
+class InspectStatisticsData(Abstract):
+    
+    def __init__(self, params={}):
+        super(InspectStatisticsData, self).__init__(params)
+
+    def get_statistics_data(self):
+        fields = ('inspect_patch', 'qualitied_patch')
+
+        cond = {
+            'level': getattr(self, 'level', None),
+            'pubtime__gte': getattr(self, 'starttime', None),
+            'pubtime__lte': getattr(self, 'endtime', None),
+        }
+
+        args = dict([k, v] for k, v in cond.items() if v)
+        queryset = Inspection.objects.filter(**args)
+
+        industry_level2_below = getattr(self, 'parent_level2', None)
+        industry_level3_below = getattr(self, 'parent_level3', None)
+
+        queryset_industrylevel2 = MajorIndustry.objects.filter(parent_id = industry_level2_below).values('name', 'id')
+        queryset_industrylevel3 = MajorIndustry.objects.filter(parent_id = industry_level3_below).values('name', 'id')
+
+        sum_inspect_patch = 0
+        sum_qualitied_patch = 0
+        result = []
+        result_levle1 = []
+        result_levle2 = []
+        result_levle3 = []
+
+        industry_id = 1
+        while industry_id <= 5 :
+            queryset_level1_below = queryset.filter(Q(industry__parent_id = industry_id) | 
+                Q(industry__parent__parent_id = industry_id) | Q(industry_id__lte = industry_id)).values(*fields)
+
+            for q in queryset_level1_below:
+                sum_inspect_patch += q['inspect_patch']
+
+            result_levle1.append({
+                'industry_name': MajorIndustry.objects.filter(id = industry_id).values_list('name', flat = True),
+                'sum_spotcheck': sum_inspect_patch,
+            })
+            sum_inspect_patch = 0
+            industry_id += 1
+        
+        for q_il2 in queryset_industrylevel2:
+            queryset_level2_below = queryset.filter(Q(industry__parent_id = q_il2['id']) | 
+                Q(industry__parent__parent_id = q_il2['id']) | Q(industry_id = q_il2['id'])).values(*fields)
+
+            for q in queryset_level2_below:
+                sum_inspect_patch += q['inspect_patch']
+                sum_qualitied_patch += q['qualitied_patch']
+            
+            result_levle2.append({
+                'industry_name': q_il2['name'],
+                'sum_passrate': 0 if not sum_inspect_patch else round(sum_qualitied_patch/sum_inspect_patch*100, 2),
+            })
+            sum_inspect_patch = 0
+            sum_qualitied_patch = 0
+
+        for q_il3 in queryset_industrylevel3:
+            queryset_level3_below = queryset.filter(Q(industry__parent_id = q_il3['id']) | Q(industry_id = q_il3['id'])).values(*fields)
+
+            for q in queryset_level3_below:
+                sum_inspect_patch += q['inspect_patch']
+                sum_qualitied_patch += q['qualitied_patch']
+
+            result_levle3.append({
+                'industry_name': q_il3['name'],
+                'sum_passrate': 0 if not sum_inspect_patch else round(sum_qualitied_patch/sum_inspect_patch*100, 2),
+            })
+            sum_inspect_patch = 0
+            sum_qualitied_patch = 0
+        
+        result.append({
+            'listlevel1': map(lambda r1 : {
+                'industry_name': r1['industry_name'],
+                'sum_spotcheck': r1['sum_spotcheck'],
+                }, result_levle1),
+            'listlevel2': map(lambda r2 : {
+                'industry_name': r2['industry_name'],
+                'sum_passrate': r2['sum_passrate'],
+                }, result_levle2),
+            'listlevel3': map(lambda r3 : {
+                'industry_name': r3['industry_name'],
+                'sum_passrate': r3['sum_passrate'],
+                }, result_levle3),
+        })
+
+        return result
