@@ -553,16 +553,18 @@ class InspectionDataExport(Abstract):
     def export(self):
         filename = "inspections.xlsx"
 
-        inspections_fields = ('title', 'url', 'pubtime', 'category', 'level', 'source', 'area__name', 'product_name', 'inspect_patch',
-                              'qualitied_patch', 'unqualitied_patch', )
+        inspections_fields = ('title', 'url', 'pubtime', 'category', 'level', 'source', 'area__name', 'product_name',
+                            'inspect_patch', 'qualitied_patch', 'unqualitied_patch', 'qualitied', )
 
-        enterprises_fields = ('url', 'enterprises__name', 'enterprises__unitem', 'product_name', 'enterprises__area__name', )
+        enterprises_fields = ('url', 'enterprises__name', 'enterprises__unitem', 'product_name',
+                             'enterprises__area__name', 'source', )
 
         inspections = [
-            ['标题', '链接', '发布日期', '抽查类别', '抽查等级', '抽检单位', '地域', '产品名称', '抽查批次', '合格批次', '不合格批次', ]
+            ['标题', '链接', '发布日期', '抽查类别', '抽查等级', '抽检单位', '地域', '产品名称', '抽查批次', '合格批次',
+             '不合格批次', '合格率', ]
         ]
         enterprises = [
-            ['链接', '不合格企业', '不合格项', '产品名称', '不合格企业地域', ]
+            ['链接', '不合格企业', '不合格项', '产品名称', '不合格企业地域', '抽检单位', ]
         ]
 
         cond = {
@@ -601,6 +603,7 @@ class InspectionDataExport(Abstract):
                 q['inspect_patch'],
                 q['qualitied_patch'],
                 q['unqualitied_patch'],
+                q['qualitied'],
             ])
 
         for q in enterprises_list:
@@ -613,6 +616,7 @@ class InspectionDataExport(Abstract):
                     q['enterprises__unitem'],
                     q['product_name'],
                     q['enterprises__area__name'],
+                    q['source'],
                 ])
 
         # write file

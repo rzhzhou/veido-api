@@ -131,6 +131,13 @@ urlpatterns = [
     path('inspection_suzhou', views.InspectionDataViewSuzhou.as_view()), # 抽检信息
     path('news_report_suzhou', views.NewsReportViewSuzhou.as_view()), # 舆情报告
 
+    # 双随机抽查
+    path('random_check_task', views.RandomCheckTaskView.as_view()), # 双随机抽查任务列表
+    path('random_check_task/delete/<str:tid>', views.RandomCheckTaskDeleteView.as_view()), # 双随机抽查任务删除
+    path('random_check_enterprise/<int:tid>', views.RandomCheckEnterpriseView.as_view()), # 双随机抽查企业列表
+    path('random_check_task/upload/<str:filename>/<int:enterprise_number>/<int:check_type>/', views.RandomCheckTaskUploadView.as_view()), # 双随机抽查任务上传
+    path('task_name/<int:tid>', views.TaskNameView.as_view()), # 获取双随机抽查任务名
+
     # 官网
     path('news', views.NewsView.as_view()), # 公司动态
     path('news/add', views.NewsAddView.as_view()), # 发布公司动态

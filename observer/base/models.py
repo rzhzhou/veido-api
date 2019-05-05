@@ -637,3 +637,45 @@ class VersionRecord(models.Model):
 
     def __str__(self):
         return self.version
+
+
+class RandomCheckTask(models.Model):
+    name = models.CharField(max_length=255, verbose_name='任务名称')
+    perform_number = models.CharField(default='', max_length=255, verbose_name='执行文号')
+    delegate = models.CharField(default='', max_length=255, verbose_name='委托单位')
+    check_agency = models.CharField(default='', max_length=255, verbose_name='检验机构')
+    enterprise_number = models.IntegerField(default=0, verbose_name='抽检企业数或企业比例')
+    check_type = models.IntegerField(default=0, verbose_name='抽查方式') # 0: 按企业个数来抽, 1: 按企业比例来抽
+
+    class Meta:
+        app_label = 'base'
+        db_table = 'base_random_check_task'
+        verbose_name_plural = '随机抽查任务'
+
+    def __str__(self):
+        return self.name
+
+
+class RandomCheckEnterpriseList(models.Model):
+    product_name = models.CharField(max_length=255, verbose_name='产品名称')
+    enterprise_name = models.CharField(max_length=255, verbose_name='生产企业名称')
+    enterprise_address = models.CharField(max_length=255, verbose_name='生产企业地址')
+    contacts = models.CharField(max_length=50, verbose_name='联系人')
+    phone = models.CharField(max_length=50, verbose_name='联系电话')
+    area = models.CharField(max_length=50, verbose_name='所属区')
+    status = models.IntegerField(default=0, verbose_name='企业状态') # 1: 被选中, 0: 未被选中
+
+    task = models.ForeignKey(
+        RandomCheckTask,
+        null=True, blank=True,
+        on_delete=models.CASCADE,
+        verbose_name='任务编号'
+    )
+
+    class Meta:
+        app_label = 'base'
+        db_table = 'base_random_check_enterprise_list'
+        verbose_name_plural = '随机抽查企业名单'
+
+    def __str__(self):
+        return self.enterprise_name

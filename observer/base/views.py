@@ -93,6 +93,8 @@ from observer.base.service.policyregion import  (PolicyAreaData,PolicyAreaTotalD
                                                 PolicyPrivateData,PolicPrivatelTotalData,PolicPrivatelAdd,
                                                 PolicyIndustryData,PolicyIndustryTotalData,PolicyIndustryAdd,
                                                 PolicyDataUpload,PolicyIndustryDataUpload)
+from observer.base.service.randomcheck import (RandomCheckTaskData, RandomCheckEnterprise, RandomCheckTaskUpload,
+                                                RandomCheckTaskDelete, TaskName)
 
 class BaseView(APIView):
 
@@ -293,7 +295,7 @@ class EventView(APIView):
         }, result)
 
         return data
-    
+
     def get(self, request, eid):
         result = EventsAnalysis().getEvent(eid = eid)
 
@@ -2313,6 +2315,131 @@ class NewsReportViewSuzhou(BaseView):
         return Response(self.serialize(queryset))
 
 
+class RandomCheckTaskView(BaseView):
+
+    def __init__(self):
+        super(RandomCheckTaskView, self).__init__()
+
+    def set_request(self, request):
+        super(RandomCheckTaskView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(RandomCheckTaskView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        result = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda x: {
+                'id': x['id'],
+                'name': x['name'],
+                'perform_number': x['perform_number'],
+                'delegate': x['delegate'],
+                'check_agency': x['check_agency'],
+                'enterprise_number': x['enterprise_number'],
+                'check_type': x['check_type'],
+            }, result),
+        }
+
+        return data
+
+    def get(self, request):
+        self.set_request(request)
+
+        queryset = RandomCheckTaskData(params=request.query_params).get_all()
+
+        return Response(self.serialize(queryset))
+
+
+class RandomCheckTaskDeleteView(BaseView):
+
+    def __init__(self):
+        super(RandomCheckTaskDeleteView, self).__init__()
+
+    def delete(self, request, tid):
+
+        queryset = RandomCheckTaskDelete(user=request.user).delete(tid)
+
+        return Response(queryset)
+
+
+class RandomCheckEnterpriseView(BaseView):
+
+    def __init__(self):
+        super(RandomCheckEnterpriseView, self).__init__()
+
+    def set_request(self, request):
+        super(RandomCheckEnterpriseView, self).set_request(request)
+
+    def paging(self, queryset):
+        return super(RandomCheckEnterpriseView, self).paging(
+            queryset,
+            self.request.query_params.get('page', 1),
+            self.request.query_params.get('length', 15)
+        )
+
+    def serialize(self, queryset):
+        total = queryset.count()
+        result = self.paging(queryset)
+        data = {
+            'total': total,
+            'list': map(lambda x: {
+                'id': x['id'],
+                'product_name': x['product_name'],
+                'enterprise_name': x['enterprise_name'],
+                'enterprise_address': x['enterprise_address'],
+                'contacts': x['contacts'],
+                'phone': x['phone'],
+                'area': x['area'],
+                'status': x['status'],
+            }, result),
+        }
+
+        return data
+
+    def get(self, request, tid=None):
+        self.set_request(request)
+
+        queryset = RandomCheckEnterprise(params=request.query_params).get_by_id(tid)
+
+        return Response(self.serialize(queryset))
+
+
+class RandomCheckTaskUploadView(BaseView):
+    parser_classes = (FileUploadParser,)
+
+    def __init__(self):
+        super(RandomCheckTaskUploadView, self).__init__()
+
+    def put(self, request, filename, enterprise_number, check_type, format=None):
+
+        queryset = RandomCheckTaskUpload(params=request.data).upload(filename, enterprise_number, check_type, request.FILES['file'])
+
+        return Response(queryset)
+
+
+
+class TaskNameView(BaseView):
+
+    def __init__(self):
+        super(TaskNameView, self).__init__()
+
+    def set_request(self, request):
+        super(TaskNameView, self).set_request(request)
+
+    def get(self, request, tid):
+        self.set_request(request)
+
+        queryset = TaskName(params=request.query_params).get_by_id(tid)
+
+        return Response(queryset)
+
+
 class NavBarDataView(BaseView):
 
     def __init__(self):
@@ -3022,7 +3149,7 @@ class EventsManageView(BaseView):
         }
 
         return data
-        
+
     def get(self, request):
         result = EventsManageData(params = request.query_params).get_data()
 
@@ -3479,17 +3606,17 @@ class PolicyAreaView(BaseView):
 
     def serialize(self, queryset):
         total = len(queryset)
+        # total = queryset.count()
         results = self.paging(queryset)
         data = {
             'total': total,
             'list': map(lambda r: {
-                'name': r['area'],
-                'area__id': r['area__id'],
-                'total': r['total'],
-                'level': r['level'],
-                'title': r['articletitle'],
-                'url': r['articleurl'],
-
+                'areas__id': r['areas__id'],
+                'level': r['areas__level'],
+                'name': r['areas__name'],
+                'title': r['title'],
+                'url': r['url'],
+                'total': r['total']
             }, results)
         }
 
@@ -3581,12 +3708,12 @@ class PolicPrivatelView(BaseView):
         data = {
             'total': total,
             'list': map(lambda r: {
-                'name': r['area'],
-                'area__id': r['area__id'],
-                'total': r['total'],
-                'level': r['level'],
-                'title': r['articletitle'],
-                'url': r['articleurl'],
+                'areas__id': r['areas__id'],
+                'level': r['areas__level'],
+                'name': r['areas__name'],
+                'title': r['title'],
+                'url': r['url'],
+                'total': r['total']
 
 
             }, results)
