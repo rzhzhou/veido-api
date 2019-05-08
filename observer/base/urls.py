@@ -8,6 +8,7 @@ urlpatterns = [
     # APP
     path('dashboard', views.DashboardView.as_view()),  # 整体概览
     path('v2', views.V2View.as_view()),  # 整体概览2
+    path('dashboardsonapi', views.dSonApiView.as_view()),  # 整体概览子api(控制最下方的过滤器)
     path('articles/<str:category>/', views.ArticleView.as_view()),  # 文章列表
     path('inspections', views.InspectionView.as_view()),  # 抽检列表
     path('unqualifiedenterprise', views.EnterpriseDataUnqualifiedView.as_view()), # 不合格企业列表
