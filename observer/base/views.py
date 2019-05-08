@@ -1573,10 +1573,8 @@ class RiskDataView(BaseView):
                 'source': x['source'],
                 'areas': areas(x['id']),
                 'keyword': '无' if not x['corpus__keyword'] else x['corpus__keyword'],
-                'industry_name': '无' if x['new_industry_id__historyindustries__name'] == None
-                    and x['new_industry_id__historyindustries__name'] == 'None' else x['new_industry_id__historyindustries__name'],
-                'industry_parent_name': '无' if x['new_industry_id__historyindustries__name'] == None
-                    and x['new_industry_id__historyindustries__name'] == 'None' else x['new_industry_id__historyindustries__industry_id__parent_id__historyindustries__name'],
+                'industry_name': '无' if x['industry__name'] == 'None' else x['industry__name'],
+                'industry_parent_name': '无' if x['industry__name'] == 'None' else x['industry__parent__name'],
                 'categories': categories(x['id'], admin=True),
                 'pubtime': date_format(x['pubtime'], '%Y-%m-%d %H:%M:%S'),
                 'status': x['status'],
