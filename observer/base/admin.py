@@ -8,13 +8,6 @@ from observer.base.resource import *
 from observer.utils.str_format import str_to_md5str
 
 
-class IndustryAdmin(ImportExportActionModelAdmin, ForeignKeyAutocompleteAdmin):
-    resource_class = IndustryResources
-    autocomplete_fields = ('parent', )
-    search_fields = ('id', 'name', )
-    list_display = ('id', 'name', 'level', 'parent', )
-
-
 class CPCIndustryAdmin(ImportExportActionModelAdmin, ForeignKeyAutocompleteAdmin):
     autocomplete_fields = ('parent', )
     search_fields = ('id', 'name', )
@@ -42,11 +35,30 @@ class ConsumerIndustryAdmin(ImportExportActionModelAdmin, ForeignKeyAutocomplete
     list_display = ('id', 'name', 'level', 'parent', )
 
 
+class MajorIndustriesAdmin(ImportExportActionModelAdmin, ForeignKeyAutocompleteAdmin):
+    resource_class = IndustryResources
+
+    autocomplete_fields = ('parent',)
+    search_fields = ('id',)
+    list_display = ('id', 'level', 'parent')
+    list_filter = ('level',)
+
+
+class HistoryIndustriesAdmin(ImportExportActionModelAdmin, ForeignKeyAutocompleteAdmin):
+    resource_class = HistoryIndustriesResources
+
+    autocomplete_fields = ('industry',)
+    search_fields = ('name', )
+    list_display = ('industry', 'name', 'year', 'status',)
+    list_filter = ('year', 'status')
+
+
 class MajorIndustryAdmin(ImportExportActionModelAdmin, ForeignKeyAutocompleteAdmin):
     # resource_class = IndustryResources
     autocomplete_fields = ('parent', 'licence', 'ccc', 'consumer')
     search_fields = ('id', 'name', )
-    list_display = ('id', 'name', 'level', 'parent', 'licence', 'ccc', 'consumer')
+    list_display = ('id', 'name', 'level', 'parent',
+                    'licence', 'ccc', 'consumer')
 
 
 class AliasIndustryAdmin(ImportExportActionModelAdmin):
@@ -117,11 +129,12 @@ class VersionRecordAdmin(ImportExportActionModelAdmin, ImportExportModelAdmin):
     list_display = ('version', 'content', 'pubtime')
 
 
-admin.site.register(Industry, IndustryAdmin)
 admin.site.register(CPCIndustry, CPCIndustryAdmin)
 admin.site.register(CCCIndustry, CCCIndustryAdmin)
 admin.site.register(LicenceIndustry, LicenceIndustryAdmin)
 admin.site.register(ConsumerIndustry, ConsumerIndustryAdmin)
+admin.site.register(MajorIndustries, MajorIndustriesAdmin)
+admin.site.register(HistoryIndustries, HistoryIndustriesAdmin)
 admin.site.register(MajorIndustry, MajorIndustryAdmin)
 admin.site.register(AliasIndustry, AliasIndustryAdmin)
 admin.site.register(Area, AreaAdmin)

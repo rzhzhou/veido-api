@@ -11,25 +11,44 @@ from observer.utils.date_format import date_format
 
 class IndustryResources(resources.ModelResource):
     id = fields.Field(attribute='id', column_name='行业编号')
-    name = fields.Field(attribute='name', column_name='行业名称')
     level = fields.Field(attribute='level', column_name='行业等级')
-    desc = fields.Field(attribute='desc', column_name='行业说明')
     pre = fields.Field(attribute='pre', column_name='上一级编号')
 
     class Meta:
-        model = Industry
-        fields = ('id', 'name', 'level', 'desc',)
-        export_order = ('id', 'name', 'level', 'desc',)
+        model = MajorIndustries
+        fields = ('id', 'level',)
+        export_order = ('id', 'level',)
 
     def before_save_instance(self, instance, dry_run, temp=''):
-        if not instance.desc:
-            instance.desc = ''
-
         pre = instance.pre
+
         if pre:
             try:
-                industry = Industry.objects.get(id=pre)
+                industry = MajorIndustries.objects.get(id=pre)
                 instance.parent = industry
+            except ObjectDoesNotExist:
+                pass
+
+
+class HistoryIndustriesResources(resources.ModelResource):
+    id = fields.Field(attribute='id', column_name='id')
+    name = fields.Field(attribute='name', column_name='产品名称')
+    year = fields.Field(attribute='year', column_name='年份')
+    status = fields.Field(attribute='status', column_name='状态')
+    industry_id = fields.Field(attribute='industry_id', column_name='产品编码')
+
+    class Meta:
+        model = HistoryIndustries
+        fields = ('id', 'name', 'year', 'status',)
+        export_order = ('id', 'name', 'year', 'status',)
+
+    def before_save_instance(self, instance, dry_run, temp=''):
+        industry_id = instance.industry_id
+
+        if industry_id:
+            try:
+                temp = MajorIndustries.objects.get(id=industry_id)
+                instance.industry = temp
             except ObjectDoesNotExist:
                 pass
 
@@ -91,8 +110,10 @@ class ArticleResources(resources.ModelResource):
     class Meta:
         model = Article
         import_id_fields = ('guid',)
-        fields = ('guid', 'title', 'url', 'pubtime', 'source', 'score', 'industry_id', 'corpus_id', )
-        export_order = ('guid', 'title', 'url', 'pubtime', 'source', 'score', 'industry_id', 'corpus_id', )
+        fields = ('guid', 'title', 'url', 'pubtime', 'source',
+                  'score', 'industry_id', 'corpus_id', )
+        export_order = ('guid', 'title', 'url', 'pubtime',
+                        'source', 'score', 'industry_id', 'corpus_id', )
 
     def dehydrate_industry_id(self, obj):
         try:
@@ -101,7 +122,6 @@ class ArticleResources(resources.ModelResource):
         except ObjectDoesNotExist:
             pass
 
-
     def before_save_instance(self, instance, using_transactions, dry_run):
 
         article2 = Article2.objects.filter(url=instance.url)
@@ -109,7 +129,8 @@ class ArticleResources(resources.ModelResource):
             return
 
         areas = instance.area.split(',')
-        a_ids = Area.objects.filter(name__in=areas).values_list('id', flat=True)
+        a_ids = Area.objects.filter(
+            name__in=areas).values_list('id', flat=True)
         if len(areas) != len(a_ids):
             return {
                 'status': 0,
@@ -118,9 +139,9 @@ class ArticleResources(resources.ModelResource):
 
         area = Area.objects.filter(id__in=a_ids)
 
-
         categories = instance.category.split(',')
-        c_ids = Category.objects.filter(name__in=categories).values_list('id', flat=True)
+        c_ids = Category.objects.filter(
+            name__in=categories).values_list('id', flat=True)
 
         if len(categories) != len(c_ids):
             return {
@@ -158,7 +179,8 @@ class InspectionResources(resources.ModelResource):
 class IndustryProductsResources(resources.ModelResource):
     id = fields.Field(attribute='id', column_name='id')
     name = fields.Field(attribute='name', column_name='name')
-    industry_id = fields.Field(attribute='industry_id', column_name='industry_id')
+    industry_id = fields.Field(
+        attribute='industry_id', column_name='industry_id')
 
     class Meta:
         model = IndustryProducts
