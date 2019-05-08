@@ -7,6 +7,7 @@ from observer.base import views
 urlpatterns = [
     # APP
     path('dashboard', views.DashboardView.as_view()),  # 整体概览
+    path('v2', views.V2View.as_view()),  # 整体概览2
     path('articles/<str:category>/', views.ArticleView.as_view()),  # 文章列表
     path('inspections', views.InspectionView.as_view()),  # 抽检列表
     path('unqualifiedenterprise', views.EnterpriseDataUnqualifiedView.as_view()), # 不合格企业列表
@@ -129,6 +130,13 @@ urlpatterns = [
     path('risk_data_suzhou', views.RiskDataViewSuzhou.as_view()), # 新闻信息
     path('inspection_suzhou', views.InspectionDataViewSuzhou.as_view()), # 抽检信息
     path('news_report_suzhou', views.NewsReportViewSuzhou.as_view()), # 舆情报告
+
+    # 双随机抽查
+    path('random_check_task', views.RandomCheckTaskView.as_view()), # 双随机抽查任务列表
+    path('random_check_task/delete/<str:tid>', views.RandomCheckTaskDeleteView.as_view()), # 双随机抽查任务删除
+    path('random_check_enterprise/<int:tid>', views.RandomCheckEnterpriseView.as_view()), # 双随机抽查企业列表
+    path('random_check_task/upload/<str:filename>/<int:enterprise_number>/<int:check_type>/', views.RandomCheckTaskUploadView.as_view()), # 双随机抽查任务上传
+    path('task_name/<int:tid>', views.TaskNameView.as_view()), # 获取双随机抽查任务名
 
     # 官网
     path('news', views.NewsView.as_view()), # 公司动态

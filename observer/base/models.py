@@ -50,7 +50,8 @@ class UserInfo(models.Model):
 
 
 class Industry(models.Model):
-    id = models.IntegerField(primary_key=True, editable=True, verbose_name='行业编号')
+    id = models.IntegerField(
+        primary_key=True, editable=True, verbose_name='行业编号')
     name = models.CharField(max_length=100, verbose_name='行业名称')
     level = models.IntegerField(verbose_name='行业等级')
     desc = models.CharField(max_length=255, blank=True, verbose_name='行业描述')
@@ -71,7 +72,8 @@ class Industry(models.Model):
 
 
 class CPCIndustry(models.Model):
-    id = models.IntegerField(primary_key=True, editable=True, verbose_name='行业编号')
+    id = models.IntegerField(
+        primary_key=True, editable=True, verbose_name='行业编号')
     name = models.CharField(max_length=100, verbose_name='行业名称')
     level = models.IntegerField(verbose_name='行业等级')
     desc = models.CharField(
@@ -96,7 +98,8 @@ class CPCIndustry(models.Model):
 
 
 class CCCIndustry(models.Model):
-    id = models.IntegerField(primary_key=True, editable=True, verbose_name='行业编号')
+    id = models.IntegerField(
+        primary_key=True, editable=True, verbose_name='行业编号')
     name = models.CharField(max_length=100, verbose_name='行业名称')
     level = models.IntegerField(verbose_name='行业等级')
     desc = models.CharField(
@@ -121,7 +124,8 @@ class CCCIndustry(models.Model):
 
 
 class LicenceIndustry(models.Model):
-    id = models.IntegerField(primary_key=True, editable=True, verbose_name='行业编号')
+    id = models.IntegerField(
+        primary_key=True, editable=True, verbose_name='行业编号')
     name = models.CharField(max_length=100, verbose_name='行业名称')
     level = models.IntegerField(verbose_name='行业等级')
     desc = models.CharField(
@@ -146,7 +150,8 @@ class LicenceIndustry(models.Model):
 
 
 class ConsumerIndustry(models.Model):
-    id = models.IntegerField(primary_key=True, editable=True, verbose_name='行业编号')
+    id = models.IntegerField(
+        primary_key=True, editable=True, verbose_name='行业编号')
     name = models.CharField(max_length=100, verbose_name='行业名称')
     level = models.IntegerField(verbose_name='行业等级')
     desc = models.CharField(
@@ -170,8 +175,53 @@ class ConsumerIndustry(models.Model):
         return self.name
 
 
+class MajorIndustries(models.Model):
+    id = models.CharField(primary_key=True, editable=True,
+                          max_length=50, verbose_name='行业编号')
+    level = models.IntegerField(verbose_name='行业等级')
+
+    parent = models.ForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        null=True, blank=True,
+        verbose_name='上一级'
+    )
+
+    class Meta:
+        app_label = 'base'
+        verbose_name_plural = '重点产品目录(新)'
+
+    def __str__(self):
+        return self.id
+
+
+class HistoryIndustries(models.Model):
+    STATUS_CHOICES = (
+        ('1', '继承'),
+        ('0', '新增'),
+    )
+    name = models.CharField(max_length=100, verbose_name='行业名称')
+    year = models.IntegerField(verbose_name='年份')
+    status = models.IntegerField(default=0, verbose_name='状态')
+
+    industry = models.ForeignKey(
+        MajorIndustries,
+        on_delete=models.CASCADE,
+        verbose_name=u'重点产品'
+    )
+
+    class Meta:
+        app_label = 'base'
+        db_table = 'base_history_majorindustries'
+        verbose_name_plural = '重点产品目录历史版本'
+
+    def __str__(self):
+        return self.name
+
+
 class MajorIndustry(models.Model):
-    id = models.IntegerField(primary_key=True, editable=True, verbose_name='行业编号')
+    id = models.IntegerField(
+        primary_key=True, editable=True, verbose_name='行业编号')
     name = models.CharField(max_length=100, verbose_name='行业名称')
     level = models.IntegerField(verbose_name='行业等级')
     desc = models.CharField(
@@ -218,7 +268,8 @@ class AliasIndustry(models.Model):
 
     industry_id = models.IntegerField(verbose_name='行业ID')
     ccc_id = models.IntegerField(default=0, blank=True, verbose_name='3C行业ID')
-    licence_id = models.IntegerField(default=0, blank=True, verbose_name='许可证行业ID')
+    licence_id = models.IntegerField(
+        default=0, blank=True, verbose_name='许可证行业ID')
 
     class Meta:
         app_label = 'base'
@@ -229,8 +280,10 @@ class AliasIndustry(models.Model):
 
 
 class CorpusCategories(models.Model):
-    keyword = models.CharField(default=0, max_length=255, verbose_name='关键词语料词')
-    status = models.IntegerField(default=0, verbose_name='状态') # 默认值 0 :未执行爬虫, 1 ： 已执行爬虫， 2：已停止并删除爬虫（但保留关键词来显示新闻关联来源）
+    keyword = models.CharField(
+        default=0, max_length=255, verbose_name='关键词语料词')
+    # 默认值 0 :未执行爬虫, 1 ： 已执行爬虫， 2：已停止并删除爬虫（但保留关键词来显示新闻关联来源）
+    status = models.IntegerField(default=0, verbose_name='状态')
     category_id = models.CharField(max_length=5, verbose_name='信息类别')
     industry_id = models.IntegerField(default=0, verbose_name='产品类别')
     startTime = models.DateField(null=True, verbose_name='开始时间')
@@ -288,7 +341,8 @@ class Inspection(models.Model):
     url = models.URLField(verbose_name='网站链接')
     pubtime = models.DateField(verbose_name='发布时间')
     source = models.CharField(max_length=255, verbose_name='信息来源')
-    origin_product = models.CharField(blank=True, null=True, max_length=255, verbose_name='导入产品名')
+    origin_product = models.CharField(
+        blank=True, null=True, max_length=255, verbose_name='导入产品名')
     product_name = models.CharField(max_length=255, verbose_name='产品名称')
     qualitied = models.FloatField(default=1.0, verbose_name='合格率')
     unqualitied_patch = models.IntegerField(default=0, verbose_name="不合格批次")
@@ -318,6 +372,12 @@ class Inspection(models.Model):
         on_delete=models.CASCADE,
         verbose_name='地域'
     )
+    new_industry = models.ForeignKey(
+        MajorIndustries,
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        verbose_name='新产品类别'
+    )
 
     enterprises = models.ManyToManyField(Enterprise)
 
@@ -331,7 +391,8 @@ class Inspection(models.Model):
 
 
 class Category(models.Model):
-    id = models.CharField(max_length=6, primary_key=True, editable=True, verbose_name='类别ID')
+    id = models.CharField(max_length=6, primary_key=True,
+                          editable=True, verbose_name='类别ID')
     name = models.CharField(max_length=10, verbose_name='名称')
     level = models.IntegerField(verbose_name='等级')
 
@@ -355,9 +416,10 @@ class Article(models.Model):
     url = models.URLField(verbose_name='网站链接')
     pubtime = models.DateTimeField(auto_now=False, verbose_name='发布时间')
     source = models.CharField(max_length=80, blank=True, verbose_name='信息来源')
-    score = models.IntegerField(default=0, verbose_name='风险程度')# 0, 默认值
-    status = models.IntegerField(default=0, verbose_name='状态')# 0, 默认值 1 有效
-    sentiment = models.IntegerField(null=True, verbose_name='情感属性')# 0:负面，1:中性，2:正面
+    score = models.IntegerField(default=0, verbose_name='风险程度')  # 0, 默认值
+    status = models.IntegerField(default=0, verbose_name='状态')  # 0, 默认值 1 有效
+    sentiment = models.IntegerField(
+        null=True, verbose_name='情感属性')  # 0:负面，1:中性，2:正面
 
     industry = models.ForeignKey(
         MajorIndustry,
@@ -376,6 +438,12 @@ class Article(models.Model):
         default=1,
         on_delete=models.CASCADE,
         verbose_name='用户'
+    )
+    new_industry = models.ForeignKey(
+        MajorIndustries,
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        verbose_name='新产品类别'
     )
 
     areas = models.ManyToManyField(Area)
@@ -414,7 +482,6 @@ class Harm(models.Model):
     class Meta:
         app_label = 'base'
         verbose_name_plural = '风险伤害'
-
 
 
 class HarmPeople(models.Model):
@@ -458,7 +525,8 @@ class Events(models.Model):
     socialHarm = models.CharField(max_length=50, verbose_name='社会危害程度')
     scope = models.CharField(max_length=50, verbose_name='影响范围')
     grading = models.CharField(max_length=50, verbose_name='分级')
-    pubtime = models.DateField(default=datetime.date.today, verbose_name='发布时间')
+    pubtime = models.DateField(
+        default=datetime.date.today, verbose_name='发布时间')
     desc = models.TextField(null=True, verbose_name='事件总结')
 
     articles = models.ManyToManyField(Article)
@@ -517,10 +585,10 @@ class EventsMedia(models.Model):
         on_delete=models.CASCADE,
         verbose_name='文章'
     )
-    
+
     class Meta:
         app_label = 'base'
-        verbose_name_plural = '新闻来源关联' 
+        verbose_name_plural = '新闻来源关联'
 
 
 class DMLink(models.Model):
@@ -531,7 +599,7 @@ class DMLink(models.Model):
     remarks = models.CharField(max_length=255, verbose_name='备注信息')
     create_at = models.DateTimeField(verbose_name='创建时间')
     update_at = models.DateTimeField(verbose_name='更新时间')
-    status = models.IntegerField(verbose_name='状态') # 0：待执行；1：执行中；2：完成
+    status = models.IntegerField(verbose_name='状态')  # 0：待执行；1：执行中；2：完成
 
     create_by = models.ForeignKey(
         User,
@@ -562,12 +630,15 @@ class IndustryProducts(models.Model):
 class Nav(models.Model):
     name = models.CharField(max_length=50, verbose_name='名称')
     href = models.CharField(default='', max_length=50, verbose_name='链接')
-    level = models.IntegerField(verbose_name='等级') # 1: 一级, 2： 二级页面, 3: 三级页面, -1: 子页面
+    # 1: 一级, 2： 二级页面, 3: 三级页面, -1: 子页面
+    level = models.IntegerField(verbose_name='等级')
     icon = models.CharField(default='', max_length=50, verbose_name='图标')
     component = models.CharField(default='', max_length=50, verbose_name='组件')
-    index = models.IntegerField(default=0, verbose_name='索引') # 排序依据
-    project = models.IntegerField(default=0, verbose_name='所属项目') # 0: 共用, 1: 质量舆情(App), 2: 产品目录管理(Admin)
-    nav_type = models.IntegerField(default=0, verbose_name='导航类型') # 0: 普通导航, 1: 主页面包含子导航的导航
+    index = models.IntegerField(default=0, verbose_name='索引')  # 排序依据
+    # 0: 共用, 1: 质量舆情(App), 2: 产品目录管理(Admin)
+    project = models.IntegerField(default=0, verbose_name='所属项目')
+    nav_type = models.IntegerField(
+        default=0, verbose_name='导航类型')  # 0: 普通导航, 1: 主页面包含子导航的导航
 
     parent = models.ForeignKey(
         'self',
@@ -609,7 +680,8 @@ class NewsReport(models.Model):
     period = models.IntegerField(verbose_name='期数')
     news_type = models.CharField(max_length=50, verbose_name='类型')
     publisher = models.CharField(max_length=50, verbose_name='发布者')
-    pubtime = models.DateField(default=datetime.date.today, verbose_name='发布时间')
+    pubtime = models.DateField(
+        default=datetime.date.today, verbose_name='发布时间')
     file = models.FileField(upload_to=UPLOAD_URL, verbose_name='文件')
     group = models.ForeignKey(
         Group,
@@ -637,3 +709,52 @@ class VersionRecord(models.Model):
 
     def __str__(self):
         return self.version
+
+
+class RandomCheckTask(models.Model):
+    name = models.CharField(max_length=255, verbose_name='任务名称')
+    perform_number = models.CharField(
+        default='', max_length=255, verbose_name='执行文号')
+    delegate = models.CharField(
+        default='', max_length=255, verbose_name='委托单位')
+    check_agency = models.CharField(
+        default='', max_length=255, verbose_name='检验机构')
+    enterprise_number = models.IntegerField(
+        default=0, verbose_name='抽检企业数或企业比例')
+    check_type = models.IntegerField(
+        default=0, verbose_name='抽查方式')  # 0: 按企业个数来抽, 1: 按企业比例来抽
+
+    class Meta:
+        app_label = 'base'
+        db_table = 'base_random_check_task'
+        verbose_name_plural = '随机抽查任务'
+
+    def __str__(self):
+        return self.name
+
+
+class RandomCheckEnterpriseList(models.Model):
+    product_name = models.CharField(max_length=255, verbose_name='产品名称')
+    enterprise_name = models.CharField(max_length=255, verbose_name='生产企业名称')
+    enterprise_address = models.CharField(
+        max_length=255, verbose_name='生产企业地址')
+    contacts = models.CharField(max_length=50, verbose_name='联系人')
+    phone = models.CharField(max_length=50, verbose_name='联系电话')
+    area = models.CharField(max_length=50, verbose_name='所属区')
+    status = models.IntegerField(
+        default=0, verbose_name='企业状态')  # 1: 被选中, 0: 未被选中
+
+    task = models.ForeignKey(
+        RandomCheckTask,
+        null=True, blank=True,
+        on_delete=models.CASCADE,
+        verbose_name='任务编号'
+    )
+
+    class Meta:
+        app_label = 'base'
+        db_table = 'base_random_check_enterprise_list'
+        verbose_name_plural = '随机抽查企业名单'
+
+    def __str__(self):
+        return self.enterprise_name

@@ -404,26 +404,22 @@ class InspectionDataUpload(Abstract):
                 old_inspection = Inspection.objects.filter(url=url)
 
                 if old_inspection.exists():
-                    old_inspections = Inspection.objects.using('hqi').get(url=url)
-                    print('1')
-                    old_inspections.title = title
-                    old_inspections.pubtime = pubtime
-                    old_inspections.source = source
-                    old_inspections.qualitied = qr(qualitied_patch, inspect_patch)
-                    old_inspections.unqualitied_patch = unqualitied_patch
-                    old_inspections.qualitied_patch = qualitied_patch
-                    old_inspections.inspect_patch = inspect_patch
-                    old_inspections.category = '' if not category else category
-                    old_inspections.level = new_level
-                    old_inspections.industry_id = industry_id
-                    old_inspections.product_name = product_name[0]
-                    old_inspections.origin_product = origin_product
-                    old_inspections.area_id = area[0].id
-                    old_inspections.status = 0
-                    print(old_inspections)
-
-                    for x in old_inspections:
-                        x.save()
+                    old_inspection = old_inspection[0]
+                    old_inspection.title = title
+                    old_inspection.pubtime = pubtime
+                    old_inspection.source = source
+                    old_inspection.qualitied = qr(qualitied_patch, inspect_patch)
+                    old_inspection.unqualitied_patch = unqualitied_patch
+                    old_inspection.qualitied_patch = qualitied_patch
+                    old_inspection.inspect_patch = inspect_patch
+                    old_inspection.category = '' if not category else category
+                    old_inspection.level = new_level
+                    old_inspection.industry_id = industry_id
+                    old_inspection.product_name = product_name[0]
+                    old_inspection.origin_product = origin_product
+                    old_inspection.area_id = area[0].id
+                    old_inspection.status = 0
+                    old_inspection.save()
 
                     dupli += 1
                     continue
@@ -557,16 +553,18 @@ class InspectionDataExport(Abstract):
     def export(self):
         filename = "inspections.xlsx"
 
-        inspections_fields = ('title', 'url', 'pubtime', 'category', 'level', 'source', 'area__name', 'product_name', 'inspect_patch',
-                              'qualitied_patch', 'unqualitied_patch', )
+        inspections_fields = ('title', 'url', 'pubtime', 'category', 'level', 'source', 'area__name', 'product_name',
+                            'inspect_patch', 'qualitied_patch', 'unqualitied_patch', 'qualitied', )
 
-        enterprises_fields = ('url', 'enterprises__name', 'enterprises__unitem', 'product_name', 'enterprises__area__name', )
+        enterprises_fields = ('url', 'enterprises__name', 'enterprises__unitem', 'product_name',
+                             'enterprises__area__name', 'source', )
 
         inspections = [
-            ['标题', '链接', '发布日期', '抽查类别', '抽查等级', '抽检单位', '地域', '产品名称', '抽查批次', '合格批次', '不合格批次', ]
+            ['标题', '链接', '发布日期', '抽查类别', '抽查等级', '抽检单位', '地域', '产品名称', '抽查批次', '合格批次',
+             '不合格批次', '合格率', ]
         ]
         enterprises = [
-            ['链接', '不合格企业', '不合格项', '产品名称', '不合格企业地域', ]
+            ['链接', '不合格企业', '不合格项', '产品名称', '不合格企业地域', '抽检单位', ]
         ]
 
         cond = {
@@ -605,6 +603,7 @@ class InspectionDataExport(Abstract):
                 q['inspect_patch'],
                 q['qualitied_patch'],
                 q['unqualitied_patch'],
+                q['qualitied'],
             ])
 
         for q in enterprises_list:
@@ -617,6 +616,7 @@ class InspectionDataExport(Abstract):
                     q['enterprises__unitem'],
                     q['product_name'],
                     q['enterprises__area__name'],
+                    q['source'],
                 ])
 
         # write file
