@@ -180,7 +180,7 @@ class DashboardData(Abstract):
 
 class V2Data(Abstract):
 
-    def __init__(self, params):
+    def __init__(self, params, user):
         self.user = user
         super(V2Data, self).__init__(params)
 
