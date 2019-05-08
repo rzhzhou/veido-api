@@ -9,7 +9,7 @@ from django.db.models import Count, Q, F, Max, Min
 from observer.base.models import(Area, Article, Category,
                                 CorpusCategories, HarmIndicator, Harm,
                                 HarmPeople, Events, EventsKeyword,
-                                EventsMedia, KeywordsStatistical)
+                                EventsMedia, KeywordsStatistical, HistoryIndustries)
 from django.contrib.auth.models import Group, User
 from observer.base.service.abstract import Abstract
 from observer.base.service.base import (areas, categories, )
@@ -184,9 +184,10 @@ class RiskData(Abstract):
         self.user = user
 
     def get_all(self):
-        fields = ('id', 'url', 'title', 'source', 'pubtime', 'score', 'status', 'corpus__keyword', 'industry__name',
-                 'industry__parent__name', 'harm__id' )
-
+        fields = ('id', 'url', 'title', 'source', 'pubtime', 'score', 'status', 'corpus__keyword', 'harm__id',
+            'new_industry_id__historyindustries__name', 'new_industry_id__historyindustries__year',
+            'new_industry_id__historyindustries__industry_id__parent_id__historyindustries__name',
+           )
         cond = {
             'pubtime__gte': getattr(self, 'starttime', None),
             'pubtime__lte': getattr(self, 'endtime', None),
@@ -198,10 +199,16 @@ class RiskData(Abstract):
             'areas': getattr(self, 'areas', None),
             'categories': getattr(self, 'category', None),
         }
-
+        # 接受前台传输年份，元组取值
+        year = getattr(self, 'year', None),
+        year = year[0]
+        if not year:
+            # 选取最大年份，排除由多个年份导致的数据重复
+            years = HistoryIndustries.objects.values_list('year', flat=True)
+            maxyear = max(list(set(years)))
+            year = maxyear
         args = dict([k, v] for k, v in cond.items() if v)
-        queryset = Article.objects.filter(**args)
-
+        queryset = Article.objects.filter(**args, new_industry_id__historyindustries__year=year, new_industry_id__historyindustries__industry_id__parent_id__historyindustries__year=year).filter(new_industry_id__gt=0)
         # 判断当前用户是否为武汉深度网科技有限公司成员，然后取出该用户管理的资料
         group_ids = Group.objects.filter(user=self.user).values_list('id', flat=True)
         if 4 in group_ids and 3 in group_ids:
