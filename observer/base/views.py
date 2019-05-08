@@ -32,7 +32,7 @@ from observer.base.service.base import (alias_industry, area, areas,
 from observer.base.service.corpus import (CategoryListData, CorpusAdd,
                                           CorpusData, CorpusDelete, CorpusEdit,
                                           CrawlerData)
-from observer.base.service.dashboard import DashboardData, V2Data
+from observer.base.service.dashboard import DashboardData, V2Data, dSonApiData
 from observer.base.service.desmon import (DMLinkAdd, DMLinkData, DMLinkDelete,
                                           DMLinkEdit, DMWordsData, DMWordsFocusData,
                                           DMWordsDelete, MonitorInformationData)
@@ -135,34 +135,118 @@ class DashboardView(BaseView):
 
 
 class V2View(BaseView):
+    
     def __init__(self):
         super(V2View, self).__init__()
-
+        
     def set_request(self, request):
+        self.user = request.user
         super(V2View, self).set_request(request)
 
-    def serialize(self, hotSpots, events):
+    def serialize(self, hotSpots, events, eventsChart, risknews, riskScore, riskLocal, inspections,
+                inspecNum, inspecPass, qualityBasis, safety, market, expertsView):
+
         data = {
             'hotSpots' : map(lambda h: {
+                'url': h['url'],
                 'title': h['title'],
                 'pubtime': date_format(h['pubtime'], '%Y-%m-%d %H:%M:%S'),
             }, hotSpots),
 
             'events' : map(lambda e: {
+                'id': e['id'],
                 'title': e['title'],
-                'socialHarm': e['socialHarm'],
+                'scope': e['scope'],
+                'grading': e['grading'],
                 'num_articles': e['num_articles'],
             }, events),
+
+            'eventsChart': eventsChart,
+
+            'risknews' : map(lambda r: {
+                'url': r['url'],
+                'title': r['title'],
+                'areas': areas(r['id']),
+                'pubtime': date_format(r['pubtime'], '%Y-%m-%d %H:%M:%S'),
+                'score': r['score'],
+                'local_related': local_related(r['id'], self.user), # 本地风险相关度
+            }, risknews),
+
+            'riskScore' : riskScore,
+
+            'riskLocal' : riskLocal,
+
+            'inspections' : map(lambda i: {
+                'industry': {'id': i['industry'], 'name': i['industry__name']},
+                'url': i['url'],
+                'source': i['source'],
+                'qualitied': qualitied(i['qualitied']),
+                'pubtime': date_format(i['pubtime'], '%Y-%m-%d %H:%M:%S'),
+                'product': i['product_name'],
+            }, inspections),
+
+            'inspecNum' : map(lambda i: {
+                'name': i['name'],
+            }, inspecNum),
+
+            'inspecPass' : inspecPass,
+
+            'qualityBasis' : qualityBasis,
+
+            'safety' : safety,
+
+            'market' : market,
+
+            'expertsView' : expertsView
+
         }
 
         return data
 
     def get(self, request):
         self.set_request(request)
+        dashboard = V2Data(params=request.query_params, user=request.user)
 
-        hotSpots = V2Data(params=request.query_params).hotSpots()
-        events = V2Data(params=request.query_params).events()
-        return Response(self.serialize(hotSpots, events))
+        hotSpots = dashboard.getHotSpots()
+        events = dashboard.getEvents()
+        eventsChart = dashboard.getEventsChart()
+        risknews = dashboard.getRisknews()
+        riskScore = dashboard.getRiskScore()
+        riskLocal = dashboard.getRiskLocal()
+        inspections = dashboard.getInspections()
+        inspecNum = dashboard.getInspecNum()
+        inspecPass = dashboard.getInspecPass()
+        qualityBasis = dashboard.getQualityBasis()
+        safety = dashboard.getSafety()
+        market = dashboard.getMarket()
+        expertsView = dashboard.getExpertsView()
+
+        return Response(self.serialize(hotSpots, events, eventsChart, risknews, riskScore, riskLocal,
+                    inspections, inspecNum, inspecPass, qualityBasis, safety, market, expertsView))
+
+
+class dSonApiView(BaseView):
+
+    def __init__(self):
+        super(dSonApiView, self).__init__()
+
+    def serialize(self, result):
+        data = {
+            'list': map(lambda q: {
+                'url': q['url'],
+                'title': q['title'],
+                'pubtime': q['pubtime'],
+                'category': q['categories__name'],
+            }, result),
+        }
+
+        return data
+        
+    def get(self, request):
+        result = dSonApiData(params=request.query_params).getData()
+
+        return Response(self.serialize(result))
+
 
 class ArticleView(BaseView):
     # 0001---质量热点
@@ -1489,8 +1573,10 @@ class RiskDataView(BaseView):
                 'source': x['source'],
                 'areas': areas(x['id']),
                 'keyword': '无' if not x['corpus__keyword'] else x['corpus__keyword'],
-                'industry_name': '无' if x['industry__name'] == 'None' else x['industry__name'],
-                'industry_parent_name': '无' if x['industry__name'] == 'None' else x['industry__parent__name'],
+                'industry_name': '无' if x['new_industry_id__historyindustries__name'] == None
+                    and x['new_industry_id__historyindustries__name'] == 'None' else x['new_industry_id__historyindustries__name'],
+                'industry_parent_name': '无' if x['new_industry_id__historyindustries__name'] == None
+                    and x['new_industry_id__historyindustries__name'] == 'None' else x['new_industry_id__historyindustries__industry_id__parent_id__historyindustries__name'],
                 'categories': categories(x['id'], admin=True),
                 'pubtime': date_format(x['pubtime'], '%Y-%m-%d %H:%M:%S'),
                 'status': x['status'],

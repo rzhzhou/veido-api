@@ -457,6 +457,21 @@ class Article(models.Model):
     def __str__(self):
         return self.title
 
+class ExpertsView(models.Model):
+    name = models.CharField(max_length=20, verbose_name='姓名')
+    portrait = models.ImageField(verbose_name='头像')
+
+    articles = models.ForeignKey(
+        Article,
+        null=True, blank=True,
+        on_delete=models.CASCADE,
+        verbose_name='文章-专家视点'
+    )
+
+    class Meta:
+        app_label = 'base'
+        verbose_name_plural = '专家视点'
+
 
 class Harm(models.Model):
     environment = models.IntegerField(null=True, verbose_name='发生时环境')
