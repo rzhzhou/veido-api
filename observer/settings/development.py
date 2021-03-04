@@ -48,10 +48,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_extensions',
 
-    'observer.base',
-    'observer.apps.hqi',
-    'observer.apps.officialsite',
-    'observer.apps.crawler',
+    'observer.apps.dyy',
 ]
 
 MIDDLEWARE = [
@@ -92,38 +89,11 @@ WSGI_APPLICATION = 'observer.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': 'gz-cdb-ko3zdkzs.sql.tencentcdb.com',
-        'NAME': 'observer',
-        'USER': 'shendu',
-        'PASSWORD': 'P@55word',
-        'PORT': 63440,
-        'OPTIONS': {'charset': 'utf8mb4'},
-    },
-    'crawler': {
-        'ENGINE': 'django.db.backends.mysql',
-        'HOST': 'gz-cdb-ko3zdkzs.sql.tencentcdb.com',
-        'NAME': 'crawler',
-        'USER': 'shendu',
-        'PASSWORD': 'P@55word',
-        'PORT': 63440,
-        'OPTIONS': {'charset': 'utf8mb4'},
-    },
-    'shendu': {
-        'ENGINE': 'django.db.backends.mysql',
-        'HOST': 'gz-cdb-ko3zdkzs.sql.tencentcdb.com',
-        'NAME': 'shendu',
-        'USER': 'shendu',
-        'PASSWORD': 'P@55word',
-        'PORT': 63440,
-        'OPTIONS': {'charset': 'utf8mb4'},
-    },
-    'hqi': {
-        'ENGINE': 'django.db.backends.mysql',
-        'HOST': 'gz-cdb-ko3zdkzs.sql.tencentcdb.com',
-        'NAME': 'hqi',
-        'USER': 'shendu',
-        'PASSWORD': 'P@55word',
-        'PORT': 63440,
+        'HOST': 'localhost',
+        'NAME': 'dyy',
+        'USER': 'root',
+        'PASSWORD': '123456',
+        'PORT': 3306,
         'OPTIONS': {'charset': 'utf8mb4'},
     },
 }
@@ -172,7 +142,7 @@ OAUTH2_PROVIDER = {
         'write': 'Write scope',
         'introspection': 'Introspect token scope',
     },
-    'ACCESS_TOKEN_EXPIRE_SECONDS': 86400,  # 1 Day.
+    'ACCESS_TOKEN_EXPIRE_SECONDS': 1 * 1 * 1 * 86400, # 1 Day.
 }
 
 JWT_AUTH = {
